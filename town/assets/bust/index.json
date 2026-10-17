@@ -1,0 +1,185 @@
+{
+ "version": 1,
+ "size": [
+  1024,
+  1280
+ ],
+ "expressions": [
+  "neutral",
+  "smile",
+  "angry",
+  "sad",
+  "surprised",
+  "blush"
+ ],
+ "alias": {
+  "normal": "neutral",
+  "happy": "smile",
+  "mad": "angry",
+  "cry": "sad",
+  "shock": "surprised",
+  "shy": "blush"
+ },
+ "chars": {
+  "hero": {
+   "name": "필멸자",
+   "side": "left",
+   "expr": {
+    "neutral": "hero/neutral.webp",
+    "smile": "hero/smile.webp",
+    "angry": "hero/angry.webp",
+    "sad": "hero/sad.webp",
+    "surprised": "hero/surprised.webp",
+    "blush": "hero/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "a_tailor": {
+   "name": "나비",
+   "side": "right",
+   "expr": {
+    "neutral": "a_tailor/neutral.webp",
+    "smile": "a_tailor/smile.webp",
+    "angry": "a_tailor/angry.webp",
+    "sad": "a_tailor/sad.webp",
+    "surprised": "a_tailor/surprised.webp",
+    "blush": "a_tailor/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "h_mystic": {
+   "name": "운",
+   "side": "right",
+   "expr": {
+    "neutral": "h_mystic/neutral.webp",
+    "smile": "h_mystic/smile.webp",
+    "angry": "h_mystic/angry.webp",
+    "sad": "h_mystic/sad.webp",
+    "surprised": "h_mystic/surprised.webp",
+    "blush": "h_mystic/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "g_dancer": {
+   "name": "방울",
+   "side": "right",
+   "expr": {
+    "neutral": "g_dancer/neutral.webp",
+    "smile": "g_dancer/smile.webp",
+    "angry": "g_dancer/angry.webp",
+    "sad": "g_dancer/sad.webp",
+    "surprised": "g_dancer/surprised.webp",
+    "blush": "g_dancer/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "f_diver": {
+   "name": "숨비",
+   "side": "right",
+   "expr": {
+    "neutral": "f_diver/neutral.webp",
+    "smile": "f_diver/smile.webp",
+    "angry": "f_diver/angry.webp",
+    "sad": "f_diver/sad.webp",
+    "surprised": "f_diver/surprised.webp",
+    "blush": "f_diver/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "e_tailor": {
+   "name": "루비",
+   "side": "right",
+   "expr": {
+    "neutral": "e_tailor/neutral.webp",
+    "smile": "e_tailor/smile.webp",
+    "angry": "e_tailor/angry.webp",
+    "sad": "e_tailor/sad.webp",
+    "surprised": "e_tailor/surprised.webp",
+    "blush": "e_tailor/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "c_priest": {
+   "name": "설화",
+   "side": "right",
+   "expr": {
+    "neutral": "c_priest/neutral.webp",
+    "smile": "c_priest/smile.webp",
+    "angry": "c_priest/angry.webp",
+    "sad": "c_priest/sad.webp",
+    "surprised": "c_priest/surprised.webp",
+    "blush": "c_priest/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  },
+  "d_yuna": {
+   "name": "유나",
+   "side": "right",
+   "expr": {
+    "neutral": "d_yuna/neutral.webp",
+    "smile": "d_yuna/smile.webp",
+    "angry": "d_yuna/angry.webp",
+    "sad": "d_yuna/sad.webp",
+    "surprised": "d_yuna/surprised.webp",
+    "blush": "d_yuna/blush.webp"
+   },
+   "source": {
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
+   }
+  }
+ }
+}

@@ -5,8 +5,8 @@ volume = `FEEL.sfxVol`, `?sfx=0` mutes, `?sfxdraft=0` = old built-in swings. Voi
 Built-in synth SFX (swing_light/heavy, hit_light/heavy/crit, kill, spin_dark, wave, ult_cutin, ult_boom) unchanged.
 
 Hooks with NO trigger yet (call them from the new code):
-- `SFX.ev.chargeLv1()` / `chargeLv2()` / `chargeRelease()` — charge attack (not in code yet)
-- `SFX.ev.dashAttack()` — fires on the roll->leap slash (swing with `leap`); a separate dash attack can call it directly
+- `SFX.ev.chargeLv1()` / `chargeLv2()` / `chargeRelease()` — charge attack: lv1 / lv2 reached while holding, charged slash released (town + world.js)
+- `SFX.ev.dashAttack()` — fires on the roll->leap slash (swing with `leap`) and the 돌진베기 dash attack (run + attack; town + world.js)
 - `SFX.ev.chest()` / `locked()` — town has no chests (world.js wired)
 - `SFX.ev.door()` / `warp()` — world.js only
 - `SFX.ev.ult(id)` — wired in town castUlt; world.js ult (gated by another worker) only plays the built-in cutin/boom: add `sfx('ult', U.id)`

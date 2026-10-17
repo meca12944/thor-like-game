@@ -1,27 +1,30 @@
-// [tachie] Japanese-game-style FULL-BODY dialogue portraits (visual-novel standing art).
-// Data: assets/tachie/index.json (made by tools/tachie/make_index.py; art = tools/tachie/*.js rendered by render.py).
+// [tachie] Japanese VN/JRPG-style UPPER-BODY BUST dialogue portraits (head to just below the waist).
+// Data: assets/bust/index.json + assets/bust/<id>/<expr>.webp|png, written by tools/import_bust.py from the illustrator's
+// docs_art/bust/<id>/<expr>.png (1024x1280 transparent). Temporary busts: tools/make_bust_temp.py (crop of the full-body art).
+// Layout: hero bottom-left, partner bottom-right, standing up from the screen bottom beside/behind the dialogue box.
 // Drawn on a separate DOM layer (#tachie) above the pixel canvas, at display resolution with smooth scaling
 // (the world canvas is nearest-scaled; this layer is not). Only CSS transform/opacity/filter animate -> GPU-composited, 60 fps.
 // Dialogue lines (TALK[id].lines[i]() in the main script) may return {who:'hero'|'<charId>'|'none', expr:'smile', t:'...'};
 // TALK[id].tachie = partner char id (defaults to TALK[id].por), TALK[id].expr = default expression. Unknown/missing expr -> neutral.
 (function(){
 'use strict';
-const BASE='assets/tachie/';
+const BASE='assets/bust/';
 let IDX=null;const ready=fetch(BASE+'index.json').then(r=>r.json()).then(j=>{IDX=j;}).catch(()=>{IDX={chars:{},expressions:[],alias:{}};});
-const css=`#tachie{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:strict}
-#tachie .ts{position:absolute;bottom:-2vh;height:min(96vh,2150px);aspect-ratio:750/2150;opacity:0;transform:translate3d(var(--off),0,0) scale(var(--sc,1));transform-origin:50% 100%;
- transition:opacity .24s ease,transform .32s cubic-bezier(.2,.8,.25,1),filter .22s ease;will-change:transform,opacity,filter;filter:brightness(1)}
-#tachie .ts.L{left:max(-2vh,calc(50% - 360px - 27vh));--off:-9vh}
-#tachie .ts.R{right:max(-2vh,calc(50% - 360px - 27vh));--off:9vh}
+// --bh = bust height; width follows the 1024x1280 canvas. The inner edge tucks ~22% of the bust behind the dialogue box sides.
+const css=`#tachie{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:strict;--bh:min(64vh,1280px,calc(42vw*1.25))}
+#tachie .ts{position:absolute;bottom:0;height:var(--bh);aspect-ratio:1024/1280;opacity:0;transform:translate3d(var(--off),var(--dy,0px),0) scale(var(--sc,1));transform-origin:50% 100%;
+ transition:opacity .24s ease,transform .32s cubic-bezier(.2,.8,.25,1),filter .22s ease;will-change:transform,opacity,filter;filter:brightness(1);z-index:1}
+#tachie .ts.L{left:max(-3vw,calc(50% - min(360px,46vw) - var(--bh)*.8*.78));--off:-10vh}
+#tachie .ts.R{right:max(-3vw,calc(50% - min(360px,46vw) - var(--bh)*.8*.78));--off:10vh}
 #tachie .ts.on{opacity:1;--off:0px}
-#tachie .ts.dim{filter:brightness(.6) saturate(.85);--sc:.975}
-#tachie .ts.talk{--sc:1.0}
+#tachie .ts.dim{filter:brightness(.55) saturate(.8);--sc:.965;--dy:1.2vh;z-index:0}
+#tachie .ts.talk{--sc:1;--dy:0px;z-index:2}
 #tachie .tb{position:absolute;inset:0;transform-origin:50% 100%;animation:tachieBreath 3.6s ease-in-out infinite;will-change:transform}
 #tachie .ts.R .tb{animation-delay:-1.7s}
 #tachie img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .14s linear;image-rendering:auto;-webkit-user-drag:none}
 #tachie img.cur{opacity:1}
-@keyframes tachieBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.003,1.009)}}
-@media (max-aspect-ratio:4/3){#tachie .ts{height:min(80vh,2150px)}}
+@keyframes tachieBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.012)}}
+@media (max-aspect-ratio:4/3){#tachie{--bh:min(50vh,calc(52vw*1.25))}}
 body.wscene #tachie{visibility:hidden}
 #dlg.tachie{z-index:2}`;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
@@ -32,11 +35,11 @@ function mkSlot(side){const s=document.createElement('div');s.className='ts '+si
 const SL={L:mkSlot('L'),R:mkSlot('R')};
 const cache={};
 function has(id){return !!(IDX&&IDX.chars[id]);}
-function normExpr(id,e){if(!has(id))return null;const C=IDX.chars[id];e=(IDX.alias&&IDX.alias[e])||e||'neutral';return C.expr[e]?e:'neutral';}
+function normExpr(id,e){if(!has(id))return null;const C=IDX.chars[id];e=(IDX.alias&&IDX.alias[e])||e||'neutral';return C.expr[e]?e:(C.expr.neutral?'neutral':Object.keys(C.expr)[0]);}
 function src(id,e){return BASE+IDX.chars[id].expr[normExpr(id,e)];}
 function preload(id){if(!has(id))return;for(const e in IDX.chars[id].expr){const u=src(id,e);if(!cache[u]){const im=new Image();im.decoding='async';im.src=u;cache[u]=im;if(im.decode)im.decode().catch(()=>{});}}}
 function setSlot(S,id,e,lit){if(!id){S.el.classList.remove('on','dim','talk');S.id=null;return;}
- e=normExpr(id,e);const C=IDX.chars[id];S.el.style.setProperty('--sc',lit?String(C.scale||1):String((C.scale||1)*.975));
+ e=normExpr(id,e);
  if(S.id!==id||S.expr!==e){const u=src(id,e),nx=1-S.cur,ni=S.imgs[nx],oi=S.imgs[S.cur];
   const swap=()=>{ni.classList.add('cur');oi.classList.remove('cur');S.cur=nx;};
   if(S.id!==id){oi.classList.remove('cur');oi.removeAttribute('src');}
@@ -46,7 +49,7 @@ function setSlot(S,id,e,lit){if(!id){S.el.classList.remove('on','dim','talk');S.
 function hide(){setSlot(SL.L,null);setSlot(SL.R,null);state.key=null;}
 const state={key:null,heroIn:false,heroExpr:'neutral',partner:null,partnerExpr:'neutral'};
 function evalLine(T,i){try{const L=T.lines[i]();return L&&typeof L==='object'?L:{t:L};}catch(e){return {t:''};}}
-// called after every renderUI(): reads the current dialogue line and updates the standing art
+// called after every renderUI(): reads the current dialogue line and updates the bust portraits
 function sync(){
  if(!IDX)return;
  if(typeof ui==='undefined'||ui!=='dialog'||typeof dlg==='undefined'||!dlg){if(state.key)hide();return;}
@@ -63,7 +66,7 @@ function sync(){
  else if(L.who&&has(L.who)){state.partner=L.who;state.partnerExpr=L.expr||'neutral';preload(L.who);}
  setSlot(SL.L,state.heroIn?'hero':null,state.heroExpr,who==='hero');
  setSlot(SL.R,state.partner,state.partnerExpr,who===state.partner);
- // small in-box portrait is replaced by the standing art for characters that have one
+ // small in-box portrait is replaced by the bust for characters that have one
  const de=document.getElementById('dlg');if(de){const shown=(who==='hero'&&state.heroIn)||(who&&who===state.partner);
   de.classList.toggle('tachie',!!(state.heroIn||state.partner));
   if(shown){const dp=de.querySelector('.dp');if(dp){dp.remove();de.classList.remove('hasp');}}}

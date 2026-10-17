@@ -1277,7 +1277,7 @@ function update(dt){
  // charge (모으기): keep holding attack after the swing -> lv1 / lv2; release fires the charged slash; dodge / skill / a flinching hit cancels it (super armor keeps it)
  if(!hero.charge&&hero.holdOk&&hero.holdT>tk(8)&&SWINGS[SP_I.c1]&&!hero.atk&&!hero.dash&&!hero.sk&&!hero.swim&&!uw&&!(hero.hurtT>0)&&!(hero.deadT>0)){const CF=spCfg(weaponType).charge;hero.charge={t:hero.holdT,lv:0,flash:0,mv:CF.moveMul||.4,anim:spAnim((CF.hold&&CF.hold.anim)||'@hit3',SWINGS),p:(CF.hold&&CF.hold.p)||.18};hero.run=false;}
  if(hero.charge){const C=hero.charge,CF=spCfg(weaponType).charge;C.t+=dt;if(C.flash>0)C.flash-=dt;const lv=C.t>=(CF.t2||1.2)?2:C.t>=(CF.t1||.6)?1:0;
-  if(lv>C.lv){C.lv=lv;C.flash=.25;SFX.play(lv>1?'ult_cutin':'hit_crit',lv>1?.4:.5,lv>1?1.9:1.7);spawnRing(hero.x,hero.y-40,6,lv>1?70:50,.3,lv>1?'255,214,110':'150,220,255',5,.6);burst(hero.x,hero.y-46,lv>1?14:8,lv>1?['#ffe08a','#fff']:['#aee8ff','#fff'],150,0,3,.4);}
+  if(lv>C.lv){C.lv=lv;C.flash=.25;if(Q.get('sfxdraft')==='0')SFX.play(lv>1?'ult_cutin':'hit_crit',lv>1?.4:.5,lv>1?1.9:1.7);else if(lv>1)SFX.ev.chargeLv2();else SFX.ev.chargeLv1();spawnRing(hero.x,hero.y-40,6,lv>1?70:50,.3,lv>1?'255,214,110':'150,220,255',5,.6);burst(hero.x,hero.y-46,lv>1?14:8,lv>1?['#ffe08a','#fff']:['#aee8ff','#fff'],150,0,3,.4);}
   if(Math.random()<(lv>1?.7:lv?.45:.2)){const an=Math.random()*Math.PI*2,d=34+Math.random()*14;parts.push({x:hero.x+Math.cos(an)*d,y:hero.y-44+Math.sin(an)*d*.8,vx:-Math.cos(an)*d*3.2,vy:-Math.sin(an)*d*2.6,g:0,t:0,life:.28,c:lv>1?'#ffe08a':lv?'#aee8ff':'#ffffff',s:3});}
   if(!hero.holdOk||hero.atk||hero.dash||hero.sk||hero.hurtT>0||hero.deadT>0){hero.charge=null;if(!hero.holdOk&&C.lv>0&&!hero.atk&&!hero.dash&&!hero.sk&&!(hero.hurtT>0)&&!(hero.deadT>0))startSwing(C.lv>1?SP_I.c2:SP_I.c1);}}
  const a=hero.atk,sk=hero.sk;
@@ -1285,7 +1285,7 @@ function update(dt){
   if(a.t<s.a1&&(s.lunge||a.runSlash)){const p=a.t/s.a1,f=((s.lunge||0)+(a.runSlash?60:0))/s.a1*2*(1-p);moveCol(hero,dv[0]*f*dt,dv[1]*f*dt*.8,12);} // eased forward step
   if(s.leap){const p=Math.min(1,a.t/s.a0);hero.z=Math.sin(p*Math.PI)*FEEL.leapHeight;
    if(p>=1&&!a.landed){a.landed=1;hero.z=0;spawnRing(hero.x,hero.y,6,80,.3,'255,240,200',6,.5);burst(hero.x,hero.y-4,12,['#e8dcc0','#fff'],160,400,4);}}
-  if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;if(s.titleSpin)SFX.play('spin_dark',1);else if(s.leap)SFX.ev.dashAttack();else if(Q.get('sfxdraft')==='0')SFX.play((s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);else SFX.ev.swing(weaponType,a.i,s.fin?1:.75);} // [sfx] per-weapon / per-step swing drafts (?sfxdraft=0 = old built-in)
+  if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;if(s.titleSpin)SFX.play('spin_dark',1);else if(s.leap||s.special==='dash')SFX.ev.dashAttack();else if(s.special==='c1'||s.special==='c2')SFX.ev.chargeRelease();else if(Q.get('sfxdraft')==='0')SFX.play((s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);else SFX.ev.swing(weaponType,a.i,s.fin?1:.75);} // [sfx] per-weapon / per-step swing drafts (?sfxdraft=0 = old built-in)
   if(s.titleSpin&&s.waves&&!a.waved&&a.t>=s.a0+tk(4)){a.waved=1;spawnWaves(s.waves);}
   if(s.wave&&!a.waved&&a.t>=s.a0){a.waved=1;spawnWaves(Object.assign({n:1,col:['255,214,110','120,80,10','255,255,255']},s.wave,{dir:Math.atan2(dv[1],dv[0]),dmg:ATK_DMG[0]*(s.wave.dmgMul||1)/DMG_UNIT}));} // charge lv2: forward sword wave
   if(a.t>=s.a0&&a.t<=s.a1){
@@ -1647,6 +1647,6 @@ Promise.all(jobs).then(()=>{
 <script src="title.js"></script><!-- [title] title screen + title BGM (town/title.js) -->
 <!-- [world] outside world: scene manager, Ys-style connected fields, dungeon, boss, minimap/map screen/route guide (world.js, world_mobs.js, world_nav.js, maps/*.json; see WORLD.md) -->
 <script src="world_mobs.js"></script><script src="world_nav.js"></script><script src="world.js"></script>
-<script src="tachie.js"></script><!-- [tachie] full-body dialogue portraits (town/tachie.js, assets/tachie) -->
+<script src="tachie.js"></script><!-- [tachie] upper-body bust dialogue portraits (town/tachie.js, assets/bust) -->
 </body>
 </html>
