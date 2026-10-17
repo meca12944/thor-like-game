@@ -1,0 +1,129 @@
+{
+ "version": 1,
+ "size": [
+  750,
+  2150
+ ],
+ "expressions": [
+  "neutral",
+  "smile",
+  "angry",
+  "sad",
+  "surprised",
+  "blush"
+ ],
+ "alias": {
+  "normal": "neutral",
+  "happy": "smile",
+  "mad": "angry",
+  "cry": "sad",
+  "shock": "surprised",
+  "shy": "blush"
+ },
+ "chars": {
+  "hero": {
+   "name": "필멸자",
+   "side": "left",
+   "scale": 1.03,
+   "expr": {
+    "neutral": "hero_neutral.png",
+    "smile": "hero_smile.png",
+    "angry": "hero_angry.png",
+    "sad": "hero_sad.png",
+    "surprised": "hero_surprised.png",
+    "blush": "hero_blush.png"
+   }
+  },
+  "a_tailor": {
+   "name": "나비",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "a_tailor_neutral.png",
+    "smile": "a_tailor_smile.png",
+    "angry": "a_tailor_angry.png",
+    "sad": "a_tailor_sad.png",
+    "surprised": "a_tailor_surprised.png",
+    "blush": "a_tailor_blush.png"
+   }
+  },
+  "h_mystic": {
+   "name": "운",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "h_mystic_neutral.png",
+    "smile": "h_mystic_smile.png",
+    "angry": "h_mystic_angry.png",
+    "sad": "h_mystic_sad.png",
+    "surprised": "h_mystic_surprised.png",
+    "blush": "h_mystic_blush.png"
+   }
+  },
+  "g_dancer": {
+   "name": "방울",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "g_dancer_neutral.png",
+    "smile": "g_dancer_smile.png",
+    "angry": "g_dancer_angry.png",
+    "sad": "g_dancer_sad.png",
+    "surprised": "g_dancer_surprised.png",
+    "blush": "g_dancer_blush.png"
+   }
+  },
+  "f_diver": {
+   "name": "숨비",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "f_diver_neutral.png",
+    "smile": "f_diver_smile.png",
+    "angry": "f_diver_angry.png",
+    "sad": "f_diver_sad.png",
+    "surprised": "f_diver_surprised.png",
+    "blush": "f_diver_blush.png"
+   }
+  },
+  "e_tailor": {
+   "name": "루비",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "e_tailor_neutral.png",
+    "smile": "e_tailor_smile.png",
+    "angry": "e_tailor_angry.png",
+    "sad": "e_tailor_sad.png",
+    "surprised": "e_tailor_surprised.png",
+    "blush": "e_tailor_blush.png"
+   }
+  },
+  "c_priest": {
+   "name": "설화",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "c_priest_neutral.png",
+    "smile": "c_priest_smile.png",
+    "angry": "c_priest_angry.png",
+    "sad": "c_priest_sad.png",
+    "surprised": "c_priest_surprised.png",
+    "blush": "c_priest_blush.png"
+   }
+  },
+  "d_yuna": {
+   "name": "유나",
+   "side": "right",
+   "scale": 1.0,
+   "expr": {
+    "neutral": "d_yuna_neutral.png",
+    "smile": "d_yuna_smile.png",
+    "angry": "d_yuna_angry.png",
+    "sad": "d_yuna_sad.png",
+    "surprised": "d_yuna_surprised.png",
+    "blush": "d_yuna_blush.png"
+   }
+  }
+ }
+}
