@@ -77,8 +77,8 @@ H(id='e_tailor',town='E',name='루비',role='외형상점 「불꽃 옷감」 �
   personality='도도하고 자신만만, 칭찬에 약하다. 실력을 인정한 상대에게만 존댓말을 버린다.',
   backstory='불사조 깃털로 「영원히 타지 않는 천」을 짜는 것이 일생의 목표. 화산 정상에 오를 동료를 찾고 있었다.',
   combat='중거리형. 불꽃 채찍 2연타, 화상 부여.',skill=dict(name='화염 고리',desc='주변 원형 불꽃, 2초 화상 (쿨 12초)'),hp=65,
-  outfit='검은 가죽 코르셋형 크롭 상의, 루비색 짧은 레이스 미니스커트, 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.',
-  visual_en='haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather corset crop top, short ruby lace mini skirt, flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe',
+  outfit='가슴 아래에서 끝나는 검은 가죽 크롭 뷔스티에(배 완전 노출), 몸에 딱 붙는 검은 가죽 H라인(펜슬) 미니스커트(허벅지 중간, 옆트임), 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.',
+  visual_en='haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather cropped bustier ending under the bust with fully bare midriff, tight black leather H-line pencil mini skirt (mid-thigh, side slit), flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe',
   likes=['불사조 깃털','흑요석'],dislikes=['물'],
   quests=[('타지 않는 실','용암 동굴에서 「화염 누에고치」 6개 — 루비 동행','호감도 +20, 금화 300'),
           ('불사조의 깃털','화산 중턱에서 불새 무리 처치 후 깃털 회수','호감도 +25, 외형 「불꽃 실크 망토」'),
@@ -92,8 +92,8 @@ H(id='c_priest',town='C',name='설화',role='눈의 신전 사제(성녀) · 서
   personality='온화하고 다정하지만 고집이 있다. 두려움을 숨기고 웃는다.',
   backstory='어린 시절 어둠 신전 사제들에게 납치될 뻔한 기억을 지녔다. 신전의 봉인을 지키는 마지막 성녀.',
   combat='후방 지원형. 서리 지팡이로 얼음 탄환.',skill=dict(name='눈꽃 축복',desc='주인공 HP 25% 회복 (쿨 20초)'),hp=55,
-  outfit='흰 털 장식 짧은 사제복 원피스(허벅지 위 길이, 어깨 노출), 하늘색 보석 비키니형 흉갑, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.',
-  visual_en='gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed off-shoulder priest dress above the thigh, ice-jewel bikini-style breastplate, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe',
+  outfit='흰 털 장식 짧은 크롭 상의(배 완전 노출)와 분리형 털 소매, 몸에 붙다가 밑단이 살짝 퍼지는 흰 머메이드 미니스커트(허벅지 중간), 하늘색 보석 장식, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.',
+  visual_en='gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed crop top with fully bare midriff, detached fur-trimmed sleeves, snug white mermaid-silhouette mini skirt flaring slightly at the mid-thigh hem, ice-jewel accents, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe',
   likes=['눈꽃 결정','따뜻한 수프'],dislikes=['어둠의 파편'],
   quests=[('얼어붙은 순례길','신전 순례길의 설인 무리 정리 — 설화 동행','호감도 +20, 회복약 3'),
           ('봉인의 종','설산 동굴의 「봉인의 종」 3개를 다시 울린다, 어둠 사제 처치','호감도 +25, 「성수」 2'),
@@ -138,3 +138,7 @@ COMPANION_RULE['portraits']=('대화 초상화: 1순위 `<id>_<expr>_bu.png` (19
   '작은 창은 `<id>_<expr>_bu_s.png` (96×128), 없으면 기존 `<id>_<expr>.png`/`<id>.png` (128×128 얼굴). 경로 town/assets/portraits/, 목록은 index.json의 expressions_bustup.')
 for _h in HEROINES:
     _h['portraits_bustup']={e:dict(large=f"{_h['id']}_{e}_bu.png",small=f"{_h['id']}_{e}_bu_s.png") for e in PORTRAIT_EXPRS}
+COMPANION_RULE['outfit_rule']=('성인 여성 의상 규칙: 상의는 배가 완전히 드러나는 짧은 크롭 탑 또는 비키니 탑만(원피스·코르셋·배를 덮는 상의 금지, 비노출). '
+ '하의 선택지: 짧은 주름 미니스커트, 비키니 하의/마이크로 비키니(축제 변형), **H라인(펜슬) 미니스커트**(몸에 딱 붙는 일자, 허벅지 중간), '
+ '**머메이드 미니스커트**(엉덩이까지 밀착, 허벅지 중간 밑단이 살짝 퍼짐). 적용: 루비=검은 가죽 H라인, 설화=흰 머메이드, 상인 미소=갈색 H라인, 책벌레 연=보라 H라인, 공주 세린=보라·금 머메이드. '
+ '참고 샘플: female_sample_hline_mermaid.jpg. 아이는 대상 아님.')

@@ -10,6 +10,7 @@
 - **affinity**: 호감도 0~100. 퀘스트 단계 완료 +15~25, 선물(취향 품목) +5~10 하루 1회, 싫어하는 선물 -5, 동행 중 쓰러뜨림 방치(귀환) -10. 선악 수치와 별개지만 아래 루트 규칙을 따른다.
 - **karma**: 선악이 「악명」 이하로 떨어지면 히로인별 반응(떠남/적대/잔류). 마왕 루트에서는 다른 성인 NPC와 마찬가지로 살해할 수 있으며, 살해 시 다시 되돌릴 수 없다.
 - **portraits**: 대화 초상화: 1순위 `<id>_<expr>_bu.png` (192×256 바스트업, 머리~허리, 대화창에서 1.5~2배 크게 표시 권장), 작은 창은 `<id>_<expr>_bu_s.png` (96×128), 없으면 기존 `<id>_<expr>.png`/`<id>.png` (128×128 얼굴). 경로 town/assets/portraits/, 목록은 index.json의 expressions_bustup.
+- **outfit_rule**: 성인 여성 의상 규칙: 상의는 배가 완전히 드러나는 짧은 크롭 탑 또는 비키니 탑만(원피스·코르셋·배를 덮는 상의 금지, 비노출). 하의 선택지: 짧은 주름 미니스커트, 비키니 하의/마이크로 비키니(축제 변형), **H라인(펜슬) 미니스커트**(몸에 딱 붙는 일자, 허벅지 중간), **머메이드 미니스커트**(엉덩이까지 밀착, 허벅지 중간 밑단이 살짝 퍼짐). 적용: 루비=검은 가죽 H라인, 설화=흰 머메이드, 상인 미소=갈색 H라인, 책벌레 연=보라 H라인, 공주 세린=보라·금 머메이드. 참고 샘플: female_sample_hline_mermaid.jpg. 아이는 대상 아님.
 
 | 호감도 | 보상 |
 |---|---|
@@ -145,7 +146,7 @@ _도도한 화산 마을 직조공. 불에 안 타는 채찍으로 싸운다._
 - 성격: 도도하고 자신만만, 칭찬에 약하다. 실력을 인정한 상대에게만 존댓말을 버린다.
 - 사연: 불사조 깃털로 「영원히 타지 않는 천」을 짜는 것이 일생의 목표. 화산 정상에 오를 동료를 찾고 있었다.
 - 전투: 중거리형. 불꽃 채찍 2연타, 화상 부여. / 스킬 「화염 고리」 주변 원형 불꽃, 2초 화상 (쿨 12초)
-- 의상: 검은 가죽 코르셋형 크롭 상의, 루비색 짧은 레이스 미니스커트, 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.
+- 의상: 가슴 아래에서 끝나는 검은 가죽 크롭 뷔스티에(배 완전 노출), 몸에 딱 붙는 검은 가죽 H라인(펜슬) 미니스커트(허벅지 중간, 옆트임), 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.
 - 선물: 좋아함 불사조 깃털, 흑요석 / 싫어함 물
 - 선악·마왕 루트: 악명: 「실망이야」 한마디로 상점 거래 거부. 마왕: 마왕군과 싸우다 적대, 살해 가능.
 - 표정 초상화: `e_tailor_normal.png`, `e_tailor_smile.png`, `e_tailor_angry.png`, `e_tailor_blush.png`
@@ -162,7 +163,7 @@ _도도한 화산 마을 직조공. 불에 안 타는 채찍으로 싸운다._
 | 60 | 듀오 합동기 「불꽃 회오리」: 화염 고리 + 주인공 회전베기 = 화염 소용돌이 |
 | 80 | 장면 「용암 강가의 밤」: 식은 용암 바위 위에서 완성한 천을 주인공 망토에 둘러 준다 |
 
-- Visual (EN): haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather corset crop top, short ruby lace mini skirt, flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe
+- Visual (EN): haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather cropped bustier ending under the bust with fully bare midriff, tight black leather H-line pencil mini skirt (mid-thigh, side slit), flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe
 - CG `workshop`: red bob haired woman in black corset crop top and ruby mini skirt weaving glowing fire cloth in a forge workshop
 - CG `lava night`: red-haired woman draping a shimmering flame cloak over the viewer beside a cooled lava river at night
 
@@ -174,7 +175,7 @@ _어둠 신전을 두려워하는 설산의 성녀. 유일한 치유형 동료._
 - 성격: 온화하고 다정하지만 고집이 있다. 두려움을 숨기고 웃는다.
 - 사연: 어린 시절 어둠 신전 사제들에게 납치될 뻔한 기억을 지녔다. 신전의 봉인을 지키는 마지막 성녀.
 - 전투: 후방 지원형. 서리 지팡이로 얼음 탄환. / 스킬 「눈꽃 축복」 주인공 HP 25% 회복 (쿨 20초)
-- 의상: 흰 털 장식 짧은 사제복 원피스(허벅지 위 길이, 어깨 노출), 하늘색 보석 비키니형 흉갑, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.
+- 의상: 흰 털 장식 짧은 크롭 상의(배 완전 노출)와 분리형 털 소매, 몸에 붙다가 밑단이 살짝 퍼지는 흰 머메이드 미니스커트(허벅지 중간), 하늘색 보석 장식, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.
 - 선물: 좋아함 눈꽃 결정, 따뜻한 수프 / 싫어함 어둠의 파편
 - 선악·마왕 루트: 악명: 신전에 틀어박혀 회복 서비스 거부. 마왕: 마지막 봉인을 지키며 적대(정화 마법이 마왕에게 추가 피해), 살해 가능.
 - 표정 초상화: `c_priest_normal.png`, `c_priest_smile.png`, `c_priest_angry.png`, `c_priest_blush.png`
@@ -191,7 +192,7 @@ _어둠 신전을 두려워하는 설산의 성녀. 유일한 치유형 동료._
 | 60 | 듀오 합동기 「성광 서리검」: 축복 후 주인공 검에 빙결 부여 10초 |
 | 80 | 장면 「눈꽃 축제 데이트」: 산장 앞 눈꽃 축제에서 따뜻한 수프를 나누며 걷기 |
 
-- Visual (EN): gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed off-shoulder priest dress above the thigh, ice-jewel bikini-style breastplate, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe
+- Visual (EN): gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed crop top with fully bare midriff, detached fur-trimmed sleeves, snug white mermaid-silhouette mini skirt flaring slightly at the mid-thigh hem, ice-jewel accents, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe
 - CG `temple`: ice-blue haired priestess in short white fur-trimmed dress praying in a snowy temple with glowing snowflakes
 - CG `snow festival`: ice-blue haired priestess holding a warm soup bowl at a snow festival with lanterns, blushing smile
 
