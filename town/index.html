@@ -99,6 +99,18 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 #qslot{position:fixed;left:14px;bottom:40px;width:46px;height:46px;background:#0a1028cc;border:3px solid var(--rc,#9aa0a8);box-shadow:0 0 0 2px #000;display:flex;align-items:center;justify-content:center}
 #qslot .cnt{position:absolute;right:2px;bottom:0;font:bold 12px monospace;color:#fff;text-shadow:1px 1px 0 #000,-1px -1px 0 #000}#qslot .qkey{position:absolute;left:-2px;top:-10px;font:bold 10px monospace;background:#0b0b14;color:#ffe08a;border:2px solid #e8d6b0;padding:0 3px}
 #qslot.zero{filter:grayscale(1) brightness(.6)}body.touch #qslot{display:none}
+/* ===== translucent windows (반투명창): one knob = --ui-alpha (panel opacity; 0.65 default, Esc menu → 창 투명도) ===== */
+:root{--ui-alpha:.65;--ui-bg:rgba(12,18,44,var(--ui-alpha));--ui-sub:rgba(8,12,32,calc(var(--ui-alpha)*.7));--ui-row:rgba(34,44,90,calc(var(--ui-alpha)*.75));--ui-gold:#e2c27a}
+#ov,#win{background:rgba(0,0,0,calc(var(--ui-alpha)*.18))}
+#ovp,#panel,#dlg{background:var(--ui-bg);border:3px double var(--ui-gold);box-shadow:0 0 0 1px #000c,inset 0 0 0 1px rgba(255,232,170,.28),inset 0 0 24px rgba(0,0,0,.35),0 6px 18px #0008;text-shadow:0 1px 2px #000,0 0 1px #000}
+#ovp:before,#panel:before,#dlg:before{content:'';position:absolute;inset:4px;border:1px solid rgba(226,194,122,.35);pointer-events:none}
+#ovp,#panel{position:relative}
+#dlg .dp{opacity:1;background:#0b0b14;border-color:var(--ui-gold)} /* speaker portrait stays fully opaque */
+.ws,.kc,#ovp .note,.inv>div,.tip,.cell,.cell.empty{background:var(--ui-sub)}
+.wi,.menu .mi,.tab,.row{background:var(--ui-row)}
+.wi.sel,.ws.sel,.menu .mi.sel,.tab.on,.row.sel,.kc.sel{background:rgba(60,72,130,calc(var(--ui-alpha)*.95))}
+#qslot{background:var(--ui-sub)}
+.menu .mi .ml{flex:1}
 </style>
 </head>
 <body>
@@ -308,26 +320,34 @@ function dialogNext(){if(!dlg)return;dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length
 // quick save (F5) — restored on the next load
 const LSQ='townDemo.quicksave';
 function quickSave(){if(uw||hero.swim||hero.sk||hero.dash){msg('지금은 저장할 수 없다',1);return;}
- const d={v:1,t:Date.now(),x:Math.round(hero.x),y:Math.round(hero.y),hp:hero.hp,inv:INV,gear:gearIdx};
+ const d={v:1,t:Date.now(),x:Math.round(hero.x),y:Math.round(hero.y),hp:hero.hp,inv:INV,gear:gearIdx,uiAlpha};
  try{localStorage.setItem(LSQ,JSON.stringify(d));}catch(e){msg('저장 실패',1);return;}
  const t=new Date(d.t);msg('빠른 저장 완료 · '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0'));}
 function loadQuick(){if(Q.has('nosave'))return false;try{const d=JSON.parse(localStorage.getItem(LSQ));if(!d||d.v!==1)return false;
- if(!blocked(d.x,d.y,12)){hero.x=d.x;hero.y=d.y;}hero.hp=Math.max(1,Math.min(hero.maxHp,d.hp|0));if(d.inv&&Array.isArray(d.inv.bag))INV=Object.assign(newInv(),d.inv);gearIdx=(d.gear|0)%GEARSETS.length;return true;}catch(e){return false;}}
+ if(!blocked(d.x,d.y,12)){hero.x=d.x;hero.y=d.y;}hero.hp=Math.max(1,Math.min(hero.maxHp,d.hp|0));if(d.inv&&Array.isArray(d.inv.bag))INV=Object.assign(newInv(),d.inv);gearIdx=(d.gear|0)%GEARSETS.length;if(d.uiAlpha)setUiAlpha(d.uiAlpha);return true;}catch(e){return false;}}
 
+
+// ---------- 창 투명도 (window transparency): --ui-alpha panel opacity, saved in localStorage + F5 quick save ----------
+const UI_ALPHA_DEFAULT=0.65,UI_TRANS_STEPS=[0,.2,.35,.5,.65]; // transparency steps (1 - opacity)
+let uiAlpha=UI_ALPHA_DEFAULT;
+function setUiAlpha(v,save=true){uiAlpha=Math.max(.3,Math.min(1,+v||UI_ALPHA_DEFAULT));document.documentElement.style.setProperty('--ui-alpha',uiAlpha.toFixed(2));if(save)try{localStorage.setItem('townDemo.uiAlpha',uiAlpha);}catch(e){}}
+function uiTransLabel(){return Math.round((1-uiAlpha)*100)+'%';}
+function stepUiAlpha(d){const t=1-uiAlpha;let i=UI_TRANS_STEPS.findIndex(x=>Math.abs(x-t)<.03);if(i<0)i=2;i=(i+d+UI_TRANS_STEPS.length)%UI_TRANS_STEPS.length;setUiAlpha(1-UI_TRANS_STEPS[i]);}
+try{const v=localStorage.getItem('townDemo.uiAlpha');setUiAlpha(v===null?UI_ALPHA_DEFAULT:v,false);}catch(e){setUiAlpha(UI_ALPHA_DEFAULT,false);}
 // ---------- overlays: menu / options (rebinding) / inventory / world map / dialog ----------
 let uiSel=0,optRow=0,optCol=0,optNote='';
 const ovEl=document.getElementById('ov'),ovp=document.getElementById('ovp'),dlgEl=document.getElementById('dlg');
 function openUI(name){releaseAll();if(winOpen)toggleWin(false);ui=name;uiSel=0;rebind=null;optNote='';if(name==='options'){optRow=0;optCol=0;}
  stick.id=null;stick.dx=stick.dy=0;stEl.style.display='none';renderUI();}
 function closeUI(){ui=null;rebind=null;dlg=null;ovEl.classList.remove('open');dlgEl.classList.remove('open');releaseAll();}
-const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모)',()=>{invTab=1;listSel=0;openUI('inv');}],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
-const MENU_KEY=['menu','','inventory','','','map','save',''];
+const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],[()=>`창 투명도: ${uiTransLabel()}  ◀ ▶`,()=>{stepUiAlpha(1);renderUI();}],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모)',()=>{invTab=1;listSel=0;openUI('inv');}],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
+const MENU_KEY=['menu','','','inventory','','','map','save',''];
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
 const kb=c=>`<kbd>${esc(keyName(c))}</kbd>`;
 function hintBar(parts){return `<div class="hb">${parts.map(([k,t])=>`<kbd>${esc(k)}</kbd> ${t}`).join(' · ')}</div>`;}
 function renderUI(){
  ovEl.classList.toggle('open',!!ui&&ui!=='dialog');ovp.classList.remove('wide');dlgEl.classList.toggle('open',ui==='dialog');
- if(ui==='menu'){ovp.innerHTML=`<h2>일시정지 · 메뉴</h2><div class="menu">${MENU.map(([t],i)=>`<div class="mi${i===uiSel?' sel':''}" data-i="${i}">${t}${MENU_KEY[i]?`<span class="mk">${esc(keyLabel(MENU_KEY[i],1))}</span>`:''}</div>`).join('')}</div>`+
+ if(ui==='menu'){ovp.innerHTML=`<h2>일시정지 · 메뉴</h2><div class="menu">${MENU.map(([t],i)=>`<div class="mi${i===uiSel?' sel':''}" data-i="${i}"><span class="ml">${typeof t==='function'?t():t}</span>${MENU_KEY[i]?`<span class="mk">${esc(keyLabel(MENU_KEY[i],1))}</span>`:''}</div>`).join('')}</div>`+
    hintBar([['↑/↓','선택'],[keyLabel('interact',1)+' · Enter','결정'],['Esc','계속하기']]);
   ovp.querySelectorAll('.mi').forEach(el=>el.onclick=()=>MENU[+el.dataset.i][1]());return;}
  if(ui==='options'){const cf=allConflicts();let h=`<h2>조작 설정 · 키 변경</h2><div class="sub">칸을 클릭하거나 방향키로 고른 뒤 Enter → 새 키를 누르세요. 행동마다 키 최대 ${MAXK}개 · 키보드 배치(한/영)와 상관없이 같은 자리 키로 인식합니다.</div><table class="km">`;
@@ -339,11 +359,13 @@ function renderUI(){
   h+=`</table><div class="note${/⚠|이미/.test(optNote)?' bad':''}">${optNote||(cf.length?'⚠ 충돌: '+cf.map(([c,x,y])=>keyName(c)+' = '+ACT[x].name+' / '+ACT[y].name).join(', '):'충돌 없음 ✓')}</div>`;
   h+=`<div class="row"><span class="btn" id="kreset">기본값으로 되돌리기</span><span class="btn" id="kback">← 메뉴로</span></div>`;
   h+=`<div class="sub" style="margin-top:8px">데모 광역 스킬 (${esc(keyLabel('area',1))}): ${[['','없음'],['chan','일월식 (찬검)'],['dk','멸계강림 (마왕)']].map(([m,t])=>`<span class="btn sm${areaMode===m?' on':''}" data-area="${m}">${t}</span>`).join(' ')}</div>`;
+  h+=`<div class="sub">창 투명도: ${UI_TRANS_STEPS.map(t=>`<span class="btn sm${Math.abs(1-uiAlpha-t)<.03?' on':''}" data-ua="${t}">${t?Math.round(t*100)+'%':'불투명'}</span>`).join(' ')}</div>`;
   h+=`<div class="sub">게임패드: ${padName?esc(padName)+' 연결됨':'없음'} (A 공격 · B 대시 · X 상호작용 · Y 물약 · LB/RB/RT 스킬 1/2/3 · LT 광역 · R3 잠수 · L3 대상 · Back 스킬창 · Start 메뉴)</div>`;
   h+=hintBar([['↑↓←→','칸 이동'],['Enter','키 변경'],['Backspace/Del','키 지우기'],['R','기본값'],['Esc','뒤로']]);
   ovp.innerHTML=h;
   ovp.querySelectorAll('.kc').forEach(el=>el.onclick=()=>{optRow=+el.dataset.r;optCol=+el.dataset.c;startRebind();});
   document.getElementById('kreset').onclick=resetKeys;document.getElementById('kback').onclick=()=>openUI('menu');
+  ovp.querySelectorAll('[data-ua]').forEach(el=>el.onclick=()=>{setUiAlpha(1-(+el.dataset.ua));renderUI();});
   ovp.querySelectorAll('[data-area]').forEach(el=>el.onclick=()=>{setAreaMode(el.dataset.area);renderUI();});
   const cur=ovp.querySelector('.kc.sel');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest'});return;}
  if(ui==='inv'){renderInv();return;}
@@ -360,6 +382,7 @@ function uiKey(code,act){
  if(ui==='dialog'){if(act==='interact'||act==='attack'||code==='Space'||code==='Enter')dialogNext();return;}
  if(ui==='menu'){if(code==='ArrowUp'||act==='up'){uiSel=(uiSel+MENU.length-1)%MENU.length;renderUI();}
   else if(code==='ArrowDown'||act==='down'){uiSel=(uiSel+1)%MENU.length;renderUI();}
+  else if((code==='ArrowLeft'||code==='ArrowRight'||act==='left'||act==='right')&&typeof MENU[uiSel][0]==='function'){stepUiAlpha(code==='ArrowLeft'||act==='left'?-1:1);renderUI();}
   else if(code==='Enter'||code==='Space'||act==='interact'||act==='attack')MENU[uiSel][1]();
   else if(act&&act!=='up'&&act!=='down'&&act!=='left'&&act!=='right'&&['inventory','map','save'].includes(act)){closeUI();doAction(act);}
   return;}
@@ -1176,7 +1199,7 @@ Promise.all(jobs).then(()=>{
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
  window.__game={hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
-  setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
+  setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
  setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0},5000);
  requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame);});
