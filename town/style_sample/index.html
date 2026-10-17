@@ -1,0 +1,74 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Art-style sample - painted town + HD pixel sprites</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}canvas{display:block}</style></head><body>
+<canvas id="cv"></canvas>
+<script>
+// STYLE SAMPLE (standalone, does not touch the live game).
+// Layers:  1) painted background drawn at SCREEN resolution with smoothing (no pixel grid at all)
+//          2) soft contact shadows at screen resolution
+//          3) pixel-art sprites on a 768x432 logical buffer (2x the game's 384x216, 32px tiles),
+//             presented "sharp-bilinear": nearest-upscale to the next integer factor, then one smooth
+//             downscale to the window -> square, even pixels at any window size (e.g. 1920x1080 = 2.5x)
+// World units = px of the 1280x720 painting (same 1280x720 world as town A).  LSC = logical px per world px.
+const VIEW={logicalW:768,logicalH:432,tile:32}, WW=1280, WH=720, LSC=VIEW.logicalW/WW;
+const Q=new URLSearchParams(location.search);
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const lc=document.createElement('canvas');lc.width=VIEW.logicalW;lc.height=VIEW.logicalH;const lctx=lc.getContext('2d');
+const up=document.createElement('canvas'),uctx=up.getContext('2d');
+let showFps=Q.has('fps'),fpsVal=0,frameMs=0,manual=false;
+const IM={},J={};let ready=false;
+function load(){const imgs=[['bg','assets/bg_town_painted.jpg'],['hero','assets/hero_hd.png'],['fem','assets/fem_hd.png']];
+ return Promise.all([...imgs.map(([k,s])=>new Promise(r=>{const i=new Image();i.onload=()=>{IM[k]=i;r()};i.src=s;})),
+  ...['hero_hd','fem_hd'].map(k=>fetch('assets/'+k+'.json').then(r=>r.json()).then(j=>J[k]=j))]);}
+// hero walks a loop around the fountain (world coords)
+const PATH=[[630,600],[860,600],[860,232],[400,232],[400,600]];
+const hero={x:630,y:600,px:630,py:600,seg:0,dir:'right',flip:false,t:0,speed:150,walking:true};
+const npcs=[{x:1010,y:455,img:'fem',json:'fem_hd',t:0}];
+const extra=+(Q.get('stress')||0); // ?stress=N adds N extra walking sprites to measure headroom
+for(let i=0;i<extra;i++)npcs.push({x:300+Math.random()*700,y:250+Math.random()*350,img:i%2?'fem':'hero',json:i%2?'fem_hd':'hero_hd',t:Math.random()*9,wander:true,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*80});
+function step(dt){hero.px=hero.x;hero.py=hero.y;hero.t+=dt;
+ const n=PATH[(hero.seg+1)%PATH.length],dx=n[0]-hero.x,dy=n[1]-hero.y,d=Math.hypot(dx,dy),s=hero.speed*dt;
+ if(Math.abs(dx)>Math.abs(dy)){hero.dir='right';hero.flip=dx<0;}else{hero.dir=dy>0?'down':'up';hero.flip=false;}
+ if(d<=s){hero.x=n[0];hero.y=n[1];hero.seg=(hero.seg+1)%PATH.length;}else{hero.x+=dx/d*s;hero.y+=dy/d*s;}
+ for(const m of npcs){m.px=m.x;m.py=m.y;m.t+=dt;if(m.wander){m.x+=m.vx*dt;m.y+=m.vy*dt;if(m.x<250||m.x>1000)m.vx*=-1;if(m.y<240||m.y>620)m.vy*=-1;}}}
+let shadowC=null;function mkShadow(){shadowC=document.createElement('canvas');shadowC.width=128;shadowC.height=64;const g=shadowC.getContext('2d'),r=g.createRadialGradient(64,32,4,64,32,62);
+ r.addColorStop(0,'rgba(30,22,10,.7)');r.addColorStop(.6,'rgba(30,22,10,.36)');r.addColorStop(1,'rgba(30,22,10,0)');g.fillStyle=r;g.save();g.scale(1,.5);g.fillRect(0,0,128,128);g.restore();}
+let k=1,ki=1,offX=0,offY=0,dw=0,dh=0;
+function resize(){cv.width=innerWidth;cv.height=innerHeight;k=Math.min(cv.width/VIEW.logicalW,cv.height/VIEW.logicalH);ki=Math.ceil(k-1e-6);
+ dw=Math.round(VIEW.logicalW*k);dh=Math.round(VIEW.logicalH*k);offX=(cv.width-dw)>>1;offY=(cv.height-dh)>>1;up.width=VIEW.logicalW*ki;up.height=VIEW.logicalH*ki;}
+addEventListener('resize',resize);
+addEventListener('keydown',e=>{if(e.code==='F3'){showFps=!showFps;e.preventDefault();}});
+function cellOf(j,anim,f){const c=J[j].cells[anim];return c[f%c.length];}
+function drawSprite(img,j,anim,f,wx,wy,flip,list){const c=cellOf(j,anim,f);list.push({img,c,wx,wy,flip});}
+function render(a){
+ ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);
+ ctx.drawImage(IM.bg,offX,offY,dw,dh);                                     // 1) painting, screen res
+ const S=dw/WW,list=[];
+ const hx=hero.px+(hero.x-hero.px)*a,hy=hero.py+(hero.y-hero.py)*a;
+ const n=J.hero_hd.cells[hero.dir].length,f=Math.floor(hero.t*60/(hero.dir==='right'?7:9))%n;
+ drawSprite(IM.hero,'hero_hd',hero.dir,f,hx,hy,hero.flip,list);
+ for(const m of npcs){const mx=m.px+(m.x-m.px)*a,my=m.py+(m.y-m.py)*a;
+  if(m.wander){const d=Math.abs(m.vx)>Math.abs(m.vy)&&m.json==='hero_hd'?'right':'down';const nn=J[m.json].cells[d].length;drawSprite(IM[m.img],m.json,d,Math.floor(m.t*60/8)%nn,mx,my,m.vx<0,list);}
+  else drawSprite(IM[m.img],m.json,'down',1,mx,my,false,list);}            // idle NPC: standing frame
+ list.sort((p,q)=>p.wy-q.wy);
+ for(const s of list){const w=s.c[2]*1.15/LSC*S;ctx.drawImage(shadowC,offX+s.wx*S-w/2,offY+(s.wy+2)*S-w*.16,w,w*.32);} // 2) soft shadows
+ lctx.clearRect(0,0,lc.width,lc.height);lctx.imageSmoothingEnabled=false;  // 3) sprites on logical grid (integer px)
+ for(const s of list){const[x,y,w,h,ax,ay]=s.c;const lx=Math.round(s.wx*LSC),ly=Math.round(s.wy*LSC);
+  if(s.flip){lctx.save();lctx.translate(lx*2,0);lctx.scale(-1,1);}
+  lctx.drawImage(s.img,x,y,w,h,lx-ax,ly-ay,w,h);if(s.flip)lctx.restore();}
+ uctx.imageSmoothingEnabled=false;uctx.clearRect(0,0,up.width,up.height);uctx.drawImage(lc,0,0,up.width,up.height);
+ ctx.imageSmoothingEnabled=(ki!==k);ctx.drawImage(up,offX,offY,dw,dh);
+ if(showFps){ctx.font='bold 16px monospace';ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(8,8,330,48);ctx.fillStyle='#9f9';
+  ctx.fillText(`FPS ${fpsVal.toFixed(1)}  frame ${frameMs.toFixed(2)} ms`,16,28);ctx.fillText(`logical ${VIEW.logicalW}x${VIEW.logicalH}  x${k.toFixed(2)}  sprites ${list.length}`,16,48);}}
+let acc=0,last=0,fc=0,ft=0,msAcc=0;const DT=1/60;
+const stats={frames:0,sumDt:0,maxDt:0,dts:[],workMs:[]};
+function frame(t){const now=t/1000;if(!last)last=now;let d=Math.min(.25,now-last);last=now;
+ if(!manual){acc+=d;while(acc>=DT){step(DT);acc-=DT;}}
+ const t0=performance.now();render(manual?1:acc/DT);const w=performance.now()-t0;msAcc+=w;
+ fc++;ft+=d;if(ft>=.5){fpsVal=fc/ft;frameMs=msAcc/fc;fc=0;ft=0;msAcc=0;}
+ if(stats.rec){stats.dts.push(d*1000);stats.workMs.push(w);}
+ requestAnimationFrame(frame);}
+window.__ss={stats,get ready(){return ready},setManual(v){manual=v},advance(s){for(let i=0;i<Math.round(s*60);i++)step(DT);},hero,
+ startRec(){stats.dts=[];stats.workMs=[];stats.rec=true},stopRec(){stats.rec=false;const a=stats.dts.slice(1),n=a.length,s=a.reduce((p,q)=>p+q,0);const w=stats.workMs;
+  return{frames:n,avgFps:1000*n/s,p99ms:a.slice().sort((p,q)=>p-q)[Math.floor(n*.99)],maxMs:Math.max(...a),longFrames:a.filter(x=>x>20).length,renderAvgMs:w.reduce((p,q)=>p+q,0)/w.length,renderMaxMs:Math.max(...w)}}};
+load().then(()=>{mkShadow();resize();ready=true;requestAnimationFrame(frame);});
+</script></body></html>
