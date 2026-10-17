@@ -38,8 +38,8 @@ def nm(i,kind):
     return e['name'],f"[{SLOTN[e['slot']]}] {st}{(' · '+ef) if ef else ''} — {e['visual']['look']}"
 # ---- TOWNS.md
 L=['# 마을 설계서 (8개 마을)','',
- '> 원본 데이터: `data/towns.json` (생성기: `tools/towns_data.py` → `tools/gen_docs.py`). 장비 외형은 [EQUIPMENT.md](EQUIPMENT.md), 강화·리스폰은 [SYSTEMS.md](SYSTEMS.md) 참고.',
- '> 지도: `world_map_v4.jpg` / 번호판 `world_map_v4_numbered.png` (빨강 1~10 = 지역, 파랑 A~H = 마을; 좌표는 1024 폭 기준).','',
+ '> 원본 데이터: `data/towns.json` (생성기: `tools/design/towns_data.py` → `tools/design/gen_docs.py`). 장비 외형은 [EQUIPMENT.md](EQUIPMENT.md), 강화·리스폰은 [SYSTEMS.md](SYSTEMS.md) 참고.',
+ '> 지도: `world_map_v4.jpg` / 번호판 `maps/world_map_v4_numbered.png` (빨강 1~10 = 지역, 파랑 A~H = 마을; 좌표는 1024 폭 기준).','',
  '## 진행 순서와 마을 도착 시점','',
  '| 순서 | 지역 | 직전 거점 마을 |','|---|---|---|',
  '| 프롤로그 | — | A 시작 마을 |','| 1 | 시작의 숲 | A |','| 2 | 수정 동굴 | B → H (1지역 후) |','| 3 | 모래 사막 | G (2지역 후) |','| 4 | 피라미드 | G |',
