@@ -15,7 +15,7 @@
 | 무기 | 30 | art/items weapons_1~3 (5×2, ITEMS.md 순서) |
 | 방어구 | 30 | armor_1~3 |
 | 보조무기 | 30 | offhand_1~3 |
-| 숨겨진 전설검 | 3 | hidden_swords.jpg (탁검 · 규검), chan_sword.jpg (찬검) — 어두운 배경 키잉, 45° 회전 |
+| 숨겨진 전설검 | 3 | hidden_swords.jpg (탁블레이드 · 규블레이드), chan_sword.jpg (찬블레이드) — 어두운 배경 키잉, 45° 회전 |
 | 소모품 | 60 | sheets/cons_1~3 (카탈로그 순서) |
 | 재료 | 172 | sheets/mat_1~7 — 고유 135 (완성 두루마리 포함) + 파생 37 |
 | UI | 3 | 금화 · 가방 · 대장간 (mat_7 #18~20) |
@@ -179,9 +179,9 @@
 | 87 | `o_shadow_kunai` | 그림자 표창 | 보조무기 | legendary | src/items/offhand_3.jpg#7 |
 | 88 | `o_void_ring` | 공허의 반지 | 보조무기 | legendary | src/items/offhand_3.jpg#8 |
 | 89 | `o_dragon_eye` | 마룡의 눈 | 보조무기 | legendary | src/items/offhand_3.jpg#9 |
-| 90 | `hs_tak` | 탁검 | 숨겨진 전설검 | unique | src/items/hidden_swords.jpg |
-| 91 | `hs_gyu` | 규검 | 숨겨진 전설검 | unique | src/items/hidden_swords.jpg |
-| 92 | `hs_chan` | 찬검 | 숨겨진 전설검 | unique | src/items/chan_sword.jpg |
+| 90 | `hs_tak` | 탁블레이드 | 숨겨진 전설검 | unique | src/items/hidden_swords.jpg |
+| 91 | `hs_gyu` | 규블레이드 | 숨겨진 전설검 | unique | src/items/hidden_swords.jpg |
+| 92 | `hs_chan` | 찬블레이드 | 숨겨진 전설검 | unique | src/items/chan_sword.jpg |
 | 93 | `herb_red` | 빨간 약초 | 소모품 | common | src/icons/cons_1.jpg#0 |
 | 94 | `potion` | 회복약 | 소모품 | common | src/icons/cons_1.jpg#1 |
 | 95 | `potion_m` | 중급 회복약 | 소모품 | common | src/icons/cons_1.jpg#2 |

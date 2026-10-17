@@ -820,7 +820,7 @@
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }
     if (m.type !== 'world') drawFieldUlt(k, ox, oy, SW, SH);
   }
-  // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬검·해동), same cut-in timing,
+  // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬블레이드·해동), same cut-in timing,
   // world frozen + hero invulnerable for the whole move, damage to every enemy on screen. Consumes the full gauge (template ULT_CFG / addUlt).
   const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 }; // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }

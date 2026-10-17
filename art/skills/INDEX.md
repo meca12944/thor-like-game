@@ -37,6 +37,6 @@
 | skills_10.png | 2 | `dk_abyss_grasp` | 심연의 촉수 | 마왕 전용 · 2칸 |
 | skills_11.png | 1 | `dk_horn_roar` | 뿔관의 포효 | 마왕 전용 · 3칸 |
 | skills_11.png | 2 | `dk_world_end` | 멸계강림 | 마왕 · 맵 전체 스킬 (4칸) |
-| skills_hidden_swords.png | 1 | `hs_sun` | 천일섬 | 탁검 (황금 태양검) |
-| skills_hidden_swords.png | 2 | `hs_moon` | 월영참 | 규검 (푸른 달검) |
-| skills_hidden_swords.png | 3 | `hs_eclipse` | 일월식 | 찬검 (일월 융합검) |
+| skills_hidden_swords.png | 1 | `hs_sun` | 천일섬 | 탁블레이드 (황금 태양검) |
+| skills_hidden_swords.png | 2 | `hs_moon` | 월영참 | 규블레이드 (푸른 달검) |
+| skills_hidden_swords.png | 3 | `hs_eclipse` | 일월식 | 찬블레이드 (일월 융합검) |

@@ -183,7 +183,7 @@ def tsrc(d):
 I=['# 아이템 카탈로그','',f"> 데이터: `data/towns.json` → `catalog`. 생성기가 개수를 검사한다 (무기 {COUNTS['weapon']} / 방어구 {COUNTS['armor']} (몸 {COUNTS['armor_body']} + 투구 {COUNTS['armor_helmet']}) / 보조무기 {COUNTS['offhand']} / 소모품 {COUNTS['consumable']}).",
  f"> 장비 {len(EQUIP_ITEMS)}종 중 상점 판매 {COUNTS['shop_equipment']}종, 희귀 드롭(보스·챔피언·퀘스트·잠수) {COUNTS['rare_equipment']}종. 티어 1~10 ≈ 지역 번호. 외형 레이어는 [EQUIPMENT.md](EQUIPMENT.md), 강화는 [SYSTEMS.md](SYSTEMS.md).",
  "> 판매: 상점 NPC의 「판매」 탭에서만 (구매가의 50%, 아이템별 `sell`; 장착 중인 장비는 해제 후). 규칙은 [CRAFTING.md](CRAFTING.md).",
- "> 희귀도 별 (아이콘 구석의 작은 별): 일반 없음 · 고급 ★ · 희귀 ★★ · 영웅 ★★★ · 전설·유일 ★★★★ (숨겨진 전설검 탁검·규검·찬검) · 타락 ★★★. 설정은 데모의 `RARITY_STARS` 한 곳.",'']
+ "> 희귀도 별 (아이콘 구석의 작은 별): 일반 없음 · 고급 ★ · 희귀 ★★ · 영웅 ★★★ · 전설·유일 ★★★★ (숨겨진 전설검 탁블레이드·규블레이드·찬블레이드) · 타락 ★★★. 설정은 데모의 `RARITY_STARS` 한 곳.",'']
 for c,title in [('weapon','무기 (30)'),('armor','방어구 (30)'),('offhand','보조무기 (30)')]:
     I+=[f"## {title}",'','| ID | 이름 | 종류 | 티어 | 능력치 | 출처 | 스프라이트 · 팔레트 | 외형 |','|---|---|---|---|---|---|---|---|']
     for e in sorted([e for e in EQUIP_ITEMS if cat(e)==c],key=lambda e:(e['tier'],e['source']['type']!='shop',e['id'])):
@@ -524,10 +524,10 @@ for line in _T:
         if line.startswith(f"- **폐허판 (마왕의 길)**: 「{t['raze']['ruined_name']}」"):
             for h in HIDDEN_SWORDS:
                 if h['where'].startswith(t['id']+' '):
-                    _X.append(f"- **숨겨진 전설검**: {h['name']} — {h['chest'] if h['id']!='hs_chan' else '마스터 대장간에서 탁검+규검 융합'} 조건: {h['unlock']} (영웅의 길 전용, ITEMS.md)")
+                    _X.append(f"- **숨겨진 전설검**: {h['name']} — {h['chest'] if h['id']!='hs_chan' else '마스터 대장간에서 탁블레이드+규블레이드 융합'} 조건: {h['unlock']} (영웅의 길 전용, ITEMS.md)")
 DOCS['TOWNS.md']=_X
 R=DOCS['STORY.md']; j=R.index('## 엔딩')
-R[j:j]=['## 숨겨진 전설검 (영웅의 길 보상)','',f"- 탁검: 마을 강자 8명을 모두 살리면 A 연못의 열리지 않는 상자가 열린다. 규검: 보스 10마리를 모두 쓰러뜨리고 잠수 능력을 얻으면 H 지하 수원의 상자가 열린다. 둘을 E 마스터 대장간에서 융합하면 찬검, 고유 광역 스킬 「일월식」.",f"- {HIDDEN_SWORD_RULE['hero_only']}",'']
+R[j:j]=['## 숨겨진 전설검 (영웅의 길 보상)','',f"- 탁블레이드: 마을 강자 8명을 모두 살리면 A 연못의 열리지 않는 상자가 열린다. 규블레이드: 보스 10마리를 모두 쓰러뜨리고 잠수 능력을 얻으면 H 지하 수원의 상자가 열린다. 둘을 E 마스터 대장간에서 융합하면 찬블레이드, 고유 광역 스킬 「일월식」.",f"- {HIDDEN_SWORD_RULE['hero_only']}",'']
 
 # ---------------- EQUIPMENT.md: 주인공 외형 · 페이퍼돌 매핑 · 숨겨진 검
 E=DOCS['EQUIPMENT.md']

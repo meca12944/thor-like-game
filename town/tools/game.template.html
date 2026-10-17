@@ -239,13 +239,13 @@ function expOf(m){const L=LEVELS&&LEVELS.demo_exp;return m.kind==='boar'?(L?L.ch
 // ---- karma title (칭호): 필멸자 / 영웅 / 타락한 필멸자 / 마왕. Picks the 필살기 and the 마왕 combo override (ANIM.titleCombo). Demo: ?title=마왕 or T key cycles.
 const TITLES=['필멸자','영웅','타락한 필멸자','마왕'];
 let title=(()=>{const q=Q.get('title');if(TITLES.includes(q))return q;try{const v=localStorage.getItem('townDemo.title');if(TITLES.includes(v))return v;}catch(e){}return '필멸자';})();
-// ---- 필살기 (full-screen ultimates). Editable data: name, route, damage, hits timing (sec into the effect), colours. Selected by ultId(): 찬검 equipped > 마왕 title > everyone else.
+// ---- 필살기 (full-screen ultimates). Editable data: name, route, damage, hits timing (sec into the effect), colours. Selected by ultId(): 찬블레이드 equipped > 마왕 title > everyone else.
 const ULTS={
  tenkou:{id:'tenkou',name:'천광낙뢰',en:'Heavenfall Thunder',route:'영웅 · 필멸자',dmg:8,hitT:[.35,.65,.95,1.25],bossMul:.5,superArmor:true,por:'hero',
   band:'#ffe9a8',tint:'255,240,190',col:['255,250,220','255,214,90','160,220,255'],shake:10,dur:1.7},
  metsukai:{id:'metsukai',name:'멸계강림',en:'Descent of World\'s End',route:'마왕',dmg:10,hitT:[.4,.75,1.1,1.45],bossMul:.5,superArmor:true,por:'hero_demon_king',
   band:'#ff3a4a',tint:'60,0,10',col:['255,40,60','120,0,20','255,150,110'],shake:12,dur:1.9},
- chan:{id:'chan',name:'찬검·해동',en:'Radiant Blade: Thaw of Dawn',route:'찬검',dmg:9,hitT:[.3,.55,.8,1.05,1.3],bossMul:.5,superArmor:true,por:'hero',
+ chan:{id:'chan',name:'찬블레이드·해동',en:'Radiant Blade: Thaw of Dawn',route:'찬블레이드',dmg:9,hitT:[.3,.55,.8,1.05,1.3],bossMul:.5,superArmor:true,por:'hero',
   band:'#bfe8ff',tint:'10,20,50',col:['255,255,255','150,220,255','255,226,140'],shake:11,dur:1.8}};
 const ULT_CFG={max:100,gainHurt:.5,gainPerfect:8,freeze:.2,cutin:1.05}; // 필살기 게이지 (max 100): 적에게 맞으면 차오르고 (받은 피해 1HP당 +0.5), 저스트 회피에 성공하면 크게 차오름 (+8 = 보통 피격 8HP분의 2배). 공격 적중 · 처치 · 보스 페이즈는 0. freeze/cutin in seconds; the world is frozen and the hero invulnerable for the whole ultimate
 function addUlt(v){if(!ultUnlocked)return;if(!ultFx&&v>0)ultG=Math.min(ULT_CFG.max,ultG+v);} // the ONLY way the gauge fills (hurtHero / perfectDodge here, world.js hurt())

@@ -369,8 +369,8 @@
 
 | ID | 이름 | 스프라이트 | 팔레트 | 궤적 | 외형 |
 |---|---|---|---|---|---|
-| `hs_tak` | 탁검 | `wpn_hidden_sun` | hidden_sun `#5a3000` `#c08000` `#ffd040` `#fffbe0` | `#fff2a0` `#ffb020` | 황금빛 장검. 날 밑동에 태양 원반이 박혀 있고, 날을 따라 흰 금빛이 흐른다. 휘두를 때 금빛 불티가 떨어진다. |
-| `hs_gyu` | 규검 | `wpn_hidden_moon` | hidden_moon `#0a1a4a` `#2a5ab0` `#80c0ff` `#f0faff` | `#d8f0ff` `#4a8aff` | 푸른 달빛 장검. 날 밑동에 초승달 장식, 날은 얼음처럼 투명한 청색이고 은빛 서리가 피어오른다. |
-| `hs_chan` | 찬검 | `wpn_hidden_eclipse` | hidden_eclipse `#0a0a14` `#c08000` `#4a8aff` `#fff8e0` | `#ffe060` `#4a8aff` | 탁검과 규검을 하나로 벼린 대검. 날의 한쪽은 금빛 태양, 다른 쪽은 푸른 달빛이고, 가운데 일식처럼 검은 원 테두리가 빛난다. |
+| `hs_tak` | 탁블레이드 | `wpn_hidden_sun` | hidden_sun `#5a3000` `#c08000` `#ffd040` `#fffbe0` | `#fff2a0` `#ffb020` | 황금빛 장검. 날 밑동에 태양 원반이 박혀 있고, 날을 따라 흰 금빛이 흐른다. 휘두를 때 금빛 불티가 떨어진다. |
+| `hs_gyu` | 규블레이드 | `wpn_hidden_moon` | hidden_moon `#0a1a4a` `#2a5ab0` `#80c0ff` `#f0faff` | `#d8f0ff` `#4a8aff` | 푸른 달빛 장검. 날 밑동에 초승달 장식, 날은 얼음처럼 투명한 청색이고 은빛 서리가 피어오른다. |
+| `hs_chan` | 찬블레이드 | `wpn_hidden_eclipse` | hidden_eclipse `#0a0a14` `#c08000` `#4a8aff` `#fff8e0` | `#ffe060` `#4a8aff` | 탁블레이드와 규블레이드를 하나로 벼린 대검. 날의 한쪽은 금빛 태양, 다른 쪽은 푸른 달빛이고, 가운데 일식처럼 검은 원 테두리가 빛난다. |
 
-아트: art/items/hidden_swords.jpg (_named) — 탁검·규검, art/items/chan_sword.jpg (_named) — 찬검
+아트: art/items/hidden_swords.jpg (_named) — 탁블레이드·규블레이드, art/items/chan_sword.jpg (_named) — 찬블레이드

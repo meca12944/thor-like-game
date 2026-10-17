@@ -4191,7 +4191,7 @@
    ]
   },
   "hidden": {
-   "name": "숨겨진 전설검 (탁검 · 규검)",
+   "name": "숨겨진 전설검 (탁블레이드 · 규블레이드)",
    "art": "reuses sword (atk1/atk2b/atk3)",
    "combo": [
     {
@@ -4263,7 +4263,7 @@
    ]
   },
   "chan": {
-   "name": "찬검",
+   "name": "찬블레이드",
    "art": "greatsword frames (gs1-3)",
    "combo": [
     {

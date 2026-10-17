@@ -49,7 +49,7 @@ async def main():
     # --- weapon types: every combo is forward-only (slime behind the hero must never be hit) ---
     allf=[];hitlog={}
     WT=[('sword','w_bronze_long','한손검'),('saber','w_desert_crescent','곡도'),('greatsword','w_anchor_great','대검'),('dagger','w_forest_dagger','단검'),('spear','w_storm_spear','창'),
-        ('whip','w_kraken_whip','채찍검'),('twin','w_shadow_twin','쌍검'),('hidden','hs_tak','숨겨진 전설검'),('chan','hs_chan','찬검'),('demon','demon_end','마왕 종언')]
+        ('whip','w_kraken_whip','채찍검'),('twin','w_shadow_twin','쌍검'),('hidden','hs_tak','숨겨진 전설검'),('chan','hs_chan','찬블레이드'),('demon','demon_end','마왕 종언')]
     for typ,wid,lab in WT:
       await pg.evaluate("""(w)=>{const g=__game;g.INV.equip.weapon={id:w,plus:0};const h=g.hero;h.atk=null;h.combo=0;h.chainT=0;h.cool=0;h.x=520;h.y=480;h.face='right';h.hz='right';g.syncWeapon();
         g.slimes.forEach((m,i)=>{if(m.kind==='boar'){m.dead=true;m.respawn=1e9;return;}m.dead=false;m.x=[585,610,488][i];m.y=[478,500,484][i];m.hp=999;m.maxHp=999;m.hpLag=999;m.t=99;m.state='idle';m.spawnT=0;m.hz=0;m.kx=m.ky=0;m.respawn=1e9;});}""",wid)
