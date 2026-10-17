@@ -16,6 +16,9 @@
   const WORLD_ZOOM = 0.5;          // overworld scale vs field (0.5 => 8px tiles, ~13px hero). Try 0.75 / 1.
   const LW = 384, LH = 216;        // logical screen (DQ6 SFC-like 16:9), integer-scaled to the window
   const HERO_SPEED = 82, WORLD_SPEED = 46;
+  const RUN = { mul: 1.72, startMul: 2.3, startT: 0.17, skidT: 0.2, dblTap: 0.25 }; // run: 1.72x walk, no MP/stamina
+  // swing hitbox = forward sector (tile 16): sword 29px = 1.8 tiles, 150 deg; other weapons scale with the town range table (__game.swingRange)
+  const SWING = { range: 29, arc: 150, arc3: 130 };
   const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
   const ATK_DMG = [10, 10, 14];
@@ -194,7 +197,9 @@
   const takePress = a => { const cs = codesOf(a); const i = queue.findIndex(c => cs.includes(c)); if (i < 0) return false; queue.splice(i, 1); return true; };
   const active = () => S.scene !== 'town' || !!S.trans;
   addEventListener('keydown', e => { if (!active() || PASS.has(e.code)) return; e.preventDefault(); e.stopPropagation();
-    if (!e.repeat) queue.push(e.code); held.add(e.code); if (queue.length > 8) queue.shift(); }, true);
+    if (!e.repeat) { queue.push(e.code); for (const d of ['up', 'down', 'left', 'right']) if (codesOf(d).includes(e.code)) dirTap(d); } held.add(e.code); if (queue.length > 8) queue.shift(); }, true);
+  // double-tap a direction (press->press <= .25s) -> dash start + run while held (same rule as the town; Esc '달리기 기본' = always run)
+  const lastTap = {}; function dirTap(d) { const now = performance.now() / 1000; if (now - (lastTap[d] ?? -9) <= RUN.dblTap) hero.runReq = true; lastTap[d] = now; }
   addEventListener('keyup', e => { held.delete(e.code); }, true);
   addEventListener('blur', () => held.clear());
 
@@ -419,18 +424,25 @@
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) [dx, dy] = FACEV[hero.face]; const L = Math.hypot(dx, dy);
-      hero.roll = { t: 0, dx: dx / L, dy: dy / L }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
-    if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > ATK.a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo }; if (ix || iy) setFace(ix, iy); }
+      hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
+    if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > ATK.a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); }
     if (takePress('interact')) interact();
-    if (hero.roll) { const r = hero.roll; r.t += dt; const sp = ROLL.speed * (1 - r.t / ROLL.dur * .55); moveCol(hero, r.dx * sp * dt, r.dy * sp * dt, 5); hero.walkT += dt * 3;
-      if (r.t >= ROLL.dur) { hero.roll = null; hero.rollCd = ROLL.cd; } }
-    else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; moveCol(hero, dv[0] * 20 * dt, dv[1] * 20 * dt, 5);
-      if (a.t >= ATK.a0 && a.t <= ATK.a1) { const hx = hero.x + dv[0] * ATK.reach, hy = hero.y - 6 + dv[1] * ATK.reach * .8, R = ATK.r + (a.i === 2 ? 4 : 0);
+    if (hero.roll) { const r = hero.roll; r.t += dt; const sp = Math.max(ROLL.speed * (1 - r.t / ROLL.dur * .55), r.carry); moveCol(hero, r.dx * sp * dt, r.dy * sp * dt, 5); hero.walkT += dt * 3; // from a run the dodge keeps momentum
+      if (r.t >= ROLL.dur) { hero.roll = null; hero.rollCd = ROLL.cd; if (r.carry) addFx('dust', hero.x, hero.y, { life: .3 }); } }
+    else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const lv = a.runSlash && a.t < ATK.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / ATK.a1) : 20; moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
+      if (a.t >= ATK.a0 && a.t <= ATK.a1) { const R = swingR(a.i), cosA = Math.cos((a.i === 2 ? SWING.arc3 : SWING.arc) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-          if (Math.hypot(mm.x - hx, (mm.y - mh * .4) - hy) < R + mm.r + mh * .25) { a.hit.add(mm); hitMob(mm, ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x)); } } }
+          const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
+          if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); hitMob(mm, ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x)); } } }
       if (a.t >= ATK.dur) { hero.atk = null; hero.comboT = ATK.chain; } }
-    else { const sp = HERO_SPEED * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = !!(ix || iy);
-      if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); hero.walkT += dt; } }
+    else { const g = window.__game, mv = !!(ix || iy);
+      if (mv && !hero.run && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
+      hero.runReq = false; if (!mv && hero.run) { hero.run = false; hero.skidT = RUN.skidT; hero.skidV = [FACEV[hero.face][0], FACEV[hero.face][1]]; addFx('dust', hero.x, hero.y, { life: .3 }); }
+      hero.runStartT = Math.max(0, (hero.runStartT || 0) - dt);
+      const rk = hero.run ? RUN.mul + (RUN.startMul - RUN.mul) * hero.runStartT / RUN.startT : 1;
+      const sp = HERO_SPEED * rk * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = mv;
+      if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? 1.6 : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
+      else if (hero.skidT > 0) { hero.skidT -= dt; const k = hero.skidT / RUN.skidT; moveCol(hero, hero.skidV[0] * HERO_SPEED * 1.2 * k * dt, hero.skidV[1] * HERO_SPEED * 1.2 * k * dt, 5); } } // short skid
     if (!hero.atk) hero.comboT = Math.max(0, hero.comboT - dt);
     // tiles & objects: pits, spikes, exits, stairs, keys, doors, warp
     const cx = Math.floor(hero.x / m.T), cy = Math.floor(hero.y / m.T);
@@ -639,10 +651,11 @@
       const d = cg.getImageData(0, 0, c.width, c.height); for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 100 ? 255 : 0; cg.putImageData(d, 0, 0); smallCache[key] = c; }
     g.save(); g.translate(Math.round(x), Math.round(y)); if (hero.face === 'left') g.scale(-1, 1); g.drawImage(c, -Math.round(c.width / 2), -c.height); g.restore();
   }
+  function swingR(i) { const g = window.__game; let k = 1; try { if (g && g.swingRange && g.SWINGS) k = g.swingRange(g.SWINGS[0]) / 96; } catch (e) { } return SWING.range * k * (i === 2 ? 1.08 : 1); }
   function drawSlash(g) { const a = hero.atk, p = a.t / ATK.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]);
-    if (p > .85) return; const sweep = (a.i % 2 ? -1 : 1), R = ATK.reach + (a.i === 2 ? 5 : 2);
-    const a0 = base - sweep * 1.3, a1 = a0 + sweep * 2.6 * Math.min(1, p / .6);
-    g.save(); g.translate(hero.x, hero.y - 9); g.lineCap = 'round';
+    if (p > .85) return; const sweep = (a.i % 2 ? -1 : 1), R = swingR(a.i) - 2, half = (a.i === 2 ? SWING.arc3 : SWING.arc) / 2 * Math.PI / 180; // trail = hitbox radius/arc; hit2 sweeps back across the FRONT
+    const a0 = base - sweep * half, a1 = a0 + sweep * 2 * half * Math.min(1, p / .6);
+    g.save(); g.translate(hero.x, hero.y - 4); g.scale(1, .8); g.lineCap = 'round';
     g.strokeStyle = a.i === 2 ? 'rgba(255,230,120,.9)' : 'rgba(255,255,255,.85)'; g.lineWidth = a.i === 2 ? 4 : 3; g.beginPath(); g.arc(0, 0, R, Math.min(a0, a1), Math.max(a0, a1)); g.stroke();
     g.strokeStyle = 'rgba(180,220,255,.5)'; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, R - 4, Math.min(a0, a1), Math.max(a0, a1)); g.stroke(); g.restore(); }
   function drawMob(g, m) {
@@ -807,7 +820,7 @@
   window.__worldHooks = { S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = {
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
-    go, setManual(v) { manual = v; },
+    go, dirTap, RUN, SWING, swingR, setManual(v) { manual = v; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
     tap(code) { queue.push(code); },

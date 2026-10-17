@@ -79,9 +79,10 @@ def bob(f, px):  # drop the upper body by px (seam at the belt, ~45% of height) 
 
 uniq = {}; cells = []
 def cell(sheet, idx, opt):
-    key = (sheet, idx, opt.get('bob', 0))
+    fl = bool(opt.get('flip')); key = (sheet, idx, opt.get('bob', 0), fl)
     if key in uniq: return uniq[key]
-    f = bob(SH[sheet][idx], opt.get('bob', 0)); ax, ay = anchor(SH[sheet][idx])
+    src = SH[sheet][idx][:, ::-1].copy() if fl else SH[sheet][idx]   # flip: mirrored frame (front/back views: same swing from the other side)
+    f = bob(src, opt.get('bob', 0)); ax, ay = anchor(src)
     cells.append(dict(img=f, ax=ax, ay=ay)); uniq[key] = len(cells) - 1; return uniq[key]
 
 anims = {}

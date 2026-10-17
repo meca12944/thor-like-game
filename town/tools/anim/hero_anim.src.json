@@ -116,6 +116,198 @@
    "n": 6,
    "ref": 0,
    "refFactor": 0.9
+  },
+  "r2r": {
+   "file": "atk2b_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs1r": {
+   "file": "gs1_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs2r": {
+   "file": "gs2_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs3r": {
+   "file": "gs3_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp1r": {
+   "file": "sp1_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp2r": {
+   "file": "sp2_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp3r": {
+   "file": "sp3_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "dg1r": {
+   "file": "dg1_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "dg2r": {
+   "file": "dg2_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "dg3r": {
+   "file": "dg3_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "tw1r": {
+   "file": "tw1_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "tw2r": {
+   "file": "tw2_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "tw3r": {
+   "file": "tw3_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "rnr": {
+   "file": "run_right",
+   "n": 8,
+   "ref": 0,
+   "refFactor": 0.96
+  },
+  "r2d": {
+   "file": "atk2b_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs1d": {
+   "file": "gs1_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs3d": {
+   "file": "gs3_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp1d": {
+   "file": "sp1_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp3d": {
+   "file": "sp3_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "dg1d": {
+   "file": "dg1_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "tw1d": {
+   "file": "tw1_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "rnd": {
+   "file": "run_down",
+   "n": 8,
+   "ref": 0,
+   "refFactor": 0.96
+  },
+  "r2u": {
+   "file": "atk2b_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs1u": {
+   "file": "gs1_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "gs3u": {
+   "file": "gs3_up",
+   "n": 6,
+   "ref": 0,
+   "refFactor": 1.12
+  },
+  "sp1u": {
+   "file": "sp1_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "sp3u": {
+   "file": "sp3_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "dg1u": {
+   "file": "dg1_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "tw1u": {
+   "file": "tw1_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "rnu": {
+   "file": "run_up",
+   "n": 8,
+   "ref": 0,
+   "refFactor": 0.96
+  },
+  "rsr": {
+   "file": "runstart_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 1.0
+  },
+  "ptr": {
+   "file": "potion_right",
+   "n": 6,
+   "ref": 0,
+   "refFactor": 1.0
   }
  },
  "anims": {
@@ -1203,21 +1395,31 @@
   },
   "atk3s_down": "atk3s_right",
   "atk3s_up": "atk3s_right",
-  "atk2s_right": {
+  "atk2b_right": {
    "loop": false,
    "frames": [
     [
-     "a1r",
-     4,
+     "r2r",
+     0,
      2
     ],
     [
-     "a1r",
+     "r2r",
+     1,
+     2
+    ],
+    [
+     "r2r",
+     2,
+     2
+    ],
+    [
+     "r2r",
      3,
-     2
+     3
     ],
     [
-     "a1r",
+     "r2r",
      3,
      2,
      {
@@ -1225,152 +1427,2370 @@
      }
     ],
     [
-     "a1r",
+     "r2r",
+     4,
+     3
+    ],
+    [
+     "r2r",
+     5,
+     3
+    ],
+    [
+     "r2r",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk2b_down": {
+   "loop": false,
+   "frames": [
+    [
+     "r2d",
+     0,
+     2
+    ],
+    [
+     "r2d",
+     1,
+     2
+    ],
+    [
+     "r2d",
+     2,
+     2
+    ],
+    [
+     "r2d",
+     3,
+     3
+    ],
+    [
+     "r2d",
+     3,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "r2d",
+     4,
+     3
+    ],
+    [
+     "r2d",
+     5,
+     3
+    ],
+    [
+     "r2d",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk2b_up": {
+   "loop": false,
+   "frames": [
+    [
+     "r2u",
+     0,
+     2
+    ],
+    [
+     "r2u",
+     1,
+     2
+    ],
+    [
+     "r2u",
+     2,
+     2
+    ],
+    [
+     "r2u",
+     3,
+     3
+    ],
+    [
+     "r2u",
+     3,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "r2u",
+     4,
+     3
+    ],
+    [
+     "r2u",
+     5,
+     3
+    ],
+    [
+     "r2u",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs1_right": {
+   "loop": false,
+   "frames": [
+    [
+     "gs1r",
+     0,
+     3
+    ],
+    [
+     "gs1r",
+     1,
+     3
+    ],
+    [
+     "gs1r",
      2,
      3
     ],
     [
-     "a1r",
-     1,
+     "gs1r",
+     3,
+     4
+    ],
+    [
+     "gs1r",
+     3,
      3,
      {
       "dx": 1
      }
     ],
     [
-     "a1r",
+     "gs1r",
+     4,
+     5
+    ],
+    [
+     "gs1r",
+     5,
+     4
+    ],
+    [
+     "gs1r",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs1_down": {
+   "loop": false,
+   "frames": [
+    [
+     "gs1d",
      0,
      3
     ],
     [
-     "a1r",
+     "gs1d",
+     1,
+     3
+    ],
+    [
+     "gs1d",
+     2,
+     3
+    ],
+    [
+     "gs1d",
+     3,
+     4
+    ],
+    [
+     "gs1d",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs1d",
+     4,
+     5
+    ],
+    [
+     "gs1d",
+     5,
+     4
+    ],
+    [
+     "gs1d",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs1_up": {
+   "loop": false,
+   "frames": [
+    [
+     "gs1u",
      0,
+     3
+    ],
+    [
+     "gs1u",
+     1,
+     3
+    ],
+    [
+     "gs1u",
+     2,
+     3
+    ],
+    [
+     "gs1u",
+     3,
+     4
+    ],
+    [
+     "gs1u",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs1u",
+     4,
+     5
+    ],
+    [
+     "gs1u",
+     5,
+     4
+    ],
+    [
+     "gs1u",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs2_right": {
+   "loop": false,
+   "frames": [
+    [
+     "gs2r",
+     0,
+     3
+    ],
+    [
+     "gs2r",
+     1,
+     3
+    ],
+    [
+     "gs2r",
+     2,
+     3
+    ],
+    [
+     "gs2r",
+     3,
+     5
+    ],
+    [
+     "gs2r",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs2r",
+     4,
+     5
+    ],
+    [
+     "gs2r",
+     5,
+     5
+    ],
+    [
+     "gs2r",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs2_down": {
+   "loop": false,
+   "frames": [
+    [
+     "gs1d",
+     0,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     1,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     2,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     3,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     3,
+     3,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     4,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     5,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1d",
+     5,
+     3,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "gs2_up": {
+   "loop": false,
+   "frames": [
+    [
+     "gs1u",
+     0,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     1,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     2,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     3,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     3,
+     3,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     4,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     5,
+     5,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "gs1u",
+     5,
+     3,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "gs3_right": {
+   "loop": false,
+   "frames": [
+    [
+     "gs3r",
+     0,
+     5
+    ],
+    [
+     "gs3r",
+     1,
+     5
+    ],
+    [
+     "gs3r",
+     2,
+     5
+    ],
+    [
+     "gs3r",
+     3,
+     8
+    ],
+    [
+     "gs3r",
+     3,
+     5,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs3r",
+     4,
+     7
+    ],
+    [
+     "gs3r",
+     5,
+     8
+    ],
+    [
+     "gs3r",
+     5,
+     5,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs3_down": {
+   "loop": false,
+   "frames": [
+    [
+     "gs3d",
+     0,
+     5
+    ],
+    [
+     "gs3d",
+     1,
+     5
+    ],
+    [
+     "gs3d",
+     2,
+     5
+    ],
+    [
+     "gs3d",
+     3,
+     8
+    ],
+    [
+     "gs3d",
+     3,
+     5,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs3d",
+     4,
+     7
+    ],
+    [
+     "gs3d",
+     5,
+     8
+    ],
+    [
+     "gs3d",
+     5,
+     5,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "gs3_up": {
+   "loop": false,
+   "frames": [
+    [
+     "gs3u",
+     0,
+     5
+    ],
+    [
+     "gs3u",
+     1,
+     5
+    ],
+    [
+     "gs3u",
+     2,
+     5
+    ],
+    [
+     "gs3u",
+     3,
+     8
+    ],
+    [
+     "gs3u",
+     3,
+     5,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "gs3u",
+     4,
+     7
+    ],
+    [
+     "gs3u",
+     5,
+     8
+    ],
+    [
+     "gs3u",
+     5,
+     5,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "sp1_right": {
+   "loop": false,
+   "frames": [
+    [
+     "sp1r",
+     0,
+     2
+    ],
+    [
+     "sp1r",
+     1,
+     2
+    ],
+    [
+     "sp1r",
+     2,
+     2
+    ],
+    [
+     "sp1r",
+     3,
+     3
+    ],
+    [
+     "sp1r",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp1r",
+     4,
+     3
+    ],
+    [
+     "sp1r",
+     5,
+     3
+    ],
+    [
+     "sp1r",
+     5,
      2,
      {
       "bob": 1
      }
-    ],
-    [
-     "a1r",
-     1,
-     2
     ]
    ]
   },
-  "atk2s_down": {
+  "sp1_down": {
    "loop": false,
    "frames": [
     [
-     "a1d",
-     4,
+     "sp1d",
+     0,
      2
     ],
     [
-     "a1d",
-     3,
-     2
-    ],
-    [
-     "a1d",
-     3,
-     2,
-     {
-      "dy": 1
-     }
-    ],
-    [
-     "a1d",
-     2,
-     3
-    ],
-    [
-     "a1d",
+     "sp1d",
      1,
-     3,
-     {
-      "dy": 1
-     }
+     2
     ],
     [
-     "a1d",
-     0,
+     "sp1d",
+     2,
+     2
+    ],
+    [
+     "sp1d",
+     3,
      3
     ],
     [
-     "a1d",
-     0,
+     "sp1d",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp1d",
+     4,
+     3
+    ],
+    [
+     "sp1d",
+     5,
+     3
+    ],
+    [
+     "sp1d",
+     5,
      2,
      {
       "bob": 1
      }
-    ],
-    [
-     "a1d",
-     1,
-     2
     ]
    ]
   },
-  "atk2s_up": {
+  "sp1_up": {
    "loop": false,
    "frames": [
     [
-     "a1u",
+     "sp1u",
+     0,
+     2
+    ],
+    [
+     "sp1u",
+     1,
+     2
+    ],
+    [
+     "sp1u",
+     2,
+     2
+    ],
+    [
+     "sp1u",
+     3,
+     3
+    ],
+    [
+     "sp1u",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp1u",
+     4,
+     3
+    ],
+    [
+     "sp1u",
+     5,
+     3
+    ],
+    [
+     "sp1u",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "sp2_right": {
+   "loop": false,
+   "frames": [
+    [
+     "sp2r",
+     0,
+     2
+    ],
+    [
+     "sp2r",
+     1,
+     3
+    ],
+    [
+     "sp2r",
+     2,
+     2
+    ],
+    [
+     "sp2r",
+     3,
+     3
+    ],
+    [
+     "sp2r",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp2r",
+     4,
+     3
+    ],
+    [
+     "sp2r",
+     5,
+     4
+    ],
+    [
+     "sp2r",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "sp2_down": {
+   "loop": false,
+   "frames": [
+    [
+     "sp1d",
+     0,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     1,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     2,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     3,
+     3,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     4,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     5,
+     4,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1d",
+     5,
+     2,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "sp2_up": {
+   "loop": false,
+   "frames": [
+    [
+     "sp1u",
+     0,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     1,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     2,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     3,
+     3,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     4,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     5,
+     4,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "sp1u",
+     5,
+     2,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "sp3_right": {
+   "loop": false,
+   "frames": [
+    [
+     "sp3r",
+     0,
+     4
+    ],
+    [
+     "sp3r",
+     1,
+     4
+    ],
+    [
+     "sp3r",
+     2,
+     4
+    ],
+    [
+     "sp3r",
+     3,
+     6
+    ],
+    [
+     "sp3r",
+     3,
+     4,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp3r",
+     4,
+     6
+    ],
+    [
+     "sp3r",
+     5,
+     6
+    ],
+    [
+     "sp3r",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "sp3_down": {
+   "loop": false,
+   "frames": [
+    [
+     "sp3d",
+     0,
+     4
+    ],
+    [
+     "sp3d",
+     1,
+     4
+    ],
+    [
+     "sp3d",
+     2,
+     4
+    ],
+    [
+     "sp3d",
+     3,
+     6
+    ],
+    [
+     "sp3d",
+     3,
+     4,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp3d",
+     4,
+     6
+    ],
+    [
+     "sp3d",
+     5,
+     6
+    ],
+    [
+     "sp3d",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "sp3_up": {
+   "loop": false,
+   "frames": [
+    [
+     "sp3u",
+     0,
+     4
+    ],
+    [
+     "sp3u",
+     1,
+     4
+    ],
+    [
+     "sp3u",
+     2,
+     4
+    ],
+    [
+     "sp3u",
+     3,
+     6
+    ],
+    [
+     "sp3u",
+     3,
+     4,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "sp3u",
+     4,
+     6
+    ],
+    [
+     "sp3u",
+     5,
+     6
+    ],
+    [
+     "sp3u",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg1_right": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1r",
+     0,
+     1
+    ],
+    [
+     "dg1r",
+     1,
+     2
+    ],
+    [
+     "dg1r",
+     2,
+     1
+    ],
+    [
+     "dg1r",
+     3,
+     2
+    ],
+    [
+     "dg1r",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "dg1r",
      4,
      2
     ],
     [
-     "a1u",
+     "dg1r",
+     5,
+     2
+    ],
+    [
+     "dg1r",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg1_down": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1d",
+     0,
+     1
+    ],
+    [
+     "dg1d",
+     1,
+     2
+    ],
+    [
+     "dg1d",
+     2,
+     1
+    ],
+    [
+     "dg1d",
      3,
      2
     ],
     [
-     "a1u",
+     "dg1d",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "dg1d",
+     4,
+     2
+    ],
+    [
+     "dg1d",
+     5,
+     2
+    ],
+    [
+     "dg1d",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg1_up": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1u",
+     0,
+     1
+    ],
+    [
+     "dg1u",
+     1,
+     2
+    ],
+    [
+     "dg1u",
+     2,
+     1
+    ],
+    [
+     "dg1u",
+     3,
+     2
+    ],
+    [
+     "dg1u",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "dg1u",
+     4,
+     2
+    ],
+    [
+     "dg1u",
+     5,
+     2
+    ],
+    [
+     "dg1u",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg2_right": {
+   "loop": false,
+   "frames": [
+    [
+     "dg2r",
+     0,
+     1
+    ],
+    [
+     "dg2r",
+     1,
+     2
+    ],
+    [
+     "dg2r",
+     2,
+     1
+    ],
+    [
+     "dg2r",
+     3,
+     2
+    ],
+    [
+     "dg2r",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "dg2r",
+     4,
+     2
+    ],
+    [
+     "dg2r",
+     5,
+     2
+    ],
+    [
+     "dg2r",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg2_down": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1d",
+     0,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     1,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     2,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
      3,
      2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     3,
+     1,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     4,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     5,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     5,
+     1,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "dg2_up": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1u",
+     0,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     1,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     2,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     3,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     3,
+     1,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     4,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     5,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     5,
+     1,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "dg3_right": {
+   "loop": false,
+   "frames": [
+    [
+     "dg3r",
+     0,
+     2
+    ],
+    [
+     "dg3r",
+     1,
+     2
+    ],
+    [
+     "dg3r",
+     2,
+     2
+    ],
+    [
+     "dg3r",
+     3,
+     3
+    ],
+    [
+     "dg3r",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "dg3r",
+     4,
+     3
+    ],
+    [
+     "dg3r",
+     5,
+     3
+    ],
+    [
+     "dg3r",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg3_down": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1d",
+     1,
+     2
+    ],
+    [
+     "dg1d",
+     2,
+     2
+    ],
+    [
+     "dg1d",
+     3,
+     2
+    ],
+    [
+     "dg1d",
+     2,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1d",
+     4,
+     3
+    ],
+    [
+     "dg1d",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dg3_up": {
+   "loop": false,
+   "frames": [
+    [
+     "dg1u",
+     1,
+     2
+    ],
+    [
+     "dg1u",
+     2,
+     2
+    ],
+    [
+     "dg1u",
+     3,
+     2
+    ],
+    [
+     "dg1u",
+     2,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "dg1u",
+     4,
+     3
+    ],
+    [
+     "dg1u",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw1_right": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1r",
+     0,
+     1
+    ],
+    [
+     "tw1r",
+     1,
+     2
+    ],
+    [
+     "tw1r",
+     2,
+     1
+    ],
+    [
+     "tw1r",
+     3,
+     3
+    ],
+    [
+     "tw1r",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw1r",
+     4,
+     2
+    ],
+    [
+     "tw1r",
+     5,
+     3
+    ],
+    [
+     "tw1r",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw1_down": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1d",
+     0,
+     1
+    ],
+    [
+     "tw1d",
+     1,
+     2
+    ],
+    [
+     "tw1d",
+     2,
+     1
+    ],
+    [
+     "tw1d",
+     3,
+     3
+    ],
+    [
+     "tw1d",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw1d",
+     4,
+     2
+    ],
+    [
+     "tw1d",
+     5,
+     3
+    ],
+    [
+     "tw1d",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw1_up": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1u",
+     0,
+     1
+    ],
+    [
+     "tw1u",
+     1,
+     2
+    ],
+    [
+     "tw1u",
+     2,
+     1
+    ],
+    [
+     "tw1u",
+     3,
+     3
+    ],
+    [
+     "tw1u",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw1u",
+     4,
+     2
+    ],
+    [
+     "tw1u",
+     5,
+     3
+    ],
+    [
+     "tw1u",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw2_right": {
+   "loop": false,
+   "frames": [
+    [
+     "tw2r",
+     0,
+     1
+    ],
+    [
+     "tw2r",
+     1,
+     2
+    ],
+    [
+     "tw2r",
+     2,
+     1
+    ],
+    [
+     "tw2r",
+     3,
+     3
+    ],
+    [
+     "tw2r",
+     3,
+     1,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw2r",
+     4,
+     2
+    ],
+    [
+     "tw2r",
+     5,
+     3
+    ],
+    [
+     "tw2r",
+     5,
+     1,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw2_down": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1d",
+     0,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     1,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     2,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     3,
+     1,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     4,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     5,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1d",
+     5,
+     1,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "tw2_up": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1u",
+     0,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     1,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     2,
+     1,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     3,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     3,
+     1,
+     {
+      "dx": 1,
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     4,
+     2,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     5,
+     3,
+     {
+      "flip": true
+     }
+    ],
+    [
+     "tw1u",
+     5,
+     1,
+     {
+      "bob": 1,
+      "flip": true
+     }
+    ]
+   ]
+  },
+  "tw3_right": {
+   "loop": false,
+   "frames": [
+    [
+     "tw3r",
+     0,
+     3
+    ],
+    [
+     "tw3r",
+     1,
+     3
+    ],
+    [
+     "tw3r",
+     2,
+     3
+    ],
+    [
+     "tw3r",
+     3,
+     5
+    ],
+    [
+     "tw3r",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw3r",
+     4,
+     5
+    ],
+    [
+     "tw3r",
+     5,
+     5
+    ],
+    [
+     "tw3r",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw3_down": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1d",
+     0,
+     3
+    ],
+    [
+     "tw1d",
+     1,
+     3
+    ],
+    [
+     "tw1d",
+     2,
+     3
+    ],
+    [
+     "tw1d",
+     3,
+     5
+    ],
+    [
+     "tw1d",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw1d",
+     4,
+     5
+    ],
+    [
+     "tw1d",
+     5,
+     5
+    ],
+    [
+     "tw1d",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "tw3_up": {
+   "loop": false,
+   "frames": [
+    [
+     "tw1u",
+     0,
+     3
+    ],
+    [
+     "tw1u",
+     1,
+     3
+    ],
+    [
+     "tw1u",
+     2,
+     3
+    ],
+    [
+     "tw1u",
+     3,
+     5
+    ],
+    [
+     "tw1u",
+     3,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "tw1u",
+     4,
+     5
+    ],
+    [
+     "tw1u",
+     5,
+     5
+    ],
+    [
+     "tw1u",
+     5,
+     3,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "run_right": {
+   "loop": true,
+   "frames": [
+    [
+     "rnr",
+     0,
+     4
+    ],
+    [
+     "rnr",
+     1,
+     4
+    ],
+    [
+     "rnr",
+     2,
+     4
+    ],
+    [
+     "rnr",
+     3,
+     4,
      {
       "dy": -1
      }
     ],
     [
-     "a1u",
-     2,
-     3
+     "rnr",
+     4,
+     4
     ],
     [
-     "a1u",
+     "rnr",
+     5,
+     4
+    ],
+    [
+     "rnr",
+     6,
+     4
+    ],
+    [
+     "rnr",
+     7,
+     4,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "run_down": {
+   "loop": true,
+   "frames": [
+    [
+     "rnd",
+     0,
+     4
+    ],
+    [
+     "rnd",
      1,
+     4
+    ],
+    [
+     "rnd",
+     2,
+     4
+    ],
+    [
+     "rnd",
      3,
+     4,
      {
       "dy": -1
      }
     ],
     [
-     "a1u",
-     0,
-     3
+     "rnd",
+     4,
+     4
     ],
     [
-     "a1u",
+     "rnd",
+     5,
+     4
+    ],
+    [
+     "rnd",
+     6,
+     4
+    ],
+    [
+     "rnd",
+     7,
+     4,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "run_up": {
+   "loop": true,
+   "frames": [
+    [
+     "rnu",
      0,
+     4
+    ],
+    [
+     "rnu",
+     1,
+     4
+    ],
+    [
+     "rnu",
      2,
+     4
+    ],
+    [
+     "rnu",
+     3,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "rnu",
+     4,
+     4
+    ],
+    [
+     "rnu",
+     5,
+     4
+    ],
+    [
+     "rnu",
+     6,
+     4
+    ],
+    [
+     "rnu",
+     7,
+     4,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "runstart_right": {
+   "loop": false,
+   "frames": [
+    [
+     "rsr",
+     0,
+     3,
      {
       "bob": 1
      }
     ],
     [
-     "a1u",
+     "rsr",
      1,
-     2
+     3
+    ],
+    [
+     "rsr",
+     2,
+     4
     ]
    ]
-  }
+  },
+  "runstart_down": "run_down",
+  "runstart_up": "run_up",
+  "skid_right": {
+   "loop": false,
+   "frames": [
+    [
+     "rsr",
+     3,
+     4
+    ],
+    [
+     "rsr",
+     4,
+     5
+    ],
+    [
+     "rsr",
+     5,
+     5
+    ]
+   ]
+  },
+  "skid_down": "idle_down",
+  "skid_up": "idle_up",
+  "potion_right": {
+   "loop": false,
+   "frames": [
+    [
+     "ptr",
+     0,
+     5
+    ],
+    [
+     "ptr",
+     1,
+     6
+    ],
+    [
+     "ptr",
+     2,
+     6
+    ],
+    [
+     "ptr",
+     3,
+     10
+    ],
+    [
+     "ptr",
+     3,
+     6,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "ptr",
+     4,
+     8
+    ],
+    [
+     "ptr",
+     5,
+     7
+    ]
+   ]
+  },
+  "potion_down": "potion_right",
+  "potion_up": "potion_right"
  },
- "_weapons_doc": "Every combo hit is a SWING (no thrusts, no 360): hit1 slash right->left, hit2 return slash left->right (mirror), hit3 forward overhead/diagonal power swing with longer recovery. Hits are clipped to the forward arc FEEL.arcDeg (120). Only exception: titleCombo['마왕'].hit3 (360 spin + sword waves). Times in 60fps ticks, distances in world px; stop = hit-stop ticks.",
+ "_weapons_doc": "Every combo hit is a SWING (no thrusts, no 360): hit1 slash right->left, hit2 return slash left->right (mirror), hit3 forward overhead/diagonal power swing with longer recovery. Hitbox = forward SECTOR: radius range (world px from the hero centre; town tile 53.3 px -> sword 96 = 1.8 tiles) and arc degrees (150 slashes / 130 overheads); the swing trail is drawn with exactly that radius and arc. hit2 = dedicated return-slash frames (atk2b / <w>2), sweeping across the FRONT in the opposite direction. Only exception: titleCombo['마왕'].hit3 (360 spin + sword waves). Times in 60fps ticks, distances in world px; stop = hit-stop ticks.",
  "weapons": {
   "sword": {
    "name": "한손검",
-   "art": "own",
+   "art": "own (atk1 / atk2b return slash / atk3)",
    "combo": [
     {
      "anim": "atk1",
@@ -1384,10 +3804,12 @@
      "reach": 40,
      "rad": 46,
      "kb": 300,
-     "lunge": 8
+     "lunge": 8,
+     "range": 96,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "atk2b",
      "kind": "slash",
      "name": "되베기",
      "dur": 17,
@@ -1399,7 +3821,9 @@
      "rad": 46,
      "kb": 320,
      "lunge": 10,
-     "mirror": true
+     "mirror": true,
+     "range": 96,
+     "arc": 150
     },
     {
      "anim": "atk3",
@@ -1414,13 +3838,15 @@
      "rad": 50,
      "kb": 700,
      "lunge": 30,
-     "fin": true
+     "fin": true,
+     "range": 104,
+     "arc": 130
     }
    ]
   },
   "saber": {
    "name": "곡도 · 마체테",
-   "art": "reuses sword",
+   "art": "reuses sword (atk1/atk2b/atk3)",
    "combo": [
     {
      "anim": "atk1",
@@ -1434,10 +3860,12 @@
      "reach": 40,
      "rad": 44,
      "kb": 260,
-     "lunge": 10
+     "lunge": 10,
+     "range": 92,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "atk2b",
      "kind": "slash",
      "name": "되베기",
      "dur": 14,
@@ -1449,7 +3877,9 @@
      "rad": 44,
      "kb": 280,
      "lunge": 10,
-     "mirror": true
+     "mirror": true,
+     "range": 92,
+     "arc": 150
     },
     {
      "anim": "atk3",
@@ -1464,16 +3894,18 @@
      "rad": 48,
      "kb": 600,
      "lunge": 34,
-     "fin": true
+     "fin": true,
+     "range": 99,
+     "arc": 150
     }
    ]
   },
   "dagger": {
    "name": "단검",
-   "art": "reuses sword",
+   "art": "own frames (dg1-3, 3 directions)",
    "combo": [
     {
-     "anim": "atk1",
+     "anim": "dg1",
      "kind": "slash",
      "name": "빠른 긋기",
      "dur": 10,
@@ -1484,10 +3916,12 @@
      "reach": 28,
      "rad": 34,
      "kb": 180,
-     "lunge": 8
+     "lunge": 8,
+     "range": 76,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "dg2",
      "kind": "slash",
      "name": "되긋기",
      "dur": 10,
@@ -1499,10 +3933,12 @@
      "rad": 34,
      "kb": 200,
      "lunge": 8,
-     "mirror": true
+     "mirror": true,
+     "range": 76,
+     "arc": 150
     },
     {
-     "anim": "atk3",
+     "anim": "dg3",
      "kind": "overhead",
      "name": "교차 긋기",
      "dur": 18,
@@ -1515,16 +3951,18 @@
      "kb": 380,
      "lunge": 20,
      "fin": true,
-     "hits": 2
+     "hits": 2,
+     "range": 82,
+     "arc": 130
     }
    ]
   },
   "greatsword": {
    "name": "대검",
-   "art": "reuses sword (needs heavy 2-hand frames)",
+   "art": "own frames (gs1-3, 3 directions)",
    "combo": [
     {
-     "anim": "atk1",
+     "anim": "gs1",
      "kind": "slash",
      "name": "큰 횡베기",
      "dur": 26,
@@ -1535,10 +3973,12 @@
      "reach": 52,
      "rad": 58,
      "kb": 460,
-     "lunge": 10
+     "lunge": 10,
+     "range": 122,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "gs2",
      "kind": "slash",
      "name": "올려베기",
      "dur": 28,
@@ -1550,10 +3990,12 @@
      "rad": 58,
      "kb": 500,
      "lunge": 12,
-     "mirror": true
+     "mirror": true,
+     "range": 122,
+     "arc": 150
     },
     {
-     "anim": "atk3",
+     "anim": "gs3",
      "kind": "overhead",
      "name": "내려찍기",
      "dur": 46,
@@ -1565,16 +4007,18 @@
      "rad": 60,
      "kb": 900,
      "lunge": 22,
-     "fin": true
+     "fin": true,
+     "range": 132,
+     "arc": 130
     }
    ]
   },
   "spear": {
    "name": "창 · 작살",
-   "art": "reuses sword (needs spear frames)",
+   "art": "own frames (sp1-3, 3 directions)",
    "combo": [
     {
-     "anim": "atk1",
+     "anim": "sp1",
      "kind": "slash",
      "name": "창 휩쓸기",
      "dur": 18,
@@ -1585,10 +4029,12 @@
      "reach": 68,
      "rad": 56,
      "kb": 340,
-     "lunge": 6
+     "lunge": 6,
+     "range": 138,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "sp2",
      "kind": "slash",
      "name": "되휩쓸기",
      "dur": 20,
@@ -1600,10 +4046,12 @@
      "rad": 56,
      "kb": 360,
      "lunge": 8,
-     "mirror": true
+     "mirror": true,
+     "range": 138,
+     "arc": 150
     },
     {
-     "anim": "atk3",
+     "anim": "sp3",
      "kind": "overhead",
      "name": "대휩쓸기 내려치기",
      "dur": 36,
@@ -1615,13 +4063,15 @@
      "rad": 62,
      "kb": 720,
      "lunge": 16,
-     "fin": true
+     "fin": true,
+     "range": 149,
+     "arc": 130
     }
    ]
   },
   "whip": {
    "name": "채찍검",
-   "art": "reuses sword (needs whip frames)",
+   "art": "reuses sword (atk1/atk2b/atk3)",
    "combo": [
     {
      "anim": "atk1",
@@ -1635,10 +4085,12 @@
      "reach": 70,
      "rad": 52,
      "kb": 240,
-     "lunge": 4
+     "lunge": 4,
+     "range": 130,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "atk2b",
      "kind": "slash",
      "name": "되감기",
      "dur": 20,
@@ -1650,7 +4102,9 @@
      "rad": 52,
      "kb": 260,
      "lunge": 4,
-     "mirror": true
+     "mirror": true,
+     "range": 130,
+     "arc": 150
     },
     {
      "anim": "atk3",
@@ -1665,16 +4119,18 @@
      "rad": 56,
      "kb": 420,
      "lunge": 10,
-     "fin": true
+     "fin": true,
+     "range": 140,
+     "arc": 130
     }
    ]
   },
   "twin": {
    "name": "쌍검",
-   "art": "reuses sword (needs off-hand blade)",
+   "art": "own frames (tw1-3, 3 directions)",
    "combo": [
     {
-     "anim": "atk1",
+     "anim": "tw1",
      "kind": "slash",
      "name": "교차베기",
      "dur": 12,
@@ -1686,10 +4142,12 @@
      "rad": 42,
      "kb": 220,
      "lunge": 8,
-     "hits": 2
+     "hits": 2,
+     "range": 84,
+     "arc": 150
     },
     {
-     "anim": "atk2s",
+     "anim": "tw2",
      "kind": "slash",
      "name": "역교차",
      "dur": 12,
@@ -1702,10 +4160,12 @@
      "kb": 240,
      "lunge": 8,
      "mirror": true,
-     "hits": 2
+     "hits": 2,
+     "range": 84,
+     "arc": 150
     },
     {
-     "anim": "atk3",
+     "anim": "tw3",
      "kind": "overhead",
      "name": "쌍 내려베기",
      "dur": 28,
@@ -1718,13 +4178,15 @@
      "kb": 560,
      "lunge": 30,
      "fin": true,
-     "hits": 2
+     "hits": 2,
+     "range": 91,
+     "arc": 130
     }
    ]
   },
   "hidden": {
    "name": "숨겨진 전설검 (탁검 · 규검)",
-   "art": "reuses sword (needs sun/moon blade layer)",
+   "art": "reuses sword (atk1/atk2b/atk3)",
    "combo": [
     {
      "trail": [
@@ -1742,14 +4204,16 @@
      "reach": 46,
      "rad": 52,
      "kb": 320,
-     "lunge": 10
+     "lunge": 10,
+     "range": 100,
+     "arc": 150
     },
     {
      "trail": [
       "140,200,255",
       "230,245,255"
      ],
-     "anim": "atk2s",
+     "anim": "atk2b",
      "kind": "slash",
      "name": "월광 되베기",
      "dur": 17,
@@ -1761,7 +4225,9 @@
      "rad": 52,
      "kb": 340,
      "lunge": 10,
-     "mirror": true
+     "mirror": true,
+     "range": 100,
+     "arc": 150
     },
     {
      "trail": [
@@ -1780,20 +4246,22 @@
      "rad": 56,
      "kb": 760,
      "lunge": 34,
-     "fin": true
+     "fin": true,
+     "range": 108,
+     "arc": 130
     }
    ]
   },
   "chan": {
    "name": "찬검",
-   "art": "reuses sword (needs eclipse greatsword frames)",
+   "art": "greatsword frames (gs1-3)",
    "combo": [
     {
      "trail": [
       "255,220,120",
       "90,140,255"
      ],
-     "anim": "atk1",
+     "anim": "gs1",
      "kind": "slash",
      "name": "일식 베기",
      "dur": 20,
@@ -1804,14 +4272,16 @@
      "reach": 48,
      "rad": 54,
      "kb": 420,
-     "lunge": 12
+     "lunge": 12,
+     "range": 120,
+     "arc": 150
     },
     {
      "trail": [
       "140,200,255",
       "255,255,255"
      ],
-     "anim": "atk2s",
+     "anim": "gs2",
      "kind": "slash",
      "name": "월식 되베기",
      "dur": 22,
@@ -1823,14 +4293,16 @@
      "rad": 54,
      "kb": 460,
      "lunge": 12,
-     "mirror": true
+     "mirror": true,
+     "range": 120,
+     "arc": 150
     },
     {
      "trail": [
       "255,220,120",
       "30,20,60"
      ],
-     "anim": "atk3",
+     "anim": "gs3",
      "kind": "overhead",
      "name": "개기일식 내려베기",
      "dur": 36,
@@ -1842,13 +4314,15 @@
      "rad": 64,
      "kb": 900,
      "lunge": 30,
-     "fin": true
+     "fin": true,
+     "range": 130,
+     "arc": 130
     }
    ]
   },
   "demon": {
    "name": "마왕 종언",
-   "art": "reuses sword (needs demon blade frames)",
+   "art": "reuses sword (atk1/atk2b/atk3)",
    "combo": [
     {
      "trail": [
@@ -1866,14 +4340,16 @@
      "reach": 50,
      "rad": 56,
      "kb": 460,
-     "lunge": 12
+     "lunge": 12,
+     "range": 108,
+     "arc": 150
     },
     {
      "trail": [
       "200,40,60",
       "255,120,140"
      ],
-     "anim": "atk2s",
+     "anim": "atk2b",
      "kind": "slash",
      "name": "종언 되베기",
      "dur": 22,
@@ -1885,7 +4361,9 @@
      "rad": 56,
      "kb": 480,
      "lunge": 12,
-     "mirror": true
+     "mirror": true,
+     "range": 108,
+     "arc": 150
     },
     {
      "trail": [
@@ -1904,7 +4382,9 @@
      "rad": 64,
      "kb": 1000,
      "lunge": 26,
-     "fin": true
+     "fin": true,
+     "range": 117,
+     "arc": 130
     }
    ]
   }

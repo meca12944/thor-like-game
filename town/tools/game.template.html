@@ -227,8 +227,9 @@ const LSC=VIEW.logicalW/WW;  // logical px per world px (0.3): the 1280x720 worl
 const CS=0.56;              // sprites still drawn from the old big sheets (NPCs, mobs, skill poses, fx) are scaled by this (old hero 165 -> 93 world = 28 logical px)
 const FEEL={
  walkSpeed:215,accelTicks:2,skidTicks:6,               // Ys VIII-like: near-instant start, short skid stop
- dashSpeed:820,dashTicks:12,dashIframes:11,dashCdTicks:24,dashRecTicks:6, // dodge roll / Flash Move (Shift)
- arcDeg:120,                          // every hero swing hits only inside this forward arc (no 360/spin attacks; thrusts are forward beams)
+ dashSpeed:820,dashTicks:13,dashIframes:11,dashCdTicks:24,dashRecTicks:6, // 회피(잔상 대시) / Flash Move (Shift/K/X): 0.18s i-frames in a 0.22s dash, 0.4s cooldown, fading ghost trail
+ arcDeg:150,                          // default swing arc (deg). Each combo hit = forward SECTOR: radius s.range (world px from hero centre, town tile 53.3) x s.arc; the trail is drawn with the same radius/arc
+ runMul:1.72,runStartMul:2.3,runStartTicks:10,runSkidTicks:12,dblTap:.25, // double-tap a direction -> dash start + run while held (1.72x walk), short skid on release; no MP/stamina
  juice:Q.get('juice')!=='0',                        // hit-feel layer (sparks, damage numbers, SFX, kick-shake, squash, finisher zoom, crits). ?juice=0 = old feel (for comparison)
  hitStopMin:4,hitStopFin:9,critChance:.12,critStop:3,critMul:2, // hit-stop ticks: light hits >= 4, finishers/crits 8-10
  kickPx:0,kickFin:0,zoomFin:0,staggerTicks:10,                 // camera kick / finisher micro-zoom: OFF (motion-sickness feedback). Feel comes from hit-stop, flash, sparks, knockback, SFX
@@ -332,7 +333,11 @@ addEventListener('keydown',e=>{const code=codeOf(e);
  if(e.repeat)return;
  doAction(act);});
 addEventListener('keyup',e=>{pressed.delete(codeOf(e));syncHeld();});
+const lastTap={};let alwaysRun=false;try{alwaysRun=localStorage.getItem('alwaysRun')==='1';}catch(e){}
+function toggleAlwaysRun(){alwaysRun=!alwaysRun;try{localStorage.setItem('alwaysRun',alwaysRun?'1':'0');}catch(e){}}
+function dirTap(d){const now=performance.now()/1000;if(now-(lastTap[d]??-9)<=FEEL.dblTap)hero.runReq=true;lastTap[d]=now;} // double-tap (press->press <= .25s); diagonal: double-tap either key
 function doAction(act){
+ if(act==='up'||act==='down'||act==='left'||act==='right'){dirTap(act);return;}
  if(act in SKILL_ACT){skPress.push(SKILL_ACT[act]);skHeld[SKILL_ACT[act]]=true;return;}
  switch(act){
   case 'attack':atkPressed=true;break;
@@ -390,14 +395,15 @@ function updateCtl(dt,ix,iy,l){ // called from update(): dash, area skill, timer
  if(dashPressed){dashPressed=false;hero.dashBuf=FEEL.bufferTicks;} // queued for 8 ticks
  if(hero.dashBuf>0){hero.dashBuf--;const a=hero.atk,cancelOk=!a||a.t>=a.s.cancel; // combo -> roll cancel window (per weapon)
   if(!uw&&cancelOk&&!hero.sk&&!hero.swim&&!hero.dash&&!(hero.dashCd>0)&&!(hero.deadT>0)&&!(hero.hurtT>0)){let dx=ix,dy=iy;if(!l){[dx,dy]=DIRV[hero.face];}
-   const n=Math.hypot(dx,dy)||1;hero.atk=null;hero.z=0;hero.dash={t:0,dx:dx/n,dy:dy/n,perfect:false};hero.dashBuf=0;hero.dashCd=tk(FEEL.dashCdTicks);hero.chainT=0;hero.combo=0;hero.vx=hero.vy=0;
+   const n=Math.hypot(dx,dy)||1;hero.atk=null;hero.z=0;hero.dash={t:0,dx:dx/n,dy:dy/n,perfect:false,carry:hero.run?FEEL.walkSpeed*FEEL.runMul:0};hero.dashBuf=0;hero.dashCd=tk(FEEL.dashCdTicks);hero.chainT=0;hero.combo=0;hero.vx=hero.vy=0;
    if(Math.abs(dx)>.2)hero.hz=dx>0?'right':'left';if(Math.abs(dx)>Math.abs(dy)*.9)hero.face=dx>0?'right':'left';else hero.face=dy>0?'down':'up';}}
 }
-function updateDash(dt){const d=hero.dash;d.t+=dt;const T=tk(FEEL.dashTicks),p=Math.min(1,d.t/T);const sp=FEEL.dashSpeed*(1-p)*(1-p)*1.5+90; // eased burst (~2 tiles)
+function updateDash(dt){const d=hero.dash;d.t+=dt;const T=tk(FEEL.dashTicks),p=Math.min(1,d.t/T);const sp=Math.max(FEEL.dashSpeed*(1-p)*(1-p)*1.5+90,d.carry*(1-p*.2)); // eased burst (~2 tiles); from a run the roll keeps the run speed
+ if(!d.dust0){d.dust0=1;burst(hero.x-d.dx*8,hero.y-2,4,['#e8dcc0','#cbb894'],80,0,3);} // small push-off puff
  moveCol(hero,d.dx*sp*dt,d.dy*sp*dt*.8,12);hero.walkT+=dt*2;
- d.ai=(d.ai||0)-1;if(d.ai<=0&&p<.85){d.ai=3;const c=heroCell();if(c)fx.push({type:'hafter',c,x:hero.x,y:hero.y,t:0,life:.2});} // after-images every 3 ticks
+ d.ai=(d.ai||0)-1;if(d.ai<=0&&p<.9){d.ai=2;const c=heroCell();if(c)fx.push({type:'hafter',c,x:hero.x,y:hero.y,t:0,life:.24});} // 회피(잔상 대시): clean ghost every 2 ticks, fades out in .24s
  if(Math.random()<.5)parts.push({x:hero.x+(Math.random()-.5)*16,y:hero.y-2,vx:-d.dx*60,vy:-20,g:0,t:0,life:.25,c:'#e8dcc0',s:4});
- if(d.t>=T)hero.dash=null;}
+ if(d.t>=T){hero.dash=null;if(d.carry){hero.vx=d.dx*d.carry;hero.vy=d.dy*d.carry;}}}
 function perfectDodge(){addMp(MPR.perfect);ultG=Math.min(ULT_CFG.max,ultG+ULT_CFG.gainPerfect);slowT=tk(FEEL.perfectSlowTicks);flash=Math.max(flash,.22);hero.inv=Math.max(hero.inv,.45);msg('Flash Move! 퍼펙트 회피');
  spawnRing(hero.x,hero.y-12,6,90,.35,'200,240,255',6,.5);burst(hero.x,hero.y-20,10,['#dff8ff','#fff'],160,0,3);}
 // interact / dialog
@@ -445,8 +451,8 @@ const ovEl=document.getElementById('ov'),ovp=document.getElementById('ovp'),dlgE
 function openUI(name){releaseAll();if(winOpen)toggleWin(false);ui=name;uiSel=0;rebind=null;optNote='';if(name==='options'){optRow=0;optCol=0;}
  stick.id=null;stick.dx=stick.dy=0;stEl.style.display='none';renderUI();}
 function closeUI(){ui=null;shopAt=null;sellPend=null;rebind=null;dlg=null;ovEl.classList.remove('open');dlgEl.classList.remove('open');releaseAll();}
-const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],[()=>`창 투명도: ${uiTransLabel()}  ◀ ▶`,()=>{stepUiAlpha(1);renderUI();}],[()=>`화면 흔들림: ${SHAKE_OPTS[shakeOpt][0]}  ◀ ▶`,()=>{stepShakeOpt(1);renderUI();}],[()=>`난이도: ${DIFF().name}  ◀ ▶`,()=>{setDifficulty(diffI+1);renderUI();}],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모 전용 바로가기 · 원래는 상점 NPC에게 말 걸기)',()=>openShop('demo')],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
-const MENU_KEY=['menu','','','','','inventory','','','map','save',''];
+const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],[()=>`창 투명도: ${uiTransLabel()}  ◀ ▶`,()=>{stepUiAlpha(1);renderUI();}],[()=>`화면 흔들림: ${SHAKE_OPTS[shakeOpt][0]}  ◀ ▶`,()=>{stepShakeOpt(1);renderUI();}],[()=>`달리기 기본: ${alwaysRun?'켬':'끔'}  ◀ ▶`,()=>{toggleAlwaysRun();renderUI();}],[()=>`난이도: ${DIFF().name}  ◀ ▶`,()=>{setDifficulty(diffI+1);renderUI();}],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모 전용 바로가기 · 원래는 상점 NPC에게 말 걸기)',()=>openShop('demo')],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
+const MENU_KEY=['menu','','','','','','inventory','','','map','save',''];
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
 const kb=c=>`<kbd>${esc(keyName(c))}</kbd>`;
 function hintBar(parts){return `<div class="hb">${parts.map(([k,t])=>`<kbd>${esc(k)}</kbd> ${t}`).join(' · ')}</div>`;}
@@ -487,7 +493,7 @@ function uiKey(code,act){
  if(ui==='dialog'){if(act==='interact'||act==='attack'||code==='Space'||code==='Enter')dialogNext();return;}
  if(ui==='menu'){if(code==='ArrowUp'||act==='up'){uiSel=(uiSel+MENU.length-1)%MENU.length;renderUI();}
   else if(code==='ArrowDown'||act==='down'){uiSel=(uiSel+1)%MENU.length;renderUI();}
-  else if((code==='ArrowLeft'||code==='ArrowRight'||act==='left'||act==='right')&&typeof MENU[uiSel][0]==='function'){const d=code==='ArrowLeft'||act==='left'?-1:1;if(String(MENU[uiSel][0]).includes('shakeOpt'))stepShakeOpt(d);else if(String(MENU[uiSel][0]).includes('DIFF()'))setDifficulty(diffI+d);else stepUiAlpha(d);renderUI();}
+  else if((code==='ArrowLeft'||code==='ArrowRight'||act==='left'||act==='right')&&typeof MENU[uiSel][0]==='function'){const d=code==='ArrowLeft'||act==='left'?-1:1;if(String(MENU[uiSel][0]).includes('shakeOpt'))stepShakeOpt(d);else if(String(MENU[uiSel][0]).includes('alwaysRun'))toggleAlwaysRun();else if(String(MENU[uiSel][0]).includes('DIFF()'))setDifficulty(diffI+d);else stepUiAlpha(d);renderUI();}
   else if(code==='Enter'||code==='Space'||act==='interact'||act==='attack')MENU[uiSel][1]();
   else if(act&&act!=='up'&&act!=='down'&&act!=='left'&&act!=='right'&&['inventory','map','save'].includes(act)){closeUI();doAction(act);}
   return;}
@@ -815,7 +821,8 @@ function syncWeapon(){if(weaponTitle!==title&&typeof hero!=='undefined'&&!hero.a
 let weaponTitle='';
 buildSwings('sword');weaponType='sword';
 const CHAIN_WINDOW=.24;
-function startSwing(i){const s=SWINGS[i];hero.atk={i,t:0,hit:new Set(),s};hero.combo=i;hero.buffered=false;hero.vx=hero.vy=0;
+function startSwing(i){const s=SWINGS[i];const runSlash=hero.run&&Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2;hero.atk={i,t:0,hit:new Set(),s,runSlash};hero.combo=i;hero.buffered=false;hero.vx=hero.vy=0;
+ if(runSlash){hero.runStartT=0;burst(hero.x,hero.y-2,6,['#e8dcc0','#cbb894'],120,0,3);} // running slash: carries the run momentum as a long lunge
  hero.atk.sfxT=Math.max(0,s.a0-tk(3));}
 const slimes=[];const parts=[];const fx=[];let shake=0; // legacy name kept: current shake amplitude in logical px (read-only, computed per frame)
 const SHAKE_OPTS=[['끔',0],['약',.67],['보통',1]];let shakeOpt=1;try{const v=localStorage.getItem('shakeOpt');if(v!==null)shakeOpt=Math.max(0,Math.min(2,+v|0));}catch(e){}
@@ -1013,6 +1020,8 @@ function drawUltBar(){const s=scale,u=s,W=cv.width,H=cv.height;const w=Math.roun
 function burst(x,y,n,cols,sp=200,g=300,s=4,life=.5){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=sp*(.3+Math.random()*.7);parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.6-sp*.3,g,t:0,life:life*(.6+Math.random()*.6),c:cols[i%cols.length],s});}}
 // hitbox helpers (ground plane, y squashed for the 3/4 view)
 function inEll(m,cx,cy,rx,ry){const dx=(m.x-cx)/rx,dy=(m.y-cy)/ry;return dx*dx+dy*dy<1;}
+function swingRange(s){return s.range||((s.reach||40)+(s.rad||46));}
+function inSector(m,x,y,dv,R,deg){const dx=m.x-x,dy=(m.y-y)/.75,d=Math.hypot(dx,dy);if(d>R)return false;if(d<16)return true;return (dx*dv[0]+dy*dv[1])/d>=Math.cos(deg/2*Math.PI/180);} // 3/4 view: y squashed .75
 function inArc(m,x,y,dv,deg){const dx=m.x-x,dy=(m.y-y)/.75,d=Math.hypot(dx,dy);if(d<6)return true;return (dx*dv[0]+dy*dv[1])/d>=Math.cos(deg/2*Math.PI/180);} // target inside the forward arc (3/4 view: y squashed)
 function inBeam(m,x,y,dv,len,half){const dx=m.x-x,dy=(m.y-y)/(dv[1]?.75:1);const a=dx*dv[0]+dy*dv[1],p=Math.abs(dx*dv[1]-dy*dv[0]);return a>0&&a<len&&p<half+22*m.sc;}
 
@@ -1202,7 +1211,7 @@ function update(dt){
  }
  const a=hero.atk,sk=hero.sk;
  if(a){a.t+=dt;const s=a.s,dv=DIRV[hero.face];
-  if(a.t<s.a1&&s.lunge){const p=a.t/s.a1,f=s.lunge/s.a1*2*(1-p);moveCol(hero,dv[0]*f*dt,dv[1]*f*dt*.8,12);} // eased forward step
+  if(a.t<s.a1&&(s.lunge||a.runSlash)){const p=a.t/s.a1,f=((s.lunge||0)+(a.runSlash?60:0))/s.a1*2*(1-p);moveCol(hero,dv[0]*f*dt,dv[1]*f*dt*.8,12);} // eased forward step
   if(s.leap){const p=Math.min(1,a.t/s.a0);hero.z=Math.sin(p*Math.PI)*FEEL.leapHeight;
    if(p>=1&&!a.landed){a.landed=1;hero.z=0;spawnRing(hero.x,hero.y,6,80,.3,'255,240,200',6,.5);burst(hero.x,hero.y-4,12,['#e8dcc0','#fff'],160,400,4);}}
   if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;SFX.play(s.titleSpin?'spin_dark':(s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);}
@@ -1211,7 +1220,7 @@ function update(dt){
    for(const m of slimes){if(m.dead||a.hit.has(m))continue;let hit=false,kx=dv[0],ky=dv[1];
     if(s.kind==='thrust')hit=inBeam(m,hero.x,hero.y-(dv[1]?0:4),dv,s.len,s.half);
     else if(s.titleSpin){hit=inEll(m,hero.x,hero.y-8,s.rad,s.rad*.72);kx=m.x-hero.x;ky=m.y-hero.y;} // 마왕 only: 360 spin
-    else{const hx=hero.x+dv[0]*s.reach,hy=hero.y+dv[1]*s.reach*.75-(dv[1]?0:6);hit=inEll(m,hx,hy,dv[0]?s.rad:s.rad*1.25,dv[0]?s.rad*.85:s.rad*.7)&&inArc(m,hero.x,hero.y,dv,FEEL.arcDeg);} // forward swing only
+    else hit=inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg); // forward sector only (same radius/arc as the trail)
     if(hit){a.hit.add(m);damageSlime(m,kx,ky,ATK_DMG[Math.min(2,a.i)]*(s.hits||1),s.kb,{stop:tk(s.stop||3),shake:s.fin?'fin':0,fin:s.fin?1:0,col:s.trail?s.trail.map(c=>'rgb('+c+')'):undefined,melee:1});}}}
   if(a.t>=s.dur){hero.atk=null;hero.z=0;
    if(hero.buffered&&a.i<2){startSwing(a.i+1);}else{hero.chainT=a.i<2?CHAIN_WINDOW:0;if(a.i>=2){hero.cool=.18;hero.combo=0;}}}
@@ -1224,11 +1233,16 @@ function update(dt){
  }else{
   if(hero.chainT>0){hero.chainT-=dt;if(hero.chainT<=0)hero.combo=0;}
   const busy=hero.deadT>0||hero.hurtT>0;
-  if(l>0&&!busy){const k=1/FEEL.accelTicks;hero.vx+=(ix*FEEL.walkSpeed*l-hero.vx)*k;hero.vy+=(iy*FEEL.walkSpeed*l-hero.vy)*k; // near-instant accel
+  if(l>0&&!busy&&(hero.runReq||alwaysRun)&&!hero.run){hero.run=true;hero.runStartT=tk(FEEL.runStartTicks);burst(hero.x-ix*10,hero.y-2,8,['#e8dcc0','#cbb894'],130,0,3);} // dash start: burst + dust kick-up
+  hero.runReq=false;if(hero.runStartT>0)hero.runStartT-=dt;if(hero.skidT>0)hero.skidT-=dt;
+  const runK=hero.run?FEEL.runMul+(FEEL.runStartMul-FEEL.runMul)*Math.max(0,hero.runStartT/tk(FEEL.runStartTicks)):1;
+  if(l>0&&!busy){const k=1/FEEL.accelTicks;hero.vx+=(ix*FEEL.walkSpeed*runK*l-hero.vx)*k;hero.vy+=(iy*FEEL.walkSpeed*runK*l-hero.vy)*k; // near-instant accel (run: 1.72x)
    if(Math.abs(ix)>Math.abs(iy)*0.9){hero.face=ix>0?'right':'left';hero.hz=hero.face;}else hero.face=iy>0?'down':'up';}
-  else{const k=1.6/FEEL.skidTicks;hero.vx-=hero.vx*k;hero.vy-=hero.vy*k;if(!(Math.hypot(hero.vx,hero.vy)>=12))hero.vx=hero.vy=0;} // (NaN-safe) // short skid
+  else{if(hero.run){hero.run=false;hero.runStartT=0;if(Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2){hero.skidT=tk(FEEL.runSkidTicks);burst(hero.x+hero.vx*.04,hero.y-2,6,['#e8dcc0','#cbb894'],90,0,3);}} // release -> short skid
+   const k=1.6/(hero.skidT>0?FEEL.runSkidTicks:FEEL.skidTicks);hero.vx-=hero.vx*k;hero.vy-=hero.vy*k;if(!(Math.hypot(hero.vx,hero.vy)>=12))hero.vx=hero.vy=0;} // (NaN-safe) // short skid
   if(hero.vx||hero.vy)moveCol(hero,hero.vx*dt,hero.vy*dt,12);
-  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;hero.skid=!hero.moving&&sp>25;hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed):0;}
+  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;hero.skid=!hero.moving&&sp>25;hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed)*(hero.run?.62:1):0;
+   if(hero.run&&hero.moving){const ph=Math.floor(hero.walkT*60/16);if(ph!==hero.footPh){hero.footPh=ph;parts.push({x:hero.x-hero.vx*.03,y:hero.y-2,vx:-hero.vx*.15,vy:-25,g:40,t:0,life:.3,c:'#e8dcc0',s:4},{x:hero.x-hero.vx*.03+4,y:hero.y-1,vx:-hero.vx*.1,vy:-15,g:40,t:0,life:.25,c:'#cbb894',s:3});}}} // footfall dust puffs
  }
  // hero knockback / invuln
  if(hero.kx||hero.ky){if(!hero.swim)moveCol(hero,hero.kx*dt,hero.ky*dt,12);hero.kx*=Math.pow(.002,dt);hero.ky*=Math.pow(.002,dt);if(Math.hypot(hero.kx,hero.ky)<5)hero.kx=hero.ky=0;}
@@ -1358,22 +1372,23 @@ function heroPose(){const h=hero,a=h.atk,sk=h.sk;
  const fi=h.moving?Math.floor(h.walkT*9)%4:0;
  if(h.face==='down')return['hero_walk_down',fi,false,0];if(h.face==='up')return['hero_walk_up',fi,false,0];return['hero_walk_right',fi,h.face==='left',0];}
 // ---------- hero frame animation (assets/anim/hero.json via tools/anim/build_anim.py; frames + ticks + foot anchors) ----------
-function heroAnimName(){const h=hero;if(h.deadT>0)return 'death';if(h.hurtT>0)return 'hurt';if(h.atk)return h.atk.s.anim||'atk1';if(h.dash)return 'dash';if(h.moving||h.skid)return 'walk';return 'idle';}
+function heroAnimName(){const h=hero;if(h.deadT>0)return 'death';if(h.hurtT>0)return 'hurt';if(h.atk)return h.atk.s.anim||'atk1';if(h.dash)return 'dash';if(h.run&&h.moving)return h.runStartT>0?'runstart':'run';if(h.skidT>0&&h.skid)return 'skid';if(h.moving||h.skid)return 'walk';return 'idle';}
 function heroDir(){return hero.face==='left'||hero.face==='right'?'right':hero.face;}
 function animFrame(A,tick,loop){tick=Math.max(0,tick);if(loop)tick%=A.ticks;else tick=Math.min(tick,A.ticks-1);let i=0;for(;i<A.frames.length-1;i++){if(tick<A.frames[i][1])break;tick-=A.frames[i][1];}return A.frames[i];}
 function heroCell(){if(!ANIM)return null;const h=hero,base=heroAnimName(),dir=heroDir();const A=ANIM.anims[base+'_'+dir]||ANIM.anims[base+'_right'];if(!A)return null;
  let tick=h.animT||0;
  if(h.atk)tick=h.atk.t/h.atk.s.dur*A.ticks;                 // anim stretched to the weapon's swing timing
- else if(base==='dash')tick=h.dash.t/tk(FEEL.dashTicks)*(A.ticks-6);
- else if(base==='walk')tick=h.walkT*60;                      // walk phase follows distance (no foot sliding), keeps phase through skids
- const f=animFrame(A,Math.floor(tick),A.loop);let fl=dir==='right'?h.face==='left':(base==='death'&&h.hz==='left');if(h.atk&&h.atk.s.mirror)fl=!fl;
- return {c:ANIM.cells[f[0]],dx:f[2]*(fl?-1:1),dy:f[3],fl};}
+ else if(base==='dash')tick=h.dash.t/tk(FEEL.dashTicks)*(A.ticks-6); // dodge = lean dash pose
+ else if(base==='walk'||base==='run')tick=h.walkT*60;                      // walk phase follows distance (no foot sliding), keeps phase through skids
+ const f=animFrame(A,Math.floor(tick),A.loop);let fl=dir==='right'?h.face==='left':(base==='death'&&h.hz==='left');
+ let sy=1;if(base==='runstart'&&h.animT<4)sy=.92; // slight crouch on the run push-off
+ return {c:ANIM.cells[f[0]],dx:f[2]*(fl?-1:1),dy:f[3],fl,sy};}
 const HERO_TINT={};
-function makeTints(){const im=IMG.hero_anim;if(!im)return;for(const[k,c]of[['white','#ffffff'],['red','#ff3020']]){const t=document.createElement('canvas');t.width=im.width;t.height=im.height;const g=t.getContext('2d');
+function makeTints(){const im=IMG.hero_anim;if(!im)return;for(const[k,c]of[['white','#ffffff'],['red','#ff3020'],['ghost','#8fdcff']]){const t=document.createElement('canvas');t.width=im.width;t.height=im.height;const g=t.getContext('2d');
  g.drawImage(im,0,0);g.globalCompositeOperation='source-atop';g.fillStyle=c;g.fillRect(0,0,t.width,t.height);HERO_TINT[k]=t;}}
 function blitHero(o,x,y,alpha=1,tint=null){const[cx,cy,w,h,ax,ay]=o.c,L=1/LSC; // whole logical pixels (sub-pixel world position, integer draw)
  const lx=Math.round(x*LSC)+o.dx,ly=Math.round(y*LSC)+o.dy;const img=tint?HERO_TINT[tint]:IMG.hero_anim;if(!img)return;
- ctx.save();ctx.globalAlpha*=alpha;ctx.translate(lx*L,ly*L);ctx.scale(L,L);if(o.fl)ctx.scale(-1,1);ctx.drawImage(img,cx,cy,w,h,-Math.round(ax),-ay,w,h);ctx.restore();}
+ ctx.save();ctx.globalAlpha*=alpha;ctx.translate(lx*L,ly*L);ctx.scale(L,L);if(o.sy&&o.sy!==1)ctx.scale(1/Math.sqrt(o.sy),o.sy);if(o.fl)ctx.scale(-1,1);ctx.drawImage(img,cx,cy,w,h,-Math.round(ax),-ay,w,h);ctx.restore();}
 function drawHero(){const h=hero;if(h.inv>0&&!(h.deadT>0)&&!(h.redT>0)&&Math.floor(h.inv*30)%2)return;
  if(h.hidden){drawMound();return;}
  if(!h.sk&&!h.swim&&ANIM&&IMG.hero_anim){const o=heroCell();if(o){blitHero(o,h.x,h.y-(h.z||0));if(h.redT>0)blitHero(o,h.x,h.y-(h.z||0),.65,'red');return;}}
@@ -1391,10 +1406,12 @@ function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=DIRV[her
  if(s.kind==='thrust'){const x0=hero.x+dv[0]*14+(dv[0]?0:(hero.hz==='left'?-6:6)),y0=hero.y-26+dv[1]*12,L=s.len*.85*Math.min(1,p*1.4);
   for(const[w,c]of[[7,`rgba(${tr[0]},${.35*fade})`],[3,`rgba(${tr[1]},${.95*fade})`]]){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+dv[0]*L,y0+dv[1]*L*.8);ctx.stroke();}
   return;}
- const cx=hero.x+dv[0]*10,cy=hero.y-28+dv[1]*14,base=Math.atan2(dv[1]*.8,dv[0]),R=(s.reach||40)*.95,sweep=s.kind==='overhead'?1.4:1.9,dir=s.mirror?-1:1;
+ // trail = the real hitbox: same centre (hero.y-8 ground plane, lifted 14px to blade height), radius swingRange and arc s.arc; hit2 (mirror) sweeps the other way across the FRONT
+ const R=swingRange(s),base=Math.atan2(dv[1],dv[0]),sweep=(s.arc||FEEL.arcDeg)*Math.PI/180,dir=s.mirror?-1:1;
  const a0=base-dir*sweep/2,a1=a0+dir*sweep*Math.min(1,p);
- ctx.save();ctx.translate(cx,cy);ctx.scale(1,.75);ctx.lineCap='butt';
- for(const [w,c,rr] of [[10,`rgba(${tr[0]},${.35*fade})`,R],[5,`rgba(${tr[1]},${.9*fade})`,R-2],[2,`rgba(${tr[0]},${fade})`,R-7]]){
+ ctx.save();ctx.translate(hero.x,hero.y-8-14);ctx.scale(1,.75);ctx.lineCap='butt';
+ if(p>.15&&p<1.05){ctx.fillStyle=`rgba(${tr[0]},${.10*fade})`;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,Math.min(a0,a1),Math.max(a0,a1));ctx.closePath();ctx.fill();} // faint sector wash = hit area
+ for(const [w,c,rr] of [[12,`rgba(${tr[0]},${.35*fade})`,R-6],[6,`rgba(${tr[1]},${.9*fade})`,R-6],[2,`rgba(${tr[0]},${fade})`,R-14]]){
   ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.arc(0,0,rr,Math.min(a0,a1),Math.max(a0,a1));ctx.stroke();}
  ctx.restore();}
 function drawSpinRing(a,part){const s=a.s;const p=(a.t-s.a0+.03)/(s.a1-s.a0+.03);if(p<0||p>1.35)return;const fade=p>1?Math.max(0,1-(p-1)/.35):1;
@@ -1426,7 +1443,7 @@ function drawFx(f){
   if(f.dv[0]<0)ctx.scale(-1,1);else if(f.dv[1])ctx.rotate(f.dv[1]>0?Math.PI/2:-Math.PI/2);drawFrame(f.key,0,0,0,false,1);ctx.restore();}
  else if(f.type==='ghost'){const al=Math.min(1,f.t/.4)*(f.fo?1-f.fo/.5:1);const bob=Math.sin(f.t*4)*6;
   shadow(f.x,f.y+2,16,5,.18*al);ctx.save();ctx.globalAlpha=.92*al;drawFrame('fx_ghost',0,f.x,f.y-f.z+bob,f.fl,.8);ctx.restore();}
- else if(f.type==='hafter'){ctx.save();ctx.globalCompositeOperation='lighter';blitHero(f.c,f.x,f.y,(1-f.t/f.life)*.5,'white');ctx.restore();}
+ else if(f.type==='hafter'){const q=1-f.t/f.life;blitHero(f.c,f.x,f.y,q*q*.55,'ghost');}
  else if(f.type==='after'){const al=(1-f.t/f.life)*.55;ctx.save();ctx.globalCompositeOperation='lighter';drawFrame(f.key,f.fi,f.x,f.y,f.fl,1,al);ctx.restore();}}
 function drawRing(f){const p=f.t/f.life,r=f.r0+(f.r1-f.r0)*(1-Math.pow(1-p,2.2)),al=1-p;
  ctx.save();ctx.translate(f.x,f.y);ctx.scale(1,f.ry);ctx.strokeStyle=`rgba(${f.col},${al})`;ctx.lineWidth=f.w*(1-p*.5)/f.ry*.6;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();ctx.restore();}
@@ -1521,7 +1538,7 @@ function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillS
  for(const sp of DIVE.spots){ctx.strokeStyle=diveTaken.includes(sp.id)?'#888':'#0ff';if(sp.r){ctx.beginPath();ctx.arc(sp.x,sp.y,sp.r,0,7);ctx.stroke();}ctx.fillStyle='#0ff';ctx.font='12px monospace';ctx.fillText('dive:'+sp.id+(diveTaken.includes(sp.id)?' (taken)':''),sp.x-30,sp.y-8);}
  const E=(x,y,rx,ry)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.stroke();};
  const a=hero.atk;if(a&&a.t>=a.s.a0&&a.t<=a.s.a1){const s=a.s,dv=DIRV[hero.face];ctx.strokeStyle='#ff0';
-  if(s.kind==='slash'||s.kind==='overhead')E(hero.x+dv[0]*s.reach,hero.y+dv[1]*s.reach*.75-(dv[1]?0:6),dv[0]?s.rad:s.rad*1.25,dv[0]?s.rad*.85:s.rad*.7);
+  if(s.kind==='slash'||s.kind==='overhead'){const R=swingRange(s),b=Math.atan2(dv[1],dv[0]),h=(s.arc||FEEL.arcDeg)*Math.PI/360;ctx.save();ctx.translate(hero.x,hero.y-8);ctx.scale(1,.75);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,b-h,b+h);ctx.closePath();ctx.restore();ctx.stroke();}
   else if(s.kind==='thrust'){ctx.save();ctx.translate(hero.x,hero.y-(dv[1]?0:4));ctx.scale(1,dv[1]?.75:1);ctx.rotate(Math.atan2(dv[1],dv[0]));ctx.strokeRect(0,-s.half,s.len,s.half*2);ctx.restore();}
   else E(hero.x,hero.y-8,s.rad,s.rad*.7);}
  ctx.strokeStyle='#f0f';for(const f of fx){if(f.type==='crystal'&&f.t>=0&&f.t<.15)E(f.x,f.y,64,46);if(f.type==='proj')E(f.x,f.y,f.r,f.r/1.2);if(f.type==='ghost')E(f.x,f.y,34,28);}
@@ -1546,7 +1563,7 @@ Promise.all(jobs).then(()=>{
  updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=boarSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
- window.__game={ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
+ window.__game={startSwingForTest:i=>startSwing(i),dirTap,toggleAlwaysRun,get alwaysRun(){return alwaysRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},get shopAt(){return shopAt},get shopMode(){return shopMode},get sellPend(){return sellPend},get shopNpc(){return shopNpc},openShop,dropNote,RARITY_STARS,starCount,IT,setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},set areaMode(v){areaMode=v},castArea,get areaCd(){return areaCd},set areaCd(v){areaCd=v},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
