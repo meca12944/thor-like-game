@@ -14,7 +14,7 @@
   {
    "id": "a_chest_tak",
    "map": "town_A",
-   "place": "마을 연못(분수 옆) 바닥, 금빛 사슬 상자",
+   "place": "중앙 분수 광장 옆 연못 — 맑은 물 바닥에 금빛 사슬로 감긴 상자가 처음부터 보인다",
    "kind": "gated",
    "status": "existing",
    "unlock": {
@@ -40,7 +40,7 @@
   {
    "id": "a_dive_fountain",
    "map": "town_A",
-   "place": "광장 분수 (잠수 지점)",
+   "place": "중앙 분수 광장 — 분수 (잠수 지점)",
    "kind": "gated",
    "status": "existing",
    "unlock": {
@@ -66,7 +66,7 @@
   {
    "id": "a_dive_well",
    "map": "town_A",
-   "place": "대장간 뒤 우물 (잠수 지점)",
+   "place": "동쪽 장인 거리 — 대장간 뒤 이끼 낀 우물 (잠수 지점)",
    "kind": "gated",
    "status": "existing",
    "unlock": {
@@ -92,7 +92,7 @@
   {
    "id": "a_dive_pond",
    "map": "town_A",
-   "place": "촌장집 연못 (잠수 지점)",
+   "place": "북쪽 언덕 주거 구역 — 촌장 집 마당의 작은 연못 (잠수 지점)",
    "kind": "gated",
    "status": "existing",
    "unlock": {
@@ -118,7 +118,7 @@
   {
    "id": "a_chest_tailor_yard",
    "map": "town_A",
-   "place": "나비 재봉소 뒤뜰, 빨랫줄 아래 뚜껑 덮인 바구니",
+   "place": "동쪽 장인 거리 — 나비 재봉소 뒤뜰. 빨랫줄에 천이 나부끼는 조용한 뒷마당, 뚜껑 덮인 바구니",
    "kind": "easy_hidden",
    "status": "proposed",
    "unlock": {
@@ -152,7 +152,7 @@
   {
    "id": "a_chest_scarecrow",
    "map": "town_A",
-   "place": "보리 밭 맨 끝 허수아비 발치의 건초 더미",
+   "place": "서쪽 밭 구역 — 마을 끝자락 보리의 밭. 허수아비들이 줄지어 선 쓸쓸한 둑길 끝, 건초 더미",
    "kind": "easy_hidden",
    "status": "proposed",
    "unlock": {
@@ -186,7 +186,7 @@
   {
    "id": "a_chest_gate_supply",
    "map": "town_A",
-   "place": "남문 초소 옆 나무 보급 상자",
+   "place": "남문 구역 — 바람길로 나가는 성문 앞 경비 초소. 횃불 그을음이 밴 초소 뒤편의 나무 보급 상자",
    "kind": "easy_hidden",
    "status": "proposed",
    "unlock": {
@@ -220,7 +220,7 @@
   {
    "id": "a_hidden_bench",
    "map": "town_A",
-   "place": "분수 광장 동쪽 낡은 벤치 밑 (조사 반짝임)",
+   "place": "중앙 분수 광장 — 광장 가장자리, 이끼 낀 낡은 벤치 밑 (조사 반짝임)",
    "kind": "easy_hidden",
    "status": "proposed",
    "unlock": {
@@ -245,7 +245,7 @@
   {
    "id": "a_chest_granny_roof",
    "map": "town_A",
-   "place": "물결 할머니 집 뒤 담장 위 까치둥지",
+   "place": "북쪽 언덕 주거 구역 — 물결 할머니의 오래된 집 뒤. 담장 아래 땅이 움푹 꺼진 그늘진 골목, 담장 위 까치둥지",
    "kind": "gated",
    "status": "proposed",
    "unlock": {
@@ -282,7 +282,7 @@
   {
    "id": "a_chest_forge_cellar",
    "map": "town_A",
-   "place": "강철 대장간 지하 창고의 금 간 벽 뒤",
+   "place": "동쪽 장인 거리 — 강철의 대장간 지하 창고. 쇳가루와 그을음뿐인 어두운 창고 안쪽, 금 간 벽 뒤",
    "kind": "gated",
    "status": "proposed",
    "unlock": {
