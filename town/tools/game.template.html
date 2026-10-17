@@ -868,18 +868,26 @@ let gauge=7/8;const cool={};let timeStop=0,flash=0,toast=null;
 // Index 3 = leap slash (attack pressed during a roll). SWINGS is mutated in place (tests hold a reference).
 const SWINGS=[];let weaponType='';
 const LEAP={name:'도약베기',kind:'overhead',leap:true,reach:44,anim:'atk3',dur:tk(FEEL.leapTicks+10),a0:tk(FEEL.leapTicks-2),a1:tk(FEEL.leapTicks+4),cancel:tk(FEEL.leapTicks+6),stop:5,rad:56,kb:520,lunge:110,fin:true};
+// dash attack (run + attack) / charge attack (hold attack) — data: hero_anim.src.json 'special' (+ per-weapon weapons[type].special). SWINGS[4]=dash, [5]=charge lv1, [6]=charge lv2
+const SP_I={dash:4,c1:5,c2:6};
+function spCfg(type){const S=(ANIM&&ANIM.special)||{},W=(ANIM&&ANIM.weapons&&ANIM.weapons[type]&&ANIM.weapons[type].special)||{},SC=S.charge||{},WC=W.charge||{};
+ return {dash:Object.assign({},S.dash,W.dash),charge:Object.assign({},SC,WC,{lv1:Object.assign({},SC.lv1,WC.lv1),lv2:Object.assign({},SC.lv2,WC.lv2),hold:Object.assign({},SC.hold,WC.hold)})};}
+function spAnim(n,L){return n==='@hit1'?L[0].anim:n==='@hit2'?L[1].anim:n==='@hit3'?(L[2].titleSpin?'atk3':L[2].anim):n;}
+function buildSpecials(type,L){const C=spCfg(type),k=Math.min(1.4,Math.max(.7,(L[0].dur||tk(17))/tk(17)));
+ return [C.dash,C.charge.lv1,C.charge.lv2].map((h,j)=>h&&h.dur?Object.assign({},h,{special:['dash','c1','c2'][j],anim:spAnim(h.anim||'@hit1',L),dur:tk(h.dur*k),a0:tk(h.a0*k),a1:tk(h.a1*k),cancel:tk(h.cancel*k),range:Math.round(swingRange(L[0])*(h.rangeMul||1)),hits:L[0].hits||1}):null);}
 function buildSwings(type){const W=(ANIM&&ANIM.weapons&&(ANIM.weapons[type]||ANIM.weapons.sword));
  const L=W?W.combo.map(h=>Object.assign({},h,h.kind==='spin'?{kind:'overhead',reach:h.reach||44,rad:Math.min(h.rad||50,60)}:{},{dur:tk(h.dur),a0:tk(h.a0),a1:tk(h.a1),cancel:tk(h.cancel)})):[
   {name:'횡베기',kind:'slash',anim:'atk1',dur:.28,a0:.05,a1:.15,cancel:.15,stop:3,reach:40,rad:46,kb:300,lunge:8},{name:'찌르기',kind:'thrust',anim:'atk2',dur:.30,a0:.07,a1:.17,cancel:.17,stop:3,len:118,half:14,kb:380,lunge:22},
   {name:'내려베기',kind:'overhead',anim:'atk3',dur:.53,a0:.17,a1:.27,cancel:.37,stop:6,reach:46,rad:50,kb:700,lunge:30,fin:true}];
  const O=ANIM&&ANIM.titleCombo&&ANIM.titleCombo[title];if(O&&O.hit3){const h=O.hit3;L[2]=Object.assign({},h,{dur:tk(h.dur),a0:tk(h.a0),a1:tk(h.a1),cancel:tk(h.cancel),titleSpin:h.kind==='spin'});} // 마왕: 360 spin + sword waves
- SWINGS.length=0;SWINGS.push(...L,LEAP);}
+ SWINGS.length=0;SWINGS.push(...L,LEAP,...buildSpecials(type,L));}
 function syncWeapon(){if(weaponTitle!==title&&typeof hero!=='undefined'&&!hero.atk){weaponTitle=title;weaponType='';}const w=(typeof INV!=='undefined'&&INV&&INV.equip)?INV.equip.weapon:null;const t=(w&&ANIM&&ANIM.itemWeaponType&&ANIM.itemWeaponType[w.id])||'sword';
  if(t!==weaponType&&!hero.atk){weaponType=t;buildSwings(t);}}
 let weaponTitle='';
 buildSwings('sword');weaponType='sword';
 const CHAIN_WINDOW=.24;
-function startSwing(i){const s=SWINGS[i];const runSlash=hero.run&&Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2;hero.atk={i,t:0,hit:new Set(),s,runSlash};hero.combo=i;hero.buffered=false;hero.vx=hero.vy=0;
+function startSwing(i){const s=SWINGS[i];hero.charge=null;const runSlash=!s.special&&hero.run&&Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2;hero.atk={i,t:0,hit:new Set(),s,runSlash};hero.combo=i;hero.buffered=false;hero.vx=hero.vy=0;
+ if(s.special==='dash'){hero.runStartT=0;burst(hero.x,hero.y-2,10,['#e8dcc0','#cbb894','#fff'],170,0,3);spawnRing(hero.x,hero.y,6,46,.22,'255,255,255',4,.5);} // 돌진베기: kick-off dust
  if(runSlash){hero.runStartT=0;burst(hero.x,hero.y-2,6,['#e8dcc0','#cbb894'],120,0,3);} // running slash: carries the run momentum as a long lunge
  hero.atk.sfxT=Math.max(0,s.a0-tk(3));}
 const slimes=[];const parts=[];const fx=[];let shake=0; // legacy name kept: current shake amplitude in logical px (read-only, computed per frame)
@@ -1001,7 +1009,7 @@ function drawDnums(){for(const d of DNUM){if(!d.on)continue;const q=d.t/.8,pop=d
   outlined(d.txt,d.x,d.y-q*40,(d.big?30:22)*pop,d.col);}ctx.globalAlpha=1;ctx.textAlign='left';}
 // ---- 마왕 sword waves (검기): pooled crescent projectiles fired outward from the spin, pierce ----
 const WAVES=Array.from({length:16},()=>({on:false,x:0,y:0,vx:0,vy:0,d:0,W:null,hit:new Set()}));
-function spawnWaves(W){SFX.play('wave',.8);let k=0;for(const w of WAVES){if(k>=W.n)break;if(w.on)continue;const a=k/W.n*Math.PI*2+Math.PI/W.n;w.on=true;w.x=hero.x;w.y=hero.y-14;w.vx=Math.cos(a)*W.speed;w.vy=Math.sin(a)*W.speed*.75;w.d=0;w.W=W;w.hit.clear();k++;}}
+function spawnWaves(W){SFX.play('wave',.8);let k=0;for(const w of WAVES){if(k>=W.n)break;if(w.on)continue;const a=W.dir!==undefined?W.dir+(k-(W.n-1)/2)*(W.spread||0):k/W.n*Math.PI*2+Math.PI/W.n;w.on=true;w.x=hero.x;w.y=hero.y-14;w.vx=Math.cos(a)*W.speed;w.vy=Math.sin(a)*W.speed*.75;w.d=0;w.W=W;w.hit.clear();k++;}}
 function updateWaves(dt){for(const w of WAVES){if(!w.on)continue;w.x+=w.vx*dt;w.y+=w.vy*dt;w.d+=Math.hypot(w.vx,w.vy)*dt;if(w.d>=w.W.range){w.on=false;continue;}
   for(const m of slimes){if(m.dead||w.hit.has(m))continue;if(inEll(m,w.x,w.y+14,w.W.rad+14*m.sc,(w.W.rad+14*m.sc)*.8)){w.hit.add(m);damageSlime(m,w.vx,w.vy,w.W.dmg,w.W.kb,{stop:tk(3),col:['#ff3048','#2a0008','#fff'],skill:1});if(!w.W.pierce){w.on=false;break;}}}}}
 function drawWaves(){ctx.save();ctx.lineCap='round';for(const w of WAVES){if(!w.on)continue;const al=1-w.d/w.W.range,a=Math.atan2(w.vy/.75,w.vx);
@@ -1257,13 +1265,21 @@ function update(dt){
   if(popup){popup.t-=dt;if(popup.t<=0)popup=null;}if(toast){toast.t-=dt;if(toast.t<=0)toast=null;}return;}
  updateSparkles(dt);
  syncWeapon();gT++;
- if(atkPressed){atkPressed=false;hero.atkBuf=FEEL.bufferTicks;} // 8-tick input queue
+ if(atkPressed){atkPressed=false;hero.atkBuf=FEEL.bufferTicks;hero.holdT=0;hero.holdOk=true;} // 8-tick input queue; holdT = how long this press is held (charge)
+ if(keys.attack&&hero.holdOk)hero.holdT+=dt;else hero.holdOk=false;
  if(hero.atkBuf>0){hero.atkBuf--;
   if(hero.swim||hero.sk||hero.deadT>0||hero.hurtT>0){}
   else if(hero.dash){if(hero.dash.t>tk(2)){hero.dash=null;faceTarget();startSwing(3);hero.atkBuf=0;}} // roll -> leap slash
   else if(hero.atk){if(hero.atk.t>.03&&hero.atk.i<2){hero.buffered=true;hero.atkBuf=0;}}
-  else if(hero.cool<=0){faceTarget();startSwing(hero.chainT>0&&hero.combo<2?hero.combo+1:0);hero.atkBuf=0;}
+  else if(hero.cool<=0){if(hero.run&&hero.moving&&SWINGS[SP_I.dash]&&Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2)startSwing(SP_I.dash); // running + attack = 돌진베기
+   else{faceTarget();startSwing(hero.chainT>0&&hero.combo<2?hero.combo+1:0);}hero.atkBuf=0;}
  }
+ // charge (모으기): keep holding attack after the swing -> lv1 / lv2; release fires the charged slash; dodge / skill / a flinching hit cancels it (super armor keeps it)
+ if(!hero.charge&&hero.holdOk&&hero.holdT>tk(8)&&SWINGS[SP_I.c1]&&!hero.atk&&!hero.dash&&!hero.sk&&!hero.swim&&!uw&&!(hero.hurtT>0)&&!(hero.deadT>0)){const CF=spCfg(weaponType).charge;hero.charge={t:hero.holdT,lv:0,flash:0,mv:CF.moveMul||.4,anim:spAnim((CF.hold&&CF.hold.anim)||'@hit3',SWINGS),p:(CF.hold&&CF.hold.p)||.18};hero.run=false;}
+ if(hero.charge){const C=hero.charge,CF=spCfg(weaponType).charge;C.t+=dt;if(C.flash>0)C.flash-=dt;const lv=C.t>=(CF.t2||1.2)?2:C.t>=(CF.t1||.6)?1:0;
+  if(lv>C.lv){C.lv=lv;C.flash=.25;SFX.play(lv>1?'ult_cutin':'hit_crit',lv>1?.4:.5,lv>1?1.9:1.7);spawnRing(hero.x,hero.y-40,6,lv>1?70:50,.3,lv>1?'255,214,110':'150,220,255',5,.6);burst(hero.x,hero.y-46,lv>1?14:8,lv>1?['#ffe08a','#fff']:['#aee8ff','#fff'],150,0,3,.4);}
+  if(Math.random()<(lv>1?.7:lv?.45:.2)){const an=Math.random()*Math.PI*2,d=34+Math.random()*14;parts.push({x:hero.x+Math.cos(an)*d,y:hero.y-44+Math.sin(an)*d*.8,vx:-Math.cos(an)*d*3.2,vy:-Math.sin(an)*d*2.6,g:0,t:0,life:.28,c:lv>1?'#ffe08a':lv?'#aee8ff':'#ffffff',s:3});}
+  if(!hero.holdOk||hero.atk||hero.dash||hero.sk||hero.hurtT>0||hero.deadT>0){hero.charge=null;if(!hero.holdOk&&C.lv>0&&!hero.atk&&!hero.dash&&!hero.sk&&!(hero.hurtT>0)&&!(hero.deadT>0))startSwing(C.lv>1?SP_I.c2:SP_I.c1);}}
  const a=hero.atk,sk=hero.sk;
  if(a){a.t+=dt;const s=a.s,dv=DIRV[hero.face];
   if(a.t<s.a1&&(s.lunge||a.runSlash)){const p=a.t/s.a1,f=((s.lunge||0)+(a.runSlash?60:0))/s.a1*2*(1-p);moveCol(hero,dv[0]*f*dt,dv[1]*f*dt*.8,12);} // eased forward step
@@ -1271,14 +1287,15 @@ function update(dt){
    if(p>=1&&!a.landed){a.landed=1;hero.z=0;spawnRing(hero.x,hero.y,6,80,.3,'255,240,200',6,.5);burst(hero.x,hero.y-4,12,['#e8dcc0','#fff'],160,400,4);}}
   if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;if(s.titleSpin)SFX.play('spin_dark',1);else if(s.leap)SFX.ev.dashAttack();else if(Q.get('sfxdraft')==='0')SFX.play((s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);else SFX.ev.swing(weaponType,a.i,s.fin?1:.75);} // [sfx] per-weapon / per-step swing drafts (?sfxdraft=0 = old built-in)
   if(s.titleSpin&&s.waves&&!a.waved&&a.t>=s.a0+tk(4)){a.waved=1;spawnWaves(s.waves);}
+  if(s.wave&&!a.waved&&a.t>=s.a0){a.waved=1;spawnWaves(Object.assign({n:1,col:['255,214,110','120,80,10','255,255,255']},s.wave,{dir:Math.atan2(dv[1],dv[0]),dmg:ATK_DMG[0]*(s.wave.dmgMul||1)/DMG_UNIT}));} // charge lv2: forward sword wave
   if(a.t>=s.a0&&a.t<=s.a1){
    for(const m of slimes){if(m.dead||a.hit.has(m))continue;let hit=false,kx=dv[0],ky=dv[1];
     if(s.kind==='thrust')hit=inBeam(m,hero.x,hero.y-(dv[1]?0:4),dv,s.len,s.half);
     else if(s.titleSpin){hit=inEll(m,hero.x,hero.y-8,s.rad,s.rad*.72);kx=m.x-hero.x;ky=m.y-hero.y;} // 마왕 only: 360 spin
     else hit=inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg); // forward sector only (same radius/arc as the trail)
-    if(hit){a.hit.add(m);damageSlime(m,kx,ky,ATK_DMG[Math.min(2,a.i)]*(s.hits||1),s.kb,{stop:tk(s.stop||3),shake:s.fin?'fin':0,fin:s.fin?1:0,col:s.trail?s.trail.map(c=>'rgb('+c+')'):undefined,melee:1});}}}
+    if(hit){a.hit.add(m);damageSlime(m,kx,ky,(s.dmgMul?ATK_DMG[0]*s.dmgMul:ATK_DMG[Math.min(2,a.i)])*(s.hits||1),s.kb,{stop:tk(s.stop||3),shake:s.shake!==undefined?s.shake:(s.fin?'fin':0),fin:s.fin?1:0,col:s.trail?s.trail.map(c=>'rgb('+c+')'):undefined,melee:1});}}}
   if(a.t>=s.dur){hero.atk=null;hero.z=0;
-   if(hero.buffered&&a.i<2){startSwing(a.i+1);}else{hero.chainT=a.i<2?CHAIN_WINDOW:0;if(a.i>=2){hero.cool=.18;hero.combo=0;}}}
+   if(hero.buffered&&a.i<2){startSwing(a.i+1);}else{hero.chainT=a.i<2?CHAIN_WINDOW:0;if(a.i>=2){hero.cool=s.cool||.18;hero.combo=0;}}}
  }else if(sk){sk.t+=dt;const F=SKFX[sk.id];F.update(sk,dt);
   if(sk.end||sk.t>=F.dur){hero.sk=null;hero.ghost=false;hero.hidden=false;}
  }else if(hero.dash){updateDash(dt);
@@ -1288,11 +1305,11 @@ function update(dt){
  }else{
   if(hero.chainT>0){hero.chainT-=dt;if(hero.chainT<=0)hero.combo=0;}
   const busy=hero.deadT>0||hero.hurtT>0;
-  if(l>0&&!busy&&(hero.runReq||alwaysRun)&&!hero.run){hero.run=true;hero.runStartT=tk(FEEL.runStartTicks);burst(hero.x-ix*10,hero.y-2,8,['#e8dcc0','#cbb894'],130,0,3);} // dash start: burst + dust kick-up
+  if(l>0&&!busy&&!hero.charge&&(hero.runReq||alwaysRun)&&!hero.run){hero.run=true;hero.runStartT=tk(FEEL.runStartTicks);burst(hero.x-ix*10,hero.y-2,8,['#e8dcc0','#cbb894'],130,0,3);} // dash start: burst + dust kick-up
   hero.runReq=false;if(hero.runStartT>0)hero.runStartT-=dt;if(hero.skidT>0)hero.skidT-=dt;
-  const runK=hero.run?FEEL.runMul+(FEEL.runStartMul-FEEL.runMul)*Math.max(0,hero.runStartT/tk(FEEL.runStartTicks)):1;
+  const runK=hero.charge?hero.charge.mv:hero.run?FEEL.runMul+(FEEL.runStartMul-FEEL.runMul)*Math.max(0,hero.runStartT/tk(FEEL.runStartTicks)):1;
   if(l>0&&!busy){const k=1/FEEL.accelTicks;hero.vx+=(ix*FEEL.walkSpeed*runK*l-hero.vx)*k;hero.vy+=(iy*FEEL.walkSpeed*runK*l-hero.vy)*k; // near-instant accel (run: 1.72x)
-   if(Math.abs(ix)>Math.abs(iy)*0.9){hero.face=ix>0?'right':'left';hero.hz=hero.face;}else hero.face=iy>0?'down':'up';}
+   if(hero.charge){}else if(Math.abs(ix)>Math.abs(iy)*0.9){hero.face=ix>0?'right':'left';hero.hz=hero.face;}else hero.face=iy>0?'down':'up';} // charging: facing locked
   else{if(hero.run){hero.run=false;hero.runStartT=0;if(Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2){hero.skidT=tk(FEEL.runSkidTicks);burst(hero.x+hero.vx*.04,hero.y-2,6,['#e8dcc0','#cbb894'],90,0,3);}} // release -> short skid
    const k=1.6/(hero.skidT>0?FEEL.runSkidTicks:FEEL.skidTicks);hero.vx-=hero.vx*k;hero.vy-=hero.vy*k;if(!(Math.hypot(hero.vx,hero.vy)>=12))hero.vx=hero.vy=0;} // (NaN-safe) // short skid
   if(hero.vx||hero.vy)moveCol(hero,hero.vx*dt,hero.vy*dt,12);
@@ -1427,14 +1444,14 @@ function heroPose(){const h=hero,a=h.atk,sk=h.sk;
  const fi=h.moving?Math.floor(h.walkT*9)%4:0;
  if(h.face==='down')return['hero_walk_down',fi,false,0];if(h.face==='up')return['hero_walk_up',fi,false,0];return['hero_walk_right',fi,h.face==='left',0];}
 // ---------- hero frame animation (assets/anim/hero.json via tools/anim/build_anim.py; frames + ticks + foot anchors) ----------
-function heroAnimName(){const h=hero;if(h.deadT>0)return 'death';if(h.hurtT>0)return 'hurt';if(h.atk)return h.atk.s.anim||'atk1';if(h.dash)return 'dash';if(h.run&&h.moving)return h.runStartT>0?'runstart':'run';if(h.skidT>0&&h.skid)return 'skid';if(h.moving||h.skid)return 'walk';return 'idle';}
+function heroAnimName(){const h=hero;if(h.deadT>0)return 'death';if(h.hurtT>0)return 'hurt';if(h.atk)return h.atk.s.anim||'atk1';if(h.charge)return h.charge.anim;if(h.dash)return 'dash';if(h.run&&h.moving)return h.runStartT>0?'runstart':'run';if(h.skidT>0&&h.skid)return 'skid';if(h.moving||h.skid)return 'walk';return 'idle';}
 function heroDir(){return hero.face==='left'||hero.face==='right'?'right':hero.face;}
 function animFrame(A,tick,loop){tick=Math.max(0,tick);if(loop)tick%=A.ticks;else tick=Math.min(tick,A.ticks-1);let i=0;for(;i<A.frames.length-1;i++){if(tick<A.frames[i][1])break;tick-=A.frames[i][1];}return A.frames[i];}
 function atkAnimP(a){const s=a.s,t=a.t,k=s.strike;if(!k||!(s.a1>s.a0))return t/s.dur; // windup -> [0,k0], active -> [k0,k1], follow-through -> [k1,1]
  if(t<s.a0)return k[0]*t/Math.max(1e-6,s.a0);if(t<s.a1)return k[0]+(k[1]-k[0])*(t-s.a0)/(s.a1-s.a0);return k[1]+(1-k[1])*Math.min(1,(t-s.a1)/Math.max(1e-6,s.dur-s.a1));}
 function heroCell(){if(!ANIM)return null;const h=hero,base=heroAnimName(),dir=heroDir();const A=ANIM.anims[base+'_'+dir]||ANIM.anims[base+'_right'];if(!A)return null;
  let tick=h.animT||0;
- if(h.atk)tick=atkAnimP(h.atk)*A.ticks;                     // anim stretched to the weapon's swing timing (hit 3: strike frames pinned to the active window)
+ if(h.atk)tick=atkAnimP(h.atk)*A.ticks;else if(h.charge)tick=h.charge.p*A.ticks;                     // anim stretched to the weapon's swing timing (hit 3: strike frames pinned to the active window)
  else if(base==='dash')tick=h.dash.t/tk(FEEL.dashTicks)*(A.ticks-6); // dodge = lean dash pose
  else if(base==='walk'||base==='run')tick=h.walkT*60;                      // walk phase follows distance (no foot sliding), keeps phase through skids
  const f=animFrame(A,Math.floor(tick),A.loop);let fl=dir==='right'?h.face==='left':(base==='death'&&h.hz==='left');
@@ -1456,6 +1473,13 @@ function drawHero(){const h=hero;if(h.inv>0&&!(h.deadT>0)&&!(h.redT>0)&&Math.flo
 function drawMound(){const h=hero,t=performance.now()/1000;ctx.fillStyle='#b8914a';ctx.beginPath();ctx.ellipse(h.x,h.y-4,34,13,0,0,Math.PI*2);ctx.fill();
  ctx.fillStyle='#d9b56a';ctx.beginPath();ctx.ellipse(h.x-3,h.y-8,24,8,0,0,Math.PI*2);ctx.fill();
  ctx.fillStyle='#f0d79a';for(let i=0;i<5;i++){const a=t*7+i*1.3;ctx.fillRect(Math.round(h.x+Math.cos(a)*26),Math.round(h.y-6+Math.sin(a)*8),4,4);}}
+function drawCharge(front){const C=hero.charge;if(!C)return;const lv=C.lv,col=lv>1?'255,214,110':lv?'140,215,255':'255,255,255',pul=.5+.5*Math.sin(C.t*(lv>1?22:14)),r=(lv>1?46:lv?38:26)+pul*6,cx=hero.x,cy=hero.y-42; // charge glow: white -> lv1 blue -> lv2 gold (aura behind the hero; ring, converging sparks, level-up flash in front)
+ ctx.save();ctx.globalCompositeOperation='lighter';
+ if(!front){const g=ctx.createRadialGradient(cx,cy,2,cx,cy,r);g.addColorStop(0,`rgba(${col},${Math.min(1,.5+.3*pul+(C.flash||0)*2)})`);g.addColorStop(.6,`rgba(${col},${.22+.15*pul})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,cy,r*.8,r*1.1,0,0,Math.PI*2);ctx.fill();}
+ else{if(lv){ctx.strokeStyle=`rgba(${col},${.6+.4*pul})`;ctx.lineWidth=lv>1?4:3;ctx.beginPath();ctx.ellipse(hero.x,hero.y-4,(lv>1?36:28)+pul*3,(lv>1?13:10)+pul,0,0,Math.PI*2);ctx.stroke();}
+  const n=(lv+1)*3;ctx.fillStyle=`rgba(${col},.95)`;for(let i=0;i<n;i++){const an=C.t*5+i*Math.PI*2/n,d=r*(1-((C.t*2.2+i*.37)%1));ctx.fillRect(cx+Math.cos(an)*d*.8-2,cy+Math.sin(an)*d-2,4,4);}
+  if(C.flash>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(.8,C.flash*3)})`;ctx.beginPath();ctx.ellipse(cx,cy,r*.5,r*.7,0,0,Math.PI*2);ctx.fill();}}
+ ctx.restore();}
 function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=DIRV[hero.face];
  if(s.leap&&a.t<s.a0-.03)return;if(s.titleSpin){drawSpinRing(a,'front');return;}
  const tr=s.trail||['120,220,255','255,255,255'];
@@ -1561,7 +1585,7 @@ function render0(){computeView();ctx=mctx;mctx.setTransform(1,0,0,1,0,0);mctx.im
  if(!hero.swim&&!hero.hidden&&!(hero.sk&&hero.sk.z>2))shadow(hero.x,hero.y+1,40,12,.4);else if(hero.sk&&hero.sk.z)shadow(hero.x,hero.y+2,30,9,.25);
  for(const m of slimes)if(!m.dead)m.kind==='boar'?shadow(m.x,m.y+1,62,14,.38):shadow(m.x-3,m.y+1,32*m.sc*(1-m.hz/80),10*m.sc,.38);
  const L=[];const heroY=hero.swim||(hero.sk&&(hero.sk.id==='dive'||hero.sk.id==='undive'))?Math.max(hero.y,419):hero.y;
- const drawHeroAll=()=>{if(hero.atk&&hero.atk.s.titleSpin)drawSpinRing(hero.atk,'back');drawHero();drawBarrier();drawSlash();ctx.save();ctx.translate(hero.x,hero.y);ctx.scale(CS,CS);ctx.translate(-hero.x,-hero.y);drawSkillOverlay();ctx.restore();};
+ const drawHeroAll=()=>{if(hero.atk&&hero.atk.s.titleSpin)drawSpinRing(hero.atk,'back');drawCharge(0);drawHero();drawCharge(1);drawBarrier();drawSlash();ctx.save();ctx.translate(hero.x,hero.y);ctx.scale(CS,CS);ctx.translate(-hero.x,-hero.y);drawSkillOverlay();ctx.restore();};
  L.push({y:heroY,f:drawHeroAll});for(const m of slimes)L.push({y:m.y,f:()=>m.kind==='boar'?drawBoar(m):drawSlime(m)});
  L.push({y:spirit.y+40,f:drawSpirit});for(const n of npcs)if(!n.dead)L.push({y:n.y,f:()=>drawNpc(n)});
  for(const f of fx)if(f.type!=='ring'&&f.type!=='twinkle')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
@@ -1611,7 +1635,7 @@ Promise.all(jobs).then(()=>{
  updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=boarSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
- window.__game={startSwingForTest:i=>startSwing(i),dirTap,toggleAlwaysRun,get alwaysRun(){return alwaysRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,unlockUltimate,ultDebug:ultDebugSet,get ultUnlocked(){return ultUnlocked},ULT_UNLOCK_FLAG,expNext,ultId,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
+ window.__game={startSwingForTest:i=>startSwing(i),SP_I,spCfg,dirTap,toggleAlwaysRun,get alwaysRun(){return alwaysRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,unlockUltimate,ultDebug:ultDebugSet,get ultUnlocked(){return ultUnlocked},ULT_UNLOCK_FLAG,expNext,ultId,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},get shopAt(){return shopAt},get shopMode(){return shopMode},get sellPend(){return sellPend},get shopNpc(){return shopNpc},openShop,dropNote,RARITY_STARS,starCount,IT,setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},set areaMode(v){areaMode=v},castArea,get areaCd(){return areaCd},set areaCd(v){areaCd=v},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};

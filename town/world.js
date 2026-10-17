@@ -35,7 +35,15 @@
     S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
   const ATK = { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
   const ATK3 = Object.assign({}, ATK, { dur: 0.38, a0: 0.07, a1: 0.24 }); // hit 3: longer active window + follow-through
-  const atkT = i => i === 2 ? ATK3 : ATK;
+  const atkT = i => i >= 3 ? atkTS(i) : i === 2 ? ATK3 : ATK;
+  // dash attack (run + attack, i 3) / charge attack lv1 / lv2 (hold attack, i 4 / 5): same data as the town (__game.ANIM.special), town px x .3, ticks / 60
+  const SPW_DEF = { dash: { dur: 26, a0: 4, a1: 12, lunge: 90, rangeMul: 1, arc: 100, dmgMul: 1.3, cool: .3 }, charge: { t1: .6, t2: 1.2, moveMul: .4,
+    lv1: { dur: 34, a0: 6, a1: 14, lunge: 24, rangeMul: 1.15, arc: 100, dmgMul: 2, cool: .25 }, lv2: { dur: 40, a0: 6, a1: 16, lunge: 30, rangeMul: 1.4, arc: 100, dmgMul: 3, cool: .3, wave: { speed: 560, range: 260, rad: 28, dmgMul: 1 } } } };
+  function spW() { const g = window.__game; return (g && g.ANIM && g.ANIM.special && g.ANIM.special.dash) ? g.ANIM.special : SPW_DEF; }
+  function spOf(i) { const C = spW(); return i === 3 ? C.dash : i === 4 ? C.charge.lv1 : C.charge.lv2; }
+  function atkTS(i) { const h = spOf(i); return { dur: h.dur / 60, a0: h.a0 / 60, a1: h.a1 / 60 }; }
+  function arcW(i) { return i >= 3 ? (spOf(i).arc || 100) : i === 2 ? SWING.arc3 : SWING.arc; }
+  function sfx(k, v, r) { try { const g = window.__game; if (g && g.SFX) g.SFX.play(k, v, r); } catch (e) { } }
   const FADE = 0.35, CARD = 2.1;
   const Q = new URLSearchParams(location.search);
   const LS = 'thor.world.v1';
@@ -252,7 +260,7 @@
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
       if (just) { hero.roll.just = true; sfx('justDodge'); ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2); sfx('hurt'); ultAdd('gainHurt', dmg);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); sfx('hurt'); ultAdd('gainHurt', dmg);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
@@ -429,30 +437,38 @@
   }
   function stepMap(dt) {
     const m = M();
-    hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt);
+    hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt); hero.atkCd = Math.max(0, (hero.atkCd || 0) - dt);
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
     if (takePress('ult') && !S.ultFx) castUlt();
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) [dx, dy] = FACEV[hero.face]; const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; sfx('dodge'); hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
-    if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; try { window.__game.SFX.ev.swing(window.__game.weaponType, hero.combo, hero.combo === 2 ? 1 : .75); } catch (e) {} if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); }
+    if (takePress('attack') && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.holdT = 0; hero.holdOk = true; hero.charge = null; // running + attack = 돌진베기
+      if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; try { window.__game.SFX.ev.swing(window.__game.weaponType, hero.combo, hero.combo === 2 ? 1 : .75); } catch (e) {} if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); } }
+    if (isHeld('attack') && hero.holdOk) hero.holdT += dt; else hero.holdOk = false; // charge (모으기): keep holding attack -> lv1 t1 / lv2 t2, release = charged slash; a hit / dodge cancels
+    if (!hero.charge && hero.holdOk && hero.holdT > .14 && !hero.atk && !hero.roll && hero.hp > 0) { hero.charge = { t: hero.holdT, lv: 0, flash: 0 }; hero.run = false; }
+    if (hero.charge) { const C = hero.charge, CF = spW().charge; C.t += dt; C.flash = Math.max(0, C.flash - dt); const lv = C.t >= CF.t2 ? 2 : C.t >= CF.t1 ? 1 : 0;
+      if (lv > C.lv) { C.lv = lv; C.flash = .25; sfx(lv > 1 ? 'ult_cutin' : 'hit_crit', lv > 1 ? .4 : .5, lv > 1 ? 1.9 : 1.7); addFx('spark', hero.x, hero.y - 12, { life: .3 }); }
+      if (!hero.holdOk || hero.roll || hero.atk || hero.hp <= 0) { const rel = !hero.holdOk && !hero.roll && !hero.atk && hero.hp > 0 && C.lv > 0; hero.charge = null; if (rel) { hero.atk = { t: 0, hit: new Set(), i: 3 + C.lv }; sfx('swing_heavy', 1); } } }
     if (takePress('interact')) interact();
     if (hero.roll) { const r = hero.roll; r.t += dt; const sp = Math.max(ROLL.speed * (1 - r.t / ROLL.dur * .55), r.carry); moveCol(hero, r.dx * sp * dt, r.dy * sp * dt, 5); hero.walkT += dt * 3; // from a run the dodge keeps momentum
       if (r.t >= ROLL.dur) { hero.roll = null; hero.rollCd = ROLL.cd; if (r.carry) addFx('dust', hero.x, hero.y, { life: .3 }); } }
-    else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const AT = atkT(a.i), lv = a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : 20; moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
-      if (a.t >= AT.a0 && a.t <= AT.a1) { const R = swingR(a.i), cosA = Math.cos((a.i === 2 ? SWING.arc3 : SWING.arc) / 2 * Math.PI / 180);
+    else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const AT = atkT(a.i), lv = a.i >= 3 ? (a.t < AT.a1 ? (spOf(a.i).lunge || 0) * .3 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : 20; moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
+      if (a.t >= AT.a0 && a.t <= AT.a1) { const R = swingR(a.i), cosA = Math.cos(arcW(a.i) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
           const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
-          if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); hitMob(mm, ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x)); } } }
-      if (a.t >= AT.dur) { hero.atk = null; hero.comboT = ATK.chain; } }
+          if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); hitMob(mm, a.i >= 3 ? ATK_DMG[0] * (spOf(a.i).dmgMul || 1) : ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x)); if (a.i >= 3) sfx(a.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
+      if (a.i === 5 && !a.waved && a.t >= AT.a0) { a.waved = true; spawnHW(Math.atan2(dv[1], dv[0])); shake(1); } // charge lv2: forward sword wave (1px shake only)
+      if (a.t >= AT.dur) { hero.atk = null; hero.comboT = a.i >= 3 ? 0 : ATK.chain; if (a.i >= 3) hero.atkCd = spOf(a.i).cool || .2; } }
     else { const g = window.__game, mv = !!(ix || iy);
-      if (mv && !hero.run && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
+      if (mv && !hero.run && !hero.charge && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
       hero.runReq = false; if (!mv && hero.run) { hero.run = false; hero.skidT = RUN.skidT; sfx('skid'); hero.skidV = [FACEV[hero.face][0], FACEV[hero.face][1]]; addFx('dust', hero.x, hero.y, { life: .3 }); }
       hero.runStartT = Math.max(0, (hero.runStartT || 0) - dt);
       const rk = hero.run ? RUN.mul + (RUN.startMul - RUN.mul) * hero.runStartT / RUN.startT : 1;
-      const sp = HERO_SPEED * rk * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = mv;
-      if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) sfx('footstep', ({ field: 'grass', dungeon: 'stone', boss: 'stone' })[M().type] || 'dirt'), addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
+      const sp = HERO_SPEED * rk * (hero.charge ? (spW().charge.moveMul || .4) : 1) * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = mv;
+      if (hero.moving) { if (!hero.charge) setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) sfx('footstep', ({ field: 'grass', dungeon: 'stone', boss: 'stone' })[M().type] || 'dirt'), addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
       else if (hero.skidT > 0) { hero.skidT -= dt; const k = hero.skidT / RUN.skidT; moveCol(hero, hero.skidV[0] * HERO_SPEED * 1.2 * k * dt, hero.skidV[1] * HERO_SPEED * 1.2 * k * dt, 5); } } // short skid
+    stepHW(dt);
     if (!hero.atk) hero.comboT = Math.max(0, hero.comboT - dt);
     // tiles & objects: pits, spikes, exits, stairs, keys, doors, warp
     const cx = Math.floor(hero.x / m.T), cy = Math.floor(hero.y / m.T);
@@ -639,7 +655,17 @@
     if (o.type === 'key' && !SAVE.keys[o.keyId]) { put('key_floor'); if (Math.sin(S.t * 5) > .6) { g.fillStyle = '#fff8c0'; g.fillRect(o.x + 3, o.y - 5, 2, 2); } }
     if (o.type === 'torch') { put('torch'); g.fillStyle = Math.sin(S.t * 13 + o.x) > 0 ? '#ffd040' : '#ff8a20'; g.fillRect(o.x - 1, o.y - 5, 2, 2); }
   }
+  function spawnHW(dir) { const w = spOf(5).wave || {}; S.hw = S.hw || []; const v = (w.speed || 560) * .3; S.hw.push({ x: hero.x, y: hero.y - 6, vx: Math.cos(dir) * v, vy: Math.sin(dir) * v * .8, d: 0, R: (w.range || 260) * .3, rad: (w.rad || 28) * .3, dmg: ATK_DMG[0] * (w.dmgMul || 1), hit: new Set(), map: S.map }); sfx('wave', .7); }
+  function stepHW(dt) { if (!S.hw) return; for (let i = S.hw.length - 1; i >= 0; i--) { const w = S.hw[i]; w.x += w.vx * dt; w.y += w.vy * dt; w.d += Math.hypot(w.vx, w.vy) * dt;
+      if (w.map !== S.map || w.d > w.R || solidAt(w.x, w.y + 6)) { S.hw.splice(i, 1); continue; }
+      for (const mm of S.mobs) { if (mm.dead || w.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1); if (Math.hypot(mm.x - w.x, (mm.y - mh * .3) - w.y) < w.rad + mm.r) { w.hit.add(mm); hitMob(mm, w.dmg, Math.atan2(w.vy, w.vx)); } } } }
+  function drawHW(g) { if (!S.hw) return; for (const w of S.hw) { const al = Math.max(0, 1 - w.d / w.R), a = Math.atan2(w.vy / .8, w.vx); g.save(); g.translate(w.x, w.y); g.scale(1, .8); g.rotate(a); g.lineCap = 'round';
+      g.strokeStyle = `rgba(255,214,110,${.8 * al})`; g.lineWidth = 4; g.beginPath(); g.arc(-3, 0, 10, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,255,255,${al})`; g.lineWidth = 1.5; g.beginPath(); g.arc(-3, 0, 10, -1, 1); g.stroke(); g.restore(); } }
+  function drawCharge(g) { const C = hero.charge; if (!C) return; const lv = C.lv, col = lv > 1 ? '255,214,110' : lv ? '140,215,255' : '255,255,255', pul = .5 + .5 * Math.sin(C.t * (lv > 1 ? 22 : 14)), r = (lv > 1 ? 13 : lv ? 11 : 8) + pul * 1.5, cx = hero.x, cy = hero.y - 10; // white -> lv1 blue -> lv2 gold
+    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(cx, cy, 1, cx, cy, r); gr.addColorStop(0, `rgba(${col},${Math.min(1, .35 + .25 * pul + C.flash * 2)})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, r * .8, r, 0, 0, TAU); g.fill();
+    const n = (lv + 1) * 3; g.fillStyle = `rgba(${col},.95)`; for (let i = 0; i < n; i++) { const a = C.t * 5 + i * TAU / n, d = r * (1 - ((C.t * 2.2 + i * .37) % 1)); g.fillRect(cx + Math.cos(a) * d - .6, cy + Math.sin(a) * d * .8 - .6, 1.2, 1.2); } g.restore(); }
   function drawHeroSprite(g, zoom) {
+    if (zoom === 1) { drawHW(g); drawCharge(g); }
     const h = hero; if (h.inv > 0 && S.scene !== 'world' && Math.floor(h.inv * 20) % 2 && !h.roll) return;
     const d = h.face === 'left' ? 'right' : h.face; const fi = h.moving || h.roll ? Math.floor(h.walkT * 8) % 4 : 0;
     const name = 'hero_' + d + '_' + fi;
@@ -661,9 +687,9 @@
       const d = cg.getImageData(0, 0, c.width, c.height); for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 100 ? 255 : 0; cg.putImageData(d, 0, 0); smallCache[key] = c; }
     g.save(); g.translate(Math.round(x), Math.round(y)); if (hero.face === 'left') g.scale(-1, 1); g.drawImage(c, -Math.round(c.width / 2), -c.height); g.restore();
   }
-  function swingR(i) { const g = window.__game; let k = 1; try { if (g && g.swingRange && g.SWINGS) k = g.swingRange(g.SWINGS[0]) / 96; } catch (e) { } return SWING.range * k * (i === 2 ? SWING.r3 : 1); }
+  function swingR(i) { const g = window.__game; let k = 1; try { if (g && g.swingRange && g.SWINGS) k = g.swingRange(g.SWINGS[0]) / 96; } catch (e) { } return SWING.range * k * (i === 2 ? SWING.r3 : i >= 3 ? (spOf(i).rangeMul || 1) : 1); }
   function drawSlash(g) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]);
-    if (p > (a.i === 2 ? .9 : .85)) return; const sweep = (a.i % 2 ? -1 : 1), R = swingR(a.i) - 2, half = (a.i === 2 ? SWING.arc3 : SWING.arc) / 2 * Math.PI / 180; // trail = hitbox radius/arc; hit2 sweeps back across the FRONT
+    if (p > (a.i === 2 ? .9 : .85)) return; const sweep = (a.i % 2 ? -1 : 1), R = swingR(a.i) - 2, half = arcW(a.i) / 2 * Math.PI / 180; // trail = hitbox radius/arc; hit2 sweeps back across the FRONT
     const a0 = base - sweep * half, a1 = a0 + sweep * 2 * half * Math.min(1, p / (AT.a1 / AT.dur));
     g.save(); g.translate(hero.x, hero.y - 4); g.scale(1, .8); g.lineCap = 'round';
     g.strokeStyle = a.i === 2 ? 'rgba(255,230,120,.9)' : 'rgba(255,255,255,.85)'; g.lineWidth = a.i === 2 ? 4 : 3; g.beginPath(); g.arc(0, 0, R, Math.min(a0, a1), Math.max(a0, a1)); g.stroke();
@@ -877,7 +903,7 @@
   window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = {
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
-    go, dirTap, RUN, SWING, swingR, setManual(v) { manual = v; },
+    go, dirTap, RUN, SWING, swingR, spOf, arcW, setManual(v) { manual = v; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
     tap(code) { queue.push(code); },
