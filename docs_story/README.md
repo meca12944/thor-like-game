@@ -8,7 +8,9 @@
 | `town_A_events_quests.md` / `.json` | 마을 이벤트 9개(프롤로그~잿빛 분수 터), 퀘스트 A1~A11 대사(offer/progress/done), 보상 아이템 목록 |
 | `chests_A_area1.md` / `.json` | 마을 A + 1지역 상자: 기존 상자 정리, 찾기 쉬운 숨은 상자, 나중 능력/열쇠 상자 |
 | `heroine_quests.md` / `.json` | 히로인 7명 등장 장면 + 호감도 대화 3단계(20/60/80), 리네트(옛 나비) 동료 퀘스트(A_TAILOR1~3) 대본. 나머지 6명 동료 퀘스트 대본은 다음 작업 |
-| `ult_unlock_event.md` | 필살기(R) 해방 중반 이벤트 제안 「낙인의 개화」 (4지역 세트라 직후) |
+| `main_story.md` | **게임 전체 메인 스토리 줄거리** — 「필멸자」(가제). 억겁의 불사자 주인공, 반전 3개, 지역별 장, 칭호별 엔딩 4종, 히로인 엔딩 |
+| `spirit_removal.md` | 정령(이슬/에스라) 삭제에 따른 게임 요소 대체안 + 코드에서 바꿀 파일 목록(수정은 안 함) |
+| `ult_unlock_event.md` | 필살기(R) 해방 중반 이벤트 「낙인의 개화」 (4지역 세트라 흡수 + 전생 기억) |
 | `names_eldenring.md` | 엘든링풍 이름표 — **확정 (2026-10-17 사장님 승인), docs_story 전체 적용 완료** |
 
 ## 대사 형식
@@ -51,7 +53,7 @@
 8. **숲의 단검 위치 불일치**: DIVE_SPOTS.md 표 순서로는 「버섯 군락 옆 늪」, ITEMS.md는 「큰 나무 뿌리 사이 샘」. 상자 JSON은 DIVE_SPOTS 기준.
 9. ~~리네트(옛 나비)의 전투 묘사 불일치~~ → 해결: 바늘 (위 3번). 원래 내용: HEROINES.md는 재봉 바늘 두 자루, towns.json 마을 사람 전투는 「재봉 가위 찌르기·실타래 던지기」. 대본은 바늘로 씀.
 10. **마을 A 지도**: A의 타일 지도 JSON이 없어 마을 상자 위치는 말로만 적었다. 촌장집 연못(잠수 지점)과 탁검이 있는 「분수 옆 연못」이 같은 연못인지 불분명.
-11. **보상 아이템 ID**: 「거친 수정 원석」「물방울 무늬 망토」「어머니의 편지」「나비 리본 망토」「망토 염색 무료권」 등은 이름만 있고 ID가 없어 `proposed_id`로 새 ID를 붙였다.
+11. **보상 아이템 ID**: 「거친 수정 원석」「물방울 무늬 망토」「어머니의 편지」(→ 어머니 설정 삭제로 「요람의 장부 조각」 `k_cradle_page`)「나비 리본 망토」「망토 염색 무료권」 등은 이름만 있고 ID가 없어 `proposed_id`로 새 ID를 붙였다.
 12. **「나비」가 들어간 아이템 이름**: 「나비 리본 망토」(`c_cape_nabi_ribbon`)·「나비 골무 부적」은 히로인 이름이 아니라 나비(butterfly) 무늬로 보고 그대로 뒀다. 히로인 이름을 딴 상점명은 「리네트 재봉소」로 바꿨다. 아이템명도 바꿀지 팀장 결정.
 
 ## 이름표 확정 적용 (2026-10-17, 사장님 승인)
@@ -62,7 +64,7 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 |---|---|
 | 촌장 한결 / 미소 / 강철 / 나비 / 물결 할머니 / 도토리(아이) / 바위 / 보리(농부) / 소담 / 가락 | 오스왈드 / 미라벨 / 브란트 / 리네트 / 엘스베트 / 토비 / 베른 / 하로 / 세레스 / 라우렌 |
 | 나그네 보리 / 운 / 방울 / 숨비 / 루비 / 설화 | 퀸트 / 베일라 / 자이라 / 마렌 / 로자린드 / 이벨린 |
-| 이슬 / 칼바람 / 매눈 솔 / 곰쇠 / 한빙 / 먼지 / 책벌레 연 / 은갑 / 흑갑 / 불칼 / 거북 / 돌쇠 / 돌님 | 에스라 / 바렌 / 솔렌 / 고름 / 하르빅 / 더스턴 / 이브넬 / 실반 / 모르반 / 볼칸 / 토르투 / 도르크 / 넬 |
+| 이슬 / 칼바람 / 매눈 솔 / 곰쇠 / 한빙 / 먼지 / 책벌레 연 / 은갑 / 흑갑 / 불칼 / 거북 / 돌쇠 / 돌님 | (에스라 — 정령 삭제로 미사용) / 바렌 / 솔렌 / 고름 / 하르빅 / 더스턴 / 이브넬 / 실반 / 모르반 / 볼칸 / 토르투 / 도르크 / 넬 |
 
 ### 팀장이 수정 필요 — docs_story 밖에서 옛 이름이 남은 파일 (직접 수정하지 않음)
 
@@ -75,3 +77,10 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 - **아트 색인**: `art/npcs/INDEX.md`, `art/npcs/portraits/index.json`, `art/icons/INDEX.md`, `art/icons/icons.json`, `art/mobs/INDEX.md`, `town/assets/portraits/index.json`, `town/assets/bust/index.json`, `town/assets/tachie/index.json`, `town/assets/icons/icons.json`, `town/assets/icons/items_demo.json`, `docs_art/bust/README.md`, `town/tools/import_bust.py`, `town/tools/tachie/sheets.py`, `town/tools/tachie/make_index.py`, `town/style_sample/tools/compose.py`
 - **테스트**: `town/tools/test_world.py`, `town/tools/test_tachie.py`, `town/tools/test_inventory.py`, `town/tools/test_shop_sell.py` (이름 문자열을 확인하는 테스트는 데이터와 함께 고쳐야 함)
 - **음악 문서**: `docs_music/gemini_prompts.md`, `docs_music/SFX_LIST.md`, `docs_music/sfx_draft/index.html`, `tools/music/gen_doc.py`, `tools/music/songs/area02_cave.py`
+
+## 메인 스토리 개편 반영 (2026-10-17)
+
+- 제목 「필멸자」(가제). **정령 이슬/에스라와 주인공의 어머니는 이야기에서 삭제.** 주인공은 분수 가에서 발견된 업둥이(억겁을 다시 태어나 온 불사자) — 상세는 `main_story.md`.
+- docs_story 안의 정령·어머니 대사를 교체함: 프롤로그 에스라 대사 → 엘스베트 「세 번째 붉은 물」, 골렘 귀환 → 바렌, 원탁의 심연 → 오스왈드, 여덟 맹세 → 나레이션. 오스왈드·엘스베트의 「네 어미」 대사 → 「스무 해 전 바구니」로 바꿈. A6 보상 「어머니의 편지」(`k_mother_letter`) → 「요람의 장부 조각」(`k_cradle_page`, 신규 ID 제안). 필살기 해방 문서는 정령 없이 다시 씀.
+- 아이템 ID(`spirit`·`spirit_hi`·`spirit_drop`)는 그대로 두고 표시 이름만 바꾸기를 제안함(`spirit_removal.md`).
+- **팀장이 수정해야 함 (docs_story 밖)**: `spirit_removal.md`의 「코드·데이터에서 바꿀 곳」 목록 참고.
