@@ -7,14 +7,14 @@
 | `town_A_npcs.md` / `.json` | A 시작 마을 NPC 10명 대사 전체 + 칭호(영웅/필멸자/필멸자·악명/타락한 필멸자/마왕)별 분기, 마왕 루트 파괴·아이 대피 규칙 |
 | `town_A_events_quests.md` / `.json` | 마을 이벤트 9개(프롤로그~잿빛 분수 터), 퀘스트 A1~A11 대사(offer/progress/done), 보상 아이템 목록 |
 | `chests_A_area1.md` / `.json` | 마을 A + 1지역 상자: 기존 상자 정리, 찾기 쉬운 숨은 상자, 나중 능력/열쇠 상자 |
-| `heroine_quests.md` / `.json` | 히로인 7명 등장 장면 + 호감도 대화 3단계(20/60/80), 나비 동료 퀘스트(A_TAILOR1~3) 대본. 나머지 6명 동료 퀘스트 대본은 다음 작업 |
+| `heroine_quests.md` / `.json` | 히로인 7명 등장 장면 + 호감도 대화 3단계(20/60/80), 리네트(옛 나비) 동료 퀘스트(A_TAILOR1~3) 대본. 나머지 6명 동료 퀘스트 대본은 다음 작업 |
 | `ult_unlock_event.md` | 필살기(R) 해방 중반 이벤트 제안 「낙인의 개화」 (4지역 세트라 직후) |
-| `names_eldenring.md` | 엘든링풍 이름 변경안 표 — **승인 대기, 아직 어떤 문서에도 미적용** |
+| `names_eldenring.md` | 엘든링풍 이름표 — **확정 (2026-10-17 사장님 승인), docs_story 전체 적용 완료** |
 
 ## 대사 형식
 
 ```json
-{"speaker": "나비", "expression": "smile", "text": "역시! 같이 오길 잘했어요."}
+{"speaker": "리네트", "expression": "smile", "text": "역시! 같이 오길 잘했어요."}
 ```
 
 - `expression`: `neutral` `smile` `angry` `sad` `surprised` `blush` 중 하나. 지금 있는 초상화는 normal/smile/angry/blush라 `neutral`→normal, `sad`·`surprised`는 파일이 생기기 전까지 normal로 대체.
@@ -24,30 +24,54 @@
 ## 규칙 준수
 
 - 여성 캐릭터는 모두 성인(설정 나이 그대로), 장면·대사는 비노출·비선정. 외모·신체 묘사 대사 없음.
-- 아이(도토리 등)는 어떤 루트에서도 죽일 수 없다 — 마왕 루트에서는 대피 연출만, 성적 묘사 없음.
+- 아이(토비 등)는 어떤 루트에서도 죽일 수 없다 — 마왕 루트에서는 대피 연출만, 성적 묘사 없음.
 - 유나만 현대 세계 출신(현대 말투·현대 복장), 나머지 6명은 판타지 세계 출신. 히로인 대사는 설렘 정도의 로맨스까지.
-- 말투: 새로 쓴 히로인 대사는 엘든링풍(고어체, 묵직하고 쓸쓸한 톤)을 섞음. 마을 A NPC 대사는 이름 변경 승인 뒤 함께 다듬을 예정.
+- 말투: 판타지 세계 인물 대사는 엘든링풍(고어체, 묵직하고 쓸쓸한 톤). 마을 A NPC 10명 대사·퀘스트 대사도 확정 이름과 함께 다듬음(악명 분기 대사도 towns.json `greeting_dark` 대신 새로 씀). 아이 토비는 아이 말투 유지, 유나는 현대 말투 유지.
+- `speaker`는 칭호 없는 짧은 이름(예: 「오스왈드」). 칭호는 `town_A_npcs.json`의 `title`, 옛 이름은 `former_name`에 둠 — 대사창 이름표에 칭호를 붙일지는 미정.
 
 ## 팀장 결정 반영 (2026-10-17)
 
-1. **주인공 나이 17세 → 성인 20세.** docs_story 안은 반영 완료(프롤로그 「스무 번째 생일 밤」, 칼바람·물결 할머니 대사 「20년 전」). 나비 대본은 호감도에 따라 설렘이 묻어나는 로맨스 톤(비노출·비선정)으로 수정.
+1. **주인공 나이 17세 → 성인 20세.** docs_story 안은 반영 완료(프롤로그 「스무 번째 생일 밤」, 바렌(옛 칼바람)·엘스베트(옛 물결 할머니) 대사 「20년 전」). 리네트(옛 나비) 대본은 호감도에 따라 설렘이 묻어나는 로맨스 톤(비노출·비선정)으로 수정.
    - **팀장이 수정 필요 (docs_story 밖, 손대지 않음)**: `STORY.md`, `TOWNS.md`, `TOWNSFOLK_COMBAT.md`, `data/towns.json`, `tools/design/story_data.py` — 「열일곱 번째 생일」「17년」 표현.
-2. **바람길 「나그네 보리」 개명.** 새 이름은 「바람길의 순례자」 퀸트(이름 변경안 표에 포함, 승인 시 확정). 농부 보리는 그대로. docs_story 본문에는 나그네가 등장하지 않아 이 README만 해당.
+2. **바람길 「나그네 보리」 개명.** 새 이름은 「바람길의 순례자」 퀸트(**확정**). 농부 보리도 이름표에 따라 「허수아비지기」 하로로 **확정**. docs_story 본문에는 나그네가 등장하지 않아 이 README만 해당.
    - **팀장이 수정 필요**: `town/maps/field00.json`(npc_bori name), `town/tools/world_maps.py`, `town/maps/quests.json`(giver `npc_bori` — ID도 바꿀지 결정).
-3. **나비 무기 = 재봉 바늘 두 자루 (HEROINES.md 기준).** 대본의 「가위」 표현 제거. **팀장이 수정 필요**: `data/towns.json`·`TOWNS.md`·`TOWNSFOLK_COMBAT.md`의 나비 전투 「재봉 가위 찌르기」.
+3. **리네트(옛 나비) 무기 = 재봉 바늘 두 자루 (HEROINES.md 기준).** 대본의 「가위」 표현 제거. **팀장이 수정 필요**: `data/towns.json`·`TOWNS.md`·`TOWNSFOLK_COMBAT.md`의 나비 전투 「재봉 가위 찌르기」.
 4. **마을 A 상자 위치**: 좌표 없이 「구역 — 장소의 느낌」으로 다시 씀 (`chests_A_area1`).
 5. **히로인 6명 등장 장면 + 호감도 대화 3단계 추가** (`heroine_quests`).
 
 ## 설정상 불분명했던 점 (확인 필요)
 
 1. ~~주인공 나이 17세~~ → 해결: 20세로 결정 (위 1번).
-2. **칭호 vs 선악 등급**: 칭호(영웅 +40 / 필멸자 ±39 / 타락한 필멸자 -40~-59)와 거절 기준(「악명」 -20 이하)이 어긋난다 → `mortal_infamous` 분기를 따로 둠. 마을 NPC의 악명 대사는 `towns.json`의 `greeting_dark`를 그대로 썼다.
+2. **칭호 vs 선악 등급**: 칭호(영웅 +40 / 필멸자 ±39 / 타락한 필멸자 -40~-59)와 거절 기준(「악명」 -20 이하)이 어긋난다 → `mortal_infamous` 분기를 따로 둠. 악명 대사는 원래 `towns.json`의 `greeting_dark`였으나 엘든링풍으로 새로 씀(towns.json 쪽 교체는 팀장 판단).
 3. ~~보리 두 명~~ → 해결: 나그네 개명 (위 2번). 원래 내용: 마을 A의 「농부 보리」(towns.json)와 바람길 지도의 「나그네 보리」(`npc_bori`, 음유시인 스프라이트, q_forest_chiefs 의뢰인)가 같은 이름이다. 같은 사람인지 확인 필요.
 4. **quests.json 위치**: WORLD.md는 `maps/quests.json`이라 쓰지만 실제 파일은 `town/maps/quests.json`(1지역 퀘스트 2개뿐). 루트 `maps/`에는 PNG만 있다.
 5. **heroines_data.py 경로·개수**: 실제 경로는 `tools/design/heroines_data.py`(town/ 아래 아님). 머리 주석은 「히로인 6명」인데 목록은 7명(유나 추가).
 6. **A_TAILOR3 장소**: 원문 「B 강변 수정 동굴 입구」 — 수정 동굴은 2지역(바람길 남쪽 낙석 너머·H 근처)이라 「낙석이 치워진 뒤 수정 동굴 입구」로 해석했다.
 7. **없는 몹**: A_TAILOR1의 거미, A_TAILOR2의 까마귀가 1지역 몹 목록(WORLD_PLAN.md)에 없다 → 색 변형 몹(은실거미·까마귀) 제안.
 8. **숲의 단검 위치 불일치**: DIVE_SPOTS.md 표 순서로는 「버섯 군락 옆 늪」, ITEMS.md는 「큰 나무 뿌리 사이 샘」. 상자 JSON은 DIVE_SPOTS 기준.
-9. ~~나비의 전투 묘사 불일치~~ → 해결: 바늘 (위 3번). 원래 내용: HEROINES.md는 재봉 바늘 두 자루, towns.json 마을 사람 전투는 「재봉 가위 찌르기·실타래 던지기」. 대본은 바늘로 씀.
+9. ~~리네트(옛 나비)의 전투 묘사 불일치~~ → 해결: 바늘 (위 3번). 원래 내용: HEROINES.md는 재봉 바늘 두 자루, towns.json 마을 사람 전투는 「재봉 가위 찌르기·실타래 던지기」. 대본은 바늘로 씀.
 10. **마을 A 지도**: A의 타일 지도 JSON이 없어 마을 상자 위치는 말로만 적었다. 촌장집 연못(잠수 지점)과 탁검이 있는 「분수 옆 연못」이 같은 연못인지 불분명.
 11. **보상 아이템 ID**: 「거친 수정 원석」「물방울 무늬 망토」「어머니의 편지」「나비 리본 망토」「망토 염색 무료권」 등은 이름만 있고 ID가 없어 `proposed_id`로 새 ID를 붙였다.
+12. **「나비」가 들어간 아이템 이름**: 「나비 리본 망토」(`c_cape_nabi_ribbon`)·「나비 골무 부적」은 히로인 이름이 아니라 나비(butterfly) 무늬로 보고 그대로 뒀다. 히로인 이름을 딴 상점명은 「리네트 재봉소」로 바꿨다. 아이템명도 바꿀지 팀장 결정.
+
+## 이름표 확정 적용 (2026-10-17, 사장님 승인)
+
+docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`speaker` 포함). 주인공 「필멸자」와 「이름 유지」 인물(카이렌·아스란·오르비스·자흐라·마고·가론·그림·아르덴·세린·루미엘·레온·사바·세트라·바르·미레·유나)은 그대로.
+
+| 옛 이름 | 확정 이름 |
+|---|---|
+| 촌장 한결 / 미소 / 강철 / 나비 / 물결 할머니 / 도토리(아이) / 바위 / 보리(농부) / 소담 / 가락 | 오스왈드 / 미라벨 / 브란트 / 리네트 / 엘스베트 / 토비 / 베른 / 하로 / 세레스 / 라우렌 |
+| 나그네 보리 / 운 / 방울 / 숨비 / 루비 / 설화 | 퀸트 / 베일라 / 자이라 / 마렌 / 로자린드 / 이벨린 |
+| 이슬 / 칼바람 / 매눈 솔 / 곰쇠 / 한빙 / 먼지 / 책벌레 연 / 은갑 / 흑갑 / 불칼 / 거북 / 돌쇠 / 돌님 | 에스라 / 바렌 / 솔렌 / 고름 / 하르빅 / 더스턴 / 이브넬 / 실반 / 모르반 / 볼칸 / 토르투 / 도르크 / 넬 |
+
+### 팀장이 수정 필요 — docs_story 밖에서 옛 이름이 남은 파일 (직접 수정하지 않음)
+
+옛 이름 문자열 검색 결과(origin/main 기준). 「바위·운·방울·루비·먼지·강철·도토리·미소·나비·거북」은 일반 낱말(돌, 운명, 물방울, 보석, 강철 재질, 도토리 재료, 웃음, 나비 무늬, 거북 몹 등)과 겹치므로 파일마다 인물 이름인지 확인해야 한다. ID(`a_chief`, `npc_bori` 등)와 초상화 파일명은 ID 기반이라 그대로 두어도 되고, 표시 이름(`name`)만 바꾸면 된다.
+
+- **설정 문서**: `STORY.md`, `TOWNS.md`, `TOWNSFOLK_COMBAT.md`, `HEROINES.md`, `SYSTEMS.md`, `MATERIALS.md`, `ITEMS.md`, `EQUIPMENT.md`, `CRAFTING.md`, `LEVELS.md`, `CONTROLS.md`, `WORLD_PLAN.md`, `BGM.md`, `STORY_GUIDE.md`, `MONSTERS.md`, `BOSS_PATTERNS.md`, `DIVE_SPOTS.md`, `CREDITS.md`, `town/WORLD.md`, `town/TACHIE.md`, `town/BALANCE_TODO.md`
+- **게임 데이터**: `data/towns.json`(NPC·강자·히로인 `name`, `greeting_dark`), `data/levels.json`, `town/maps/field00.json`(나그네 `npc_bori` name), `town/maps/quests.json`(giver `npc_bori`)
+- **데이터 생성 스크립트**: `tools/design/towns_data.py`, `tools/design/story_data.py`, `tools/design/heroines_data.py`, `tools/design/craft_data.py`, `tools/design/level_data.py`, `tools/design/difficulty_data.py`, `tools/design/gen_docs.py`, `tools/build_art.py`, `town/tools/world_maps.py`
+- **게임 코드·화면**: `town/index.html`, `town/tools/game.template.html`, `town/world.js`, `town/world_mobs.js`, `town/tachie.js`, `town/tools/tachie/chars.js`, `town/tools/tachie/chars2.js`, `old_proto.html`
+- **아트 색인**: `art/npcs/INDEX.md`, `art/npcs/portraits/index.json`, `art/icons/INDEX.md`, `art/icons/icons.json`, `art/mobs/INDEX.md`, `town/assets/portraits/index.json`, `town/assets/bust/index.json`, `town/assets/tachie/index.json`, `town/assets/icons/icons.json`, `town/assets/icons/items_demo.json`, `docs_art/bust/README.md`, `town/tools/import_bust.py`, `town/tools/tachie/sheets.py`, `town/tools/tachie/make_index.py`, `town/style_sample/tools/compose.py`
+- **테스트**: `town/tools/test_world.py`, `town/tools/test_tachie.py`, `town/tools/test_inventory.py`, `town/tools/test_shop_sell.py` (이름 문자열을 확인하는 테스트는 데이터와 함께 고쳐야 함)
+- **음악 문서**: `docs_music/gemini_prompts.md`, `docs_music/SFX_LIST.md`, `docs_music/sfx_draft/index.html`, `tools/music/gen_doc.py`, `tools/music/songs/area02_cave.py`
