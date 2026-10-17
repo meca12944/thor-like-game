@@ -1,0 +1,23 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="icon" href="data:,"><title>토르 3D 마을 테스트</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#20262b;touch-action:none;user-select:none;-webkit-user-select:none;font-family:system-ui,sans-serif}
+canvas{display:block}
+#hud{position:fixed;left:12px;top:max(10px,env(safe-area-inset-top));color:#fff;font-size:22px;text-shadow:0 2px 3px #0008;pointer-events:none}
+#hud .t{font-size:13px;opacity:.85;margin-top:2px}
+#msg{position:fixed;left:50%;top:18%;transform:translateX(-50%);color:#fff;font-size:20px;font-weight:700;text-shadow:0 2px 4px #000a;pointer-events:none;opacity:0;transition:opacity .4s}
+#load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#20262b;font-size:18px;z-index:9}
+#joy{position:fixed;left:24px;bottom:max(24px,env(safe-area-inset-bottom));width:130px;height:130px;border-radius:50%;background:#ffffff22;border:2px solid #ffffff44}
+#knob{position:absolute;left:40px;top:40px;width:50px;height:50px;border-radius:50%;background:#ffffffaa}
+#atk{position:fixed;right:28px;bottom:max(36px,env(safe-area-inset-bottom));width:84px;height:84px;border-radius:50%;background:#d9534fcc;border:3px solid #fff8;color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center}
+@media (hover:hover) and (pointer:fine){#joy,#atk{opacity:.35}}
+</style>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
+</head><body>
+<div id="load">불러오는 중…</div>
+<div id="hud"><div id="hearts"></div><div class="t">이동: WASD/방향키 · 공격: Z</div></div>
+<div id="msg"></div>
+<div id="joy"><div id="knob"></div></div><div id="atk">공격</div>
+<script type="module" src="./game.js"></script>
+</body></html>
