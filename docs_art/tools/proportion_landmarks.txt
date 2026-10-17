@@ -1,0 +1,29 @@
+# proportion landmarks (source = pre-normalization art); see proportion.py
+outfits_v3/hero 165 221 427 aspect=0.85
+outfits_v3/a_tailor 182 236 455 crotch=655 aspect=0.85
+outfits_v3/h_mystic 177 228 449 crotch=640 aspect=1.145
+outfits_v3/g_dancer 167 228 444 crotch=650 aspect=1.03
+outfits_v3/f_diver 188 245 449 crotch=650 aspect=1.15
+outfits_v3/e_tailor 177 238 441 crotch=640 aspect=1.141
+outfits_v3/c_priest 198 262 449 aspect=1.15
+outfits_v3/d_yuna 180 240 444 crotch=615 aspect=0.911
+characters/a_chief 177 232 440
+characters/a_tool 170 238 448 crotch=660
+characters/a_smith 152 213 449
+characters/a_granny 377 445 470 hunch
+characters/a_guard 145 207 420
+characters/a_farmer 160 222 441
+characters/a_herb 170 228 436
+characters/a_bard 177 232 411
+characters/a_kid 672 728 463 crotch=1045 child
+characters/npc_bori 145 203 381
+characters/b_mayor 162 232 436
+characters/b_miller 152 232 451
+characters/b_tool 172 240 420
+characters/b_smith 203 262 435
+characters/b_dyer 180 240 416
+characters/b_fisher 195 262 411
+characters/b_ferry 185 255 433
+characters/b_widow 255 330 475
+characters/b_twins 612 668 450 crotch=1009 child group
+characters/b_scholar 185 245 411

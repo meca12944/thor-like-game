@@ -21,8 +21,23 @@
   "shy": "blush"
  },
  "chars": {
+  "hero": {
+   "name": "필멸자",
+   "title": "낙인의 자식",
+   "label": "「낙인의 자식」 필멸자",
+   "expr": {
+    "neutral": "hero/neutral.png",
+    "smile": "hero/smile.png",
+    "angry": "hero/angry.png",
+    "sad": "hero/sad.png",
+    "surprised": "hero/surprised.png",
+    "blush": "hero/blush.png"
+   }
+  },
   "a_tailor": {
    "name": "리네트",
+   "title": "은바늘의",
+   "label": "「은바늘의」 리네트",
    "expr": {
     "neutral": "a_tailor/neutral.png",
     "smile": "a_tailor/smile.png",
@@ -32,8 +47,75 @@
     "blush": "a_tailor/blush.png"
    }
   },
+  "h_mystic": {
+   "name": "베일라",
+   "title": "별을 엮는 점성녀",
+   "label": "「별을 엮는 점성녀」 베일라",
+   "expr": {
+    "neutral": "h_mystic/neutral.png",
+    "smile": "h_mystic/smile.png",
+    "angry": "h_mystic/angry.png",
+    "sad": "h_mystic/sad.png",
+    "surprised": "h_mystic/surprised.png",
+    "blush": "h_mystic/blush.png"
+   }
+  },
+  "g_dancer": {
+   "name": "자이라",
+   "title": "사막방울의 무희",
+   "label": "「사막방울의 무희」 자이라",
+   "expr": {
+    "neutral": "g_dancer/neutral.png",
+    "smile": "g_dancer/smile.png",
+    "angry": "g_dancer/angry.png",
+    "sad": "g_dancer/sad.png",
+    "surprised": "g_dancer/surprised.png",
+    "blush": "g_dancer/blush.png"
+   }
+  },
+  "f_diver": {
+   "name": "마렌",
+   "title": "잿물결의 해녀",
+   "label": "「잿물결의 해녀」 마렌",
+   "expr": {
+    "neutral": "f_diver/neutral.png",
+    "smile": "f_diver/smile.png",
+    "angry": "f_diver/angry.png",
+    "sad": "f_diver/sad.png",
+    "surprised": "f_diver/surprised.png",
+    "blush": "f_diver/blush.png"
+   }
+  },
+  "e_tailor": {
+   "name": "로자린드",
+   "title": "불꽃실의 직녀",
+   "label": "「불꽃실의 직녀」 로자린드",
+   "expr": {
+    "neutral": "e_tailor/neutral.png",
+    "smile": "e_tailor/smile.png",
+    "angry": "e_tailor/angry.png",
+    "sad": "e_tailor/sad.png",
+    "surprised": "e_tailor/surprised.png",
+    "blush": "e_tailor/blush.png"
+   }
+  },
+  "c_priest": {
+   "name": "이벨린",
+   "title": "서리 성녀",
+   "label": "「서리 성녀」 이벨린",
+   "expr": {
+    "neutral": "c_priest/neutral.png",
+    "smile": "c_priest/smile.png",
+    "angry": "c_priest/angry.png",
+    "sad": "c_priest/sad.png",
+    "surprised": "c_priest/surprised.png",
+    "blush": "c_priest/blush.png"
+   }
+  },
   "d_yuna": {
    "name": "유나",
+   "title": "차원을 건넌 이방인",
+   "label": "「차원을 건넌 이방인」 유나",
    "expr": {
     "neutral": "d_yuna/neutral.png",
     "smile": "d_yuna/smile.png",
@@ -41,7 +123,19 @@
     "sad": "d_yuna/sad.png",
     "surprised": "d_yuna/surprised.png",
     "blush": "d_yuna/blush.png"
-   }
+   },
+   "full_name": "한유나"
   }
+ },
+ "proportion": {
+  "ref": "docs_art/ref/user_proportion_ref.png",
+  "eye_y": 391,
+  "chin_y": 565,
+  "shoulder_y": 660,
+  "chest_y": 843,
+  "waist_y": 1042,
+  "shoulder_halfwidth": 235,
+  "center_x": 512,
+  "check": "bust/proportion_check.png"
  }
 }

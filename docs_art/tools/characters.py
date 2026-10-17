@@ -1,4 +1,5 @@
 # full-body character profile normalizer (same canvas/body/baseline as outfits_v3)
+# after this step run proportion.py with eye/chin(/crotch) landmarks -> proportion template
 # usage: characters.py <batch_name> "<title>" id=src:name:title:hf[:special] ...
 #  special: comma list of fit | clampw | hat=<px in source> (headwear height to exclude)
 #  hf = height factor vs adult BODY (1.0 adult, ~0.62 child, monsters can be >1 / fit)
@@ -64,8 +65,8 @@ sc=0.5; tw=int(CW*sc*0.9); W=tw*len(ids)+80; H=int(CH*sc)+165
 L=Image.new('RGBA',(W,H),(32,34,40,255)); d=ImageDraw.Draw(L)
 font=ImageFont.truetype('/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc',26); small=ImageFont.truetype('/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',18); tiny=ImageFont.truetype('/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',15)
 y0=60
-for yy in [y0+TOP*sc,y0+BASE*sc]: d.line([(20,yy),(W-20,yy)],fill=(90,95,110,255),width=2)
-d.text((20,15),f'characters / batch {batch} — {btitle} · 같은 캔버스·몸 높이·기준선 (outfits_v3 규격)',font=small,fill=(220,220,230,255))
+for yy in [y0+207*sc,y0+694*sc,y0+BASE*sc]: d.line([(20,yy),(W-20,yy)],fill=(90,95,110,255),width=2)  # adult eye / hip / baseline (proportion template)
+d.text((20,15),f'characters / batch {batch} — {btitle} · 비율 템플릿 통일 (눈선 y207 · 고관절 y694 · 바닥 y1260, 아이는 아이 템플릿)',font=small,fill=(220,220,230,255))
 for i,cid in enumerate(ids):
     m=idx['chars'][cid]; im=Image.open(f'{OUT}/{cid}.png').resize((int(CW*sc),int(CH*sc)),Image.LANCZOS)
     L.alpha_composite(im,(40+i*tw+tw//2-im.width//2,y0)); tx=40+i*tw+tw//2

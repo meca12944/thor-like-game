@@ -1,0 +1,143 @@
+{
+ "target": {
+  "eye": 391,
+  "chin": 565,
+  "sh": 660,
+  "chest": 843,
+  "waist": 1042,
+  "half": 235,
+  "cx": 512
+ },
+ "measured": {
+  "hero": [
+   207,
+   325,
+   505,
+   473,
+   330,
+   664,
+   900
+  ],
+  "a_tailor": [
+   277,
+   412,
+   506,
+   500,
+   290,
+   718,
+   900
+  ],
+  "h_mystic": [
+   270,
+   393,
+   512,
+   482,
+   215,
+   673,
+   882
+  ],
+  "g_dancer": [
+   255,
+   368,
+   510,
+   491,
+   277,
+   673,
+   955
+  ],
+  "f_diver": [
+   295,
+   407,
+   511,
+   527,
+   240,
+   727,
+   990
+  ],
+  "e_tailor": [
+   285,
+   405,
+   487,
+   500,
+   235,
+   673,
+   936
+  ],
+  "c_priest": [
+   310,
+   423,
+   510,
+   518,
+   205,
+   718,
+   918
+  ],
+  "d_yuna": [
+   285,
+   420,
+   511,
+   545,
+   277,
+   745,
+   955
+  ]
+ },
+ "applied": {
+  "hero": {
+   "head_scale": 1.475,
+   "torso_v": 0.895,
+   "x_body": 0.76,
+   "aspect": 0.85,
+   "shoulder_half_out": 251
+  },
+  "a_tailor": {
+   "head_scale": 1.289,
+   "torso_v": 0.955,
+   "x_body": 0.812,
+   "aspect": 0.85,
+   "shoulder_half_out": 235
+  },
+  "h_mystic": {
+   "head_scale": 1.415,
+   "torso_v": 0.955,
+   "x_body": 1.093,
+   "aspect": 1.145,
+   "shoulder_half_out": 235
+  },
+  "g_dancer": {
+   "head_scale": 1.54,
+   "torso_v": 0.823,
+   "x_body": 0.848,
+   "aspect": 1.03,
+   "shoulder_half_out": 235
+  },
+  "f_diver": {
+   "head_scale": 1.554,
+   "torso_v": 0.825,
+   "x_body": 0.949,
+   "aspect": 1.15,
+   "shoulder_half_out": 228
+  },
+  "e_tailor": {
+   "head_scale": 1.45,
+   "torso_v": 0.876,
+   "x_body": 1.0,
+   "aspect": 1.141,
+   "shoulder_half_out": 235
+  },
+  "c_priest": {
+   "head_scale": 1.54,
+   "torso_v": 0.955,
+   "x_body": 1.098,
+   "aspect": 1.15,
+   "shoulder_half_out": 225
+  },
+  "d_yuna": {
+   "head_scale": 1.289,
+   "torso_v": 0.932,
+   "x_body": 0.848,
+   "aspect": 0.911,
+   "shoulder_half_out": 235
+  }
+ }
+}

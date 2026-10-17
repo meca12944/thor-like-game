@@ -61,7 +61,17 @@
    "title": "차원을 건넌 이방인",
    "label": "「차원을 건넌 이방인」 유나",
    "file": "d_yuna.png",
-   "src_scale": 1.707
+   "src_scale": 1.707,
+   "full_name": "한유나"
   }
+ },
+ "proportion": {
+  "ref": "docs_art/ref/user_proportion_ref.png",
+  "head_eye_to_chin": 77,
+  "eye_y": 207,
+  "chin_y": 284,
+  "hip_y": 694,
+  "baseline": 1260,
+  "check": "characters/proportion_check.png"
  }
 }

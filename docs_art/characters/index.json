@@ -201,5 +201,31 @@
    ],
    "lineup": "batch_B.png"
   }
+ },
+ "proportion": {
+  "ref": "docs_art/ref/user_proportion_ref.png",
+  "adult": {
+   "eye_y": 207,
+   "chin_y": 284,
+   "eye_to_chin": 77,
+   "hip_y": 694,
+   "baseline": 1260
+  },
+  "child": {
+   "eye_y": 648,
+   "chin_y": 716,
+   "eye_to_chin": 71,
+   "hip_y": 1037,
+   "baseline": 1260
+  },
+  "child_ids": [
+   "a_kid",
+   "b_twins"
+  ],
+  "hunch_ids": [
+   "a_granny"
+  ],
+  "check": "characters/proportion_check.png",
+  "tool": "tools/proportion.py + tools/proportion_landmarks.txt"
  }
 }
