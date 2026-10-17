@@ -83,6 +83,7 @@ L += ['총 %d곡 · %.1f MB' % (n, tot_b / 1e6), '',
       '- 원탁의 심연(분수 아래 수몰 투기장) 입장 연출은 `underwater`, 전투는 `battle_aslan`.',
       '- 마왕 강림 순간 `demon_awaken`(1회) → 이후 월드맵·검은 성채·마을 공성은 `demon_field`. 마을이 「파괴됨」이 되면 `town_ruin`.',
       '- 엔딩 특별판 「잿더미의 왕」은 `ending_demon`.', '',
+      open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'V2.md')).read(), '',
       '## 사용자 레퍼런스 분석 (`user_ref_01.mp3`)', '', REF, '',
       '## 데모 연동 (`town/bgm.js`)', '',
       '- 첫 키 입력·클릭·터치 뒤에 시작 (브라우저 자동재생 규칙). 마을: `town_a_fountain` → 챔피언 돌엄니와 교전(거리 340px 이내 또는 피격): `battle_champion` (1.2초 크로스페이드) → 격파: `jingle_victory` → 마을 곡 복귀. 잠수(분수/웅덩이): `underwater`.',
@@ -90,7 +91,7 @@ L += ['총 %d곡 · %.1f MB' % (n, tot_b / 1e6), '',
       '- URL `?bgm=battle_boss` 처럼 곡을 고정, `?bgm=off` 는 음악 끔.',
       '- 본편용 API: `BGM.scene(\'boss\'|\'boss2\'|\'aslan\'|\'kairen\'|\'demon\'|\'ruin\'|\'area3\'|\'townG\'...)`, `BGM.play(id)`, `BGM.jingle(id)`, `BGM.setVolume(v)`, `BGM.toggleMute()`.', '',
       '## 다시 만들기 · 고치기', '',
-      '```', 'python3 tools/music/render.py                 # 전 곡 렌더 → audio/bgm/*.ogg + bgm.json', 'python3 tools/music/render.py area01_forest   # 한 곡만', 'python3 tools/music/check.py audio/bgm          # 루프 이음새 · 클리핑 · 라우드니스 검사', 'python3 tools/music/gen_doc.py                # 이 문서 다시 생성', '```', '',
+      '```', 'python3 tools/music/render2.py <id ...>       # v2 샘플 악기 렌더 (현재 audio/bgm 은 v2)', 'tools/music/fetch_samples.sh                  # v2 용 사운드폰트·샘플 받기', 'python3 tools/music/render.py                 # v1 FM 합성 렌더', 'python3 tools/music/render.py area01_forest   # 한 곡만', 'python3 tools/music/check.py audio/bgm          # 루프 이음새 · 클리핑 · 라우드니스 검사', 'python3 tools/music/gen_doc.py                # 이 문서 다시 생성', '```', '',
       '곡 데이터는 `tools/music/songs/<id>.py` 의 파이썬 dict 입니다 (형식: `tools/music/README.md`). 선율은 MML 비슷한 문자열(`~e5/6 a5/2 b5/4`), 화음은 `Am F G E`, 베이스·드럼·반주는 패턴 이름이나 16칸 문자열로 적습니다.', '']
 open(os.path.join(ROOT, 'BGM.md'), 'w').write('\n'.join(L))
 print('BGM.md written:', n, 'tracks', round(tot_b / 1e6, 2), 'MB')
