@@ -1,0 +1,51 @@
+{
+ "size": [
+  900,
+  1320
+ ],
+ "body_height": 1200,
+ "top": 60,
+ "baseline": 1260,
+ "chars": {
+  "hero": {
+   "name": "필멸자 (주인공)",
+   "src_scale": 1.727,
+   "clipped": false
+  },
+  "a_tailor": {
+   "name": "나비",
+   "src_scale": 1.717,
+   "clipped": false
+  },
+  "h_mystic": {
+   "name": "운",
+   "src_scale": 1.719,
+   "clipped": false
+  },
+  "g_dancer": {
+   "name": "방울",
+   "src_scale": 1.7,
+   "clipped": false
+  },
+  "f_diver": {
+   "name": "숨비",
+   "src_scale": 1.717,
+   "clipped": false
+  },
+  "e_tailor": {
+   "name": "루비",
+   "src_scale": 1.719,
+   "clipped": false
+  },
+  "c_priest": {
+   "name": "설화",
+   "src_scale": 1.712,
+   "clipped": false
+  },
+  "d_yuna": {
+   "name": "유나 (현대복)",
+   "src_scale": 1.705,
+   "clipped": false
+  }
+ }
+}
