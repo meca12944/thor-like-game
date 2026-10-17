@@ -73,10 +73,10 @@ async def main():
     near=await pg.evaluate("()=>{const g=__game;return [g.blocked(600,440,12)]}")
     await pg.evaluate("()=>{__game.useSkill('water');__game.advance(.7);__game.keys['d']=true;__game.advance(.5);__game.keys['d']=false}")
     await pg.wait_for_timeout(80)
-    sw=await pg.evaluate("()=>{const h=__game.hero;return [!!h.swim,h.x|0,h.y|0]}")
+    sw=await pg.evaluate("()=>{const h=__game.hero;return [!!__game.uw,h.x|0,h.y|0]}")
     await pg.screenshot(path='/tmp/sk_dive.png',clip=dict(x=520,y=220,width=520,height=300))
     await pg.evaluate("()=>{__game.useSkill('water');__game.advance(.6)}")
-    sw2=await pg.evaluate("()=>{const h=__game.hero;return [!!h.swim,h.x|0,h.y|0]}")
+    sw2=await pg.evaluate("()=>{const h=__game.hero;return [!!__game.uw,h.x|0,h.y|0]}")
     skl['dive']=dict(blockedStart=near,swimming=sw,afterExit=sw2)
     res['skills']=skl
     # contact sheet 5x2 (+dive inset)

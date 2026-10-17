@@ -482,5 +482,13 @@
   "n": 10,
   "ax": 0,
   "ay": 0
+ },
+ "decal_puddle": {
+  "src": "decal_puddle.png",
+  "w": 96,
+  "h": 44,
+  "n": 1,
+  "ax": 48,
+  "ay": 22
  }
 }

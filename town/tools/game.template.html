@@ -144,7 +144,7 @@ document.getElementById('wbtn').addEventListener('touchend',e=>{e.preventDefault
 
 // ---------- skill window / quick slots (saved in localStorage) ----------
 const LS='townDemo.skillSlots';
-let slots=['fire','quake','time'];
+let slots=['fire','water','time'];
 try{const v=JSON.parse(localStorage.getItem(LS));if(Array.isArray(v)&&v.length===3)slots=v.map(x=>SK[x]?x:null);}catch(e){}
 function saveSlots(){try{localStorage.setItem(LS,JSON.stringify(slots));}catch(e){}}
 let winOpen=false,winSel=null;const winEl=document.getElementById('win');
@@ -248,7 +248,7 @@ const SKFX={
    burst(hero.x+(s.flip?-o[0]:o[0]),hero.y-40,16,['#e7b0ff','#b46cff','#fff'],160,-80);}}},
  water:{dur:.5,pose:s=>s.t<.16?0:1,update(s){if(!s.done&&s.t>=.16){s.done=1;proj('fx_water',s,SPR.fx_water.off[0],600,440,36,false,['#bff4ff','#5fd0ff','#fff']);}}},
  dive:{dur:.55,key:'sk_water',pose:s=>2,update(s){const p=Math.min(1,s.t/.55);hero.x=s.from[0]+(s.to[0]-s.from[0])*p;hero.y=s.from[1]+(s.to[1]-s.from[1])*p;s.z=Math.sin(p*Math.PI)*70;hero.ghost=true;
-   if(s.t>=.53&&!s.done){s.done=1;hero.swim={entry:s.from};spawnRing(hero.x,hero.y,6,70,.5,'210,245,255',5,.4);burst(hero.x,hero.y-10,22,['#dff8ff','#7fd8ff','#fff'],220,500,4);}}},
+   if(s.t>=.53&&!s.done){s.done=1;burst(hero.x,hero.y-10,22,['#dff8ff','#7fd8ff','#fff'],220,500,4);enterUW(s.spot,s.from);}}},
  undive:{dur:.5,key:'sk_water',pose:s=>s.t<.4?3:0,update(s){const p=Math.min(1,s.t/.4);hero.x=s.from[0]+(s.to[0]-s.from[0])*p;hero.y=s.from[1]+(s.to[1]-s.from[1])*p;s.z=Math.sin(p*Math.PI)*60;hero.ghost=true;if(s.t>=.4&&!s.done){s.done=1;hero.ghost=false;}}},
  shield:{dur:99,pose:s=>({hold:0,spark:1,perfect:1,bash:2,rec:3})[s.ph],update(s,dt){s.pt=(s.pt||0)+dt;const held=s.slot>=0?skHeld[s.slot]:s.t<(s.holdFor||0);hero.ghost=s.ph==='perfect'||s.ph==='bash';
    if(s.ph==='hold'&&(!held||s.t>5)){s.ph='rec';s.pt=0;}
@@ -281,17 +281,119 @@ const SKFX={
 };
 function canAct(){return !hero.atk&&!hero.sk;}
 function useSkill(id,opt={}){const S=SK[id];if(!S||!unlocked(id))return false;
+ if(uw){if(id==='water')surface();return id==='water';}
  if(hero.swim){if(id!=='water'||hero.sk)return false;const e=hero.swim.entry;hero.swim=null;hero.sk={id:'undive',t:0,dir:faceDV(),flip:hero.hz==='left',from:[hero.x,hero.y],to:e,z:0};showToast(S,'물 밖으로');return true;}
  if(!canAct())return false;
  if((cool[id]||0)>0){showToast(S,'쿨타임',1);return false;}
- // Ocean Breath next to the fountain -> dive (free)
- if(id==='water'&&nearFountain(hero.x,hero.y)&&!opt.noDive){let tx=hero.x,ty=hero.y;const a=Math.atan2((hero.y-POOL.y)/POOL.ry,(hero.x-POOL.x)/POOL.rx);
-  for(let r=.85;r>.3;r-=.05){tx=POOL.x+Math.cos(a)*POOL.rx*r;ty=POOL.y+Math.sin(a)*POOL.ry*r;if(swimOk(tx,ty))break;}
-  hero.sk={id:'dive',t:0,dir:faceDV(),flip:tx<hero.x,from:[hero.x,hero.y],to:[tx,ty],z:0};hero.hz=tx<hero.x?'left':'right';showToast(S,'잠수');return true;}
+ // Ocean Breath next to a dive spot (DIVE.spots) -> dive (free)
+ if(id==='water'&&!opt.noDive){const sp=findSpot();if(sp){startDive(sp);showToast(S,'잠수');return true;}}
  if(gauge+1e-6<S.cost/8){showToast(S,'기력 부족',1);return false;}
  gauge-=S.cost/8;cool[id]=S.cd;const dv=faceDV();
  hero.sk={id,t:0,dir:dv,flip:heroFlip(dv),slot:opt.slot??-1,holdFor:opt.hold,ph:'hold'};showToast(S);return true;}
 function showToast(S,extra,bad){toast={S,extra,bad,t:1.4};}
+
+// =====================================================================
+//  HIDDEN DIVE SPOTS + ITEMS — edit freely (see DIVE_SPOTS.md).
+//  A spot is found by using 해류의 숨결 (Ocean Breath) next to it. Each holds ONE item, no enemies/puzzles.
+//  effect: 'maxHeart' (+amount max hearts) | 'coins' (+amount) | 'fullHeal'.  pix = pixel-art key in PIX below.
+// =====================================================================
+const DIVE={
+ items:{
+  pearl:  {name:'생명의 진주',  popup:'최대 하트 +1',  effect:'maxHeart',amount:1,  pix:'pearl'},
+  gold_m: {name:'금화 주머니(중)',popup:'금화 +100',   effect:'coins',   amount:100,pix:'pouch'},
+  hipotion:{name:'고급 회복약', popup:'하트 완전 회복',effect:'fullHeal',          pix:'potion'},
+ },
+ spots:[ // x,y = water surface centre (world px); r = how close the hero's feet must be; hidden = no visual cue except a near-by sparkle
+  {id:'fountain',name:'광장 분수',        x:777,y:398,r:0, near:'fountain',item:'pearl',   theme:'stone',hidden:false},
+  {id:'barrel',  name:'대장간 옆 빗물통', x:450,y:168,r:72,item:'gold_m', theme:'wood', hidden:true},
+  {id:'puddle',  name:'촌장집 앞 웅덩이', x:868,y:572,r:46,item:'hipotion',theme:'mud',  hidden:true},
+ ],
+ floorItem:[930,600],   // where the item lies in the underwater view
+ baseHearts:5,
+};
+const PIX={ // 12x12 pixel maps, '.'=transparent
+ pearl:{pal:{K:'#3a2a4a',W:'#f2ecf8',H:'#ffffff',P:'#cdb2e2',D:'#9a7cb8'},rows:["....KKKK....","..KKWWWWKK..",".KWHHWWWWWK.",".KWHHWWWWPK.","KWWHWWWWWPPK","KWWWWWWWWPPK","KWWWWWWWPPPK","KPWWWWWWPPDK",".KPPWWWPPPK.",".KDPPPPPPDK.","..KKDDDDKK..","....KKKK...."]},
+ pouch:{pal:{K:'#2a1606',G:'#ffd84a',Y:'#fff2a0',R:'#c8a060',B:'#a8743a',L:'#d8a860',D:'#6e4420'},rows:["...KKKKK....","..KGYGGGK...","...KKRRKK...","....KRRK....","..KKBBBBKK..",".KBLLBBBBBK.",".KBLBBBBBDK.","KBLBBBBBBBDK","KBBBBBBBBBDK","KBBBBBBBBDDK",".KDDDDDDDDK.","..KKKKKKKK.."]},
+ potion:{pal:{K:'#2a0a18',C:'#b88a50',c:'#80582c',G:'#cfe8f0',R:'#e0306a',H:'#ffd0e0',D:'#8a1040'},rows:["....KKKK....","....KCcK....","....KCcK....","...KKGGKK...","...KGGGGK...","..KGRRRRGK..",".KGRHRRRRGK.",".KRHHRRRRRK.",".KRRRRRRRRK.",".KRRRRRRRDK.","..KDDDDDDK..","...KKKKKK..."]},
+ coin:{pal:{K:'#3a2400',Y:'#ffcf3a',W:'#fff6b0',D:'#c08410'},rows:["..KKKK..",".KYYYYK.","KYWYYYDK","KYWYDYDK","KYWYDYDK","KYYYYYDK",".KDDDDK.","..KKKK.."]},
+};
+function drawPix(name,x,y,p){const P=PIX[name],R=v=>Math.round(v);P.rows.forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch==='.')continue;ctx.fillStyle=P.pal[ch];
+ ctx.fillRect(R(x+i*p),R(y+j*p),R(x+(i+1)*p)-R(x+i*p),R(y+(j+1)*p)-R(y+j*p));}});}
+const LSD='townDemo.dive';
+let diveTaken=[];try{const v=JSON.parse(localStorage.getItem(LSD));if(v&&Array.isArray(v.taken))diveTaken=v.taken.filter(id=>DIVE.spots.some(s=>s.id===id));}catch(e){}
+let coins=0;
+function applySaved(){// max hearts + coins are derived from what was picked up (so they persist without double-counting)
+ let mh=DIVE.baseHearts;coins=0;for(const id of diveTaken){const it=DIVE.items[DIVE.spots.find(s=>s.id===id).item];if(it.effect==='maxHeart')mh+=it.amount;if(it.effect==='coins')coins+=it.amount;}
+ hero.maxHp=mh;hero.hp=Math.min(Math.max(hero.hp,0)||mh,mh);}
+function saveDive(){try{localStorage.setItem(LSD,JSON.stringify({taken:diveTaken}));}catch(e){}}
+function resetDive(){diveTaken=[];saveDive();hero.hp=DIVE.baseHearts;applySaved();hero.hp=hero.maxHp;}
+function spotNear(s){if(s.near==='fountain')return ((hero.x-777)/140)**2+((hero.y-415)/95)**2<1.85;return Math.hypot(hero.x-s.x,hero.y-s.y)<s.r;}
+function findSpot(){return DIVE.spots.find(spotNear);}
+let uw=null,popup=null,sparkT=1;
+function startDive(s){let tx=s.x,ty=s.y;
+ if(s.near==='fountain'){const a=Math.atan2((hero.y-POOL.y)/POOL.ry,(hero.x-POOL.x)/POOL.rx);for(let r=.85;r>.3;r-=.05){tx=POOL.x+Math.cos(a)*POOL.rx*r;ty=POOL.y+Math.sin(a)*POOL.ry*r;if(swimOk(tx,ty))break;}}
+ hero.sk={id:'dive',t:0,dir:faceDV(),flip:tx<hero.x,from:[hero.x,hero.y],to:[tx,ty],z:0,spot:s};if(Math.abs(tx-hero.x)>4)hero.hz=tx<hero.x?'left':'right';}
+function enterUW(s,ret){uw={spot:s,t:0,fade:1,leave:0,ret,item:diveTaken.includes(s.id)?null:s.item,bg:makeUWBg(s.theme),bub:[],emptyMsg:diveTaken.includes(s.id)?2.2:0};
+ hero.sk=null;hero.ghost=false;hero.x=260;hero.y=430;hero.hz='right';hero.kx=hero.ky=0;}
+function surface(){if(uw&&!uw.leave)uw.leave=.001;}
+function exitUW(){const r=uw.ret;uw=null;hero.x=r[0];hero.y=r[1];hero.inv=.6;
+ spawnRing(hero.x,hero.y,6,70,.5,'210,245,255',5,.4);burst(hero.x,hero.y-20,22,['#dff8ff','#7fd8ff','#fff'],220,500,4);}
+function pickUp(){const s=uw.spot,it=DIVE.items[uw.item];uw.item=null;if(!diveTaken.includes(s.id))diveTaken.push(s.id);saveDive();applySaved();
+ if(it.effect==='maxHeart')hero.hp=Math.min(hero.maxHp,hero.hp+it.amount);if(it.effect==='fullHeal')hero.hp=hero.maxHp;
+ popup={title:it.name+'!',sub:it.popup,pix:it.pix,t:2.6};burst(DIVE.floorItem[0],DIVE.floorItem[1]-30,26,['#fff','#bff4ff','#ffe08a'],260,-60,5,.8);}
+function updateUW(dt,ix,iy,l){uw.t+=dt;
+ if(uw.leave){uw.leave+=dt;if(uw.leave>.4){exitUW();return;}}else uw.fade=Math.max(0,uw.fade-dt*2.5);
+ if(l>0){hero.x=Math.max(90,Math.min(1190,hero.x+ix*230*l*dt));hero.y=Math.max(230,Math.min(600,hero.y+iy*190*l*dt));if(Math.abs(ix)>.2)hero.hz=ix>0?'right':'left';}
+ hero.walkT+=dt*(l>0?2:1);
+ if(Math.random()<dt*5)uw.bub.push({x:hero.x+(hero.hz==='left'?-60:60),y:hero.y-20,r:2+Math.random()*3,t:0,vx:(Math.random()-.5)*20});
+ if(Math.random()<dt*2)uw.bub.push({x:100+Math.random()*1080,y:690,r:2+Math.random()*4,t:0,vx:0});
+ for(let i=uw.bub.length-1;i>=0;i--){const b=uw.bub[i];b.t+=dt;b.y-=(50+b.r*12)*dt;b.x+=Math.sin(b.t*4+b.r)*12*dt+b.vx*dt;if(b.y<40)uw.bub.splice(i,1);}
+ const[fx0,fy0]=DIVE.floorItem;if(uw.item&&!uw.leave&&Math.abs(hero.x-fx0)<75&&Math.abs(hero.y-(fy0-30))<70)pickUp();
+ if(uw.emptyMsg>0)uw.emptyMsg-=dt;}
+function makeUWBg(theme){// pre-rendered at 320x180 then scaled 4x (matches the chunky pixel grain)
+ const T={stone:{top:[40,140,176],bot:[10,52,80],floor:['#5f6f7c','#7d8d98','#48565f'],weed:1},
+          wood:{top:[70,110,84],bot:[16,36,28],floor:['#6b4a2a','#8a6236','#4a3018'],weed:0},
+          mud:{top:[78,110,86],bot:[22,40,30],floor:['#5e5236','#7a6a44','#3e3420'],weed:1}}[theme];
+ const c=document.createElement('canvas');c.width=320;c.height=180;const g=c.getContext('2d');let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ for(let y=0;y<180;y++){const k=y/179;g.fillStyle=`rgb(${T.top.map((v,i)=>Math.round(v+(T.bot[i]-v)*k)).join()})`;g.fillRect(0,y,320,1);}
+ for(let i=0;i<220;i++){g.fillStyle='rgba(255,255,255,.05)';g.fillRect(Math.floor(rnd()*320),Math.floor(rnd()*140),1,1);}
+ // floor
+ const fy=x=>150+Math.round(Math.sin(x*.05)*3+Math.sin(x*.13)*1.5);
+ for(let x=0;x<320;x++){const y0=fy(x);for(let y=y0;y<180;y++){const r=rnd();g.fillStyle=y===y0?T.floor[1]:r<.12?T.floor[2]:r<.2?T.floor[1]:T.floor[0];g.fillRect(x,y,1,1);}}
+ if(theme==='stone')for(let x=0;x<320;x+=16){g.fillStyle='#3c4850';g.fillRect(x,152,1,28);}            // basin tiles
+ if(theme==='wood'){for(let x=0;x<320;x+=22){g.fillStyle='rgba(30,18,6,.55)';g.fillRect(x,0,2,180);}       // barrel staves
+  g.fillStyle='rgba(40,26,10,.6)';g.fillRect(0,30,320,3);g.fillRect(0,110,320,3);}
+ for(let i=0;i<14;i++){const x=Math.floor(rnd()*320),y=fy(x)+2+Math.floor(rnd()*20),w=3+Math.floor(rnd()*6);g.fillStyle=T.floor[2];g.fillRect(x,y,w,2);g.fillStyle=T.floor[1];g.fillRect(x,y-1,w-1,1);}
+ return{c,weed:T.weed,fy};}
+function drawUnderwater(){const B=uw.bg,t=uw.t;ctx.drawImage(B.c,0,0,WW,WH);
+ // light rays
+ ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<4;i++){const x=200+i*290+Math.sin(t*.6+i)*40;ctx.fillStyle='rgba(180,240,255,.05)';ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+70,0);ctx.lineTo(x+220,620);ctx.lineTo(x+60,620);ctx.closePath();ctx.fill();}ctx.restore();
+ // seaweed
+ if(B.weed)for(let i=0;i<9;i++){const x=60+i*140+(i%3)*23,h=8+(i*7)%10;const base=B.fy(x/4)*4;for(let k=0;k<h;k++){const sw=Math.round(Math.sin(t*1.8+i+k*.5)*k*.6);ctx.fillStyle=k%2?'#2f8a4a':'#3fa85a';ctx.fillRect(Math.round((x+sw*4)/4)*4,base-k*8-8,8,8);}}
+ // item
+ const[ix0,iy0]=DIVE.floorItem;
+ if(uw.item){const it=DIVE.items[uw.item],bob=Math.round(Math.sin(t*2.4)*2)*2,gl=.35+.2*Math.sin(t*4);
+  const gr=ctx.createRadialGradient(ix0,iy0-30,4,ix0,iy0-30,70);gr.addColorStop(0,`rgba(255,250,220,${gl})`);gr.addColorStop(1,'rgba(255,250,220,0)');ctx.fillStyle=gr;ctx.fillRect(ix0-80,iy0-110,160,160);
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(ix0-26,iy0-4,52,8);drawPix(it.pix,ix0-30,iy0-60+bob,5);
+  if(Math.floor(t*3)%3===0){ctx.fillStyle='#fff';ctx.fillRect(ix0+18,iy0-64+bob,4,12);ctx.fillRect(ix0+14,iy0-60+bob,12,4);}}
+ // hero swimming
+ const sw=Math.sin(hero.walkT*5)*3;drawFrame('sk_water',3,hero.x,hero.y+58+sw,hero.hz==='left',1.15);
+ for(const b of uw.bub){ctx.strokeStyle='rgba(220,250,255,.8)';ctx.lineWidth=2;ctx.strokeRect(Math.round(b.x-b.r),Math.round(b.y-b.r),Math.round(b.r*2),Math.round(b.r*2));ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillRect(Math.round(b.x-b.r+1),Math.round(b.y-b.r+1),2,2);}
+ // surface shimmer + tint
+ ctx.fillStyle='rgba(200,245,255,.25)';for(let x=0;x<WW;x+=16){const y=6+Math.round(Math.sin(x*.03+t*3)*3)*2;ctx.fillRect(x,y,12,4);}
+ ctx.fillStyle='rgba(20,90,130,.12)';ctx.fillRect(0,0,WW,WH);
+ outlined(uw.spot.name+' · 물속',WW/2-110,60,22,'#bff4ff');
+ if(uw.emptyMsg>0)outlined('아무것도 없다…',WW/2-80,330,26,'#dff');
+ outlined('해류의 숨결(다시) / 공격 = 물 밖으로',WW/2-190,700,18,'rgba(255,255,255,.8)');
+ const f=Math.max(uw.fade,uw.leave?Math.min(1,uw.leave/.4):0);if(f>0){ctx.fillStyle=`rgba(8,40,60,${f})`;ctx.fillRect(0,0,WW,WH);}}
+function updateSparkles(dt){// faint occasional glint above hidden spots that still hold an item, only when the hero is near
+ sparkT-=dt;if(sparkT>0)return;sparkT=.9+Math.random()*1.2;
+ for(const s of DIVE.spots){if(diveTaken.includes(s.id))continue;const d=Math.hypot(hero.x-s.x,hero.y-s.y);if(d>(s.hidden?170:240))continue;
+  const n=1+(Math.random()<.4);for(let i=0;i<n;i++){let x=s.x,y=s.y;if(s.near==='fountain'){const a=Math.random()*6.28;x=POOL.x+Math.cos(a)*POOL.rx*.7;y=POOL.y+Math.sin(a)*POOL.ry*.7;}
+   else{x+=(Math.random()-.5)*(s.id==='barrel'?16:40);y+=(Math.random()-.5)*(s.id==='barrel'?5:10);}
+   fx.push({type:'twinkle',x,y,t:-i*.15,life:.55});}}}
+function drawTwinkle(f){if(f.t<0)return;const p=f.t/f.life,k=Math.sin(p*Math.PI),a=Math.round(k*2);const x=Math.round(f.x/2)*2,y=Math.round(f.y/2)*2;
+ ctx.globalAlpha=.85*k;ctx.fillStyle='#bff4ff';ctx.fillRect(x-2*a-1,y-1,4*a+2,2);ctx.fillRect(x-1,y-2*a-1,2,4*a+2);ctx.fillStyle='#fff';ctx.fillRect(x-1,y-1,2,2);ctx.globalAlpha=1;}
 
 function update(dt){
  // hero input
@@ -301,6 +403,9 @@ function update(dt){
  for(const k in cool)if(cool[k]>0)cool[k]=Math.max(0,cool[k]-dt);
  gauge=Math.min(1,gauge+DEMO.gaugeRegen*dt);
  while(skPress.length){const i=skPress.shift();if(slots[i])useSkill(slots[i],{slot:i});}
+ if(uw){if(atkPressed){atkPressed=false;surface();}updateUW(dt,ix,iy,l);updateFx(dt);for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt;if(p.t>p.life)parts.splice(i,1);}
+  if(popup){popup.t-=dt;if(popup.t<=0)popup=null;}if(toast){toast.t-=dt;if(toast.t<=0)toast=null;}return;}
+ updateSparkles(dt);
  if(atkPressed){atkPressed=false;
   if(hero.swim||hero.sk){}
   else if(hero.atk){if(hero.atk.t>.03&&hero.atk.i<2)hero.buffered=true;}
@@ -358,6 +463,7 @@ function update(dt){
  if(shake>0)shake=Math.max(0,shake-dt*30);
  if(flash>0)flash=Math.max(0,flash-dt*1.6);
  if(toast){toast.t-=dt;if(toast.t<=0)toast=null;}
+ if(popup){popup.t-=dt;if(popup.t<=0)popup=null;}
 }
 function updateFx(dt){
  for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;
@@ -478,7 +584,7 @@ function outlined(t,x,y,px,col='#fff'){ctx.font=`bold ${Math.round(px)}px sans-s
 function drawHUD(){// positions in world-pixels of the concept (1280x720 base), anchored to visible top-left
  const s=scale,ox=Math.max(0,-camX)*s+offX,oy=Math.max(0,-camY)*s;const u=s; ctx.save();ctx.setTransform(1,0,0,1,0,0);
  const P=Math.max(1,2.72*u);
- for(let i=0;i<5;i++)drawHeart(ox+27*u+i*41*u,oy+19*u,P,i<hero.hp);
+ for(let i=0;i<hero.maxHp;i++)drawHeart(ox+27*u+i*41*u,oy+19*u,P,i<hero.hp);
  const bx=Math.round(ox+28*u),by=Math.round(oy+64*u),bw=Math.round(272*u),bh=Math.round(34*u),q=Math.max(1,Math.round(2*u));
  ctx.fillStyle='#0b0b14';ctx.fillRect(bx-q,by-q,bw+2*q,bh+2*q);
  ctx.fillStyle='#d8dde8';ctx.fillRect(bx,by,bw,bh);ctx.fillStyle='#8a90a0';ctx.fillRect(bx+q,by+bh-2*q,bw-2*q,q);ctx.fillRect(bx+bw-2*q,by+q,q,bh-2*q);
@@ -489,7 +595,11 @@ function drawHUD(){// positions in world-pixels of the concept (1280x720 base), 
   ctx.fillStyle='#1ea6f2';ctx.fillRect(x0,iy,x1-x0,ih);ctx.fillStyle='#46d0ff';ctx.fillRect(x0,iy+q,x1-x0,Math.round(ih*.45));
   ctx.fillStyle='#b4f2ff';ctx.fillRect(x0,iy+q,x1-x0,q);ctx.fillStyle='#0f5fa8';ctx.fillRect(x0,iy+ih-q,x1-x0,q);
   if(k>0){ctx.fillStyle='#0d4f8c';ctx.fillRect(x0,iy,q,ih);}}
- let ty=by+bh+26*u;
+ {const cx=bx+2*u,cy=by+bh+8*u;drawPix('coin',cx,cy,3*u);outlined('× '+coins,cx+30*u,cy+21*u,19*u,'#ffe08a');} // coin counter (under the gauge)
+ if(popup){const al=Math.min(1,popup.t/.4),w=Math.round(420*u),h=Math.round(92*u),px=Math.round(cv.width/2-w/2),py=Math.round(oy+150*u);ctx.globalAlpha=al;
+  ctx.fillStyle='#0b0b14';ctx.fillRect(px-3*q,py-3*q,w+6*q,h+6*q);ctx.fillStyle='#e8d6b0';ctx.fillRect(px-q,py-q,w+2*q,h+2*q);ctx.fillStyle='#18203f';ctx.fillRect(px+q,py+q,w-2*q,h-2*q);
+  drawPix(popup.pix,px+16*u,py+16*u,5*u);outlined(popup.title,px+96*u,py+40*u,26*u,'#ffe08a');outlined(popup.sub,px+96*u,py+72*u,20*u,'#fff');ctx.globalAlpha=1;}
+ let ty=by+bh+26*u+32*u;
  if(hero.atk||(hero.combo>0&&hero.chainT>0)){const i=hero.atk?hero.atk.i:hero.combo;outlined((i+1)+' HIT '+SWINGS[i].name,bx,ty,20*u);ty+=26*u;}
  if(toast){const S=toast.S,al=Math.min(1,toast.t/.3);ctx.globalAlpha=al;const isz=Math.round(36*u);
   ctx.fillStyle='#0b0b14';ctx.fillRect(bx-q,ty-22*u-q,isz+2*q,isz+2*q);ctx.drawImage(IMG.ui_icons,S.icon*48,0,48,48,bx,ty-22*u,isz,isz);
@@ -500,14 +610,17 @@ function drawHUD(){// positions in world-pixels of the concept (1280x720 base), 
 function render(){computeView();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#000';ctx.fillRect(0,0,cv.width,cv.height);
  const sx=shake?(Math.random()-.5)*shake:0,sy=shake?(Math.random()-.5)*shake:0;
  offX=0;ctx.setTransform(scale,0,0,scale,(-camX+sx)*scale,(-camY+sy)*scale);ctx.imageSmoothingEnabled=false;
+ if(uw){drawUnderwater();for(const p of parts){ctx.globalAlpha=Math.max(0,1-p.t/p.life);ctx.fillStyle=p.c;ctx.fillRect(Math.round(p.x),Math.round(p.y),p.s,p.s);}ctx.globalAlpha=1;drawHUD();return;}
  ctx.drawImage(IMG.bg,0,0,WW,WH);
+ drawFrame('decal_puddle',0,868,572,false); // hidden dive spot (rain puddle)
+ for(const f of fx)if(f.type==='twinkle')drawTwinkle(f);
  if(!hero.swim&&!hero.hidden&&!(hero.sk&&hero.sk.z>2))shadow(hero.x-8,hero.y+2,44,14,.4);else if(hero.sk&&hero.sk.z)shadow(hero.x,hero.y+2,30,9,.25);
  for(const m of slimes)if(!m.dead)shadow(m.x-3,m.y+1,32*m.sc*(1-m.hz/80),10*m.sc,.38);
  const L=[];const heroY=hero.swim||(hero.sk&&(hero.sk.id==='dive'||hero.sk.id==='undive'))?Math.max(hero.y,419):hero.y;
  const drawHeroAll=()=>{if(hero.atk&&hero.atk.s.kind==='spin')drawSpinRing(hero.atk,'back');drawHero();drawSlash();drawSkillOverlay();};
  L.push({y:heroY,f:drawHeroAll});for(const m of slimes)L.push({y:m.y,f:()=>drawSlime(m)});
  L.push({y:spirit.y+40,f:drawSpirit});
- for(const f of fx)if(f.type!=='ring')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
+ for(const f of fx)if(f.type!=='ring'&&f.type!=='twinkle')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
  for(const o of LVL.overlayImgs)L.push({y:o.sortY,ov:1,f:()=>ctx.drawImage(IMG['ov_'+o.name],o.x,o.y)});
  L.sort((a,b)=>a.y-b.y||(a.ov?1:0)-(b.ov?1:0));for(const d of L)d.f();
  for(const f of fx)if(f.type==='ring'&&!f.noTint)drawRing(f);
@@ -522,6 +635,7 @@ function render(){computeView();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothing
 function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillStyle='rgba(255,0,0,.2)';
  for(const o of LVL.blocks){ctx.beginPath();if(o.poly){o.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}else{const[x,y,rx,ry]=o.ellipse;ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);}ctx.fill();ctx.stroke();}
  ctx.strokeStyle='#0cf';ctx.beginPath();ctx.ellipse(POOL.x,POOL.y,POOL.rx,POOL.ry,0,0,7);ctx.stroke();
+ for(const sp of DIVE.spots){ctx.strokeStyle=diveTaken.includes(sp.id)?'#888':'#0ff';if(sp.r){ctx.beginPath();ctx.arc(sp.x,sp.y,sp.r,0,7);ctx.stroke();}ctx.fillStyle='#0ff';ctx.font='12px monospace';ctx.fillText('dive:'+sp.id+(diveTaken.includes(sp.id)?' (taken)':''),sp.x-30,sp.y-8);}
  const E=(x,y,rx,ry)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.stroke();};
  const a=hero.atk;if(a&&a.t>=a.s.a0&&a.t<=a.s.a1){const s=a.s,dv=DIRV[hero.face];ctx.strokeStyle='#ff0';
   if(s.kind==='slash')E(hero.x+dv[0]*s.reach,hero.y+dv[1]*s.reach*.75-(dv[1]?0:6),dv[0]?s.rad:s.rad*1.25,dv[0]?s.rad*.85:s.rad*.7);
@@ -540,8 +654,10 @@ function frame(t){const dt=Math.min(1/30,(t-last)/1000||0);last=t;
 const jobs=[load('bg','bg_town.jpg')];for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));
 Promise.all(jobs).then(()=>{
  const pose=Q.get('pose');if(pose&&pose.startsWith('attack')){const i=(+pose.slice(6)||1)-1;slimes.forEach(m=>m.t=99);startSwing(i);hero.atk.t=(SWINGS[i].a0+SWINGS[i].a1)/2;hero.atk.hit=new Set(slimes);if(Q.get('face'))hero.face=Q.get('face');hitStop=1e9;shake=0;document.getElementById('hint').style.display='none';}
- updateSlotEls(true);
- window.__game={hero,slimes,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,
+ updateSlotEls(true);applySaved();hero.hp=hero.maxHp;
+ if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
+  b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
+ window.__game={hero,slimes,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
  setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0},5000);
