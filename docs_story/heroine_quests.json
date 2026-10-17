@@ -1,0 +1,497 @@
+{
+ "version": 1,
+ "conventions": {
+  "expression": "neutral/smile/angry/sad/surprised/blush. 기존 초상화는 normal/smile/angry/blush뿐 → neutral=normal, sad·surprised는 파일이 없으면 normal로 대체(HEROINES.md 표정 훅 규칙).",
+  "speaker": "표시 이름. 「필멸자」는 주인공 — 게임에서는 현재 칭호(영웅/필멸자/타락한 필멸자/마왕)로 치환. 「나레이션」은 이름표 없이 표시.",
+  "title_branch": "hero / mortal / mortal_infamous / fallen / demon_king. 동료·선의 퀘스트의 거절 기준은 칭호가 아니라 선악 등급 「악명」(-20 이하)이므로 필멸자 칭호를 둘로 나눔."
+ },
+ "included": [
+  "a_tailor"
+ ],
+ "deferred": [
+  "h_mystic 운",
+  "g_dancer 방울",
+  "f_diver 숨비",
+  "e_tailor 루비",
+  "c_priest 설화",
+  "d_yuna 유나"
+ ],
+ "heroines": [
+  {
+   "heroine_id": "a_tailor",
+   "name": "나비",
+   "town": "A 시작 마을",
+   "origin": "판타지 세계 출신 (A 시작 마을 태생, 왕도 궁정 의상실 견습 경력)",
+   "age": "22세 (성인)",
+   "chain_title": "나비 동료 퀘스트 「영웅의 망토」",
+   "appeal": "밝고 수다스러운 재봉사. 겁이 많아 혼자 숲에 못 가지만, 지켜야 할 사람이 생기면 바늘 두 자루로 먼저 뛰어든다. 색과 옷감 이야기에 눈을 반짝이는 장인 기질 + 은근한 허세 + 진짜 용기.",
+   "outfit_note": "고유 의상 유지(HEROINES.md): 하늘색 주름 미니스커트, 나비 리본 크롭 블라우스, 바늘꽂이 벨트, 줄무늬 사이하이 스타킹, 금발 트윈테일. 대본에서 외모·신체를 묘사하지 않는다.",
+   "relation_note": "주인공은 프롤로그 시점 17세. 나비와의 관계는 「동네 누나 같은 재봉사 ↔ 단골」로 쓰고 연애·선정 뉘앙스는 넣지 않는다.",
+   "karma_rule": "영웅(+40↑) / 필멸자(-39~+39) / 타락한 필멸자(-40~-59) / 마왕(강림 후). 동료 퀘스트는 선악 「악명」(-20) 이하에서 거절되므로, 필멸자 칭호라도 -20~-39면 `mortal_infamous` 대사로 거절하고, 타락한 필멸자·마왕은 항상 거절/적대다.",
+   "quests": [
+    {
+     "id": "A_TAILOR1",
+     "step": 1,
+     "title": "실 한 타래의 용기",
+     "trigger": "A 「첫 출발」 이벤트 이후, 나비에게 말 걸기. 선악 -19 이상, 마왕 강림 전.",
+     "objective": "시작의 숲에서 「은빛 거미줄」 5개 채집 — 나비 동행, 거미 몹으로부터 그녀를 지킨다",
+     "steps": [
+      "재봉소에서 의뢰 수락 → 나비가 동료로 합류(AI 동행, HP 60).",
+      "바람길 → 시작의 숲 서쪽 공터(키 큰 풀숲 주변)의 나무에서 은빛 거미줄 5개 조사 채집. 채집 중(2초) 나비가 무방비 — 은실거미 3마리가 나비를 노린다.",
+      "5개를 모으면 은실거미 우두머리 1마리 출현. 나비가 처음으로 「실타래 묶기」를 쓴다(연출).",
+      "재봉소로 귀환해 보고."
+     ],
+     "reward": "호감도 +20, 금화 100",
+     "reward_items": [
+      {
+       "id": "affinity",
+       "n": 20,
+       "status": "existing"
+      },
+      {
+       "id": "gold",
+       "n": 100,
+       "status": "existing"
+      }
+     ],
+     "script": {
+      "offer": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "아, 마침 잘 왔어요! 단골님, 지금 바빠요? 안 바쁘죠? 안 바빠 보여요!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "숲속 나무에 「은빛 거미줄」이 있거든요. 달빛에 헹군 것처럼 반짝여서, 그걸로 실을 꼬면 망토 가장자리가 은빛으로 흘러요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "blush",
+        "text": "…근데 거미가 있어요. 그리고 저는 거미가 무서워요. 아주 많이요."
+       },
+       {
+        "speaker": "필멸자",
+        "expression": "neutral",
+        "text": "같이 가자."
+       },
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "정말요? 아, 그럼 이건 정식 의뢰예요! 보수도 드릴게요. 제 바늘이 지켜 줄… 아니, 제가 지켜질게요. 잘 부탁해요!"
+       }
+      ],
+      "field": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "저기, 저 나무! 반짝이는 거 보여요? …저 대신 먼저 가 볼래요?"
+       },
+       {
+        "speaker": "나비",
+        "expression": "angry",
+        "text": "으아악! 다리 여덟 개는 반칙이잖아요! 찌르기 세 번이면 되겠죠? 되겠죠?!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "세 개째! 손끝에 감기는 감촉이 완전 비단이에요. 와아…"
+       },
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "크, 큰 거 왔어요! 잠깐만요, 실타래…! 묶여라!"
+       }
+      ],
+      "down": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "으… 다리가 안 움직여요… 두고 가지 마요…"
+       }
+      ],
+      "done": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "다섯 타래! 보세요, 빛이 물처럼 흘러요. 역시! 같이 오길 잘했어요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "blush",
+        "text": "솔직히 말하면요, 왕도에서 돌아온 뒤로 숲 쪽은 쳐다보지도 못했어요. 오늘 처음으로 무서운 것보다 예쁜 게 먼저 보였어요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "이건 약속한 보수! 그리고 다음에도 부르면… 와 줄 거죠?"
+       }
+      ]
+     },
+     "title_variants": {
+      "hero": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "영웅님이랑 같이 가면 거미도 길 비켜 주겠죠? …비켜 주겠죠?"
+       }
+      ],
+      "mortal": [
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "단골님, 무서우면 무섭다고 말해도 돼요. 저는 벌써 말했으니까요."
+       }
+      ],
+      "mortal_infamous": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "…미안해요. 요즘 소문이 너무 무서워서, 오늘은 숲에 못 가겠어요."
+       }
+      ],
+      "fallen": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "(문에 「휴업」 팻말을 건다) …오늘은 문 닫았어요. 내일도요."
+       }
+      ],
+      "demon_king": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "오, 오지 마… 망토는 공짜로 줄게요! 그러니까…!"
+       }
+      ]
+     }
+    },
+    {
+     "id": "A_TAILOR2",
+     "step": 2,
+     "title": "허수아비 패션쇼",
+     "requires": "A_TAILOR1",
+     "trigger": "A_TAILOR1 완료 다음 날 이후 나비에게 말 걸기. A1(뿔토끼) 수락 여부와 무관.",
+     "objective": "보리의 허수아비 옷감을 훔쳐 간 까마귀 무리 처치 후 옷감 회수 — 나비 동행",
+     "steps": [
+      "재봉소: 나비가 보리의 허수아비에게 새 옷을 입혀 「패션쇼」를 열 계획을 말한다.",
+      "보리의 밭: 옷감이 사라졌다. 까마귀 깃털이 바람길 쪽으로 떨어져 있다.",
+      "바람길 서쪽 바람의 언덕 → 까마귀 둥지 무리(3파) 처치, 옷감 꾸러미 3개 회수.",
+      "회수한 천 중 하나는 보리의 것이 아니다(A5 「허수아비의 밤」 복선). 나비가 수상히 여겨 보리에게 알린다.",
+      "밭으로 돌아와 허수아비 3개에 옷 입히기(조사 3회) → 마을 사람 몇 명이 구경 온다(짧은 컷)."
+     ],
+     "reward": "호감도 +20, 외형 「나비 리본 망토」",
+     "reward_items": [
+      {
+       "id": "affinity",
+       "n": 20,
+       "status": "existing"
+      },
+      {
+       "id": "c_cape_nabi_ribbon",
+       "n": 1,
+       "status": "proposed_id"
+      }
+     ],
+     "script": {
+      "offer": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "단골님! 저 엄청난 걸 생각해 냈어요. 보리 아저씨 허수아비들, 옷이 너무 낡았잖아요?"
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "그래서 제가 새 옷을 지어 입히려고요. 이름하여 「허수아비 패션쇼」! 관객은 까마귀랑 마을 사람들!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "…그런데 옷감을 밭에 널어 뒀더니 까마귀들이 몽땅 물어 갔대요. 제 최고급 옷감을요!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "angry",
+        "text": "이번엔 저도 화났어요. 같이 가요. 찌를 거예요. 까마귀를. 아주 정중하게."
+       }
+      ],
+      "field": [
+       {
+        "speaker": "보리",
+        "expression": "sad",
+        "text": "아이고, 나비 아가씨 천이 저기 언덕 쪽으로 날아갔어. 까마귀 놈들 둥지가 그쪽이야."
+       },
+       {
+        "speaker": "나비",
+        "expression": "angry",
+        "text": "돌려줘요! 그거 한 마에 금화 열 닢짜리란 말이에요!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "찾았다, 하늘색 무명! …음, 그리고 이건 노을색 비단. 둘 다 무사해요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "…어? 이건 제 천이 아닌데요. 작은 소매 조각… 보리 아저씨 것도 아니고요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "이상해요. 이따가 보리 아저씨한테 꼭 보여 줘야겠어요."
+       }
+      ],
+      "down": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "까마귀한테 진 재봉사라니… 소문나면 안 돼요…"
+       }
+      ],
+      "done": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "자, 큰돌이는 하늘색 조끼, 작은돌이는 노을색 두건! 어때요, 보리 아저씨?"
+       },
+       {
+        "speaker": "보리",
+        "expression": "smile",
+        "text": "허허, 내 허수아비들이 나보다 잘 입었구먼! 고맙네, 아가씨."
+       },
+       {
+        "speaker": "보리",
+        "expression": "sad",
+        "text": "…그 작은 천 조각은 내가 맡아 두지. 요즘 밭에 이상한 녀석들이 섞여 들어서 말이야."
+       },
+       {
+        "speaker": "나비",
+        "expression": "blush",
+        "text": "단골님, 이건 패션쇼 1등 상품이에요. 제가 밤새 지은 「나비 리본 망토」! 심사위원은 저 혼자였지만요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "역시! 같이 오길 잘했어요."
+       }
+      ]
+     },
+     "title_variants": {
+      "hero": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "영웅님이 지켜 준 패션쇼라고 소문내도 돼요? 손님이 세 배는 늘 거예요!"
+       }
+      ],
+      "mortal": [
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "까마귀는 반짝이는 걸 좋아한대요. 저랑 취향이 같아서 더 얄미워요."
+       }
+      ],
+      "mortal_infamous": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "패션쇼는… 다음에 할게요. 요즘 사람들이 광장에 잘 안 모여서요."
+       }
+      ],
+      "fallen": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "(대답 없이 재봉소 창 커튼을 친다)"
+       }
+      ],
+      "demon_king": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "히익…! 허, 허수아비 옷 다 가져가요! 저는 놔줘요!"
+       }
+      ]
+     }
+    },
+    {
+     "id": "A_TAILOR3",
+     "step": 3,
+     "title": "영웅의 망토",
+     "requires": "A_TAILOR2",
+     "trigger": "A_TAILOR2 완료 + 1지역 보스(이끼 수정 골렘) 격파 후 A 귀환(「숲에서 돌아온 날」 이벤트).",
+     "objective": "수정 동굴 입구까지 동행해 「물빛 실크」 획득, 재봉소로 귀환",
+     "steps": [
+      "재봉소: 나비가 「영웅의 망토」의 마지막 재료 「물빛 실크」를 말한다. 수정 동굴 입구 개울에 사는 물빛 누에의 고치에서만 나온다.",
+      "낙석이 치워진 바람길 남쪽 → 수정 동굴(2지역) 입구까지 동행. 도중 박쥐 떼 2파(동굴 입구 쪽 몹).",
+      "입구 개울가: 물빛 누에 고치 3개 조사. 마지막 고치를 집는 순간 동굴 안에서 자장가 같은 소리가 들린다(돌님 복선) → 나비가 겁먹지만 먼저 주인공 팔을 잡아끈다.",
+      "재봉소로 귀환. 나비가 망토 치수를 잰다. 망토 완성은 「호감도 80 장면」으로 미룬다.",
+      "완료 시 동료 등록 완료: 이후 호감도 80 이상이면 퀘스트 밖에서도 동행 호출 가능."
+     ],
+     "reward": "호감도 +25, 망토 염색 무료권",
+     "reward_items": [
+      {
+       "id": "affinity",
+       "n": 25,
+       "status": "existing"
+      },
+      {
+       "id": "t_dye_free",
+       "n": 1,
+       "status": "proposed_id"
+      }
+     ],
+     "script": {
+      "offer": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "숲의 그 커다란 수정 골렘을… 진짜로요? 단골님이요? 와아…"
+       },
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "그럼 이제 말할 수 있겠다. 저, 왕도에서 쫓겨나듯 돌아온 거 알죠? 스승님이랑 크게 싸웠거든요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "「너는 남이 지은 옷에 단추만 달 사람이다」래요. 그래서 꼭 보여 주고 싶었어요. 제가 처음부터 끝까지 지은 옷을요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "이름은 정해 뒀어요. 「영웅의 망토」. 마지막 재료는 수정 동굴 입구에서 나는 「물빛 실크」예요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "blush",
+        "text": "…동굴은 숲보다 백 배 무섭겠지만요. 그래도 이번엔 제가 먼저 가자고 할게요. 가요!"
+       }
+      ],
+      "field": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "박쥐! 박쥐는 거미보다 낫다고 생각했는데 아니에요! 둘 다 싫어요!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "저기 개울가! 고치가 물빛으로 빛나요. 꼭 물방울을 실로 꼰 것 같아요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "…방금 그 소리 들었어요? 동굴 안에서… 누가 노래해요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "자장가 같아요. 슬픈 거요. …우리, 지금은 돌아가요. 대신 다음에 단골님이 저 안에 들어가면, 그 노래 주인도 꼭 찾아 줘요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "(주인공의 팔을 잡아끈다) 자, 가요. 무서울 땐 빨리 걷는 게 최고예요."
+       }
+      ],
+      "down": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "실크… 실크는 꼭 쥐고 있었어요… 칭찬해 줘요…"
+       }
+      ],
+      "done": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "물빛 실크 세 타래! 해냈어요, 우리가!"
+       },
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "자, 팔 벌려요. 치수 잴 거예요. …처음 망토 맞추러 왔을 땐 끝자락이 땅에 끌렸는데, 이젠 딱 맞겠네요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "망토는 바로는 못 만들어요. 영웅의 망토는 영웅이 될 사람한테 맞춰야 하니까, 단골님이 어떤 사람이 되는지 보고 나서 마지막 바늘을 꿰맬 거예요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "blush",
+        "text": "그때까지 이건 맡아 둬요. 염색 무료권! 아무 색이나요. …빨강만 빼고 다 어울릴 거예요. 아, 빨강도 어울려요. 미안해요."
+       },
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "그리고… 이제 저 동료 맞죠? 부르면 갈게요. 바늘 두 자루 들고요!"
+       }
+      ]
+     },
+     "title_variants": {
+      "hero": [
+       {
+        "speaker": "나비",
+        "expression": "smile",
+        "text": "영웅님! 이름부터 「영웅의 망토」랑 딱 맞잖아요. 운명이에요, 이건. 재봉사의 운명!"
+       }
+      ],
+      "mortal": [
+       {
+        "speaker": "나비",
+        "expression": "neutral",
+        "text": "영웅이 아니어도 돼요. 망토는 입는 사람이 어떤 길을 고르는지에 맞춰 짓는 거니까요."
+       }
+      ],
+      "mortal_infamous": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "…그 망토, 아직 지을 수가 없어요. 지금 단골님 어깨에 맞는 치수를 모르겠어요."
+       }
+      ],
+      "fallen": [
+       {
+        "speaker": "나비",
+        "expression": "sad",
+        "text": "(재봉소는 비어 있다. 탁자 위에 쪽지) 「강변 마을로 가요. 망토는… 미안해요. ― 나비」"
+       }
+      ],
+      "demon_king": [
+       {
+        "speaker": "나비",
+        "expression": "surprised",
+        "text": "(가위를 떨어뜨리고 뒷문으로 도망친다) 오지 마요…!"
+       }
+      ]
+     }
+    }
+   ],
+   "karma_route_summary": [
+    "악명(-20) 이하: 울면서 재봉소 문을 닫고 B 강변 물레방아 마을로 떠난다(HEROINES.md). 진행 중이던 단계는 중단, 호감도 유지.",
+    "마왕: 겁에 질려 도망치며, 공격하면 살해 가능(전투력 낮음, HP 8). 살해 시 되돌릴 수 없음. 동료 퀘스트 영구 실패."
+   ],
+   "affinity_rewards": {
+    "40": "보조무기 「나비 골무 부적」 (회피 +5%)",
+    "60": "듀오 합동기 「매듭 베기」",
+    "80": "장면 「분수 축제의 밤」 (비노출·비선정, 등불 띄우기와 대화)"
+   },
+   "new_items": {
+    "c_cape_nabi_ribbon": "외형 「나비 리본 망토」 (기존 보상명, ID는 신규 제안)",
+    "t_dye_free": "망토 염색 무료권 (기존 보상명, ID는 신규 제안)",
+    "m_silver_web": "은빛 거미줄 (퀘스트 아이템, 신규 제안)",
+    "m_aqua_silk": "물빛 실크 (퀘스트 아이템, 신규 제안)"
+   },
+   "new_mobs": {
+    "silk_spider": "은실거미 — 1지역 몹 목록(WORLD_PLAN.md)에 거미가 없어 2지역 동굴 거미 색 변형으로 제안",
+    "crow": "까마귀 — 1지역 몹 목록에 없음. 박쥐(fly) 스프라이트 색 변형 제안"
+   }
+  }
+ ]
+}

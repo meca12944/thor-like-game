@@ -1,0 +1,1032 @@
+{
+ "version": 1,
+ "scope": "A 시작 마을 + 1지역(바람길·시작의 숲·고대 숲 신전·골렘의 방)",
+ "kinds": {
+  "easy_hidden": "숨겼지만 찾기 쉬움 (능력 불필요)",
+  "gated": "나중 능력/열쇠/아이템으로만 열림",
+  "existing_reward": "보스 보상 (참고)"
+ },
+ "status": {
+  "existing": "이미 지도·설정에 있음 (그대로 둠)",
+  "proposed": "이번 설정안 — 지도 반영 필요"
+ },
+ "chests": [
+  {
+   "id": "a_chest_tak",
+   "map": "town_A",
+   "place": "마을 연못(분수 옆) 바닥, 금빛 사슬 상자",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "oath",
+    "detail": "마을 강자 8명 모두 결투에서 살려 줌(strongman_state 전원 ally), 마왕 강림 전. 한 명이라도 죽였으면 영원히 닫힘"
+   },
+   "loot": [
+    [
+     "hs_tak",
+     1
+    ]
+   ],
+   "hint": "조사: 「여덟 개의 맹세가 모이면 열린다」",
+   "source": "ITEMS.md / STORY.md",
+   "loot_items": [
+    {
+     "id": "hs_tak",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_dive_fountain",
+   "map": "town_A",
+   "place": "광장 분수 (잠수 지점)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수, 5지역 크라켄)"
+   },
+   "loot": [
+    [
+     "pearl",
+     1
+    ]
+   ],
+   "hint": "A6 퀘스트와 연결 — 어머니의 편지도 여기서",
+   "source": "DIVE_SPOTS.md / A6",
+   "loot_items": [
+    {
+     "id": "pearl",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_dive_well",
+   "map": "town_A",
+   "place": "대장간 뒤 우물 (잠수 지점)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수)"
+   },
+   "loot": [
+    [
+     "gold_pouch_m",
+     1
+    ]
+   ],
+   "hint": "물방울 반짝임",
+   "source": "DIVE_SPOTS.md",
+   "loot_items": [
+    {
+     "id": "gold_pouch_m",
+     "n": 1,
+     "status": "proposed_id"
+    }
+   ]
+  },
+  {
+   "id": "a_dive_pond",
+   "map": "town_A",
+   "place": "촌장집 연못 (잠수 지점)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수)"
+   },
+   "loot": [
+    [
+     "potion_hi",
+     1
+    ]
+   ],
+   "hint": "물방울 반짝임",
+   "source": "DIVE_SPOTS.md",
+   "loot_items": [
+    {
+     "id": "potion_hi",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_chest_tailor_yard",
+   "map": "town_A",
+   "place": "나비 재봉소 뒤뜰, 빨랫줄 아래 뚜껑 덮인 바구니",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "herb_red",
+     2
+    ]
+   ],
+   "owner": "없음(나비가 「손님 주라고 둔 거예요」라고 말함 → 선악 영향 없음)",
+   "hint": "빨랫줄의 천이 바람에 들리면 바구니가 잠깐 보인다",
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "herb_red",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_chest_scarecrow",
+   "map": "town_A",
+   "place": "보리 밭 맨 끝 허수아비 발치의 건초 더미",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "spd_s",
+     1
+    ],
+    [
+     "m_hardwood",
+     2
+    ]
+   ],
+   "owner": "없음(밭 밖 공용 건초)",
+   "hint": "건초 위에서 반짝임. A5 이후엔 이 허수아비가 사라져 있다",
+   "loot_items": [
+    {
+     "id": "spd_s",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "m_hardwood",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_chest_gate_supply",
+   "map": "town_A",
+   "place": "남문 초소 옆 나무 보급 상자",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "torch",
+     2
+    ],
+    [
+     "antidote",
+     1
+    ]
+   ],
+   "owner": "경비 보급품 — 처음 열 때 바위가 「그거 가져가도 돼요, 숲 가는 사람 거예요」 → 선악 영향 없음",
+   "hint": "초소 뒤로 반 칸 돌아가면 보임",
+   "loot_items": [
+    {
+     "id": "torch",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "antidote",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_hidden_bench",
+   "map": "town_A",
+   "place": "분수 광장 동쪽 낡은 벤치 밑 (조사 반짝임)",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "feather",
+     1
+    ]
+   ],
+   "owner": "없음",
+   "hint": "낮에만 반짝인다. A3 장난감 위치(대장간 뒤·촌장 울타리·분수 꽃밭)와 겹치지 않게 배치",
+   "loot_items": [
+    {
+     "id": "feather",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "a_chest_granny_roof",
+   "map": "town_A",
+   "place": "물결 할머니 집 뒤 담장 위 까치둥지",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "ability",
+    "ability": "대지의 수정 (1지역 보스 흡수) — 담장 아래 움푹한 땅에 수정 기둥을 세워 발판으로 삼는다"
+   },
+   "loot": [
+    [
+     "potion_m",
+     2
+    ],
+    [
+     "c_cape_pinwheel",
+     1
+    ]
+   ],
+   "hint": "골렘 격파 후 첫 귀환 때 도토리가 「저 위에 까치가 반짝이는 거 물어 갔어!」라고 알려 줌",
+   "new_items": {
+    "c_cape_pinwheel": "외형 「바람개비 망토 장식」 (능력치 없음, 신규 제안)"
+   },
+   "loot_items": [
+    {
+     "id": "potion_m",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "c_cape_pinwheel",
+     "n": 1,
+     "status": "proposed_id"
+    }
+   ]
+  },
+  {
+   "id": "a_chest_forge_cellar",
+   "map": "town_A",
+   "place": "강철 대장간 지하 창고의 금 간 벽 뒤",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "item",
+    "item": "bomb (작은 폭탄, H·G에서 판매) 또는 o_ore_pick (투척 곡괭이)"
+   },
+   "loot": [
+    [
+     "m_iron_ingot",
+     3
+    ],
+    [
+     "charm_luck",
+     1
+    ]
+   ],
+   "hint": "강철: 「지하 벽 금 간 거? 우리 아버지가 뭘 숨겨 놨다던데. 부수든 말든 맘대로 해.」 → 허락받은 것이라 선악 영향 없음",
+   "loot_items": [
+    {
+     "id": "m_iron_ingot",
+     "n": 3,
+     "status": "existing"
+    },
+    {
+     "id": "charm_luck",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f00_chest_hill",
+   "map": "field00",
+   "x": 6,
+   "y": 8,
+   "place": "바람의 언덕 비석 옆",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "m_hardwood",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "m_hardwood",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f00_chest_boulder",
+   "map": "field00",
+   "x": 24,
+   "y": 13,
+   "place": "바람길 큰 바위(R, 23,12) 뒤편 풀밭",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "antidote",
+     1
+    ]
+   ],
+   "hint": "길에서 바위 그림자 사이로 상자 모서리가 보인다",
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "antidote",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f00_hidden_tallgrass",
+   "map": "field00",
+   "x": 50,
+   "y": 14,
+   "place": "동쪽 키 큰 풀숲(\" 구역) 가운데",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "herb_red",
+     2
+    ]
+   ],
+   "hint": "풀 사이 반짝임 (hidden 오브젝트)",
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "herb_red",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f00_chest_pond_isle",
+   "map": "field00",
+   "x": 44,
+   "y": 6,
+   "place": "북동쪽 연못 한가운데 바위섬",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (물 위 걷기, 5지역)"
+   },
+   "loot": [
+    [
+     "potion_hi",
+     1
+    ],
+    [
+     "spirit_hi",
+     1
+    ]
+   ],
+   "hint": "처음부터 섬 위 상자가 보이지만 갈 방법이 없다",
+   "needs_map_edit": true,
+   "map_edit": "(44,6) 물(~)을 바위섬 1칸(':' 또는 새 글자)으로",
+   "loot_items": [
+    {
+     "id": "potion_hi",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "spirit_hi",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_chest_glade",
+   "map": "field01",
+   "x": 9,
+   "y": 31,
+   "place": "공터 위쪽 이상한 나무(Y)를 통과",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     2
+    ],
+    [
+     "m_hardwood",
+     2
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "m_hardwood",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_chest_island",
+   "map": "field01",
+   "x": 32,
+   "y": 31,
+   "place": "웅덩이 섬 — 서쪽 둑 징검돌(:)",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "heart_piece",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_chest_cliff",
+   "map": "field01",
+   "x": 59,
+   "y": 7,
+   "place": "신전 동쪽 절벽 아래",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "m_a1_shared",
+     3
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "m_a1_shared",
+     "n": 3,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_grass_item",
+   "map": "field01",
+   "x": 56,
+   "y": 14,
+   "place": "동쪽 키 큰 풀 반짝임",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "spirit_drop",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "spirit_drop",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_hidden_mushroom",
+   "map": "field01",
+   "x": 20,
+   "y": 20,
+   "place": "버섯 군락(m) 한가운데",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "m_spore",
+     2
+    ],
+    [
+     "antidote",
+     1
+    ]
+   ],
+   "hint": "소담 대사 「갓 무늬로 구별해요」를 떠올리면 무늬 다른 버섯 하나가 반짝인다",
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "m_spore",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "antidote",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_hidden_tallgrass_w",
+   "map": "field01",
+   "x": 6,
+   "y": 25,
+   "place": "서쪽 공터 키 큰 풀숲",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "herb_red",
+     2
+    ],
+    [
+     "spd_s",
+     1
+    ]
+   ],
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "herb_red",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "spd_s",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "f01_cache_boar_glade",
+   "map": "field01",
+   "x": 49,
+   "y": 27,
+   "place": "돌엄니 공터의 「땅이 울리는 곳」",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "ability",
+    "ability": "사중 잠행 (3지역 모래 대지렁이 흡수) — 땅속으로 들어가면 묻힌 상자"
+   },
+   "loot": [
+    [
+     "atk_s",
+     2
+    ],
+    [
+     "def_s",
+     2
+    ],
+    [
+     "c_cape_boar",
+     1
+    ]
+   ],
+   "hint": "돌엄니 격파 후 공터를 걸으면 발소리가 한 칸에서만 울린다",
+   "new_items": {
+    "c_cape_boar": "외형 「멧돼지 털 망토 깃」 (능력치 없음, 신규 제안)"
+   },
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "atk_s",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "def_s",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "c_cape_boar",
+     "n": 1,
+     "status": "proposed_id"
+    }
+   ]
+  },
+  {
+   "id": "f01_chest_upstream",
+   "map": "field01",
+   "x": 35,
+   "y": 1,
+   "place": "북쪽 개울 상류, 물줄기 옆 바위턱",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "ability",
+    "ability": "수정 실 (2지역 수정 여왕거미 흡수) — 실을 걸어 건너편 턱으로 날아간다"
+   },
+   "loot": [
+    [
+     "potion_m",
+     2
+    ],
+    [
+     "spirit",
+     2
+    ]
+   ],
+   "hint": "쉼터 다리에서 북쪽을 보면 턱 위 상자가 보인다",
+   "needs_map_edit": true,
+   "map_edit": "(35,1) 나무(T)를 바위턱 바닥으로, 실 고정점 표시",
+   "loot_items": [
+    {
+     "id": "potion_m",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "spirit",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "dive_a1_waterfall",
+   "map": "field01",
+   "place": "폭포 아래 웅덩이 (잠수)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수)"
+   },
+   "loot": [
+    [
+     "pearl",
+     1
+    ]
+   ],
+   "source": "DIVE_SPOTS.md / B5",
+   "loot_items": [
+    {
+     "id": "pearl",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "dive_a1_roots",
+   "map": "field01",
+   "place": "큰 나무 뿌리 사이 샘 (잠수)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수)"
+   },
+   "loot": [
+    [
+     "spirit_drop",
+     1
+    ]
+   ],
+   "source": "DIVE_SPOTS.md",
+   "loot_items": [
+    {
+     "id": "spirit_drop",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "dive_a1_swamp",
+   "map": "field01",
+   "place": "버섯 군락 옆 늪 (잠수)",
+   "kind": "gated",
+   "status": "existing",
+   "unlock": {
+    "type": "ability",
+    "ability": "해류의 숨결 (잠수)"
+   },
+   "loot": [
+    [
+     "w_forest_dagger",
+     1
+    ]
+   ],
+   "source": "DIVE_SPOTS.md (ITEMS.md는 숲의 단검 위치를 「큰 나무 뿌리 사이 샘」으로 적음 — 불일치)",
+   "loot_items": [
+    {
+     "id": "w_forest_dagger",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d1_c1",
+   "map": "dungeon01_b1",
+   "x": 3,
+   "y": 5,
+   "place": "B1 입구 방",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d1_c2",
+   "map": "dungeon01_b1",
+   "x": 5,
+   "y": 19,
+   "place": "B1 남서 방",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "m_spore",
+     2
+    ],
+    [
+     "bomb",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "m_spore",
+     "n": 2,
+     "status": "existing"
+    },
+    {
+     "id": "bomb",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d1_chest_crystal_plinth",
+   "map": "dungeon01_b1",
+   "x": 33,
+   "y": 5,
+   "place": "B1 북동 계단 방, 수정 두 개(c) 사이 빈 받침대",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "ability",
+    "ability": "대지의 수정 (1지역 보스) — 받침대 위에 수정 기둥을 세우면 벽감이 열림"
+   },
+   "loot": [
+    [
+     "potion_m",
+     1
+    ],
+    [
+     "m_a1_shared",
+     3
+    ]
+   ],
+   "hint": "받침대 비문: 「대지의 수정이 다시 서는 날」. 보스 격파 직후 빛의 문으로 나오며 바로 시험해 볼 수 있는 첫 능력 상자",
+   "needs_map_edit": true,
+   "map_edit": "(33,5) 바닥에 받침대 오브젝트 추가",
+   "loot_items": [
+    {
+     "id": "potion_m",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "m_a1_shared",
+     "n": 3,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d2_c1",
+   "map": "dungeon01_b2",
+   "x": 5,
+   "y": 15,
+   "place": "B2 서쪽 레버 방",
+   "kind": "easy_hidden",
+   "status": "existing",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "potion",
+     2
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 2,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d1_chest_cracked",
+   "map": "dungeon01_b1",
+   "x": 18,
+   "y": 6,
+   "place": "B1 가시 함정 방 북쪽 벽, 횃불 두 개(17,8)(21,8) 사이 금 간 벽(K) 너머 작은 방",
+   "kind": "gated",
+   "status": "proposed",
+   "unlock": {
+    "type": "item",
+    "item": "bomb (같은 층 d1_c2에서 1개 획득 — 처음 오는 플레이어도 열 수 있음) 또는 o_ore_pick"
+   },
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "o_sling",
+     1
+    ]
+   ],
+   "hint": "두 횃불 사이 벽에만 금이 가 있고 틈으로 바람 소리가 난다",
+   "needs_map_edit": true,
+   "map_edit": "(18,8) 벽을 K로, (17~19,6~7) 벽을 바닥으로 파서 작은 방",
+   "loot_items": [
+    {
+     "id": "potion",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "o_sling",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "d2_chest_dark_corner",
+   "map": "dungeon01_b2",
+   "x": 36,
+   "y": 3,
+   "place": "B2 북쪽 기둥 방 북동 구석 (어둠)",
+   "kind": "easy_hidden",
+   "status": "proposed",
+   "unlock": {
+    "type": "none"
+   },
+   "loot": [
+    [
+     "torch",
+     1
+    ],
+    [
+     "spirit",
+     1
+    ]
+   ],
+   "hint": "던전 어둠(dark) 때문에 횃불·수정 빛 가까이 가야 보인다",
+   "needs_map_edit": false,
+   "loot_items": [
+    {
+     "id": "torch",
+     "n": 1,
+     "status": "existing"
+    },
+    {
+     "id": "spirit",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  },
+  {
+   "id": "boss01_reward",
+   "map": "boss01",
+   "place": "골렘의 방 (보스 보상)",
+   "kind": "existing_reward",
+   "status": "existing",
+   "unlock": {
+    "type": "boss",
+    "flag": "boss01"
+   },
+   "loot": [
+    [
+     "m_a1_shared",
+     5
+    ],
+    [
+     "heart_piece",
+     1
+    ]
+   ],
+   "loot_items": [
+    {
+     "id": "m_a1_shared",
+     "n": 5,
+     "status": "existing"
+    },
+    {
+     "id": "heart_piece",
+     "n": 1,
+     "status": "existing"
+    }
+   ]
+  }
+ ]
+}
