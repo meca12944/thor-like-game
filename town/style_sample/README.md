@@ -56,3 +56,16 @@
 | **합계** | | **약 2–4개월** (최소안: 마을 + 1지역 + 모든 스프라이트 재축소 ≈ 3–4주) |
 
 큰 위험: 생성 그림은 여러 화면을 이어 붙이면 이음새 · 스타일이 흔들림 → 지도 전체를 한 장으로 그리기보다 "페인팅 지형 + 따로 그린 소품" 방식을 추천.
+
+## v2 (2026-10-17): hero-matched women, 4-direction idle/walk
+- Proportions (approved): hero FRONT idle = 56 px, head 14 px (4.0 heads), legs 20 px (0.357), crown row 0 / chin 13 / split 36 / sole 55.
+  All 8 women x front/side/back measured from pixels: `female_proportions_v2.csv`, `female_vs_hero_v2.png` (all PASS, ±1 px).
+- `lineup_v2.png` hero + 7 heroines (유나 modern, others fantasy) + 사프란 (sample NPC). 운/방울 skirts regenerated to mini (old turnarounds kept as *_v1_longskirt.jpg).
+- Animation: `assets/walk_<id>.png` rows down/left/right/up x [idle breathing 4 | walk 8] (64x57 cells, anchor 32,56), `walk_meta.json`.
+  Front walk = 8 generated poses; side/back = 4 generated key poses (contact/passing x2) + 1 px bob in-betweens -> 8 frames. Left = mirrored right.
+  Every frame is re-landmarked and remapped onto the same rows (head/torso/legs), so nothing pops between idle/walk/directions.
+  Jitter check `fem_anim_metrics.csv`: baseline range 0 px for every animation, crown range = the designed 1 px bob, head-centre drift <= 1 px
+  (except staff/spear carriers, where the weapon shaft is in the measured band). `heroines_walk_4dir.gif`.
+- Scene: `sample_scene_v2.png` (index.html default; `?v1` = first sample). 60.0 FPS at 1920x1080, 60.0 with +40 sprites (`fps_measure_v2.json`).
+- Live game: 28 px bake of the same pipeline -> `town/assets/npcs/v2` (tools/build_live.py), engine block `[npc_v2]`.
+- Tools: tools/build_fem.py (idle 3 views), build_walk.py (4-dir idle+walk), build_live.py, measure_fem.py/report_fem.py, anim_metrics.py, lineup_v2.py, walk_gif.py.

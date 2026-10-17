@@ -1,0 +1,28 @@
+id,name,view,crown_row,chin_row,split_row,sole_row(baseline),total_h,head_h,heads_tall,legs_px,leg_ratio,shoulder_w,d_total_vs_hero,d_head_vs_hero,d_legs_vs_hero,d_baseline_vs_hero,shoulder_vs_hero,result,note
+hero,주인공,front,0,13,36,55,56,14,4.0,20,0.357,20,0,0,0,0,1.0,PASS,
+hero,주인공,side,0,13,,55,56,14,4.0,,,10,0,0,,0,1.0,PASS,legs overlap in side view (split not measurable)
+hero,주인공,back,0,,36,55,56,,,20,0.357,19,0,,0,0,1.0,PASS,head: face hidden in back view (not measurable)
+g_tool,사프란 (샘플 NPC),front,0,13,36,55,56,14,4.0,20,0.357,19,0,0,0,0,0.95,PASS,
+g_tool,사프란 (샘플 NPC),side,0,13,,55,56,14,4.0,,,16,0,0,,0,1.6,PASS,legs overlap in side view (split not measurable)
+g_tool,사프란 (샘플 NPC),back,0,,36,55,56,,,20,0.357,17,0,,0,0,0.89,PASS,head: face hidden in back view (not measurable)
+a_tailor,나비,front,0,12,36,55,56,13,4.31,20,0.357,15,0,-1,0,0,0.75,PASS,
+a_tailor,나비,side,0,12,,55,56,13,4.31,,,11,0,-1,,0,1.1,PASS,legs overlap in side view (split not measurable)
+a_tailor,나비,back,0,,36,55,56,,,20,0.357,17,0,,0,0,0.89,PASS,head: face hidden in back view (not measurable)
+h_mystic,운,front,0,13,36,55,56,14,4.0,20,0.357,16,0,0,0,0,0.8,PASS,long sheer/wrap skirt covers the leg gap -> visible split lower than the remapped crotch
+h_mystic,운,side,0,13,,55,56,14,4.0,,,15,0,0,,0,1.5,PASS,legs overlap in side view (split not measurable)
+h_mystic,운,back,0,,36,55,56,,,20,0.357,16,0,,0,0,0.84,PASS,head: face hidden in back view (not measurable); long sheer/wrap skirt covers the leg gap -> visible split lower than the remapped crotch
+g_dancer,방울,front,0,12,36,55,56,13,4.31,20,0.357,18,0,-1,0,0,0.9,PASS,long sheer/wrap skirt covers the leg gap -> visible split lower than the remapped crotch
+g_dancer,방울,side,0,12,,55,56,13,4.31,,,16,0,-1,,0,1.6,PASS,legs overlap in side view (split not measurable)
+g_dancer,방울,back,0,,36,55,56,,,20,0.357,18,0,,0,0,0.95,PASS,head: face hidden in back view (not measurable); long sheer/wrap skirt covers the leg gap -> visible split lower than the remapped crotch
+f_diver,숨비,front,0,13,36,55,56,14,4.0,20,0.357,15,0,0,0,0,0.75,PASS,
+f_diver,숨비,side,0,13,,55,56,14,4.0,,,10,0,0,,0,1.0,PASS,legs overlap in side view (split not measurable)
+f_diver,숨비,back,0,,36,55,56,,,20,0.357,15,0,,0,0,0.79,PASS,head: face hidden in back view (not measurable)
+e_tailor,루비,front,0,13,36,55,56,14,4.0,20,0.357,14,0,0,0,0,0.7,PASS,
+e_tailor,루비,side,0,13,,55,56,14,4.0,,,9,0,0,,0,0.9,PASS,legs overlap in side view (split not measurable)
+e_tailor,루비,back,0,,36,55,56,,,20,0.357,14,0,,0,0,0.74,PASS,head: face hidden in back view (not measurable)
+c_priest,설화,front,0,13,36,55,56,14,4.0,20,0.357,18,0,0,0,0,0.9,PASS,
+c_priest,설화,side,0,13,,55,56,14,4.0,,,15,0,0,,0,1.5,PASS,legs overlap in side view (split not measurable)
+c_priest,설화,back,0,,36,55,56,,,20,0.357,18,0,,0,0,0.95,PASS,head: face hidden in back view (not measurable)
+d_yuna,유나 (현대복),front,0,12,36,55,56,13,4.31,20,0.357,15,0,-1,0,0,0.75,PASS,
+d_yuna,유나 (현대복),side,0,12,,55,56,13,4.31,,,13,0,-1,,0,1.3,PASS,legs overlap in side view (split not measurable)
+d_yuna,유나 (현대복),back,0,,36,55,56,,,20,0.357,15,0,,0,0,0.79,PASS,head: face hidden in back view (not measurable)

@@ -16,20 +16,31 @@ const lc=document.createElement('canvas');lc.width=VIEW.logicalW;lc.height=VIEW.
 const up=document.createElement('canvas'),uctx=up.getContext('2d');
 let showFps=Q.has('fps'),fpsVal=0,frameMs=0,manual=false;
 const IM={},J={};let ready=false;
-function load(){const imgs=[['bg','assets/bg_town_painted.jpg'],['hero','assets/hero_hd.png'],['fem','assets/fem_hd.png']];
- return Promise.all([...imgs.map(([k,s])=>new Promise(r=>{const i=new Image();i.onload=()=>{IM[k]=i;r()};i.src=s;})),
+const V1=Q.has('v1');   // ?v1 = first sample (single 7.9-head NPC); default = v2 (hero-matched women, 4-dir idle/walk)
+const WOMEN=['g_tool','a_tailor','h_mystic','g_dancer','f_diver','e_tailor','c_priest','d_yuna'];
+function load(){const imgs=[['bg','assets/bg_town_painted.jpg'],['hero','assets/hero_hd.png'],['fem','assets/fem_hd.png'],...(V1?[]:WOMEN.map(n=>['w_'+n,'assets/walk_'+n+'.png']))];
+ return Promise.all([fetch('assets/walk_meta.json').then(r=>r.json()).then(j=>J.walk=j),...imgs.map(([k,s])=>new Promise(r=>{const i=new Image();i.onload=()=>{IM[k]=i;r()};i.src=s;})),
   ...['hero_hd','fem_hd'].map(k=>fetch('assets/'+k+'.json').then(r=>r.json()).then(j=>J[k]=j))]);}
 // hero walks a loop around the fountain (world coords)
 const PATH=[[630,600],[860,600],[860,232],[400,232],[400,600]];
 const hero={x:630,y:600,px:630,py:600,seg:0,dir:'right',flip:false,t:0,speed:150,walking:true};
-const npcs=[{x:1010,y:455,img:'fem',json:'fem_hd',t:0}];
+const npcs=V1?[{x:1010,y:455,img:'fem',json:'fem_hd',t:0}]:[];
+// v2 women: patrol paths (walk 8f @ 9 ticks/frame, 4 dirs) or standing (idle breathing 4f @ 15 ticks)
+const WP={a_tailor:[[300,470],[455,470]],h_mystic:[[940,300],[940,560]],g_dancer:[[700,660],[1000,660]],d_yuna:[[760,578],[520,578]]};
+const WI={g_tool:[1020,455,'down'],f_diver:[250,380,'right'],e_tailor:[880,250,'down'],c_priest:[420,330,'right']};
+if(!V1){for(const[n,pp]of Object.entries(WP))npcs.push({w:n,x:pp[0][0],y:pp[0][1],path:pp,seg:0,t:Math.random()*3,dir:'down',speed:70});
+ for(const[n,v]of Object.entries(WI))npcs.push({w:n,x:v[0],y:v[1],t:Math.random()*3,dir:v[2]});}
 const extra=+(Q.get('stress')||0); // ?stress=N adds N extra walking sprites to measure headroom
 for(let i=0;i<extra;i++)npcs.push({x:300+Math.random()*700,y:250+Math.random()*350,img:i%2?'fem':'hero',json:i%2?'fem_hd':'hero_hd',t:Math.random()*9,wander:true,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*80});
 function step(dt){hero.px=hero.x;hero.py=hero.y;hero.t+=dt;
  const n=PATH[(hero.seg+1)%PATH.length],dx=n[0]-hero.x,dy=n[1]-hero.y,d=Math.hypot(dx,dy),s=hero.speed*dt;
  if(Math.abs(dx)>Math.abs(dy)){hero.dir='right';hero.flip=dx<0;}else{hero.dir=dy>0?'down':'up';hero.flip=false;}
  if(d<=s){hero.x=n[0];hero.y=n[1];hero.seg=(hero.seg+1)%PATH.length;}else{hero.x+=dx/d*s;hero.y+=dy/d*s;}
- for(const m of npcs){m.px=m.x;m.py=m.y;m.t+=dt;if(m.wander){m.x+=m.vx*dt;m.y+=m.vy*dt;if(m.x<250||m.x>1000)m.vx*=-1;if(m.y<240||m.y>620)m.vy*=-1;}}}
+ for(const m of npcs){m.px=m.x;m.py=m.y;m.t+=dt;
+  if(m.path){const n=m.path[(m.seg+1)%m.path.length],dx=n[0]-m.x,dy=n[1]-m.y,d=Math.hypot(dx,dy),s=m.speed*dt;
+   m.dir=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy>0?'down':'up');
+   if(d<=s){m.x=n[0];m.y=n[1];m.seg=(m.seg+1)%m.path.length;}else{m.x+=dx/d*s;m.y+=dy/d*s;}}
+  if(m.wander){m.x+=m.vx*dt;m.y+=m.vy*dt;if(m.x<250||m.x>1000)m.vx*=-1;if(m.y<240||m.y>620)m.vy*=-1;}}}
 let shadowC=null;function mkShadow(){shadowC=document.createElement('canvas');shadowC.width=128;shadowC.height=64;const g=shadowC.getContext('2d'),r=g.createRadialGradient(64,32,4,64,32,62);
  r.addColorStop(0,'rgba(30,22,10,.7)');r.addColorStop(.6,'rgba(30,22,10,.36)');r.addColorStop(1,'rgba(30,22,10,0)');g.fillStyle=r;g.save();g.scale(1,.5);g.fillRect(0,0,128,128);g.restore();}
 let k=1,ki=1,offX=0,offY=0,dw=0,dh=0;
@@ -47,10 +58,12 @@ function render(a){
  const n=J.hero_hd.cells[hero.dir].length,f=Math.floor(hero.t*60/(hero.dir==='right'?7:9))%n;
  drawSprite(IM.hero,'hero_hd',hero.dir,f,hx,hy,hero.flip,list);
  for(const m of npcs){const mx=m.px+(m.x-m.px)*a,my=m.py+(m.y-m.py)*a;
+  if(m.w){const W=J.walk[m.w],r=W.rows.indexOf(m.dir),walk=!!m.path,fi=walk?W.walk[0]+Math.floor(m.t*60/9)%W.walk[1]:W.idle[0]+Math.floor(m.t*60/15)%W.idle[1];
+   list.push({img:IM['w_'+m.w],c:[fi*W.cw,r*W.ch,W.cw,W.ch,W.ax,W.ay],wx:mx,wy:my,flip:false,sw:24});continue;}
   if(m.wander){const d=Math.abs(m.vx)>Math.abs(m.vy)&&m.json==='hero_hd'?'right':'down';const nn=J[m.json].cells[d].length;drawSprite(IM[m.img],m.json,d,Math.floor(m.t*60/8)%nn,mx,my,m.vx<0,list);}
   else drawSprite(IM[m.img],m.json,'down',1,mx,my,false,list);}            // idle NPC: standing frame
  list.sort((p,q)=>p.wy-q.wy);
- for(const s of list){const w=s.c[2]*1.15/LSC*S;ctx.drawImage(shadowC,offX+s.wx*S-w/2,offY+(s.wy+2)*S-w*.16,w,w*.32);} // 2) soft shadows
+ for(const s of list){const w=(s.sw||s.c[2])*1.15/LSC*S;ctx.drawImage(shadowC,offX+s.wx*S-w/2,offY+(s.wy+2)*S-w*.16,w,w*.32);} // 2) soft shadows
  lctx.clearRect(0,0,lc.width,lc.height);lctx.imageSmoothingEnabled=false;  // 3) sprites on logical grid (integer px)
  for(const s of list){const[x,y,w,h,ax,ay]=s.c;const lx=Math.round(s.wx*LSC),ly=Math.round(s.wy*LSC);
   if(s.flip){lctx.save();lctx.translate(lx*2,0);lctx.scale(-1,1);}
