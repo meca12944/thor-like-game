@@ -81,7 +81,7 @@ for a,ch,id,n,ty,c in CHAMPS:
     M(id,n,a,ty,c,[dict(kind='champion',where=f'{a}지역 {ch}',rate='첫 격파 2개 확정, 이후 35%')],a*60)
     MOB_DROPS.append(dict(area=a,mob=ch,kind='champion',drops=[(id,35),(AREAS[a]['shared'][0],100),('enh_tier%d'%((a+1)//2),'CHAMPION_DROPS 표')]))
 for a,b,id,n,c in BOSSES:
-    M(id,n,a,'core',c,[dict(kind='boss',where=f'{a}지역 {b}',rate=100)],a*300,'보스 고유 핵. 핵 레시피(전설)는 E 마스터 대장간(또는 마염 대장간)에서만 제작')
+    M(id,n,a,'core',c,[dict(kind='boss',where=f'{a}지역 {b}',rate=100)],a*300,'보스 고유 핵. 핵 레시피(전설)는 E 마스터 대장간에서만 제작 (마왕 강림 전)')
     MOB_DROPS.append(dict(area=a,mob=b,kind='boss',drops=[(id,100)]+([(AREAS[a]['shared'][0],100)] if a<10 else [('x_m_a9_shared',100)])))
 # 10지역 강화판: 공통 재료·챔피언 재료의 「타락한」 변형
 for a in range(1,10):
@@ -94,7 +94,7 @@ for a,ch,id,n,ty,c in CHAMPS:
     MOB_DROPS.append(dict(area=10,mob='강화 '+ch,kind='enhanced_champion',drops=[('x_'+id,30),(id,60),('enh_tier5','CHAMPION_DROPS 표')]))
 for id,n,ty,c in TOWNSFOLK_MATS:
     M(id,n,1 if id!='tf_soul' else 5,ty,c,[dict(kind='townsfolk',where='마을 사람 (악의 길 전용)',rate='NPC별')],5 if id!='tf_soul' else 150,
-      '마을 사람을 죽여야 나온다. 선악 감소는 살해 페널티(TOWNSFOLK_COMBAT.md) 그대로' if id!='tf_soul' else '모든 살해 NPC 15%, 마을 파괴 보상. 마염 대장간에서 금화 대신 쓸 수 있음')
+      '마을 사람을 죽여야 나온다. 선악 감소는 살해 페널티(TOWNSFOLK_COMBAT.md) 그대로' if id!='tf_soul' else '모든 살해 NPC 15%, 마을 파괴 보상. 마염 제단에서 소모품 제작·각인 봉헌에 쓰임')
 for t,(id,n) in STRONG_TOKENS.items():
     M(id,n,8,'token','#ffd860',[dict(kind='strongman',where=f'{t} 마을 강자 (살려 주면 건네받음 / 죽이면 시신에서)',rate=100)],0,'원탁의 심연 입장 조건. 팔 수 없음')
 M('m_aeon_core','영겁의 핵',10,'core','#e8f0ff',[dict(kind='boss',where='원탁의 주인 아스란',rate=100)],5000,'선대의 부러진 검 복원 레시피 재료')
@@ -120,7 +120,8 @@ FORGE_RULES=dict(
  unlock=['기본: 그 마을 상점에서 파는 장비의 레시피는 대장장이에게 말을 걸면 바로 배운다',
          '대장간 의뢰(각 마을 ⑪, E는 E3 장인의 시험): 완료하면 대장간 등급 +1 (E는 10으로)',
          '레시피 두루마리: 희귀 장비 레시피. 보스 첫 격파 시 그 보스 장비 두루마리 확정, 챔피언 15%, 잠수 지점 장비는 같은 지점에서 두루마리, 퀘스트 장비는 퀘스트 보상과 함께. 지역 두루마리 조각 5개로도 해독 가능',
-         '핵 레시피(전설): 보스 핵이 있어야 하고 E 마스터 대장간(또는 마왕의 길의 마염 대장간)에서만 제작'],
+         '핵 레시피(전설): 보스 핵이 있어야 하고 E 마스터 대장간에서만 제작'],
+ demon='【마왕 강림 후】 장비가 고정·무내구가 되므로 제작·강화·수리·분해는 모두 쓸 수 없다. 강림 전 장비는 잿더미 상인에게 40%로 판매만 가능. 재료는 마염 제단의 소모품 제작과 마왕 각인 봉헌에 쓴다.',
  upgrade='아래 티어 장비를 재료로 넣는 「승급 제작」: 같은 분류·같은 종류의 바로 아래 장비 1개를 넣으면 기본·지역 재료가 40% 줄어든다(핵·챔피언 재료는 그대로). 강화 단계는 1단계 낮아진 채로 이어진다.',
 )
 FORGES=[

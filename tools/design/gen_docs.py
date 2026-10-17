@@ -81,6 +81,26 @@ _ft=[t['forge']['tier'] for o in order for t in TOWNS if t['id']==o]; assert _ft
 for _f in ['STORY','TOWNSFOLK_RULE','RAZE_RULE','FINAL_HUMAN','QUEST_REWRITES','GREETING_REWRITES']:
     import re as _re; assert not _re.search(r'하루(?!\s*(1회|최대|\d|한 번|에|동안|종일))',json.dumps(globals()[_f],ensure_ascii=False)),_f
 COUNTS.update(materials=len(MATERIALS),recipes=len(RECIPES),mob_drop_tables=len(MOB_DROPS),npc_drop_tables=len(NPC_DROPS),forges=len(FORGES),razeable_towns=len(RAZE),craft_only=len(CRAFT_ONLY))
+# ---------------- 마왕 모드 검증
+DK_=DEMON_KING
+assert len(DK_['skills'])==3 and all(k['motion'] and k['effect'] and k['cost'] and k['cooldown'] for k in DK_['skills'])
+assert len({k['id'] for k in DK_['skills']})==3 and DK_['map_skill']['children'] and len(DK_['map_skill']['motion'])>=3
+assert '아이' in DK_['map_skill']['children'] and '죽일 수 없다' in RAZE_RULE['children']
+assert {g['slot'] for g in DK_['gear']['items']}>={'weapon','armor','helmet','offhand'}
+for g in DK_['gear']['items']: assert g['palette'] in DK_['gear']['palettes'] and g['id'] not in EQ
+_allnpc={n['id'] for t in TOWNS for n in t['npcs']}
+_kids={n['id'] for t in TOWNS for n in t['npcs'] if not n['combat']['lethal']}
+assert _kids=={'a_kid','b_twins','h_boy','g_thief','f_kid','e_apprentice','c_child'},_kids
+for a,_n,_r,fb in DK_['essential']['list']: assert (a in _allnpc or a=='strongman') and a not in _kids and fb,a
+for t in TOWNS:  # 강림 후 아이 외 전원 처치 가능 = 아이가 아닌 NPC는 모두 lethal
+    for n in t['npcs']: assert n['combat']['lethal'] or n['id'] in _kids
+assert RAZE_RULE['structures']['threshold']==70
+for z in RAZE: assert z['structures']['house']+z['structures']['shop']>0 and z['structures']['landmark']>=1 and z['ruin_power'] and ('제단' in z['gained'] or '상인' in z['gained'])
+for i,ms,so in MAGMA_ALTAR:
+    assert i in TOOLS,i
+    for m,c in ms: assert m in MATERIALS,m
+assert '불태운다」를 고르면' not in json.dumps(RAZE_RULE,ensure_ascii=False)
+COUNTS.update(dk_skills=len(DK_['skills']),dk_gear=len(DK_['gear']['items']),essential_fallbacks=len(DK_['essential']['list']))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
 def item_json(e): return {k:v for k,v in e.items()}
@@ -98,7 +118,7 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
  materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
  drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
- final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE))
+ final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
@@ -344,7 +364,7 @@ CR=['# 제작 · 대장간','',f"> 데이터: `data/towns.json` → `recipes`, `
 allnpc={n['id']:n['name'] for t in TOWNS for n in t['npcs']}
 for f in FORGES:
     CR.append(f"| {f['town']} {TN[f['town']]} | {f['name']}{' ★마스터' if f.get('master') else ''} | {allnpc[f['npc']]} | {f['tier']} | {f['tier_after']} | {f['quest']} | {', '.join(MN(m) for m in f['sells'])} |")
-CR+=['','마왕의 길: 마을을 파괴하면 그 마을 대장간은 사라진다. 대신 검은 성채와 일부 폐허의 **마염 대장간**(등급 10, 핵 레시피 가능, 원한 서린 혼석으로 비용 일부 대체)을 쓴다 (SYSTEMS.md 6장).','',
+CR+=['',FR['demon']+' 대신 검은 성채와 일부 폐허의 **마염 제단**에서 소모품을 만든다 (아래 표, SYSTEMS.md 7장).','',
  '### 대장간 의뢰','']
 for t,q in FORGE_QUESTS.items(): CR+=[f"**{q[0]}. {q[1]}** ({t} {TN[t]}) — {q[2]}",f"- 목표: {q[3]}",f"- 보상: {q[4]}",'']
 CR+=['## 성공률과 실패','','| 레시피 | 성공률 |','|---|---|']+[f"| {a} | {b}% |" for a,b in FR['success']]+['',FR['fail'],'',
@@ -371,18 +391,26 @@ for line in DOCS['TOWNS.md']:
             _T.append(f"- **폐허판 (마왕의 길)**: 「{z['ruined_name']}」 · 아이 대피: {z['evac_leader']} → {z['evac_route']} · 난민 행선지: {z['refugees_to']} · 남는 것: {z['gained']} (SYSTEMS.md 6장)")
 DOCS['TOWNS.md']=_T
 # ---------------- SYSTEMS.md: 5장 대장간, 6장 마을 파괴
-DOCS['SYSTEMS.md'][0]='# 시스템 설계: 무기 강화 · 몬스터 리스폰 · 선악 · 현상금 · 대장간 · 마을 파괴'
+DOCS['SYSTEMS.md'][0]='# 시스템 설계: 무기 강화 · 몬스터 리스폰 · 선악 · 현상금 · 대장간 · 마을 파괴 · 마왕 모드'
 S=DOCS['SYSTEMS.md']
 S+=['','## 5. 대장간 · 제작 · 내구도','','상세 레시피는 [CRAFTING.md](CRAFTING.md), 재료와 드롭 표는 [MATERIALS.md](MATERIALS.md).','']+[f"- {x}" for x in FR['services']]
 S+=['- 대장간 등급: '+' / '.join(f"{f['town']} {f['tier']}→{f['tier_after']}" for f in FORGES)+' (E는 마스터 대장간, 핵 레시피 전용)',
     '- 성공률: '+', '.join(f"{a} {b}%" for a,b in FR['success'])+'. '+FR['fail'],
-    '- 장인 불칼(E)이 죽으면 마스터 대장간도 사라진다. 핵 레시피는 이후 마염 대장간(검은 성채)에서만 만들 수 있다.','',
-    '## 6. 마을 파괴 (마왕의 길)','',f"**발동**: {RAZE_RULE['trigger']}",'','### 공성 순서','']+RAZE_RULE['siege']
+    '- 장인 불칼(E)이 죽으면 마스터 대장간도 사라진다. 그 뒤로는 핵 레시피를 만들 수 없다 (핵은 판매·각인 봉헌용).','',
+    f"- {FR['demon']}",'',
+    '## 6. 마을 파괴 (마왕의 길, 자유 파괴)','',f"**발동**: {RAZE_RULE['trigger']}",'','### 구조물','','| 종류 | 이름 | HP | 붕괴 단계 |','|---|---|---|---|']+[f"| `{a}` | {b} | {c} | {d} |" for a,b,c,d in RAZE_RULE['structures']['types']]+['',
+    f"- 단계: {RAZE_RULE['structures']['stages']}",f"- 피해: {RAZE_RULE['structures']['damage']}",f"- 저장: {RAZE_RULE['structures']['persist']}",
+    f"- 파괴 판정: 소품을 뺀 건물 HP 합계의 **{RAZE_RULE['structures']['threshold']}%** 이상이 무너지면 파괴됨 (상징물 붕괴는 +15%p).",f"- 부분 파괴: {RAZE_RULE['structures']['partial']}",
+    '','```js','// 구조물 피해 (마왕 상태에서만 호출)','function hitStructure(s, dmg){','  s.hp = Math.max(0, s.hp - dmg);','  const st = s.hp<=0 ? 3 : s.hp<=s.max*0.33 ? 2 : s.hp<=s.max*0.66 ? 1 : 0;',
+    '  if (st !== s.stage){ s.stage = st; save.townStruct[town.id][s.id] = st; burstDebris(s); shake(st===3?8:4); gainRuin(1); }','  if (st===3 && s.kind!==\'prop\') checkRazed(town);','}',
+    'function checkRazed(t){','  const tot = sum(t.structs.filter(b=>b.kind!==\'prop\'), b=>b.max);','  const down = sum(t.structs.filter(b=>b.kind!==\'prop\' && b.stage===3), b=>b.max);',
+    '  const bonus = t.structs.some(b=>b.kind===\'landmark\' && b.stage===3) ? 0.15 : 0;','  if (down/tot + bonus >= 0.70) razeTown(t);   // 폐허판 전환, town_razed[t.id]=true','}','```','',
+    '### 진행 순서','']+RAZE_RULE['siege']
 S+=['',f"### 아이들의 대피 (절대 규칙)",'',RAZE_RULE['children'],'',f"### 폐허판 맵",'',RAZE_RULE['ruined'],'',f"### 보상",'',RAZE_RULE['rewards'],'',
     '### 세계의 반응','']+[f"- {x}" for x in RAZE_RULE['world']]+['','### 마을을 모두 파괴해도 깰 수 있는 이유','']+[f"- {x}" for x in RAZE_RULE['beatable']]
-S+=['','### 마을별 파괴','','| 마을 | 폐허 이름 | 아이 대피 인솔 | 대피로 | 난민 행선지 | 잃는 것 | 생기는 것 | 전리품 | 어둠 강화 |','|---|---|---|---|---|---|---|---|---|']
+S+=['','### 마을별 파괴','','| 마을 | 폐허 이름 | 구조물 (민가/상점/상징물/성벽/소품) · 건물 HP 합 | 아이 대피 인솔 | 대피로 | 난민 행선지 | 잃는 것 | 생기는 것 | 전리품 | 폐허 권능 |','|---|---|---|---|---|---|---|---|---|---|']
 for z in RAZE:
-    S.append(f"| {z['town']} {TN[z['town']]} | {z['ruined_name']} | {z['evac_leader']} | {z['evac_route']} | {z['refugees_to']} | {z['lost']} | {z['gained']} | "+', '.join(f"{MN(m)} ×{c}" for m,c in z['loot'])+f" | {z['dark_upgrade']} |")
+    S.append(f"| {z['town']} {TN[z['town']]} | {z['ruined_name']} | {'/'.join(str(z['structures'][k]) for k in ['house','shop','landmark','wall','prop'])} · {z['structure_hp']} | {z['evac_leader']} | {z['evac_route']} | {z['refugees_to']} | {z['lost']} | {z['gained']} | "+', '.join(f"{MN(m)} ×{c}" for m,c in z['loot'])+f" | {z['ruin_power']} |")
 S+=['','- 저장 플래그: `town_razed[A~H]`, `corruption_stage`, `black_citadel_unlocked`. 파괴된 마을의 NPC는 `npc_dead[]`가 아니라 `npc_fled[]`(난민) 또는 `npc_dead[]`(싸우다 죽은 어른)로 나뉜다. 아이는 항상 `npc_evacuated[]`.']
 # ---------------- STORY.md: 칭호, 최종 인간 보스, 파괴 영향
 FH=FINAL_HUMAN
@@ -403,6 +431,36 @@ C+=['',f"2페이즈 (50%): {FH['phase2']}",'',f"**필살기 「{FH['ultimate'][0
     f"결말: {FH['resolution']}",'','드롭: '+', '.join(f"{n} {r}%" for _,n,r in FH['drops']),'',f"리스폰: {FH['respawn']}",'',
     '# 4부. 마을 파괴 중 전투','','- 공성 중 어른 NPC는 반응(도주/반격)대로 행동하되, 도주형은 대피로로 빠져나가 난민이 된다(처치하지 않아도 공성 진행).','- 마을 강자는 항복 없이 필살기까지 쓴다. 이미 동료였어도 등을 돌린다.',
     f"- {RAZE_RULE['children']}"]
+
+DK=DEMON_KING
+S+=['','## 7. 마왕 모드 (마왕 강림 · 고정 장비 · 고정 스킬)','',f"- **발동**: {DK['trigger']}",f"- **되돌릴 수 없음**: {DK['irreversible']}",
+    f"- **스킬 잠금**: {DK['lock']['skills']}",f"- **장비 잠금**: {DK['lock']['equipment']}",f"- **UI**: {DK['lock']['ui']}",'',
+    f"### 기본 공격: {DK['normal_attack']['name']}",'',DK['normal_attack']['desc'],'',f"모션: {DK['normal_attack']['motion']}",'',
+    '### 마왕 전용 스킬 (등록 3칸 고정)','','| 칸 | 스킬 | 게이지 | 재사용 | 효과 | 모션 |','|---|---|---|---|---|---|']
+S+=[f"| {k['slot']} | **{k['name']}** `{k['id']}` | {k['cost']} | {k['cooldown']}초 | {k['effect']} | {k['motion']} |" for k in DK['skills']]
+MS=DK['map_skill']
+S+=['',f"### 맵 전체 스킬: {MS['name']} `{MS['id']}` (4번째 칸)",'',f"- **비용**: {MS['resource']}",f"- **파멸 게이지**: {MS['gauge']}",f"- **효과**: {MS['effect']}",f"- **아이**: {MS['children']}",'','**모션 (약 3.5초)**','']+[f"- {x}" for x in MS['motion']]+['',f"- 시트: {MS['sheets']}",'',
+    '### 고정 마왕 장비','',f"콘셉트: {DK['gear']['concept']}",'','| 칸 | ID | 이름 | 스프라이트 | 팔레트 | 외형 |','|---|---|---|---|---|---|']
+S+=[f"| {g['slot']} | `{g['id']}` | {g['name']} | `{g['sprite']}` | {g['palette']} "+' '.join(f"`{c}`" for c in DK['gear']['palettes'][g['palette']])+f" | {g['look']} |" for g in DK['gear']['items']]
+S+=['',f"- **능력치**: {DK['gear']['stats']}",f"- **마왕 각인**: {DK['gear']['engrave']}",'','### 메아리 (강림 전 흡수 스킬의 변환)','',DK['echoes']['rule'],'','| 원래 스킬 | 메아리 효과 |','|---|---|']+[f"| {a} | {b} |" for a,b in DK['echoes']['list']]
+S+=['','### 마염 제단 소모품 제작 (강림 후 유일한 제작)','','| 결과 | 재료 | 혼석 |','|---|---|---|']+[f"| {TOOLS[i]['name']} | {', '.join(f'{MN(m)} ×{c}' for m,c in ms)} | {so} |" for i,ms,so in MAGMA_ALTAR]
+E_=DK['essential']
+S+=['','### 모두 죽일 수 있다 — 핵심 인물 대체 경로 (진행 막힘 방지)','',E_['rule'],'']+[f"- {x}" for x in E_['general']]+['','| NPC | 이름 | 맡던 역할 | 죽었을 때 대체 경로 |','|---|---|---|---|']+[f"| `{a}` | {b} | {c} | {d} |" for a,b,c,d in E_['list']]
+S+=['',f"- **아이 (절대 규칙)**: {RAZE_RULE['children']}",'','### 바뀐 규칙 정리 (충돌 해결)','','| 기존 규칙 | 마왕 모드에서 |','|---|---|']+[f"| {a} | {b} |" for a,b in DK['conflicts']]
+S+=['','- 저장 플래그: `demon_king` (true면 영구), `dk_engrave` (0~9), `ruin_gauge`, `town_struct[마을][구조물]`, `npc_evacuated[]`.']
+# STORY: 마왕의 길 요약
+R=DOCS['STORY.md']; j=R.index('## 엔딩')
+R[j:j]=['## 마왕 강림','',DK['trigger'],'',DK['irreversible'],'',f"- 고정 스킬: "+', '.join(k['name'] for k in DK['skills'])+f" + 맵 전체 스킬 「{MS['name']}」",
+        '- 고정 장비: '+', '.join(g['name'] for g in DK['gear']['items']),'- 상세 규칙은 SYSTEMS.md 7장.','']
+# EQUIPMENT: 마왕 세트
+E=DOCS['EQUIPMENT.md']
+E+=['','## 마왕 강림 시 고정 장비 (페이퍼돌 전 칸 잠금)','',f"콘셉트 아트: {DK['gear']['concept']}",'',DK['lock']['equipment'],'','| 칸 | 레이어 스프라이트 | 이름 | 팔레트 | 외형 |','|---|---|---|---|---|']
+E+=[f"| {g['slot']} | `{g['sprite']}` | {g['name']} | {g['palette']} | {g['look']} |" for g in DK['gear']['items']]
+E+=['','- 그리는 순서는 일반 장비와 같다. 단, 촉수(`off_dk_tentacles`)는 방패 자리 대신 **망토 바로 아래(등 뒤)** 에 그리고, 정면에서는 어깨 위로 끝만 보인다. 뒷면에서는 망토 위에 그린다.',
+    '- 대검 `wpn_dk_greatsword`는 일반 검보다 커서 콤보 시트를 따로 둔다 (hero_dk_combo). 스킬 시트도 마왕 전용(skill_dk_*)이다.']
+# TOWNSFOLK_COMBAT 4부 보강
+C=DOCS['TOWNSFOLK_COMBAT.md']
+C+=['',f"- 마왕 강림 후: {E_['rule']} 대체 경로는 SYSTEMS.md 7장.",'- 마을 강자는 강림 후 결투·항복 없이 바로 싸운다. 처치하면 메아리(+4%)와 심판의 징표.']
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
     for d in COPY_DIRS:

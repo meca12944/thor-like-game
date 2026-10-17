@@ -731,7 +731,7 @@ import craft_data as _cd
 from craft_data import MATERIALS, MOB_DROPS, FORGES, FORGE_RULES, FORGE_QUESTS, CRAFT_ONLY, AREA_NAMES
 for _e in EQUIP_ITEMS:
     if _e['id'] in CRAFT_ONLY:
-        _e['source']=dict(type='craft',where=f"E 마스터 대장간 / 마염 대장간 (재료: {MATERIALS[CRAFT_ONLY[_e['id']]]['name']})",
+        _e['source']=dict(type='craft',where=f"E 마스터 대장간 (재료: {MATERIALS[CRAFT_ONLY[_e['id']]]['name']})",
                           rate='보스 첫 격파 시 핵 + 레시피 두루마리 확정 (장비 자체는 드롭 안 함)')
 RECIPES=_cd.make_recipes(EQUIP_ITEMS,[t['id'] for t in TOWNS])
 for _e in EQUIP_ITEMS: _e['recipe']='r_'+_e['id']
@@ -751,7 +751,7 @@ for _t in TOWNS:
     _t['raze']=_RZ[_t['id']]
     if _t['id'] in FORGE_QUESTS:
         _q=FORGE_QUESTS[_t['id']]
-        _t['quests'].append(dict(id=_q[0],giver=_f['npc'],title=_q[1],type='대장간',story=_q[2],objective=_q[3],reward=_q[4],path='good',karma_gate='악명 이하에서는 의뢰인이 거절 (마왕의 길은 마염 대장간으로 대체)'))
+        _t['quests'].append(dict(id=_q[0],giver=_f['npc'],title=_q[1],type='대장간',story=_q[2],objective=_q[3],reward=_q[4],path='good',karma_gate='악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)'))
     else:
         for _q in _t['quests']:
             if _q['id']==_f['quest']: _q['reward']+=' + 대장간 등급 10 (마스터 대장간: 핵 레시피 제작, 제작 성공률 +10%p)'
