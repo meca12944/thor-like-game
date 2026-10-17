@@ -1,0 +1,47 @@
+{
+ "version": 1,
+ "size": [
+  1024,
+  1280
+ ],
+ "expressions": [
+  "neutral",
+  "smile",
+  "angry",
+  "sad",
+  "surprised",
+  "blush"
+ ],
+ "alias": {
+  "normal": "neutral",
+  "happy": "smile",
+  "mad": "angry",
+  "cry": "sad",
+  "shock": "surprised",
+  "shy": "blush"
+ },
+ "chars": {
+  "a_tailor": {
+   "name": "나비",
+   "expr": {
+    "neutral": "a_tailor/neutral.png",
+    "smile": "a_tailor/smile.png",
+    "angry": "a_tailor/angry.png",
+    "sad": "a_tailor/sad.png",
+    "surprised": "a_tailor/surprised.png",
+    "blush": "a_tailor/blush.png"
+   }
+  },
+  "d_yuna": {
+   "name": "유나",
+   "expr": {
+    "neutral": "d_yuna/neutral.png",
+    "smile": "d_yuna/smile.png",
+    "angry": "d_yuna/angry.png",
+    "sad": "d_yuna/sad.png",
+    "surprised": "d_yuna/surprised.png",
+    "blush": "d_yuna/blush.png"
+   }
+  }
+ }
+}
