@@ -21835,7 +21835,8 @@
    },
    "karma": "선악이 「악명」 이하로 떨어지면 히로인별 반응(떠남/적대/잔류). 마왕 루트에서는 다른 성인 NPC와 마찬가지로 살해할 수 있으며, 살해 시 다시 되돌릴 수 없다.",
    "portraits": "대화 초상화: 1순위 `<id>_<expr>_bu.png` (192×256 바스트업, 머리~허리, 대화창에서 1.5~2배 크게 표시 권장), 작은 창은 `<id>_<expr>_bu_s.png` (96×128), 없으면 기존 `<id>_<expr>.png`/`<id>.png` (128×128 얼굴). 경로 town/assets/portraits/, 목록은 index.json의 expressions_bustup.",
-   "outfit_rule": "성인 여성 의상 규칙: 상의는 배가 완전히 드러나는 짧은 크롭 탑 또는 비키니 탑만(원피스·코르셋·배를 덮는 상의 금지, 비노출). 하의 선택지: 짧은 주름 미니스커트, 비키니 하의/마이크로 비키니(축제 변형), **H라인(펜슬) 미니스커트**(몸에 딱 붙는 일자, 허벅지 중간), **머메이드 미니스커트**(엉덩이까지 밀착, 허벅지 중간 밑단이 살짝 퍼짐). 적용: 루비=검은 가죽 H라인, 설화=흰 머메이드, 상인 미소=갈색 H라인, 책벌레 연=보라 H라인, 공주 세린=보라·금 머메이드. 비키니 탑 변형(가리는 면적은 일반 비키니 이상, 언더붓 노출 금지): **스트래피 비키니**(일반 비키니 탑 + 갈비뼈·허리를 감는 가는 교차 끈), **홀터넥 비키니**(목 뒤로 묶는 삼각 탑, 컵 사이 작은 키홀 허용), **메탈 장식 비키니**(금·은 판금, 체인, 보석 장식의 비키니 아머). 적용: 미소=빨강 스트래피, 연=보라 홀터넥, 빛나=노랑 홀터넥, 세린=금·보라 메탈 장식. 참고 샘플: female_sample_hline_mermaid.jpg, female_sample_bikini_variants.jpg. 아이는 대상 아님."
+   "outfit_rule": "성인 여성 의상 규칙: 상의는 배가 완전히 드러나는 짧은 크롭 탑 또는 비키니 탑만(원피스·코르셋·배를 덮는 상의 금지, 비노출). 하의 선택지: 짧은 주름 미니스커트, 비키니 하의/마이크로 비키니(축제 변형), **H라인(펜슬) 미니스커트**(몸에 딱 붙는 일자, 허벅지 중간), **머메이드 미니스커트**(엉덩이까지 밀착, 허벅지 중간 밑단이 살짝 퍼짐). 적용: 루비=검은 가죽 H라인, 설화=흰 머메이드, 상인 미소=갈색 H라인, 책벌레 연=보라 H라인, 공주 세린=보라·금 머메이드. 비키니 탑 변형(가리는 면적은 일반 비키니 이상, 언더붓 노출 금지): **스트래피 비키니**(일반 비키니 탑 + 갈비뼈·허리를 감는 가는 교차 끈), **홀터넥 비키니**(목 뒤로 묶는 삼각 탑, 컵 사이 작은 키홀 허용), **메탈 장식 비키니**(금·은 판금, 체인, 보석 장식의 비키니 아머). 적용: 미소=빨강 스트래피, 연=보라 홀터넥, 빛나=노랑 홀터넥, 세린=금·보라 메탈 장식. 참고 샘플: female_sample_hline_mermaid.jpg, female_sample_bikini_variants.jpg. 아이는 대상 아님. **삼각 비키니 단독 착용**(상·하의 모두 일반 삼각 비키니, 치마·바지 없음; 샌들·작은 장신구·소지품만 허용, 일반 비키니 노출 범위, 비노출, 명백한 성인): 쪽빛(b_dyer, 강변 염색공방·남색), 사프란(g_tool, 사막 바자르 도구상·빨강), 자스민(g_tailor, 사막 바자르 의상상·연보라), 진주(f_tailor, 항구 의상상·라벤더). 히로인(운 등)은 고유 의상 유지.",
+   "body_standard": "성인 여성 맵 스프라이트 체형 기준(실측 검증): 기준 = female_sample_bikini_variants.jpg 맨 오른쪽 여성. 목표 7.9등신(정수리~턱 = 키/7.9), 다리비(가랑이~발바닥 / 키) 0.50, 허용 범위 7.5~8.3등신·다리비 0.47~0.53. 캔버스 규격: town/assets/npcs/<id>.png는 위쪽 여백 = 키의 7%(정수리 위), 아래 = 발바닥(기준선) 고정 → 엔진이 n.h=120px로 그릴 때 몸 높이 112.2px로 전원 동일(±3% 이내), 같은 기준선. 정수리 6.54%, 턱 18.37%, 가랑이 53.27% 위치. 머리 위로 튀어나온 소품(횃불·창끝·모자 장식)은 몸을 줄이지 않도록 잘라냄. 측정법: 알파 bbox 기준 확대 눈금자 수동 판독(정수리·턱·가랑이) → 머리 구간은 가로세로, 몸통·다리는 세로 구간별 보정. 2026-10 전수 재측정: 24명 중 23명이 기준 밖(재측정 전 6.1~10.1등신, 다리비 0.50~0.55, 게임 내 몸 높이 109~119px) → 24명 전원 재비율, 결과 표는 town-demo/female_proportions.csv, 확인용 female_lineup_after.png. 의상·색·머리 유지(세린 보라 슬릿 랩스커트 유지). 아이는 대상 아님. 비노출."
   },
   "portrait_exprs": [
    "normal",
@@ -25595,7 +25596,7 @@
     "major": false,
     "id": "iframe1",
     "name": "회피 무적 +",
-    "desc": "구르기 무적 0.20초 → 0.23초"
+    "desc": "구르기 무적 0.18초 → 0.21초"
    },
    {
     "level": 20,
@@ -25609,21 +25610,21 @@
     "major": false,
     "id": "roll_cd1",
     "name": "회피 재사용 -",
-    "desc": "구르기 재사용 0.55초 → 0.50초"
+    "desc": "구르기 재사용 0.40초 → 0.36초"
    },
    {
     "level": 30,
     "major": true,
     "id": "perfect_window",
     "name": "퍼펙트 회피 판정 확대",
-    "desc": "퍼펙트 회피 판정 0.12초 → 0.16초, 퍼펙트 회피 MP 회복 15 → 20"
+    "desc": "퍼펙트 회피 판정 +2틱 (보통 7틱 0.117초 → 9틱 0.15초, 난이도 기본값에 +2), 퍼펙트 회피 MP 회복 20 → 25"
    },
    {
     "level": 35,
     "major": false,
     "id": "iframe2",
     "name": "회피 무적 ++",
-    "desc": "구르기 무적 0.23초 → 0.26초"
+    "desc": "구르기 무적 0.21초 → 0.24초"
    },
    {
     "level": 40,
@@ -25637,7 +25638,7 @@
     "major": false,
     "id": "roll_cd2",
     "name": "회피 재사용 -- · 치명 +3%",
-    "desc": "구르기 재사용 0.50초 → 0.45초, 치명타 확률 +3%p"
+    "desc": "구르기 재사용 0.36초 → 0.32초, 치명타 확률 +3%p"
    },
    {
     "level": 50,
@@ -25889,7 +25890,7 @@
    }
   },
   "enemy_scale": {
-   "rule": "설계 문서의 적 체력(1지역 보스 = 100 기준 상대값)과 공격(하트 단위)은 「그 지역 권장 레벨의 주인공」 기준이다. 실제 값 = 체력 × hp_mult[지역], 공격 = 하트 × 10HP × dmg_mult[지역]. hp_mult는 권장 레벨 주인공의 예상 공격력 비율, dmg_mult는 예상 HP × 방어 보정 비율이다. 그래서 적정 레벨이면 「몇 대 때려야 잡고 몇 대 맞으면 죽는지」가 설계값 그대로이고, 레벨이 높으면 빨리 잡고 덜 아프며, 낮으면 반대가 된다. 마을 사람·강자는 그 마을 기준 레벨의 지역 값을 쓴다.",
+   "rule": "(정확한 지역별 적 HP·피해 목표는 14장 「난이도와 전투 밸런스」가 우선한다. 이 장의 배율은 설계 문서의 상대값을 지역별로 키우는 비율로만 쓴다.) 설계 문서의 적 체력(1지역 보스 = 100 기준 상대값)과 공격(하트 단위)은 「그 지역 권장 레벨의 주인공」 기준이다. 실제 값 = 체력 × hp_mult[지역], 공격 = 하트 × 10HP × dmg_mult[지역]. hp_mult는 권장 레벨 주인공의 예상 공격력 비율, dmg_mult는 예상 HP × 방어 보정 비율이다. 그래서 적정 레벨이면 「몇 대 때려야 잡고 몇 대 맞으면 죽는지」가 설계값 그대로이고, 레벨이 높으면 빨리 잡고 덜 아프며, 낮으면 반대가 된다. 마을 사람·강자는 그 마을 기준 레벨의 지역 값을 쓴다.",
    "areas": [
     {
      "area": 1,
@@ -26061,22 +26062,22 @@
     {
      "id": "passive",
      "name": "자연 회복 (전투 중)",
-     "value": "0.6 MP/초 (≈ 1칸 / 17초). 정신 포인트당 +1%, Lv55 보상 +25%, 정령 찻잎 60초 ×2, 서리 부적 +10%, 공허의 반지 +15%"
+     "value": "0.25 MP/초 (≈ 1칸 / 40초 — 거의 기대지 않는 수준). 정신 포인트당 +1%, Lv55 보상 +25%, 정령 찻잎 60초 ×2, 서리 부적 +10%, 공허의 반지 +15%. 난이도 배율 적용(악몽 0)"
     },
     {
      "id": "passive_idle",
      "name": "자연 회복 (비전투)",
-     "value": "화면에 적대 대상이 없고 3초 지나면 자연 회복 ×4 (2.4 MP/초)"
+     "value": "화면에 적대 대상이 없고 3초 지나면 자연 회복 ×6 (1.5 MP/초)"
     },
     {
      "id": "hit",
      "name": "일반 공격 적중",
-     "value": "타격 1회당 +3 MP (콤보 마지막 타 +5). 한 번 휘두름에 최대 2마리까지만 계산. Lv55 보상 +1. 구조물·소품 타격은 0"
+     "value": "타격 1회당 +3 MP (콤보 마지막 타 +5). 콤보 카운터 10히트 이상 +1, 30히트 이상 +2 (공격성 보상 — 맞으면 카운터 초기화). 한 번 휘두름에 최대 2마리까지만 계산. Lv55 보상 +1. 구조물·소품 타격은 0"
     },
     {
      "id": "perfect_dodge",
      "name": "퍼펙트 회피",
-     "value": "적 공격 판정 직전 0.12초(Lv30: 0.16초) 안에 구르기 → +15 MP(Lv30: +20) + 1.2초 슬로 모션 + 필살기 게이지 +5"
+     "value": "구르기 시작 7틱(0.117초, 보통) 안에 적 공격이 닿으면 → +20 MP(Lv30: +25) + 슬로 모션 + 필살기 게이지 +5. 판정 틱은 난이도별(14장)"
     },
     {
      "id": "kill",
@@ -26135,7 +26136,7 @@
    ],
    "rest": [
     "마을 여관·집 침대(1박): HP·MP 전부 회복. 영웅·필멸자 무료, 타락한 필멸자(악명) 금화 10 × 지역 번호, 현상금 ★2 이상 마을은 이용 불가.",
-    "마을 분수·우물 옆에 서 있으면 MP 자연 회복 ×4 (전투 불가 구역).",
+    "마을 분수·우물 옆에 서 있으면 MP 자연 회복 ×6 (전투 불가 구역).",
     "지역 안 세이브 결정(쉼터 화면): HP 30%, MP 전부 회복 (1회 방문당 1번, 화면을 나갔다 오면 다시).",
     "마왕: 여관 불가. 폐허의 「검은 왕좌」·검은 성채에서만 휴식 (HP·MP 전부)."
    ],
@@ -26388,20 +26389,21 @@
   },
   "roll": {
    "choice": "스태미나 없음 — 구르기는 무료 + 짧은 재사용",
-   "why": "Ys VIII처럼 회피가 유일한 방어이므로 회피를 자원으로 묶으면 패턴 읽기보다 게이지 관리가 앞선다. 데모도 이미 재사용 0.55초 대시라서 그대로 이어 쓴다. 대신 「연속 3회 뒤 피로」로 무한 구르기를 막고, 레벨 보상이 무적·재사용을 조금씩 늘린다.",
+   "why": "Ys VIII처럼 회피가 유일한 방어이므로 회피를 자원으로 묶으면 패턴 읽기보다 게이지 관리가 앞선다. 대신 무적 시간을 짧게(0.18초) 두어 「타이밍」이 난이도가 되게 한다. 대신 「연속 3회 뒤 피로」로 무한 구르기를 막고, 레벨 보상이 무적·재사용을 조금씩 늘린다.",
    "base": {
-    "duration": 0.2,
-    "iframes": 0.2,
-    "cooldown": 0.55,
-    "perfect_window": 0.12,
+    "duration": 0.22,
+    "iframes": 0.18,
+    "cooldown": 0.4,
+    "perfect_window": 0.117,
+    "perfect_ticks": 7,
     "chain": 3,
     "fatigue": 0.8
    },
    "rules": [
-    "구르기 지속 0.20초 전체 무적 (Lv15 0.23 / Lv35 0.26).",
-    "재사용 0.55초 (Lv25 0.50 / Lv45 0.45).",
+    "구르기 0.22초 중 앞 0.18초 무적 (Lv15 0.21 / Lv35 0.24, 난이도 보정 별도). 끝 0.04초는 무적 아님 — 연타 구르기로 버티기 어렵게.",
+    "재사용 0.40초 (Lv25 0.36 / Lv45 0.32).",
     "1.5초 안에 3번 연속 구르면 다음 구르기까지 0.8초 피로 (짧게 숨 고르는 모션). 퍼펙트 회피 성공은 연속 횟수에서 빠진다.",
-    "퍼펙트 회피: 적 공격 판정 직전 0.12초(Lv30 0.16) 안에 구르면 성공 → 1.2초 슬로, MP +15(+20), 필살기 게이지 +5.",
+    "퍼펙트 회피: 구르기 시작 7틱(0.117초, 보통 · Lv30 +2틱) 안에 공격이 닿으면 성공 → 슬로 모션, MP +20(+25), 필살기 게이지 +5.",
     "스킬·필살기 시전 중에는 구를 수 없다 (시전 취소 없음)."
    ]
   },
@@ -26531,6 +26533,1505 @@
     "strongmen": 7560,
     "mob_kills": 135
    }
-  ]
+  ],
+  "difficulty": {
+   "default": "normal",
+   "targets": {
+    "mob_dmg_pct": {
+     "range": [
+      8,
+      12
+     ],
+     "center": 10,
+     "desc": "일반 몹 한 대"
+    },
+    "champ_dmg_pct": {
+     "range": [
+      15,
+      20
+     ],
+     "center": 17.5,
+     "desc": "챔피언 한 대"
+    },
+    "boss_dmg_pct": {
+     "range": [
+      18,
+      25
+     ],
+     "center": 21.5,
+     "desc": "보스 일반 패턴 한 대"
+    },
+    "boss_ult_pct": {
+     "range": [
+      45,
+      60
+     ],
+     "center": 52,
+     "desc": "보스 필살기 (가득 찬 HP에서 한 번은 버팀, 구르기 실패를 크게 벌함)"
+    },
+    "mob_hits": {
+     "range": [
+      4,
+      6
+     ],
+     "center": 5,
+     "desc": "일반 몹 처치 타수 (1콤보로 안 죽음)"
+    },
+    "champ_hits": {
+     "range": [
+      25,
+      40
+     ],
+     "center": 32,
+     "desc": "챔피언 처치 타수"
+    },
+    "boss_seconds": {
+     "range": [
+      150,
+      240
+     ],
+     "center": 190,
+     "desc": "숙련자 보스전 시간 (초)"
+    }
+   },
+   "motion_avg": 1.133,
+   "skilled_hits_per_sec": 0.9,
+   "level_advantage_rule": "유효 레벨 우위 상한: 주인공 레벨이 그 지역 보스 권장 레벨 + 상한(난이도별)보다 높으면, 전투 계산에서는 「권장 + 상한」 레벨의 주인공으로 본다. 구현: 적 HP × (실제 공격력 ÷ 상한 레벨 예상 공격력), 적 피해 × (실제 최대 HP ÷ 상한 레벨 예상 최대 HP). 장비·강화·분배 포인트로 얻은 우위는 그대로 남는다(레벨 숫자만 묶음). EXP는 기존 레벨 차이 보정을 그대로 쓴다. 레벨이 낮은 쪽은 묶지 않는다 (불리함은 그대로).",
+   "behavior": {
+    "telegraph": {
+     "mult": 0.85,
+     "floor_attack": 0.45,
+     "floor_aoe": 0.6,
+     "floor_charge_line": 0.45,
+     "ult_min": 2.2,
+     "desc": "예고 시간 = 현재 엔진 값 × 0.85, 단 하한 아래로는 줄이지 않는다 (근접·사격 0.45초, 바닥 광역 0.60초, 돌진 예고선 0.45초, 필살기 2.2초). 모든 공격은 여전히 구르기로 피할 수 있다."
+    },
+    "approach": {
+     "speed_mult": 1.25,
+     "aggro_radius_mult": 1.3,
+     "attack_cd_mult": 0.8,
+     "desc": "접근 속도 ×1.25, 인식 거리 ×1.3, 공격 재사용 ×0.8. 주인공이 멀리 도망가도 쉽게 포기하지 않는다(추격 시간 +50%)."
+    },
+    "tokens": {
+     "normal": 2,
+     "token_cd": 0.6,
+     "desc": "공격 토큰: 동시에 공격 동작에 들어갈 수 있는 적 수. 토큰이 없는 적은 주인공 주변 70~110px를 돌며 자리를 잡고(측면·후방 우선), 토큰이 반납되면 0.6초 뒤 다음 적이 받는다. 원거리 몹은 토큰 1개를 따로 쓴다 (근접 2 + 원거리 1)."
+    },
+    "champions": {
+     "extra_patterns": 1,
+     "enrage_at": 0.4,
+     "enrage_speed": 1.2,
+     "desc": "챔피언은 패턴 1개 추가 + HP 40% 이하 분노(행동 속도 ×1.2, 예고는 하한 유지). 추가 패턴은 마지막 동작 뒤 1.2초 빈틈을 반드시 둔다."
+    },
+    "bosses": {
+     "pattern_gap": [
+      0.7,
+      1.1
+     ],
+     "phase2_tele_mult": 0.85,
+     "ult_cd": 24,
+     "desc": "보스 패턴 사이 빈틈 0.7~1.1초(2페이즈 0.55~0.9), 2페이즈 예고 ×0.85(하한 유지), 필살기 재사용 24초."
+    },
+    "recovery": "모든 적 공격은 끝난 뒤 최소 0.4초 경직(반격 기회). 보스 일반 패턴은 0.8초 이상."
+   },
+   "champion_extra": {
+    "거대 왕멧돼지 '돌엄니'": "「땅울림 3연 돌진」: 예고선 0.55초 → 돌진, 벽에 부딪히면 바로 재조준 2회 (각 0.45초 예고), 마지막에 원형 충격파(0.7초 예고)",
+    "여왕 말벌": "「독침 부채꼴」: 5갈래 예고선 0.6초 → 독침 5발, 0.5초 뒤 반대 각도로 한 번 더 (2회째는 HP 40% 이하에서만)"
+   },
+   "resources": {
+    "potion_cap": {
+     "normal": 5,
+     "desc": "HP 회복 물약은 종류 합쳐서 최대 5개만 들고 다닌다 (초과분은 마을 창고). 만능 영약은 별도 1개."
+    },
+    "potion_heal": {
+     "potion": 30,
+     "potion_m": 50,
+     "potion_hi": 100,
+     "desc": "회복량을 최대 HP 비율로 바꾼다: 회복약 30% / 중급 50% / 고급 100% (구 「하트 2·4칸·전부」는 후반에 무의미해지므로)."
+    },
+    "potion_use": {
+     "anim": 0.6,
+     "cooldown": 4.0,
+     "desc": "사용 모션 0.6초(이동 가능, 공격·구르기 불가, 맞으면 취소되지만 소모 안 됨), 재사용 4초."
+    },
+    "price_mult": {
+     "normal": 1.5,
+     "desc": "HP·MP 물약 가격 ×1.5 (towns_data 기준가 대비). 장비·재료 가격은 그대로."
+    },
+    "heart_drop": {
+     "normal": 0.04,
+     "desc": "몹이 떨어뜨리는 회복 하트: 4% 확률, 하트 1개 = 최대 HP 5%."
+    },
+    "mp": {
+     "passive": 0.25,
+     "idle_mult": 6,
+     "hit": 3,
+     "finisher": 5,
+     "aggro_bonus": [
+      [
+       10,
+       1
+      ],
+      [
+       30,
+       2
+      ]
+     ],
+     "perfect": 20,
+     "kill": 1,
+     "desc": "MP 자연 회복 0.25/초(전투 중), 적이 없으면 ×6. 일반 공격 적중 +3(마무리 +5), 콤보 카운터 10히트 이상 +1·30히트 이상 +2(공격성 보상, 맞으면 콤보 초기화). 퍼펙트 회피 +20. 처치 +1."
+    }
+   },
+   "levels": [
+    {
+     "id": "easy",
+     "name": "쉬움 (이야기)",
+     "unlock": "처음부터",
+     "enemy_hp": 0.75,
+     "enemy_dmg": 0.6,
+     "telegraph": 1.3,
+     "aggression": 0.8,
+     "tokens": 1,
+     "champ_extra": 0,
+     "potion_cap": 10,
+     "price": 1.0,
+     "mp_regen": 1.5,
+     "perfect_ticks": 10,
+     "iframe_bonus": 0.06,
+     "level_adv_cap": 99,
+     "exp": 1.0,
+     "drop": 1.0,
+     "ult_cap": 0.5,
+     "note": "이야기를 보고 싶은 사람용. 패턴은 같지만 예고가 길고 덜 아프다. 레벨 우위 상한 없음.",
+     "telegraph_floor": {
+      "attack": 0.45,
+      "aoe": 0.6,
+      "charge_line": 0.45,
+      "ult": 2.2
+     }
+    },
+    {
+     "id": "normal",
+     "name": "보통",
+     "unlock": "처음부터 (기본값)",
+     "enemy_hp": 1.0,
+     "enemy_dmg": 1.0,
+     "telegraph": 1.0,
+     "aggression": 1.0,
+     "tokens": 2,
+     "champ_extra": 1,
+     "potion_cap": 5,
+     "price": 1.5,
+     "mp_regen": 1.0,
+     "perfect_ticks": 7,
+     "iframe_bonus": 0.0,
+     "level_adv_cap": 5,
+     "exp": 1.0,
+     "drop": 1.0,
+     "ult_cap": 0.9,
+     "note": "기준 난이도 = Ys VIII 보통~어려움. 위 목표 범위 그대로.",
+     "telegraph_floor": {
+      "attack": 0.45,
+      "aoe": 0.6,
+      "charge_line": 0.45,
+      "ult": 2.2
+     }
+    },
+    {
+     "id": "hard",
+     "name": "어려움",
+     "unlock": "처음부터",
+     "enemy_hp": 1.25,
+     "enemy_dmg": 1.3,
+     "telegraph": 0.85,
+     "aggression": 1.2,
+     "tokens": 3,
+     "champ_extra": 1,
+     "potion_cap": 3,
+     "price": 2.0,
+     "mp_regen": 0.8,
+     "perfect_ticks": 6,
+     "iframe_bonus": -0.02,
+     "level_adv_cap": 3,
+     "exp": 1.15,
+     "drop": 1.15,
+     "ult_cap": 0.9,
+     "note": "토큰 3, 물약 3개. 필살기는 여전히 가득 찬 HP에서 한 번 버틴다(최대 90%).",
+     "telegraph_floor": {
+      "attack": 0.38,
+      "aoe": 0.51,
+      "charge_line": 0.38,
+      "ult": 1.87
+     }
+    },
+    {
+     "id": "nightmare",
+     "name": "악몽",
+     "unlock": "아무 난이도로 엔딩을 한 번 본 뒤",
+     "enemy_hp": 1.4,
+     "enemy_dmg": 1.6,
+     "telegraph": 0.7,
+     "aggression": 1.35,
+     "tokens": 3,
+     "champ_extra": 2,
+     "potion_cap": 3,
+     "price": 2.5,
+     "mp_regen": 0.0,
+     "perfect_ticks": 4,
+     "iframe_bonus": -0.03,
+     "level_adv_cap": 0,
+     "exp": 1.3,
+     "drop": 1.5,
+     "ult_cap": 0.95,
+     "note": "레벨 완전 동기화(우위 상한 0), 자연 MP 회복 없음(공격·퍼펙트 회피로만), 퍼펙트 회피 판정 4틱(0.067초), 예고 ×0.7(하한은 지킴). 필살기 95% — 가득 찬 HP에서만 버틴다.",
+     "telegraph_floor": {
+      "attack": 0.33,
+      "aoe": 0.42,
+      "charge_line": 0.33,
+      "ult": 1.6
+     }
+    }
+   ],
+   "telegraph_floor_abs": 0.33,
+   "areas": [
+    {
+     "area": 1,
+     "normal": {
+      "area": 1,
+      "hit_dmg": 19.5,
+      "mitigation": 0.938,
+      "mobs": [
+       {
+        "name": "독버섯",
+        "hp": 97,
+        "dmg": 5.8
+       },
+       {
+        "name": "뿔토끼",
+        "hp": 78,
+        "dmg": 5.8
+       },
+       {
+        "name": "말벌",
+        "hp": 97,
+        "dmg": 5.8
+       },
+       {
+        "name": "멧돼지",
+        "hp": 117,
+        "dmg": 6.6
+       },
+       {
+        "name": "호박 허수아비",
+        "hp": 107,
+        "dmg": 5.8
+       },
+       {
+        "name": "숲 슬라임",
+        "hp": 78,
+        "dmg": 5.8
+       },
+       {
+        "name": "도토리 다람쥐",
+        "hp": 78,
+        "dmg": 5.8
+       },
+       {
+        "name": "나무 정령 새싹",
+        "hp": 117,
+        "dmg": 5.8
+       }
+      ],
+      "mob_hp": 97,
+      "mob_dmg": 5.8,
+      "champ_hp": 624,
+      "champ_dmg": 10.1,
+      "boss_hp": 3263,
+      "boss_dmg": 12.4,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 30.0
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.1,
+       10.1,
+       10.1,
+       11.5,
+       10.1,
+       10.1,
+       10.1,
+       10.1
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.1,
+      "mob_hits": [
+       5.0,
+       4.0,
+       5.0,
+       6.0,
+       5.5,
+       4.0,
+       4.0,
+       6.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 2,
+     "normal": {
+      "area": 2,
+      "hit_dmg": 31.3,
+      "mitigation": 0.893,
+      "mobs": [
+       {
+        "name": "가시덩굴",
+        "hp": 156,
+        "dmg": 7.2
+       },
+       {
+        "name": "박쥐",
+        "hp": 125,
+        "dmg": 6.1
+       },
+       {
+        "name": "수정 딱정벌레",
+        "hp": 156,
+        "dmg": 7.2
+       },
+       {
+        "name": "동굴 거미",
+        "hp": 156,
+        "dmg": 7.2
+       },
+       {
+        "name": "곡괭이 바위도깨비",
+        "hp": 188,
+        "dmg": 7.2
+       },
+       {
+        "name": "반딧불 지렁이",
+        "hp": 125,
+        "dmg": 7.2
+       },
+       {
+        "name": "동굴 두더지",
+        "hp": 156,
+        "dmg": 7.2
+       },
+       {
+        "name": "수정 슬라임",
+        "hp": 172,
+        "dmg": 7.2
+       }
+      ],
+      "mob_hp": 156,
+      "mob_dmg": 7.2,
+      "champ_hp": 1001,
+      "champ_dmg": 12.5,
+      "boss_hp": 5236,
+      "boss_dmg": 15.4,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 37.3
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       8.5,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.4,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       4.0,
+       5.0,
+       5.0,
+       6.0,
+       4.0,
+       5.0,
+       5.5
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 3,
+     "normal": {
+      "area": 3,
+      "hit_dmg": 42.7,
+      "mitigation": 0.847,
+      "mobs": [
+       {
+        "name": "전갈",
+        "hp": 214,
+        "dmg": 8.7
+       },
+       {
+        "name": "선인장 골렘",
+        "hp": 256,
+        "dmg": 8.7
+       },
+       {
+        "name": "모래 독사",
+        "hp": 214,
+        "dmg": 8.7
+       },
+       {
+        "name": "대머리 독수리",
+        "hp": 192,
+        "dmg": 8.7
+       },
+       {
+        "name": "사막 도적",
+        "hp": 256,
+        "dmg": 8.7
+       },
+       {
+        "name": "모래 정령",
+        "hp": 214,
+        "dmg": 8.7
+       },
+       {
+        "name": "낙타 거북",
+        "hp": 256,
+        "dmg": 8.7
+       },
+       {
+        "name": "개미귀신",
+        "hp": 214,
+        "dmg": 8.7
+       }
+      ],
+      "mob_hp": 214,
+      "mob_dmg": 8.7,
+      "champ_hp": 1367,
+      "champ_dmg": 15.3,
+      "boss_hp": 7152,
+      "boss_dmg": 18.8,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 45.4
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       6.0,
+       5.0,
+       4.5,
+       6.0,
+       5.0,
+       6.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 4,
+     "normal": {
+      "area": 4,
+      "hit_dmg": 49.6,
+      "mitigation": 0.802,
+      "mobs": [
+       {
+        "name": "미라",
+        "hp": 248,
+        "dmg": 10.5
+       },
+       {
+        "name": "스카라베 떼",
+        "hp": 199,
+        "dmg": 8.9
+       },
+       {
+        "name": "아누비스 경비병",
+        "hp": 298,
+        "dmg": 10.5
+       },
+       {
+        "name": "저주 항아리",
+        "hp": 199,
+        "dmg": 10.5
+       },
+       {
+        "name": "뱀 머리 석상",
+        "hp": 248,
+        "dmg": 10.5
+       },
+       {
+        "name": "고양이 망령",
+        "hp": 248,
+        "dmg": 10.5
+       },
+       {
+        "name": "함정 석판 골렘",
+        "hp": 298,
+        "dmg": 10.5
+       },
+       {
+        "name": "모래 해골 궁수",
+        "hp": 248,
+        "dmg": 10.5
+       }
+      ],
+      "mob_hp": 248,
+      "mob_dmg": 10.5,
+      "champ_hp": 1588,
+      "champ_dmg": 18.3,
+      "boss_hp": 8310,
+      "boss_dmg": 22.5,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 54.5
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       8.5,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       4.0,
+       6.0,
+       4.0,
+       5.0,
+       5.0,
+       6.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 5,
+     "normal": {
+      "area": 5,
+      "hit_dmg": 60.7,
+      "mitigation": 0.749,
+      "mobs": [
+       {
+        "name": "어인",
+        "hp": 304,
+        "dmg": 13.3
+       },
+       {
+        "name": "해파리",
+        "hp": 243,
+        "dmg": 12.0
+       },
+       {
+        "name": "가시 복어",
+        "hp": 304,
+        "dmg": 13.3
+       },
+       {
+        "name": "상어 돌격병",
+        "hp": 364,
+        "dmg": 15.4
+       },
+       {
+        "name": "문어 먹물병",
+        "hp": 304,
+        "dmg": 13.3
+       },
+       {
+        "name": "전기 뱀장어",
+        "hp": 304,
+        "dmg": 13.3
+       },
+       {
+        "name": "아귀",
+        "hp": 364,
+        "dmg": 13.3
+       },
+       {
+        "name": "소라게",
+        "hp": 273,
+        "dmg": 13.3
+       }
+      ],
+      "mob_hp": 304,
+      "mob_dmg": 13.3,
+      "champ_hp": 1944,
+      "champ_dmg": 23.4,
+      "boss_hp": 10169,
+      "boss_dmg": 28.7,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 69.4
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       9.0,
+       10.0,
+       11.5,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       4.0,
+       5.0,
+       6.0,
+       5.0,
+       5.0,
+       6.0,
+       4.5
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 6,
+     "normal": {
+      "area": 6,
+      "hit_dmg": 69.5,
+      "mitigation": 0.709,
+      "mobs": [
+       {
+        "name": "집게 병사",
+        "hp": 347,
+        "dmg": 16.6
+       },
+       {
+        "name": "갈매기",
+        "hp": 278,
+        "dmg": 14.1
+       },
+       {
+        "name": "해적 해골",
+        "hp": 382,
+        "dmg": 16.6
+       },
+       {
+        "name": "따개비 골렘",
+        "hp": 417,
+        "dmg": 16.6
+       },
+       {
+        "name": "바다 거북 방패병",
+        "hp": 417,
+        "dmg": 16.6
+       },
+       {
+        "name": "파도 정령",
+        "hp": 347,
+        "dmg": 16.6
+       },
+       {
+        "name": "불가사리",
+        "hp": 347,
+        "dmg": 16.6
+       },
+       {
+        "name": "해적 앵무새",
+        "hp": 347,
+        "dmg": 16.6
+       }
+      ],
+      "mob_hp": 347,
+      "mob_dmg": 16.6,
+      "champ_hp": 2223,
+      "champ_dmg": 29.1,
+      "boss_hp": 11630,
+      "boss_dmg": 35.8,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 86.5
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       8.5,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       4.0,
+       5.5,
+       6.0,
+       6.0,
+       5.0,
+       5.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 7,
+     "normal": {
+      "area": 7,
+      "hit_dmg": 86.8,
+      "mitigation": 0.675,
+      "mobs": [
+       {
+        "name": "용암 슬라임",
+        "hp": 434,
+        "dmg": 20.2
+       },
+       {
+        "name": "불 도롱뇽",
+        "hp": 434,
+        "dmg": 20.2
+       },
+       {
+        "name": "용암 바위 골렘",
+        "hp": 521,
+        "dmg": 23.2
+       },
+       {
+        "name": "불꽃 임프",
+        "hp": 391,
+        "dmg": 20.2
+       },
+       {
+        "name": "잿불 불사조 새끼",
+        "hp": 477,
+        "dmg": 20.2
+       },
+       {
+        "name": "저주받은 갑옷",
+        "hp": 521,
+        "dmg": 20.2
+       },
+       {
+        "name": "화염 사냥개",
+        "hp": 434,
+        "dmg": 20.2
+       },
+       {
+        "name": "흑요석 궁수",
+        "hp": 434,
+        "dmg": 20.2
+       }
+      ],
+      "mob_hp": 434,
+      "mob_dmg": 20.2,
+      "champ_hp": 2778,
+      "champ_dmg": 35.3,
+      "boss_hp": 14533,
+      "boss_dmg": 43.3,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 104.8
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       10.0,
+       11.5,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       5.0,
+       6.0,
+       4.5,
+       5.5,
+       6.0,
+       5.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 8,
+     "normal": {
+      "area": 8,
+      "hit_dmg": 105.1,
+      "mitigation": 0.644,
+      "mobs": [
+       {
+        "name": "서리 늑대",
+        "hp": 525,
+        "dmg": 24.2
+       },
+       {
+        "name": "얼음 슬라임",
+        "hp": 525,
+        "dmg": 24.2
+       },
+       {
+        "name": "설인 새끼",
+        "hp": 630,
+        "dmg": 24.2
+       },
+       {
+        "name": "서리 요정",
+        "hp": 420,
+        "dmg": 24.2
+       },
+       {
+        "name": "펭귄 기사",
+        "hp": 525,
+        "dmg": 24.2
+       },
+       {
+        "name": "뇌운 새",
+        "hp": 525,
+        "dmg": 24.2
+       },
+       {
+        "name": "얼음 거북",
+        "hp": 630,
+        "dmg": 24.2
+       },
+       {
+        "name": "폭풍 가고일",
+        "hp": 630,
+        "dmg": 24.2
+       }
+      ],
+      "mob_hp": 525,
+      "mob_dmg": 24.2,
+      "champ_hp": 3362,
+      "champ_dmg": 42.4,
+      "boss_hp": 17587,
+      "boss_dmg": 52.0,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 125.9
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       5.0,
+       6.0,
+       4.0,
+       5.0,
+       5.0,
+       6.0,
+       6.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 9,
+     "normal": {
+      "area": 9,
+      "hit_dmg": 123.3,
+      "mitigation": 0.62,
+      "mobs": [
+       {
+        "name": "해골 창병",
+        "hp": 617,
+        "dmg": 28.4
+       },
+       {
+        "name": "고블린",
+        "hp": 493,
+        "dmg": 28.4
+       },
+       {
+        "name": "보라 도깨비불",
+        "hp": 493,
+        "dmg": 28.4
+       },
+       {
+        "name": "어둠 마법사",
+        "hp": 617,
+        "dmg": 28.4
+       },
+       {
+        "name": "그림자 암살자",
+        "hp": 740,
+        "dmg": 32.7
+       },
+       {
+        "name": "공허 눈알",
+        "hp": 617,
+        "dmg": 28.4
+       },
+       {
+        "name": "가고일 석상",
+        "hp": 740,
+        "dmg": 28.4
+       },
+       {
+        "name": "저주 인형",
+        "hp": 617,
+        "dmg": 28.4
+       }
+      ],
+      "mob_hp": 617,
+      "mob_dmg": 28.4,
+      "champ_hp": 3946,
+      "champ_dmg": 49.7,
+      "boss_hp": 20642,
+      "boss_dmg": 61.0,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 147.7
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       11.5,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       4.0,
+       4.0,
+       5.0,
+       6.0,
+       5.0,
+       6.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    },
+    {
+     "area": 10,
+     "normal": {
+      "area": 10,
+      "hit_dmg": 152.3,
+      "mitigation": 0.588,
+      "mobs": [
+       {
+        "name": "강화 독버섯 외 1지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 가시덩굴 외 2지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 전갈 외 3지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 미라 외 4지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 어인 외 5지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 집게 병사 외 6지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 용암 슬라임 외 7지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 서리 늑대 외 8지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       },
+       {
+        "name": "강화 해골 창병 외 9지역 8종",
+        "hp": 762,
+        "dmg": 34.7
+       }
+      ],
+      "mob_hp": 762,
+      "mob_dmg": 34.7,
+      "champ_hp": 4874,
+      "champ_dmg": 60.7,
+      "boss_hp": 25498,
+      "boss_dmg": 74.6,
+      "boss_ult_pct": 52,
+      "boss_ult_dmg": 180.3
+     },
+     "check": {
+      "mob_dmg_pct": [
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0,
+       10.0
+      ],
+      "champ_dmg_pct": 17.5,
+      "boss_dmg_pct": 21.5,
+      "boss_ult_pct": 52.0,
+      "mob_hits": [
+       5.0,
+       5.0,
+       5.0,
+       5.0,
+       5.0,
+       5.0,
+       5.0,
+       5.0,
+       5.0
+      ],
+      "champ_hits": 32.0,
+      "boss_seconds": 190
+     },
+     "by_difficulty": {
+      "easy": {
+       "mob_hp_mult": 0.75,
+       "dmg_mult": 0.6,
+       "mob_dmg_pct": 6.0,
+       "champ_dmg_pct": 10.5,
+       "boss_dmg_pct": 12.9,
+       "boss_ult_pct": 31.2,
+       "mob_hits": 3.8
+      },
+      "normal": {
+       "mob_hp_mult": 1.0,
+       "dmg_mult": 1.0,
+       "mob_dmg_pct": 10.0,
+       "champ_dmg_pct": 17.5,
+       "boss_dmg_pct": 21.5,
+       "boss_ult_pct": 52.0,
+       "mob_hits": 5.0
+      },
+      "hard": {
+       "mob_hp_mult": 1.25,
+       "dmg_mult": 1.3,
+       "mob_dmg_pct": 13.0,
+       "champ_dmg_pct": 22.8,
+       "boss_dmg_pct": 27.9,
+       "boss_ult_pct": 67.6,
+       "mob_hits": 6.2
+      },
+      "nightmare": {
+       "mob_hp_mult": 1.4,
+       "dmg_mult": 1.6,
+       "mob_dmg_pct": 16.0,
+       "champ_dmg_pct": 28.0,
+       "boss_dmg_pct": 34.4,
+       "boss_ult_pct": 83.2,
+       "mob_hits": 7.0
+      }
+     }
+    }
+   ]
+  }
  }
 }

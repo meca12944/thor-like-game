@@ -136,7 +136,10 @@ import level_data as LV
 _LV_WARN=LV.validate(TOWNS,os.path.join(REPO,'town','tools','game.template.html'))
 for _t in TOWNS:
     for _q in _t['quests']: _q['exp']=LV.quest_exp(_q,_t['id'])
+import difficulty_data as DF
+DF.validate()
 LEVELS=LV.export(TOWNS)
+LEVELS['difficulty']=DF.export()
 COUNTS.update(level_cap=LV.LEVEL_CAP,level_perks=len(LV.PERKS),mp_skills=len(LV.SKILL_MP))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
@@ -578,7 +581,7 @@ for _h in HEROINES:
     _HM+=['',f"- Visual (EN): {_h['visual_en']}"]+[f"- CG `{a}`: {b}" for a,b in _h['cg']]
 _HM+=['','## 대사 표정 교체 훅','','각 히로인 `lines[]`의 대사마다 `expr`(normal/smile/angry/blush)이 있다. 대화창은 `portraits/<id>_<expr>.png`를 띄우고, 파일이 없으면 `portraits/<id>.png`(normal)로 대체한다. 퀘스트 대사 등 다른 대사에도 같은 `expr` 필드를 붙이면 된다 (game.template.html은 아직 수정하지 않음 — 대화창 렌더에서 이 규칙만 적용하면 됨).']
 DOCS['HEROINES.md']=_HM
-DOCS['LEVELS.md']=LV.doc_lines(TOWNS,HEROINES,TN)
+DOCS['LEVELS.md']=LV.doc_lines(TOWNS,HEROINES,TN)+DF.doc_lines()
 DOCS['SYSTEMS.md'].insert(3,'> 레벨·경험치·능력치 성장·MP(구 파란 게이지)·회피·필살기 게이지는 [LEVELS.md](LEVELS.md).')
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
@@ -588,4 +591,5 @@ for d in ['/workspace/town-demo/data']:
     if os.path.isdir(d):
         for _f in ['towns.json','levels.json']: shutil.copy(os.path.join(REPO,'data',_f),d)
 for _w in _LV_WARN: print('경고(level_data):',_w)
+open(os.path.join(REPO,'town','BALANCE_TODO.md'),'w').write('\n'.join(DF.balance_todo(REPO))+'\n')
 print(json.dumps(COUNTS,ensure_ascii=False))
