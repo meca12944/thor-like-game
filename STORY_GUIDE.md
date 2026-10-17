@@ -213,3 +213,45 @@ field: { bpm:132, lead:'A4 C5 E5 - D5 ...', bass:'A2 A3 ...', drum:true }
 - 타일은 방에 들어갈 때 픽셀 단위로 렌더링합니다(노이즈, 디더링, 그림자). 물과 불은 4프레임으로 애니메이션됩니다.
 - 동굴(cave), 신전(temple), 탑(tower) 테마에는 조명 효과가 적용되고, 야외(field/town/canyon/sand)에는 구름 그림자가 지나갑니다.
 - 내부 해상도는 320x240 논리 좌표이고 3배 해상도로 출력합니다. 맵 데이터 형식은 그대로입니다.
+
+## 그림 파일(일러스트)로 교체하기 — ASSETS 블록
+
+`index.html` 위쪽 데이터 블록의 `ASSETS` 에서 그림 파일을 지정합니다.
+
+- `enabled: true` 로 바꾸면 `assets/` 폴더의 그림을 사용합니다.
+  - 목록에 없거나 불러오지 못한 그림은 자동으로 코드로 그린 기본 그래픽으로 대체되므로, 일부만 교체해도 됩니다.
+  - 단, 목록에 적힌 파일이 실제로 없으면 브라우저 콘솔에 404 오류가 남으니, 없는 파일은 목록에서 지우세요.
+- 시험해 볼 때는 주소 뒤에 붙입니다.
+  - `?assets=폴더/` : 그림 사용
+  - `?noassets` : 코드 그래픽
+- 스프라이트 항목은 `'파일.png'` 또는 `{src, frames, fps, h, w, ax, ay, flip}` 형식입니다.
+  - `h` 는 게임 안 높이입니다(논리 px, 화면은 320x240, 한 칸은 16).
+  - 기준점 기본값은 발밑 가운데(`ax:.5, ay:1`)입니다.
+  - 여러 프레임은 가로로 이어 붙인 한 장(스트립)입니다.
+- 항목별 찾는 방법:
+  - `hero`: `d/u/r` 방향 × `idle/walk/atk/jump/hurt`. 왼쪽은 `r` 을 좌우 반전합니다. `codeBlade:false` 이면 그림 속 칼을 쓰고, 베기 궤적 효과만 코드로 그립니다.
+  - `enemies`: `ENEMIES` 의 키 또는 `look` 이름(보스 포함)으로 찾습니다.
+  - `spirits`: `SPIRITS` 의 `id` 로 찾습니다.
+  - `npcs`: NPC 의 `img` 값 → `name` → `_default` 순서로 찾습니다.
+  - `props`: 맵 글자(`T o B X C c t L A`)로 찾습니다.
+  - `rooms`: 방 `id` 마다 배경 그림 한 장(4:3, 1280x960 권장)입니다.
+  - `title`: 타이틀 배경입니다.
+- 방 배경 그림은 그림일 뿐이고, 충돌·퍼즐은 그대로 `MAPS` 의 글자 지도로 동작합니다.
+  - 그림은 `assets_src/guides/<방>_collision.png`(칸 도식)와 `<방>_layout.png`(기본 그래픽)에 맞춰 그려야 벽·물 위치가 맞습니다.
+  - 상자·블록·횃불·제단처럼 바뀌는 소품은 배경에 그리지 말고 `props` 로 그립니다.
+  - 나무처럼 배경에 이미 그린 소품은 `hide:'T'` 로 따로 그리지 않게 합니다.
+  - 퍼즐로 바뀐 칸(열린 문, 부서진 벽, 생긴 다리 등)은 자동으로 기본 타일을 덧그립니다.
+- 그림을 쓰면 화면 해상도가 기기에 맞춰 최대 4배로 올라가고 부드럽게(비픽셀) 그립니다.
+
+### 후처리 도구 (`tools/asset_pipeline.py`, Python + Pillow + numpy)
+
+```
+python3 tools/asset_pipeline.py split 시트.png --cols 4 --rows 1 -o work/walk_%d.png   # 격자 시트 자르기
+python3 tools/asset_pipeline.py sprite work/walk_0.png work/walk_1.png ... -o assets/hero_d_walk.png --height 144
+python3 tools/asset_pipeline.py bg 그림.png -o assets/bg_town1.jpg                       # 4:3 자르기 + 1280x960 JPG
+python3 tools/asset_pipeline.py check                                                 # 목록 대비 빠진 파일 확인
+python3 tools/make_guides.py                                                          # 방 배치 가이드 다시 만들기
+```
+
+- `sprite` 는 단색 배경(테두리와 이어진 영역)을 투명하게 지우고, 프레임들을 발밑 기준으로 정렬해 스트립으로 저장합니다.
+- 프레임 높이는 게임 안 높이 × 4 정도를 권장합니다(주인공 144px, 보스 220px 정도).
