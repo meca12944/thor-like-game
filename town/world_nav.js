@@ -334,7 +334,7 @@
       h.save(); st.dirty = true; }
     const ok = h.codesOf('interact').some(c => tapCode(c)) || tapCode('Enter');
     if (ok && best) {
-      if (best.kind === 'waystone' && h.SAVE.waystones[best.id]) { st.screen = null; h.banner('순간이동 — ' + best.label, 1.2, true); h.go(best.map, 'ws:' + best.id, { card: false }); return true; }
+      if (best.kind === 'waystone' && h.SAVE.waystones[best.id]) { st.screen = null; h.banner('순간이동 — ' + best.label, 1.2, true); try { window.__game.SFX.ev.warp(); } catch (e) {} h.go(best.map, 'ws:' + best.id, { card: false }); return true; }
       if (best.kind === 'waystone') { h.banner('아직 등록하지 않은 비석이다 (직접 가서 조사)', 1.6, true); }
       else { h.SAVE.dest = { type: 'marker', map: best.map, x: best.x, y: best.y + (best.kind === 'npc' ? 1 : 0), label: best.label }; h.save(); st.dirty = true; h.banner('목표: ' + best.label, 1.4, true); }
     }

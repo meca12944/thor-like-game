@@ -233,7 +233,8 @@
     return names.join(', '); }
 
   // ---------------- hazards / shots: the only things that can hurt the hero ----------------
-  function hazard(h) { h.t = 0; h.hit = false; teleScale(h); S.hazards.push(h); return h; }
+  function sfx(k, a) { try { const E = window.__game.SFX.ev; E[k] && E[k](a); } catch (e) {} } // [sfx] named file-SFX hooks (town/index.html SFX.ev)
+  function hazard(h) { sfx(h.kind === 'ult' || (S.bossRef && !S.bossRef.dead) ? 'bossWarning' : 'monsterAttack'); h.t = 0; h.hit = false; teleScale(h); S.hazards.push(h); return h; }
   function inHaz(h, x, y) {
     if (h.shape === 'circle') return Math.hypot(x - h.x, (y - h.y) * 1.15) < h.r + 3;
     if (h.shape === 'ring') { const d = Math.hypot(x - h.x, (y - h.y) * 1.15); return d > h.r0 - 3 && d < h.r + 3; }
@@ -246,9 +247,9 @@
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
-      if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
+      if (just) { hero.roll.just = true; sfx('justDodge'); ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2); ultAdd('gainHurt', dmg);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2); sfx('hurt'); ultAdd('gainHurt', dmg);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
@@ -288,7 +289,7 @@
     if (m.hp <= 0) killMob(m);
   }
   function killMob(m) {
-    if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
+    if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D; sfx('monsterDeath');
     addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion });
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
@@ -394,7 +395,7 @@
     S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
     if (S.scene === 'town') return;
-    if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
+    if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) { S.dialog = null; sfx('blip'); } queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) S.pause = !S.pause;
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; go('town', null, { card: false }); } queue.length = 0; return; }
@@ -430,8 +431,8 @@
     if (takePress('potion')) usePotion();
     if (takePress('ult') && !S.ultFx) castUlt();
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) [dx, dy] = FACEV[hero.face]; const L = Math.hypot(dx, dy);
-      hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
-    if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); }
+      hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; sfx('dodge'); hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
+    if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; try { window.__game.SFX.ev.swing(window.__game.weaponType, hero.combo, hero.combo === 2 ? 1 : .75); } catch (e) {} if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); }
     if (takePress('interact')) interact();
     if (hero.roll) { const r = hero.roll; r.t += dt; const sp = Math.max(ROLL.speed * (1 - r.t / ROLL.dur * .55), r.carry); moveCol(hero, r.dx * sp * dt, r.dy * sp * dt, 5); hero.walkT += dt * 3; // from a run the dodge keeps momentum
       if (r.t >= ROLL.dur) { hero.roll = null; hero.rollCd = ROLL.cd; if (r.carry) addFx('dust', hero.x, hero.y, { life: .3 }); } }
@@ -443,11 +444,11 @@
       if (a.t >= AT.dur) { hero.atk = null; hero.comboT = ATK.chain; } }
     else { const g = window.__game, mv = !!(ix || iy);
       if (mv && !hero.run && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
-      hero.runReq = false; if (!mv && hero.run) { hero.run = false; hero.skidT = RUN.skidT; hero.skidV = [FACEV[hero.face][0], FACEV[hero.face][1]]; addFx('dust', hero.x, hero.y, { life: .3 }); }
+      hero.runReq = false; if (!mv && hero.run) { hero.run = false; hero.skidT = RUN.skidT; sfx('skid'); hero.skidV = [FACEV[hero.face][0], FACEV[hero.face][1]]; addFx('dust', hero.x, hero.y, { life: .3 }); }
       hero.runStartT = Math.max(0, (hero.runStartT || 0) - dt);
       const rk = hero.run ? RUN.mul + (RUN.startMul - RUN.mul) * hero.runStartT / RUN.startT : 1;
       const sp = HERO_SPEED * rk * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = mv;
-      if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
+      if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) sfx('footstep', ({ field: 'grass', dungeon: 'stone', boss: 'stone' })[M().type] || 'dirt'), addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
       else if (hero.skidT > 0) { hero.skidT -= dt; const k = hero.skidT / RUN.skidT; moveCol(hero, hero.skidV[0] * HERO_SPEED * 1.2 * k * dt, hero.skidV[1] * HERO_SPEED * 1.2 * k * dt, 5); } } // short skid
     if (!hero.atk) hero.comboT = Math.max(0, hero.comboT - dt);
     // tiles & objects: pits, spikes, exits, stairs, keys, doors, warp
@@ -462,7 +463,7 @@
         if (m.boss && S.bossRef && !S.bossRef.dead) { hero.y = cy * m.T - 3; if (!S.msg) msg('봉인의 결계 — 보스를 쓰러뜨리기 전에는 나갈 수 없다', 1.6); continue; } // no fleeing mid-fight
         const L = m.links[o.type]; go(L.to, L.spawn); return; }
       if (o.type === 'exit' && hero.x >= o.tx * m.T && hero.x < (o.tx + o.w) * m.T && hero.y >= o.ty * m.T && hero.y < (o.ty + o.h) * m.T) { go(o.to, o.spawn); return; }
-      if (o.type === 'warp' && Math.hypot(hero.x - o.x, hero.y - o.y) < 10) { go(o.to, o.spawn, { card: false }); return; }
+      if (o.type === 'warp' && Math.hypot(hero.x - o.x, hero.y - o.y) < 10) { sfx('warp'); go(o.to, o.spawn, { card: false }); return; }
       const bump = Math.abs(hero.x - o.x) < 10 && hero.y > o.y && hero.y - o.y < m.T * 1.05 && isHeld('up');
       if (o.type === 'boss_door' && bump) bossDoor(o);
       if (o.type === 'door_locked' && !o.open && bump) tryDoor(o);
@@ -495,7 +496,7 @@
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
-      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
+      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { sfx('pickup'); const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
     const e = S.engaged; let want = m.bgm;
@@ -511,7 +512,7 @@
   const trapAt = (cx, cy) => M().objs.some(o => (o.type === 'spikes' || o.type === 'pit') && Math.abs(o.tx - cx) <= 1 && Math.abs(o.ty - cy) <= 1);
   function usePotion() { const g = window.__game; const n = g ? g.potions : 0; if (!n) { msg('물약이 없다'); return; } if (hero.hp >= hero.maxHp) { msg('체력이 가득하다'); return; }
     if (g.potionCd > 0) { msg('물약 재사용 대기 ' + g.potionCd.toFixed(1) + '초'); return; }
-    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
+    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; sfx('potion'); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -520,22 +521,22 @@
       if (o.type === 'npc') { S.dialog = { text: NAV() ? NAV().talk(o) : (o.idle || '…') }; return; }
       if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20);
         S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
-      if (o.type === 'chest') { if (SAVE.chests[o.id]) { msg('빈 상자다'); return; } SAVE.chests[o.id] = true; save(); banner('보물상자! ' + giveLoot(o.loot || []), 2.2); addFx('sparkle', o.x, o.y - 10, { life: .8 }); return; }
+      if (o.type === 'chest') { if (SAVE.chests[o.id]) { sfx('locked'); msg('빈 상자다'); return; } SAVE.chests[o.id] = true; save(); sfx('chest'); banner('보물상자! ' + giveLoot(o.loot || []), 2.2); addFx('sparkle', o.x, o.y - 10, { life: .8 }); return; }
       if (o.type === 'heal') { hero.hp = hero.maxHp; syncTownHp(); msg('쉼터에서 쉬었다. 체력 회복!'); addFx('heal', hero.x, hero.y - 20); return; }
       if (o.type === 'lever') { if (o.on) { msg('이미 당긴 레버다'); return; } o.on = true; SAVE.levers[o.key] = true; save(); shake(1); updateGate(m); return; }
       if (o.type === 'door_locked') { tryDoor(o); return; }
       if (o.type === 'boss_door') { bossDoor(o); return; }
       if (o.type === 'gate' && !o.open) { msg('철창이다. 어딘가의 레버로 열 수 있을 것 같다'); return; }
     }
-    for (const o of m.objs) if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.hypot(o.x - hero.x, o.y - hero.y) < 22) { SAVE.chests[o.id] = true; save(); banner('풀숲에서 찾았다! ' + giveLoot(o.loot || []), 2.2); return; }
+    for (const o of m.objs) if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.hypot(o.x - hero.x, o.y - hero.y) < 22) { SAVE.chests[o.id] = true; save(); sfx('pickup'); banner('풀숲에서 찾았다! ' + giveLoot(o.loot || []), 2.2); return; }
   }
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
-    if (!keyId) { if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
-    SAVE.keys[keyId + ':used'] = true; o.open = true; SAVE.opened[o.key] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; banner('열쇠로 문을 열었다', 1.4); shake(1); }
+    if (!keyId) { if (!S.msg) sfx('locked'); if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
+    SAVE.keys[keyId + ':used'] = true; o.open = true; SAVE.opened[o.key] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; sfx('door'); banner('열쇠로 문을 열었다', 1.4); shake(1); }
   function updateGate(m, silent) { if (m.gateNeeds !== 'levers') return; const lv = m.objs.filter(o => o.type === 'lever'); const on = lv.filter(o => o.on).length;
     if (!silent) msg('레버를 당겼다 (' + on + '/' + lv.length + ')');
-    if (on === lv.length) for (const o of m.objs) if (o.type === 'gate' && !o.open) { o.open = true; SAVE.opened[o.key] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; if (!silent) { banner('철창이 열렸다!', 1.6); shake(2); } } }
+    if (on === lv.length) for (const o of m.objs) if (o.type === 'gate' && !o.open) { o.open = true; SAVE.opened[o.key] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; if (!silent) { sfx('door'); banner('철창이 열렸다!', 1.6); shake(2); } } }
   function bossDoor(o) { const m = M(); const L = m.links.boss_door; const need = (L.needFlags || []).filter(f => !SAVE.flags[f]);
     if (need.length) { if (!S.msg) msg(L.lockedText + '  (남은 챔피언 ' + need.length + ')', 3); return; }
     go(L.to, L.spawn); }

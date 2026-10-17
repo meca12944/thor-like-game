@@ -144,12 +144,51 @@ const SPR=/*SPRITES*/;
 const LVL=/*LEVEL*/;
 const ANIM=/*ANIM*/;
 const SFX_DATA=/*SFX*/; // procedural impact SFX (tools/sfx/gen_sfx.py), inlined as data URIs by build.py
-const SFX=(()=>{let ac=null,gain=null;const buf={},last={};
+const SFX=(()=>{let ac=null,gain=null;const buf={},last={},voices=[],pend={};
+ // [sfx] file SFX (assets/sfx/fx/*.ogg, .m4a fallback for Safari) from docs_music/sfx_draft: fetched lazily after the audio unlock, never inlined.
+ // FILE: key -> [file, per-key max voices, min gap (s), pitch jitter (+-), base vol, ui(=plays even with ?juice=0)]
+ const FX='assets/sfx/fx/',FILE={},def=(ks,mx,gap,jit,vol,ui)=>{for(const k of ks.split(' '))FILE[k]={mx,gap,jit,vol,ui};};
+ def('swing_sword_1 swing_sword_2 swing_sword_3 swing_spear swing_axe dash_attack',2,.04,.05,.8);
+ def('hit_normal hit_finisher hit_critical',3,.035,.05,.9);def('combo_hit',1,.06,.02,.35);
+ def('charge_stage1 charge_stage2 charge_release dodge_afterimage just_dodge',1,.08,.02,.8);
+ def('footstep step_dirt step_stone step_wood step_grass',2,.09,.12,.22);def('skid',1,.25,.06,.3);
+ def('player_hurt',1,.12,.05,.8);def('level_up',1,.5,0,.8,1);
+ def('ult_raikou ult_demon_descent ult_ice_sword',1,.5,0,.9);def('magic_cast',1,.1,.03,.8);
+ for(let i=1;i<=10;i++)def('skill_'+String(i).padStart(2,'0'),2,.08,.03,.7);
+ def('monster_attack',3,.08,.08,.5);def('monster_death',3,.06,.08,.6);def('boss_warning',1,.4,0,.8);
+ def('chest_open chest_locked item_pickup potion shop_buy door_open warp',2,.1,.02,.7,1);
+ def('menu_move',1,.03,.03,.35,1);def('menu_confirm menu_cancel',1,.05,.02,.5,1);def('dialogue_advance',1,.03,.06,.35,1);
+ const OGG=(()=>{try{return !!document.createElement('audio').canPlayType('audio/ogg; codecs="vorbis"');}catch(e){return false;}})();
+ const MAXV=12,stat={req:0,ok:0,fail:[]};
+ function dec(u){return fetch(u).then(r=>{if(!r.ok)throw new Error(r.status+' '+u);return r.arrayBuffer();}).then(a=>new Promise((res,rej)=>ac.decodeAudioData(a,res,rej)));}
+ function load(k){if(!ac||buf[k]||pend[k]||!FILE[k])return pend[k];stat.req++;const o=FX+k+'.ogg',m=FX+k+'.m4a';
+  return pend[k]=(OGG?dec(o).catch(()=>dec(m)):dec(m)).then(b=>{buf[k]=b;stat.ok++;}).catch(e=>{stat.fail.push(k);console.warn('[sfx] load failed',k,e&&e.message||e);});}
  function init(){if(ac||!SFX_DATA)return;try{ac=new (window.AudioContext||window.webkitAudioContext)();gain=ac.createGain();gain.gain.value=FEEL.sfxVol;gain.connect(ac.destination);
-  for(const k in SFX_DATA){fetch(SFX_DATA[k]).then(r=>r.arrayBuffer()).then(a=>ac.decodeAudioData(a)).then(b=>{buf[k]=b;}).catch(()=>{});}}catch(e){ac=null;}}
+  for(const k in SFX_DATA){fetch(SFX_DATA[k]).then(r=>r.arrayBuffer()).then(a=>ac.decodeAudioData(a)).then(b=>{buf[k]=b;}).catch(()=>{});}
+  let i=0;const ks=Object.keys(FILE),next=()=>{if(i<ks.length){load(ks[i++]);setTimeout(next,40);}};setTimeout(next,300);}catch(e){ac=null;}} // trickle-preload after unlock
  addEventListener('keydown',init,{once:false});addEventListener('pointerdown',init);
- return {play(k,vol=1,rate=1){if(!FEEL.juice||!ac||!buf[k])return;const now=ac.currentTime;if(last[k]&&now-last[k]<.035)return;last[k]=now;
-   if(ac.state==='suspended')ac.resume();const s=ac.createBufferSource(),g=ac.createGain();s.buffer=buf[k];s.playbackRate.value=rate*(0.96+Math.random()*.08);g.gain.value=vol;s.connect(g);g.connect(gain);s.start();},get ready(){return !!ac}};})(); // hero frame animation + weapon combos (assets/anim/hero.json <- tools/anim/hero_anim.src.json)
+ function play(k,vol=1,rate=1){const F=FILE[k];if(Q.get('sfx')==='0'||!ac)return;if(!FEEL.juice&&!(F&&F.ui))return;
+  if(!buf[k]){if(F)load(k);return;}
+  const now=ac.currentTime;if(last[k]&&now-last[k]<(F?F.gap:.035))return;
+  for(let i=voices.length-1;i>=0;i--)if(voices[i].end<=now)voices.splice(i,1);
+  const same=voices.filter(v=>v.k===k);if(same.length>=(F?F.mx:4)){try{same[0].s.stop();}catch(e){}voices.splice(voices.indexOf(same[0]),1);} // per-key cap: steal oldest
+  if(voices.length>=MAXV){try{voices[0].s.stop();}catch(e){}voices.shift();}
+  last[k]=now;if(ac.state==='suspended')ac.resume();gain.gain.value=FEEL.sfxVol;
+  const j=F?F.jit:.04,s=ac.createBufferSource(),g=ac.createGain();s.buffer=buf[k];s.playbackRate.value=rate*(1-j+Math.random()*2*j);
+  g.gain.value=vol*(F?F.vol:1)*(same.length?.8:1);s.connect(g);g.connect(gain);s.start();voices.push({k,s,end:now+buf[k].duration/s.playbackRate.value});}
+ // named gameplay hooks (call from game code; some have no trigger yet, see SFX_HOOKS.md)
+ const W={sword:['swing_sword_1','swing_sword_2','swing_sword_3'],spear:['swing_spear'],axe:['swing_axe']};W.greatsword=W.demon=W.axe; // no axe weapon type yet: heavy 2-handers use the axe draft
+ const ULT={tenkou:'ult_raikou',metsukai:'ult_demon_descent',chan:'ult_ice_sword'};
+ const ev={swing(w,i,vol=.8){const a=W[w]||W.sword;play(a[Math.min(i,a.length-1)],vol,a.length===1?[1,1.08,.92][i%3]:1);},dashAttack(){play('dash_attack');},
+  chargeLv1(){play('charge_stage1');},chargeLv2(){play('charge_stage2');},chargeRelease(){play('charge_release');},
+  dodge(){play('dodge_afterimage');},justDodge(){play('just_dodge');},footstep(surf){const k='step_'+surf;play(FILE[k]&&!stat.fail.includes(k)?k:'footstep');}/* surf: dirt|stone|wood|grass, footstep.ogg fallback */,skid(){play('skid');},
+  hurt(){play('player_hurt');},levelUp(){play('level_up');},ult(id){if(ULT[id])play(ULT[id]);},magic(){play('magic_cast');},
+  skill(i){play('skill_'+String(i+1).padStart(2,'0'));},finisher(){play('hit_finisher',.7);},combo(n){play('combo_hit',1,1+Math.min(+n||0,50)/100);},
+  monsterAttack(){play('monster_attack');},monsterDeath(){play('monster_death');},bossWarning(){play('boss_warning');},
+  chest(){play('chest_open');},locked(){play('chest_locked');},pickup(){play('item_pickup');},potion(){play('potion');},
+  menuMove(){play('menu_move');},menuOk(){play('menu_confirm');},menuCancel(){play('menu_cancel');},blip(){play('dialogue_advance');},
+  shop(){play('shop_buy');},door(){play('door_open');},warp(){play('warp');}};
+ return {play,ev,FILE,load,get stat(){return {...stat,loaded:Object.keys(buf),voices:voices.length,ctx:ac&&ac.state};},get ready(){return !!ac}};})(); // hero frame animation + weapon combos (assets/anim/hero.json <- tools/anim/hero_anim.src.json)
 const WW=1280,WH=720;
 const Q=new URLSearchParams(location.search);
 const DEBUG=Q.has('debug');
@@ -188,7 +227,7 @@ function expNext(l){const t=LEVELS&&LEVELS.exp_table;const r=t&&t.find(e=>e.leve
 function mpMax(l=lvl){const m=LEVELS&&LEVELS.mp;if(!m)return 80;let v=m.base;for(const[a,b,d]of m.steps)for(let k=a;k<=Math.min(b,l);k++)v+=d;return v;}
 function addMp(v){gauge=Math.min(1,gauge+v/mpMax());}
 function gainExp(v){exp+=v;let up=false;while(lvl<(LEVELS&&LEVELS.level_cap||60)&&exp>=expNext(lvl)){exp-=expNext(lvl);const mp=gauge*mpMax();lvl++;gauge=Math.min(1,mp/mpMax());up=true;}
- if(up){lvFx=2;gauge=1;hero.hp=hero.maxHp;spawnRing(hero.x,hero.y-10,10,140,.5,'255,224,120',8,.9);burst(hero.x,hero.y-60,30,['#ffe08a','#fff','#ffb030'],260,-80,5,.9);SFX.play('ult_cutin',.5,1.6);msg('LEVEL UP!  Lv '+lvl);}}
+ if(up){lvFx=2;gauge=1;hero.hp=hero.maxHp;spawnRing(hero.x,hero.y-10,10,140,.5,'255,224,120',8,.9);burst(hero.x,hero.y-60,30,['#ffe08a','#fff','#ffb030'],260,-80,5,.9);SFX.ev.levelUp();msg('LEVEL UP!  Lv '+lvl);}}
 function expOf(m){const L=LEVELS&&LEVELS.demo_exp;return m.kind==='boar'?(L?L.champion:42):(L?L.slime:6);}
 // ---- karma title (칭호): 필멸자 / 영웅 / 타락한 필멸자 / 마왕. Picks the 필살기 and the 마왕 combo override (ANIM.titleCombo). Demo: ?title=마왕 or T key cycles.
 const TITLES=['필멸자','영웅','타락한 필멸자','마왕'];
@@ -372,7 +411,7 @@ function castArea(){const A=AREA[areaMode];
  if(uw||hero.swim||!canAct())return;
  if(areaCd>0){msg(A.name+' 재사용 대기 '+Math.ceil(areaCd)+'초',1);return;}
  if(gauge+1e-6<A.cost*10/mpMax()){msg(A.name+' — MP 부족',1);return;}gauge-=A.cost*10/mpMax();
- areaCd=A.cd;areaFx={t:0,A,x:hero.x,y:hero.y};shakeAdd('heavy');flash=.2;hitStop=.08;
+ areaCd=A.cd;areaFx={t:0,A,x:hero.x,y:hero.y};SFX.ev.magic();shakeAdd('heavy');flash=.2;hitStop=.08;
  for(const m of live())if(inEll(m,hero.x,hero.y,A.rad,A.rad*.72))damageSlime(m,m.x-hero.x,m.y-hero.y,A.dmg,A.kb,{skill:1,fin:1,col:A.col,stop:.08}); // radial magic around the hero (enemies only)
  msg(A.name+'!  ('+A.src+')');}
 function quickPotion(){if(uw)return;useConsumable(INV.quick,false);} // E: uses the quick-slot item (default 회복약)
@@ -397,7 +436,7 @@ function updateCtl(dt,ix,iy,l){ // called from update(): dash, area skill, timer
  if(dashPressed){dashPressed=false;hero.dashBuf=FEEL.bufferTicks;} // queued for 8 ticks
  if(hero.dashBuf>0){hero.dashBuf--;const a=hero.atk,cancelOk=!a||a.t>=a.s.cancel; // combo -> roll cancel window (per weapon)
   if(!uw&&cancelOk&&!hero.sk&&!hero.swim&&!hero.dash&&!(hero.dashCd>0)&&!(hero.deadT>0)&&!(hero.hurtT>0)){let dx=ix,dy=iy;if(!l){[dx,dy]=DIRV[hero.face];}
-   const n=Math.hypot(dx,dy)||1;hero.atk=null;hero.z=0;hero.dash={t:0,dx:dx/n,dy:dy/n,perfect:false,carry:hero.run?FEEL.walkSpeed*FEEL.runMul:0};hero.dashBuf=0;hero.dashCd=tk(FEEL.dashCdTicks);hero.chainT=0;hero.combo=0;hero.vx=hero.vy=0;
+   const n=Math.hypot(dx,dy)||1;hero.atk=null;hero.z=0;hero.dash={t:0,dx:dx/n,dy:dy/n,perfect:false,carry:hero.run?FEEL.walkSpeed*FEEL.runMul:0};hero.dashBuf=0;hero.dashCd=tk(FEEL.dashCdTicks);SFX.ev.dodge();hero.chainT=0;hero.combo=0;hero.vx=hero.vy=0;
    if(Math.abs(dx)>.2)hero.hz=dx>0?'right':'left';if(Math.abs(dx)>Math.abs(dy)*.9)hero.face=dx>0?'right':'left';else hero.face=dy>0?'down':'up';}}
 }
 function updateDash(dt){const d=hero.dash;d.t+=dt;const T=tk(FEEL.dashTicks),p=Math.min(1,d.t/T);const sp=Math.max(FEEL.dashSpeed*(1-p)*(1-p)*1.5+90,d.carry*(1-p*.2)); // eased burst (~2 tiles); from a run the roll keeps the run speed
@@ -406,7 +445,7 @@ function updateDash(dt){const d=hero.dash;d.t+=dt;const T=tk(FEEL.dashTicks),p=M
  d.ai=(d.ai||0)-1;if(d.ai<=0&&p<.9){d.ai=2;const c=heroCell();if(c)fx.push({type:'hafter',c,x:hero.x,y:hero.y,t:0,life:.24});} // 회피(잔상 대시): clean ghost every 2 ticks, fades out in .24s
  if(Math.random()<.5)parts.push({x:hero.x+(Math.random()-.5)*16,y:hero.y-2,vx:-d.dx*60,vy:-20,g:0,t:0,life:.25,c:'#e8dcc0',s:4});
  if(d.t>=T){hero.dash=null;if(d.carry){hero.vx=d.dx*d.carry;hero.vy=d.dy*d.carry;}}}
-function perfectDodge(){addMp(MPR.perfect);addUlt(ULT_CFG.gainPerfect);slowT=tk(FEEL.perfectSlowTicks);flash=Math.max(flash,.22);hero.inv=Math.max(hero.inv,.45);msg('Flash Move! 퍼펙트 회피');
+function perfectDodge(){SFX.ev.justDodge();addMp(MPR.perfect);addUlt(ULT_CFG.gainPerfect);slowT=tk(FEEL.perfectSlowTicks);flash=Math.max(flash,.22);hero.inv=Math.max(hero.inv,.45);msg('Flash Move! 퍼펙트 회피');
  spawnRing(hero.x,hero.y-12,6,90,.35,'200,240,255',6,.5);burst(hero.x,hero.y-20,10,['#dff8ff','#fff'],160,0,3);}
 // interact / dialog
 const TALK={
@@ -429,7 +468,7 @@ let dlg=null; // {id,i}
 const HERO_NAME='필멸자';
 function interactTarget(){if(nearShopNpc())return 'shop';if(nearFountain(hero.x,hero.y))return 'fountain';return 'spirit';} // the spirit always floats next to the hero
 function interact(){if(uw||hero.swim||hero.sk||hero.atk)return;dlg={id:interactTarget(),i:0};openUI('dialog');}
-function dialogNext(){if(!dlg)return;dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){const T=TALK[dlg.id];closeUI();if(T.then)T.then();return;}renderUI();}
+function dialogNext(){if(!dlg)return;SFX.ev.blip();dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){const T=TALK[dlg.id];closeUI();if(T.then)T.then();return;}renderUI();}
 // quick save (F5) — restored on the next load
 const LSQ='townDemo.quicksave';
 function quickSave(){if(uw||hero.swim||hero.sk||hero.dash){msg('지금은 저장할 수 없다',1);return;}
@@ -489,7 +528,7 @@ function renderUI(){
   dlgEl.classList.toggle('hasp',!!por);
   dlgEl.innerHTML=(por?`<img class="dp" src="assets/portraits/${esc(por)}.png" alt="">`:'')+`<div class="dn">${esc(nm)}</div><div class="dt">${esc(L)}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?(T.then?'거래하기 ▶':'닫기'):'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
   dlgEl.onclick=dialogNext;}}
-function uiKey(code,act){
+function uiKey(code,act){if(ui!=='dialog'&&ui!=='options')uiSfx(code,act);
  if(ui==='options'){optKey(code);return;}
  if((code==='Escape'||act==='menu')&&!(ui==='inv'&&sellPend)){closeUI();return;}
  if(ui==='dialog'){if(act==='interact'||act==='attack'||code==='Space'||code==='Enter')dialogNext();return;}
@@ -694,7 +733,7 @@ function invAction(){
  if(invTab===1){const id=ITEMS.shopA[listSel],d=IT[id];if(!id)return;
   if(!spend(d.p)){invNote='⚠ 금화가 부족하다';renderInv();return;}
   if(!invAdd(id,1)){INV.gold+=d.p;if(!POTION.hpIds.includes(id))invNote='⚠ 가방이 가득 찼다';renderInv();return;}
-  invNote=`${d.n} 구매 (−${d.p})`;dropNote(id,1,'구매');renderInv();refreshQuick();return;}
+  SFX.ev.shop();invNote=`${d.n} 구매 (−${d.p})`;dropNote(id,1,'구매');renderInv();refreshQuick();return;}
  if(invTab===2){const r=forgeRows()[listSel];if(!r)return;
   if(r.kind==='enhmax'){invNote='⚠ 이 마을 대장간은 +3 까지만 강화할 수 있다';renderInv();return;}
   if(r.kind==='enh'){if(!spend(r.e.c)){invNote='⚠ 금화가 부족하다';renderInv();return;}
@@ -711,7 +750,7 @@ function useConsumable(id,inUI){const d=IT[id];if(!d||!invCount(id)){const t=`${
  const h=POTION.heal[id];
  if(h){if(hero.hp>=hero.maxHp){const t='체력이 이미 가득 차 있다';inUI?invNote='⚠ '+t:msg(t,1);return false;}
   if(potionCd>0){const t=`회복약 재사용 대기 ${potionCd.toFixed(1)}초`;inUI?invNote='⚠ '+t:msg(t,1);return false;}
-  invTake(id,1);potionCd=POTION.cd;hero.hp=Math.min(hero.maxHp,hero.hp+Math.ceil(hero.maxHp*h/100));burst(hero.x,hero.y-50,18,['#ff6a8a','#ffd0dc','#fff'],150,-120,4,.7);}
+  invTake(id,1);potionCd=POTION.cd;SFX.ev.potion();hero.hp=Math.min(hero.maxHp,hero.hp+Math.ceil(hero.maxHp*h/100));burst(hero.x,hero.y-50,18,['#ff6a8a','#ffd0dc','#fff'],150,-120,4,.7);}
  else invTake(id,1);
  const t=`${d.n} 사용${h?` (HP +${h>=100?'전부':h+'%'})`:' (데모: 효과 생략)'} · 남은 ${invCount(id)}`;inUI?invNote=t:msg(t);refreshQuick();return true;}
 function invMove(dx,dy){
@@ -722,6 +761,7 @@ function invMove(dx,dy){
   if(dx<0&&c===0){invZone='equip';eqSel=Math.min(EQ_SLOTS.length-1,r);}
   else{c=(c+dx+BAG_COLS)%BAG_COLS;r=(r+dy+BAG_ROWS)%BAG_ROWS;invSel=r*BAG_COLS+c;}}
  invNote='';renderInv();}
+function uiSfx(code,act){if(/^Arrow/.test(code)||['up','down','left','right'].includes(act))SFX.ev.menuMove();else if(code==='Escape'||act==='menu'||act==='inventory')SFX.ev.menuCancel();else if(code==='Enter'||code==='NumpadEnter'||code==='Space'||act==='interact')SFX.ev.menuOk();} // [sfx]
 function invKey(code,act){
  if(code==='Escape'&&sellPend){sellPend=null;invNote='판매 취소';renderInv();return;}
  if(code==='Escape'||act==='menu'||act==='inventory'){closeUI();return;}
@@ -893,12 +933,12 @@ function damageSlime(m,dx,dy,dmg,kb,o={}){if(m.dead)return;if(!o.melee)dmg*=DMG_
  hitStop=Math.max(hitStop,o.stop??.04);if(o.shake)shakeAdd(typeof o.shake==='string'?o.shake:'skill');if(!o.skill&&!o.ult)addMp((o.fin?MPR.finisher:MPR.hit)+(cmb.n>=30?MPR.combo30:cmb.n>=10?MPR.combo10:0));
  const cols=o.col||['#fff','#9ef0a0'];
  for(let i=0;i<(o.fin?14:8);i++)parts.push({x:m.x,y:m.y-28*m.sc,vx:(Math.random()-.5)*260+dx*120,vy:-Math.random()*200,g:600,t:0,life:.4+Math.random()*.2,c:cols[i%cols.length],s:4});
- if(m.hp<=0){m.dead=true;m.respawn=4+Math.random()*3;addMp(m.kind==='boar'?MPR.champKill:MPR.kill);gainExp(expOf(m));if(FEEL.juice){SFX.play('kill',.9);spark(m.x,m.y-20*m.sc,0,0,2,m.kind==='boar'?'255,200,120':'200,255,140');spawnRing(m.x,m.y-10,8,70,.3,'255,255,255',5,.6);}
+ if(m.hp<=0){m.dead=true;m.respawn=4+Math.random()*3;addMp(m.kind==='boar'?MPR.champKill:MPR.kill);gainExp(expOf(m));if(FEEL.juice){SFX.play('kill',.9);if(m.kind==='boar')SFX.ev.monsterDeath();spark(m.x,m.y-20*m.sc,0,0,2,m.kind==='boar'?'255,200,120':'200,255,140');spawnRing(m.x,m.y-10,8,70,.3,'255,255,255',5,.6);}
   for(let i=0;i<22;i++){const a=Math.random()*Math.PI*2,sp=80+Math.random()*200;parts.push({x:m.x,y:m.y-25*m.sc,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*.6-120,g:500,t:0,life:.5+Math.random()*.3,c:(m.kind==='boar'?['#6a4a30','#3a2618','#d8b070','#fff']:['#7ccf3a','#4f9a1e','#c8f58a','#fff'])[i%4],s:5});}
   if(m.kind==='boar'){m.respawn=9;shakeAdd('fin');}}}
 function hurtHero(dx,dy,dmg=5){if(hero.deadT>0||ultFx)return;hpGhostT=.45;if(cmb.n)comboEnd();dmg=Math.max(1,Math.round(dmg*DIFF().enemy_dmg));
  if(hero.barrier&&hero.barrier.hp>0){const B=hero.barrier;B.hp=Math.max(0,B.hp-dmg);hero.inv=Math.max(hero.inv,.6);B.flash=.2; // coral barrier absorbs the hit (no damage, no flinch)
-  burst(hero.x,hero.y-50,10,['#ffd0e0','#ff7a9a','#fff'],200,0);if(B.hp<=0){hero.barrier=null;spawnRing(hero.x,hero.y-40,10,110,.3,'255,120,170',6,.7);burst(hero.x,hero.y-50,26,['#ff7a9a','#ffd0e0','#fff'],320,200,5);msg('산호 결계가 깨졌다');}return;}addUlt(ULT_CFG.gainHurt*dmg);hero.hp=Math.max(0,hero.hp-dmg);hero.inv=1;hero.redT=tk(FEEL.flashTicks*2);
+  burst(hero.x,hero.y-50,10,['#ffd0e0','#ff7a9a','#fff'],200,0);if(B.hp<=0){hero.barrier=null;spawnRing(hero.x,hero.y-40,10,110,.3,'255,120,170',6,.7);burst(hero.x,hero.y-50,26,['#ff7a9a','#ffd0e0','#fff'],320,200,5);msg('산호 결계가 깨졌다');}return;}addUlt(ULT_CFG.gainHurt*dmg);hero.hp=Math.max(0,hero.hp-dmg);SFX.ev.hurt();hero.inv=1;hero.redT=tk(FEEL.flashTicks*2);
  const sa=!!(hero.sk&&SK[hero.sk.id]&&SK[hero.sk.id].superArmor!==false)||!!hero.barrier; // skill cast = super armor: damage only, no flinch / knockback / cancel
  if(!sa){const l=Math.hypot(dx,dy)||1;hero.kx=dx/l*FEEL.heroKb;hero.ky=dy/l*FEEL.heroKb*.8;hero.atk=null;hero.z=0;hero.combo=0;hero.hurtT=tk(FEEL.hurtTicks);hero.vx=hero.vy=0;}
  shakeAdd('hurt');hitStop=Math.max(hitStop,tk(3));
@@ -912,7 +952,7 @@ let kickX=0,kickY=0,zoomA=0;
 const COMBO_CFG={window:2.0,pop:.14,shake:2,total:1.6,minShow:2,tiers:[[50,'#ff3a3a'],[30,'#ff9a2a'],[10,'#ffe14a'],[0,'#ffffff']]};
 const cmb={n:0,dmg:0,t:0,pop:0,txt:'',col:'#fff',endT:0,endTxt:'',endN:''};
 function cmbCol(n){for(const[k,c]of COMBO_CFG.tiers)if(n>=k)return c;return '#fff';}
-function comboHit(d){cmb.n++;cmb.dmg+=d;cmb.t=COMBO_CFG.window;cmb.pop=COMBO_CFG.pop;cmb.txt=String(cmb.n);cmb.col=cmbCol(cmb.n);cmb.endT=0;}
+function comboHit(d){cmb.n++;if(cmb.n===10||cmb.n===30||cmb.n===50||(cmb.n>50&&cmb.n%50===0))SFX.ev.combo(cmb.n);cmb.dmg+=d;cmb.t=COMBO_CFG.window;cmb.pop=COMBO_CFG.pop;cmb.txt=String(cmb.n);cmb.col=cmbCol(cmb.n);cmb.endT=0;}
 function comboEnd(){if(cmb.n>=COMBO_CFG.minShow){cmb.endT=COMBO_CFG.total;cmb.endTxt='TOTAL '+Math.round(cmb.dmg*10).toLocaleString('en-US');cmb.endN=cmb.n+' HITS';}cmb.n=0;cmb.dmg=0;cmb.t=0;}
 function updateCombo(dt){if(cmb.n>0){cmb.t-=dt;if(cmb.t<=0)comboEnd();}if(cmb.pop>0)cmb.pop=Math.max(0,cmb.pop-dt);if(cmb.endT>0)cmb.endT=Math.max(0,cmb.endT-dt);}
 function drawCombo(){if(!FEEL.juice)return;const W=cv.width,H=cv.height,u=scale;mctx.save();mctx.setTransform(1,0,0,1,0,0);ctx=mctx;mctx.textAlign='right';
@@ -928,7 +968,7 @@ function dnum(x,y,v,crit,col){const d=DNUM[dnumI++%DNUM.length];d.on=true;d.x=x+
 function hitFeel(m,dx,dy,dmg,strong,crit,o){const cy=m.y-22*m.sc;spark(m.x-dx*10*m.sc,cy,dx,dy,strong?1:0,crit?'255,230,90':o.ult?'255,255,255':'255,255,255');
  dnum(m.x,cy-26*m.sc,dmg,crit,crit?'#ffd84a':o.ult?'#ffe9a8':o.skill?'#aee8ff':'#ffffff');
  const k=strong?FEEL.kickFin:FEEL.kickPx;kickX=dx*k;kickY=dy*k*.7;if(FEEL.zoomFin&&(o.fin||crit))zoomA=Math.max(zoomA,FEEL.zoomFin);if(crit&&o.melee)shakeAdd('fin');
- SFX.play(crit?'hit_crit':strong?'hit_heavy':'hit_light',strong?1:.8);}
+ SFX.play(crit?'hit_crit':strong?'hit_heavy':'hit_light',strong?1:.8);if(o.fin&&o.melee&&!crit)SFX.ev.finisher();}
 let hpGhost=50,hpGhostT=0;
 function updateJuice(dt){if(hpGhost>hero.hp){if(hpGhostT>0)hpGhostT-=dt;else hpGhost=Math.max(hero.hp,hpGhost-dt*hero.maxHp*.44);}else hpGhost=hero.hp;for(const p of SPARKS)if(p.on){p.t+=dt;if(p.t>=p.life)p.on=false;}for(const d of DNUM)if(d.on){d.t+=dt;if(d.t>=.8)d.on=false;}
  updateCombo(dt);const k=Math.exp(-dt*22);kickX*=k;kickY*=k;zoomA*=Math.exp(-dt*9);if(zoomA<.002)zoomA=0;}
@@ -963,7 +1003,7 @@ function castUlt(){const U=ULTS[ultId()];if(!U)return;
  if(ultG<ULT_CFG.max){msg('필살기 게이지 부족 ('+Math.floor(ultG)+'%)',1);return;}
  if(uw||hero.swim||hero.deadT>0||!canAct())return;
  ultG=0;hero.atk=null;hero.dash=null;hero.vx=hero.vy=0;hero.inv=9;porImg(U.por);
- ultFx={U,t:0,hitI:0,cx:WW/2,cy:WH/2};for(const p of UP)p.on=false;
+ ultFx={U,t:0,hitI:0,cx:WW/2,cy:WH/2};SFX.ev.ult(U.id);for(const p of UP)p.on=false;
  for(let i=0;i<UOBJ.length;i++){const o=UOBJ[i];o.x=60+Math.random()*(WW-120);o.y=120+Math.random()*(WH-160);o.t0=i/UOBJ.length*(U.dur*.75);o.k=Math.random();o.hit=0;}
  SFX.play('ult_cutin',1);}
 function ultVictims(){return live();} // the whole town map is on screen; in bigger maps: enemies inside the view rect
@@ -1082,7 +1122,7 @@ function useSkill(id,opt={}){const S=SK[id];if(!S||!unlocked(id))return false;
  if(id==='water'&&!opt.noDive){const sp=findSpot();if(sp){startDive(sp);showToast(S,'잠수');return true;}}
  if(gauge+1e-6<S.cost*10/mpMax()){showToast(S,'MP 부족',1);return false;}
  gauge-=S.cost*10/mpMax();cool[id]=S.cd;hero.atk=null;hero.z=0;hero.dash=null;hero.vx=hero.vy=0;const dv=faceDV();
- hero.sk={id,t:0,dir:dv,flip:heroFlip(dv),slot:opt.slot??-1,holdFor:opt.hold,ph:'hold'};showToast(S);return true;}
+ hero.sk={id,t:0,dir:dv,flip:heroFlip(dv),slot:opt.slot??-1,holdFor:opt.hold,ph:'hold'};SFX.ev.skill(S.icon);showToast(S);return true;}
 function showToast(S,extra,bad){toast={S,extra,bad,t:1.4};}
 
 // =====================================================================
@@ -1131,7 +1171,7 @@ function enterUW(s,ret){uw={spot:s,t:0,fade:1,leave:0,ret,item:diveTaken.include
 function surface(){if(uw&&!uw.leave)uw.leave=.001;}
 function exitUW(){const r=uw.ret;uw=null;hero.x=r[0];hero.y=r[1];hero.inv=.6;
  spawnRing(hero.x,hero.y,6,70,.5,'210,245,255',5,.4);burst(hero.x,hero.y-20,22,['#dff8ff','#7fd8ff','#fff'],220,500,4);}
-function pickUp(){const s=uw.spot,it=DIVE.items[uw.item];uw.item=null;if(!diveTaken.includes(s.id))diveTaken.push(s.id);saveDive();applySaved();
+function pickUp(){SFX.ev.pickup();const s=uw.spot,it=DIVE.items[uw.item];uw.item=null;if(!diveTaken.includes(s.id))diveTaken.push(s.id);saveDive();applySaved();
  if(it.effect==='maxHeart')hero.hp=Math.min(hero.maxHp,hero.hp+it.amount*10);if(it.effect==='fullHeal')hero.hp=hero.maxHp;
  popup={title:it.name+'!',sub:it.popup,pix:it.pix,t:2.6};if(IT[s.item])dropNote(s.item);burst(DIVE.floorItem[0],DIVE.floorItem[1]-30,26,['#fff','#bff4ff','#ffe08a'],260,-60,5,.8);}
 function updateUW(dt,ix,iy,l){uw.t+=dt;
@@ -1213,7 +1253,7 @@ function update(dt){
   if(a.t<s.a1&&(s.lunge||a.runSlash)){const p=a.t/s.a1,f=((s.lunge||0)+(a.runSlash?60:0))/s.a1*2*(1-p);moveCol(hero,dv[0]*f*dt,dv[1]*f*dt*.8,12);} // eased forward step
   if(s.leap){const p=Math.min(1,a.t/s.a0);hero.z=Math.sin(p*Math.PI)*FEEL.leapHeight;
    if(p>=1&&!a.landed){a.landed=1;hero.z=0;spawnRing(hero.x,hero.y,6,80,.3,'255,240,200',6,.5);burst(hero.x,hero.y-4,12,['#e8dcc0','#fff'],160,400,4);}}
-  if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;SFX.play(s.titleSpin?'spin_dark':(s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);}
+  if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;if(s.titleSpin)SFX.play('spin_dark',1);else if(s.leap)SFX.ev.dashAttack();else if(Q.get('sfxdraft')==='0')SFX.play((s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);else SFX.ev.swing(weaponType,a.i,s.fin?1:.75);} // [sfx] per-weapon / per-step swing drafts (?sfxdraft=0 = old built-in)
   if(s.titleSpin&&s.waves&&!a.waved&&a.t>=s.a0+tk(4)){a.waved=1;spawnWaves(s.waves);}
   if(a.t>=s.a0&&a.t<=s.a1){
    for(const m of slimes){if(m.dead||a.hit.has(m))continue;let hit=false,kx=dv[0],ky=dv[1];
@@ -1240,8 +1280,8 @@ function update(dt){
   else{if(hero.run){hero.run=false;hero.runStartT=0;if(Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2){hero.skidT=tk(FEEL.runSkidTicks);burst(hero.x+hero.vx*.04,hero.y-2,6,['#e8dcc0','#cbb894'],90,0,3);}} // release -> short skid
    const k=1.6/(hero.skidT>0?FEEL.runSkidTicks:FEEL.skidTicks);hero.vx-=hero.vx*k;hero.vy-=hero.vy*k;if(!(Math.hypot(hero.vx,hero.vy)>=12))hero.vx=hero.vy=0;} // (NaN-safe) // short skid
   if(hero.vx||hero.vy)moveCol(hero,hero.vx*dt,hero.vy*dt,12);
-  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;hero.skid=!hero.moving&&sp>25;hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed)*(hero.run?FEEL.runStride:1):0;
-   if(hero.run&&hero.moving){const ph=Math.floor(hero.walkT*60/16);if(ph!==hero.footPh){hero.footPh=ph;parts.push({x:hero.x-hero.vx*.03,y:hero.y-2,vx:-hero.vx*.15,vy:-25,g:40,t:0,life:.3,c:'#e8dcc0',s:4},{x:hero.x-hero.vx*.03+4,y:hero.y-1,vx:-hero.vx*.1,vy:-15,g:40,t:0,life:.25,c:'#cbb894',s:3});}}} // footfall dust puffs
+  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;{const sk=!hero.moving&&sp>25;if(sk&&!hero.skid&&hero.run)SFX.ev.skid();hero.skid=sk;}hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed)*(hero.run?FEEL.runStride:1):0;
+   if(hero.run&&hero.moving){const ph=Math.floor(hero.walkT*60/16);if(ph!==hero.footPh){hero.footPh=ph;SFX.ev.footstep('stone');parts.push({x:hero.x-hero.vx*.03,y:hero.y-2,vx:-hero.vx*.15,vy:-25,g:40,t:0,life:.3,c:'#e8dcc0',s:4},{x:hero.x-hero.vx*.03+4,y:hero.y-1,vx:-hero.vx*.1,vy:-15,g:40,t:0,life:.25,c:'#cbb894',s:3});}}} // footfall dust puffs
  }
  // hero knockback / invuln
  if(hero.kx||hero.ky){if(!hero.swim)moveCol(hero,hero.kx*dt,hero.ky*dt,12);hero.kx*=Math.pow(.002,dt);hero.ky*=Math.pow(.002,dt);if(Math.hypot(hero.kx,hero.ky)<5)hero.kx=hero.ky=0;}
@@ -1306,9 +1346,9 @@ function updateBoar(m,dt){m.anim+=dt;const px0=m.x,py0=m.y;const dx=hero.x-m.x,d
   const Z=BOAR_ZONE,inZ=hero.x>Z.x0-60&&hero.x<Z.x1+60&&hero.y>Z.y0-60&&hero.y<Z.y1+60; // only engages a hero standing in its plaza
   if(!m.wx||Math.hypot(m.wx-m.x,m.wy-m.y)<20){const[x,y]=boarSpot();m.wx=x;m.wy=y;}
   if(m.t>1.4||!inZ){const wx=m.wx-m.x,wy=m.wy-m.y,wl=Math.hypot(wx,wy)||1;if(Math.abs(wx)>8&&!inZ)m.face=wx>0?1:-1;if(moveCol(m,wx/wl*36*dt,wy/wl*26*dt,26)===false)m.wx=0;}
-  if(m.t<=0){if(inZ&&d<560){m.state='dig';m.t=.55;}else m.t=.8;}}
+  if(m.t<=0){if(inZ&&d<560){m.state='dig';m.t=.55;SFX.ev.bossWarning();}else m.t=.8;}}
  else if(m.state==='dig'){m.face=dx>0?1:-1;if(Math.random()<.5)parts.push({x:m.x-m.face*40,y:m.y-4,vx:-m.face*(60+Math.random()*80),vy:-60-Math.random()*60,g:400,t:0,life:.4,c:['#d8b070','#a07a40'][Math.random()*2|0],s:4});
-  if(m.t<=0){m.state='charge';m.t=.95;m.vx=dx/d*430;m.vy=dy/d*430*.8;}}
+  if(m.t<=0){m.state='charge';m.t=.95;SFX.ev.monsterAttack();m.vx=dx/d*430;m.vy=dy/d*430*.8;}}
  else if(m.state==='charge'){const ok=moveCol(m,m.vx*dt,m.vy*dt,26);
   if(Math.random()<.7)parts.push({x:m.x-Math.sign(m.vx)*50,y:m.y-2,vx:-m.vx*.15,vy:-40-Math.random()*50,g:300,t:0,life:.35,c:'#d8b070',s:4});
   if(ok===false){m.state='stun';m.t=1.2;shakeAdd('fin');burst(m.x+Math.sign(m.vx)*60,m.y-40,14,['#c8b088','#8a7050','#fff'],220,500);}
