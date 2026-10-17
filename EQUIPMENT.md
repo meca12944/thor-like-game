@@ -1,5 +1,12 @@
 # 장비와 외형 시스템
 
+## 주인공 기본 외형
+
+- **필멸자는 검은 머리다** (짧고 뻗친 흑발, 하이라이트는 푸른빛 도는 회색 `#4c4c5c`, 그림자 `#121216`). 기본 차림은 파란 튜닉 + 빨간 망토 + 갈색 가죽 장화·팔보호대.
+- 기본 몸 레이어(`body_base`)와 모든 장비 착용 시트·콘셉트 시트는 검은 머리로 그린다. 투구를 비우면 검은 머리가 보인다.
+- 타운 데모의 기존 주인공 시트(걷기·공격·콤보·스킬 포즈 19장)는 `town/tools/hair_black.py`로 갈색 → 검은 머리 팔레트 스왑을 적용했다 (원본은 `assets_orig_hair/`에 보관).
+- 마왕 강림 후에는 마왕 장비 세트로 고정된다 (아래 「마왕 강림 시 고정 장비」).
+
 > 전체 아이템 목록과 출처는 [ITEMS.md](ITEMS.md). 데이터: `data/towns.json` → `catalog`, `equipment`. (아직 게임에 구현하지 않음 — 설계만)
 
 ## 장비 칸 (4칸)
@@ -8,7 +15,7 @@
 |---|---|---|
 | 무기 | `weapon` | 검 스프라이트(날 모양·색)와 베기 궤적 색이 바뀐다. 3단 콤보(횡베기·찌르기·돌려베기)와 스킬 포즈 모두에 적용. |
 | 방어구 | `armor` | 튜닉/갑옷 레이어. 몸통·팔·허리 부분 외형이 바뀐다. |
-| 투구 | `helmet` | 머리 장비(선택). 비우면 기본 갈색 머리가 그대로 보인다. |
+| 투구 | `helmet` | 머리 장비(선택). 비우면 필멸자의 기본 검은 머리가 그대로 보인다. |
 | 보조무기 | `offhand` | 방패·팔보호대·투척무기·오브·부적·반지·장화. 방패는 왼팔, 팔보호대는 팔뚝, 투척무기는 허리 주머니+던질 때 왼손, 오브는 어깨 옆에 떠다니는 FX, 부적은 가슴, 반지는 손가락 반짝임, 장화는 발 레이어로 보인다. |
 
 방어구 30종은 몸 16 + 투구 14로 나뉜다(같은 「방어구」 분류, 칸은 2개).
@@ -51,7 +58,7 @@
 
 ## 앞으로 필요한 스프라이트 시트
 
-1. `body_base` — 기본 신체(얼굴·갈색 머리·맨손), 위 프레임 전부. 기존 걷기/콤보/스킬 시트를 다시 그려 분리.
+1. `body_base` — 기본 신체(얼굴·**검은 머리**·맨손), 위 프레임 전부. 기존 걷기/콤보/스킬 시트를 다시 그려 분리.
 2. `body_*` 회색 원본: tunic, quilted, leather, light, mail, plate, fur, coat, shell, scale (10종 형태) × 전 프레임.
 3. `head_*` 회색 원본: hood, circlet, cap_lamp, turban, shell, helm_horn, helm_fur, helm_visor, mask, witch, plume, crown (12종) × 4방향 + 콤보/스킬 오프셋 표.
 4. `cape` 회색 원본 1종(펄럭임 포함) + `cape_tattered`(타락) + 코스메틱 장식 레이어.
@@ -218,3 +225,152 @@
 
 - 그리는 순서는 일반 장비와 같다. 단, 촉수(`off_dk_tentacles`)는 방패 자리 대신 **망토 바로 아래(등 뒤)** 에 그리고, 정면에서는 어깨 위로 끝만 보인다. 뒷면에서는 망토 위에 그린다.
 - 대검 `wpn_dk_greatsword`는 일반 검보다 커서 콤보 시트를 따로 둔다 (hero_dk_combo). 스킬 시트도 마왕 전용(skill_dk_*)이다.
+
+## 페이퍼돌: 장비 90종 → 레이어 스프라이트 · 팔레트 스왑 그룹
+
+착용 시트: `art/hero/paperdoll/` (데모 원본 `src/hero/paperdoll/`). 생성기: `town/tools/paperdoll.py`.
+
+| 시트 | 내용 |
+|---|---|
+| `hero_base_body.jpg` | 기본 몸 레이어 (검은 머리 · 기본 튜닉), 4방향 × (대기·걷기·공격 3) |
+| `hero_gear_g1.jpg` ~ `g4.jpg` | 대표 장비 세트 착용 콘셉트: g1 초급(견습 철검·누빔 갑옷·가죽 두건·나무 원형방패), g2 중급 바다(파도 검·비늘 사슬갑옷·앵무조개 투구·산호 버클러), g3 후반 미스릴(미스릴 장검·미스릴 판금·깃털 기사 투구·왕실 문장 방패), g4 최종 마룡(삼두 마룡검·마룡 비늘 갑옷·공허의 관·마룡의 눈) — 4방향 × 대기·걷기·공격 3 |
+| `hero_layers_g1.jpg` ~ `g4.jpg` | 같은 세트를 레이어별로 분해: 기본 몸 / 방어구 / 투구 / 무기 / 보조무기 / 합성 (4방향 대기) |
+| `hero_weapon_offhand_variety.jpg` | 무기 팔레트 16종 + 방패·오브 10종 견본 |
+
+**레이어 생성 규칙 (paperdoll.py, 프레임마다)**
+
+1. 몸(`body_base`): 검은 머리 주인공 원본 프레임 그대로.
+2. 방어구(`body_*`): 몸 프레임의 파란 튜닉 픽셀(색상 190~250°)을 골라 밝기 4단계로 나눈 뒤 아이템 `palette` 4색으로 치환한다 → 방어구 16종이 시트 하나를 공유한다.
+3. 투구(`head_*`): 머리카락 픽셀 영역을 투구 실루엣으로 쓴다. 금속·껍데기형은 닫힘·구멍 메우기로 둥근 돔으로 다듬고 위쪽이 밝은 돔 음영 + 외곽선을 준다. 천(두건·터번)은 1~2px 늘어뜨린다. 바이저 틈·깃털·왕관 뿔·조개 가시·터번 매듭은 머리 상자 기준 코드 드로잉.
+4. 무기(`wpn_*`): 검날 픽셀(채도 < 0.2, 밝기 > 0.5, 머리 영역 밖)을 무기 팔레트로 치환한다. 콤보 시트의 베기 궤적도 같은 규칙으로 무기 `trail` 색을 띤다.
+5. 보조무기(`off_*`, `acc_*`): 방패는 왼팔 위치(정면: 화면 오른쪽, 뒷면: 화면 왼쪽, 옆모습: 몸 뒤)에 원형·연형으로 그린다. 오브는 왼쪽 어깨 위에 떠 있는 발광 구체.
+6. 합성 순서: (옆모습 방패) → 몸 → 방어구 → 투구 → 무기 → (정면·뒷면 방패·오브).
+
+**타운 데모**: `G` 키로 기본 튜닉 → g1 → g2 → g3 → g4 장비 세트를 순환한다. 걷기 3방향·공격 3종·콤보 3종(9시트 × 4세트 = 36장, `town/assets/gear/`)을 미리 합성해 두고, `drawFrame`이 `키@세트` 시트가 있으면 그것으로 바꿔 그린다. 스킬 포즈 시트는 기본 차림(검은 머리) 그대로.
+
+### 레이어 스프라이트별 아이템
+
+| 레이어 | 스프라이트 키 | 아이템 (팔레트) |
+|---|---|---|
+| armor | `body_coat` | 여행자 외투 (leather_brown), 갑판장 코트 (pirate_brass), 유령 선장의 코트 (ghost_teal) |
+| armor | `body_fur` | 설원 털가죽 갑옷 (fur_white_grey) |
+| armor | `body_leather` | 광부 가죽 조끼 (leather_brown) |
+| armor | `body_light` | 사막 비단 경갑 (sand_gold), 그림자 잠행복 (shadow_black) |
+| armor | `body_mail` | 비늘 사슬갑옷 (sea_scale) |
+| armor | `body_plate` | 흑철 판금 흉갑 (black_iron_red), 미스릴 판금 (mithril_gold) |
+| armor | `body_quilted` | 누빔 갑옷 (quilted_beige) |
+| armor | `body_scale` | 뇌전 비늘 갑옷 (wyvern_blue), 마룡 비늘 갑옷 (dragon_tri) |
+| armor | `body_shell` | 이끼 수정 흉갑 (moss_crystal), 거대게 껍질 갑옷 (crab_red) |
+| armor | `body_tunic` | 천 튜닉 (tunic_blue) |
+| helmet | `head_cap_lamp` | 광부 헬멧 (miner_yellow) |
+| helmet | `head_circlet` | 강철 머리띠 (steel_blue) |
+| helmet | `head_crown` | 공허의 관 (void_purple) |
+| helmet | `head_helm_fur` | 털모자 투구 (fur_white_grey) |
+| helmet | `head_helm_horn` | 뿔 달린 흑철 투구 (black_iron_red) |
+| helmet | `head_helm_visor` | 깃털 기사 투구 (royal_silver_gold) |
+| helmet | `head_hood` | 가죽 두건 (leather_brown) |
+| helmet | `head_mask` | 용병 쇠가면 (anchor_steel), 황금 가면 (pharaoh_gold) |
+| helmet | `head_plume` | 그리폰 깃털 투구 (storm_yellow) |
+| helmet | `head_shell` | 앵무조개 투구 (shell_coral) |
+| helmet | `head_turban` | 루비 터번 (turban_white_ruby), 사막의 터번 (sand_gold) |
+| helmet | `head_witch` | 화염 마녀의 모자 (witch_crimson) |
+| offhand | `acc_amulet` | 광석 부적 (copper_green), 서리 부적 (ice_pale), 황금 풍뎅이 부적 (scarab_gold) |
+| offhand | `acc_boots` | 사막 질주 장화 (sand_gold) |
+| offhand | `acc_bracer` | 가죽 팔보호대 (leather_brown), 화염 팔찌 (forge_red), 기사 건틀릿 (royal_silver_gold), 설인 털 팔보호대 (yeti_white) |
+| offhand | `acc_ring` | 흡혈 박쥐왕의 반지 (blood_red), 공허의 반지 (void_purple) |
+| offhand | `off_orb` | 조개 오브 (shell_coral), 불씨 오브 (lava_core), 성광 오브 (holy_white), 용암 거인의 핵 (lava_core), 마룡의 눈 (dragon_tri) |
+| offhand | `off_shield_kite` | 왕실 문장 방패 (royal_silver_gold), 백상어 지느러미 방패 (shark_grey) |
+| offhand | `off_shield_round` | 나무 원형방패 (wood), 산호 버클러 (shell_coral), 이끼 수정 방패 (moss_crystal), 거대게 집게 방패 (crab_red) |
+| offhand | `off_shield_tower` | 흑철 대방패 (black_iron_red) |
+| offhand | `off_throw_javelin` | 얼음 투창 (ice_pale) |
+| offhand | `off_throw_knife` | 투척 단검 묶음 (iron), 여왕벌 독침 다트 (scorpion_amber) |
+| offhand | `off_throw_pick` | 투척 곡괭이 (dark_iron_copper) |
+| offhand | `off_throw_ring` | 사막 차크람 (desert_gold), 대지렁이 이빨 부메랑 (boar_ivory) |
+| offhand | `off_throw_sling` | 투석끈 (leather_brown) |
+| offhand | `off_throw_star` | 그림자 표창 (shadow_black) |
+| weapon | `wpn_broad` | 광부의 두꺼운 검 (dark_iron_copper), 닻 대검 (anchor_steel), 용광로 대검 (forge_red), 돌엄니 송곳검 (boar_ivory) |
+| weapon | `wpn_crystal` | 수정날 검 (crystal_cyan), 흑요석 검 (obsidian_ember), 서리 결정검 (ice_pale) |
+| weapon | `wpn_curved` | 사막 초승달검 (desert_gold), 여왕거미 독니검 (spider_violet), 해적 선장의 커틀러스 (pirate_brass) |
+| weapon | `wpn_dagger` | 숲의 단검 (forest_leaf) |
+| weapon | `wpn_flame` | 업화의 흑검 (hellfire) |
+| weapon | `wpn_harpoon` | 작살검 (sea_blue) |
+| weapon | `wpn_leaf` | 갈대잎 검 (reed_green), 태양침 독검 (scorpion_amber) |
+| weapon | `wpn_machete` | 사냥꾼 마체테 (iron) |
+| weapon | `wpn_ornate` | 왕실 기사검 (royal_silver_gold), 삼두 마룡검 (dragon_tri) |
+| weapon | `wpn_scepter` | 황금가면 왕홀검 (pharaoh_gold) |
+| weapon | `wpn_spear` | 뇌전 창검 (storm_yellow) |
+| weapon | `wpn_straight` | 견습 철검 (iron), 물레 강철검 (steel_blue) |
+| weapon | `wpn_straight_long` | 청동 장검 (bronze), 태양 문양 검 (sun_gold), 북풍 장검 (silver_fur), 미스릴 장검 (mithril), 선대의 부러진 검 (ancient_rust) |
+| weapon | `wpn_twin` | 그림자 쌍검 (shadow_black) |
+| weapon | `wpn_wavy` | 파도 검 (sea_blue) |
+| weapon | `wpn_whip` | 크라켄 촉수검 (kraken_purple) |
+
+### 팔레트 스왑 그룹 (같은 4색 램프를 쓰는 아이템)
+
+| 팔레트 | 4색 | 아이템 |
+|---|---|---|
+| anchor_steel | `#2a3038` `#4a5664` `#6a7a8a` `#f0f0f0` | `w_anchor_great`, `h_iron_mask` |
+| ancient_rust | `#2a1a14` `#6a3a2a` `#9a7a6a` `#e8d8c8` | `w_first_bearer` |
+| black_iron_red | `#0a0a0e` `#24242c` `#4a4a56` `#c02020` | `b_black_plate`, `h_horned`, `o_forge_tower` |
+| blood_red | `#1a0000` `#4a0000` `#a00010` `#ff6060` | `o_bat_ring` |
+| boar_ivory | `#3a2a1a` `#7a5a3a` `#d8c8a0` `#fff8e0` | `w_boar_tusk`, `o_worm_fang` |
+| bronze | `#4a2a10` `#8a5420` `#c88a3a` `#ffd9a0` | `w_bronze_long` |
+| copper_green | `#1a3a30` `#3a7a5a` `#c07a3a` `#a0f0c0` | `a_ore_amulet` |
+| crab_red | `#4a0a0a` `#a02a1a` `#ff7a5a` `#ffd8c8` | `b_crab_shell`, `o_crab_claw` |
+| crystal_cyan | `#0e4a5a` `#2a9aaa` `#5ee0e0` `#e0ffff` | `w_crystal_edge` |
+| dark_iron_copper | `#1a1a20` `#3a3a44` `#a86a3a` `#f0d0b0` | `w_miner_broad`, `o_ore_pick` |
+| desert_gold | `#5a3a08` `#a0700a` `#e0b030` `#fff0b0` | `w_desert_crescent`, `o_chakram` |
+| dragon_tri | `#0a0a0a` `#5a0a0a` `#3a8ad0` `#b070ff` | `w_dragon_tri`, `b_dragon_scale`, `o_dragon_eye` |
+| forest_leaf | `#14301a` `#2e6a34` `#5aa84a` `#c8f0a0` | `w_forest_dagger` |
+| forge_red | `#1a0e0a` `#3a1a10` `#ff3a10` `#fff0c0` | `w_forge_great`, `a_flame_bracer` |
+| fur_white_grey | `#4a4e56` `#8a909a` `#d8dce4` `#ffffff` | `b_snow_fur`, `h_fur_helm` |
+| ghost_teal | `#0a2a2a` `#2a5a5a` `#7ad0c0` `#e0fff8` | `b_ghost_coat` |
+| hellfire | `#100000` `#400a0a` `#ff2a00` `#ffe060` | `w_hellfire` |
+| holy_white | `#6a6a5a` `#c0c0b0` `#fff8e0` `#ffffff` | `o_holy_orb` |
+| ice_pale | `#3a5a7a` `#6a9ac0` `#a0d8ff` `#ffffff` | `w_frost_crystal`, `a_frost_amulet`, `o_ice_javelin` |
+| iron | `#3a4250` `#6a7686` `#9aa8b8` `#d8e0e8` | `w_iron_trainee`, `w_hunter_machete`, `o_throw_knife` |
+| kraken_purple | `#200a30` `#4a1a6a` `#9a4ac0` `#e0b0ff` | `w_kraken_whip` |
+| lava_core | `#1a0800` `#5a1a00` `#ff6a00` `#ffff80` | `o_ember_orb`, `o_lava_core` |
+| leather_brown | `#2a1608` `#5a3418` `#8a5a2e` `#c08a52` | `b_miner_vest`, `h_leather_hood`, `a_leather_bracer`, `b_traveler`, `o_sling` |
+| miner_yellow | `#5a4000` `#b08a00` `#f0c820` `#fff4a0` | `h_miner_helmet` |
+| mithril | `#2a4a5a` `#4a8aa0` `#80e0ff` `#f0ffff` | `w_mithril` |
+| mithril_gold | `#2a4a5a` `#5a9ab0` `#a0e8ff` `#ffd860` | `b_mithril_plate` |
+| moss_crystal | `#1a3a20` `#3a6a3a` `#6ad0c0` `#d0fff0` | `b_moss_crystal`, `o_moss_shield` |
+| obsidian_ember | `#0a0a10` `#20202a` `#ff6a20` `#ffd0a0` | `w_obsidian` |
+| pharaoh_gold | `#2a1a40` `#4a3a8a` `#ffc820` `#fff4c0` | `w_pharaoh_scepter`, `h_pharaoh_mask` |
+| pirate_brass | `#2a1a10` `#6a4a20` `#c0a050` `#f8f0c0` | `w_captain_cutlass`, `b_bosun_coat` |
+| quilted_beige | `#4a3a2a` `#8a7458` `#c8b090` `#f0e2c8` | `b_quilted` |
+| reed_green | `#1e3a1a` `#3e7a36` `#6ac060` `#e0ffd0` | `w_reed_leaf` |
+| royal_silver_gold | `#3a3a50` `#8a8ca0` `#ffd860` `#ffffff` | `w_royal_knight`, `h_knight_plume`, `a_royal_kite`, `o_knight_gauntlet` |
+| sand_gold | `#5a4420` `#a08050` `#d8c090` `#fff0c8` | `b_desert_silk`, `a_dune_boots`, `h_desert_turban` |
+| scarab_gold | `#0a2a2a` `#1a6a5a` `#e0c030` `#fff8b0` | `o_golden_scarab` |
+| scorpion_amber | `#4a2000` `#a05000` `#ffa020` `#fff0b0` | `w_sun_sting`, `o_wasp_dart` |
+| sea_blue | `#0a2a5a` `#1a5aa0` `#30a0e0` `#e0f8ff` | `w_wave_blade`, `w_harpoon_blade` |
+| sea_scale | `#0a3a3a` `#1a6a64` `#30a090` `#9ae0d0` | `b_scale_mail` |
+| shadow_black | `#000000` `#14141e` `#3a3a5a` `#9a7aff` | `w_shadow_twin`, `b_shadow_garb`, `o_shadow_kunai` |
+| shark_grey | `#1a2a3a` `#4a5a6a` `#9aaabb` `#f0f4f8` | `o_shark_fin` |
+| shell_coral | `#6a2a3a` `#c05a6a` `#ff9aa0` `#ffe0d8` | `h_nautilus`, `a_coral_buckler`, `o_shell_orb` |
+| silver_fur | `#4a505a` `#8a92a0` `#c0c8d8` `#f8fbff` | `w_northwind` |
+| spider_violet | `#2a1440` `#5a2a8a` `#a070e0` `#e8d8ff` | `w_spider_fang` |
+| steel_blue | `#22304a` `#4a6a96` `#7fb0e0` `#e8f4ff` | `w_mill_steel`, `h_steel_circlet` |
+| storm_yellow | `#1a1a3a` `#3a4a8a` `#ffe040` `#ffffff` | `w_storm_spear`, `h_griffon_helm` |
+| sun_gold | `#6a4000` `#b08000` `#ffcf40` `#fffbe0` | `w_sun_sigil` |
+| tunic_blue | `#0e1a3a` `#1e3a7a` `#2e5ab0` `#5a8ae0` | `b_cloth_tunic` |
+| turban_white_ruby | `#8a8070` `#d8d0c0` `#ffffff` `#d01030` | `h_turban` |
+| void_purple | `#0a0014` `#2a0a4a` `#7a2ad0` `#e0c0ff` | `h_void_crown`, `o_void_ring` |
+| witch_crimson | `#1a0a14` `#5a0a2a` `#c02a4a` `#ffb0a0` | `h_witch_hat` |
+| wood | `#3a2410` `#6a4420` `#9a6a36` `#c89a5a` | `a_wood_round` |
+| wyvern_blue | `#0a1a3a` `#1a4a8a` `#4aa0ff` `#e0f4ff` | `b_wyvern_scale` |
+| yeti_white | `#5a5a6a` `#a0a0b0` `#e8e8f0` `#ffffff` | `o_yeti_bracer` |
+
+합계: 장비 90종 → 레이어 스프라이트 52종, 팔레트 53종.
+
+## 숨겨진 전설검 외형 (정원 외)
+
+| ID | 이름 | 스프라이트 | 팔레트 | 궤적 | 외형 |
+|---|---|---|---|---|---|
+| `hs_tak` | 탁검 | `wpn_hidden_sun` | hidden_sun `#5a3000` `#c08000` `#ffd040` `#fffbe0` | `#fff2a0` `#ffb020` | 황금빛 장검. 날 밑동에 태양 원반이 박혀 있고, 날을 따라 흰 금빛이 흐른다. 휘두를 때 금빛 불티가 떨어진다. |
+| `hs_gyu` | 규검 | `wpn_hidden_moon` | hidden_moon `#0a1a4a` `#2a5ab0` `#80c0ff` `#f0faff` | `#d8f0ff` `#4a8aff` | 푸른 달빛 장검. 날 밑동에 초승달 장식, 날은 얼음처럼 투명한 청색이고 은빛 서리가 피어오른다. |
+| `hs_chan` | 찬검 | `wpn_hidden_eclipse` | hidden_eclipse `#0a0a14` `#c08000` `#4a8aff` `#fff8e0` | `#ffe060` `#4a8aff` | 탁검과 규검을 하나로 벼린 대검. 날의 한쪽은 금빛 태양, 다른 쪽은 푸른 달빛이고, 가운데 일식처럼 검은 원 테두리가 빛난다. |
+
+아트: art/items/hidden_swords.jpg (_named) — 탁검·규검, art/items/chan_sword.jpg (_named) — 찬검

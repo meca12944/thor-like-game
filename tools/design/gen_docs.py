@@ -101,6 +101,18 @@ for i,ms,so in MAGMA_ALTAR:
     for m,c in ms: assert m in MATERIALS,m
 assert '불태운다」를 고르면' not in json.dumps(RAZE_RULE,ensure_ascii=False)
 COUNTS.update(dk_skills=len(DK_['skills']),dk_gear=len(DK_['gear']['items']),essential_fallbacks=len(DK_['essential']['list']))
+# ---------------- 숨겨진 전설검 검증
+from craft_data import FUSION_RECIPES
+HSW={h['id']:h for h in HIDDEN_SWORDS}
+assert len(HIDDEN_SWORDS)==3 and not (set(HSW)&set(EQ)) and not (set(HSW)&set(TOOLS))
+assert sum(cat(e)=='weapon' for e in EQUIP_ITEMS)==30   # 정원 밖: 카탈로그 무기 수는 그대로
+for h in HIDDEN_SWORDS:
+    assert h['visual']['palette'] in HIDDEN_PALETTES and h['skill']['name'] and h['skill']['motion'] and h['passive'] and h['unlock'] and h['chest']
+    assert h['name'] not in [e['name'] for e in EQUIP_ITEMS]
+assert HSW['hs_chan']['skill'].get('area') and '아이' in HSW['hs_chan']['skill']['children']
+for r in FUSION_RECIPES: assert r['item'] in HSW and all(i in HSW for i in r['inputs']) and r['forge_tier']==10
+assert '타락' in HIDDEN_SWORD_RULE['hero_only'] and '마왕' in HIDDEN_SWORD_RULE['hero_only']
+COUNTS.update(hidden_swords=len(HIDDEN_SWORDS))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
 def item_json(e): return {k:v for k,v in e.items()}
@@ -118,7 +130,7 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
  materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
  drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
- final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
+ final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
@@ -220,7 +232,7 @@ E+=['','방어구 30종은 몸 16 + 투구 14로 나뉜다(같은 「방어구�
  '| 등급 | 추가·변경 레이어 |','|---|---|']
 for c in CORRUPTION_VISUALS: E.append(f"| {c['tier']} | "+'<br>'.join(c['layers'])+' |')
 E+=['','## 앞으로 필요한 스프라이트 시트','',
- '1. `body_base` — 기본 신체(얼굴·갈색 머리·맨손), 위 프레임 전부. 기존 걷기/콤보/스킬 시트를 다시 그려 분리.',
+ '1. `body_base` — 기본 신체(얼굴·**검은 머리**·맨손), 위 프레임 전부. 기존 걷기/콤보/스킬 시트를 다시 그려 분리.',
  '2. `body_*` 회색 원본: tunic, quilted, leather, light, mail, plate, fur, coat, shell, scale (10종 형태) × 전 프레임.',
  '3. `head_*` 회색 원본: hood, circlet, cap_lamp, turban, shell, helm_horn, helm_fur, helm_visor, mask, witch, plume, crown (12종) × 4방향 + 콤보/스킬 오프셋 표.',
  '4. `cape` 회색 원본 1종(펄럭임 포함) + `cape_tattered`(타락) + 코스메틱 장식 레이어.',
@@ -461,6 +473,68 @@ E+=['','- 그리는 순서는 일반 장비와 같다. 단, 촉수(`off_dk_tenta
 # TOWNSFOLK_COMBAT 4부 보강
 C=DOCS['TOWNSFOLK_COMBAT.md']
 C+=['',f"- 마왕 강림 후: {E_['rule']} 대체 경로는 SYSTEMS.md 7장.",'- 마을 강자는 강림 후 결투·항복 없이 바로 싸운다. 처치하면 메아리(+4%)와 심판의 징표.']
+
+# ---------------- 숨겨진 전설검 문서
+def hs_lines(h):
+    k=h['skill']
+    return [f"### {h['name']} `{h['id']}` — 공격 {h['atk']} · 티어 {h['tier']} (정원 외)",'',f"- 외형: {h['visual']['look']} (스프라이트 `{h['visual']['sprite']}`, 팔레트 {h['visual']['palette']} "+' '.join(f"`{c}`" for c in HIDDEN_PALETTES[h['visual']['palette']])+')',
+            f"- 장소: {h['where']} — {h['chest']}",f"- 해금 조건: {h['unlock']}",f"- 얻는 법: {h['obtain']}",
+            f"- 고유 스킬 「{k['name']}」 (게이지 {k['cost']}, 재사용 {k['cooldown']}초): {k['effect']}",f"  - 모션: {k['motion']}"]+([f"  - 아이: {k['children']}"] if k.get('children') else [])+[f"- 패시브: {h['passive']}",'']
+HSDOC=['## 숨겨진 전설검 (무기 30종 정원 밖 · 3종)','',HIDDEN_SWORD_RULE['extra'],'',f"**영웅의 길 전용**: {HIDDEN_SWORD_RULE['hero_only']}",'',HIDDEN_SWORD_RULE['skills'],'',f"아트: {HIDDEN_SWORD_RULE['art']}",'']
+for h in HIDDEN_SWORDS: HSDOC+=hs_lines(h)
+DOCS['ITEMS.md']+=['']+HSDOC
+S=DOCS['SYSTEMS.md']; S+=['','## 8. 숨겨진 전설검과 일월식','']+HSDOC[2:]+['','융합 레시피: '+', '.join(f"`{r['id']}` {'+'.join(HSW[i]['name'] for i in r['inputs'])} → {HSW[r['item']]['name']} ({r['town']} 등급 {r['forge_tier']}, 금화 {r['coins']}, 성공률 {r['success']}%)" for r in FUSION_RECIPES)]
+_T=DOCS['TOWNS.md']; _X=[]
+for line in _T:
+    _X.append(line)
+    for h in HIDDEN_SWORDS:
+        if line.startswith('- **대장간**:') and False: pass
+    for t in TOWNS:
+        if line.startswith(f"- **폐허판 (마왕의 길)**: 「{t['raze']['ruined_name']}」"):
+            for h in HIDDEN_SWORDS:
+                if h['where'].startswith(t['id']+' '):
+                    _X.append(f"- **숨겨진 전설검**: {h['name']} — {h['chest'] if h['id']!='hs_chan' else '마스터 대장간에서 탁검+규검 융합'} 조건: {h['unlock']} (영웅의 길 전용, ITEMS.md)")
+DOCS['TOWNS.md']=_X
+R=DOCS['STORY.md']; j=R.index('## 엔딩')
+R[j:j]=['## 숨겨진 전설검 (영웅의 길 보상)','',f"- 탁검: 마을 강자 8명을 모두 살리면 A 연못의 열리지 않는 상자가 열린다. 규검: 보스 10마리를 모두 쓰러뜨리고 잠수 능력을 얻으면 H 지하 수원의 상자가 열린다. 둘을 E 마스터 대장간에서 융합하면 찬검, 고유 광역 스킬 「일월식」.",f"- {HIDDEN_SWORD_RULE['hero_only']}",'']
+
+# ---------------- EQUIPMENT.md: 주인공 외형 · 페이퍼돌 매핑 · 숨겨진 검
+E=DOCS['EQUIPMENT.md']
+E[2:2]=['## 주인공 기본 외형','','- **필멸자는 검은 머리다** (짧고 뻗친 흑발, 하이라이트는 푸른빛 도는 회색 `#4c4c5c`, 그림자 `#121216`). 기본 차림은 파란 튜닉 + 빨간 망토 + 갈색 가죽 장화·팔보호대.',
+        '- 기본 몸 레이어(`body_base`)와 모든 장비 착용 시트·콘셉트 시트는 검은 머리로 그린다. 투구를 비우면 검은 머리가 보인다.',
+        '- 타운 데모의 기존 주인공 시트(걷기·공격·콤보·스킬 포즈 19장)는 `town/tools/hair_black.py`로 갈색 → 검은 머리 팔레트 스왑을 적용했다 (원본은 `assets_orig_hair/`에 보관).',
+        '- 마왕 강림 후에는 마왕 장비 세트로 고정된다 (아래 「마왕 강림 시 고정 장비」).','']
+SP={}
+for e in EQUIP_ITEMS: SP.setdefault(e['visual']['sprite'],[]).append(e)
+PG={}
+for e in EQUIP_ITEMS: PG.setdefault(e['visual']['palette'],[]).append(e)
+LAYER_OF=lambda e:{'weapon':'weapon','armor':'armor','helmet':'helmet'}.get(e['slot'],'offhand')
+E+=['','## 페이퍼돌: 장비 90종 → 레이어 스프라이트 · 팔레트 스왑 그룹','',
+    '착용 시트: `art/hero/paperdoll/` (데모 원본 `src/hero/paperdoll/`). 생성기: `town/tools/paperdoll.py`.','',
+    '| 시트 | 내용 |','|---|---|',
+    '| `hero_base_body.jpg` | 기본 몸 레이어 (검은 머리 · 기본 튜닉), 4방향 × (대기·걷기·공격 3) |',
+    '| `hero_gear_g1.jpg` ~ `g4.jpg` | 대표 장비 세트 착용 콘셉트: g1 초급(견습 철검·누빔 갑옷·가죽 두건·나무 원형방패), g2 중급 바다(파도 검·비늘 사슬갑옷·앵무조개 투구·산호 버클러), g3 후반 미스릴(미스릴 장검·미스릴 판금·깃털 기사 투구·왕실 문장 방패), g4 최종 마룡(삼두 마룡검·마룡 비늘 갑옷·공허의 관·마룡의 눈) — 4방향 × 대기·걷기·공격 3 |',
+    '| `hero_layers_g1.jpg` ~ `g4.jpg` | 같은 세트를 레이어별로 분해: 기본 몸 / 방어구 / 투구 / 무기 / 보조무기 / 합성 (4방향 대기) |',
+    '| `hero_weapon_offhand_variety.jpg` | 무기 팔레트 16종 + 방패·오브 10종 견본 |','',
+    '**레이어 생성 규칙 (paperdoll.py, 프레임마다)**','',
+    '1. 몸(`body_base`): 검은 머리 주인공 원본 프레임 그대로.',
+    '2. 방어구(`body_*`): 몸 프레임의 파란 튜닉 픽셀(색상 190~250°)을 골라 밝기 4단계로 나눈 뒤 아이템 `palette` 4색으로 치환한다 → 방어구 16종이 시트 하나를 공유한다.',
+    '3. 투구(`head_*`): 머리카락 픽셀 영역을 투구 실루엣으로 쓴다. 금속·껍데기형은 닫힘·구멍 메우기로 둥근 돔으로 다듬고 위쪽이 밝은 돔 음영 + 외곽선을 준다. 천(두건·터번)은 1~2px 늘어뜨린다. 바이저 틈·깃털·왕관 뿔·조개 가시·터번 매듭은 머리 상자 기준 코드 드로잉.',
+    '4. 무기(`wpn_*`): 검날 픽셀(채도 < 0.2, 밝기 > 0.5, 머리 영역 밖)을 무기 팔레트로 치환한다. 콤보 시트의 베기 궤적도 같은 규칙으로 무기 `trail` 색을 띤다.',
+    '5. 보조무기(`off_*`, `acc_*`): 방패는 왼팔 위치(정면: 화면 오른쪽, 뒷면: 화면 왼쪽, 옆모습: 몸 뒤)에 원형·연형으로 그린다. 오브는 왼쪽 어깨 위에 떠 있는 발광 구체.',
+    '6. 합성 순서: (옆모습 방패) → 몸 → 방어구 → 투구 → 무기 → (정면·뒷면 방패·오브).','',
+    '**타운 데모**: `G` 키로 기본 튜닉 → g1 → g2 → g3 → g4 장비 세트를 순환한다. 걷기 3방향·공격 3종·콤보 3종(9시트 × 4세트 = 36장, `town/assets/gear/`)을 미리 합성해 두고, `drawFrame`이 `키@세트` 시트가 있으면 그것으로 바꿔 그린다. 스킬 포즈 시트는 기본 차림(검은 머리) 그대로.','',
+    '### 레이어 스프라이트별 아이템','','| 레이어 | 스프라이트 키 | 아이템 (팔레트) |','|---|---|---|']
+for sp_,items in sorted(SP.items(),key=lambda x:(LAYER_OF(x[1][0]),x[0])):
+    E.append(f"| {LAYER_OF(items[0])} | `{sp_}` | "+', '.join(f"{e['name']} ({e['visual']['palette']})" for e in items)+' |')
+E+=['','### 팔레트 스왑 그룹 (같은 4색 램프를 쓰는 아이템)','','| 팔레트 | 4색 | 아이템 |','|---|---|---|']
+for pg,items in sorted(PG.items()):
+    E.append(f"| {pg} | "+' '.join(f"`{c}`" for c in PALETTES[pg])+' | '+', '.join(f"`{e['id']}`" for e in items)+' |')
+E+=['',f"합계: 장비 {len(EQUIP_ITEMS)}종 → 레이어 스프라이트 {len(SP)}종, 팔레트 {len(PG)}종.",'',
+    '## 숨겨진 전설검 외형 (정원 외)','','| ID | 이름 | 스프라이트 | 팔레트 | 궤적 | 외형 |','|---|---|---|---|---|---|']
+E+=[f"| `{h['id']}` | {h['name']} | `{h['visual']['sprite']}` | {h['visual']['palette']} "+' '.join(f"`{c}`" for c in HIDDEN_PALETTES[h['visual']['palette']])+' | '+' '.join(f"`{c}`" for c in h['visual']['trail'])+f" | {h['visual']['look']} |" for h in HIDDEN_SWORDS]
+E+=['',f"아트: {HIDDEN_SWORD_RULE['art']}"]
+assert sum(len(v) for v in SP.values())==90
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
     for d in COPY_DIRS:

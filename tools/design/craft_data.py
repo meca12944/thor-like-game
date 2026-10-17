@@ -196,3 +196,7 @@ def make_recipes(items,town_order):
     return R
 SRC_LABEL={'shop':'상점','boss':'보스','champion':'챔피언','mob':'일반 몹','quest':'퀘스트','dive':'잠수','craft':'제작 전용'}
 M('scroll_first_bearer','레시피 두루마리: 선대의 부러진 검 복원',10,'cloth','#fff8e0',[dict(kind='boss',where='원탁의 주인 아스란',rate=100)],0,'「선대의 부러진 검」을 영겁의 핵으로 복원하는 레시피')
+
+# 숨겨진 전설검 융합 (레시피 표 90개와 별개 · E 마스터 대장간 등급 10 전용)
+FUSION_RECIPES=[dict(id='f_hs_chan',item='hs_chan',inputs=['hs_tak','hs_gyu'],coins=5000,forge_tier=10,town='E',success=100,
+  note='두 검은 사라진다. 마왕 강림 후에는 불가.')]
