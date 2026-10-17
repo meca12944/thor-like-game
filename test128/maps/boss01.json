@@ -1,0 +1,139 @@
+{
+ "id": "boss01",
+ "region": "temple01",
+ "mapPos": [
+  96,
+  4
+ ],
+ "type": "boss",
+ "area": 1,
+ "name": "이끼 수정 골렘의 방",
+ "title": {
+  "kicker": "BOSS",
+  "name": "이끼 수정 골렘",
+  "sub": "숲의 심장을 지키는 자"
+ },
+ "bgm": "battle_boss",
+ "bgm2": "battle_boss_phase2",
+ "dark": 0.35,
+ "tileset": "dungeon",
+ "tile": 16,
+ "w": 26,
+ "h": 13,
+ "legend": {
+  "#": "wall",
+  ".": "floor",
+  ",": "floor_moss",
+  "%": "floor_crack",
+  "^": {
+   "ground": "floor",
+   "obj": "spikes"
+  },
+  "o": {
+   "ground": "floor",
+   "obj": "pit"
+  },
+  "U": {
+   "ground": "floor",
+   "obj": "stairs_up"
+  },
+  "V": {
+   "ground": "floor",
+   "obj": "stairs_down"
+  },
+  "D": {
+   "ground": "floor",
+   "obj": "door_locked"
+  },
+  "G": {
+   "ground": "floor",
+   "obj": "gate"
+  },
+  "B": {
+   "ground": "floor",
+   "obj": "boss_door"
+  },
+  "K": {
+   "ground": "floor",
+   "obj": "key"
+  },
+  "C": {
+   "ground": "floor",
+   "obj": "chest"
+  },
+  "S": {
+   "ground": "floor",
+   "obj": "lever"
+  },
+  "t": {
+   "ground": "wall",
+   "obj": "torch"
+  },
+  "c": {
+   "ground": "floor_moss",
+   "deco": "crystal",
+   "solid": true
+  },
+  "p": {
+   "ground": "floor",
+   "deco": "pillar",
+   "solid": true
+  }
+ },
+ "solid": [
+  "#",
+  "t"
+ ],
+ "spawns": {
+  "default": [
+   12.5,
+   10.2,
+   "up"
+  ]
+ },
+ "links": {
+  "stairs_up": {
+   "to": "dungeon01_b2",
+   "spawn": "boss"
+  }
+ },
+ "boss": {
+  "id": "golem01",
+  "kind": "golem",
+  "name": "이끼 수정 골렘",
+  "x": 12.5,
+  "y": 4.5,
+  "flag": "boss01",
+  "absorb": "대지의 수정 (quake)",
+  "reward": [
+   [
+    "m_a1_shared",
+    5
+   ],
+   [
+    "heart_piece",
+    1
+   ]
+  ],
+  "exit": {
+   "to": "field01",
+   "spawn": "dungeon"
+  }
+ },
+ "objects": [],
+ "ground": [
+  "##########################",
+  "####t####t######t####t####",
+  "###....................###",
+  "###..p......c.......p..###",
+  "###....................###",
+  "###....................###",
+  "###.......p....p.......###",
+  "###....................###",
+  "###....................###",
+  "###..p..............p..###",
+  "###....................###",
+  "###.........U..........###",
+  "##########################"
+ ]
+}

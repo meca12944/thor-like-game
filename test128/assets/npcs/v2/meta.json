@@ -1,0 +1,183 @@
+{
+"a_tailor": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"g_tool": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"h_mystic": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"g_dancer": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"f_diver": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"e_tailor": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"c_priest": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"d_yuna": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+]
+},
+"a_tool": {
+"cw": 32,
+"ch": 29,
+"ax": 16,
+"ay": 28,
+"rows": [
+"down",
+"left",
+"right",
+"up"
+],
+"idle": [
+0,
+4
+],
+"walk": [
+4,
+8
+],
+"static": true
+}
+}
