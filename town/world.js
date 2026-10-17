@@ -243,15 +243,17 @@
   function hurt(dmg, src, raw) {
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god) return false;
-    if (hero.roll && hero.roll.t < iframe()) { if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
+    if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
+      if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2); ultAdd('gainHurt', dmg);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
     if (hero.hp <= 0) die();
     return true;
   }
+  function ultAdd(k, n) { const g = window.__game; if (g && g.addUlt && g.ULT_CFG) g.addUlt(g.ULT_CFG[k] * n); } // 필살기 게이지: 피격(1HP당) · 저스트 회피만 (template ULT_CFG)
   function touch(m, r, dmg) { if (Math.hypot(hero.x - m.x, hero.y - m.y) < r + 5) hurt(dmg, m); }
   function shot(s) { s.t = 0; s.vx = Math.cos(s.a) * s.sp; s.vy = Math.sin(s.a) * s.sp; s.life = s.life || 2; S.shots.push(s); }
   function tempSolid(x, y, r, life, kind) { S.temp.push({ x, y, r, life, kind }); const d = Math.hypot(hero.x - x, hero.y - y); if (d < r + 5) { const a = Math.atan2(hero.y - y, hero.x - x) || 0, need = r + 6 - d; moveCol(hero, Math.cos(a) * need, Math.sin(a) * need, 5);
@@ -305,7 +307,7 @@
     after(3.2, () => { addWarp(M()); msg('빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다', 4); });
   }
   function addWarp(m) { if (!m.objs.some(o => o.type === 'warp')) m.objs.push({ type: 'warp', x: m.pw / 2, y: m.ph / 2 + 16, tx: -1, ty: -1, to: m.boss.exit.to, spawn: m.boss.exit.spawn }); }
-  function phase2(m) { banner('2페이즈 — 골렘이 수정 갑옷을 일으킨다!', 2); shake(5); try { const g = window.__game; if (g && g.ULT_CFG) g.ultG = Math.min(g.ULT_CFG.max, g.ultG + g.ULT_CFG.gainBossPhase); } catch (e) {} for (let i = 0; i < 14; i++) addFx('crystal', m.x + Math.cos(i / 14 * TAU) * 30, m.y + Math.sin(i / 14 * TAU) * 22, { life: .8 }); }
+  function phase2(m) { banner('2페이즈 — 골렘이 수정 갑옷을 일으킨다!', 2); shake(5); for (let i = 0; i < 14; i++) addFx('crystal', m.x + Math.cos(i / 14 * TAU) * 30, m.y + Math.sin(i / 14 * TAU) * 22, { life: .8 }); }
   function ult(m, warn) { banner('필살 — 대지 붕괴!  기둥 뒤로 숨거나, 폭발 순간 구르기', 2.6); S.ult = hazard({ shape: 'all', x: m.x, y: m.y, owner: m, warn, act: 0.05, dmg: Math.ceil(hero.maxHp * Math.min(0.52 * DIFF().enemy_dmg, DIFF().ult_cap || 0.9)), raw: true, kind: 'ult' }); m.ultW = S.ult.warn; } // 52% of max HP (normal), capped so a full-HP hero survives one
   function jingle() { try { if (window.BGM && BGM.jingle) { BGM.jingle('jingle_victory'); S.jingleT = 3.5; } } catch (e) {} }
 
@@ -757,10 +759,10 @@
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
-      { const bw = Math.round(96 * u), bh = Math.max(3, Math.round(4 * u)), bx = Math.round(ox + 12 * u), by = Math.round(oy + 10 * u), f = Math.max(0, hero.hp / hero.maxHp); // [balance] numeric HP bar (matches the town HUD)
-        ctx.fillStyle = '#05060c'; ctx.fillRect(bx - 1, by - 1, bw + 2, bh + 2); ctx.fillStyle = '#1a1c2a'; ctx.fillRect(bx, by, bw, bh); ctx.fillStyle = f > .3 ? '#3ccf5a' : '#e0302c'; ctx.fillRect(bx, by, Math.round(bw * f), bh);
-        textOut(Math.ceil(hero.hp) + '/' + hero.maxHp, bx + bw + 4 * u, by + bh, 10 * u, '#d8f5dc', '#000', 'left'); }
-      const g = window.__game; textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, oy + 26 * u, 11 * u, '#cfe8ff', '#000', 'left');
+      const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
+      if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
+        if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: '', key: null, fieldNote: '필드에서는 아직 사용 불가' }); }
+      textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
@@ -780,6 +782,7 @@
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }
   }
+  function b0() { const b = S.bossRef; return !!(b && !b.dead); }
   function hpBar(e, x, y, w, h) { x = Math.round(x - w / 2); y = Math.round(y); const fr = Math.max(0, e.hp / e.maxHp), lg = Math.max(fr, (e.hpLag ?? e.hp) / e.maxHp);
     ctx.fillStyle = e.hitT > .15 ? 'rgba(255,255,255,.8)' : 'rgba(8,6,14,.85)'; ctx.fillRect(x - 1, y - 1, w + 2, h + 2); ctx.fillStyle = '#3a1010'; ctx.fillRect(x, y, w, h);
     if (lg > fr) { ctx.fillStyle = '#ffd84a'; ctx.fillRect(x + w * fr, y, w * (lg - fr), h); }
@@ -817,7 +820,7 @@
     publish();
     requestAnimationFrame(frame);
   }
-  window.__worldHooks = { S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
+  window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = {
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
     go, dirTap, RUN, SWING, swingR, setManual(v) { manual = v; },

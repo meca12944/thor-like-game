@@ -257,7 +257,7 @@ def balance_todo(repo):
         f"| 물약 휴대 | {'난이도별 상한 (`potion_cap`)' if 'potion_cap' in tp else '제한 없음 (`g.potions`)'} | **최대 {RS['potion_cap']['normal']}개** (쉬움 10 / 어려움·악몽 3){ap('potion_cap' in tp)} | 덜 관대한 자원 |",
         f"| world.js 회복 하트 줍기 | {'최대 HP 5%, 드롭 4%' if 'heartPct: 5' in wj else '+1 하트'} | **최대 HP 5%**, 드롭 {int(RS['heart_drop']['normal']*100)}%{ap('heartPct: 5' in wj)} | |",
         f"| 템플릿 MP 자연 회복 | {('MPR.passive '+mpr.group(1)+' MP/초') if mpr else (regen.group(1) if regen else '?')+' (8칸 기준)'} | **MP 0.25/초** (비전투 ×6) = 80MP 기준 0.0031/틱{ap(mpr and float(mpr.group(1))==RS['mp']['passive'])} | 자연 회복 느리게, 공격·퍼펙트 회피로 채움 |",
-        f"| 템플릿 ULT_CFG | {ult.group(1) if ult else '?'} | **gainDeal 0.5, gainKill 1, gainHurt 2(반 칸당), gainPerfect 5, 보스 페이즈 +15**{ap(ult and 'gainDeal:.5' in ult.group(1) and 'gainBossPhase:15' in ult.group(1))} | LEVELS.md 13장. 현재 값이면 필살기가 너무 자주 나온다 |",
+        f"| 템플릿 ULT_CFG | {ult.group(1) if ult else '?'} | **적에게 맞으면 차오르고, 저스트 회피에 성공하면 크게 차오름: gainHurt 0.5 (받은 피해 1HP당), gainPerfect 8 (보통 피격 8HP분의 2배). 공격 적중 · 처치 · 보스 페이즈 = 0**{ap(ult and 'gainHurt:.5' in ult.group(1) and 'gainPerfect:8' in ult.group(1) and 'gainDeal' not in ult.group(1))} | LEVELS.md 13장. 조건을 두 가지로 단순화, 어려운 전투 1.5~2번에 1회 |",
         f"| MP 적중 회복 | {'MPR (hit/finisher/combo10/combo30/perfect)' if 'combo30' in tp else '(없음/게이지)'} | **+{RS['mp']['hit']} (마무리 +{RS['mp']['finisher']}), 콤보 10히트↑ +1, 30히트↑ +2, 퍼펙트 회피 +{RS['mp']['perfect']}**{ap('combo30:2' in tp and 'perfect:20' in tp)} | 공격성 보상 |",
         '',f"## 3. 2지역 이후 (엔진 단위, 1타 = 그 지역 최종 공격력)",'','| 지역 | 1타 | 몹 HP | 몹 피해 | 챔피언 HP | 챔피언 피해 | 보스 HP | 보스 패턴 | 필살기 |','|---|---|---|---|---|---|---|---|---|']
     for a in range(1,11):

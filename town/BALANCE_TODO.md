@@ -39,13 +39,13 @@
 | 위치 | 현재 | **목표 (보통)** | 이유 |
 |---|---|---|---|
 | world.js `ROLL` | dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 | **dur: 0.22, iframe: 0.18, cd: 0.4** ✅ | 무적 0.32초 + 재사용 0.12초는 사실상 무한 무적. Lv15·35 보상으로 +0.03씩 |
-| 템플릿 FEEL dash | dashTicks 12, dashIframes 11, dashCdTicks 24 | **dashIframes 11, dashCdTicks 24** ✅ | 같은 규칙 (60Hz 틱) |
+| 템플릿 FEEL dash | dashTicks 13, dashIframes 11, dashCdTicks 24 | **dashIframes 11, dashCdTicks 24** ✅ | 같은 규칙 (60Hz 틱) |
 | 템플릿 FEEL perfectTicks | 7 | **7 (보통) / 10 쉬움 / 6 어려움 / 4 악몽** ✅ | 난이도표 |
 | world.js 물약 회복 | 최대 HP 30% | **최대 HP 30%** (중급 50%, 고급 100%), 사용 모션 0.6초, 재사용 4.0초 ✅ (회복량 · 재사용 적용, 0.6초 사용 모션은 아직 없음) | 후반에도 의미 있는 비율 회복 |
 | 물약 휴대 | 난이도별 상한 (`potion_cap`) | **최대 5개** (쉬움 10 / 어려움·악몽 3) ✅ | 덜 관대한 자원 |
 | world.js 회복 하트 줍기 | 최대 HP 5%, 드롭 4% | **최대 HP 5%**, 드롭 4% ✅ | |
 | 템플릿 MP 자연 회복 | MPR.passive .25 MP/초 | **MP 0.25/초** (비전투 ×6) = 80MP 기준 0.0031/틱 ✅ | 자연 회복 느리게, 공격·퍼펙트 회피로 채움 |
-| 템플릿 ULT_CFG | max:100,gainDeal:.5,gainKill:1,gainHurt:2,gainPerfect:5,gainBossPhase:15,freeze:.2,cutin:1.05 | **gainDeal 0.5, gainKill 1, gainHurt 2(반 칸당), gainPerfect 5, 보스 페이즈 +15** ✅ | LEVELS.md 13장. 현재 값이면 필살기가 너무 자주 나온다 |
+| 템플릿 ULT_CFG | max:100,gainHurt:.5,gainPerfect:8,freeze:.2,cutin:1.05 | **적에게 맞으면 차오르고, 저스트 회피에 성공하면 크게 차오름: gainHurt 0.5 (받은 피해 1HP당), gainPerfect 8 (보통 피격 8HP분의 2배). 공격 적중 · 처치 · 보스 페이즈 = 0** ✅ | LEVELS.md 13장. 조건을 두 가지로 단순화, 어려운 전투 1.5~2번에 1회 |
 | MP 적중 회복 | MPR (hit/finisher/combo10/combo30/perfect) | **+3 (마무리 +5), 콤보 10히트↑ +1, 30히트↑ +2, 퍼펙트 회피 +20** ✅ | 공격성 보상 |
 
 ## 3. 2지역 이후 (엔진 단위, 1타 = 그 지역 최종 공격력)

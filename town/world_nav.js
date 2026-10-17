@@ -282,7 +282,7 @@
     const h = H(), m = h.M(), c = h.ctx, SW = h.LW * k, SH = h.LH * k;
     // objective line (top-left, under the hearts)
     const dest = st.dest, dist = Math.round(remaining());
-    if (dest) h.textOut('◆ 목표: ' + st.label + (st.via ? '  (→ ' + st.via + ')' : '') + (PN && !srch.on ? '  ' + dist + 'm' : '') + (st.noRoute ? '  · 길이 막혀 있다' : ''), ox + 12 * u, oy + 38 * u, 10 * u, '#ffe08a', '#000', 'left');
+    if (dest) h.textOut('◆ 목표: ' + st.label + (st.via ? '  (→ ' + st.via + ')' : '') + (PN && !srch.on ? '  ' + dist + 'm' : '') + (st.noRoute ? '  · 길이 막혀 있다' : ''), ox + 12 * u, (h.hudY && h.hudY()) || oy + 38 * u, 10 * u, '#ffe08a', '#000', 'left');
     // quest markers over NPC heads + bobbing target marker
     const d = NM[m.id]; if (d) for (const mk of d.markers) if (mk.kind === 'npc') { const t = npcMark(mk.id); if (!t) continue; const [sx, sy] = h.W2S((mk.x + .5) * m.T, mk.y * m.T - 24 + Math.sin(h.S.t * 4) * 1.5); qMark(c, t, sx, sy, 14 * u); }
     if (!st.goal || srch.on) return;
