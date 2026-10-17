@@ -35,7 +35,7 @@
 | `sfx_draft/charge_stage2.ogg` | 차지 2단계 도달 | 0.87 | v2: 트랜지언트+바디+테일 레이어, -14 LUFS·피크 ≤-1 dBFS | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
 | `sfx_draft/charge_release.ogg` | 차지 해방 | 0.82 | v2: 트랜지언트+바디+테일 레이어, -14 LUFS·피크 ≤-1 dBFS | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
 | `sfx_draft/dodge_afterimage.ogg` | 잔상 회피 | 0.24 | 짧고 펀치 있게 | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
-| `sfx_draft/just_dodge.ogg` | 저스트 회피 성공 | 1.3 | v2: 트랜지언트+바디+테일 레이어, -14 LUFS·피크 ≤-1 dBFS | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
+| `sfx_draft/just_dodge.ogg` | 저스트 회피 성공 | 0.47 | v3: 경쾌 — 짧고 밝은 휘익 → 3음 상승 아르페지오 '팅!', 짧은 테일, -14 LUFS·피크 ≤-1 dBFS | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
 | `sfx_draft/footstep.ogg` | 달리기 발소리 | 0.08 | 짧고 펀치 있게 | P2 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
 | `sfx_draft/skid.ogg` | 급정지 미끄러짐 | 0.32 | 짧고 펀치 있게 | P3 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
 | `sfx_draft/player_hurt.ogg` | 플레이어 피격 | 0.52 | v2: 트랜지언트+바디+테일 레이어, -14 LUFS·피크 ≤-1 dBFS | P1 | numpy 합성 (자작) | 자작, CC0 로 배포 가능 |
