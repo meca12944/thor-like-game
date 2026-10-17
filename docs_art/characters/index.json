@@ -1,0 +1,109 @@
+{
+ "size": [
+  900,
+  1320
+ ],
+ "body_height": 1200,
+ "top": 60,
+ "baseline": 1260,
+ "chars": {
+  "a_chief": {
+   "name": "오스왈드",
+   "title": "분수 마을의 장로",
+   "label": "「분수 마을의 장로」 오스왈드",
+   "file": "a_chief.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_tool": {
+   "name": "미라벨",
+   "title": "보따리의",
+   "label": "「보따리의」 미라벨",
+   "file": "a_tool.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_smith": {
+   "name": "브란트",
+   "title": "무쇠손",
+   "label": "「무쇠손」 브란트",
+   "file": "a_smith.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_granny": {
+   "name": "엘스베트",
+   "title": "샘지기 노파",
+   "label": "「샘지기 노파」 엘스베트",
+   "file": "a_granny.png",
+   "batch": "A",
+   "height_factor": 0.86
+  },
+  "a_guard": {
+   "name": "베른",
+   "title": "떨리는 창",
+   "label": "「떨리는 창」 베른",
+   "file": "a_guard.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_farmer": {
+   "name": "하로",
+   "title": "허수아비지기",
+   "label": "「허수아비지기」 하로",
+   "file": "a_farmer.png",
+   "batch": "A",
+   "height_factor": 0.97
+  },
+  "a_herb": {
+   "name": "세레스",
+   "title": "쓴잎의",
+   "label": "「쓴잎의」 세레스",
+   "file": "a_herb.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_bard": {
+   "name": "라우렌",
+   "title": "떠도는 현(絃)",
+   "label": "「떠도는 현(絃)」 라우렌",
+   "file": "a_bard.png",
+   "batch": "A",
+   "height_factor": 1.0
+  },
+  "a_kid": {
+   "name": "꼬마 토비",
+   "title": "",
+   "label": "꼬마 토비",
+   "file": "a_kid.png",
+   "batch": "A",
+   "height_factor": 0.62
+  },
+  "npc_bori": {
+   "name": "퀸트",
+   "title": "바람길의 순례자",
+   "label": "「바람길의 순례자」 퀸트",
+   "file": "npc_bori.png",
+   "batch": "A",
+   "height_factor": 1.0
+  }
+ },
+ "batches": {
+  "A": {
+   "title": "마을 A 사람들 + 나그네",
+   "ids": [
+    "a_chief",
+    "a_tool",
+    "a_smith",
+    "a_granny",
+    "a_guard",
+    "a_farmer",
+    "a_herb",
+    "a_bard",
+    "a_kid",
+    "npc_bori"
+   ],
+   "lineup": "batch_A.png"
+  }
+ }
+}
