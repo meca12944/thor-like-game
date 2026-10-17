@@ -238,6 +238,78 @@
    "file": "h_guard.png",
    "batch": "H",
    "height_factor": 1.0
+  },
+  "g_sultan": {
+   "name": "하심",
+   "title": "바자르장",
+   "label": "「바자르장」 하심",
+   "file": "g_sultan.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_tool": {
+   "name": "사프란",
+   "title": "오아시스 잡화",
+   "label": "「오아시스 잡화」 사프란",
+   "file": "g_tool.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_smith": {
+   "name": "칼림",
+   "title": "바자르 대장장이",
+   "label": "「바자르 대장장이」 칼림",
+   "file": "g_smith.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_tailor": {
+   "name": "자스민",
+   "title": "비단 천막",
+   "label": "「비단 천막」 자스민",
+   "file": "g_tailor.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_camel": {
+   "name": "우드",
+   "title": "낙타지기",
+   "label": "「낙타지기」 우드",
+   "file": "g_camel.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_thief": {
+   "name": "모래쥐",
+   "title": "소매치기 소녀",
+   "label": "「소매치기 소녀」 모래쥐",
+   "file": "g_thief.png",
+   "batch": "G",
+   "height_factor": 0.62
+  },
+  "g_archaeo": {
+   "name": "레일라",
+   "title": "고고학자",
+   "label": "「고고학자」 레일라",
+   "file": "g_archaeo.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_guard": {
+   "name": "파루크",
+   "title": "창잡이",
+   "label": "「창잡이」 파루크",
+   "file": "g_guard.png",
+   "batch": "G",
+   "height_factor": 1.0
+  },
+  "g_oracle": {
+   "name": "사바",
+   "title": "눈먼 예언자",
+   "label": "「눈먼 예언자」 사바",
+   "file": "g_oracle.png",
+   "batch": "G",
+   "height_factor": 1.0
   }
  },
  "batches": {
@@ -287,6 +359,21 @@
     "h_guard"
    ],
    "lineup": "batch_H.png"
+  },
+  "G": {
+   "title": "사막 바자르",
+   "ids": [
+    "g_sultan",
+    "g_tool",
+    "g_smith",
+    "g_tailor",
+    "g_camel",
+    "g_thief",
+    "g_archaeo",
+    "g_guard",
+    "g_oracle"
+   ],
+   "lineup": "batch_G.png"
   }
  },
  "proportion": {

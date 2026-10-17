@@ -36,3 +36,12 @@ characters/h_widow 344 399 450
 characters/h_boy 502 582 450 child
 characters/h_old 190 260 451
 characters/h_guard 127 205 450
+characters/g_sultan 150 210 449
+characters/g_tool 171 228 450
+characters/g_smith 165 225 449
+characters/g_tailor 165 220 451
+characters/g_camel 165 225 450
+characters/g_thief 625 680 450 child
+characters/g_archaeo 145 200 451
+characters/g_guard 140 195 451
+characters/g_oracle 166 226 449
