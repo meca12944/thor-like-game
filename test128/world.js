@@ -465,7 +465,7 @@
     tickTrail(dt);
     if (hero.roll) { const r = hero.roll, D = DG(), RD = rollDur(); const p0 = Math.min(1, r.t / RD); r.t += dt; const p = Math.min(1, r.t / RD);
       if (D) { const E = EASE[D.ease] || EASE.outCubic, st = D.tiles * 16 * (E(p) - E(p0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5); // dash: fixed distance, ease-out
-        const AI = D.afterimage || {}; r.ai = (r.ai || 0) - 1; r.ain = r.ain || 0; if (r.ai <= 0 && r.ain < (AI.count || 5) && p < .95) { r.ai = AI.intervalTicks || 2; r.ain++; S.trail = S.trail || []; S.trail.push({ name: heroFrameName(), x: hero.x, y: hero.y, flip: hero.face === 'left', t: 0, life: AI.fade || .25, a: AI.alpha ?? .55 }); } }
+        const AI = D.afterimage || {}; r.ai = (r.ai || 0) - 1; r.ain = r.ain || 0; if (r.ai <= 0 && r.ain < (AI.count || 5) && p < .95) { r.ai = AI.intervalTicks || 2; r.ain++; S.trail = S.trail || []; S.trail.push({ c128: h128() ? h128Cell() : null, name: heroFrameName(), x: hero.x, y: hero.y, flip: hero.face === 'left', t: 0, life: AI.fade || .25, a: AI.alpha ?? .55 }); } }
       else { const sp = Math.max(ROLL.speed * (1 - r.t / ROLL.dur * .55), r.carry); moveCol(hero, r.dx * sp * dt, r.dy * sp * dt, 5); }
       hero.walkT += dt * 3;
       if (r.t >= RD) { hero.roll = null; hero.rollCd = DG() ? DG().cdTicks / 60 : ROLL.cd; if (r.carry) { hero.run = true; } } }
@@ -608,7 +608,7 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
-      drawHiRes(k, ox, oy);
+      drawHeroHi(k); drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
       if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
@@ -697,12 +697,41 @@
   function heroFrameName() { const h = hero, d = h.face === 'left' ? 'right' : h.face, D = DG(); let fi = h.moving || h.roll ? Math.floor(h.walkT * 8) % 4 : 0;
     if (h.roll && D && D.frames && D.frames.world) { const p = h.roll.t / rollDur(), ph = D.frames.world.find(f => p <= f.until); if (ph) fi = ph.frame; } return 'hero_' + d + '_' + fi; }
   function tickTrail(dt) { if (!S.trail) return; for (const a of S.trail) a.t += dt; S.trail = S.trail.filter(a => a.t < a.life); }
+  // ---- test128: 128px hero drawn in the hi-res pass (fields/dungeons; the overworld map keeps the tiny sprite) ----
+  const H128FIG = 30; // figure height in field px (tile 16): about the old hero's 28px
+  function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
+  function h128Cell() { const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
+    if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
+    else if (h.atk) { const i = h.atk.i, AT = atkT(i); an = i >= 4 || i === 2 ? 'attack3' : i === 1 ? 'attack2' : 'attack1'; const k = AT.a1 / AT.dur; const q = h.atk.t / AT.dur; p = q < AT.a0 / AT.dur ? .25 * q / (AT.a0 / AT.dur) : q < k ? .25 + .35 * (q - AT.a0 / AT.dur) / Math.max(1e-6, k - AT.a0 / AT.dur) : .6 + .4 * Math.min(1, (q - k) / Math.max(1e-6, 1 - k)); }
+    else if (h.charge) { an = 'attack3'; p = .1; }
+    else if (h.roll) { an = 'dodge'; p = Math.min(1, h.roll.t / rollDur()); }
+    else if (hero.inv > .75 && S.scene !== 'world') { an = 'hurt'; tick = (1 - hero.inv) * 20; }
+    else if (h.moving) { an = h.run && H.anims['run_' + dir] ? 'run' : 'walk'; tick = h.walkT * (h.run ? 14 : 11); }
+    const L = H.anims[an + '_' + dir] || H.anims[an + '_down'], n = L.length;
+    let f = p != null ? Math.min(n - 1, Math.floor(p * n)) : (an === 'idle' ? Math.floor(tick) % n : (an === 'walk' || an === 'run') ? 1 + Math.floor(tick) % (n - 1) : Math.min(n - 1, Math.floor(tick)));
+    return H.cells[L[f]]; }
+  function drawH128(c, x, y, k, alpha, tint) { const G = h128(), im = tint ? (G.H128tint || {})[tint] : G.H128img; if (!im) return; const sc = k * H128FIG / 117, [sx, sy] = W2S(x, y);
+    ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
+  function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
+    if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
+    if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
+    drawH128(h128Cell(), h.x, h.y, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x, h.y, k, .5, 'white');
+    if (h.atk) drawSlashHi(k); }
+  function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
+    const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
+    const sweep = (a.i % 2 ? -1 : 1), half = arcW(a.i) / 2 * Math.PI / 180, a0 = base - sweep * half, a1 = a0 + sweep * 2 * half * Math.min(1, p / (AT.a1 / AT.dur));
+    const [sx, sy] = W2S(hero.x + pv[0] * f, hero.y + pv[1] * f), r = (hs.r || 52) * f * k, wm = (hs.w || 1) * k / 5, R = (swingR(a.i) - 2) * k;
+    ctx.save(); ctx.translate(sx, sy); ctx.scale(1, .78); ctx.lineCap = 'round';
+    ctx.fillStyle = 'rgba(120,220,255,.07)'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, Math.min(a0, a1), Math.max(a0, a1)); ctx.closePath(); ctx.fill();
+    for (const [w, c, rr] of [[16 * wm, 'rgba(120,220,255,.35)', r], [7 * wm, a.i === 2 ? 'rgba(255,236,150,.95)' : 'rgba(255,255,255,.92)', r], [2.5 * wm, 'rgba(120,220,255,1)', r - 8 * k / 5]]) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(0, 0, rr, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke(); }
+    ctx.restore(); }
   function drawHeroSprite(g, zoom) {
     if (zoom === 1) { drawHW(g); drawCharge(g); }
     const h = hero; if (h.inv > 0 && S.scene !== 'world' && Math.floor(h.inv * 20) % 2 && !h.roll) return;
     const d = h.face === 'left' ? 'right' : h.face; const fi = h.moving || h.roll ? Math.floor(h.walkT * 8) % 4 : 0;
     const name = 'hero_' + d + '_' + fi;
     g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(h.x, h.y, 6 * zoom + 1, 2.5 * zoom + .5, 0, 0, TAU); g.fill();
+    if (zoom === 1 && h128() && S.map && S.map.type !== 'world') return; // test128: body + trail + slash drawn by drawHeroHi
     if (S.trail) for (const a of S.trail) { const q = 1 - a.t / a.life; drawSpr(g, a.name, a.x, a.y, { flip: a.flip, alpha: q * q * a.a, mode: 'dodge' }); } // dash afterimages
     if (h.roll) { if (DG()) { drawSpr(g, heroFrameName(), h.x, h.y, { flip: h.face === 'left' }); if (h.roll.t < iframe()) { g.fillStyle = 'rgba(160,240,255,.22)'; g.beginPath(); g.ellipse(h.x, h.y - 9, 8, 10, 0, 0, TAU); g.fill(); } return; }
       const p = h.roll.t / ROLL.dur; // legacy tumble (no dodge config)
