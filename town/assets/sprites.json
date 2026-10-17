@@ -1,0 +1,110 @@
+{
+ "hero_walk_down": {
+  "src": "hero_walk_down.png",
+  "w": 110,
+  "h": 165,
+  "n": 4,
+  "ax": 47,
+  "ay": 164,
+  "bodyH": [
+   163,
+   163,
+   162,
+   162
+  ]
+ },
+ "hero_walk_up": {
+  "src": "hero_walk_up.png",
+  "w": 116,
+  "h": 173,
+  "n": 4,
+  "ax": 51,
+  "ay": 172,
+  "bodyH": [
+   171,
+   171,
+   171,
+   171
+  ]
+ },
+ "hero_walk_right": {
+  "src": "hero_walk_right.png",
+  "w": 123,
+  "h": 172,
+  "n": 4,
+  "ax": 61,
+  "ay": 171,
+  "bodyH": [
+   170,
+   170,
+   170,
+   170
+  ]
+ },
+ "hero_atk_r1": {
+  "src": "hero_atk_r1.png",
+  "w": 189,
+  "h": 170,
+  "n": 3,
+  "ax": 62,
+  "ay": 169,
+  "bodyH": [
+   168,
+   128,
+   127
+  ]
+ },
+ "hero_atk_up": {
+  "src": "hero_atk_up.png",
+  "w": 182,
+  "h": 174,
+  "n": 3,
+  "ax": 67,
+  "ay": 173,
+  "bodyH": [
+   172,
+   147,
+   139
+  ]
+ },
+ "hero_atk_right": {
+  "src": "hero_atk_right.png",
+  "w": 226,
+  "h": 140,
+  "n": 3,
+  "ax": 55,
+  "ay": 139,
+  "bodyH": [
+   138,
+   130,
+   133
+  ]
+ },
+ "slime": {
+  "src": "slime.png",
+  "w": 86,
+  "h": 78,
+  "n": 3,
+  "ax": 43,
+  "ay": 77,
+  "bodyH": [
+   75,
+   55,
+   76
+  ]
+ },
+ "spirit": {
+  "src": "spirit.png",
+  "w": 65,
+  "h": 103,
+  "n": 4,
+  "ax": 29,
+  "ay": 102,
+  "bodyH": [
+   101,
+   100,
+   100,
+   92
+  ]
+ }
+}
