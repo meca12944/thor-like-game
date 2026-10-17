@@ -132,3 +132,9 @@ def _lines(h):
 for _h in HEROINES:
     _h['lines']=_lines(_h)
     _h['portraits']={e:f"{_h['id']}_{e}.png" for e in PORTRAIT_EXPRS}
+# 고해상도 바스트업 초상화 (머리~허리, 대화창 확대 표시용)
+PORTRAIT_SIZES=dict(bustup=[192,256],bustup_small=[96,128],face_fallback=[128,128])
+COMPANION_RULE['portraits']=('대화 초상화: 1순위 `<id>_<expr>_bu.png` (192×256 바스트업, 머리~허리, 대화창에서 1.5~2배 크게 표시 권장), '
+  '작은 창은 `<id>_<expr>_bu_s.png` (96×128), 없으면 기존 `<id>_<expr>.png`/`<id>.png` (128×128 얼굴). 경로 town/assets/portraits/, 목록은 index.json의 expressions_bustup.')
+for _h in HEROINES:
+    _h['portraits_bustup']={e:dict(large=f"{_h['id']}_{e}_bu.png",small=f"{_h['id']}_{e}_bu_s.png") for e in PORTRAIT_EXPRS}

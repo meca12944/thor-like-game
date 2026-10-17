@@ -21,7 +21,63 @@
   "name": "나비",
   "file": "a_tailor.png",
   "sheet": "raw/por_fix.jpg",
-  "cell": "r1c2"
+  "cell": "r1c2",
+  "expressions": {
+   "normal": "a_tailor_normal.png",
+   "smile": "a_tailor_smile.png",
+   "angry": "a_tailor_angry.png",
+   "blush": "a_tailor_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "a_tailor_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "a_tailor_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "a_tailor_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "a_tailor_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "a_tailor_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "a_tailor_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "a_tailor_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "a_tailor_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "a_granny": {
   "name": "물결 할머니",
@@ -177,7 +233,63 @@
   "name": "보랏빛 점술가 운",
   "file": "h_mystic.png",
   "sheet": "raw/por_H.jpg",
-  "cell": "r2c5"
+  "cell": "r2c5",
+  "expressions": {
+   "normal": "h_mystic_normal.png",
+   "smile": "h_mystic_smile.png",
+   "angry": "h_mystic_angry.png",
+   "blush": "h_mystic_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "h_mystic_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "h_mystic_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "h_mystic_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "h_mystic_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "h_mystic_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "h_mystic_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "h_mystic_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "h_mystic_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "g_sultan": {
   "name": "바자르장 하심",
@@ -225,7 +337,63 @@
   "name": "방울",
   "file": "g_dancer.png",
   "sheet": "raw/por_G.jpg",
-  "cell": "r2c3"
+  "cell": "r2c3",
+  "expressions": {
+   "normal": "g_dancer_normal.png",
+   "smile": "g_dancer_smile.png",
+   "angry": "g_dancer_angry.png",
+   "blush": "g_dancer_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "g_dancer_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "g_dancer_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "g_dancer_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "g_dancer_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "g_dancer_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "g_dancer_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "g_dancer_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "g_dancer_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "g_guard": {
   "name": "창잡이 파루크",
@@ -279,7 +447,63 @@
   "name": "해녀 숨비",
   "file": "f_diver.png",
   "sheet": "raw/por_F.jpg",
-  "cell": "r2c2"
+  "cell": "r2c2",
+  "expressions": {
+   "normal": "f_diver_normal.png",
+   "smile": "f_diver_smile.png",
+   "angry": "f_diver_angry.png",
+   "blush": "f_diver_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "f_diver_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "f_diver_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "f_diver_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "f_diver_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "f_diver_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "f_diver_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "f_diver_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "f_diver_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "f_cook": {
   "name": "생선구이 장",
@@ -321,7 +545,63 @@
   "name": "잿빛 루비",
   "file": "e_tailor.png",
   "sheet": "raw/por_E.jpg",
-  "cell": "r1c4"
+  "cell": "r1c4",
+  "expressions": {
+   "normal": "e_tailor_normal.png",
+   "smile": "e_tailor_smile.png",
+   "angry": "e_tailor_angry.png",
+   "blush": "e_tailor_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "e_tailor_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "e_tailor_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "e_tailor_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "e_tailor_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "e_tailor_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "e_tailor_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "e_tailor_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "e_tailor_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "e_miner": {
   "name": "유황 광부 노랑",
@@ -411,7 +691,63 @@
   "name": "성녀 설화",
   "file": "c_priest.png",
   "sheet": "raw/por_C.jpg",
-  "cell": "r2c4"
+  "cell": "r2c4",
+  "expressions": {
+   "normal": "c_priest_normal.png",
+   "smile": "c_priest_smile.png",
+   "angry": "c_priest_angry.png",
+   "blush": "c_priest_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "c_priest_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "c_priest_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "c_priest_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "c_priest_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "c_priest_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "c_priest_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "c_priest_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "c_priest_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
  },
  "c_penguin": {
   "name": "펭귄 집사 펭",
@@ -550,5 +886,291 @@
   "file": "spirit_iseul.png",
   "sheet": "raw/por_X.jpg",
   "cell": "r1c4"
+ },
+ "d_yuna": {
+  "name": "유나",
+  "file": "d_yuna.png",
+  "sheet": "heroines (generated)",
+  "cell": "single",
+  "expressions": {
+   "normal": "d_yuna_normal.png",
+   "smile": "d_yuna_smile.png",
+   "angry": "d_yuna_angry.png",
+   "blush": "d_yuna_blush.png"
+  },
+  "expressions_bustup": {
+   "normal": {
+    "large": "d_yuna_normal_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "d_yuna_normal_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "smile": {
+    "large": "d_yuna_smile_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "d_yuna_smile_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "angry": {
+    "large": "d_yuna_angry_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "d_yuna_angry_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   },
+   "blush": {
+    "large": "d_yuna_blush_bu.png",
+    "large_size": [
+     192,
+     256
+    ],
+    "small": "d_yuna_blush_bu_s.png",
+    "small_size": [
+     96,
+     128
+    ]
+   }
+  }
+ },
+ "a_tailor_normal": {
+  "name": "나비",
+  "file": "a_tailor_normal.png",
+  "sheet": "raw/expr_a_tailor.jpg",
+  "cell": "normal",
+  "heroine": "a_tailor",
+  "expr": "normal"
+ },
+ "a_tailor_smile": {
+  "name": "나비",
+  "file": "a_tailor_smile.png",
+  "sheet": "raw/expr_a_tailor.jpg",
+  "cell": "smile",
+  "heroine": "a_tailor",
+  "expr": "smile"
+ },
+ "a_tailor_angry": {
+  "name": "나비",
+  "file": "a_tailor_angry.png",
+  "sheet": "raw/expr_a_tailor.jpg",
+  "cell": "angry",
+  "heroine": "a_tailor",
+  "expr": "angry"
+ },
+ "a_tailor_blush": {
+  "name": "나비",
+  "file": "a_tailor_blush.png",
+  "sheet": "raw/expr_a_tailor.jpg",
+  "cell": "blush",
+  "heroine": "a_tailor",
+  "expr": "blush"
+ },
+ "h_mystic_normal": {
+  "name": "운",
+  "file": "h_mystic_normal.png",
+  "sheet": "raw/expr_h_mystic.jpg",
+  "cell": "normal",
+  "heroine": "h_mystic",
+  "expr": "normal"
+ },
+ "h_mystic_smile": {
+  "name": "운",
+  "file": "h_mystic_smile.png",
+  "sheet": "raw/expr_h_mystic.jpg",
+  "cell": "smile",
+  "heroine": "h_mystic",
+  "expr": "smile"
+ },
+ "h_mystic_angry": {
+  "name": "운",
+  "file": "h_mystic_angry.png",
+  "sheet": "raw/expr_h_mystic.jpg",
+  "cell": "angry",
+  "heroine": "h_mystic",
+  "expr": "angry"
+ },
+ "h_mystic_blush": {
+  "name": "운",
+  "file": "h_mystic_blush.png",
+  "sheet": "raw/expr_h_mystic.jpg",
+  "cell": "blush",
+  "heroine": "h_mystic",
+  "expr": "blush"
+ },
+ "g_dancer_normal": {
+  "name": "방울",
+  "file": "g_dancer_normal.png",
+  "sheet": "raw/expr_g_dancer.jpg",
+  "cell": "normal",
+  "heroine": "g_dancer",
+  "expr": "normal"
+ },
+ "g_dancer_smile": {
+  "name": "방울",
+  "file": "g_dancer_smile.png",
+  "sheet": "raw/expr_g_dancer.jpg",
+  "cell": "smile",
+  "heroine": "g_dancer",
+  "expr": "smile"
+ },
+ "g_dancer_angry": {
+  "name": "방울",
+  "file": "g_dancer_angry.png",
+  "sheet": "raw/expr_g_dancer.jpg",
+  "cell": "angry",
+  "heroine": "g_dancer",
+  "expr": "angry"
+ },
+ "g_dancer_blush": {
+  "name": "방울",
+  "file": "g_dancer_blush.png",
+  "sheet": "raw/expr_g_dancer.jpg",
+  "cell": "blush",
+  "heroine": "g_dancer",
+  "expr": "blush"
+ },
+ "f_diver_normal": {
+  "name": "숨비",
+  "file": "f_diver_normal.png",
+  "sheet": "raw/expr_f_diver.jpg",
+  "cell": "normal",
+  "heroine": "f_diver",
+  "expr": "normal"
+ },
+ "f_diver_smile": {
+  "name": "숨비",
+  "file": "f_diver_smile.png",
+  "sheet": "raw/expr_f_diver.jpg",
+  "cell": "smile",
+  "heroine": "f_diver",
+  "expr": "smile"
+ },
+ "f_diver_angry": {
+  "name": "숨비",
+  "file": "f_diver_angry.png",
+  "sheet": "raw/expr_f_diver.jpg",
+  "cell": "angry",
+  "heroine": "f_diver",
+  "expr": "angry"
+ },
+ "f_diver_blush": {
+  "name": "숨비",
+  "file": "f_diver_blush.png",
+  "sheet": "raw/expr_f_diver.jpg",
+  "cell": "blush",
+  "heroine": "f_diver",
+  "expr": "blush"
+ },
+ "e_tailor_normal": {
+  "name": "루비",
+  "file": "e_tailor_normal.png",
+  "sheet": "raw/expr_e_tailor.jpg",
+  "cell": "normal",
+  "heroine": "e_tailor",
+  "expr": "normal"
+ },
+ "e_tailor_smile": {
+  "name": "루비",
+  "file": "e_tailor_smile.png",
+  "sheet": "raw/expr_e_tailor.jpg",
+  "cell": "smile",
+  "heroine": "e_tailor",
+  "expr": "smile"
+ },
+ "e_tailor_angry": {
+  "name": "루비",
+  "file": "e_tailor_angry.png",
+  "sheet": "raw/expr_e_tailor.jpg",
+  "cell": "angry",
+  "heroine": "e_tailor",
+  "expr": "angry"
+ },
+ "e_tailor_blush": {
+  "name": "루비",
+  "file": "e_tailor_blush.png",
+  "sheet": "raw/expr_e_tailor.jpg",
+  "cell": "blush",
+  "heroine": "e_tailor",
+  "expr": "blush"
+ },
+ "c_priest_normal": {
+  "name": "설화",
+  "file": "c_priest_normal.png",
+  "sheet": "raw/expr_c_priest.jpg",
+  "cell": "normal",
+  "heroine": "c_priest",
+  "expr": "normal"
+ },
+ "c_priest_smile": {
+  "name": "설화",
+  "file": "c_priest_smile.png",
+  "sheet": "raw/expr_c_priest.jpg",
+  "cell": "smile",
+  "heroine": "c_priest",
+  "expr": "smile"
+ },
+ "c_priest_angry": {
+  "name": "설화",
+  "file": "c_priest_angry.png",
+  "sheet": "raw/expr_c_priest.jpg",
+  "cell": "angry",
+  "heroine": "c_priest",
+  "expr": "angry"
+ },
+ "c_priest_blush": {
+  "name": "설화",
+  "file": "c_priest_blush.png",
+  "sheet": "raw/expr_c_priest.jpg",
+  "cell": "blush",
+  "heroine": "c_priest",
+  "expr": "blush"
+ },
+ "d_yuna_normal": {
+  "name": "유나",
+  "file": "d_yuna_normal.png",
+  "sheet": "raw/expr_d_yuna.jpg",
+  "cell": "normal",
+  "heroine": "d_yuna",
+  "expr": "normal"
+ },
+ "d_yuna_smile": {
+  "name": "유나",
+  "file": "d_yuna_smile.png",
+  "sheet": "raw/expr_d_yuna.jpg",
+  "cell": "smile",
+  "heroine": "d_yuna",
+  "expr": "smile"
+ },
+ "d_yuna_angry": {
+  "name": "유나",
+  "file": "d_yuna_angry.png",
+  "sheet": "raw/expr_d_yuna.jpg",
+  "cell": "angry",
+  "heroine": "d_yuna",
+  "expr": "angry"
+ },
+ "d_yuna_blush": {
+  "name": "유나",
+  "file": "d_yuna_blush.png",
+  "sheet": "raw/expr_d_yuna.jpg",
+  "cell": "blush",
+  "heroine": "d_yuna",
+  "expr": "blush"
  }
 }
