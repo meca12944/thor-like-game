@@ -63,8 +63,9 @@
     if (o.expNext) { const es = track('exp', Math.max(0, Math.min(1, o.exp / o.expNext)), dt); es.g = es.v; gauge(c, gx, ey, gw, eh, es, EXP, { glowA: .5 }); }
     c.restore(); return by + ph;
   }
-  // 필살기 gauge, bottom centre: o { cx, y, u, v (0..1), name, key }
+  // 필살기 gauge, bottom centre: o { cx, y, u, v (0..1), name, key, locked }. Hidden while the ultimate is story-locked (__game.ultUnlocked false)
   function drawUlt(c, o) {
+    const g = window.__game; if (o.locked || (g && g.ultUnlocked === false)) return;
     const u = o.u, w = Math.round(180 * u), h = Math.max(2, Math.round(4 * u)), x = Math.round(o.cx - w / 2), y = Math.round(o.y), full = o.v >= 1;
     c.save(); c.setTransform(1, 0, 0, 1, 0, 0); const s = track('ult', Math.max(0, Math.min(1, o.v)), 0); s.v = s.g = Math.max(0, Math.min(1, o.v));
     const br = full ? .5 - .5 * Math.cos(T * Math.PI * 2 * .8) : 0;   // gentle breathing glow when READY (~0.8 Hz, no motion)

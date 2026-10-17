@@ -61,6 +61,9 @@
   if (Q.has('worldreset')) SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null };
   for (const k of ['explored', 'waystones', 'landmarks', 'quests']) SAVE[k] = SAVE[k] || {};
   const save = () => { try { localStorage.setItem(LS, JSON.stringify(SAVE)); } catch (e) {} };
+  // story-flag hooks. 필살기 해금: the ultimate unlocks after the story midpoint = flag 'mid_story' (template ULT_UNLOCK_FLAG; placeholder,
+  // no midpoint event yet — the future mid-story event / area5 arrival just sets it). unlockUltimate() persists SAVE.flags.ultUnlocked.
+  function storyFlag(id) { const g = window.__game; if (g && id === g.ULT_UNLOCK_FLAG && g.unlockUltimate) g.unlockUltimate(); }
 
   // ---------------- assets ----------------
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
@@ -294,7 +297,7 @@
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
-    if (m.flag) { SAVE.flags[m.flag] = true; save(); }
+    if (m.flag) { SAVE.flags[m.flag] = true; save(); storyFlag(m.flag); }
     if (D.champion) { banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const left = ['champ_boar', 'champ_wasp'].filter(f => !SAVE.flags[f]).length;
       after(2.3, () => msg(left ? '남은 챔피언: ' + left + ' — 모두 쓰러뜨리면 골렘의 방이 열린다' : '숲의 두 우두머리를 쓰러뜨렸다! 신전 B2의 봉인된 문이 열린다.', 3.5)); }
     if (D.boss) bossDefeated(m);
@@ -302,7 +305,7 @@
     if (S.engaged === m) S.engaged = null;
   }
   function bossDefeated(m) {
-    const B = M().boss; SAVE.flags[B.flag] = true; save();
+    const B = M().boss; SAVE.flags[B.flag] = true; save(); storyFlag(B.flag);
     S.hazards.length = 0; S.shots.length = 0; S.temp.length = 0; S.ult = null;
     S.mobs.forEach(o => { if (o !== m && !o.dead) killMob(o); });
     shake(5); jingle(); banner(B.name + ' 격파!', 3);
@@ -766,7 +769,7 @@
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
-        if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R' }); }
+        if (g && g.ULT_CFG && g.ultUnlocked !== false) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R' }); }
       textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
@@ -794,6 +797,7 @@
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
+    if (g.ultUnlocked === false) return; // 필살기 locked until the story midpoint: R does nothing
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
     if (hero.hp <= 0 || S.deadT > 0) return;
     const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
@@ -877,7 +881,7 @@
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
     tap(code) { queue.push(code); },
-    flag(id, v = true) { SAVE.flags[id] = v; save(); }, reset() { SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null }; save(); if (NAV()) NAV().reset(); },
+    flag(id, v = true) { SAVE.flags[id] = v; save(); if (v) storyFlag(id); }, reset() { SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null }; save(); if (NAV()) NAV().reset(); },
     get nav() { return NAV(); },
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
     hurt, spawn, render, tile: () => [Math.floor(hero.x / S.map.T), Math.floor(hero.y / S.map.T)],
