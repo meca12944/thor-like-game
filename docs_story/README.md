@@ -78,6 +78,7 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 - **테스트**: `town/tools/test_world.py`, `town/tools/test_tachie.py`, `town/tools/test_inventory.py`, `town/tools/test_shop_sell.py` (이름 문자열을 확인하는 테스트는 데이터와 함께 고쳐야 함)
 - **숨은 검 새 해금 조건 (사장님 확정)**: 탁블레이드 = 3번째 보스(모래 대지렁이) 처치, 규블레이드 = 6번째 보스(산호 거대게) 처치, 찬블레이드 = 8번째 보스(뇌전 와이번) 처치 직후 폭풍지기의 첨탑에서 두 검이 하나가 됨. 옛 조건(강자 8명 생존 + A 연못 상자 `a_chest_tak`, H 지하 수원 잠수 + 보스 10마리, E 대장간 등급 10 + 볼칸 생존 + 금화 5000 융합 `f_hs_chan`)은 모두 삭제한다. 고칠 곳: `ITEMS.md`(숨겨진 전설검 절), `STORY.md`, `SYSTEMS.md`, `TOWNS.md`, `EQUIPMENT.md`, `CRAFTING.md`(융합 레시피), `data/towns.json`(`hs_*` 항목, `f_hs_chan`), `tools/design/story_data.py`(HS 정의), `tools/design/craft_data.py`(`FUSION_RECIPES`), `tools/design/towns_data.py`, `tools/design/gen_docs.py`(「마스터 대장간에서 탁검+규검 융합」 문구·assert), `town/tools/game.template.html` → `town/index.html`(상자·해금 판정), `town/tools/test_shop_sell.py`. 숨은 검 표시 이름도 탁블레이드·규블레이드·찬블레이드로 바꾼다.
 - **은팔찌 흔적 (은팔찌 설정 삭제)**: `SYSTEMS.md` 115행·`data/towns.json`·`tools/design/story_data.py` 80행의 「HUD: 팔찌의 이슬 보석 색」 → 손등 낙인 문양 HUD로 교체(`spirit_removal.md`), `old_proto.html`(옛 프로토타입의 「은빛 팔찌」 대사 2곳).
+- **스토리 개연성 개편 (카이렌 삭제, 원탁 하나로 통합, 마룡 → 「삼킨 자」)**: 카이렌·사도단·마룡이 남은 docs_story 밖 파일. 설정 문서 `STORY.md`, `BOSS_PATTERNS.md`(10지역 보스·카이렌 패턴 → 아스란과 「삼킨 자」), `WORLD_PLAN.md`, `HEROINES.md`, `TOWNS.md`, `SYSTEMS.md`, `ITEMS.md`, `EQUIPMENT.md`, `MATERIALS.md`, `CRAFTING.md`, `MONSTERS.md`, `LEVELS.md`, `CONTROLS.md`, `DIVE_SPOTS.md`, `TOWNSFOLK_COMBAT.md`, `BGM.md` / 데이터 `data/towns.json`, `data/levels.json`, `audio/bgm/bgm.json`, `town/maps/world.json` / 스크립트 `tools/design/story_data.py`, `towns_data.py`, `heroines_data.py`, `level_data.py`, `craft_data.py`, `gen_docs.py`, `town/tools/world_maps.py`, `town/tools/paperdoll.py` / 게임 `town/tools/game.template.html` → `town/index.html` / 아트·아이콘 `art/icons/INDEX.md`, `art/icons/icons.json`, `art/skills/INDEX.md`, `town/assets/icons/icons.json`, `town/assets/icons/items_demo.json` / 음악 `docs_music/gemini_prompts.md`, `docs_music/matching_table.md`, `tools/music/V2.md`, `tools/music/gen_doc.py`, `tools/music/songs/area10_dragon_nest.py`, `tools/music/songs/battle_kairen.py`(곡 용도를 아스란 최종전으로).
 - **음악 문서**: `docs_music/gemini_prompts.md`, `docs_music/SFX_LIST.md`, `docs_music/sfx_draft/index.html`, `tools/music/gen_doc.py`, `tools/music/songs/area02_cave.py`
 
 ## 메인 스토리 개편 반영 (2026-10-17)
@@ -106,3 +107,20 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 | `main_story.md` 삭제 목록의 「은팔찌 포함」 | 문구 삭제 |
 
 - **숨은 검 해금 조건 (사장님 확정)**: 탁블레이드는 3번째 보스, 규블레이드는 6번째 보스, 찬블레이드는 8번째 보스를 처치하면 얻는다. `main_story.md`, `story_full.md`, `names_world.md`의 동선을 고쳤다. A 연못 상자(`a_chest_tak`, `chests_A_area1.*`)와 이벤트 「여덟 개의 맹세」(`ev_a_takgeom`, `town_A_events_quests.*`)는 삭제했다.
+
+## 스토리 개연성 개편 (2026-10-17, 사장님 지시 「단순하고 탄탄하게」)
+
+- `main_story.md`, `story_full.md`를 다시 썼다. 전체 줄거리, 바뀐 점 표, 인과 체크리스트는 `story_full.md`에 있다.
+  - 반전은 2개다. ① 억겁의 불사자(4장 세트라 → 귀향의 요람의 장부) ② 최종 보스 아스란은 옛 제자(9장 오르비스·그림 → 최종장). 「모든 낙인은 주인공의 조각」 반전은 삭제했다.
+  - 카이렌을 삭제하고 아스란 한 명으로 합쳤다. 최종 형태는 아스란이 삼킨 불사자 서른일곱의 힘이 폭주한 「삼킨 자」다.
+  - 적 세력은 「심판의 원탁」 하나다. 사도단은 오르비스 휘하 「원탁의 수확자」로 흡수했고, 왕가와 처형인 가문은 원탁의 손발이다.
+  - 숨은 검은 스승이 제자를 죽이지 않으려고 직접 셋으로 나눈 칼이다. 3·6·8번째 보스는 그 칼을 지키다 타락한 수호자다.
+  - 귀향은 4장 바로 뒤로 옮겼다.
+  - 타락한 필멸자 엔딩 이름을 「미뤄진 날」로 바꿨다.
+  - 유나의 문양은 물길 결박 동판의 각인으로 바꿨다.
+- 함께 맞춘 문서
+  - `names_world.md`: 5·6·10지역 이름, 마룡·카이렌·사도단 계열 아이템과 능력 이름.
+  - `names_eldenring.md`: 카이렌 삭제 표시. 아스란, 오르비스, 하르빅, 더스턴, 모르반, 볼칸, 사바, 세트라, 바르, 토르투, 바렌, 이벨린의 소개.
+  - `ult_unlock_event.md`: 세트라의 계약 상대와 귀향 시점.
+  - `heroine_quests.md`/`.json`: 유나의 귀환 방법.
+  - `town_A_events_quests.md`/`.json`: 사도단 첩자 → 원탁의 수확자, 낙인 목소리 → 아스란(존댓말), 원탁의 심연 조건.
