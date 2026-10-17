@@ -510,7 +510,7 @@ def S(typ,where,rate=None):
     d=dict(type=typ,where=where)
     if rate: d['rate']=rate
     return d
-SRC_KO={'shop':'상점','boss':'보스','champion':'챔피언','mob':'일반 몹','quest':'퀘스트','dive':'잠수'}
+SRC_KO={'shop':'상점','boss':'보스','champion':'챔피언','mob':'일반 몹','quest':'퀘스트','dive':'잠수','craft':'제작 전용'}
 # 기존 40종: (tier, source, shop price)
 _META={
  'w_iron_trainee':(1,S('shop','A'),120),'w_bronze_long':(1,S('shop','A'),280),
@@ -725,3 +725,44 @@ for _t in TOWNS:
         _d=dict(id=_e[0],giver=_e[1],title=_e[2],type='악의 길'+(' (변형)' if _e[6] else ''),story=_e[3],objective=_e[4],reward=_e[5],path='evil',karma_gate='악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)')
         if _e[6]: _d['variant_of']=_e[6]
         _t['quests'].append(_d)
+
+# ================================================================ 제작·재료·대장간 (craft_data.py) + 최종 인간 보스 + 마을 파괴
+import craft_data as _cd
+from craft_data import MATERIALS, MOB_DROPS, FORGES, FORGE_RULES, FORGE_QUESTS, CRAFT_ONLY, AREA_NAMES
+for _e in EQUIP_ITEMS:
+    if _e['id'] in CRAFT_ONLY:
+        _e['source']=dict(type='craft',where=f"E 마스터 대장간 / 마염 대장간 (재료: {MATERIALS[CRAFT_ONLY[_e['id']]]['name']})",
+                          rate='보스 첫 격파 시 핵 + 레시피 두루마리 확정 (장비 자체는 드롭 안 함)')
+RECIPES=_cd.make_recipes(EQUIP_ITEMS,[t['id'] for t in TOWNS])
+for _e in EQUIP_ITEMS: _e['recipe']='r_'+_e['id']
+# 마을 사람 드롭 (악의 길 전용): 아이 제외 전원
+NPC_DROPS=[]
+for _t in TOWNS:
+    for _n in _t['npcs']:
+        _c=_n['combat']
+        if not _c.get('lethal',True): continue
+        _m=_cd.npc_material(_n['role'])
+        _d=[(_m,60),('tf_soul',15)]
+        if _n['id'] in('a_smith','b_smith','h_smith','g_smith','f_smith','e_master','e_smith','c_smith','d_smith'): _d.append((_cd._ingot(_cd.FORGES[[f['town'] for f in FORGES].index(_t['id'])]['tier']),40))
+        NPC_DROPS.append(dict(town=_t['id'],npc=_n['id'],name=_n['name'],drops=_d,karma=_c['karma_penalty']))
+_FG={f['town']:f for f in FORGES}; _RZ={r['town']:r for r in RAZE}
+for _t in TOWNS:
+    _f=_FG[_t['id']]; _t['forge']=_f
+    _t['raze']=_RZ[_t['id']]
+    if _t['id'] in FORGE_QUESTS:
+        _q=FORGE_QUESTS[_t['id']]
+        _t['quests'].append(dict(id=_q[0],giver=_f['npc'],title=_q[1],type='대장간',story=_q[2],objective=_q[3],reward=_q[4],path='good',karma_gate='악명 이하에서는 의뢰인이 거절 (마왕의 길은 마염 대장간으로 대체)'))
+    else:
+        for _q in _t['quests']:
+            if _q['id']==_f['quest']: _q['reward']+=' + 대장간 등급 10 (마스터 대장간: 핵 레시피 제작, 제작 성공률 +10%p)'
+# 챔피언 강화 재료 칸을 실제 강화 재료 이름·확률로 치환
+_ENH={x['tier']:x['name'] for x in ENH_TIERS}; _CDR={d['champion']:d for d in CHAMPION_DROPS}
+for _d in MOB_DROPS:
+    _new=[]
+    for _m,_r in _d['drops']:
+        if _m.startswith('enh_tier'):
+            _tier=int(_m[8:]); _src=_CDR.get(_d['mob'].replace('강화 ',''))
+            _r=_src['drop'] if _src and _d['kind']=='champion' else 30
+            _m='enh:'+_ENH[_tier]
+        _new.append((_m,_r))
+    _d['drops']=_new

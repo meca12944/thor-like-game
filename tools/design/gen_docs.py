@@ -4,6 +4,8 @@ import json, sys, os, shutil
 from collections import Counter
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 from towns_data import *
+import craft_data as _cd
+from towns_data import RECIPES, NPC_DROPS
 REPO=os.path.abspath(os.path.join(HERE,'..','..'))
 COPY_DIRS=['/workspace/town-demo/src/monsters']
 EQ={e['id']:e for e in EQUIP_ITEMS}
@@ -45,6 +47,40 @@ COUNTS=dict(weapon=cnt['weapon'],armor=cnt['armor'],armor_body=sum(e['slot']=='a
             offhand=cnt['offhand'],consumable=cnt['consumable'],shop_equipment=sum(e['source']['type']=='shop' for e in EQUIP_ITEMS),
             rare_equipment=sum(e['source']['type']!='shop' for e in EQUIP_ITEMS),quests=sum(len(t['quests']) for t in TOWNS),
             evil_quests=sum(q['path']=='evil' for t in TOWNS for q in t['quests']),npcs=sum(len(t['npcs']) for t in TOWNS),strongmen=len(STRONGMEN))
+# ---------------- 제작·재료 검증
+MOBS_EXPECT={a:[m[0] for m in _cd.AREAS[a]['mobs']] for a in range(1,10)}
+dropped={(d['area'],d['mob']) for d in MOB_DROPS if d['drops']}
+for a,ms in MOBS_EXPECT.items():
+    for m in ms: assert (a,m) in dropped and (10,'강화 '+m) in dropped,(a,m)
+for a,ch,*_ in _cd.CHAMPS: assert (a,ch) in dropped and (10,'강화 '+ch) in dropped,ch
+for a,b,*_ in _cd.BOSSES: assert (a,b) in dropped,b
+assert sum(d['kind']=='normal' for d in MOB_DROPS)==72 and sum(d['kind']=='champion' for d in MOB_DROPS)==18 and sum(d['kind']=='boss' for d in MOB_DROPS)==10
+def _matok(m): return m in MATERIALS or m.startswith('enh:')
+for d in MOB_DROPS+NPC_DROPS:
+    assert 1<=len(d['drops'])<=3,d
+    for m,_ in d['drops']: assert _matok(m),m
+for t in TOWNS:
+    for n in t['npcs']:
+        if n['combat']['lethal']: assert any(x['npc']==n['id'] for x in NPC_DROPS),n['id']
+        else: assert not any(x['npc']==n['id'] for x in NPC_DROPS),n['id']
+for e in EQUIP_ITEMS:
+    r=RECIPES.get(e['recipe']); assert r and r['item']==e['id'],e['id']
+    for x in r['materials']: assert x['mat'] in MATERIALS,(e['id'],x['mat'])
+    if r['upgrade_from']: assert EQ[r['upgrade_from']]['tier']<e['tier']
+assert len(RECIPES)==len(EQUIP_ITEMS)==90
+for m in MATERIALS.values(): assert m['sources'] and m['icon']['shape'] and m['name']
+assert len({m['name'] for m in MATERIALS.values()})==len(MATERIALS)
+for t in TOWNS:
+    assert t['forge'] and t['raze']
+    for m,_ in t['raze']['loot']: assert m in MATERIALS,m
+    for m in t['forge']['sells']: assert m in MATERIALS,m
+for m,_n,_r in FINAL_HUMAN['drops']: assert m in MATERIALS,m
+assert len(FINAL_HUMAN['patterns'])==6 and FINAL_HUMAN['ultimate'] and FINAL_HUMAN['phase2']
+assert len(RAZE)==8 and {r['town'] for r in RAZE}==set(TN)
+_ft=[t['forge']['tier'] for o in order for t in TOWNS if t['id']==o]; assert _ft==sorted(_ft)
+for _f in ['STORY','TOWNSFOLK_RULE','RAZE_RULE','FINAL_HUMAN','QUEST_REWRITES','GREETING_REWRITES']:
+    import re as _re; assert not _re.search(r'하루(?!\s*(1회|최대|\d|한 번|에|동안|종일))',json.dumps(globals()[_f],ensure_ascii=False)),_f
+COUNTS.update(materials=len(MATERIALS),recipes=len(RECIPES),mob_drop_tables=len(MOB_DROPS),npc_drop_tables=len(NPC_DROPS),forges=len(FORGES),razeable_towns=len(RAZE),craft_only=len(CRAFT_ONLY))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
 def item_json(e): return {k:v for k,v in e.items()}
@@ -59,7 +95,10 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  enhancement=dict(rules=ENH_RULES,tiers=ENH_TIERS,levels=ENH_LEVELS,champion_drops=CHAMPION_DROPS),
  respawn=RESPAWN,
  story=STORY,karma=KARMA,bounty=BOUNTY,skill_evolution=[dict(skill=a,base=b,light=c,dark=d) for a,b,c,d in SKILL_EVOLUTION],
- strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE)
+ strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
+ materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
+ drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
+ final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE))
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
@@ -230,7 +269,7 @@ R+=['','## 전제','',st['premise'],'',f"## 최종 적: {st['antagonist']['name'
  '## 보스가 존재하는 이유','','| 지역 | 보스 | 정체와 이유 |','|---|---|---|']+[f"| {a} | {b} | {c} |" for a,b,c in st['bosses']]
 R+=['','## 줄거리 (진행 순서)','']
 for a,b,c in st['chapters']: R+=[f"### {a} — {b}",'',c,'']
-R+=['## 마을 강자와 이야기','','각 마을의 강자는 낙인을 지닌 하루를 「심판」하려 한다. 결투에서 살려 주면 피의 맹세로 기술을 받는다. 이것이 「받은 힘」이고, 진엔딩의 열쇠가 된다. 죽이면 기술을 빼앗는다. 이것이 「빼앗은 힘」이고, 굶주림을 키운다.','']
+R+=['## 마을 강자와 이야기','','각 마을의 강자는 낙인을 지닌 필멸자를 「심판」하려 한다. 결투에서 살려 주면 피의 맹세로 기술을 받는다. 이것이 「받은 힘」이고, 진엔딩의 열쇠가 된다. 죽이면 기술을 빼앗는다. 이것이 「빼앗은 힘」이고, 굶주림을 키운다.','']
 R+=[f"- **{s['town']} {s['name']}** ({s['title']}): {s['background']}" for s in STRONGMEN]
 R+=['','## 엔딩','','엔딩 직전, 인간 카이렌의 질문(「삼키겠느냐, 받아 가겠느냐」)과 그 시점의 선악 수치로 정해진다. 위에서부터 조건을 확인한다.','','| 엔딩 | 조건 | 내용 |','|---|---|---|']
 R+=[f"| {e['name']} | {e['cond']} | {e['desc']} |" for e in st['endings']]
@@ -257,6 +296,113 @@ for t in TOWNS:
         c=n['combat']; C.append(f"| {n['name']} | {c['hp']} | {c['atk']} | {c['behavior']} | "+'<br>'.join(f"{a['name']}: {a['desc']}" for a in c['attacks'])+f" | {c['absorb']['name']}: {c['absorb']['effect']} | {c['karma_penalty']}{'' if c['lethal'] else ' (기운 강탈)'} |")
     C.append('')
 DOCS['TOWNSFOLK_COMBAT.md']=C
+# ---------------- 제작 공통
+MN=lambda m: (m[4:]+' (강화 재료)') if m.startswith('enh:') else MATERIALS[m]['name']
+def rate(r): return f"{r}%" if isinstance(r,(int,float)) else str(r)
+def mats(r): return ', '.join(f"{MN(x['mat'])} ×{x['count']}" for x in r['materials'])
+FN={f['town']:f for f in FORGES}
+KIND_KO={'mob':'일반 몹','champion':'챔피언','boss':'보스','townsfolk':'마을 사람','strongman':'마을 강자','forge_shop':'대장간'}
+TYPE_KO={'hide':'가죽','bone':'뼈·뿔','crystal':'결정','essence':'정수','cloth':'천·실','wood':'목재','metal':'금속','shell':'껍데기','core':'핵','token':'징표','scrap':'잡동사니'}
+# ITEMS.md: 레시피 열 추가 (장비 표 행 끝에 붙임)
+_I=[]
+for line in DOCS['ITEMS.md']:
+    if line.startswith('| ID | 이름 | 종류 | 티어 |'): line+=' 레시피 |'
+    elif line.startswith('|---|---|---|---|---|---|---|---|') and line.count('|')==9: line+='---|'
+    elif line.startswith('| `') and line[3:line.index('`',3)] in EQ:
+        e=EQ[line[3:line.index('`',3)]]; r=RECIPES[e['recipe']]; line+=f" `{r['id']}` ({r['town']}, {r['success']}%{', 제작 전용' if r['craft_only'] else ''}) |"
+    _I.append(line)
+_I.insert(3,f"> 장비 90종 모두 대장간 제작 레시피가 있다 (`r_<아이템id>`, 칸: 최초 제작 마을·성공률). 재료는 [MATERIALS.md](MATERIALS.md), 레시피 상세는 [CRAFTING.md](CRAFTING.md). 「제작 전용」 {len(CRAFT_ONLY)}종은 드롭되지 않고 보스 핵으로만 만든다.")
+DOCS['ITEMS.md']=_I
+# ---------------- MATERIALS.md
+MT=['# 재료 목록','',f"> 데이터: `data/towns.json` → `materials`, `drops`. 재료 {len(MATERIALS)}종. 제작 레시피는 [CRAFTING.md](CRAFTING.md), 장비는 [ITEMS.md](ITEMS.md).",
+ '> 아이콘: 32×32 시트 `ui_materials.png`. 모양은 종류로, 주색은 아래 색 코드로 그린다. 판매가는 대장간·도구상점 기준 (선악 가격 배율 적용).','',
+ '## 드롭 규칙','',
+ '- 일반 몹: 대표 재료 1종(45~55%) + 지역 공통 재료(12%). 각 지역 첫 번째 몹은 레시피 두루마리 조각(1%)도 떨어뜨린다.',
+ '- 챔피언: 기존 강화 재료(SYSTEMS.md 1장 확률 그대로) + 챔피언 고유 재료(첫 격파 2개 확정, 이후 35%) + 지역 공통 재료 확정.',
+ '- 보스: 고유 핵 100% + 지역 공통 재료. 보스는 리스폰하지 않으므로 **핵은 게임당 1개**.',
+ '- 10지역 강화판: 일반 몹은 원래 대표 재료(40%) + 「타락한」 공통 재료(15%), 강화 챔피언은 「타락한」 챔피언 재료(30%) + 원래 재료(60%) + 강화 재료.',
+ '- 마을 사람: **악의 길 전용**. 죽였을 때만 역할별 재료 1종(60%) + 원한 서린 혼석(15%), 대장장이는 주괴(40%)도. 선악 감소는 살해 페널티 그대로이며 재료로 상쇄되지 않는다. **아이들은 드롭 표가 없다** (죽일 수 없음).','',
+ '## 재료 전체','','| ID | 이름 | 티어 | 종류 | 아이콘 | 출처 (확률) | 판매가 | 비고 |','|---|---|---|---|---|---|---|---|']
+for m in sorted(MATERIALS.values(),key=lambda m:(m['tier'],m['id'])):
+    MT.append(f"| `{m['id']}` | {m['name']} | {m['tier']} | {TYPE_KO[m['type']]} | {m['icon']['shape']} `{m['icon']['color']}` | "+'<br>'.join(f"{KIND_KO[s['kind']]}: {s['where']}"+(f" ({rate(s['rate'])})" if s.get('rate') is not None else '')+(f" — {s['price']}금화" if s.get('price') else '') for s in m['sources'])+f" | {m['sell']} | {m.get('note','')} |")
+MT+=['','## 몬스터별 드롭 표','']
+for a in range(1,11):
+    MT+=[f"### {a}지역 {AREA_NAMES[a]}",'','| 몬스터 | 구분 | 드롭 (확률) |','|---|---|---|']
+    for d in [d for d in MOB_DROPS if d['area']==a]:
+        MT.append(f"| {d['mob']} | {dict(normal='일반',champion='챔피언',boss='보스',enhanced='강화판',enhanced_champion='강화 챔피언')[d['kind']]} | "+', '.join(f"{MN(m)} {rate(r)}" for m,r in d['drops'])+' |')
+    MT.append('')
+MT+=['## 마을 사람 드롭 (악의 길 전용)','','| 마을 | NPC | 드롭 (확률) | 선악 |','|---|---|---|---|']
+MT+=[f"| {d['town']} | {d['name']} | "+', '.join(f"{MN(m)} {rate(r)}" for m,r in d['drops'])+f" | {d['karma']} |" for d in NPC_DROPS]
+MT+=['','마을 강자는 「심판의 징표」(살려 주면 건네받고, 죽이면 시신에서), 원탁의 주인 아스란은 영겁의 핵·원탁의 파편·복원 두루마리를 떨어뜨린다 (STORY.md).']
+DOCS['MATERIALS.md']=MT
+# ---------------- CRAFTING.md
+FR=FORGE_RULES
+CR=['# 제작 · 대장간','',f"> 데이터: `data/towns.json` → `recipes`, `forges`. 레시피 {len(RECIPES)}개 (장비 90종 전부). 재료는 [MATERIALS.md](MATERIALS.md).",'',
+ '## 대장간 서비스 (마을마다 대장장이 = 무기상점 주인)','']+[f"- {x}" for x in FR['services']]+['',
+ '## 대장간 등급','','레시피의 「필요 등급」 이상이어야 제작할 수 있다. 각 마을 대장간 의뢰(⑪)를 끝내면 등급이 1 오른다. E는 「장인의 시험」(E3)을 끝내면 마스터 대장간(등급 10)이 된다.','',
+ '| 마을 | 대장간 | 대장장이 | 기본 등급 | 의뢰 후 | 의뢰 | 파는 기본 재료 |','|---|---|---|---|---|---|---|']
+allnpc={n['id']:n['name'] for t in TOWNS for n in t['npcs']}
+for f in FORGES:
+    CR.append(f"| {f['town']} {TN[f['town']]} | {f['name']}{' ★마스터' if f.get('master') else ''} | {allnpc[f['npc']]} | {f['tier']} | {f['tier_after']} | {f['quest']} | {', '.join(MN(m) for m in f['sells'])} |")
+CR+=['','마왕의 길: 마을을 파괴하면 그 마을 대장간은 사라진다. 대신 검은 성채와 일부 폐허의 **마염 대장간**(등급 10, 핵 레시피 가능, 원한 서린 혼석으로 비용 일부 대체)을 쓴다 (SYSTEMS.md 6장).','',
+ '### 대장간 의뢰','']
+for t,q in FORGE_QUESTS.items(): CR+=[f"**{q[0]}. {q[1]}** ({t} {TN[t]}) — {q[2]}",f"- 목표: {q[3]}",f"- 보상: {q[4]}",'']
+CR+=['## 성공률과 실패','','| 레시피 | 성공률 |','|---|---|']+[f"| {a} | {b}% |" for a,b in FR['success']]+['',FR['fail'],'',
+ '## 레시피 해금','']+[f"- {x}" for x in FR['unlock']]+['',f"## 승급 제작",'',FR['upgrade'],'',
+ '## 제작 전용 전설 장비','','| 장비 | 필요한 핵 | 원래 출처 |','|---|---|---|']
+for i,c in CRAFT_ONLY.items(): CR.append(f"| {EQ[i]['name']} | {MATERIALS[c]['name']} | {EQ[i]['source']['where']} |")
+CR+=['','그 밖에 「선대의 부러진 검」은 아스란이 떨어뜨리는 복원 두루마리 + 영겁의 핵으로 다시 벼릴 수 있다(퀘스트 보상판과 별개로 한 단계 강한 복원판을 만드는 것이 아니라, 퀘스트를 놓쳤을 때의 대체 경로). 「그림자 망토」는 그림자 천과 쌍검사의 그림자 칼날이 필요하다.','',
+ '## 레시피 전체','']
+for c,title in [('weapon','무기'),('armor','방어구'),('offhand','보조무기')]:
+    CR+=[f"### {title}",'','| 레시피 | 장비 | 티어 | 재료 | 금화 | 등급 · 최초 마을 | 성공률 | 승급 재료 | 해금 |','|---|---|---|---|---|---|---|---|---|']
+    for e in sorted([e for e in EQUIP_ITEMS if cat(e)==c],key=lambda e:(e['tier'],e['id'])):
+        r=RECIPES[e['recipe']]
+        CR.append(f"| `{r['id']}` | {e['name']}{' ★' if r['craft_only'] else ''} | {e['tier']} | {mats(r)} | {r['coins']} | {r['forge_tier']} · {r['town']} | {r['success']}% | {EQ[r['upgrade_from']]['name'] if r['upgrade_from'] else '—'} | {r['unlock']} |")
+    CR.append('')
+DOCS['CRAFTING.md']=CR
+# ---------------- TOWNS.md: 대장간·폐허 정보
+_T=[]
+for line in DOCS['TOWNS.md']:
+    _T.append(line)
+    for t in TOWNS:
+        if line.startswith(f"- **마을 강자**: {t['strongman']['name']} ("):
+            f=t['forge']; z=t['raze']
+            _T.append(f"- **대장간**: {f['name']} — 등급 {f['tier']} → {f['tier_after']} (의뢰 {f['quest']}). 제작·강화·수리·분해·판매 (CRAFTING.md)")
+            _T.append(f"- **폐허판 (마왕의 길)**: 「{z['ruined_name']}」 · 아이 대피: {z['evac_leader']} → {z['evac_route']} · 난민 행선지: {z['refugees_to']} · 남는 것: {z['gained']} (SYSTEMS.md 6장)")
+DOCS['TOWNS.md']=_T
+# ---------------- SYSTEMS.md: 5장 대장간, 6장 마을 파괴
+DOCS['SYSTEMS.md'][0]='# 시스템 설계: 무기 강화 · 몬스터 리스폰 · 선악 · 현상금 · 대장간 · 마을 파괴'
+S=DOCS['SYSTEMS.md']
+S+=['','## 5. 대장간 · 제작 · 내구도','','상세 레시피는 [CRAFTING.md](CRAFTING.md), 재료와 드롭 표는 [MATERIALS.md](MATERIALS.md).','']+[f"- {x}" for x in FR['services']]
+S+=['- 대장간 등급: '+' / '.join(f"{f['town']} {f['tier']}→{f['tier_after']}" for f in FORGES)+' (E는 마스터 대장간, 핵 레시피 전용)',
+    '- 성공률: '+', '.join(f"{a} {b}%" for a,b in FR['success'])+'. '+FR['fail'],
+    '- 장인 불칼(E)이 죽으면 마스터 대장간도 사라진다. 핵 레시피는 이후 마염 대장간(검은 성채)에서만 만들 수 있다.','',
+    '## 6. 마을 파괴 (마왕의 길)','',f"**발동**: {RAZE_RULE['trigger']}",'','### 공성 순서','']+RAZE_RULE['siege']
+S+=['',f"### 아이들의 대피 (절대 규칙)",'',RAZE_RULE['children'],'',f"### 폐허판 맵",'',RAZE_RULE['ruined'],'',f"### 보상",'',RAZE_RULE['rewards'],'',
+    '### 세계의 반응','']+[f"- {x}" for x in RAZE_RULE['world']]+['','### 마을을 모두 파괴해도 깰 수 있는 이유','']+[f"- {x}" for x in RAZE_RULE['beatable']]
+S+=['','### 마을별 파괴','','| 마을 | 폐허 이름 | 아이 대피 인솔 | 대피로 | 난민 행선지 | 잃는 것 | 생기는 것 | 전리품 | 어둠 강화 |','|---|---|---|---|---|---|---|---|---|']
+for z in RAZE:
+    S.append(f"| {z['town']} {TN[z['town']]} | {z['ruined_name']} | {z['evac_leader']} | {z['evac_route']} | {z['refugees_to']} | {z['lost']} | {z['gained']} | "+', '.join(f"{MN(m)} ×{c}" for m,c in z['loot'])+f" | {z['dark_upgrade']} |")
+S+=['','- 저장 플래그: `town_razed[A~H]`, `corruption_stage`, `black_citadel_unlocked`. 파괴된 마을의 NPC는 `npc_dead[]`가 아니라 `npc_fled[]`(난민) 또는 `npc_dead[]`(싸우다 죽은 어른)로 나뉜다. 아이는 항상 `npc_evacuated[]`.']
+# ---------------- STORY.md: 칭호, 최종 인간 보스, 파괴 영향
+FH=FINAL_HUMAN
+R=DOCS['STORY.md']
+i=R.index(f"**주인공**: {STORY['hero']}")+1
+R[i:i]=['','| 칭호 | 조건 |','|---|---|']+[f"| {h['title']} | {h['cond']} |" for h in STORY['hero_titles']]+['','NPC 대사·UI의 주인공 이름은 그때의 칭호로 표시된다 (예: 「영웅님」, 「마왕이다!」).']
+j=R.index('## 엔딩')
+R[j:j]=[f"## 숨은 최종 인간 보스: {FH['name']} — {FH['title']}",'',FH['background'],'',f"- **장소**: {FH['location']}",f"- **해금**: {FH['unlock']}",'',
+        '| 변형 | 조건 | 내용 |','|---|---|---|']+[f"| {v['name']} | {v['cond']} | {v['desc']} |" for v in FH['variants']]+['',f"- **결말**: {FH['resolution']}",'- 패턴과 드롭은 TOWNSFOLK_COMBAT.md 3부.','',
+        '## 마을 파괴와 이야기 (마왕의 길)','',RAZE_RULE['trigger'],'',RAZE_RULE['children'],'']+[f"- {x}" for x in RAZE_RULE['world']]+[f"- {RAZE_RULE['beatable'][0]}",'']
+# ---------------- TOWNSFOLK_COMBAT.md 3부
+C=DOCS['TOWNSFOLK_COMBAT.md']
+C+=[f"# 3부. 최종 인간 보스 — {FH['name']} ({FH['title']})",'',f"무기: {FH['weapon']} · 체력 {FH['hp']} · 기본 공격 {FH['atk']}칸 · 마을 강자 8명 위의 존재",'',FH['background'],'',
+    f"- 장소: {FH['location']}",f"- 해금: {FH['unlock']}",'']+[f"- 변형 「{v['name']}」 ({v['cond']}): {v['desc']}" for v in FH['variants']]+['']
+C+=[f"{k} {n}: {d}" for k,n,d in FH['patterns']]
+C+=['',f"2페이즈 (50%): {FH['phase2']}",'',f"**필살기 「{FH['ultimate'][0]}」** (맞으면 최대 체력 50% 감소): {FH['ultimate'][1]}",'',
+    f"**흡수 스킬 「{FH['skill']['name']}」**: {FH['skill']['desc']}",f"- 빛 변형: {FH['skill']['light']}",f"- 어둠 변형: {FH['skill']['dark']}",'',
+    f"결말: {FH['resolution']}",'','드롭: '+', '.join(f"{n} {r}%" for _,n,r in FH['drops']),'',f"리스폰: {FH['respawn']}",'',
+    '# 4부. 마을 파괴 중 전투','','- 공성 중 어른 NPC는 반응(도주/반격)대로 행동하되, 도주형은 대피로로 빠져나가 난민이 된다(처치하지 않아도 공성 진행).','- 마을 강자는 항복 없이 필살기까지 쓴다. 이미 동료였어도 등을 돌린다.',
+    f"- {RAZE_RULE['children']}"]
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
     for d in COPY_DIRS:
