@@ -45,8 +45,8 @@
   // o: { x, y, u, hp, maxHp, mp, maxMp, exp, expNext, lvl, lvFlash, alpha }  -> returns bottom y of the panel (device px)
   function drawPlayer(c, o) {
     const dt = tick(), u = o.u, a = o.alpha ?? 1; c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
-    const bx = Math.round(o.x), by = Math.round(o.y), badge = Math.round(30 * u), gw = Math.round(196 * u), hh = Math.max(3, Math.round(5 * u)), mh = Math.max(2, Math.round(3.5 * u)), eh = Math.max(1, Math.round(1.5 * u));
-    const pw = badge + gw + Math.round(30 * u), ph = Math.round(48 * u); panel(c, bx, by, pw, ph, u, a);
+    const bx = Math.round(o.x), by = Math.round(o.y), badge = Math.round(30 * u), gw = Math.round(124 * u), hh = Math.max(3, Math.round(5 * u)), mh = Math.max(2, Math.round(3.5 * u)), eh = Math.max(1, Math.round(1.5 * u));
+    const pw = badge + gw + Math.round(26 * u), ph = Math.round(48 * u); panel(c, bx, by, pw, ph, u, a);
     // level badge: thin gold ring, number centred
     const cx = bx + Math.round(8 * u) + badge / 2, cy = by + ph / 2; c.beginPath(); c.arc(cx, cy, badge / 2, 0, Math.PI * 2); c.fillStyle = 'rgba(0,0,0,.45)'; c.fill();
     const lf = o.lvFlash > 0 ? .5 + .5 * Math.cos(T * 5) : 0; c.strokeStyle = `rgba(255,214,120,${.75 + .25 * lf})`; c.lineWidth = Math.max(1, 1.4 * u); c.stroke();

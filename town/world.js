@@ -190,7 +190,7 @@
   const held = new Set(), queue = [];
   const PASS = new Set(['KeyB', 'KeyN', 'Minus', 'Equal', 'NumpadSubtract', 'NumpadAdd', 'F12']); // BGM keys keep working
   const DEFKEYS = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], attack: ['KeyJ', 'KeyZ'], dash: ['KeyK', 'KeyX'],
-    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], menu: ['Escape'] };
+    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'] };
   function KM() { const g = window.__game; return (g && g.ctl && g.ctl.KEYMAP) || DEFKEYS; }
   function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
   const isHeld = a => codesOf(a).some(c => held.has(c));
@@ -242,7 +242,7 @@
   }
   function hurt(dmg, src, raw) {
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
-    if (W_API.god) return false;
+    if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
       if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
@@ -396,6 +396,7 @@
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) S.pause = !S.pause;
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; go('town', null, { card: false }); } queue.length = 0; return; }
+    if (S.ultFx) { stepUlt(dt); queue.length = 0; updateCam(dt); return; } // 필살기: world frozen (timers, mobs, hazards, shots)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
     if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -425,6 +426,7 @@
     hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt);
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
+    if (takePress('ult') && !S.ultFx) castUlt();
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) [dx, dy] = FACEV[hero.face]; const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
     if (takePress('attack') && !hero.roll && (!hero.atk || hero.atk.t > ATK.a1)) { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); }
@@ -761,7 +763,7 @@
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
-        if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: '', key: null, fieldNote: '필드에서는 아직 사용 불가' }); }
+        if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R' }); }
       textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
@@ -781,7 +783,52 @@
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }
+    if (m.type !== 'world') drawFieldUlt(k, ox, oy, SW, SH);
   }
+  // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬검·해동), same cut-in timing,
+  // world frozen + hero invulnerable for the whole move, damage to every enemy on screen. Consumes the full gauge (template ULT_CFG / addUlt).
+  const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 }; // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
+  const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
+  function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
+  function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
+    if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
+    if (hero.hp <= 0 || S.deadT > 0) return;
+    const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
+    S.ultFx = { U, t: 0, hitI: 0, boomed: false, vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
+    try { g.SFX.play('ult_cutin', 1); } catch (e) {} }
+  function stepUlt(dt) { const f = S.ultFx, U = f.U, g = window.__game; f.t += dt; hero.inv = Math.max(hero.inv, 1); S.shake = Math.max(0, S.shake - dt * 14);
+    const e = f.t - FULT.freeze - FULT.cutin;
+    if (e >= 0 && !f.boomed) { f.boomed = true; shake(2); try { g.SFX.play('ult_boom', 1); } catch (er) {} } // modest: 2px boom, 1px per hit (world cap 3px + '화면 흔들림' option)
+    while (e >= 0 && f.hitI < U.hitT.length && e >= U.hitT[f.hitI]) { f.hitI++; shake(1); const n = U.hitT.length;
+      for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, tot = D.boss ? mm.maxHp * FULT.boss : D.champion ? mm.maxHp * FULT.champ : FULT.mob, d = Math.max(1, Math.round(tot / n));
+        mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' });
+        if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
+    if (e >= U.dur) { S.ultFx = null; hero.inv = .6; } }
+  function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - FULT.freeze - FULT.cutin, c = f.t - FULT.freeze;
+    ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
+    ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / FULT.freeze)})`; ctx.fillRect(ox, oy, SW, SH);
+    if (e >= 0) { ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .15) / .5; if (q < 0 || q > 1) continue; const al = 1 - q;
+        if (U.id === 'chan') { const ang = [-.42, .38, -.12, .6, -.7][i % 5], cy = oy + SH * (.3 + .1 * i); ctx.save(); ctx.translate(ox + SW / 2, cy); ctx.rotate(ang); const L = SW * 1.4 * Math.min(1, q * 4);
+          ctx.fillStyle = `rgba(${U.col[1]},${al * .6})`; ctx.fillRect(-L / 2, -14 * u * (1 - q), L, 28 * u * (1 - q)); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L / 2, -3 * u, L, 6 * u); ctx.restore(); }
+        const list = f.vic.length ? f.vic : [{ x: hero.x + 40, y: hero.y }, { x: hero.x - 40, y: hero.y - 20 }];
+        for (const mm of list) { const [sx, sy] = W2S(mm.x, mm.y); const w = (22 + (i % 2) * 8) * u * (1 - q * .5);
+          const gr = ctx.createLinearGradient(0, oy, 0, sy); gr.addColorStop(0, `rgba(${U.col[2]},0)`); gr.addColorStop(.7, `rgba(${U.col[1]},${al * .7})`); gr.addColorStop(1, `rgba(${U.col[0]},${al})`);
+          ctx.fillStyle = gr; ctx.fillRect(sx - w / 2, oy, w, sy - oy); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(sx - w * .18, oy, w * .36, sy - oy);
+          ctx.fillStyle = `rgba(${U.col[1]},${al * .8})`; ctx.beginPath(); ctx.ellipse(sx, sy, w * 1.8 * (.6 + q), w * .6 * (.6 + q), 0, 0, TAU); ctx.fill(); } }
+      ctx.globalCompositeOperation = 'source-over'; }
+    if (c >= 0 && c < FULT.cutin) { const q = c / FULT.cutin, inn = Math.min(1, q / .15), out = q > .85 ? (q - .85) / .15 : 0, bh = SH * .34 * inn * (1 - out), by = oy + SH * .5;
+      ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(ox, oy, SW, SH);
+      ctx.save(); ctx.translate(ox + SW / 2, by); ctx.rotate(-.06); ctx.fillStyle = '#07070c'; ctx.fillRect(-SW, -bh / 2, SW * 2, bh); const lw = Math.max(2, SH * .006);
+      ctx.fillStyle = U.band; ctx.fillRect(-SW, -bh / 2, SW * 2, lw); ctx.fillRect(-SW, bh / 2 - lw, SW * 2, lw);
+      const im = porImg(U.por);
+      if (im.complete && im.naturalWidth) { const ih = bh * 1.25, iw = ih * im.naturalWidth / im.naturalHeight, ease = 1 - Math.pow(1 - Math.min(1, q / .3), 3), px = SW * .75 - ease * SW * .68 + q * SW * .04;
+        ctx.save(); ctx.beginPath(); ctx.rect(-SW, -bh / 2, SW * 2, bh); ctx.clip(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, px - SW / 2, -ih * .42, iw, ih); ctx.restore(); }
+      ctx.restore();
+      const tx = ox + SW * .62 - (1 - Math.min(1, q / .25)) * SW * .3, fs = Math.round(SH * .085); ctx.globalAlpha = Math.min(1, q / .2) * (1 - out);
+      textOut(U.name, tx, by + fs * .25, fs, U.band); textOut(U.route + ' 필살기 · ' + U.en, tx, by + fs * .25 + SH * .05, Math.round(SH * .026), '#fff'); ctx.globalAlpha = 1; }
+    if (e >= 0 && e < .25) { ctx.fillStyle = `rgba(255,255,255,${.6 * (1 - e / .25)})`; ctx.fillRect(ox, oy, SW, SH); } // softer flash than the town (.9)
+    ctx.restore(); }
   function b0() { const b = S.bossRef; return !!(b && !b.dead); }
   function hpBar(e, x, y, w, h) { x = Math.round(x - w / 2); y = Math.round(y); const fr = Math.max(0, e.hp / e.maxHp), lg = Math.max(fr, (e.hpLag ?? e.hp) / e.maxHp);
     ctx.fillStyle = e.hitT > .15 ? 'rgba(255,255,255,.8)' : 'rgba(8,6,14,.85)'; ctx.fillRect(x - 1, y - 1, w + 2, h + 2); ctx.fillStyle = '#3a1010'; ctx.fillRect(x, y, w, h);
@@ -832,7 +879,7 @@
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
     hurt, spawn, render, tile: () => [Math.floor(hero.x / S.map.T), Math.floor(hero.y / S.map.T)],
     setHeroTile(x, y, face) { hero.x = (x + .5) * S.map.T; hero.y = (y + .5) * S.map.T; if (face) hero.face = face; snapCam(); },
-    get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
+    castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
   };
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
 })();
