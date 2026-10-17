@@ -56,14 +56,14 @@ EQUIP_ITEMS=[
  A('h_fur_helm','helmet','털모자 투구',4,'head_helm_fur','fur_white_grey','쇠 투구 안쪽과 귀덮개에 흰 털.'),
  A('h_knight_plume','helmet','깃털 기사 투구',5,'head_helm_visor','royal_silver_gold','은빛 면갑 투구 위 파란 깃털 장식.'),
  # 보조장비 (방패/팔보호대/부적/장화)
- A('a_wood_round','accessory','나무 원형방패',1,'off_shield_round','wood','왼팔에 작은 둥근 나무 방패 (철 테). 정지 상태에서 정면 피해 25% 확률 막기.',{'kind':'shield'}),
- A('a_leather_bracer','accessory','가죽 팔보호대',0,'acc_bracer','leather_brown','양 팔뚝에 갈색 가죽 보호대 (버클 2개).',{'kind':'bracer','atk_speed':'+5%'}),
- A('a_ore_amulet','accessory','광석 부적',0,'acc_amulet','copper_green','가슴에 매단 녹청 구리 펜던트, 원석이 박혀 있다.',{'kind':'amulet','drop':'강화 재료 드롭 +5%p'}),
- A('a_dune_boots','accessory','사막 질주 장화',0,'acc_boots','sand_gold','모래색 긴 장화에 금 버클, 걸을 때 모래 먼지.',{'kind':'boots','move':'+10%'}),
- A('a_coral_buckler','accessory','산호 버클러',2,'off_shield_round','shell_coral','분홍 산호가 박힌 작은 방패. 산호 방패 스킬 퍼펙트 판정 +0.05초.',{'kind':'shield'}),
- A('a_flame_bracer','accessory','화염 팔찌',0,'acc_bracer','forge_red','손목의 흑철 팔찌, 붉은 홈이 은은히 빛남.',{'kind':'bracer','skill':'업화의 검 피해 +20%'}),
- A('a_frost_amulet','accessory','서리 부적',0,'acc_amulet','ice_pale','눈송이 모양 얼음 펜던트.',{'kind':'amulet','gauge':'파란 게이지 회복 +10%'}),
- A('a_royal_kite','accessory','왕실 문장 방패',4,'off_shield_kite','royal_silver_gold','파란 바탕에 금 사자 문장의 연(鳶)형 방패.',{'kind':'shield'}),
+ A('a_wood_round','offhand','나무 원형방패',1,'off_shield_round','wood','왼팔에 작은 둥근 나무 방패 (철 테). 정지 상태에서 정면 피해 25% 확률 막기.',{'kind':'shield'}),
+ A('a_leather_bracer','offhand','가죽 팔보호대',0,'acc_bracer','leather_brown','양 팔뚝에 갈색 가죽 보호대 (버클 2개).',{'kind':'bracer','atk_speed':'+5%'}),
+ A('a_ore_amulet','offhand','광석 부적',0,'acc_amulet','copper_green','가슴에 매단 녹청 구리 펜던트, 원석이 박혀 있다.',{'kind':'amulet','drop':'강화 재료 드롭 +5%p'}),
+ A('a_dune_boots','offhand','사막 질주 장화',0,'acc_boots','sand_gold','모래색 긴 장화에 금 버클, 걸을 때 모래 먼지.',{'kind':'boots','move':'+10%'}),
+ A('a_coral_buckler','offhand','산호 버클러',2,'off_shield_round','shell_coral','분홍 산호가 박힌 작은 방패. 산호 방패 스킬 퍼펙트 판정 +0.05초.',{'kind':'shield'}),
+ A('a_flame_bracer','offhand','화염 팔찌',0,'acc_bracer','forge_red','손목의 흑철 팔찌, 붉은 홈이 은은히 빛남.',{'kind':'bracer','skill':'업화의 검 피해 +20%'}),
+ A('a_frost_amulet','offhand','서리 부적',0,'acc_amulet','ice_pale','눈송이 모양 얼음 펜던트.',{'kind':'amulet','gauge':'파란 게이지 회복 +10%'}),
+ A('a_royal_kite','offhand','왕실 문장 방패',4,'off_shield_kite','royal_silver_gold','파란 바탕에 금 사자 문장의 연(鳶)형 방패.',{'kind':'shield'}),
 ]
 # 팔레트 스왑 키 → 4단 램프(어두움→밝음). 회색조 원본 시트의 4단계를 이 색으로 치환.
 PALETTES={
@@ -87,7 +87,7 @@ EQUIP_SLOTS=[
  dict(id='weapon',name='무기',layer='weapon',desc='검 스프라이트(날 모양·색)와 베기 궤적 색이 바뀐다. 3단 콤보(횡베기·찌르기·돌려베기)와 스킬 포즈 모두에 적용.'),
  dict(id='armor',name='방어구',layer='armor',desc='튜닉/갑옷 레이어. 몸통·팔·허리 부분 외형이 바뀐다.'),
  dict(id='helmet',name='투구',layer='helmet',desc='머리 장비(선택). 비우면 기본 갈색 머리가 그대로 보인다.'),
- dict(id='accessory',name='보조장비',layer='offhand',desc='방패·팔보호대·부적·장화. 방패는 왼팔, 팔보호대는 팔뚝, 부적은 가슴, 장화는 발 레이어로 보인다.'),
+ dict(id='offhand',name='보조무기',layer='offhand',desc='방패·팔보호대·투척무기·오브·부적·반지·장화. 방패는 왼팔, 팔보호대는 팔뚝, 투척무기는 허리 주머니+던질 때 왼손, 오브는 어깨 옆에 떠다니는 FX, 부적은 가슴, 반지는 손가락 반짝임, 장화는 발 레이어로 보인다.'),
 ]
 COSMETIC_RULE='외형상점 아이템은 능력치가 없는 순수 외형 덮어쓰기. 망토 색은 망토 레이어 팔레트를, 의상 스킨은 방어구 레이어의 그림만(능력치는 장착 방어구 유지), 머리 장식은 투구 레이어가 비었거나 "투구 숨기기"일 때 표시, 궤적 스킨은 무기 궤적 색을 덮어쓴다.'
 
@@ -502,3 +502,226 @@ RESPAWN=dict(
  counts='화면당 일반 몹 수는 맵 데이터의 min~max 사이 무작위(길 2~5, 지역 3~6). 챔피언은 champZone 화면에만 1마리.',
  anti_abuse='선택 규칙: 같은 챔피언을 10분 안에 3번 넘게 잡으면 재료 드롭률 절반 (파밍은 가능하되 과도한 반복 완화).',
 )
+
+# ================================================================ 전체 아이템 카탈로그
+# 무기 30 / 방어구 30(몸 16 + 투구 14) / 보조무기 30 / 소모품 60. 기존 장비 40종은 여기 흡수(중복 없음).
+# source: shop(town) 또는 boss/champion/mob/quest/dive 드롭. 희귀 장비는 상점에 없다.
+def S(typ,where,rate=None):
+    d=dict(type=typ,where=where)
+    if rate: d['rate']=rate
+    return d
+SRC_KO={'shop':'상점','boss':'보스','champion':'챔피언','mob':'일반 몹','quest':'퀘스트','dive':'잠수'}
+# 기존 40종: (tier, source, shop price)
+_META={
+ 'w_iron_trainee':(1,S('shop','A'),120),'w_bronze_long':(1,S('shop','A'),280),
+ 'w_mill_steel':(2,S('shop','B'),520),'w_reed_leaf':(2,S('shop','B'),480),
+ 'w_crystal_edge':(2,S('shop','H'),780),'w_miner_broad':(2,S('shop','H'),860),
+ 'w_desert_crescent':(3,S('shop','G'),1200),'w_sun_sigil':(4,S('shop','G'),1350),
+ 'w_wave_blade':(5,S('shop','F'),1700),'w_anchor_great':(6,S('shop','F'),1850),
+ 'w_obsidian':(7,S('shop','E'),2600),'w_forge_great':(7,S('shop','E'),2900),
+ 'w_frost_crystal':(8,S('shop','C'),3600),'w_northwind':(8,S('shop','C'),3900),
+ 'w_royal_knight':(9,S('shop','D'),4800),'w_mithril':(9,S('shop','D'),5600),
+ 'b_cloth_tunic':(1,S('shop','A'),80),'b_quilted':(2,S('shop','B'),260),'b_miner_vest':(2,S('shop','H'),540),
+ 'b_desert_silk':(3,S('shop','G'),900),'b_scale_mail':(5,S('shop','F'),1400),'b_black_plate':(7,S('shop','E'),2200),
+ 'b_snow_fur':(8,S('shop','C'),3000),'b_mithril_plate':(9,S('shop','D'),4500),
+ 'h_leather_hood':(1,S('shop','A'),60),'h_steel_circlet':(2,S('shop','B'),200),'h_miner_helmet':(2,S('shop','H'),380),
+ 'h_turban':(3,S('shop','G'),700),'h_nautilus':(5,S('shop','F'),1100),'h_horned':(7,S('shop','E'),1700),
+ 'h_fur_helm':(8,S('shop','C'),2300),'h_knight_plume':(9,S('shop','D'),3200),
+ 'a_wood_round':(1,S('shop','A'),100),'a_leather_bracer':(2,S('shop','B'),240),'a_ore_amulet':(2,S('shop','H'),600),
+ 'a_dune_boots':(4,S('shop','G'),950),'a_coral_buckler':(5,S('shop','F'),1300),'a_flame_bracer':(7,S('shop','E'),2000),
+ 'a_frost_amulet':(8,S('shop','C'),2800),'a_royal_kite':(9,S('shop','D'),3800),
+}
+for _e in EQUIP_ITEMS:
+    _t,_s,_p=_META[_e['id']]; _e['tier']=_t; _e['source']=_s; _e['price']=_p
+for _e in EQUIP_ITEMS:
+    if _e['slot']=='offhand': _e['effect'].setdefault('kind','shield')
+def NW(id,name,tier,atk,sprite,pal,trail,look,src,price=None,extra=None):
+    d=W(id,name,atk,sprite,pal,trail,look,extra); d.update(tier=tier,source=src,price=price); return d
+def NA(id,slot,name,tier,df,sprite,pal,look,src,price=None,extra=None):
+    d=A(id,slot,name,df,sprite,pal,look,extra); d.update(tier=tier,source=src,price=price); return d
+def NO(id,name,tier,kind,df,atk,sprite,pal,look,src,price=None,extra=None):
+    e=dict(kind=kind); e.update(extra or {})
+    d=A(id,'offhand',name,df,sprite,pal,look,e); d.update(tier=tier,source=src,price=price)
+    if atk: d['atk']=atk
+    return d
+PALETTES.update({
+ 'forest_leaf':['#14301a','#2e6a34','#5aa84a','#c8f0a0'],'boar_ivory':['#3a2a1a','#7a5a3a','#d8c8a0','#fff8e0'],
+ 'spider_violet':['#2a1440','#5a2a8a','#a070e0','#e8d8ff'],'scorpion_amber':['#4a2000','#a05000','#ffa020','#fff0b0'],
+ 'pharaoh_gold':['#2a1a40','#4a3a8a','#ffc820','#fff4c0'],'kraken_purple':['#200a30','#4a1a6a','#9a4ac0','#e0b0ff'],
+ 'pirate_brass':['#2a1a10','#6a4a20','#c0a050','#f8f0c0'],'hellfire':['#100000','#400a0a','#ff2a00','#ffe060'],
+ 'storm_yellow':['#1a1a3a','#3a4a8a','#ffe040','#ffffff'],'shadow_black':['#000000','#14141e','#3a3a5a','#9a7aff'],
+ 'void_purple':['#0a0014','#2a0a4a','#7a2ad0','#e0c0ff'],'dragon_tri':['#0a0a0a','#5a0a0a','#3a8ad0','#b070ff'],
+ 'ancient_rust':['#2a1a14','#6a3a2a','#9a7a6a','#e8d8c8'],'moss_crystal':['#1a3a20','#3a6a3a','#6ad0c0','#d0fff0'],
+ 'crab_red':['#4a0a0a','#a02a1a','#ff7a5a','#ffd8c8'],'ghost_teal':['#0a2a2a','#2a5a5a','#7ad0c0','#e0fff8'],
+ 'wyvern_blue':['#0a1a3a','#1a4a8a','#4aa0ff','#e0f4ff'],'witch_crimson':['#1a0a14','#5a0a2a','#c02a4a','#ffb0a0'],
+ 'holy_white':['#6a6a5a','#c0c0b0','#fff8e0','#ffffff'],'shark_grey':['#1a2a3a','#4a5a6a','#9aaabb','#f0f4f8'],
+ 'yeti_white':['#5a5a6a','#a0a0b0','#e8e8f0','#ffffff'],'lava_core':['#1a0800','#5a1a00','#ff6a00','#ffff80'],
+ 'scarab_gold':['#0a2a2a','#1a6a5a','#e0c030','#fff8b0'],'blood_red':['#1a0000','#4a0000','#a00010','#ff6060'],
+})
+EQUIP_ITEMS+=[
+ # ---------------- 무기 신규 14 (상점 2 + 희귀 12)
+ NW('w_hunter_machete','사냥꾼 마체테',2,9,'wpn_machete','iron',['#e0e0e0','#8a8a8a'],'끝이 넓적한 외날 정글도, 손잡이에 짐승 이빨 장식. 짧고 두꺼운 회색 궤적.',S('shop','B'),560,{'beast':'짐승형 몹 피해 +15%'}),
+ NW('w_harpoon_blade','작살검',5,18,'wpn_harpoon','sea_blue',['#e0f8ff','#3a7ab0'],'끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 찌르기(2타) 사거리 +20%.',S('shop','F'),1950,{'thrust':'찌르기 사거리 +20%'}),
+ NW('w_forest_dagger','숲의 단검',1,6,'wpn_dagger','forest_leaf',['#e0ffd0','#5aa84a'],'나뭇잎 잎맥이 새겨진 짧은 초록 단검, 휘두르면 잎사귀가 흩날린다.',S('dive','1지역 큰 나무 뿌리 사이 샘'),None,{'atk_speed':'+10%'}),
+ NW('w_boar_tusk','돌엄니 송곳검',1,8,'wpn_broad','boar_ivory',['#fff8e0','#a08060'],'거대 멧돼지 엄니를 통째로 깎은 상아빛 칼날, 밑동에 털가죽.',S('champion',"1지역 거대 왕멧돼지 '돌엄니'",'8%'),None,{'kb':'+25%'}),
+ NW('w_spider_fang','여왕거미 독니검',2,13,'wpn_curved','spider_violet',['#f0e0ff','#a070e0'],'보랏빛 수정 독니가 휜 날이 된 검, 날 끝에서 독 방울이 떨어진다.',S('boss','2지역 수정 여왕거미','첫 격파 확정'),None,{'poison':'타격 시 15% 독'}),
+ NW('w_sun_sting','태양침 독검',3,15,'wpn_leaf','scorpion_amber',['#fff0b0','#ff9a20'],'황금 전갈 꼬리 마디로 이은 호박색 날, 끝은 독침.',S('champion',"3지역 황금 전갈 '태양침'",'6%'),None,{'poison':'찌르기 독 30%'}),
+ NW('w_pharaoh_scepter','황금가면 왕홀검',4,17,'wpn_scepter','pharaoh_gold',['#fff4c0','#ffc820'],'남색 손잡이 위 금빛 왕홀 머리, 날은 상형문자가 새겨진 짧은 금날. 궤적에 상형문자.',S('boss','4지역 황금가면 미라왕','첫 격파 확정'),None,{'curse':'처치 시 하트 반칸 흡수 10%'}),
+ NW('w_kraken_whip','크라켄 촉수검',5,19,'wpn_whip','kraken_purple',['#e0b0ff','#6a2a9a'],'빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 돌려베기 범위 +25%.',S('boss','5지역 심해 크라켄 뱀','첫 격파 확정'),None,{'spin':'돌려베기 범위 +25%'}),
+ NW('w_captain_cutlass','해적 선장의 커틀러스',6,20,'wpn_curved','pirate_brass',['#f8f0c0','#c0a050'],'놋쇠 바구니 가드의 짧은 곡도, 칼등에 해골 각인. 녹슨 금빛 궤적.',S('dive','6지역 해적 동굴 바닷물'),None,{'coin':'몹 금화 +15%'}),
+ NW('w_hellfire','업화의 흑검',7,24,'wpn_flame','hellfire',['#ffe060','#ff2a00'],'흑기사의 검. 검은 날 전체가 불꽃 모양으로 일렁이며 늘 불이 붙어 있다.',S('boss','7지역 화염검 흑기사','첫 격파 확정'),None,{'burn':'모든 타격 화상 20%'}),
+ NW('w_storm_spear','뇌전 창검',8,27,'wpn_spear','storm_yellow',['#ffffff','#ffe040'],'와이번 뿔로 만든 창날 검, 날 위로 잔번개가 튄다. 노란 지그재그 궤적.',S('boss','8지역 뇌전 와이번','첫 격파 확정'),None,{'shock':'3타 연쇄 번개'}),
+ NW('w_shadow_twin','그림자 쌍검',9,29,'wpn_twin','shadow_black',['#9a7aff','#14141e'],'검은 날 두 자루를 양손에 든다(보조무기 칸 잠김). 보라 잔상이 두 줄로 남는다.',S('champion','9지역 그림자 쌍검사','5%'),None,{'twin':'타격 2회, 보조무기 사용 불가'}),
+ NW('w_dragon_tri','삼두 마룡검',10,36,'wpn_ornate','dragon_tri',['#ff6a20','#3a8ad0','#b070ff'],'칼자루에 용머리 셋, 날이 붉은·푸른·보라 세 줄로 갈라져 빛남. 3색 궤적.',S('boss','10지역 머리 셋 달린 그림자 마룡','첫 격파 확정'),None,{'tri':'타격마다 불/얼음/어둠 순환 부가 피해'}),
+ NW('w_first_bearer','선대의 부러진 검',9,30,'wpn_straight_long','ancient_rust',['#e8d8c8','#7a2020'],'반쯤 부러진 녹슨 장검. 낙인을 지녔던 선대 용사의 검으로, 쥐면 칼날 끝에 붉은 빛의 환영 날이 이어진다.',S('quest','D5 왕도의 그림자 ③'),None,{'karma':'선악 수치 절댓값이 클수록 공격 +최대 6'}),
+ # ---------------- 방어구(몸) 신규 8
+ NA('b_traveler','armor','여행자 외투',1,1,'body_coat','leather_brown','무릎까지 오는 갈색 여행자 외투, 어깨에 둥근 가죽 덧댐. 주머니가 많다.',S('shop','A'),150,{'carry':'소모품 최대 소지 +1'}),
+ NA('b_bosun_coat','armor','갑판장 코트',5,5,'body_coat','pirate_brass','남색 긴 코트에 놋쇠 단추 두 줄, 옷자락이 바람에 휘날린다.',S('shop','F'),1600,{'swim':'수영 속도 +15%'}),
+ NA('b_moss_crystal','armor','이끼 수정 흉갑',1,3,'body_shell','moss_crystal','초록 이끼 위로 하늘색 수정 결정이 돋아난 흉갑.',S('boss','1지역 이끼 수정 골렘','첫 격파 확정'),None,{'regen':'정지 3초 후 10초마다 반칸 회복'}),
+ NA('b_crab_shell','armor','거대게 껍질 갑옷',6,7,'body_shell','crab_red','붉은 게 껍질 판을 이어 붙인 갑옷, 어깨에 작은 가시.',S('boss','6지역 산호 거대게','첫 격파 확정'),None,{'guard':'산호 방패 지속 +0.5초'}),
+ NA('b_ghost_coat','armor','유령 선장의 코트',6,6,'body_coat','ghost_teal','반투명한 청록 코트, 옷자락 끝이 연기처럼 흩어진다.',S('champion','6지역 유령 해적 선장','6%'),None,{'evade':'피격 시 8% 확률 무효'}),
+ NA('b_wyvern_scale','armor','뇌전 비늘 갑옷',8,9,'body_scale','wyvern_blue','짙은 청색 비늘 갑옷, 비늘 틈으로 잔번개가 흐른다.',S('boss','8지역 뇌전 와이번','첫 격파 확정'),None,{'shock_res':'감전 무효'}),
+ NA('b_shadow_garb','armor','그림자 잠행복',9,7,'body_light','shadow_black','몸에 붙는 검은 잠행복과 보라 띠, 움직일 때 윤곽이 흐려진다.',S('quest','D5 왕도의 그림자 ③ (악의 길 변형 D8 보상도 동일)'),None,{'stealth':'몹 인식 거리 -30%'}),
+ NA('b_dragon_scale','armor','마룡 비늘 갑옷',10,13,'body_scale','dragon_tri','검붉은 비늘 갑옷, 가슴에 세 갈래 용 문양이 붉게·푸르게·보랏빛으로 맥동.',S('boss','10지역 머리 셋 달린 그림자 마룡','첫 격파 확정'),None,{'res':'화상·빙결·저주 피해 -50%'}),
+ # ---------------- 투구 신규 6
+ NA('h_iron_mask','helmet','용병 쇠가면',2,2,'head_mask','anchor_steel','얼굴 아래 절반을 가리는 투박한 쇠가면, 이마에 긁힌 자국.',S('shop','H'),420,{'intimidate':'일반 몹 경직 +5%'}),
+ NA('h_desert_turban','helmet','사막의 터번',3,2,'head_turban','sand_gold','모래색 긴 터번, 얼굴 가리개가 달려 있다.',S('dive','3지역 마른 우물'),None,{'heat':'열사병 게이지 증가 -50%'}),
+ NA('h_pharaoh_mask','helmet','황금 가면',4,3,'head_mask','pharaoh_gold','미라왕의 황금 가면을 머리 위로 올려 쓴다. 눈구멍이 푸르게 빛남.',S('boss','4지역 황금가면 미라왕','25%'),None,{'curse_res':'최대 체력 저주 무효'}),
+ NA('h_witch_hat','helmet','화염 마녀의 모자',7,3,'head_witch','witch_crimson','끝이 꺾인 진홍색 뾰족 모자, 챙에 불씨가 맴돈다.',S('champion','7지역 화염 마녀','7%'),None,{'gauge':'스킬 게이지 소모 -10%'}),
+ NA('h_griffon_helm','helmet','그리폰 깃털 투구',8,5,'head_plume','storm_yellow','금빛 날개 모양 깃털이 양옆으로 뻗은 투구.',S('champion','8지역 번개 그리폰','7%'),None,{'dash':'뇌광 질주 거리 +20%'}),
+ NA('h_void_crown','helmet','공허의 관',9,5,'head_crown','void_purple','머리 위에 떠 있는 보라 고리 관, 작은 시계 바늘이 돈다.',S('boss','9지역 공허의 대사제','첫 격파 확정'),None,{'time':'시간 정지 지속 +0.5초'}),
+ # ---------------- 보조무기 신규 22 (상점 10 + 희귀 12)
+ NO('o_sling','투석끈',1,'throw',0,2,'off_throw_sling','leather_brown','허리에 감은 가죽 투석끈과 돌 주머니. 보조 키(Shift)로 돌 1발.',S('shop','A'),90,{'ammo':'무한, 쿨 1초'}),
+ NO('o_throw_knife','투척 단검 묶음',2,'throw',0,3,'off_throw_knife','iron','허벅지 띠에 꽂힌 단검 5자루. 보조 키로 직선 투척.',S('shop','B'),300,{'ammo':'5발, 마을에서 보충'}),
+ NO('o_ore_pick','투척 곡괭이',2,'throw',0,5,'off_throw_pick','dark_iron_copper','등에 멘 작은 곡괭이 2자루. 포물선으로 던지면 금 간 벽도 부순다.',S('shop','H'),650,{'wall':'금 간 벽 파괴'}),
+ NO('o_chakram','사막 차크람',3,'throw',0,6,'off_throw_ring','desert_gold','금빛 원반 칼날. 던지면 부메랑처럼 돌아온다.',S('shop','G'),1100,{'return':'왕복 2타'}),
+ NO('o_shell_orb','조개 오브',5,'orb',0,4,'off_orb','shell_coral','어깨 옆에 떠다니는 분홍 진주 조개. 2초마다 가까운 적에게 물방울 탄.',S('shop','F'),1500,{'auto':'자동 사격 2초'}),
+ NO('o_forge_tower','흑철 대방패',7,'shield',7,0,'off_shield_tower','black_iron_red','몸을 거의 가리는 검은 사각 대방패, 가운데 붉은 용광로 문양. 이동 -5%.',S('shop','E'),2500,{'block':'정지 시 정면 피해 40% 막기','move':'-5%'}),
+ NO('o_ember_orb','불씨 오브',7,'orb',0,8,'off_orb','lava_core','주황 불씨가 소용돌이치는 구슬, 1.5초마다 화염탄.',S('shop','E'),2400,{'auto':'자동 사격 1.5초, 화상 10%'}),
+ NO('o_ice_javelin','얼음 투창',8,'throw',0,10,'off_throw_javelin','ice_pale','등에 꽂힌 얼음 투창 3자루, 맞은 적 둔화.',S('shop','C'),3300,{'slow':'둔화 2초'}),
+ NO('o_knight_gauntlet','기사 건틀릿',9,'bracer',2,0,'acc_bracer','royal_silver_gold','팔꿈치까지 오는 은빛 판금 건틀릿, 손등에 금 사자.',S('shop','D'),3600,{'combo':'3타 피해 +15%'}),
+ NO('o_holy_orb','성광 오브',9,'orb',0,9,'off_orb','holy_white','순백의 빛 구슬. 자동 사격 + 어둠 속성 피해 2배.',S('shop','D'),4200,{'auto':'자동 사격 1.5초','holy':'언데드·어둠 2배'}),
+ NO('o_wasp_dart','여왕벌 독침 다트',1,'throw',0,4,'off_throw_knife','scorpion_amber','노란 독침 다트 6개가 꽂힌 벌집 모양 주머니.',S('champion','1지역 여왕 말벌','10%'),None,{'poison':'독 40%'}),
+ NO('o_bat_ring','흡혈 박쥐왕의 반지',2,'ring',0,0,'acc_ring','blood_red','붉은 박쥐 날개 모양 반지, 손을 휘두르면 붉은 반짝임.',S('champion','2지역 흡혈 박쥐왕','8%'),None,{'lifesteal':'처치 시 10% 확률 반칸 회복'}),
+ NO('o_moss_shield','이끼 수정 방패',1,'shield',2,0,'off_shield_round','moss_crystal','이끼 낀 둥근 돌 방패에 수정 세 개.',S('boss','1지역 이끼 수정 골렘','30%'),None,{'block':'정지 시 정면 피해 30% 막기'}),
+ NO('o_worm_fang','대지렁이 이빨 부메랑',3,'throw',0,8,'off_throw_ring','boar_ivory','갈고리 모양 상아빛 이빨 부메랑.',S('boss','3지역 모래 대지렁이','첫 격파 확정'),None,{'return':'왕복 2타, 관통'}),
+ NO('o_golden_scarab','황금 풍뎅이 부적',4,'amulet',0,0,'acc_amulet','scarab_gold','청록 날개의 황금 풍뎅이 펜던트.',S('dive','4지역 무너진 방 침수 구역'),None,{'revive':'하루 1회 쓰러질 때 하트 1칸으로 버팀'}),
+ NO('o_shark_fin','백상어 지느러미 방패',5,'shield',4,0,'off_shield_kite','shark_grey','회색 상어 지느러미 모양 방패, 가장자리가 톱날.',S('champion','5지역 백상어 장군','7%'),None,{'block':'막기 성공 시 반격 피해 3'}),
+ NO('o_crab_claw','거대게 집게 방패',6,'shield',5,0,'off_shield_round','crab_red','붉은 게 집게를 통째로 방패로 쓴다. 막을 때 집게가 딸깍.',S('boss','6지역 산호 거대게','35%'),None,{'block':'정면 40%, 산호 방패 퍼펙트 +0.08초'}),
+ NO('o_lava_core','용암 거인의 핵',7,'orb',0,10,'off_orb','lava_core','주먹만 한 용암 덩어리가 어깨 위에서 부글거린다.',S('champion','7지역 용암 거인 수문장','6%'),None,{'auto':'자동 사격 2초, 착탄 불 장판'}),
+ NO('o_yeti_bracer','설인 털 팔보호대',8,'bracer',2,0,'acc_bracer','yeti_white','두툼한 흰 털 팔보호대, 손등에 얼음 발톱.',S('champion','8지역 어미 설인','7%'),None,{'freeze':'빙결 면역, 타격 빙결 5%'}),
+ NO('o_shadow_kunai','그림자 표창',9,'throw',0,12,'off_throw_star','shadow_black','허리띠에 꽂힌 검보라 표창 8개, 던지면 3갈래로 갈라진다.',S('champion','9지역 그림자 쌍검사','5%'),None,{'spread':'3갈래'}),
+ NO('o_void_ring','공허의 반지',9,'ring',0,0,'acc_ring','void_purple','빛을 빨아들이는 검은 반지, 보라 테두리.',S('dive','9지역 지하 수로'),None,{'gauge':'게이지 최대 +1, 자연 회복 +15%'}),
+ NO('o_dragon_eye','마룡의 눈',10,'orb',0,14,'off_orb','dragon_tri','세로 동공의 용 눈알 구슬. 노려본 적에게 3색 광선.',S('boss','10지역 머리 셋 달린 그림자 마룡','50%'),None,{'auto':'자동 광선 1.2초'}),
+]
+# ---------------------------------------------------------------- 소모품 60
+# (id, 이름, 효과, 기준가, 분류, [(판매 마을, 가격)], 기타 출처)
+def T(id,name,effect,price,cat,shops=(),other=None,black=False):
+    return id,dict(name=name,effect=effect,price=price,category=cat,shops=[dict(town=t,price=p) for t,p in shops],
+                  other_source=other,black_market=black)
+_ALL=['A','B','H','G','F','E','C','D']
+TOOLS=dict([
+ # 체력 회복
+ T('herb_red','빨간 약초','하트 1칸 회복',8,'체력',[('A',8),('B',8)],'들판 몹 5%'),
+ T('potion','회복약','하트 2칸 회복',20,'체력',[('A',20),('B',20),('H',22)],'상자'),
+ T('potion_m','중급 회복약','하트 4칸 회복',60,'체력',[('B',60),('H',60),('G',60),('F',60)],'퀘스트 H4·F1'),
+ T('riceball','광부 주먹밥','하트 3칸 회복 + 30초간 10초마다 반칸',35,'체력',[('H',35)]),
+ T('potion_regen','재생의 물약','20초간 2초마다 하트 반칸 회복',90,'체력',[('G',90),('F',90),('E',95)]),
+ T('potion_hi','고급 회복약','하트 전부 회복',180,'체력',[('F',180),('E',180),('C',180),('D',180)],'잠수 지점(0·3·7·10지역)'),
+ T('elixir','생명의 영약','쓰러질 때 자동으로 하트 절반 회복하며 부활',800,'체력',[('E',800),('C',800),('D',750)],'퀘스트 D4'),
+ # 게이지(정령력)
+ T('spirit','정령수','파란 게이지 3칸 회복',30,'게이지',[('A',30),('B',30),('H',30)]),
+ T('spirit_tea','정령 찻잎','60초간 파란 게이지 자연 회복 2배',70,'게이지',[('G',70),('F',70)]),
+ T('spirit_hi','상급 정령수','파란 게이지 전부 회복',120,'게이지',[('G',120),('F',120),('E',120),('C',120),('D',120)],'퀘스트 E6·C4·D4'),
+ T('panacea_full','만능 영약','하트·파란 게이지 전부 회복 + 상태이상 해제',400,'게이지',[('D',450)],'챔피언 10%'),
+ # 상태이상 치료
+ T('antidote','해독초','독 해제 + 10초 독 면역',15,'치료',[('A',15),('B',15),('H',15),('G',15),('F',15)]),
+ T('quick_powder','날쌘 가루','둔화·속박(거미줄·뿌리) 해제',20,'치료',[('B',20),('H',20)]),
+ T('water_skin','물주머니','사막 열사병 게이지 초기화',25,'치료',[('G',25)]),
+ T('holy_water','정화의 성수','저주 해제 (깎인 최대 하트 복구)',50,'치료',[('G',55),('D',50)]),
+ T('clear_eye','맑은 눈약','혼란·석화 해제 + 15초 면역',25,'치료',[('G',25),('D',25)]),
+ T('burn_salve','화상 연고','화상 해제 + 20초 화상 면역',30,'치료',[('F',35),('E',30)]),
+ T('thaw','해빙 연고','빙결 해제 + 20초 빙결 면역',30,'치료',[('C',30)]),
+ T('insulate','절연 송진','감전·마비 해제 + 20초 감전 면역',35,'치료',[('C',35),('F',40)]),
+ T('cure_all','만병통치약','모든 상태이상 해제 + 10초 면역',150,'치료',[('E',150),('C',150),('D',150)]),
+ # 일시 강화
+ T('atk_s','힘의 열매','60초간 공격 +15%',50,'버프',[('B',50),('H',50),('G',55)]),
+ T('atk_l','분노의 물약','60초간 공격 +30%',200,'버프',[('F',200),('E',200),('C',210),('D',200)]),
+ T('def_s','단단 껍질차','60초간 받는 피해 -15%',50,'버프',[('B',50),('H',50),('G',55)]),
+ T('def_l','철벽의 물약','60초간 받는 피해 -30%',200,'버프',[('E',200),('C',200),('D',200)]),
+ T('spd_s','바람 사탕','60초간 이동 속도 +20%',40,'버프',[('A',40),('G',40)]),
+ T('spd_l','질풍의 물약','60초간 이동·공격 속도 +25%',180,'버프',[('F',180),('C',180)]),
+ T('crit_s','매의 눈 향초','60초간 치명타 확률 +10%p',80,'버프',[('G',80),('F',80)]),
+ T('crit_l','사냥꾼의 집중약','60초간 치명타 +20%p, 치명 피해 +50%',260,'버프',[('E',260),('D',260)]),
+ T('berserk','광전사의 피','30초간 공격 +50%, 받는 피해 +30%',350,'버프',[('E',350)],'챔피언 5%'),
+ # 영구 능력치
+ T('pearl','생명의 진주','최대 하트 +1 (영구)',0,'영구',[],'잠수 지점 10곳 (DIVE_SPOTS.md)'),
+ T('heart_piece','하트 조각','4개 모으면 최대 하트 +1 (영구)',0,'영구',[],'마을 퀘스트 보상 8개 (A3·B4·H3·G3·F2·E5·C3·D2)'),
+ T('spirit_drop','정령의 물방울','파란 게이지 최대 +1칸 (영구)',0,'영구',[],'잠수 지점 8곳'),
+ T('giant_fruit','거인의 열매','공격력 +1 (영구)',0,'영구',[],'보스 1~9 첫 격파 확정 1개 + 마을 강자 결투 승리'),
+ T('turtle_fruit','거북 등껍질 열매','방어력 +1 (영구)',0,'영구',[],'챔피언 첫 격파 15%, 퀘스트 C5'),
+ T('dragon_heart','용의 심장 조각','최대 하트 +2 (영구)',0,'영구',[],'10지역 보스 확정'),
+ T('wind_plume','바람새 깃털','이동 속도 +3% (영구, 최대 3개)',0,'영구',[],'퀘스트 G4·F5·C2'),
+ # 탈출·이동
+ T('feather','귀환의 깃털','마지막으로 들른 마을로 즉시 귀환',50,'이동',[(t,50) for t in _ALL]),
+ T('smoke','연막 구슬','주변 몬스터·사람 3초 혼란, 전투 이탈',40,'이동',[('B',40),('G',40),('F',45)]),
+ T('escape_rope','탈출 밧줄','동굴·던전 안에서 그 지역 입구로 탈출',30,'이동',[('H',30),('G',30)]),
+ T('warp_stone','이동의 돌','방문한 마을 중 원하는 곳으로 순간이동',150,'이동',[('F',150),('E',150),('C',150),('D',150)]),
+ T('gate_bell','문지기의 종','이미 연 보스 방 문 앞으로 순간이동',120,'이동',[('E',120),('D',120)]),
+ T('invis_dust','투명 가루','10초간 몹·경비병에게 들키지 않음 (공격하면 풀림)',160,'이동',[('C',160),('D',160)]),
+ # 잠수
+ T('goggles_oil','잠수 기름','잠수 시간 +30초 (해당 맵 1회)',80,'잠수',[('F',80),('E',85)]),
+ T('air_bubble','공기 방울 병','물속에서 즉시 숨 게이지 50% 회복',45,'잠수',[('B',50),('F',45)]),
+ T('swim_fin','물갈퀴 기름','60초간 수영·잠수 이동 +40%',70,'잠수',[('B',75),('F',70)]),
+ T('deep_lamp','심해 등불','60초간 물속 시야 확대 + 숨은 물건 반짝임',60,'잠수',[('F',60)]),
+ T('mermaid_scale','인어 비늘','3분간 물속 숨 무한',300,'잠수',[('F',350)],'5지역 몹 2%'),
+ # 도구
+ T('torch','횃불','어두운 맵에서 60초 시야 확대',10,'도구',[('A',10),('H',10)]),
+ T('bomb','작은 폭탄','금 간 벽 파괴, 주변 피해 3',35,'도구',[('H',35),('G',40)]),
+ T('big_bomb','큰 폭탄','단단한 바위 파괴, 주변 피해 8',120,'도구',[('E',120),('C',120)]),
+ T('lure','미끼 고기','던진 곳으로 짐승형 몹을 5초간 끌어들임',15,'도구',[('B',15),('C',15)]),
+ T('map_scroll','탐험 지도','현재 지역의 잠수 지점·보물 위치를 지도에 표시',200,'도구',[('G',200),('D',220)]),
+ T('skeleton_key','만능 열쇠','잠긴 상자·문 1회 열기 (마을 안에서 쓰면 도둑질, 선악 -5)',100,'도구',[('G',100)],'고블린 3%'),
+ T('coin_charm','황금 동전','5분간 금화 획득 +50%',300,'도구',[('D',300)]),
+ # 강화
+ T('charm_guard','수호의 부적','강화 실패 시 단계 하락 방지 (1회용, +7 이상 시도에만 의미)',1500,'강화',[('E',1500),('D',1800)],'7~10지역 챔피언 3~5%'),
+ T('charm_luck','행운의 숫돌','강화 성공 확률 +10%p (1회용)',600,'강화',[('E',600),('C',650),('D',600)],'퀘스트 F6·E2'),
+ # 선악 관련
+ T('pardon','면죄 증서','현상금 전액 말소 (선악 수치는 그대로)',500,'선악',[('D',500)],'대성당 (선악 -60 이하는 판매 거부)'),
+ T('candle','참회의 촛불','선악 +5 (마을 성소에서 하루 1회)',300,'선악',[('C',300),('D',300)]),
+ T('poison_vial','맹독 병','60초간 무기에 독 부여 (타격 독 40%). 마을 사람에게 쓰면 선악 -5',120,'선악',[('G',120),('E',130)],'사막 도적 3%',True),
+ T('blood_tonic','검은 피의 비약','60초간 공격 +40%, 흡수한 인간 능력 위력 +20%. 사용 시 선악 -2',250,'선악',[('H',250),('F',250),('D',300)],None,True),
+])
+# ---------------------------------------------------------------- 상점 목록을 카탈로그에서 생성
+for _t in TOWNS:
+    _t['shops']['weapon']=sorted([(e['id'],e['price']) for e in EQUIP_ITEMS if e['source']['type']=='shop' and e['source']['where']==_t['id']],key=lambda x:x[1])
+    _t['shops']['tool']=[(i,s['price']) for i,d in TOOLS.items() for s in d['shops'] if s['town']==_t['id'] and not d['black_market']]
+    _t['shops']['black']=[(i,s['price']) for i,d in TOOLS.items() for s in d['shops'] if s['town']==_t['id'] and d['black_market']]
+CATALOG_COUNTS=dict(weapon=30,armor=30,offhand=30,consumable=60)
+
+# ================================================================ 이야기·선악·전투 데이터 결합 (story_data.py)
+from story_data import *
+_FOLK={p['npc']:p for p in TOWNSFOLK}
+_SMT={s['town']:s for s in STRONGMEN}
+for _t in TOWNS:
+    for _n in _t['npcs']:
+        if _n['id'] in GREETING_REWRITES: _n['greeting']=GREETING_REWRITES[_n['id']]
+        _n['greeting_dark']=_FOLK[_n['id']]['fear_line']
+        _n['combat']={k:v for k,v in _FOLK[_n['id']].items() if k not in('npc','fear_line')}
+    for _i,_q in enumerate(_t['quests']):
+        _q.update(QUEST_REWRITES.get(_q['id'],{}))
+        _q['path']='good'
+        _q['karma_gate']='악명 이하에서는 의뢰인이 거절' if _i>=2 else '선악과 무관 (마왕 등급만 거절)'
+    _s=_SMT[_t['id']]; _t['strongman']=_s
+    _dq,_mq=_s['duel_quest'],_s['murder_quest']
+    _t['quests'].append(dict(id=_dq[0],giver='strongman',title=_dq[1],type='결투',story=_dq[2],
+        objective=f"{_s['name']}과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
+        reward=f"살려 줌: 「{_s['skill']['name']}」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「{_s['skill']['name']}」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
+        path='both',karma_gate='선악과 무관'))
+    _t['quests'].append(dict(id=_mq[0],giver='strongman',title=_mq[1],type='암살',story=_mq[2],
+        objective=f"결투 밖에서 {_s['name']} 처치 (항복 없음, 필살기 포함 전력)",
+        reward=f"「{_s['skill']['name']}」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",path='evil',karma_gate='악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외'))
+    for _e in EVIL_QUESTS[_t['id']]:
+        _d=dict(id=_e[0],giver=_e[1],title=_e[2],type='악의 길'+(' (변형)' if _e[6] else ''),story=_e[3],objective=_e[4],reward=_e[5],path='evil',karma_gate='악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)')
+        if _e[6]: _d['variant_of']=_e[6]
+        _t['quests'].append(_d)
