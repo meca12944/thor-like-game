@@ -1,0 +1,1989 @@
+{
+ "_doc": "Hero animation source. Edit and run: python3 tools/anim/build_anim.py hero. Sheets are generated pixel-art strips (src/hero/anim_raw/*.jpg) keyed to exact #FF00FF (src/hero/anim_keyed). 'ref' = frame used for scale (its height == heroH * refFactor). Frame entry: [sheet, index, ticks(60fps), {bob: upper-body drop px, dy: whole-sprite y offset px (neg=up), dx: x offset px (forward = +), flip: mirror}]. Pixel units are LOGICAL px (384x216 view = world*0.3). Directions: right (left = mirrored right), down, up.",
+ "heroH": 28,
+ "logicalScale": 0.3,
+ "sheets": {
+  "wr": {
+   "file": "walk_right_k6",
+   "n": 6,
+   "ref": 2,
+   "refFactor": 1.0
+  },
+  "wd": {
+   "file": "walk_down_k4",
+   "n": 4,
+   "ref": 1,
+   "refFactor": 1.0
+  },
+  "wu": {
+   "file": "walk_up_k4",
+   "n": 4,
+   "ref": 1,
+   "refFactor": 1.0
+  },
+  "id": {
+   "file": "idle3",
+   "n": 3,
+   "ref": 0,
+   "refFactor": 1.0
+  },
+  "hd": {
+   "file": "hurt_death",
+   "n": 6,
+   "ref": 2,
+   "refFactor": 0.9
+  },
+  "hfb": {
+   "file": "hurt_fb",
+   "n": 4,
+   "ref": 1,
+   "refFactor": 0.9
+  },
+  "dr": {
+   "file": "dash_right",
+   "n": 5,
+   "ref": 4,
+   "refFactor": 0.93
+  },
+  "dd": {
+   "file": "dash_down",
+   "n": 4,
+   "ref": 3,
+   "refFactor": 0.93
+  },
+  "du": {
+   "file": "dash_up",
+   "n": 4,
+   "ref": 3,
+   "refFactor": 0.98
+  },
+  "a1r": {
+   "file": "atk1_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a2r": {
+   "file": "atk2_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a1d": {
+   "file": "atk1_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a1u": {
+   "file": "atk1_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a2d": {
+   "file": "atk2_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a2u": {
+   "file": "atk2_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "c3r": {
+   "file": "atk3_chop_right",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "c3d": {
+   "file": "atk3_chop_down",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "c3u": {
+   "file": "atk3_chop_up",
+   "n": 6,
+   "ref": 5,
+   "refFactor": 0.93
+  },
+  "a3": {
+   "file": "atk3_spin",
+   "n": 6,
+   "ref": 0,
+   "refFactor": 0.9
+  }
+ },
+ "anims": {
+  "idle_right": {
+   "loop": true,
+   "frames": [
+    [
+     "id",
+     1,
+     14
+    ],
+    [
+     "id",
+     1,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     1,
+     14,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     1,
+     10,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     1,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     1,
+     8
+    ]
+   ]
+  },
+  "idle_down": {
+   "loop": true,
+   "frames": [
+    [
+     "id",
+     0,
+     14
+    ],
+    [
+     "id",
+     0,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     0,
+     14,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     0,
+     10,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     0,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     0,
+     8
+    ]
+   ]
+  },
+  "idle_up": {
+   "loop": true,
+   "frames": [
+    [
+     "id",
+     2,
+     14
+    ],
+    [
+     "id",
+     2,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     2,
+     14,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     2,
+     10,
+     {
+      "bob": 2
+     }
+    ],
+    [
+     "id",
+     2,
+     10,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "id",
+     2,
+     8
+    ]
+   ]
+  },
+  "walk_right": {
+   "loop": true,
+   "frames": [
+    [
+     "wr",
+     0,
+     5
+    ],
+    [
+     "wr",
+     1,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wr",
+     2,
+     5
+    ],
+    [
+     "wr",
+     2,
+     5,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "wr",
+     3,
+     5
+    ],
+    [
+     "wr",
+     4,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wr",
+     5,
+     5
+    ],
+    [
+     "wr",
+     5,
+     5,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "walk_down": {
+   "loop": true,
+   "frames": [
+    [
+     "wd",
+     0,
+     5
+    ],
+    [
+     "wd",
+     0,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wd",
+     1,
+     5
+    ],
+    [
+     "wd",
+     1,
+     5,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "wd",
+     2,
+     5
+    ],
+    [
+     "wd",
+     2,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wd",
+     3,
+     5
+    ],
+    [
+     "wd",
+     3,
+     5,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "walk_up": {
+   "loop": true,
+   "frames": [
+    [
+     "wu",
+     0,
+     5
+    ],
+    [
+     "wu",
+     0,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wu",
+     1,
+     5
+    ],
+    [
+     "wu",
+     1,
+     5,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "wu",
+     2,
+     5
+    ],
+    [
+     "wu",
+     2,
+     5,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "wu",
+     3,
+     5
+    ],
+    [
+     "wu",
+     3,
+     5,
+     {
+      "dy": -1
+     }
+    ]
+   ]
+  },
+  "dash_right": {
+   "loop": false,
+   "frames": [
+    [
+     "dr",
+     0,
+     2
+    ],
+    [
+     "dr",
+     1,
+     3
+    ],
+    [
+     "dr",
+     2,
+     3,
+     {
+      "dy": -3
+     }
+    ],
+    [
+     "dr",
+     2,
+     3,
+     {
+      "dy": -2
+     }
+    ],
+    [
+     "dr",
+     3,
+     4
+    ],
+    [
+     "dr",
+     4,
+     6
+    ]
+   ]
+  },
+  "dash_down": {
+   "loop": false,
+   "frames": [
+    [
+     "dd",
+     0,
+     2
+    ],
+    [
+     "dd",
+     1,
+     3
+    ],
+    [
+     "dd",
+     2,
+     3
+    ],
+    [
+     "dd",
+     2,
+     3,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "dd",
+     3,
+     4
+    ],
+    [
+     "dd",
+     3,
+     6,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "dash_up": {
+   "loop": false,
+   "frames": [
+    [
+     "du",
+     0,
+     2
+    ],
+    [
+     "du",
+     1,
+     3
+    ],
+    [
+     "du",
+     2,
+     3
+    ],
+    [
+     "du",
+     2,
+     3,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "du",
+     3,
+     4
+    ],
+    [
+     "du",
+     3,
+     6,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk1_right": {
+   "loop": false,
+   "frames": [
+    [
+     "a1r",
+     0,
+     2
+    ],
+    [
+     "a1r",
+     1,
+     2
+    ],
+    [
+     "a1r",
+     2,
+     2
+    ],
+    [
+     "a1r",
+     3,
+     3
+    ],
+    [
+     "a1r",
+     3,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "a1r",
+     4,
+     3
+    ],
+    [
+     "a1r",
+     5,
+     3
+    ],
+    [
+     "a1r",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk1_down": {
+   "loop": false,
+   "frames": [
+    [
+     "a1d",
+     0,
+     2
+    ],
+    [
+     "a1d",
+     1,
+     2
+    ],
+    [
+     "a1d",
+     2,
+     2
+    ],
+    [
+     "a1d",
+     3,
+     3
+    ],
+    [
+     "a1d",
+     3,
+     2,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "a1d",
+     4,
+     3
+    ],
+    [
+     "a1d",
+     5,
+     3
+    ],
+    [
+     "a1d",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk1_up": {
+   "loop": false,
+   "frames": [
+    [
+     "a1u",
+     0,
+     2
+    ],
+    [
+     "a1u",
+     1,
+     2
+    ],
+    [
+     "a1u",
+     2,
+     2
+    ],
+    [
+     "a1u",
+     3,
+     3
+    ],
+    [
+     "a1u",
+     3,
+     2,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "a1u",
+     4,
+     3
+    ],
+    [
+     "a1u",
+     5,
+     3
+    ],
+    [
+     "a1u",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk2_right": {
+   "loop": false,
+   "frames": [
+    [
+     "a2r",
+     0,
+     2
+    ],
+    [
+     "a2r",
+     1,
+     3
+    ],
+    [
+     "a2r",
+     2,
+     2
+    ],
+    [
+     "a2r",
+     3,
+     3
+    ],
+    [
+     "a2r",
+     3,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "a2r",
+     4,
+     3
+    ],
+    [
+     "a2r",
+     5,
+     3
+    ],
+    [
+     "a2r",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk2_down": {
+   "loop": false,
+   "frames": [
+    [
+     "a2d",
+     0,
+     2
+    ],
+    [
+     "a2d",
+     1,
+     3
+    ],
+    [
+     "a2d",
+     2,
+     2
+    ],
+    [
+     "a2d",
+     3,
+     3
+    ],
+    [
+     "a2d",
+     3,
+     2,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "a2d",
+     4,
+     3
+    ],
+    [
+     "a2d",
+     5,
+     3
+    ],
+    [
+     "a2d",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk2_up": {
+   "loop": false,
+   "frames": [
+    [
+     "a2u",
+     0,
+     2
+    ],
+    [
+     "a2u",
+     1,
+     3
+    ],
+    [
+     "a2u",
+     2,
+     2
+    ],
+    [
+     "a2u",
+     3,
+     3
+    ],
+    [
+     "a2u",
+     3,
+     2,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "a2u",
+     4,
+     3
+    ],
+    [
+     "a2u",
+     5,
+     3
+    ],
+    [
+     "a2u",
+     5,
+     2,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "hurt_right": {
+   "loop": false,
+   "frames": [
+    [
+     "hd",
+     0,
+     6
+    ],
+    [
+     "hd",
+     0,
+     6,
+     {
+      "dx": -1
+     }
+    ],
+    [
+     "hd",
+     1,
+     8
+    ]
+   ]
+  },
+  "hurt_down": {
+   "loop": false,
+   "frames": [
+    [
+     "hfb",
+     0,
+     6
+    ],
+    [
+     "hfb",
+     0,
+     6,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "hfb",
+     1,
+     8
+    ]
+   ]
+  },
+  "hurt_up": {
+   "loop": false,
+   "frames": [
+    [
+     "hfb",
+     2,
+     6
+    ],
+    [
+     "hfb",
+     2,
+     6,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "hfb",
+     3,
+     8
+    ]
+   ]
+  },
+  "death_right": {
+   "loop": false,
+   "frames": [
+    [
+     "hd",
+     0,
+     8
+    ],
+    [
+     "hd",
+     1,
+     10
+    ],
+    [
+     "hd",
+     2,
+     10
+    ],
+    [
+     "hd",
+     3,
+     6
+    ],
+    [
+     "hd",
+     4,
+     5
+    ],
+    [
+     "hd",
+     4,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "hd",
+     5,
+     8
+    ],
+    [
+     "hd",
+     5,
+     60
+    ]
+   ]
+  },
+  "death_down": "death_right",
+  "death_up": "death_right",
+  "atk3_right": {
+   "loop": false,
+   "frames": [
+    [
+     "c3r",
+     0,
+     5
+    ],
+    [
+     "c3r",
+     1,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "c3r",
+     2,
+     2
+    ],
+    [
+     "c3r",
+     2,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "c3r",
+     3,
+     4,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "c3r",
+     4,
+     5
+    ],
+    [
+     "c3r",
+     5,
+     4
+    ],
+    [
+     "c3r",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk3_down": {
+   "loop": false,
+   "frames": [
+    [
+     "c3d",
+     0,
+     5
+    ],
+    [
+     "c3d",
+     1,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "c3d",
+     2,
+     2
+    ],
+    [
+     "c3d",
+     2,
+     2,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "c3d",
+     3,
+     4,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "c3d",
+     4,
+     5
+    ],
+    [
+     "c3d",
+     5,
+     4
+    ],
+    [
+     "c3d",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk3_up": {
+   "loop": false,
+   "frames": [
+    [
+     "c3u",
+     0,
+     5
+    ],
+    [
+     "c3u",
+     1,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "c3u",
+     2,
+     2
+    ],
+    [
+     "c3u",
+     2,
+     2,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "c3u",
+     3,
+     4,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "c3u",
+     4,
+     5
+    ],
+    [
+     "c3u",
+     5,
+     4
+    ],
+    [
+     "c3u",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk3s_right": {
+   "loop": false,
+   "frames": [
+    [
+     "a3",
+     0,
+     4
+    ],
+    [
+     "a3",
+     1,
+     3
+    ],
+    [
+     "a3",
+     2,
+     3
+    ],
+    [
+     "a3",
+     3,
+     3
+    ],
+    [
+     "a3",
+     4,
+     4
+    ],
+    [
+     "a3",
+     4,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "a3",
+     5,
+     6
+    ],
+    [
+     "a3",
+     5,
+     4,
+     {
+      "bob": 1
+     }
+    ]
+   ]
+  },
+  "atk3s_down": "atk3s_right",
+  "atk3s_up": "atk3s_right",
+  "atk2s_right": {
+   "loop": false,
+   "frames": [
+    [
+     "a1r",
+     4,
+     2
+    ],
+    [
+     "a1r",
+     3,
+     2
+    ],
+    [
+     "a1r",
+     3,
+     2,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "a1r",
+     2,
+     3
+    ],
+    [
+     "a1r",
+     1,
+     3,
+     {
+      "dx": 1
+     }
+    ],
+    [
+     "a1r",
+     0,
+     3
+    ],
+    [
+     "a1r",
+     0,
+     2,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "a1r",
+     1,
+     2
+    ]
+   ]
+  },
+  "atk2s_down": {
+   "loop": false,
+   "frames": [
+    [
+     "a1d",
+     4,
+     2
+    ],
+    [
+     "a1d",
+     3,
+     2
+    ],
+    [
+     "a1d",
+     3,
+     2,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "a1d",
+     2,
+     3
+    ],
+    [
+     "a1d",
+     1,
+     3,
+     {
+      "dy": 1
+     }
+    ],
+    [
+     "a1d",
+     0,
+     3
+    ],
+    [
+     "a1d",
+     0,
+     2,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "a1d",
+     1,
+     2
+    ]
+   ]
+  },
+  "atk2s_up": {
+   "loop": false,
+   "frames": [
+    [
+     "a1u",
+     4,
+     2
+    ],
+    [
+     "a1u",
+     3,
+     2
+    ],
+    [
+     "a1u",
+     3,
+     2,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "a1u",
+     2,
+     3
+    ],
+    [
+     "a1u",
+     1,
+     3,
+     {
+      "dy": -1
+     }
+    ],
+    [
+     "a1u",
+     0,
+     3
+    ],
+    [
+     "a1u",
+     0,
+     2,
+     {
+      "bob": 1
+     }
+    ],
+    [
+     "a1u",
+     1,
+     2
+    ]
+   ]
+  }
+ },
+ "_weapons_doc": "Every combo hit is a SWING (no thrusts, no 360): hit1 slash right->left, hit2 return slash left->right (mirror), hit3 forward overhead/diagonal power swing with longer recovery. Hits are clipped to the forward arc FEEL.arcDeg (120). Only exception: titleCombo['마왕'].hit3 (360 spin + sword waves). Times in 60fps ticks, distances in world px; stop = hit-stop ticks.",
+ "weapons": {
+  "sword": {
+   "name": "한손검",
+   "art": "own",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "횡베기",
+     "dur": 17,
+     "a0": 3,
+     "a1": 9,
+     "cancel": 9,
+     "stop": 4,
+     "reach": 40,
+     "rad": 46,
+     "kb": 300,
+     "lunge": 8
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "되베기",
+     "dur": 17,
+     "a0": 3,
+     "a1": 9,
+     "cancel": 9,
+     "stop": 4,
+     "reach": 40,
+     "rad": 46,
+     "kb": 320,
+     "lunge": 10,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "내려베기",
+     "dur": 32,
+     "a0": 10,
+     "a1": 16,
+     "cancel": 22,
+     "stop": 8,
+     "reach": 46,
+     "rad": 50,
+     "kb": 700,
+     "lunge": 30,
+     "fin": true
+    }
+   ]
+  },
+  "saber": {
+   "name": "곡도 · 마체테",
+   "art": "reuses sword",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "흘려베기",
+     "dur": 14,
+     "a0": 2,
+     "a1": 7,
+     "cancel": 7,
+     "stop": 4,
+     "reach": 40,
+     "rad": 44,
+     "kb": 260,
+     "lunge": 10
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "되베기",
+     "dur": 14,
+     "a0": 2,
+     "a1": 7,
+     "cancel": 7,
+     "stop": 4,
+     "reach": 40,
+     "rad": 44,
+     "kb": 280,
+     "lunge": 10,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "slash",
+     "name": "사선 베기",
+     "dur": 28,
+     "a0": 8,
+     "a1": 14,
+     "cancel": 19,
+     "stop": 8,
+     "reach": 44,
+     "rad": 48,
+     "kb": 600,
+     "lunge": 34,
+     "fin": true
+    }
+   ]
+  },
+  "dagger": {
+   "name": "단검",
+   "art": "reuses sword",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "빠른 긋기",
+     "dur": 10,
+     "a0": 2,
+     "a1": 5,
+     "cancel": 5,
+     "stop": 3,
+     "reach": 28,
+     "rad": 34,
+     "kb": 180,
+     "lunge": 8
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "되긋기",
+     "dur": 10,
+     "a0": 2,
+     "a1": 5,
+     "cancel": 5,
+     "stop": 3,
+     "reach": 28,
+     "rad": 34,
+     "kb": 200,
+     "lunge": 8,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "교차 긋기",
+     "dur": 18,
+     "a0": 5,
+     "a1": 10,
+     "cancel": 12,
+     "stop": 7,
+     "reach": 32,
+     "rad": 38,
+     "kb": 380,
+     "lunge": 20,
+     "fin": true,
+     "hits": 2
+    }
+   ]
+  },
+  "greatsword": {
+   "name": "대검",
+   "art": "reuses sword (needs heavy 2-hand frames)",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "큰 횡베기",
+     "dur": 26,
+     "a0": 8,
+     "a1": 15,
+     "cancel": 18,
+     "stop": 6,
+     "reach": 52,
+     "rad": 58,
+     "kb": 460,
+     "lunge": 10
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "올려베기",
+     "dur": 28,
+     "a0": 8,
+     "a1": 16,
+     "cancel": 20,
+     "stop": 6,
+     "reach": 52,
+     "rad": 58,
+     "kb": 500,
+     "lunge": 12,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "내려찍기",
+     "dur": 46,
+     "a0": 16,
+     "a1": 23,
+     "cancel": 34,
+     "stop": 10,
+     "reach": 54,
+     "rad": 60,
+     "kb": 900,
+     "lunge": 22,
+     "fin": true
+    }
+   ]
+  },
+  "spear": {
+   "name": "창 · 작살",
+   "art": "reuses sword (needs spear frames)",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "창 휩쓸기",
+     "dur": 18,
+     "a0": 4,
+     "a1": 11,
+     "cancel": 11,
+     "stop": 4,
+     "reach": 68,
+     "rad": 56,
+     "kb": 340,
+     "lunge": 6
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "되휩쓸기",
+     "dur": 20,
+     "a0": 5,
+     "a1": 12,
+     "cancel": 12,
+     "stop": 4,
+     "reach": 68,
+     "rad": 56,
+     "kb": 360,
+     "lunge": 8,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "대휩쓸기 내려치기",
+     "dur": 36,
+     "a0": 12,
+     "a1": 19,
+     "cancel": 26,
+     "stop": 8,
+     "reach": 76,
+     "rad": 62,
+     "kb": 720,
+     "lunge": 16,
+     "fin": true
+    }
+   ]
+  },
+  "whip": {
+   "name": "채찍검",
+   "art": "reuses sword (needs whip frames)",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "채찍질",
+     "dur": 20,
+     "a0": 4,
+     "a1": 12,
+     "cancel": 12,
+     "stop": 4,
+     "reach": 70,
+     "rad": 52,
+     "kb": 240,
+     "lunge": 4
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "되감기",
+     "dur": 20,
+     "a0": 4,
+     "a1": 12,
+     "cancel": 12,
+     "stop": 4,
+     "reach": 70,
+     "rad": 52,
+     "kb": 260,
+     "lunge": 4,
+     "mirror": true
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "내리치기",
+     "dur": 34,
+     "a0": 11,
+     "a1": 18,
+     "cancel": 25,
+     "stop": 8,
+     "reach": 72,
+     "rad": 56,
+     "kb": 420,
+     "lunge": 10,
+     "fin": true
+    }
+   ]
+  },
+  "twin": {
+   "name": "쌍검",
+   "art": "reuses sword (needs off-hand blade)",
+   "combo": [
+    {
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "교차베기",
+     "dur": 12,
+     "a0": 2,
+     "a1": 6,
+     "cancel": 6,
+     "stop": 4,
+     "reach": 36,
+     "rad": 42,
+     "kb": 220,
+     "lunge": 8,
+     "hits": 2
+    },
+    {
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "역교차",
+     "dur": 12,
+     "a0": 2,
+     "a1": 6,
+     "cancel": 6,
+     "stop": 4,
+     "reach": 36,
+     "rad": 42,
+     "kb": 240,
+     "lunge": 8,
+     "mirror": true,
+     "hits": 2
+    },
+    {
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "쌍 내려베기",
+     "dur": 28,
+     "a0": 9,
+     "a1": 15,
+     "cancel": 20,
+     "stop": 8,
+     "reach": 44,
+     "rad": 46,
+     "kb": 560,
+     "lunge": 30,
+     "fin": true,
+     "hits": 2
+    }
+   ]
+  },
+  "hidden": {
+   "name": "숨겨진 전설검 (탁검 · 규검)",
+   "art": "reuses sword (needs sun/moon blade layer)",
+   "combo": [
+    {
+     "trail": [
+      "255,220,120",
+      "255,250,220"
+     ],
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "일섬",
+     "dur": 16,
+     "a0": 3,
+     "a1": 9,
+     "cancel": 9,
+     "stop": 4,
+     "reach": 46,
+     "rad": 52,
+     "kb": 320,
+     "lunge": 10
+    },
+    {
+     "trail": [
+      "140,200,255",
+      "230,245,255"
+     ],
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "월광 되베기",
+     "dur": 17,
+     "a0": 3,
+     "a1": 9,
+     "cancel": 10,
+     "stop": 4,
+     "reach": 46,
+     "rad": 52,
+     "kb": 340,
+     "lunge": 10,
+     "mirror": true
+    },
+    {
+     "trail": [
+      "255,220,120",
+      "140,200,255"
+     ],
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "일월 내려베기",
+     "dur": 32,
+     "a0": 10,
+     "a1": 16,
+     "cancel": 22,
+     "stop": 9,
+     "reach": 52,
+     "rad": 56,
+     "kb": 760,
+     "lunge": 34,
+     "fin": true
+    }
+   ]
+  },
+  "chan": {
+   "name": "찬검",
+   "art": "reuses sword (needs eclipse greatsword frames)",
+   "combo": [
+    {
+     "trail": [
+      "255,220,120",
+      "90,140,255"
+     ],
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "일식 베기",
+     "dur": 20,
+     "a0": 4,
+     "a1": 12,
+     "cancel": 12,
+     "stop": 5,
+     "reach": 48,
+     "rad": 54,
+     "kb": 420,
+     "lunge": 12
+    },
+    {
+     "trail": [
+      "140,200,255",
+      "255,255,255"
+     ],
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "월식 되베기",
+     "dur": 22,
+     "a0": 5,
+     "a1": 13,
+     "cancel": 14,
+     "stop": 5,
+     "reach": 48,
+     "rad": 54,
+     "kb": 460,
+     "lunge": 12,
+     "mirror": true
+    },
+    {
+     "trail": [
+      "255,220,120",
+      "30,20,60"
+     ],
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "개기일식 내려베기",
+     "dur": 36,
+     "a0": 12,
+     "a1": 19,
+     "cancel": 26,
+     "stop": 10,
+     "reach": 58,
+     "rad": 64,
+     "kb": 900,
+     "lunge": 30,
+     "fin": true
+    }
+   ]
+  },
+  "demon": {
+   "name": "마왕 종언",
+   "art": "reuses sword (needs demon blade frames)",
+   "combo": [
+    {
+     "trail": [
+      "200,40,60",
+      "40,0,20"
+     ],
+     "anim": "atk1",
+     "kind": "slash",
+     "name": "종언 베기",
+     "dur": 22,
+     "a0": 5,
+     "a1": 14,
+     "cancel": 14,
+     "stop": 6,
+     "reach": 50,
+     "rad": 56,
+     "kb": 460,
+     "lunge": 12
+    },
+    {
+     "trail": [
+      "200,40,60",
+      "255,120,140"
+     ],
+     "anim": "atk2s",
+     "kind": "slash",
+     "name": "종언 되베기",
+     "dur": 22,
+     "a0": 5,
+     "a1": 14,
+     "cancel": 14,
+     "stop": 6,
+     "reach": 50,
+     "rad": 56,
+     "kb": 480,
+     "lunge": 12,
+     "mirror": true
+    },
+    {
+     "trail": [
+      "120,0,40",
+      "255,60,80"
+     ],
+     "anim": "atk3",
+     "kind": "overhead",
+     "name": "종언 내려찍기",
+     "dur": 42,
+     "a0": 14,
+     "a1": 21,
+     "cancel": 30,
+     "stop": 10,
+     "reach": 58,
+     "rad": 64,
+     "kb": 1000,
+     "lunge": 26,
+     "fin": true
+    }
+   ]
+  }
+ },
+ "itemWeaponType": {
+  "w_bronze_long": "sword",
+  "w_iron_trainee": "sword",
+  "w_boar_tusk": "greatsword",
+  "w_forest_dagger": "dagger",
+  "w_crystal_edge": "sword",
+  "w_hunter_machete": "saber",
+  "w_mill_steel": "sword",
+  "w_miner_broad": "greatsword",
+  "w_reed_leaf": "sword",
+  "w_spider_fang": "saber",
+  "w_desert_crescent": "saber",
+  "w_sun_sting": "sword",
+  "w_sun_sigil": "sword",
+  "w_pharaoh_scepter": "sword",
+  "w_harpoon_blade": "spear",
+  "w_wave_blade": "sword",
+  "w_kraken_whip": "whip",
+  "w_anchor_great": "greatsword",
+  "w_captain_cutlass": "saber",
+  "w_forge_great": "greatsword",
+  "w_obsidian": "sword",
+  "w_hellfire": "sword",
+  "w_frost_crystal": "sword",
+  "w_northwind": "sword",
+  "w_storm_spear": "spear",
+  "w_mithril": "sword",
+  "w_royal_knight": "sword",
+  "w_first_bearer": "sword",
+  "w_shadow_twin": "twin",
+  "w_dragon_tri": "sword",
+  "hs_tak": "hidden",
+  "hs_gyu": "hidden",
+  "hs_chan": "chan",
+  "demon_end": "demon"
+ },
+ "_titleCombo_doc": "Karma-title overrides of the combo. Key = title (필멸자 / 영웅 / 타락한 필멸자 / 마왕). hit3 replaces combo hit 3 for every weapon type. The ONLY 360-degree attack in the game is the 마왕 hit 3 (kind 'spin' is ignored unless it comes from here). waves = sword-wave projectiles (검기) fired outward: n, speed (world px/s), range (world px), rad (hit radius), dmg, kb, pierce.",
+ "titleCombo": {
+  "마왕": {
+   "hit3": {
+    "anim": "atk3s",
+    "kind": "spin",
+    "name": "마왕 참륜",
+    "dur": 40,
+    "a0": 6,
+    "a1": 22,
+    "cancel": 30,
+    "stop": 9,
+    "rad": 118,
+    "kb": 820,
+    "lunge": 0,
+    "fin": true,
+    "ring": [
+     "120,0,20",
+     "255,60,80",
+     "60,0,10"
+    ],
+    "trail": [
+     "255,50,70",
+     "90,0,20"
+    ],
+    "waves": {
+     "n": 8,
+     "speed": 560,
+     "range": 360,
+     "rad": 30,
+     "dmg": 1,
+     "kb": 380,
+     "pierce": true,
+     "col": [
+      "255,40,70",
+      "40,0,10"
+     ]
+    }
+   }
+  }
+ }
+}

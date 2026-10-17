@@ -26,10 +26,10 @@
 | `w_pharaoh_scepter` | 황금가면 왕홀검 | 무기 | 4 | 공격 17 · 처치 시 하트 반칸 흡수 10% | 보스: 4지역 황금가면 미라왕 (첫 격파 확정) | `wpn_scepter` · pharaoh_gold | 남색 손잡이 위 금빛 왕홀 머리, 날은 상형문자가 새겨진 짧은 금날. 궤적에 상형문자. | `r_w_pharaoh_scepter` (E, 70%) |
 | `w_harpoon_blade` | 작살검 | 무기 | 5 | 공격 18 · 찌르기 사거리 +20% | F 남쪽 항구 마을 상점 (1950) | `wpn_harpoon` · sea_blue | 끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 찌르기(2타) 사거리 +20%. | `r_w_harpoon_blade` (F, 100%) |
 | `w_wave_blade` | 파도 검 | 무기 | 5 | 공격 17 | F 남쪽 항구 마을 상점 (1700) | `wpn_wavy` · sea_blue | 물결치듯 구불구불한 바다색 날(플랑베르주형). 궤적이 물보라처럼 흩어진다. | `r_w_wave_blade` (F, 100%) |
-| `w_kraken_whip` | 크라켄 촉수검 | 무기 | 5 | 공격 19 · 돌려베기 범위 +25% | 보스: 5지역 심해 크라켄 뱀 (첫 격파 확정) | `wpn_whip` · kraken_purple | 빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 돌려베기 범위 +25%. | `r_w_kraken_whip` (E, 70%) |
+| `w_kraken_whip` | 크라켄 촉수검 | 무기 | 5 | 공격 19 · 3타 범위 +25% | 보스: 5지역 심해 크라켄 뱀 (첫 격파 확정) | `wpn_whip` · kraken_purple | 빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 3타 범위 +25%. | `r_w_kraken_whip` (E, 70%) |
 | `w_anchor_great` | 닻 대검 | 무기 | 6 | 공격 18 · 넉백 +30% | F 남쪽 항구 마을 상점 (1850) | `wpn_broad` · anchor_steel | 닻 모양 가드가 달린 넓은 회철 대검, 손잡이에 밧줄 감김. | `r_w_anchor_great` (F, 100%) |
 | `w_captain_cutlass` | 해적 선장의 커틀러스 | 무기 | 6 | 공격 20 · 몹 금화 +15% | 잠수: 6지역 해적 동굴 바닷물 | `wpn_curved` · pirate_brass | 놋쇠 바구니 가드의 짧은 곡도, 칼등에 해골 각인. 녹슨 금빛 궤적. | `r_w_captain_cutlass` (F, 100%) |
-| `w_forge_great` | 용광로 대검 | 무기 | 7 | 공격 23 · 3타 돌려베기 화상 | E 화산 기슭 대장장이 마을 상점 (2900) | `wpn_broad` · forge_red | 넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다. | `r_w_forge_great` (E, 90%) |
+| `w_forge_great` | 용광로 대검 | 무기 | 7 | 공격 23 · 3타 내려찍기 화상 | E 화산 기슭 대장장이 마을 상점 (2900) | `wpn_broad` · forge_red | 넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다. | `r_w_forge_great` (E, 90%) |
 | `w_obsidian` | 흑요석 검 | 무기 | 7 | 공격 21 | E 화산 기슭 대장장이 마을 상점 (2600) | `wpn_crystal` · obsidian_ember | 검은 유리 같은 흑요석 날, 가장자리만 주황 불씨처럼 빛남. 주황 궤적. | `r_w_obsidian` (E, 90%) |
 | `w_hellfire` | 업화의 흑검 | 무기 | 7 | 공격 24 · 모든 타격 화상 20% | 제작 전용: E 마스터 대장간 (재료: 흑기사의 업화 핵) (보스 첫 격파 시 핵 + 레시피 두루마리 확정 (장비 자체는 드롭 안 함)) | `wpn_flame` · hellfire | 흑기사의 검. 검은 날 전체가 불꽃 모양으로 일렁이며 늘 불이 붙어 있다. | `r_w_hellfire` (E, 70%, 제작 전용) |
 | `w_frost_crystal` | 서리 결정검 | 무기 | 8 | 공격 25 · 2타 찌르기 둔화 | C 설산 산장 마을 상점 (3600) | `wpn_crystal` · ice_pale | 얼음 결정이 겹겹이 자란 창백한 하늘색 날, 서리 김이 피어오름. | `r_w_frost_crystal` (E, 90%) |

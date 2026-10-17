@@ -32,7 +32,7 @@ EQUIP_ITEMS=[
  W('w_wave_blade','파도 검',17,'wpn_wavy','sea_blue',['#e0f8ff','#30a0e0'],'물결치듯 구불구불한 바다색 날(플랑베르주형). 궤적이 물보라처럼 흩어진다.'),
  W('w_anchor_great','닻 대검',18,'wpn_broad','anchor_steel',['#f0f0f0','#6a7a8a'],'닻 모양 가드가 달린 넓은 회철 대검, 손잡이에 밧줄 감김.',{'kb':'+30%'}),
  W('w_obsidian','흑요석 검',21,'wpn_crystal','obsidian_ember',['#ffd0a0','#ff6a20'],'검은 유리 같은 흑요석 날, 가장자리만 주황 불씨처럼 빛남. 주황 궤적.'),
- W('w_forge_great','용광로 대검',23,'wpn_broad','forge_red',['#fff0c0','#ff3a10'],'넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다.',{'burn':'3타 돌려베기 화상'}),
+ W('w_forge_great','용광로 대검',23,'wpn_broad','forge_red',['#fff0c0','#ff3a10'],'넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다.',{'burn':'3타 내려찍기 화상'}),
  W('w_frost_crystal','서리 결정검',25,'wpn_crystal','ice_pale',['#ffffff','#a0d8ff'],'얼음 결정이 겹겹이 자란 창백한 하늘색 날, 서리 김이 피어오름.',{'slow':'2타 찌르기 둔화'}),
  W('w_northwind','북풍 장검',26,'wpn_straight_long','silver_fur',['#f8fbff','#c0c8d8'],'은빛 장검, 손잡이에 흰 털가죽, 가드 끝에 늑대 머리.'),
  W('w_royal_knight','왕실 기사검',28,'wpn_ornate','royal_silver_gold',['#ffffff','#ffd860'],'은날에 금 상감, 십자 가드에 파란 왕실 보석. 흰·금 이중 궤적.'),
@@ -84,7 +84,7 @@ PALETTES={
  'copper_green':['#1a3a30','#3a7a5a','#c07a3a','#a0f0c0'],
 }
 EQUIP_SLOTS=[
- dict(id='weapon',name='무기',layer='weapon',desc='검 스프라이트(날 모양·색)와 베기 궤적 색이 바뀐다. 3단 콤보(횡베기·찌르기·돌려베기)와 스킬 포즈 모두에 적용.'),
+ dict(id='weapon',name='무기',layer='weapon',desc='검 스프라이트(날 모양·색)와 베기 궤적 색이 바뀐다. 3단 콤보(무기 종류별 정면 3연타)와 스킬 포즈 모두에 적용.'),
  dict(id='armor',name='방어구',layer='armor',desc='튜닉/갑옷 레이어. 몸통·팔·허리 부분 외형이 바뀐다.'),
  dict(id='helmet',name='투구',layer='helmet',desc='머리 장비(선택). 비우면 필멸자의 기본 검은 머리가 그대로 보인다.'),
  dict(id='offhand',name='보조무기',layer='offhand',desc='방패·팔보호대·투척무기·오브·부적·반지·장화. 방패는 왼팔, 팔보호대는 팔뚝, 투척무기는 허리 주머니+던질 때 왼손, 오브는 어깨 옆에 떠다니는 FX, 부적은 가슴, 반지는 손가락 반짝임, 장화는 발 레이어로 보인다.'),
@@ -466,7 +466,7 @@ ENH_RULES=dict(
  npc='각 마을 무기상점 대장장이가 강화 담당. 마을별 최대 단계: A·B·H +3 / G·F +6 / E·C·D +9 (E는 성공률 보너스)',
  visuals=[dict(level=4,fx='glow',desc='검날 가장자리에 무기 팔레트 밝은색 1px 외곽 발광, 2초 주기로 은은히 깜빡임'),
           dict(level=7,fx='aura',desc='검 주변에 재료 티어 색(화뢰 정수 주황) 아지랑이 오라 + 베기 궤적 두께 1.5배'),
-          dict(level=9,fx='aura_max',desc='검 전체가 공허 결정 보라·흰 빛으로 빛나고, 걸을 때 빛 입자가 떨어짐. 3타 돌려베기 링이 무기 궤적색 이중 링으로 바뀜')],
+          dict(level=9,fx='aura_max',desc='검 전체가 공허 결정 보라·흰 빛으로 빛나고, 걸을 때 빛 입자가 떨어짐. 3타 마무리 궤적이 무기 궤적색 이중 궤적으로 바뀜')],
  stat_note='공격력 보너스는 무기 기본 공격력에 대한 누적 %. 표시는 정수 반올림 (예: 공격 20 무기 +5 → 24.8 → 25)',
 )
 CHAMPION_DROPS=[ # 첫 격파는 확정 2개, 재등장 후 격파는 drop% 로 1개 (희귀 5%로 2개)
@@ -567,7 +567,7 @@ EQUIP_ITEMS+=[
  NW('w_spider_fang','여왕거미 독니검',2,13,'wpn_curved','spider_violet',['#f0e0ff','#a070e0'],'보랏빛 수정 독니가 휜 날이 된 검, 날 끝에서 독 방울이 떨어진다.',S('boss','2지역 수정 여왕거미','첫 격파 확정'),None,{'poison':'타격 시 15% 독'}),
  NW('w_sun_sting','태양침 독검',3,15,'wpn_leaf','scorpion_amber',['#fff0b0','#ff9a20'],'황금 전갈 꼬리 마디로 이은 호박색 날, 끝은 독침.',S('champion',"3지역 황금 전갈 '태양침'",'6%'),None,{'poison':'찌르기 독 30%'}),
  NW('w_pharaoh_scepter','황금가면 왕홀검',4,17,'wpn_scepter','pharaoh_gold',['#fff4c0','#ffc820'],'남색 손잡이 위 금빛 왕홀 머리, 날은 상형문자가 새겨진 짧은 금날. 궤적에 상형문자.',S('boss','4지역 황금가면 미라왕','첫 격파 확정'),None,{'curse':'처치 시 하트 반칸 흡수 10%'}),
- NW('w_kraken_whip','크라켄 촉수검',5,19,'wpn_whip','kraken_purple',['#e0b0ff','#6a2a9a'],'빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 돌려베기 범위 +25%.',S('boss','5지역 심해 크라켄 뱀','첫 격파 확정'),None,{'spin':'돌려베기 범위 +25%'}),
+ NW('w_kraken_whip','크라켄 촉수검',5,19,'wpn_whip','kraken_purple',['#e0b0ff','#6a2a9a'],'빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 3타 범위 +25%.',S('boss','5지역 심해 크라켄 뱀','첫 격파 확정'),None,{'spin':'3타 범위 +25%'}),
  NW('w_captain_cutlass','해적 선장의 커틀러스',6,20,'wpn_curved','pirate_brass',['#f8f0c0','#c0a050'],'놋쇠 바구니 가드의 짧은 곡도, 칼등에 해골 각인. 녹슨 금빛 궤적.',S('dive','6지역 해적 동굴 바닷물'),None,{'coin':'몹 금화 +15%'}),
  NW('w_hellfire','업화의 흑검',7,24,'wpn_flame','hellfire',['#ffe060','#ff2a00'],'흑기사의 검. 검은 날 전체가 불꽃 모양으로 일렁이며 늘 불이 붙어 있다.',S('boss','7지역 화염검 흑기사','첫 격파 확정'),None,{'burn':'모든 타격 화상 20%'}),
  NW('w_storm_spear','뇌전 창검',8,27,'wpn_spear','storm_yellow',['#ffffff','#ffe040'],'와이번 뿔로 만든 창날 검, 날 위로 잔번개가 튄다. 노란 지그재그 궤적.',S('boss','8지역 뇌전 와이번','첫 격파 확정'),None,{'shock':'3타 연쇄 번개'}),
