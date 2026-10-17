@@ -1,6 +1,8 @@
 # NPC 시트 색인
 
-셀 위치는 r행c열 (왼쪽 위부터). 원본·배경 보정본·셀 잘라낸 것은 raw/.
+셀 위치는 r행c열 (왼쪽 위부터). 셀별 투명 PNG는 raw/cell_<id>.png.
+
+성인 여성 NPC는 v2 비키니 아머 + 미니스커트 스타일(female_sample_desert_v2.jpg). 마이크로 비키니(female_sample_microbikini.jpg): g_dancer 방울, f_tailor 진주, f_diver 숨비. 특별 캐릭터(가슴 약 2배): sm_G 모래매 자흐라, sm_F 작살잡이 마고. g_tool 사프란 = v2 샘플 캐릭터. 아이 NPC는 변경 없음(단정한 복장).
 
 | 시트 | 셀 | NPC id | 이름 | 역할 |
 |---|---|---|---|---|
@@ -93,3 +95,10 @@
 | npc_strongmen.png | r2c3 | sm_C | 설산의 무승 한빙 | C · 은둔 무승 |
 | npc_strongmen.png | r2c4 | sm_D | 무명의 그림 | D · 왕실 처형인 (낙인 사냥꾼) |
 | npc_aslan.png | 전체 | final_human | 아스란 | 원탁의 주인 · 영겁의 심판자 |
+
+## 데모: NPC 스프라이트와 idle bounce
+
+- 셀 PNG는 `town/assets/npcs/<id>.png`로 복사되어 데모에서 `__game.spawnNpc(id,x,y,{h,child})`로 배치할 수 있다 (기본 맵에는 배치하지 않음).
+- **idle bounce (조절 가능)**: `town/tools/game.template.html`의 `NPC_BOUNCE = {amp:1.5, idleHz:1.3, walkHz:4, top:.17, bot:.36}`.
+  성인 여성 NPC(`NPC_BOUNCE_IDS`)의 상체 띠(스프라이트 높이의 top~bot 비율)를 대기 중 idleHz, 이동 중 walkHz로 ±amp px 사인 오프셋. `amp:0`이면 끔. 아이 NPC는 목록에 없다.
+- 대화 초상화: `town/assets/portraits/<id>.png` (art/npcs/portraits/index.json 참고). 대사 함수가 `{who:'hero',t}`를 반환하면 필멸자 초상화가 표시된다.

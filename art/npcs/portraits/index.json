@@ -8,8 +8,8 @@
  "a_tool": {
   "name": "미소",
   "file": "a_tool.png",
-  "sheet": "raw/por_A.jpg",
-  "cell": "r1c2"
+  "sheet": "raw/por_fix.jpg",
+  "cell": "r1c1"
  },
  "a_smith": {
   "name": "강철",
@@ -20,8 +20,8 @@
  "a_tailor": {
   "name": "나비",
   "file": "a_tailor.png",
-  "sheet": "raw/por_A.jpg",
-  "cell": "r1c4"
+  "sheet": "raw/por_fix.jpg",
+  "cell": "r1c2"
  },
  "a_granny": {
   "name": "물결 할머니",
@@ -50,8 +50,8 @@
  "a_herb": {
   "name": "소담",
   "file": "a_herb.png",
-  "sheet": "raw/por_A.jpg",
-  "cell": "r2c4"
+  "sheet": "raw/por_fix.jpg",
+  "cell": "r1c3"
  },
  "a_bard": {
   "name": "가락",
@@ -440,7 +440,7 @@
  "d_tailor": {
   "name": "궁정 의상가 비단결",
   "file": "d_tailor.png",
-  "sheet": "raw/por_D.jpg",
+  "sheet": "raw/por_fix.jpg",
   "cell": "r1c4"
  },
  "d_captain": {
