@@ -587,7 +587,8 @@ def main():
     rep = {}
     for sid in args:
         info, an = render_song(os.path.join(HERE, 'songs', sid + '.py'), outdir)
-        man[sid] = info; rep[sid] = an
+        key = sid + 'Alt' if man.get(sid, {}).get('userSupplied') else sid   # never overwrite a user-supplied track entry
+        man[key] = dict(info, id=key); rep[sid] = an
         json.dump(dict(sorted(man.items())), open(man_p, 'w'), ensure_ascii=False, indent=1)
     json.dump(rep, open(os.path.join(outdir, '_analysis_v2.json'), 'w'), indent=1)
 

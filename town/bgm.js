@@ -1,6 +1,7 @@
 /* BGM manager for the town demo (Web Audio, seamless loops, crossfades).
  * Self-contained: watches window.__game, never touches game logic.
  *   - starts only after the first user input (browser autoplay rules)
+ *   - title screen (title.js) -> 'title' (user-supplied title_user01.ogg), 2 s fade into the town music on start
  *   - town -> 'town_a_fountain', champion fight -> 'battle_champion', dive -> 'underwater',
  *     champion defeated -> 'jingle_victory' then back to the town theme
  *   - keys (only when the key is not bound to a game action):  B = mute/unmute,  - / = volume,  N = jukebox (next track)
@@ -15,7 +16,7 @@
   const FADE = 1.2;
   // situation -> track (for the full game; the demo uses town / champion / dive / victory)
   const SCENES = {
-    title: 'title', world: 'worldmap', town: 'town_a_fountain', shop: 'forge_shop', ruin: 'town_ruin',
+    title: 'title', titleAlt: 'titleAlt', world: 'worldmap', town: 'town_a_fountain', shop: 'forge_shop', ruin: 'town_ruin',
     champion: 'battle_champion', boss: 'battle_boss', boss2: 'battle_boss_phase2', aslan: 'battle_aslan', kairen: 'user_ref_01', kairenAlt: 'battle_kairen',
     demon: 'demon_field', awaken: 'demon_awaken', dive: 'underwater', gameover: 'jingle_gameover', victory: 'jingle_victory',
     area1: 'area01_forest', area2: 'area02_cave', area3: 'area03_desert', area4: 'area04_pyramid', area5: 'area05_coral_sea',
@@ -94,6 +95,8 @@
   let fightT = 0, lastBoarDead = null;
   function desired() {
     if (forced && forced !== 'off') return forced;
+    const ts = window.__titleScreen; // [title] title screen (title.js) -> title theme until a menu choice is made
+    if (ts && ts.active) return SCENES.title;
     const sc = window.__scene; // [world] outside-world scenes (world.js) pick their own track; null = keep playing
     if (sc && sc.active) return sc.bgm || null;
     const g = window.__game;
@@ -118,7 +121,7 @@
     if (b && h && !b.dead && fightT > 0 && Math.hypot(b.x - h.x, b.y - h.y) < 520) fightT = Math.max(fightT, 1);
     const id = desired();
     if (id === null || performance.now() < jingleUntil) return;
-    if (!cur || cur.id !== id) play(id);
+    if (!cur || cur.id !== id) play(id, cur && cur.id === SCENES.title ? { fade: 2.0, fadeIn: 1.0 } : {}); // [title] slow fade out of the title theme
   }, 250);
 
   // ---------- start on first input ----------

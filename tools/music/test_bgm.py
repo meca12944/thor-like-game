@@ -25,7 +25,7 @@ async def main():
             st = lambda: pg.evaluate('BGM.state')
             s0 = await st(); print('before input:', s0)
             assert not s0['started'], 'must not start before input'
-            await pg.evaluate("()=>{const g=__game;const b=g.boar;b.x=g.hero.x+900;b.y=g.hero.y;b.hp=b.maxHp;b.t=99}")
+            await pg.evaluate("()=>{const g=__game,b=g.boar,h=g.hero;h.x=120;h.y=560;b.x=1180;b.y=600;b.hp=b.maxHp;b.t=99}")
             await pg.keyboard.press('ArrowRight')
             async def wait_track(tid, ms=12000):
                 for _ in range(ms // 200):
@@ -34,7 +34,7 @@ async def main():
                     await pg.wait_for_timeout(200)
                 raise AssertionError('expected %s, state %s' % (tid, await st()))
             async def keep_boar_far():
-                await pg.evaluate("()=>{const g=__game,b=g.boar;b.x=Math.min(1400,g.hero.x+900);b.y=g.hero.y;b.hp=b.maxHp;}")
+                await pg.evaluate("()=>{const g=__game,b=g.boar,h=g.hero;h.x=120;h.y=560;b.x=1180;b.y=600;b.hp=b.maxHp;b.t=99}")
             await keep_boar_far()
             s = await wait_track('town_a_fountain'); print('town:', s)
             await pg.evaluate("()=>{const g=__game,b=g.boar;b.dead=false;b.x=g.hero.x+150;b.y=g.hero.y;b.hp=b.maxHp-1;}")

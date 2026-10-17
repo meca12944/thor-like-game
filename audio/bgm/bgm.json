@@ -385,6 +385,27 @@
  },
  "title": {
   "id": "title",
+  "file": "title_user01.ogg",
+  "title": "타이틀 (사용자 제공곡 · Gemini)",
+  "en": "Title theme (user-supplied, Gemini)",
+  "bpm": 130,
+  "key": "E minor (E pedal, D# leading tone)",
+  "loop": true,
+  "loopStart": 44.503991,
+  "loopEnd": 147.888707,
+  "duration": 147.889,
+  "lufs": -12.3,
+  "truePeak": -0.3,
+  "bytes": 3074847,
+  "userSupplied": true,
+  "source": "user-supplied (Gemini)",
+  "note": "사용자 제공 음원 (Gemini 생성). 사용 권리는 사용자가 확인 필요",
+  "sourceFile": "music_ref/user_title_01.mp3",
+  "loopBars": 56,
+  "crossfadeMs": 60
+ },
+ "titleAlt": {
+  "id": "titleAlt",
   "file": "title.ogg",
   "title": "낙인의 서곡",
   "en": "Overture of the Brand",
@@ -397,7 +418,8 @@
   "lufs": -11.9,
   "truePeak": -1.0,
   "bytes": 899257,
-  "version": 2
+  "version": 2,
+  "note": "자작 v2 타이틀곡 (대체곡). 메인 타이틀은 사용자 제공곡 title_user01.ogg"
  },
  "town_a_fountain": {
   "id": "town_a_fountain",

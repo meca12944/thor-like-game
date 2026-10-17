@@ -196,6 +196,7 @@ def main():
     man = json.load(open(man_p)) if os.path.exists(man_p) else {}
     for f in files:
         info = render_song(f, outdir, wav)
+        if man.get(info['id'], {}).get('userSupplied'): info['id'] += 'Alt'   # never overwrite a user-supplied track entry
         man[info['id']] = info
     json.dump(dict(sorted(man.items())), open(man_p, 'w'), ensure_ascii=False, indent=1)
 
