@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""정령의 팔찌 II - 무료 라이선스 그림 팩으로 게임용 에셋 만들기.
+"""필멸자 (가제) - 무료 라이선스 그림 팩으로 게임용 에셋 만들기.
 
   python3 tools/build_art.py          # 원본 팩 내려받기(assets_src/packs, 캐시) + assets/*.png 생성 + CREDITS.md 갱신
 

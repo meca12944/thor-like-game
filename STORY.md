@@ -1,4 +1,4 @@
-# 본편 이야기 — 정령의 팔찌 II — 포식의 낙인
+# 본편 이야기 — 필멸자 (가제) — 포식의 낙인
 
 > 어두운 톤의 본편 줄거리. 데이터: `data/towns.json` → `story`. 선악 시스템은 SYSTEMS.md 3장, 마을 강자는 TOWNSFOLK_COMBAT.md.
 

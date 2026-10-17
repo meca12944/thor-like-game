@@ -72,7 +72,7 @@ for _k, (_g, _d, _sc) in SRC.items():
     BATCH.append('| `%s.mp3` | `%s` (`%s`) | %.1fs → %.1fs | %.3f → %.3f (%d마디, 인트로 1회) | %s | %s | %s | %s |' % (_g, _m['file'], _k, _d, _m['duration'], _m['loopStart'], _m['loopEnd'], _m['loopBars'], _m['bpm'], _m['key'], _m['mood'], _sc))
 BATCH += ['']
 REF = open(os.path.join(HERE, 'REFERENCE_ANALYSIS.md')).read()
-L = ['# BGM 트랙 목록 — 정령의 팔찌 II · 포식의 낙인', '',
+L = ['# BGM 트랙 목록 — 필멸자 (가제) · 포식의 낙인', '',
      '> 자작곡은 모두 **오리지널 작곡**입니다 (사용자 제공곡 `user_ref_01`, `title`, Gemini 1차 6곡 제외 — 아래 표의 ⚠️ 표시). 이스(Ys) 시리즈(팔콤, 1987~90년대 PC-88/메가드라이브/PC엔진)의 **장르·편성·템포·분위기**만 참고했고, 기존 곡의 선율·리프는 옮기거나 인용하지 않았습니다. 사용자 레퍼런스 음원도 분석 수치(템포·조성·음색·구조)만 참고했습니다.',
      '> 파일: `audio/bgm/*.ogg` (Ogg Vorbis 44.1kHz 스테레오, 약 -14 LUFS, 피크 -1.2 dBFS 이하) · 루프 정보: `audio/bgm/bgm.json` · 소스(신스·악보): `tools/music/` · 데모 연동: `town/bgm.js`', '',
      '## 음악 정책 (Music policy)', '',

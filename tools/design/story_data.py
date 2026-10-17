@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 어두운 본편 이야기 · 선악(카르마) · 현상금 · 마을 강자 · 마을 사람 전투 데이터. towns_data.py 끝에서 import.
 STORY=dict(
- title='정령의 팔찌 II — 포식의 낙인',
+ title='필멸자 (가제) — 포식의 낙인',
  hero='필멸자 (The Mortal) — 시작 이름이자 칭호. 선악에 따라 바뀐다. 외형: 검은 머리(짧고 뻗친 흑발), 파란 튜닉에 빨간 망토(기본 차림). 마왕 강림 후에는 마왕 장비로 고정',
  hero_titles=[dict(cond='선악 +40 이상 (빛의 길)',title='영웅'),dict(cond='선악 -39 ~ +39',title='필멸자'),dict(cond='선악 -40 이하 (어둠의 길)',title='마왕')],
  gift=dict(name='포식의 낙인(捕食의 烙印)',

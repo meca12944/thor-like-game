@@ -1,5 +1,5 @@
 /* [title] Minimal title screen for the town demo (self-contained, never touches game logic).
- *   '제목 미정' logo placeholder -> 'Press any key' -> menu 새 게임 / 이어하기 / 설정.
+ *   '필멸자' (가제, working title) logo -> 'Press any key' -> menu 새 게임 / 이어하기 / 설정.
  *   Title BGM (bgm.json 'title' = user-supplied title_user01.ogg) starts on the first key/click (browser autoplay rule,
  *   handled by bgm.js which follows window.__titleScreen.active), then crossfades into the town music on start.
  *   While active it swallows keys in the capture phase so the game behind it does not react.
@@ -35,7 +35,7 @@
 @keyframes ttlGlow{from{text-shadow:0 0 10px #b8862b55,0 3px 0 #5a3b12,0 6px 18px #000}to{text-shadow:0 0 26px #e0a83caa,0 3px 0 #5a3b12,0 6px 18px #000}}
 @keyframes ttlBlink{to{visibility:hidden}}`;
   const el = document.createElement('div'); el.id = 'ttl';
-  el.innerHTML = '<div class="logo">제목 미정</div><div class="sub">TITLE NOT CHOSEN YET</div><div class="press">PRESS ANY KEY</div><div class="snd">아무 키나 눌러 시작 (음악 켜짐)</div>' +
+  el.innerHTML = '<div class="logo">필멸자</div><div class="sub">WORKING TITLE · 가제</div><div class="press">PRESS ANY KEY</div><div class="snd">아무 키나 눌러 시작 (음악 켜짐)</div>' +
     '<ul hidden></ul><div class="set" hidden></div><div class="foot">↑↓ 선택 · Enter 결정 · Esc 뒤로</div>';
   const mount = () => { document.head.appendChild(css); document.body.appendChild(el); };
   document.body ? mount() : addEventListener('DOMContentLoaded', mount);

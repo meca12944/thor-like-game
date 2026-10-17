@@ -1,4 +1,4 @@
-# 정령의 팔찌 II – 데이터 편집 가이드
+# 필멸자 (가제) – 데이터 편집 가이드
 
 게임은 `index.html` 한 파일입니다. `<script>` 맨 위의 **「편집 가능한 데이터 블록」**(STORY → SWORDS → WEAPONS → SPIRITS → ITEMS → ENEMIES → 타일표 → TOWNS → MAPS → MUSIC → THEMES → START)만 고치면 됩니다.
 `/* ===== 데이터 블록 끝 / 엔진 시작 ===== */` 아래의 엔진 코드는 건드릴 필요가 없습니다.
