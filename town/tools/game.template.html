@@ -137,7 +137,7 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 <div style="font-size:11px;color:#c9d3f0">스킬을 누르면 빈 슬롯에 장착 · 슬롯이 꽉 찼으면 스킬 선택 후 슬롯 1/2/3을 눌러 교체 · 선택 없이 슬롯을 누르면 해제</div>
 <div id="wslots"></div><div id="wlist"></div>
 <div id="wnote">※ 데모: 10개 스킬 모두 해금 (DEMO.unlockAll). 실제 게임에서는 각 보스를 쓰러뜨리고 흡수해야 습득. 기력(파란 게이지)은 데모용으로 천천히 자동 회복.</div></div></div>
-<script src="hud.js"></script><!-- modern HUD gauges: HP/MP/EXP/필살기 (town/hud.js) -->
+<script src="hud.js"></script><script src="town_a.js"></script><!-- [town_a] start-town map runtime (town/town_a.js) --><!-- modern HUD gauges: HP/MP/EXP/필살기 (town/hud.js) -->
 <script>
 'use strict';
 const SPR=/*SPRITES*/;
@@ -311,7 +311,8 @@ let slowT=0,gT=0,showFps=Q.has('fps'),fpsVal=0; // real game: check boss-absorbe
 
 // ---------- collision ----------
 function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
-function blockedPt(x,y){const b=LVL.bounds;if(x<b[0]||x>b[2]||y<b[1]||y>b[3])return true;
+function blockedPt(x,y){if(LVL.ta&&!uw)return TOWN_A.blockedPt(x,y); // [town_a] per-room bit grids
+ const b=LVL.bounds;if(x<b[0]||x>b[2]||y<b[1]||y>b[3])return true;
  for(const o of LVL.blocks){if(o.poly&&inPoly(x,y,o.poly))return true;if(o.ellipse){const[ex,ey,rx,ry]=o.ellipse;const dx=(x-ex)/rx,dy=(y-ey)/ry;if(dx*dx+dy*dy<1)return true;}}return false;}
 function blocked(x,y,r){return blockedPt(x,y)||blockedPt(x-r,y)||blockedPt(x+r,y)||blockedPt(x,y-r*.4)||blockedPt(x,y+r*.4);}
 function moveCol(e,dx,dy,r){let ok=true;if(dx){if(!blocked(e.x+dx,e.y,r))e.x+=dx;else ok=false;}
@@ -632,7 +633,7 @@ function updateKhud(){if(!khudEl)return;const P=[];
  else if(hero.swim)P.push([keyLabel('dive',1),'물 밖으로']);
  else{P.push([keyLabel('attack',1),'공격'],[keyLabel('dash',2),'회피']);
   if(unlocked('water')&&findSpot())P.push([keyLabel('dive',1),'잠수','hot']);
-  {const it=interactTarget();P.push([keyLabel('interact',1),it==='shop'?'미라벨과 거래 (상점)':it==='fountain'?'분수 살피기':'이슬과 대화',it==='spirit'?'':'hot']);}
+  {const it=interactTarget();P.push([keyLabel('interact',1),it==='shop'?'미라벨과 거래 (상점)':it==='fountain'?'분수 살피기':(it==='ta_npc_hint'||it==='ta_hot')?TOWN_A.hintLabel():'이슬과 대화'/*[town_a]*/,it==='spirit'?'':'hot']);}
   P.push([keyLabel('area',1),areaMode?AREA[areaMode].name+(areaCd>0?' '+Math.ceil(areaCd)+'s':''):'광역 —']);
   P.push([keyLabel('target',1),target?'대상 ✓':'대상']);}
  P.push([keyLabel('potion',1),((IT[INV.quick]||{}).n||'물약')+' ×'+invCount(INV.quick)],[keyLabel('menu',1),'메뉴']);
@@ -667,7 +668,7 @@ let INV=newInv();
 let invMouse=[-1,-1]; // hover selects only on real mouse movement (Chrome re-fires hover after re-render)
 let invTab=0,invZone='bag',invSel=0,eqSel=0,listSel=0,invNote='';
 let shopAt=null,shopMode='buy',sellPend=null; // shop opens only via a shop NPC (or the demo-only Esc shortcut); sell = '판매' mode
-const SHOP_NAMES={a_tool:'미라벨의 도구상점 「보따리」',demo:'상점 (데모 바로가기)'};
+const SHOP_NAMES={a_tool:'미라벨의 도구상점 「보따리」',a_smith:'브란트의 대장간',demo:'상점 (데모 바로가기)'};
 const INV_TABS=['가방 · 장비','상점','대장간'];
 function stackable(id){const s=IT[id]&&IT[id].s;return s==='consumable'||s==='material';}
 function invCount(id){return INV.bag.filter(b=>b.id===id).reduce((a,b)=>a+b.n,0);}
@@ -1056,6 +1057,7 @@ function drawWaves(){ctx.save();ctx.lineCap='round';for(const w of WAVES){if(!w.
  ctx.restore();}
 // ---- 필살기 (full-screen ultimate): freeze -> cut-in band with bust art -> screen-wide effect. Pooled particles / pillars. ----
 const UP=Array.from({length:320},()=>({on:false,x:0,y:0,vx:0,vy:0,g:0,t:0,life:0,c:'',s:3}));let upI=0;
+function VR(){return LVL.ta?[camX-60,camY-60,viewW+120,viewH+120]:[0,0,WW,WH];} // [town_a] full-screen world fills cover the visible view
 function upush(x,y,vx,vy,g,life,c,sz){const p=UP[upI++%UP.length];p.on=true;p.x=x;p.y=y;p.vx=vx;p.vy=vy;p.g=g;p.t=0;p.life=life;p.c=c;p.s=sz;}
 const UOBJ=Array.from({length:28},()=>({x:0,y:0,t0:0,k:0,hit:0}));
 const POR={};function porImg(id){if(!POR[id]){const im=new Image();im.src='assets/portraits/'+id+'.png';POR[id]=im;}return POR[id];}
@@ -1064,7 +1066,7 @@ function castUlt(){if(!ultUnlocked)return;const U=ULTS[ultId()];if(!U)return; //
  if(uw||hero.swim||hero.deadT>0||!canAct())return;
  ultG=0;hero.atk=null;hero.dash=null;hero.vx=hero.vy=0;hero.inv=9;porImg(U.por);
  ultFx={U,t:0,hitI:0,cx:WW/2,cy:WH/2};SFX.ev.ult(U.id);for(const p of UP)p.on=false;
- for(let i=0;i<UOBJ.length;i++){const o=UOBJ[i];o.x=60+Math.random()*(WW-120);o.y=120+Math.random()*(WH-160);o.t0=i/UOBJ.length*(U.dur*.75);o.k=Math.random();o.hit=0;}
+ for(let i=0;i<UOBJ.length;i++){const o=UOBJ[i];o.x=60+Math.random()*(WW-120)+(LVL.ta?camX:0);o.y=120+Math.random()*(WH-160)+(LVL.ta?camY:0);o.t0=i/UOBJ.length*(U.dur*.75);o.k=Math.random();o.hit=0;}
  SFX.play('ult_cutin',1);}
 function ultVictims(){return live();} // the whole town map is on screen; in bigger maps: enemies inside the view rect
 function updateUlt(dt){const f=ultFx,U=f.U;f.t+=dt;hero.inv=Math.max(hero.inv,1);
@@ -1075,28 +1077,28 @@ function updateUlt(dt){const f=ultFx,U=f.U;f.t+=dt;hero.inv=Math.max(hero.inv,1)
  if(e>=0){
   if(U.id==='tenkou'){for(const o of UOBJ){if(!o.hit&&e>=o.t0){o.hit=1;shakeAdd('ultHit');for(let i=0;i<10;i++)upush(o.x,o.y,(Math.random()-.5)*300,-Math.random()*260,500,.5,'rgba('+U.col[i%3]+',1)',5);}}}
   if(U.id==='metsukai'){for(const o of UOBJ){if(!o.hit&&e>=o.t0+.25){o.hit=1;shakeAdd('ultHit');for(let i=0;i<12;i++)upush(o.x,o.y,(Math.random()-.5)*360,-Math.random()*300,520,.6,'rgba('+U.col[i%3]+',1)',6);}}
-   if(Math.random()<.9)upush(Math.random()*WW,WH+10,(Math.random()-.5)*30,-120-Math.random()*200,-60,1.2,'rgba(255,60,80,.9)',4);}
-  if(U.id==='chan'){if(Math.random()<.8)upush(Math.random()*WW,Math.random()*WH,(Math.random()-.5)*80,-40,0,.7,'rgba('+U.col[(Math.random()*3)|0]+',1)',4);}
+   if(Math.random()<.9)upush(Math.random()*WW+(LVL.ta?camX:0),WH+10+(LVL.ta?camY:0),(Math.random()-.5)*30,-120-Math.random()*200,-60,1.2,'rgba(255,60,80,.9)',4);}
+  if(U.id==='chan'){if(Math.random()<.8)upush(Math.random()*WW+(LVL.ta?camX:0),Math.random()*WH+(LVL.ta?camY:0),(Math.random()-.5)*80,-40,0,.7,'rgba('+U.col[(Math.random()*3)|0]+',1)',4);}
   while(f.hitI<U.hitT.length&&e>=U.hitT[f.hitI]){f.hitI++;flash=Math.max(flash,.35);shakeAdd('ultHit');
    const per=U.dmg/U.hitT.length;for(const m of ultVictims()){const mul=(m.kind==='boar'||m.boss)?U.bossMul:1;damageSlime(m,m.x-hero.x||1,m.y-hero.y,per*mul,f.hitI===U.hitT.length?700:80,{skill:1,ult:1,fin:1,stop:0,col:U.col.map(c=>'rgb('+c+')')});}}}
  if(flash>0)flash=Math.max(0,flash-dt*1.6);
  if(e>=U.dur){ultFx=null;hero.inv=.6;hitStop=tk(6);}}
 function drawUltWorld(){const f=ultFx;if(!f)return;const U=f.U,T0=ULT_CFG.freeze+ULT_CFG.cutin,e=f.t-T0;
- const dim=Math.min(1,f.t/ULT_CFG.freeze);ctx.fillStyle=`rgba(${U.tint},${.45*dim})`;ctx.fillRect(0,0,WW,WH);
+ const dim=Math.min(1,f.t/ULT_CFG.freeze);ctx.fillStyle=`rgba(${U.tint},${.45*dim})`;ctx.fillRect(...VR());
  if(e>=0){ctx.save();ctx.globalCompositeOperation='lighter';
   if(U.id==='tenkou'){for(const o of UOBJ){const q=(e-o.t0)/.45;if(q<-.25||q>1)continue;
     if(q<0){ctx.strokeStyle=`rgba(255,240,180,${.5+q*2})`;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(o.x,o.y,40,14,0,0,Math.PI*2);ctx.stroke();continue;} // telegraph ring
     const al=1-q,w=(26+o.k*14)*(1-q*.5);const g=ctx.createLinearGradient(0,o.y-720,0,o.y);g.addColorStop(0,`rgba(${U.col[2]},0)`);g.addColorStop(.7,`rgba(${U.col[1]},${al*.7})`);g.addColorStop(1,`rgba(${U.col[0]},${al})`);
-    ctx.fillStyle=g;ctx.fillRect(o.x-w/2,0,w,o.y);ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.fillRect(o.x-w*.18,0,w*.36,o.y);
+    ctx.fillStyle=g;const y0=LVL.ta?camY-60:0;ctx.fillRect(o.x-w/2,y0,w,o.y-y0);ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.fillRect(o.x-w*.18,y0,w*.36,o.y-y0);
     ctx.fillStyle=`rgba(${U.col[1]},${al*.8})`;ctx.beginPath();ctx.ellipse(o.x,o.y,w*1.8*(.6+q),w*.6*(.6+q),0,0,Math.PI*2);ctx.fill();}}
-  if(U.id==='metsukai'){const ab=Math.min(1,e/.4);ctx.globalCompositeOperation='source-over';ctx.fillStyle=`rgba(10,0,4,${.35*ab})`;ctx.fillRect(0,0,WW,WH);
+  if(U.id==='metsukai'){const ab=Math.min(1,e/.4);ctx.globalCompositeOperation='source-over';ctx.fillStyle=`rgba(10,0,4,${.35*ab})`;ctx.fillRect(...VR());
     ctx.fillStyle=`rgba(80,0,10,${.6*ab})`;ctx.beginPath();ctx.ellipse(hero.x,hero.y,260*ab,90*ab,0,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation='lighter';
     for(const o of UOBJ){const q=(e-o.t0)/.25;if(q<-1.2||q>2.2)continue;
      if(q<1){const sx=o.x-260*(1-q),sy=o.y-520*(1-q);ctx.strokeStyle='rgba(255,60,70,.85)';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(sx-60,sy-120);ctx.lineTo(sx,sy);ctx.stroke();
       ctx.fillStyle='rgba(255,200,180,1)';ctx.beginPath();ctx.arc(sx,sy,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,60,60,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(o.x,o.y,36,12,0,0,Math.PI*2);ctx.stroke();}
      else{const r=(q-1)/1.2,al=1-r;ctx.fillStyle=`rgba(255,60,60,${al*.8})`;ctx.beginPath();ctx.ellipse(o.x,o.y,70*(.3+r),26*(.3+r),0,0,Math.PI*2);ctx.fill();ctx.fillStyle=`rgba(255,220,200,${al})`;ctx.beginPath();ctx.ellipse(o.x,o.y,26*(1-r),10*(1-r),0,0,Math.PI*2);ctx.fill();}}}
   if(U.id==='chan'){for(let i=0;i<U.hitT.length;i++){const q=(e-U.hitT[i]+.12)/.5;if(q<0||q>1)continue;const al=1-q,ang=[-.42,.38,-.12,.6,-.7][i%5],cy=WH*(.3+.1*i);
-    ctx.save();ctx.translate(WW/2,cy);ctx.rotate(ang);const L=WW*1.4*Math.min(1,q*4);ctx.fillStyle=`rgba(${U.col[1]},${al*.6})`;ctx.fillRect(-L/2,-14*(1-q),L,28*(1-q));
+    ctx.save();ctx.translate(WW/2+(LVL.ta?camX:0),cy+(LVL.ta?camY:0));ctx.rotate(ang);const L=WW*1.4*Math.min(1,q*4);ctx.fillStyle=`rgba(${U.col[1]},${al*.6})`;ctx.fillRect(-L/2,-14*(1-q),L,28*(1-q));
     ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.fillRect(-L/2,-3,L,6);ctx.restore();}}
   for(const p of UP){if(!p.on)continue;ctx.globalAlpha=1-p.t/p.life;ctx.fillStyle=p.c;pfill(p.x,p.y,p.s);}ctx.globalAlpha=1;ctx.restore();}}
 function drawUltScreen(){const f=ultFx;if(!f)return;const U=f.U,W=cv.width,H=cv.height,c=f.t-ULT_CFG.freeze;mctx.save();mctx.setTransform(1,0,0,1,0,0);ctx=mctx;
@@ -1198,8 +1200,9 @@ const DIVE={
  },
  spots:[ // x,y = water surface centre (world px); r = how close the hero's feet must be; hidden = no visual cue except a near-by sparkle
   {id:'fountain',name:'광장 분수',        x:777,y:398,r:0, near:'fountain',item:'pearl',   theme:'stone',hidden:false},
-  {id:'barrel',  name:'대장간 옆 빗물통', x:450,y:168,r:72,item:'gold_m', theme:'wood', hidden:true},
-  {id:'puddle',  name:'촌장집 앞 웅덩이', x:868,y:572,r:46,item:'hipotion',theme:'mud',  hidden:true},
+  {id:'barrel',  name:'대장간 옆 이끼 낀 우물', x:450,y:168,r:72,item:'gold_m', theme:'stone', hidden:true}, // [town_a] the mossy well by the smithy
+  {id:'puddle',  name:'광장 빗물 웅덩이', x:868,y:572,r:46,item:'hipotion',theme:'mud',  hidden:true},
+  {id:'pond',    name:'촌장 집 연못', x:1030,y:-250,r:96,item:'hipotion',theme:'mud',  hidden:true}, // [town_a]
  ],
  floorItem:[930,600],   // where the item lies in the underwater view
  baseHearts:5, // x10 = HP 50
@@ -1455,6 +1458,8 @@ function computeView(){const W=cv.width,H=cv.height; // logical buffer covers th
  pix=k;LW=Math.ceil(W/k);LH=Math.ceil(H/k);scale=k*LSC;viewW=W/scale;viewH=H/scale;
  camTX=viewW>=WW?(WW-viewW)/2:Math.max(0,Math.min(WW-viewW,hero.x-viewW/2));
  camTY=viewH>=WH?(WH-viewH)/2:Math.max(0,Math.min(WH-viewH,hero.y-40-viewH/2));
+ if(LVL.ta&&!uw){const r=TOWN_A.room(),rw=r.x1-r.x0,rh=r.y1-r.y0; // [town_a] camera clamps to the current room (outdoor town / interior)
+  camTX=viewW>=rw?r.x0+(rw-viewW)/2:Math.max(r.x0,Math.min(r.x1-viewW,hero.x-viewW/2));camTY=viewH>=rh?r.y0+(rh-viewH)/2:Math.max(r.y0,Math.min(r.y1-viewH,hero.y-40-viewH/2));}
  if(!camInit||manual){camX=camTX;camY=camTY;camInit=true;}}
 function updateCam(){const k=VIEW.camLerp;camX+=(camTX-camX)*k;camY+=(camTY-camY)*k;if(Math.abs(camTX-camX)<.05)camX=camTX;if(Math.abs(camTY-camY)<.05)camY=camTY;} // smooth follow (per tick)
 
@@ -1587,7 +1592,7 @@ function drawGearToast(){if(gearToast<=0)return;gearToast-=1/60;ctx.save();ctx.s
  const t='장비 세트: '+GEARSETS[gearIdx].name+'  ('+keyLabel('gear',1)+')';ctx.textAlign='center';outlined(t,innerWidth/2,innerHeight*0.16,Math.max(16,innerWidth/55),'#ffe08a');ctx.textAlign='start';ctx.restore();}
 window.__gear=()=>({idx:gearIdx,name:GEARSETS[gearIdx].name});
 function drawHUD(){// positions in world-pixels of the concept (1280x720 base), anchored to visible top-left
- const s=scale,ox=Math.max(0,-camX)*s+offX,oy=Math.max(0,-camY)*s;const u=s; ctx.save();ctx.setTransform(1,0,0,1,0,0);
+ const s=scale,ox=(LVL.ta&&!uw?0:Math.max(0,-camX))*s+offX,oy=(LVL.ta&&!uw?0:Math.max(0,-camY))*s;/* [town_a] no letterbox offset on the big map */const u=s; ctx.save();ctx.setTransform(1,0,0,1,0,0);
  // modern thin HP / MP / EXP gauges + level badge (town/hud.js): translucent panel, gradient fill, damage ghost, low-HP pulse, display resolution
  const hu=Math.max(.75,cv.height/600),hb=window.HUD?HUD.drawPlayer(ctx,{x:ox+10*hu,y:oy+10*hu,u:hu,hp:hero.hp,maxHp:hero.maxHp,mp:gauge*mpMax(),maxMp:mpMax(),exp,expNext:expNext(lvl),lvl,lvFlash:lvFx,alpha:Math.max(.6,uiAlpha)}):oy+60*hu;
  const bx=Math.round(ox+10*hu),by=Math.round(hb),bw=Math.round(250*hu),bh=0,q=Math.max(1,Math.round(2*u));
@@ -1615,7 +1620,7 @@ function render0(){computeView();ctx=mctx;mctx.setTransform(1,0,0,1,0,0);mctx.im
  if(lc.width!==LW||lc.height!==LH){lc.width=LW;lc.height=LH;}
  ctx=lctx;lctx.setTransform(1,0,0,1,0,0);lctx.fillStyle='#000';lctx.fillRect(0,0,LW,LH);lctx.imageSmoothingEnabled=true;lctx.imageSmoothingQuality='high'; // old big sheets get filtered down once per draw
  lctx.setTransform(LSC,0,0,LSC,(-rcx+sx)*LSC,(-rcy+sy)*LSC);
- ctx.drawImage(IMG.bg,0,0,WW,WH);
+ if(LVL.ta)TOWN_A.ground(ctx);else ctx.drawImage(IMG.bg,0,0,WW,WH); // [town_a]
  drawFrame('decal_puddle',0,868,572,false,1/CS); // hidden dive spot (rain puddle)
  for(const f of fx)if(f.type==='twinkle')drawTwinkle(f);
  if(!hero.swim&&!hero.hidden&&!(hero.sk&&hero.sk.z>2))shadow(hero.x,hero.y+1,40,12,.4);else if(hero.sk&&hero.sk.z)shadow(hero.x,hero.y+2,30,9,.25);
@@ -1626,19 +1631,20 @@ function render0(){computeView();ctx=mctx;mctx.setTransform(1,0,0,1,0,0);mctx.im
  L.push({y:spirit.y+40,f:drawSpirit});for(const n of npcs)if(!n.dead)L.push({y:n.y,f:()=>drawNpc(n)});
  for(const f of fx)if(f.type!=='ring'&&f.type!=='twinkle')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
  for(const o of LVL.overlayImgs)L.push({y:o.sortY,ov:1,f:()=>ctx.drawImage(IMG['ov_'+o.name],o.x,o.y)});
+ if(LVL.ta)TOWN_A.layers(L); // [town_a] buildings / trees / props, y-sorted
  L.sort((a,b)=>a.y-b.y||(a.ov?1:0)-(b.ov?1:0));for(const d of L)d.f();
  for(const f of fx)if(f.type==='ring'&&!f.noTint)drawRing(f);
  for(const p of parts){ctx.globalAlpha=Math.max(0,1-p.t/p.life);ctx.fillStyle=p.c;pfill(p.x,p.y,p.s);}ctx.globalAlpha=1;
  drawWaves();if(FEEL.juice)drawSparks();drawUltWorld();
  if(timeStop>0){// world goes grey-blue, the hero keeps his colours
-  const al=Math.min(1,timeStop/.3);ctx.save();ctx.globalAlpha=.8*al;ctx.globalCompositeOperation='saturation';ctx.fillStyle='hsl(0,0%,50%)';ctx.fillRect(0,0,WW,WH);
-  ctx.globalCompositeOperation='multiply';ctx.fillStyle='#9fb2d6';ctx.fillRect(0,0,WW,WH);ctx.restore();drawHeroAll();}
+  const al=Math.min(1,timeStop/.3);ctx.save();ctx.globalAlpha=.8*al;ctx.globalCompositeOperation='saturation';ctx.fillStyle='hsl(0,0%,50%)';ctx.fillRect(...VR());
+  ctx.globalCompositeOperation='multiply';ctx.fillStyle='#9fb2d6';ctx.fillRect(...VR());ctx.restore();drawHeroAll();}
  for(const f of fx)if(f.type==='ring'&&f.noTint)drawRing(f);
  present();ctx=mctx;mctx.setTransform(scale,0,0,scale,presOX+(-rcx+sx)*scale,presOY+(-rcy+sy)*scale); // screen-res world overlay (crisp text / bars)
- drawBars();drawCtlWorld();if(FEEL.juice)drawDnums();
- if(flash>0){ctx.fillStyle=`rgba(255,250,230,${Math.min(.7,flash)})`;ctx.fillRect(0,0,WW,WH);}
+ drawBars();drawCtlWorld();if(LVL.ta)TOWN_A.worldUI(ctx);if(FEEL.juice)drawDnums(); // [town_a] crisp sign text / prompts
+ if(flash>0){ctx.fillStyle=`rgba(255,250,230,${Math.min(.7,flash)})`;ctx.fillRect(...VR());}
  if(DEBUG)drawDebug();
- drawHUD();drawUltBar();drawGearToast();drawCtlHUD();drawCombo();drawLvUp();drawUltScreen();drawFps();}
+ drawHUD();if(LVL.ta)TOWN_A.hud(mctx);drawUltBar();drawGearToast();drawCtlHUD();drawCombo();drawLvUp();drawUltScreen();drawFps();} // [town_a] minimap / exit arrow / door fade
 function drawFps(){if(!showFps)return;mctx.save();mctx.setTransform(1,0,0,1,0,0);mctx.textAlign='right';ctx=mctx;outlined(fpsVal.toFixed(1)+' FPS · 60Hz fixed'+(slowT>0?' · SLOW':''),cv.width-12,cv.height-14,Math.max(14,cv.width/80),'#9effa0');mctx.restore();}
 function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillStyle='rgba(255,0,0,.2)';
  for(const o of LVL.blocks){ctx.beginPath();if(o.poly){o.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}else{const[x,y,rx,ry]=o.ellipse;ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);}ctx.fill();ctx.stroke();}
@@ -1656,7 +1662,7 @@ function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillS
 
 // ---------- loop ----------
 let last=0,manual=false;
-function step(dt){if(winOpen||ui)return;if(ultFx){updateUlt(dt);updateCam();return;}updateJuice(dt);if(hitStop>0)hitStop-=dt;else{update(dt);updateWaves(dt);}updateCam();}
+function step(dt){if(winOpen||ui)return;if(ultFx){updateUlt(dt);updateCam();return;}updateJuice(dt);if(hitStop>0)hitStop-=dt;else{update(dt);updateWaves(dt);}if(LVL.ta)TOWN_A.update(dt);updateCam();} // [town_a] doors, rooms, yard leash
 // fixed 60 Hz simulation (accumulator); render every rAF, interpolating positions between the last two ticks on high-refresh screens
 const INTERP=()=>[hero,spirit,...slimes,...npcs];let acc=0,renderAlpha=1,fpsN=0,fpsAcc=0;
 function snapPrev(){for(const e of INTERP()){e._px=e.x;e._py=e.y;}}
@@ -1665,8 +1671,9 @@ function withInterp(a,fn){if(a>=1||manual){fn();return;}const sv=[];for(const e 
 function frame(t){let el=(t-last)/1000||0;last=t;if(el>.25)el=.25;fpsN++;fpsAcc+=el;if(fpsAcc>=.5){fpsVal=fpsN/fpsAcc;fpsN=0;fpsAcc=0;}
  pollPad();if(!manual){acc+=el;let n=0;while(acc>=1/60-1e-6&&n<6){snapPrev();step(1/60);acc-=1/60;n++;}if(n>=6)acc=0;renderAlpha=Math.min(1,acc*60+0);if(winOpen||ui)renderAlpha=1;}else renderAlpha=1;
  updateSlotEls();updateKhud();render();requestAnimationFrame(frame);}
-const jobs=[load('bg','bg_town.jpg')];if(ANIM)jobs.push(load('hero_anim',ANIM.src).then(makeTints));for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));
+const jobs=[load('bg','bg_town.jpg')];if(ANIM)jobs.push(load('hero_anim',ANIM.src).then(makeTints));for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));if(LVL.ta)jobs.push(TOWN_A.load()); // [town_a]
 Promise.all(jobs).then(()=>{
+ if(LVL.ta)TOWN_A.init(); // [town_a] NPCs, chests, doors, practice-slime yard
  const pose=Q.get('pose');if(pose&&pose.startsWith('attack')){const i=(+pose.slice(6)||1)-1;slimes.forEach(m=>m.t=99);startSwing(i);hero.atk.t=(SWINGS[i].a0+SWINGS[i].a1)/2;hero.atk.hit=new Set(slimes);if(Q.get('face'))hero.face=Q.get('face');hitStop=1e9;shake=0;document.getElementById('hint').style.display='none';}
  updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=boarSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
