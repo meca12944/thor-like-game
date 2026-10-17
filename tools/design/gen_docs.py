@@ -131,6 +131,13 @@ assert len(HEROINES)>=4 and len({h['town'] for h in HEROINES})==len(HEROINES) an
 for _h in HEROINES:
     assert 2<=len(_h['quests'])<=3 and _h['skill']['name'] and _h['cg'] and _h['visual_en'] and '성인' in _h['age'] and {40,60,80}<=set(_h['rewards']) and all(l['expr'] in PORTRAIT_EXPRS for l in _h['lines'])
 COUNTS.update(heroines=len(HEROINES),companion_quests=sum(len(h['quests']) for h in HEROINES))
+# ---------------- 레벨 · EXP · MP (level_data.py)
+import level_data as LV
+_LV_WARN=LV.validate(TOWNS,os.path.join(REPO,'town','tools','game.template.html'))
+for _t in TOWNS:
+    for _q in _t['quests']: _q['exp']=LV.quest_exp(_q,_t['id'])
+LEVELS=LV.export(TOWNS)
+COUNTS.update(level_cap=LV.LEVEL_CAP,level_perks=len(LV.PERKS),mp_skills=len(LV.SKILL_MP))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
 def item_json(e): return {k:v for k,v in e.items()}
@@ -148,9 +155,10 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
  materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
  drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
- heroines=dict(rule=COMPANION_RULE,portrait_exprs=PORTRAIT_EXPRS,list=HEROINES),final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
+ heroines=dict(rule=COMPANION_RULE,portrait_exprs=PORTRAIT_EXPRS,list=HEROINES),final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR],levels=LEVELS)
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
+json.dump(LEVELS,open(os.path.join(REPO,'data','levels.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
 def stat(e):
     if e['slot']=='weapon': s=f"공격 {e['atk']}"
@@ -210,7 +218,7 @@ for t in TOWNS:
     for qq in t['quests']:
         tag={'good':'선','evil':'악','both':'선/악 분기'}[qq['path']]
         L+=[f"**{qq['id']}. {qq['title']}** · {qq['type']} · [{tag}] · 의뢰: {nmap[qq['giver']]}"+(f" · 조건: {qq['requires']}" if qq.get('requires') else '')+(f" · 변형 원본: {qq['variant_of']}" if qq.get('variant_of') else ''),
-            f"- 이야기: {qq['story']}",f"- 목표: {qq['objective']}",f"- 보상: {qq['reward']}",f"- 선악 조건: {qq['karma_gate']}",'']
+            f"- 이야기: {qq['story']}",f"- 목표: {qq['objective']}",f"- 보상: {qq['reward']}"+(f" · EXP {qq['exp']}" if qq.get('exp') else ''),f"- 선악 조건: {qq['karma_gate']}",'']
     for kind,title in [('tool','도구상점'),('weapon','장비상점 (무기상점)'),('cosmetic','외형상점')]:
         owner=[n['name'] for n in t['npcs'] if n.get('shop')==kind][0]
         L+=[f"### {title} ({owner})",'','| ID | 품목 | 가격(금화) | 설명 |','|---|---|---|---|']
@@ -570,10 +578,14 @@ for _h in HEROINES:
     _HM+=['',f"- Visual (EN): {_h['visual_en']}"]+[f"- CG `{a}`: {b}" for a,b in _h['cg']]
 _HM+=['','## 대사 표정 교체 훅','','각 히로인 `lines[]`의 대사마다 `expr`(normal/smile/angry/blush)이 있다. 대화창은 `portraits/<id>_<expr>.png`를 띄우고, 파일이 없으면 `portraits/<id>.png`(normal)로 대체한다. 퀘스트 대사 등 다른 대사에도 같은 `expr` 필드를 붙이면 된다 (game.template.html은 아직 수정하지 않음 — 대화창 렌더에서 이 규칙만 적용하면 됨).']
 DOCS['HEROINES.md']=_HM
+DOCS['LEVELS.md']=LV.doc_lines(TOWNS,HEROINES,TN)
+DOCS['SYSTEMS.md'].insert(3,'> 레벨·경험치·능력치 성장·MP(구 파란 게이지)·회피·필살기 게이지는 [LEVELS.md](LEVELS.md).')
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
     for d in COPY_DIRS:
         if os.path.isdir(d): shutil.copy(p,os.path.join(d,name))
 for d in ['/workspace/town-demo/data']:
-    if os.path.isdir(d): shutil.copy(os.path.join(REPO,'data','towns.json'),d)
+    if os.path.isdir(d):
+        for _f in ['towns.json','levels.json']: shutil.copy(os.path.join(REPO,'data',_f),d)
+for _w in _LV_WARN: print('경고(level_data):',_w)
 print(json.dumps(COUNTS,ensure_ascii=False))

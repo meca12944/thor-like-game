@@ -26,7 +26,10 @@
   "essential_fallbacks": 14,
   "hidden_swords": 3,
   "heroines": 7,
-  "companion_quests": 21
+  "companion_quests": 21,
+  "level_cap": 60,
+  "level_perks": 12,
+  "mp_skills": 24
  },
  "towns": [
   {
@@ -361,7 +364,8 @@
      "objective": "시작의 숲 입구 화면 1~2에서 뿔토끼 6마리 처치",
      "reward": "금화 60 + 회복약 2",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 10
     },
     {
      "id": "A2",
@@ -372,7 +376,8 @@
      "objective": "약초 꾸러미를 B 강변 물레방아 마을의 방앗간 주인 맷돌에게 전달 (도중 말벌 출몰)",
      "reward": "금화 80 + 해독초 3",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 10
     },
     {
      "id": "A3",
@@ -383,7 +388,8 @@
      "objective": "마을 안 세 곳(대장간 뒤 빗물통 옆, 촌장집 울타리, 분수 꽃밭)에서 나무 장난감 3개 찾기",
      "reward": "하트 조각 1",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 10
     },
     {
      "id": "A4",
@@ -394,7 +400,8 @@
      "objective": "바위를 시작의 숲 감시탑까지 호위 (독버섯·말벌 습격, 바위 체력 0이 되면 실패)",
      "reward": "강화 재료 「거친 수정 원석」 1 + 금화 100",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 20
     },
     {
      "id": "A5",
@@ -410,7 +417,8 @@
       "돌엄니 처치"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 50
     },
     {
      "id": "A6",
@@ -422,7 +430,8 @@
      "reward": "외형 「물방울 무늬 망토」 + 어머니의 편지 (스토리 단서)",
      "requires": "잠수(5지역 크라켄 격파)",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 40
     },
     {
      "id": "A7",
@@ -433,7 +442,8 @@
      "objective": "칼바람과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「바람 가르기」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「바람 가르기」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "A8",
@@ -444,7 +454,8 @@
      "objective": "결투 밖에서 칼바람 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「바람 가르기」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "A9",
@@ -455,7 +466,8 @@
      "objective": "밤에 촌장 집 지하에 잠입해 세금 상자 훔치기 (목격되면 현상금 100)",
      "reward": "금화 400 / 선악 -10",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 40
     },
     {
      "id": "A10",
@@ -467,7 +479,8 @@
      "reward": "고급 회복약 3 + 금화 200 / 선악 -12 / 바위 부상 (이후 A 경비 약화)",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "A4"
+     "variant_of": "A4",
+     "exp": 40
     },
     {
      "id": "A11",
@@ -478,7 +491,8 @@
      "objective": "멧돼지 가죽 5 + 단단한 도토리 껍질 3 + 철 주괴 3 전달",
      "reward": "대장간 등급 2 + 레시피 「돌엄니 송곳검」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 40
     },
     {
      "id": "A_TAILOR1",
@@ -495,7 +509,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "나비 동료 퀘스트"
+     "chain": "나비 동료 퀘스트",
+     "exp": 10
     },
     {
      "id": "A_TAILOR2",
@@ -513,7 +528,8 @@
       "steps": 3
      },
      "requires": "A_TAILOR1",
-     "chain": "나비 동료 퀘스트"
+     "chain": "나비 동료 퀘스트",
+     "exp": 40
     },
     {
      "id": "A_TAILOR3",
@@ -531,7 +547,8 @@
       "steps": 3
      },
      "requires": "A_TAILOR2",
-     "chain": "나비 동료 퀘스트"
+     "chain": "나비 동료 퀘스트",
+     "exp": 60
     }
    ],
    "strongman": {
@@ -1049,7 +1066,8 @@
      "objective": "방앗간 수로에서 숲 슬라임 8마리 처치 (분열체 포함)",
      "reward": "금화 90 + 회복약 3",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 60
     },
     {
      "id": "B2",
@@ -1060,7 +1078,8 @@
      "objective": "나룻배 위에서 상인을 지키며 하류 선착장까지 (도토리 다람쥐 10마리 출현, 배 체력 0이면 실패)",
      "reward": "금화 120 + 외형 「뱃사공 밀짚모자」",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 80
     },
     {
      "id": "B3",
@@ -1071,7 +1090,8 @@
      "objective": "연의 편지를 H 서쪽 광산 마을의 측량사 다림에게 전달하고 답장 받아오기",
      "reward": "「거친 수정 원석」 2",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 50
     },
     {
      "id": "B4",
@@ -1082,7 +1102,8 @@
      "objective": "마을 안 숨은 조개 5개 찾기 (다리 밑, 빨래터, 물레방아 뒤, 나룻배, 낚시터)",
      "reward": "하트 조각 1",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 40
     },
     {
      "id": "B5",
@@ -1099,7 +1120,8 @@
       "잠수"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 130
     },
     {
      "id": "B6",
@@ -1110,7 +1132,8 @@
      "objective": "나무 정령 새싹을 쓰러뜨려 단단한 가지 5개 모아 촌장에게 전달",
      "reward": "금화 150 + 귀환의 깃털 2",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 50
     },
     {
      "id": "B7",
@@ -1121,7 +1144,8 @@
      "objective": "매눈 솔과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「매의 삼연사」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「매의 삼연사」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "B8",
@@ -1132,7 +1156,8 @@
      "objective": "결투 밖에서 매눈 솔 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「매의 삼연사」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "B9",
@@ -1143,7 +1168,8 @@
      "objective": "상류 물레 수원 3곳에 혼석 가루 뿌리기",
      "reward": "검은 피의 비약 3 + 금화 500 / 선악 -20 / B 마을 사람들이 병에 걸림 (상점 물약 가격 +50%)",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 120
     },
     {
      "id": "B10",
@@ -1155,7 +1181,8 @@
      "reward": "금화 900 / 선악 -10 / 영감 이후 등장 안 함",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "B5"
+     "variant_of": "B5",
+     "exp": 100
     },
     {
      "id": "B11",
@@ -1166,7 +1193,8 @@
      "objective": "가시덩굴 줄기 4 + 박쥐 날개 4 + 강철 주괴 1",
      "reward": "대장간 등급 3 + 레시피 「흡혈 박쥐왕의 반지」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 120
     }
    ],
    "strongman": {
@@ -1708,7 +1736,8 @@
      "objective": "수정 동굴 화면 1~3에서 박쥐 12마리 처치",
      "reward": "금화 150 + 회복약 3",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 80
     },
     {
      "id": "H2",
@@ -1719,7 +1748,8 @@
      "objective": "광차를 동굴 화면 2의 채굴장까지 호위 (동굴 거미·동굴 두더지 기습)",
      "reward": "외형 「견습 광부 두건」 + 금화 100",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 100
     },
     {
      "id": "H3",
@@ -1730,7 +1760,8 @@
      "objective": "수정 동굴에서 반딧불 지렁이가 비추는 곳에 숨은 측량 표지 3개 찾기 (횃불 끄면 보임)",
      "reward": "하트 조각 1 + 금화 120",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 50
     },
     {
      "id": "H4",
@@ -1741,7 +1772,8 @@
      "objective": "제한 시간 4분 안에 도시락을 동굴 화면 4의 광부 3명에게 전달",
      "reward": "중급 회복약 3",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 70
     },
     {
      "id": "H5",
@@ -1757,7 +1789,8 @@
       "챔피언 처치"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 160
     },
     {
      "id": "H6",
@@ -1769,7 +1802,8 @@
      "reward": "외형 「수정 단추 망토 장식」 (주머니 금화는 주인공 몫)",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 120
     },
     {
      "id": "H7",
@@ -1780,7 +1814,8 @@
      "objective": "바위주먹 곰쇠과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「대지 강권」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「대지 강권」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "H8",
@@ -1791,7 +1826,8 @@
      "objective": "결투 밖에서 바위주먹 곰쇠 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「대지 강권」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "H9",
@@ -1802,7 +1838,8 @@
      "objective": "3번 갱도 지지대 3곳에 폭탄 설치",
      "reward": "검은 피의 비약 2 + 「대지 강권」 어둠 변형 강화 / 선악 -20 / 광부 3명 사망 (H 상점 가격 +25%)",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 140
     },
     {
      "id": "H10",
@@ -1814,7 +1851,8 @@
      "reward": "금화 주머니(대) + 돌님의 머리핀 (판매 300) / 선악 -5",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "H6"
+     "variant_of": "H6",
+     "exp": 120
     },
     {
      "id": "H11",
@@ -1825,7 +1863,8 @@
      "objective": "수정 슬라임 핵 5 + 동굴 수정 파편 6",
      "reward": "대장간 등급 3 + 투척 곡괭이 강화 레시피",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 140
     },
     {
      "id": "H_MYSTIC1",
@@ -1842,7 +1881,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "운 동료 퀘스트"
+     "chain": "운 동료 퀘스트",
+     "exp": 80
     },
     {
      "id": "H_MYSTIC2",
@@ -1860,7 +1900,8 @@
       "steps": 3
      },
      "requires": "H_MYSTIC1",
-     "chain": "운 동료 퀘스트"
+     "chain": "운 동료 퀘스트",
+     "exp": 120
     },
     {
      "id": "H_MYSTIC3",
@@ -1878,7 +1919,8 @@
       "steps": 3
      },
      "requires": "H_MYSTIC2",
-     "chain": "운 동료 퀘스트"
+     "chain": "운 동료 퀘스트",
+     "exp": 170
     }
    ],
    "strongman": {
@@ -2427,7 +2469,8 @@
      "objective": "모래 사막에서 사막 도적 10마리 처치 + 챔피언 「사막 도적 두목」 처치",
      "reward": "금화 500 + 「사막 태양석」 2",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 190
     },
     {
      "id": "G2",
@@ -2438,7 +2481,8 @@
      "objective": "낙타 3마리를 오아시스까지 호위 (개미귀신 함정, 대머리 독수리 급강하 주의; 낙타 1마리 이상 생존)",
      "reward": "금화 300 + 외형 「낙타 방울 망토 장식」",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 220
     },
     {
      "id": "G3",
@@ -2449,7 +2493,8 @@
      "objective": "피라미드에서 숨은 벽화 4곳 찾아 탁본 (뱀 머리 석상의 석화 시선 피하기)",
      "reward": "하트 조각 1 + 금화 250",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 130
     },
     {
      "id": "G4",
@@ -2460,7 +2505,8 @@
      "objective": "식량 자루를 경비에게 들키지 않고 사막 화면 3의 움막까지 전달 (사막 도적 매복)",
      "reward": "외형 「모래쥐 스카프」 + 연막 구슬 3",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 160
     },
     {
      "id": "G5",
@@ -2472,7 +2518,8 @@
      "reward": "외형 「별빛 터번」",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 250
     },
     {
      "id": "G6",
@@ -2488,7 +2535,8 @@
       "태양침 처치"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 330
     },
     {
      "id": "G7",
@@ -2499,7 +2547,8 @@
      "objective": "모래매 자흐라과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「모래 장막」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「모래 장막」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "G8",
@@ -2510,7 +2559,8 @@
      "objective": "결투 밖에서 모래매 자흐라 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「모래 장막」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "G9",
@@ -2521,7 +2571,8 @@
      "objective": "노예 대상 호위 (도중 자흐라가 습격). 끝에서 노예를 풀어 주면 선 분기로 전환 (선악 +10, 우드 적대)",
      "reward": "금화 1500 / 선악 -15",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 290
     },
     {
      "id": "G10",
@@ -2533,7 +2584,8 @@
      "reward": "금화 600 / 선악 -10 / 모래쥐 투옥, 고아 움막 사라짐",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "G4"
+     "variant_of": "G4",
+     "exp": 250
     },
     {
      "id": "G11",
@@ -2544,7 +2596,8 @@
      "objective": "피라미드 벽화 방에서 도면 조각 획득 + 저주받은 금박 6",
      "reward": "대장간 등급 4 + 레시피 「태양침 독검」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 290
     },
     {
      "id": "G_DANCER1",
@@ -2561,7 +2614,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "방울 동료 퀘스트"
+     "chain": "방울 동료 퀘스트",
+     "exp": 190
     },
     {
      "id": "G_DANCER2",
@@ -2579,7 +2633,8 @@
       "steps": 3
      },
      "requires": "G_DANCER1",
-     "chain": "방울 동료 퀘스트"
+     "chain": "방울 동료 퀘스트",
+     "exp": 250
     },
     {
      "id": "G_DANCER3",
@@ -2597,7 +2652,8 @@
       "steps": 3
      },
      "requires": "G_DANCER2",
-     "chain": "방울 동료 퀘스트"
+     "chain": "방울 동료 퀘스트",
+     "exp": 310
     }
    ],
    "strongman": {
@@ -3165,7 +3221,8 @@
      "objective": "산호 바다 화면 1~2에서 해파리 10마리 + 전기 뱀장어 4마리 처치",
      "reward": "금화 600 + 중급 회복약 3",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 530
     },
     {
      "id": "F2",
@@ -3176,7 +3233,8 @@
      "objective": "해안 절벽에서 갈매기 둥지 4곳을 찾아 리본·방울·구슬·편지 회수",
      "reward": "하트 조각 1",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 350
     },
     {
      "id": "F3",
@@ -3188,7 +3246,8 @@
      "reward": "금화 500 + 외형 「등대지기 망토」",
      "requires": "E 마을 방문",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 440
     },
     {
      "id": "F4",
@@ -3204,7 +3263,8 @@
       "유령 선장 처치"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 820
     },
     {
      "id": "F5",
@@ -3216,7 +3276,8 @@
      "reward": "외형 「해녀 물안경」 + 잠수 기름 3",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 620
     },
     {
      "id": "F6",
@@ -3227,7 +3288,8 @@
      "objective": "짐수레를 해안 절벽 화면 4까지 호위 (해적 앵무새를 먼저 처치하면 적 증원 없음)",
      "reward": "금화 700 + 행운의 숫돌 1",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 620
     },
     {
      "id": "F7",
@@ -3238,7 +3300,8 @@
      "objective": "작살잡이 마고과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「작살 사슬」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「작살 사슬」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "F8",
@@ -3249,7 +3312,8 @@
      "objective": "결투 밖에서 작살잡이 마고 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「작살 사슬」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "F9",
@@ -3260,7 +3324,8 @@
      "objective": "혼석 상자 3개를 밤중에 부두로 운반 (마고의 순찰 피하기)",
      "reward": "금화 1800 + 검은 피의 비약 2 / 선악 -20",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 720
     },
     {
      "id": "F10",
@@ -3272,7 +3337,8 @@
      "reward": "생명의 진주 1 추가 + 금화 500 / 선악 -15 / 숨비 사망 (F 잠수 관련 퀘스트 소멸)",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "F5"
+     "variant_of": "F5",
+     "exp": 620
     },
     {
      "id": "F11",
@@ -3283,7 +3349,8 @@
      "objective": "바다거북 등판 5 + 따개비 판 5 + 흑철 주괴 2",
      "reward": "대장간 등급 6 + 레시피 「백상어 지느러미 방패」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 720
     },
     {
      "id": "F_DIVER1",
@@ -3300,7 +3367,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "숨비 동료 퀘스트"
+     "chain": "숨비 동료 퀘스트",
+     "exp": 530
     },
     {
      "id": "F_DIVER2",
@@ -3318,7 +3386,8 @@
       "steps": 3
      },
      "requires": "F_DIVER1",
-     "chain": "숨비 동료 퀘스트"
+     "chain": "숨비 동료 퀘스트",
+     "exp": 620
     },
     {
      "id": "F_DIVER3",
@@ -3336,7 +3405,8 @@
       "steps": 3
      },
      "requires": "F_DIVER2",
-     "chain": "숨비 동료 퀘스트"
+     "chain": "숨비 동료 퀘스트",
+     "exp": 710
     }
    ],
    "strongman": {
@@ -3921,7 +3991,8 @@
      "objective": "화산 성채 외곽 화면 1~3에서 용암 슬라임 15마리 처치 (분열체 포함)",
      "reward": "금화 900 + 화상 연고 4",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 1140
     },
     {
      "id": "E2",
@@ -3932,7 +4003,8 @@
      "objective": "풀무의 단검을 F 남쪽 항구 마을 너울에게 전달하고 평가서 받아오기",
      "reward": "금화 600 + 행운의 숫돌 1",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 950
     },
     {
      "id": "E3",
@@ -3948,7 +4020,8 @@
       "용암 거인 처치"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1680
     },
     {
      "id": "E4",
@@ -3959,7 +4032,8 @@
      "objective": "은갑을 화산 성채 정문까지 호위 (화염 사냥개·저주받은 갑옷 습격)",
      "reward": "금화 800 + 외형 「몰락한 기사의 검은 망토」",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1330
     },
     {
      "id": "E5",
@@ -3971,7 +4045,8 @@
      "reward": "금화 500 + 하트 조각 1",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1260
     },
     {
      "id": "E6",
@@ -3982,7 +4057,8 @@
      "objective": "화산 성채에서 숨은 불사조 깃털 3개 찾기 (용암 위 발판, 무너진 탑, 대장간 폐허)",
      "reward": "외형 「불사조 깃털 머리장식」 + 상급 정령수 2",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 760
     },
     {
      "id": "E7",
@@ -3993,7 +4069,8 @@
      "objective": "철벽 가론과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「철벽 반격」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「철벽 반격」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "E8",
@@ -4004,7 +4081,8 @@
      "objective": "결투 밖에서 철벽 가론 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「철벽 반격」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "E9",
@@ -4015,7 +4093,8 @@
      "objective": "E4 도중 은갑을 성채 감옥에 넘김",
      "reward": "금화 2000 + 「업화의 검」 어둠 변형 강화 / 선악 -20 / 은갑 사망, 흑갑 구원 불가",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 1470
     },
     {
      "id": "E10",
@@ -4027,7 +4106,8 @@
      "reward": "금화 1200 / 선악 -5 / 풀무가 대장장이를 그만둠",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "E2"
+     "variant_of": "E2",
+     "exp": 1260
     },
     {
      "id": "E_TAILOR1",
@@ -4044,7 +4124,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "루비 동료 퀘스트"
+     "chain": "루비 동료 퀘스트",
+     "exp": 1140
     },
     {
      "id": "E_TAILOR2",
@@ -4062,7 +4143,8 @@
       "steps": 3
      },
      "requires": "E_TAILOR1",
-     "chain": "루비 동료 퀘스트"
+     "chain": "루비 동료 퀘스트",
+     "exp": 1260
     },
     {
      "id": "E_TAILOR3",
@@ -4080,7 +4162,8 @@
       "steps": 3
      },
      "requires": "E_TAILOR2",
-     "chain": "루비 동료 퀘스트"
+     "chain": "루비 동료 퀘스트",
+     "exp": 1390
     }
    ],
    "strongman": {
@@ -4654,7 +4737,8 @@
      "objective": "설산 화면 1~3에서 서리 늑대 12마리 처치 (울부짖는 개체 우선)",
      "reward": "금화 1100 + 해빙 연고 4",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 1520
     },
     {
      "id": "C2",
@@ -4665,7 +4749,8 @@
      "objective": "제한 시간 6분 안에 약 상자를 D 성벽 왕도의 의원에게 전달 (도중 얼음 거북 빙판)",
      "reward": "금화 900 + 귀환의 깃털 3",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 1270
     },
     {
      "id": "C3",
@@ -4676,7 +4761,8 @@
      "objective": "설산에서 눈사람의 당근 코·단추 2개·목도리 4개 부품 찾기 → 하얀과 다시 만들기",
      "reward": "하트 조각 1 + 외형 「눈사람 목도리」",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1010
     },
     {
      "id": "C4",
@@ -4687,7 +4773,8 @@
      "objective": "번개를 설산 뇌전 탑 중턱 관측대까지 호위 (뇌운 새·폭풍 가고일)",
      "reward": "금화 1200 + 상급 정령수 3",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1770
     },
     {
      "id": "C5",
@@ -4703,7 +4790,8 @@
       "어미 설인"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 2210
     },
     {
      "id": "C6",
@@ -4715,7 +4803,8 @@
      "reward": "외형 「서리 성녀 망토」 + 액세서리 「서리 부적」",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1660
     },
     {
      "id": "C7",
@@ -4726,7 +4815,8 @@
      "objective": "설산의 무승 한빙과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「한기 장풍」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「한기 장풍」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "C8",
@@ -4737,7 +4827,8 @@
      "objective": "결투 밖에서 설산의 무승 한빙 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「한기 장풍」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "C9",
@@ -4748,7 +4839,8 @@
      "objective": "설인 새끼 5마리 사냥 (어미 설인이 분노 상태로 추격)",
      "reward": "금화 1600 + 절연 송진 5 / 선악 -15",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 1930
     },
     {
      "id": "C10",
@@ -4760,7 +4852,8 @@
      "reward": "금화 1000 + 「화뢰 정수」 3 / 선악 -10 / 송곳 부상",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "C5"
+     "variant_of": "C5",
+     "exp": 1660
     },
     {
      "id": "C11",
@@ -4771,7 +4864,8 @@
      "objective": "영구 서리 결정 8 + 서리 늑대 모피 4 + 흑철 주괴 3",
      "reward": "대장간 등급 8 + 레시피 「설인 털 팔보호대」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 1930
     },
     {
      "id": "C_PRIEST1",
@@ -4788,7 +4882,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "설화 동료 퀘스트"
+     "chain": "설화 동료 퀘스트",
+     "exp": 1520
     },
     {
      "id": "C_PRIEST2",
@@ -4806,7 +4901,8 @@
       "steps": 3
      },
      "requires": "C_PRIEST1",
-     "chain": "설화 동료 퀘스트"
+     "chain": "설화 동료 퀘스트",
+     "exp": 1660
     },
     {
      "id": "C_PRIEST3",
@@ -4824,7 +4920,8 @@
       "steps": 3
      },
      "requires": "C_PRIEST2",
-     "chain": "설화 동료 퀘스트"
+     "chain": "설화 동료 퀘스트",
+     "exp": 1800
     }
    ],
    "strongman": {
@@ -5395,7 +5492,8 @@
      "objective": "어둠 신전 외곽 화면 1~3에서 해골 창병 10마리(재조립 포함) + 고블린 8마리 처치",
      "reward": "외형 「왕국 기사단 망토」 + 금화 1500",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 1950
     },
     {
      "id": "D2",
@@ -5406,7 +5504,8 @@
      "objective": "세린을 경비병 시야를 피해 왕도 남문 밖 꽃밭까지 호위 후 무사히 귀환 (도중 그림자 암살자 습격 이벤트)",
      "reward": "하트 조각 1 + 외형 「공주의 리본 장식」",
      "path": "good",
-     "karma_gate": "선악과 무관 (마왕 등급만 거절)"
+     "karma_gate": "선악과 무관 (마왕 등급만 거절)",
+     "exp": 2280
     },
     {
      "id": "D3",
@@ -5417,7 +5516,8 @@
      "objective": "왕립 서고에서 책장 퍼즐 없이 숨은 열쇠 조각 3개 찾기 (책 더미, 촛대 뒤, 지도 밑)",
      "reward": "금화 1200 + 「공허 결정」 1",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1300
     },
     {
      "id": "D4",
@@ -5428,7 +5528,8 @@
      "objective": "편지를 C 설산 산장 마을의 성녀 설화에게 전달하고 봉인 성수를 받아오기",
      "reward": "상급 정령수 3 + 생명의 영약 1",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 1630
     },
     {
      "id": "D5",
@@ -5444,7 +5545,8 @@
       "그림자 쌍검사"
      ],
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 2810
     },
     {
      "id": "D6",
@@ -5456,7 +5558,8 @@
      "reward": "외형 「대성당 순백 의상」",
      "requires": "잠수",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절",
+     "exp": 2110
     },
     {
      "id": "D7",
@@ -5467,7 +5570,8 @@
      "objective": "무명의 그림과 결투 (항복 시 「살려 준다」 / 「숨통을 끊는다」 선택)",
      "reward": "살려 줌: 「단죄의 일격」 빛 변형 전수 + 동료 + 거인의 열매 1 / 선악 +10 · 끊음: 「단죄의 일격」 어둠 변형 강탈 + 거인의 열매 1 / 선악 -25",
      "path": "both",
-     "karma_gate": "선악과 무관"
+     "karma_gate": "선악과 무관",
+     "exp": 0
     },
     {
      "id": "D8",
@@ -5478,7 +5582,8 @@
      "objective": "결투 밖에서 무명의 그림 처치 (항복 없음, 필살기 포함 전력)",
      "reward": "「단죄의 일격」 어둠 변형(한 단계 강화) / 선악 -40 / 현상금 3000",
      "path": "evil",
-     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외"
+     "karma_gate": "악명 이하 또는 ⑦에서 숨통을 끊은 경우 제외",
+     "exp": 0
     },
     {
      "id": "D9",
@@ -5489,7 +5594,8 @@
      "objective": "D2 가출 이벤트 도중 세린을 신전 입구로 데려감",
      "reward": "금화 3000 + 「공허 결정」 2 / 선악 -30 / 현상금 ★3, D 기사단 전원 적대",
      "path": "evil",
-     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)"
+     "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
+     "exp": 2460
     },
     {
      "id": "D10",
@@ -5501,7 +5607,8 @@
      "reward": "검은 피의 비약 3 + 금화 1500 / 선악 -20 / 설화가 9지역에서 붙잡힘 (진엔딩 불가)",
      "path": "evil",
      "karma_gate": "악명 이하 (평범이면 수상한 NPC가 1개만 넌지시 제안)",
-     "variant_of": "D4"
+     "variant_of": "D4",
+     "exp": 2110
     },
     {
      "id": "D11",
@@ -5512,7 +5619,8 @@
      "objective": "가고일 심장석 4 + 미스릴 주괴 2",
      "reward": "대장간 등급 9 + 레시피 「그림자 표창」 두루마리",
      "path": "good",
-     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+     "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)",
+     "exp": 2460
     },
     {
      "id": "D_YUNA1",
@@ -5529,7 +5637,8 @@
       "step": 1,
       "steps": 3
      },
-     "chain": "유나 동료 퀘스트"
+     "chain": "유나 동료 퀘스트",
+     "exp": 1950
     },
     {
      "id": "D_YUNA2",
@@ -5547,7 +5656,8 @@
       "steps": 3
      },
      "requires": "D_YUNA1",
-     "chain": "유나 동료 퀘스트"
+     "chain": "유나 동료 퀘스트",
+     "exp": 2110
     },
     {
      "id": "D_YUNA3",
@@ -5565,7 +5675,8 @@
       "steps": 3
      },
      "requires": "D_YUNA2",
-     "chain": "유나 동료 퀘스트"
+     "chain": "유나 동료 퀘스트",
+     "exp": 2270
     }
    ],
    "strongman": {
@@ -21722,7 +21833,9 @@
     "80": "특별 장면(비노출, 모닥불 대화·축제 데이트 등) + 상시 동행",
     "100": "엔딩 후일담 장면"
    },
-   "karma": "선악이 「악명」 이하로 떨어지면 히로인별 반응(떠남/적대/잔류). 마왕 루트에서는 다른 성인 NPC와 마찬가지로 살해할 수 있으며, 살해 시 다시 되돌릴 수 없다."
+   "karma": "선악이 「악명」 이하로 떨어지면 히로인별 반응(떠남/적대/잔류). 마왕 루트에서는 다른 성인 NPC와 마찬가지로 살해할 수 있으며, 살해 시 다시 되돌릴 수 없다.",
+   "portraits": "대화 초상화: 1순위 `<id>_<expr>_bu.png` (192×256 바스트업, 머리~허리, 대화창에서 1.5~2배 크게 표시 권장), 작은 창은 `<id>_<expr>_bu_s.png` (96×128), 없으면 기존 `<id>_<expr>.png`/`<id>.png` (128×128 얼굴). 경로 town/assets/portraits/, 목록은 index.json의 expressions_bustup.",
+   "outfit_rule": "성인 여성 의상 규칙: 상의는 배가 완전히 드러나는 짧은 크롭 탑 또는 비키니 탑만(원피스·코르셋·배를 덮는 상의 금지, 비노출). 하의 선택지: 짧은 주름 미니스커트, 비키니 하의/마이크로 비키니(축제 변형), **H라인(펜슬) 미니스커트**(몸에 딱 붙는 일자, 허벅지 중간), **머메이드 미니스커트**(엉덩이까지 밀착, 허벅지 중간 밑단이 살짝 퍼짐). 적용: 루비=검은 가죽 H라인, 설화=흰 머메이드, 상인 미소=갈색 H라인, 책벌레 연=보라 H라인, 공주 세린=보라·금 머메이드. 비키니 탑 변형(가리는 면적은 일반 비키니 이상, 언더붓 노출 금지): **스트래피 비키니**(일반 비키니 탑 + 갈비뼈·허리를 감는 가는 교차 끈), **홀터넥 비키니**(목 뒤로 묶는 삼각 탑, 컵 사이 작은 키홀 허용), **메탈 장식 비키니**(금·은 판금, 체인, 보석 장식의 비키니 아머). 적용: 미소=빨강 스트래피, 연=보라 홀터넥, 빛나=노랑 홀터넥, 세린=금·보라 메탈 장식. 참고 샘플: female_sample_hline_mermaid.jpg, female_sample_bikini_variants.jpg. 아이는 대상 아님."
   },
   "portrait_exprs": [
    "normal",
@@ -21818,6 +21931,24 @@
      "angry": "a_tailor_angry.png",
      "blush": "a_tailor_blush.png"
     },
+    "portraits_bustup": {
+     "normal": {
+      "large": "a_tailor_normal_bu.png",
+      "small": "a_tailor_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "a_tailor_smile_bu.png",
+      "small": "a_tailor_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "a_tailor_angry_bu.png",
+      "small": "a_tailor_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "a_tailor_blush_bu.png",
+      "small": "a_tailor_blush_bu_s.png"
+     }
+    },
     "quest_ids": [
      "A_TAILOR1",
      "A_TAILOR2",
@@ -21909,6 +22040,24 @@
      "smile": "h_mystic_smile.png",
      "angry": "h_mystic_angry.png",
      "blush": "h_mystic_blush.png"
+    },
+    "portraits_bustup": {
+     "normal": {
+      "large": "h_mystic_normal_bu.png",
+      "small": "h_mystic_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "h_mystic_smile_bu.png",
+      "small": "h_mystic_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "h_mystic_angry_bu.png",
+      "small": "h_mystic_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "h_mystic_blush_bu.png",
+      "small": "h_mystic_blush_bu_s.png"
+     }
     },
     "quest_ids": [
      "H_MYSTIC1",
@@ -22011,6 +22160,24 @@
      "angry": "g_dancer_angry.png",
      "blush": "g_dancer_blush.png"
     },
+    "portraits_bustup": {
+     "normal": {
+      "large": "g_dancer_normal_bu.png",
+      "small": "g_dancer_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "g_dancer_smile_bu.png",
+      "small": "g_dancer_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "g_dancer_angry_bu.png",
+      "small": "g_dancer_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "g_dancer_blush_bu.png",
+      "small": "g_dancer_blush_bu_s.png"
+     }
+    },
     "quest_ids": [
      "G_DANCER1",
      "G_DANCER2",
@@ -22103,6 +22270,24 @@
      "angry": "f_diver_angry.png",
      "blush": "f_diver_blush.png"
     },
+    "portraits_bustup": {
+     "normal": {
+      "large": "f_diver_normal_bu.png",
+      "small": "f_diver_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "f_diver_smile_bu.png",
+      "small": "f_diver_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "f_diver_angry_bu.png",
+      "small": "f_diver_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "f_diver_blush_bu.png",
+      "small": "f_diver_blush_bu_s.png"
+     }
+    },
     "quest_ids": [
      "F_DIVER1",
      "F_DIVER2",
@@ -22125,8 +22310,8 @@
      "desc": "주변 원형 불꽃, 2초 화상 (쿨 12초)"
     },
     "hp": 65,
-    "outfit": "검은 가죽 코르셋형 크롭 상의, 루비색 짧은 레이스 미니스커트, 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.",
-    "visual_en": "haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather corset crop top, short ruby lace mini skirt, flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe",
+    "outfit": "가슴 아래에서 끝나는 검은 가죽 크롭 뷔스티에(배 완전 노출), 몸에 딱 붙는 검은 가죽 H라인(펜슬) 미니스커트(허벅지 중간, 옆트임), 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.",
+    "visual_en": "haughty adult weaver (26), sharp red bob haircut, ruby eyes, black leather cropped bustier ending under the bust with fully bare midriff, tight black leather H-line pencil mini skirt (mid-thigh, side slit), flame-pattern thigh-high boots, coiled fire whip, ruby earrings, proud tsundere vibe",
     "likes": [
      "불사조 깃털",
      "흑요석"
@@ -22195,6 +22380,24 @@
      "angry": "e_tailor_angry.png",
      "blush": "e_tailor_blush.png"
     },
+    "portraits_bustup": {
+     "normal": {
+      "large": "e_tailor_normal_bu.png",
+      "small": "e_tailor_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "e_tailor_smile_bu.png",
+      "small": "e_tailor_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "e_tailor_angry_bu.png",
+      "small": "e_tailor_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "e_tailor_blush_bu.png",
+      "small": "e_tailor_blush_bu_s.png"
+     }
+    },
     "quest_ids": [
      "E_TAILOR1",
      "E_TAILOR2",
@@ -22217,8 +22420,8 @@
      "desc": "주인공 HP 25% 회복 (쿨 20초)"
     },
     "hp": 55,
-    "outfit": "흰 털 장식 짧은 사제복 원피스(허벅지 위 길이, 어깨 노출), 하늘색 보석 비키니형 흉갑, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.",
-    "visual_en": "gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed off-shoulder priest dress above the thigh, ice-jewel bikini-style breastplate, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe",
+    "outfit": "흰 털 장식 짧은 크롭 상의(배 완전 노출)와 분리형 털 소매, 몸에 붙다가 밑단이 살짝 퍼지는 흰 머메이드 미니스커트(허벅지 중간), 하늘색 보석 장식, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.",
+    "visual_en": "gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed crop top with fully bare midriff, detached fur-trimmed sleeves, snug white mermaid-silhouette mini skirt flaring slightly at the mid-thigh hem, ice-jewel accents, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe",
     "likes": [
      "눈꽃 결정",
      "따뜻한 수프"
@@ -22286,6 +22489,24 @@
      "smile": "c_priest_smile.png",
      "angry": "c_priest_angry.png",
      "blush": "c_priest_blush.png"
+    },
+    "portraits_bustup": {
+     "normal": {
+      "large": "c_priest_normal_bu.png",
+      "small": "c_priest_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "c_priest_smile_bu.png",
+      "small": "c_priest_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "c_priest_angry_bu.png",
+      "small": "c_priest_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "c_priest_blush_bu.png",
+      "small": "c_priest_blush_bu_s.png"
+     }
     },
     "quest_ids": [
      "C_PRIEST1",
@@ -22388,6 +22609,24 @@
      "smile": "d_yuna_smile.png",
      "angry": "d_yuna_angry.png",
      "blush": "d_yuna_blush.png"
+    },
+    "portraits_bustup": {
+     "normal": {
+      "large": "d_yuna_normal_bu.png",
+      "small": "d_yuna_normal_bu_s.png"
+     },
+     "smile": {
+      "large": "d_yuna_smile_bu.png",
+      "small": "d_yuna_smile_bu_s.png"
+     },
+     "angry": {
+      "large": "d_yuna_angry_bu.png",
+      "small": "d_yuna_angry_bu_s.png"
+     },
+     "blush": {
+      "large": "d_yuna_blush_bu.png",
+      "small": "d_yuna_blush_bu_s.png"
+     }
     },
     "quest_ids": [
      "D_YUNA1",
@@ -23398,5 +23637,2900 @@
    ],
    "souls": 0
   }
- ]
+ ],
+ "levels": {
+  "version": 1,
+  "note": "레벨·EXP·능력치·MP 설계 데이터 (게임 미연결). 원본: tools/design/level_data.py → gen_docs.py.",
+  "level_cap": 60,
+  "exp_curve": {
+   "A": 10.0,
+   "P": 1.9,
+   "B": 40.0,
+   "round_to": 5,
+   "formula": "다음 레벨까지 EXP(L) = 10 × L^1.9 + 40 × L (5 단위 반올림)",
+   "why": "초반은 거의 직선(몇 마리만 잡아도 오름), 후반은 L^1.9로 완만하게 가팔라진다. 지수가 2보다 작아 Lv50 이후에도 「벽」이 생기지 않고, 몹 EXP를 지역별로 같은 공식에서 뽑아 쓰므로 어느 지역이든 적정 레벨에서 비슷한 처치 수로 1레벨이 오른다."
+  },
+  "exp_table": [
+   {
+    "level": 1,
+    "next": 50,
+    "total": 0
+   },
+   {
+    "level": 2,
+    "next": 115,
+    "total": 50
+   },
+   {
+    "level": 3,
+    "next": 200,
+    "total": 165
+   },
+   {
+    "level": 4,
+    "next": 300,
+    "total": 365
+   },
+   {
+    "level": 5,
+    "next": 415,
+    "total": 665
+   },
+   {
+    "level": 6,
+    "next": 540,
+    "total": 1080
+   },
+   {
+    "level": 7,
+    "next": 685,
+    "total": 1620
+   },
+   {
+    "level": 8,
+    "next": 840,
+    "total": 2305
+   },
+   {
+    "level": 9,
+    "next": 1010,
+    "total": 3145
+   },
+   {
+    "level": 10,
+    "next": 1195,
+    "total": 4155
+   },
+   {
+    "level": 11,
+    "next": 1390,
+    "total": 5350
+   },
+   {
+    "level": 12,
+    "next": 1605,
+    "total": 6740
+   },
+   {
+    "level": 13,
+    "next": 1830,
+    "total": 8345
+   },
+   {
+    "level": 14,
+    "next": 2065,
+    "total": 10175
+   },
+   {
+    "level": 15,
+    "next": 2315,
+    "total": 12240
+   },
+   {
+    "level": 16,
+    "next": 2580,
+    "total": 14555
+   },
+   {
+    "level": 17,
+    "next": 2855,
+    "total": 17135
+   },
+   {
+    "level": 18,
+    "next": 3145,
+    "total": 19990
+   },
+   {
+    "level": 19,
+    "next": 3450,
+    "total": 23135
+   },
+   {
+    "level": 20,
+    "next": 3765,
+    "total": 26585
+   },
+   {
+    "level": 21,
+    "next": 4090,
+    "total": 30350
+   },
+   {
+    "level": 22,
+    "next": 4435,
+    "total": 34440
+   },
+   {
+    "level": 23,
+    "next": 4785,
+    "total": 38875
+   },
+   {
+    "level": 24,
+    "next": 5150,
+    "total": 43660
+   },
+   {
+    "level": 25,
+    "next": 5530,
+    "total": 48810
+   },
+   {
+    "level": 26,
+    "next": 5920,
+    "total": 54340
+   },
+   {
+    "level": 27,
+    "next": 6325,
+    "total": 60260
+   },
+   {
+    "level": 28,
+    "next": 6740,
+    "total": 66585
+   },
+   {
+    "level": 29,
+    "next": 7165,
+    "total": 73325
+   },
+   {
+    "level": 30,
+    "next": 7605,
+    "total": 80490
+   },
+   {
+    "level": 31,
+    "next": 8055,
+    "total": 88095
+   },
+   {
+    "level": 32,
+    "next": 8520,
+    "total": 96150
+   },
+   {
+    "level": 33,
+    "next": 8995,
+    "total": 104670
+   },
+   {
+    "level": 34,
+    "next": 9485,
+    "total": 113665
+   },
+   {
+    "level": 35,
+    "next": 9985,
+    "total": 123150
+   },
+   {
+    "level": 36,
+    "next": 10495,
+    "total": 133135
+   },
+   {
+    "level": 37,
+    "next": 11020,
+    "total": 143630
+   },
+   {
+    "level": 38,
+    "next": 11555,
+    "total": 154650
+   },
+   {
+    "level": 39,
+    "next": 12105,
+    "total": 166205
+   },
+   {
+    "level": 40,
+    "next": 12665,
+    "total": 178310
+   },
+   {
+    "level": 41,
+    "next": 13235,
+    "total": 190975
+   },
+   {
+    "level": 42,
+    "next": 13820,
+    "total": 204210
+   },
+   {
+    "level": 43,
+    "next": 14415,
+    "total": 218030
+   },
+   {
+    "level": 44,
+    "next": 15020,
+    "total": 232445
+   },
+   {
+    "level": 45,
+    "next": 15640,
+    "total": 247465
+   },
+   {
+    "level": 46,
+    "next": 16270,
+    "total": 263105
+   },
+   {
+    "level": 47,
+    "next": 16910,
+    "total": 279375
+   },
+   {
+    "level": 48,
+    "next": 17565,
+    "total": 296285
+   },
+   {
+    "level": 49,
+    "next": 18230,
+    "total": 313850
+   },
+   {
+    "level": 50,
+    "next": 18905,
+    "total": 332080
+   },
+   {
+    "level": 51,
+    "next": 19595,
+    "total": 350985
+   },
+   {
+    "level": 52,
+    "next": 20295,
+    "total": 370580
+   },
+   {
+    "level": 53,
+    "next": 21005,
+    "total": 390875
+   },
+   {
+    "level": 54,
+    "next": 21730,
+    "total": 411880
+   },
+   {
+    "level": 55,
+    "next": 22460,
+    "total": 433610
+   },
+   {
+    "level": 56,
+    "next": 23210,
+    "total": 456070
+   },
+   {
+    "level": 57,
+    "next": 23965,
+    "total": 479280
+   },
+   {
+    "level": 58,
+    "next": 24735,
+    "total": 503245
+   },
+   {
+    "level": 59,
+    "next": 25515,
+    "total": 527980
+   },
+   {
+    "level": 60,
+    "next": 0,
+    "total": 553495
+   }
+  ],
+  "area_levels": {
+   "1": [
+    1,
+    6
+   ],
+   "2": [
+    6,
+    11
+   ],
+   "3": [
+    11,
+    16
+   ],
+   "4": [
+    16,
+    21
+   ],
+   "5": [
+    21,
+    27
+   ],
+   "6": [
+    27,
+    33
+   ],
+   "7": [
+    33,
+    39
+   ],
+   "8": [
+    39,
+    45
+   ],
+   "9": [
+    45,
+    50
+   ],
+   "10": [
+    50,
+    58
+   ]
+  },
+  "postgame": {
+   "name": "원탁의 심연 · 아스란 · 10지역 강화판 재방문",
+   "levels": [
+    58,
+    60
+   ],
+   "note": "Lv60은 엔드게임 콘텐츠(마을 강자 징표 8개 → 원탁의 심연, 아스란)로 닿게 설계. 본편 엔딩은 Lv55~58이면 충분하다."
+  },
+  "town_levels": {
+   "A": {
+    "level": 2,
+    "areas": [
+     1
+    ]
+   },
+   "B": {
+    "level": 6,
+    "areas": [
+     2,
+     3
+    ]
+   },
+   "H": {
+    "level": 7,
+    "areas": [
+     2,
+     3
+    ]
+   },
+   "G": {
+    "level": 12,
+    "areas": [
+     3,
+     4
+    ]
+   },
+   "F": {
+    "level": 22,
+    "areas": [
+     5,
+     6
+    ]
+   },
+   "E": {
+    "level": 34,
+    "areas": [
+     7
+    ]
+   },
+   "C": {
+    "level": 40,
+    "areas": [
+     8
+    ]
+   },
+   "D": {
+    "level": 46,
+    "areas": [
+     9,
+     10
+    ]
+   }
+  },
+  "monster_exp": [
+   {
+    "area": 1,
+    "name": "시작의 숲",
+    "levels": [
+     1,
+     6
+    ],
+    "base_exp": 7,
+    "mobs": [
+     {
+      "name": "독버섯",
+      "level": 1,
+      "exp": 7,
+      "weight": 1.0
+     },
+     {
+      "name": "뿔토끼",
+      "level": 2,
+      "exp": 6,
+      "weight": 0.8
+     },
+     {
+      "name": "말벌",
+      "level": 2,
+      "exp": 7,
+      "weight": 1.0
+     },
+     {
+      "name": "멧돼지",
+      "level": 3,
+      "exp": 9,
+      "weight": 1.3
+     },
+     {
+      "name": "호박 허수아비",
+      "level": 3,
+      "exp": 8,
+      "weight": 1.1
+     },
+     {
+      "name": "숲 슬라임",
+      "level": 4,
+      "exp": 6,
+      "weight": 0.8
+     },
+     {
+      "name": "도토리 다람쥐",
+      "level": 4,
+      "exp": 6,
+      "weight": 0.8
+     },
+     {
+      "name": "나무 정령 새싹",
+      "level": 5,
+      "exp": 8,
+      "weight": 1.2
+     }
+    ],
+    "champions": [
+     {
+      "name": "거대 왕멧돼지 '돌엄니'",
+      "level": 6,
+      "exp": 42
+     },
+     {
+      "name": "여왕 말벌",
+      "level": 6,
+      "exp": 42
+     }
+    ],
+    "boss": {
+     "name": "이끼 수정 골렘",
+     "level": 6,
+     "exp": 320
+    }
+   },
+   {
+    "area": 2,
+    "name": "수정 동굴",
+    "levels": [
+     6,
+     11
+    ],
+    "base_exp": 28,
+    "mobs": [
+     {
+      "name": "가시덩굴",
+      "level": 6,
+      "exp": 28,
+      "weight": 1.0
+     },
+     {
+      "name": "박쥐",
+      "level": 7,
+      "exp": 20,
+      "weight": 0.7
+     },
+     {
+      "name": "수정 딱정벌레",
+      "level": 7,
+      "exp": 28,
+      "weight": 1.0
+     },
+     {
+      "name": "동굴 거미",
+      "level": 8,
+      "exp": 28,
+      "weight": 1.0
+     },
+     {
+      "name": "곡괭이 바위도깨비",
+      "level": 8,
+      "exp": 36,
+      "weight": 1.3
+     },
+     {
+      "name": "반딧불 지렁이",
+      "level": 9,
+      "exp": 22,
+      "weight": 0.8
+     },
+     {
+      "name": "동굴 두더지",
+      "level": 9,
+      "exp": 28,
+      "weight": 1.0
+     },
+     {
+      "name": "수정 슬라임",
+      "level": 10,
+      "exp": 31,
+      "weight": 1.1
+     }
+    ],
+    "champions": [
+     {
+      "name": "흡혈 박쥐왕",
+      "level": 11,
+      "exp": 168
+     },
+     {
+      "name": "광부 도깨비 대장",
+      "level": 11,
+      "exp": 168
+     }
+    ],
+    "boss": {
+     "name": "수정 여왕거미",
+     "level": 11,
+     "exp": 830
+    }
+   },
+   {
+    "area": 3,
+    "name": "모래 사막",
+    "levels": [
+     11,
+     16
+    ],
+    "base_exp": 61,
+    "mobs": [
+     {
+      "name": "전갈",
+      "level": 11,
+      "exp": 61,
+      "weight": 1.0
+     },
+     {
+      "name": "선인장 골렘",
+      "level": 12,
+      "exp": 79,
+      "weight": 1.3
+     },
+     {
+      "name": "모래 독사",
+      "level": 12,
+      "exp": 61,
+      "weight": 1.0
+     },
+     {
+      "name": "대머리 독수리",
+      "level": 13,
+      "exp": 55,
+      "weight": 0.9
+     },
+     {
+      "name": "사막 도적",
+      "level": 13,
+      "exp": 73,
+      "weight": 1.2
+     },
+     {
+      "name": "모래 정령",
+      "level": 14,
+      "exp": 61,
+      "weight": 1.0
+     },
+     {
+      "name": "낙타 거북",
+      "level": 14,
+      "exp": 79,
+      "weight": 1.3
+     },
+     {
+      "name": "개미귀신",
+      "level": 15,
+      "exp": 61,
+      "weight": 1.0
+     }
+    ],
+    "champions": [
+     {
+      "name": "황금 전갈 '태양침'",
+      "level": 16,
+      "exp": 366
+     },
+     {
+      "name": "사막 도적 두목",
+      "level": 16,
+      "exp": 366
+     }
+    ],
+    "boss": {
+     "name": "모래 대지렁이",
+     "level": 16,
+     "exp": 1550
+    }
+   },
+   {
+    "area": 4,
+    "name": "피라미드",
+    "levels": [
+     16,
+     21
+    ],
+    "base_exp": 105,
+    "mobs": [
+     {
+      "name": "미라",
+      "level": 16,
+      "exp": 105,
+      "weight": 1.0
+     },
+     {
+      "name": "스카라베 떼",
+      "level": 17,
+      "exp": 74,
+      "weight": 0.7
+     },
+     {
+      "name": "아누비스 경비병",
+      "level": 17,
+      "exp": 136,
+      "weight": 1.3
+     },
+     {
+      "name": "저주 항아리",
+      "level": 18,
+      "exp": 84,
+      "weight": 0.8
+     },
+     {
+      "name": "뱀 머리 석상",
+      "level": 18,
+      "exp": 105,
+      "weight": 1.0
+     },
+     {
+      "name": "고양이 망령",
+      "level": 19,
+      "exp": 105,
+      "weight": 1.0
+     },
+     {
+      "name": "함정 석판 골렘",
+      "level": 19,
+      "exp": 147,
+      "weight": 1.4
+     },
+     {
+      "name": "모래 해골 궁수",
+      "level": 20,
+      "exp": 105,
+      "weight": 1.0
+     }
+    ],
+    "champions": [
+     {
+      "name": "쌍둥이 아누비스",
+      "level": 21,
+      "exp": 630
+     },
+     {
+      "name": "저주받은 대신관",
+      "level": 21,
+      "exp": 630
+     }
+    ],
+    "boss": {
+     "name": "황금가면 미라왕",
+     "level": 21,
+     "exp": 2450
+    }
+   },
+   {
+    "area": 5,
+    "name": "산호 바다",
+    "levels": [
+     21,
+     27
+    ],
+    "base_exp": 172,
+    "mobs": [
+     {
+      "name": "어인",
+      "level": 21,
+      "exp": 172,
+      "weight": 1.0
+     },
+     {
+      "name": "해파리",
+      "level": 22,
+      "exp": 138,
+      "weight": 0.8
+     },
+     {
+      "name": "가시 복어",
+      "level": 22,
+      "exp": 172,
+      "weight": 1.0
+     },
+     {
+      "name": "상어 돌격병",
+      "level": 23,
+      "exp": 224,
+      "weight": 1.3
+     },
+     {
+      "name": "문어 먹물병",
+      "level": 24,
+      "exp": 172,
+      "weight": 1.0
+     },
+     {
+      "name": "전기 뱀장어",
+      "level": 25,
+      "exp": 172,
+      "weight": 1.0
+     },
+     {
+      "name": "아귀",
+      "level": 25,
+      "exp": 206,
+      "weight": 1.2
+     },
+     {
+      "name": "소라게",
+      "level": 26,
+      "exp": 155,
+      "weight": 0.9
+     }
+    ],
+    "champions": [
+     {
+      "name": "백상어 장군",
+      "level": 27,
+      "exp": 1032
+     },
+     {
+      "name": "심해 아귀 여왕",
+      "level": 27,
+      "exp": 1032
+     }
+    ],
+    "boss": {
+     "name": "심해 크라켄 뱀",
+     "level": 27,
+     "exp": 3800
+    }
+   },
+   {
+    "area": 6,
+    "name": "해안 절벽",
+    "levels": [
+     27,
+     33
+    ],
+    "base_exp": 254,
+    "mobs": [
+     {
+      "name": "집게 병사",
+      "level": 27,
+      "exp": 254,
+      "weight": 1.0
+     },
+     {
+      "name": "갈매기",
+      "level": 28,
+      "exp": 178,
+      "weight": 0.7
+     },
+     {
+      "name": "해적 해골",
+      "level": 28,
+      "exp": 279,
+      "weight": 1.1
+     },
+     {
+      "name": "따개비 골렘",
+      "level": 29,
+      "exp": 356,
+      "weight": 1.4
+     },
+     {
+      "name": "바다 거북 방패병",
+      "level": 30,
+      "exp": 330,
+      "weight": 1.3
+     },
+     {
+      "name": "파도 정령",
+      "level": 31,
+      "exp": 254,
+      "weight": 1.0
+     },
+     {
+      "name": "불가사리",
+      "level": 31,
+      "exp": 254,
+      "weight": 1.0
+     },
+     {
+      "name": "해적 앵무새",
+      "level": 32,
+      "exp": 254,
+      "weight": 1.0
+     }
+    ],
+    "champions": [
+     {
+      "name": "유령 해적 선장",
+      "level": 33,
+      "exp": 1524
+     },
+     {
+      "name": "거대 바닷가재",
+      "level": 33,
+      "exp": 1524
+     }
+    ],
+    "boss": {
+     "name": "산호 거대게",
+     "level": 33,
+     "exp": 5400
+    }
+   },
+   {
+    "area": 7,
+    "name": "화산 성채",
+    "levels": [
+     33,
+     39
+    ],
+    "base_exp": 350,
+    "mobs": [
+     {
+      "name": "용암 슬라임",
+      "level": 33,
+      "exp": 350,
+      "weight": 1.0
+     },
+     {
+      "name": "불 도롱뇽",
+      "level": 34,
+      "exp": 350,
+      "weight": 1.0
+     },
+     {
+      "name": "용암 바위 골렘",
+      "level": 34,
+      "exp": 490,
+      "weight": 1.4
+     },
+     {
+      "name": "불꽃 임프",
+      "level": 35,
+      "exp": 315,
+      "weight": 0.9
+     },
+     {
+      "name": "잿불 불사조 새끼",
+      "level": 36,
+      "exp": 385,
+      "weight": 1.1
+     },
+     {
+      "name": "저주받은 갑옷",
+      "level": 37,
+      "exp": 455,
+      "weight": 1.3
+     },
+     {
+      "name": "화염 사냥개",
+      "level": 37,
+      "exp": 350,
+      "weight": 1.0
+     },
+     {
+      "name": "흑요석 궁수",
+      "level": 38,
+      "exp": 350,
+      "weight": 1.0
+     }
+    ],
+    "champions": [
+     {
+      "name": "용암 거인 수문장",
+      "level": 39,
+      "exp": 2100
+     },
+     {
+      "name": "화염 마녀",
+      "level": 39,
+      "exp": 2100
+     }
+    ],
+    "boss": {
+     "name": "화염검 흑기사",
+     "level": 39,
+     "exp": 7260
+    }
+   },
+   {
+    "area": 8,
+    "name": "설산 뇌전 탑",
+    "levels": [
+     39,
+     45
+    ],
+    "base_exp": 461,
+    "mobs": [
+     {
+      "name": "서리 늑대",
+      "level": 39,
+      "exp": 461,
+      "weight": 1.0
+     },
+     {
+      "name": "얼음 슬라임",
+      "level": 40,
+      "exp": 461,
+      "weight": 1.0
+     },
+     {
+      "name": "설인 새끼",
+      "level": 40,
+      "exp": 553,
+      "weight": 1.2
+     },
+     {
+      "name": "서리 요정",
+      "level": 41,
+      "exp": 369,
+      "weight": 0.8
+     },
+     {
+      "name": "펭귄 기사",
+      "level": 42,
+      "exp": 461,
+      "weight": 1.0
+     },
+     {
+      "name": "뇌운 새",
+      "level": 43,
+      "exp": 461,
+      "weight": 1.0
+     },
+     {
+      "name": "얼음 거북",
+      "level": 43,
+      "exp": 599,
+      "weight": 1.3
+     },
+     {
+      "name": "폭풍 가고일",
+      "level": 44,
+      "exp": 599,
+      "weight": 1.3
+     }
+    ],
+    "champions": [
+     {
+      "name": "어미 설인",
+      "level": 45,
+      "exp": 2766
+     },
+     {
+      "name": "번개 그리폰",
+      "level": 45,
+      "exp": 2766
+     }
+    ],
+    "boss": {
+     "name": "뇌전 와이번",
+     "level": 45,
+     "exp": 9380
+    }
+   },
+   {
+    "area": 9,
+    "name": "어둠 신전",
+    "levels": [
+     45,
+     50
+    ],
+    "base_exp": 564,
+    "mobs": [
+     {
+      "name": "해골 창병",
+      "level": 45,
+      "exp": 564,
+      "weight": 1.0
+     },
+     {
+      "name": "고블린",
+      "level": 46,
+      "exp": 451,
+      "weight": 0.8
+     },
+     {
+      "name": "보라 도깨비불",
+      "level": 46,
+      "exp": 451,
+      "weight": 0.8
+     },
+     {
+      "name": "어둠 마법사",
+      "level": 47,
+      "exp": 564,
+      "weight": 1.0
+     },
+     {
+      "name": "그림자 암살자",
+      "level": 47,
+      "exp": 733,
+      "weight": 1.3
+     },
+     {
+      "name": "공허 눈알",
+      "level": 48,
+      "exp": 564,
+      "weight": 1.0
+     },
+     {
+      "name": "가고일 석상",
+      "level": 48,
+      "exp": 790,
+      "weight": 1.4
+     },
+     {
+      "name": "저주 인형",
+      "level": 49,
+      "exp": 564,
+      "weight": 1.0
+     }
+    ],
+    "champions": [
+     {
+      "name": "그림자 쌍검사",
+      "level": 50,
+      "exp": 3384
+     },
+     {
+      "name": "공허의 수문장",
+      "level": 50,
+      "exp": 3384
+     }
+    ],
+    "boss": {
+     "name": "공허의 대사제",
+     "level": 50,
+     "exp": 11340
+    }
+   },
+   {
+    "area": 10,
+    "name": "마룡의 둥지",
+    "levels": [
+     50,
+     58
+    ],
+    "base_exp": 724,
+    "mobs": [
+     {
+      "name": "강화 독버섯 외 1지역 8종",
+      "level": 50,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 1
+     },
+     {
+      "name": "강화 가시덩굴 외 2지역 8종",
+      "level": 51,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 2
+     },
+     {
+      "name": "강화 전갈 외 3지역 8종",
+      "level": 52,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 3
+     },
+     {
+      "name": "강화 미라 외 4지역 8종",
+      "level": 53,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 4
+     },
+     {
+      "name": "강화 어인 외 5지역 8종",
+      "level": 54,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 5
+     },
+     {
+      "name": "강화 집게 병사 외 6지역 8종",
+      "level": 54,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 6
+     },
+     {
+      "name": "강화 용암 슬라임 외 7지역 8종",
+      "level": 55,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 7
+     },
+     {
+      "name": "강화 서리 늑대 외 8지역 8종",
+      "level": 56,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 8
+     },
+     {
+      "name": "강화 해골 창병 외 9지역 8종",
+      "level": 57,
+      "exp": 724,
+      "weight": 1.0,
+      "enhanced_of": 9
+     }
+    ],
+    "champions": [
+     {
+      "name": "강화 챔피언 18종 (1~9지역 챔피언의 강화판)",
+      "level": 58,
+      "exp": 4344
+     }
+    ],
+    "boss": {
+     "name": "머리 셋 달린 그림자 마룡",
+     "level": 58,
+     "exp": 29680
+    }
+   }
+  ],
+  "strongman_exp": {
+   "A": 220,
+   "B": 480,
+   "H": 560,
+   "G": 1030,
+   "F": 2370,
+   "E": 4620,
+   "C": 6010,
+   "D": 7560
+  },
+  "asran_exp": 51030,
+  "level_diff": {
+   "table": [
+    {
+     "max_diff": -6,
+     "mult": 1.25,
+     "desc": "6 이상 낮음: 도전 보너스 +25% (상한)"
+    },
+    {
+     "max_diff": -3,
+     "mult": 1.1,
+     "desc": "3~5 낮음: +10%"
+    },
+    {
+     "max_diff": 2,
+     "mult": 1.0,
+     "desc": "±2 이내: 그대로"
+    },
+    {
+     "max_diff": 3,
+     "mult": 0.8,
+     "desc": "3 높음"
+    },
+    {
+     "max_diff": 4,
+     "mult": 0.6,
+     "desc": "4 높음"
+    },
+    {
+     "max_diff": 5,
+     "mult": 0.4,
+     "desc": "5 높음"
+    },
+    {
+     "max_diff": 6,
+     "mult": 0.25,
+     "desc": "6 높음"
+    },
+    {
+     "max_diff": 7,
+     "mult": 0.12,
+     "desc": "7 높음"
+    },
+    {
+     "max_diff": 99,
+     "mult": 0.05,
+     "desc": "8 이상 높음: 5% (사실상 0)"
+    }
+   ],
+   "rules": [
+    "보스는 리스폰하지 않으므로 보정 하한 50% (늦게 잡아도 손해가 크지 않음).",
+    "챔피언은 같은 보정 + 기존 「10분 안에 3번 넘게 잡으면 재료 절반」 규칙과 별개로, 같은 챔피언 4번째 처치부터 EXP 절반 (10분 창).",
+    "퀘스트 EXP는 레벨 차 보정 없음 (늦게 깨도 그대로). 대신 퀘스트 EXP 자체가 마을 기준 레벨로 고정돼 있어 후반엔 비중이 작다.",
+    "동료 히로인이 마무리해도 주인공이 전부 받는다 (분배 없음).",
+    "마을 사람·경비병 처치 EXP(악의 길·마왕)도 같은 보정을 쓴다. 마을 사람 레벨 = 그 마을 기준 레벨."
+   ],
+   "boss_floor": 0.5
+  },
+  "growth": {
+   "choice": "고정 성장 + 소량 분배 포인트(힘·체력·정신 3종). 이유: ① 회피 구르기만으로 막는 액션이라 숫자 빌드보다 조작이 중심이어야 하고, 고정 성장이 지역 난이도 곡선을 예측 가능하게 만든다(적 스케일 계약, 아래 9장). ② 그래도 「내 캐릭터」 감각을 주려고 레벨당 1포인트를 3종에만 나눠 준다. 포인트 효과는 고정 성장의 약 20~25% 규모라 잘못 찍어도 진행이 막히지 않는다. ③ 마왕 강림처럼 장비·스킬이 잠기는 루트에서도 성장 선택지가 남는다.",
+   "stats": {
+    "hp": {
+     "name": "최대 체력(HP)",
+     "base": 50,
+     "steps": [
+      [
+       2,
+       20,
+       2
+      ],
+      [
+       21,
+       40,
+       3
+      ],
+      [
+       41,
+       60,
+       4
+      ]
+     ],
+     "unit": "HP",
+     "note": "1하트 = 10HP (반 칸 = 5HP). HUD는 하트 20칸까지 그리고 넘으면 하트 줄 끝에 ×숫자. 하트 조각·거인의 열매·원한의 조각은 +10HP(1하트)씩 따로 더한다."
+    },
+    "atk": {
+     "name": "기본 공격력(ATK)",
+     "base": 10,
+     "steps": [
+      [
+       2,
+       30,
+       1
+      ],
+      [
+       31,
+       60,
+       1.5
+      ]
+     ],
+     "unit": "",
+     "note": "최종 공격력 = ATK + 무기 공격 × (1 + 강화 %). 콤보 타마다 배율이 붙는다(1타 1.0 / 2타 1.0 / 3타 1.4)."
+    },
+    "def": {
+     "name": "방어(DEF)",
+     "base": 0,
+     "steps": [
+      [
+       2,
+       60,
+       0.5
+      ]
+     ],
+     "unit": "",
+     "note": "받는 피해 = 원래 피해 × 60 / (60 + DEF합). DEF합 = 레벨 DEF + 몸·투구·보조무기 방어."
+    },
+    "mag": {
+     "name": "마력(MAG, 스킬 위력)",
+     "base": 14,
+     "steps": [
+      [
+       2,
+       60,
+       2
+      ]
+     ],
+     "unit": "",
+     "note": "스킬 피해 = 스킬 배율(dmg) × (0.5 × 최종 공격력 + 0.5 × MAG). 구 「기력」의 위력 부분."
+    },
+    "mp": {
+     "name": "최대 MP",
+     "base": 80,
+     "steps": [
+      [
+       2,
+       60,
+       2
+      ]
+     ],
+     "unit": "MP",
+     "note": "구 「파란 게이지」. 1칸 = 10MP 눈금 (Lv1 = 8칸, 기존 데모와 같음)."
+    },
+    "crit": {
+     "name": "치명타 확률",
+     "base": 5.0,
+     "steps": [
+      [
+       2,
+       60,
+       0.1
+      ]
+     ],
+     "unit": "%",
+     "note": "치명타 피해 ×1.5. 상한 40%."
+    }
+   },
+   "table": [
+    {
+     "level": 1,
+     "hp": 50,
+     "atk": 10,
+     "def": 0,
+     "mag": 14,
+     "mp": 80,
+     "crit": 5
+    },
+    {
+     "level": 2,
+     "hp": 52,
+     "atk": 11,
+     "def": 0.5,
+     "mag": 16,
+     "mp": 82,
+     "crit": 5.1
+    },
+    {
+     "level": 3,
+     "hp": 54,
+     "atk": 12,
+     "def": 1,
+     "mag": 18,
+     "mp": 84,
+     "crit": 5.2
+    },
+    {
+     "level": 4,
+     "hp": 56,
+     "atk": 13,
+     "def": 1.5,
+     "mag": 20,
+     "mp": 86,
+     "crit": 5.3
+    },
+    {
+     "level": 5,
+     "hp": 58,
+     "atk": 14,
+     "def": 2,
+     "mag": 22,
+     "mp": 88,
+     "crit": 5.4
+    },
+    {
+     "level": 6,
+     "hp": 60,
+     "atk": 15,
+     "def": 2.5,
+     "mag": 24,
+     "mp": 90,
+     "crit": 5.5
+    },
+    {
+     "level": 7,
+     "hp": 62,
+     "atk": 16,
+     "def": 3,
+     "mag": 26,
+     "mp": 92,
+     "crit": 5.6
+    },
+    {
+     "level": 8,
+     "hp": 64,
+     "atk": 17,
+     "def": 3.5,
+     "mag": 28,
+     "mp": 94,
+     "crit": 5.7
+    },
+    {
+     "level": 9,
+     "hp": 66,
+     "atk": 18,
+     "def": 4,
+     "mag": 30,
+     "mp": 96,
+     "crit": 5.8
+    },
+    {
+     "level": 10,
+     "hp": 68,
+     "atk": 19,
+     "def": 4.5,
+     "mag": 32,
+     "mp": 98,
+     "crit": 5.9
+    },
+    {
+     "level": 11,
+     "hp": 70,
+     "atk": 20,
+     "def": 5,
+     "mag": 34,
+     "mp": 100,
+     "crit": 6
+    },
+    {
+     "level": 12,
+     "hp": 72,
+     "atk": 21,
+     "def": 5.5,
+     "mag": 36,
+     "mp": 102,
+     "crit": 6.1
+    },
+    {
+     "level": 13,
+     "hp": 74,
+     "atk": 22,
+     "def": 6,
+     "mag": 38,
+     "mp": 104,
+     "crit": 6.2
+    },
+    {
+     "level": 14,
+     "hp": 76,
+     "atk": 23,
+     "def": 6.5,
+     "mag": 40,
+     "mp": 106,
+     "crit": 6.3
+    },
+    {
+     "level": 15,
+     "hp": 78,
+     "atk": 24,
+     "def": 7,
+     "mag": 42,
+     "mp": 108,
+     "crit": 6.4
+    },
+    {
+     "level": 16,
+     "hp": 80,
+     "atk": 25,
+     "def": 7.5,
+     "mag": 44,
+     "mp": 110,
+     "crit": 6.5
+    },
+    {
+     "level": 17,
+     "hp": 82,
+     "atk": 26,
+     "def": 8,
+     "mag": 46,
+     "mp": 112,
+     "crit": 6.6
+    },
+    {
+     "level": 18,
+     "hp": 84,
+     "atk": 27,
+     "def": 8.5,
+     "mag": 48,
+     "mp": 114,
+     "crit": 6.7
+    },
+    {
+     "level": 19,
+     "hp": 86,
+     "atk": 28,
+     "def": 9,
+     "mag": 50,
+     "mp": 116,
+     "crit": 6.8
+    },
+    {
+     "level": 20,
+     "hp": 88,
+     "atk": 29,
+     "def": 9.5,
+     "mag": 52,
+     "mp": 118,
+     "crit": 6.9
+    },
+    {
+     "level": 21,
+     "hp": 91,
+     "atk": 30,
+     "def": 10,
+     "mag": 54,
+     "mp": 120,
+     "crit": 7
+    },
+    {
+     "level": 22,
+     "hp": 94,
+     "atk": 31,
+     "def": 10.5,
+     "mag": 56,
+     "mp": 122,
+     "crit": 7.1
+    },
+    {
+     "level": 23,
+     "hp": 97,
+     "atk": 32,
+     "def": 11,
+     "mag": 58,
+     "mp": 124,
+     "crit": 7.2
+    },
+    {
+     "level": 24,
+     "hp": 100,
+     "atk": 33,
+     "def": 11.5,
+     "mag": 60,
+     "mp": 126,
+     "crit": 7.3
+    },
+    {
+     "level": 25,
+     "hp": 103,
+     "atk": 34,
+     "def": 12,
+     "mag": 62,
+     "mp": 128,
+     "crit": 7.4
+    },
+    {
+     "level": 26,
+     "hp": 106,
+     "atk": 35,
+     "def": 12.5,
+     "mag": 64,
+     "mp": 130,
+     "crit": 7.5
+    },
+    {
+     "level": 27,
+     "hp": 109,
+     "atk": 36,
+     "def": 13,
+     "mag": 66,
+     "mp": 132,
+     "crit": 7.6
+    },
+    {
+     "level": 28,
+     "hp": 112,
+     "atk": 37,
+     "def": 13.5,
+     "mag": 68,
+     "mp": 134,
+     "crit": 7.7
+    },
+    {
+     "level": 29,
+     "hp": 115,
+     "atk": 38,
+     "def": 14,
+     "mag": 70,
+     "mp": 136,
+     "crit": 7.8
+    },
+    {
+     "level": 30,
+     "hp": 118,
+     "atk": 39,
+     "def": 14.5,
+     "mag": 72,
+     "mp": 138,
+     "crit": 7.9
+    },
+    {
+     "level": 31,
+     "hp": 121,
+     "atk": 40.5,
+     "def": 15,
+     "mag": 74,
+     "mp": 140,
+     "crit": 8
+    },
+    {
+     "level": 32,
+     "hp": 124,
+     "atk": 42,
+     "def": 15.5,
+     "mag": 76,
+     "mp": 142,
+     "crit": 8.1
+    },
+    {
+     "level": 33,
+     "hp": 127,
+     "atk": 43.5,
+     "def": 16,
+     "mag": 78,
+     "mp": 144,
+     "crit": 8.2
+    },
+    {
+     "level": 34,
+     "hp": 130,
+     "atk": 45,
+     "def": 16.5,
+     "mag": 80,
+     "mp": 146,
+     "crit": 8.3
+    },
+    {
+     "level": 35,
+     "hp": 133,
+     "atk": 46.5,
+     "def": 17,
+     "mag": 82,
+     "mp": 148,
+     "crit": 8.4
+    },
+    {
+     "level": 36,
+     "hp": 136,
+     "atk": 48,
+     "def": 17.5,
+     "mag": 84,
+     "mp": 150,
+     "crit": 8.5
+    },
+    {
+     "level": 37,
+     "hp": 139,
+     "atk": 49.5,
+     "def": 18,
+     "mag": 86,
+     "mp": 152,
+     "crit": 8.6
+    },
+    {
+     "level": 38,
+     "hp": 142,
+     "atk": 51,
+     "def": 18.5,
+     "mag": 88,
+     "mp": 154,
+     "crit": 8.7
+    },
+    {
+     "level": 39,
+     "hp": 145,
+     "atk": 52.5,
+     "def": 19,
+     "mag": 90,
+     "mp": 156,
+     "crit": 8.8
+    },
+    {
+     "level": 40,
+     "hp": 148,
+     "atk": 54,
+     "def": 19.5,
+     "mag": 92,
+     "mp": 158,
+     "crit": 8.9
+    },
+    {
+     "level": 41,
+     "hp": 152,
+     "atk": 55.5,
+     "def": 20,
+     "mag": 94,
+     "mp": 160,
+     "crit": 9
+    },
+    {
+     "level": 42,
+     "hp": 156,
+     "atk": 57,
+     "def": 20.5,
+     "mag": 96,
+     "mp": 162,
+     "crit": 9.1
+    },
+    {
+     "level": 43,
+     "hp": 160,
+     "atk": 58.5,
+     "def": 21,
+     "mag": 98,
+     "mp": 164,
+     "crit": 9.2
+    },
+    {
+     "level": 44,
+     "hp": 164,
+     "atk": 60,
+     "def": 21.5,
+     "mag": 100,
+     "mp": 166,
+     "crit": 9.3
+    },
+    {
+     "level": 45,
+     "hp": 168,
+     "atk": 61.5,
+     "def": 22,
+     "mag": 102,
+     "mp": 168,
+     "crit": 9.4
+    },
+    {
+     "level": 46,
+     "hp": 172,
+     "atk": 63,
+     "def": 22.5,
+     "mag": 104,
+     "mp": 170,
+     "crit": 9.5
+    },
+    {
+     "level": 47,
+     "hp": 176,
+     "atk": 64.5,
+     "def": 23,
+     "mag": 106,
+     "mp": 172,
+     "crit": 9.6
+    },
+    {
+     "level": 48,
+     "hp": 180,
+     "atk": 66,
+     "def": 23.5,
+     "mag": 108,
+     "mp": 174,
+     "crit": 9.7
+    },
+    {
+     "level": 49,
+     "hp": 184,
+     "atk": 67.5,
+     "def": 24,
+     "mag": 110,
+     "mp": 176,
+     "crit": 9.8
+    },
+    {
+     "level": 50,
+     "hp": 188,
+     "atk": 69,
+     "def": 24.5,
+     "mag": 112,
+     "mp": 178,
+     "crit": 9.9
+    },
+    {
+     "level": 51,
+     "hp": 192,
+     "atk": 70.5,
+     "def": 25,
+     "mag": 114,
+     "mp": 180,
+     "crit": 10
+    },
+    {
+     "level": 52,
+     "hp": 196,
+     "atk": 72,
+     "def": 25.5,
+     "mag": 116,
+     "mp": 182,
+     "crit": 10.1
+    },
+    {
+     "level": 53,
+     "hp": 200,
+     "atk": 73.5,
+     "def": 26,
+     "mag": 118,
+     "mp": 184,
+     "crit": 10.2
+    },
+    {
+     "level": 54,
+     "hp": 204,
+     "atk": 75,
+     "def": 26.5,
+     "mag": 120,
+     "mp": 186,
+     "crit": 10.3
+    },
+    {
+     "level": 55,
+     "hp": 208,
+     "atk": 76.5,
+     "def": 27,
+     "mag": 122,
+     "mp": 188,
+     "crit": 10.4
+    },
+    {
+     "level": 56,
+     "hp": 212,
+     "atk": 78,
+     "def": 27.5,
+     "mag": 124,
+     "mp": 190,
+     "crit": 10.5
+    },
+    {
+     "level": 57,
+     "hp": 216,
+     "atk": 79.5,
+     "def": 28,
+     "mag": 126,
+     "mp": 192,
+     "crit": 10.6
+    },
+    {
+     "level": 58,
+     "hp": 220,
+     "atk": 81,
+     "def": 28.5,
+     "mag": 128,
+     "mp": 194,
+     "crit": 10.7
+    },
+    {
+     "level": 59,
+     "hp": 224,
+     "atk": 82.5,
+     "def": 29,
+     "mag": 130,
+     "mp": 196,
+     "crit": 10.8
+    },
+    {
+     "level": 60,
+     "hp": 228,
+     "atk": 84,
+     "def": 29.5,
+     "mag": 132,
+     "mp": 198,
+     "crit": 10.9
+    }
+   ]
+  },
+  "stat_points": {
+   "per_level": 1,
+   "from_level": 2,
+   "total": 59,
+   "cap_per_stat": 30,
+   "stats": [
+    {
+     "id": "str",
+     "name": "힘",
+     "effect": "공격력 +1 · 치명타 +0.1%p",
+     "per": {
+      "atk": 1.0,
+      "crit": 0.1
+     }
+    },
+    {
+     "id": "vit",
+     "name": "체력",
+     "effect": "최대 HP +4 · DEF +0.3",
+     "per": {
+      "hp": 4,
+      "defense": 0.3
+     }
+    },
+    {
+     "id": "spi",
+     "name": "정신",
+     "effect": "MAG +1.5 · 최대 MP +2 · MP 자연 회복 +1%",
+     "per": {
+      "mag": 1.5,
+      "mp": 2,
+      "mp_regen_pct": 1
+     }
+    }
+   ],
+   "respec": "재분배: C 성녀 설화 또는 D 대주교 루미엘(대성당)에게서 금화 50 × 레벨. 처음 1회 무료. 마왕은 마염 제단에서 원한 서린 혼석 1개.",
+   "why": "레벨당 1포인트(총 59), 한 능력치 최대 30. 고정 성장 대비 약 20~25% 규모라 「잘못 찍은 빌드」가 생기지 않는다."
+  },
+  "perks": [
+   {
+    "level": 5,
+    "major": false,
+    "id": "quick_potion",
+    "name": "빠른 물약",
+    "desc": "물약 사용 모션 0.6초 → 0.4초"
+   },
+   {
+    "level": 10,
+    "major": true,
+    "id": "combo4",
+    "name": "4타 콤보",
+    "desc": "3타 돌려베기 직후 공격 → 4타 「내려찍기」(배율 1.6, 작은 충격파). 콤보 시트 내려찍기 4프레임 재사용"
+   },
+   {
+    "level": 15,
+    "major": false,
+    "id": "iframe1",
+    "name": "회피 무적 +",
+    "desc": "구르기 무적 0.20초 → 0.23초"
+   },
+   {
+    "level": 20,
+    "major": true,
+    "id": "ult_rate1",
+    "name": "필살기 게이지 충전 +15%",
+    "desc": "필살기 게이지 획득량 ×1.15"
+   },
+   {
+    "level": 25,
+    "major": false,
+    "id": "roll_cd1",
+    "name": "회피 재사용 -",
+    "desc": "구르기 재사용 0.55초 → 0.50초"
+   },
+   {
+    "level": 30,
+    "major": true,
+    "id": "perfect_window",
+    "name": "퍼펙트 회피 판정 확대",
+    "desc": "퍼펙트 회피 판정 0.12초 → 0.16초, 퍼펙트 회피 MP 회복 15 → 20"
+   },
+   {
+    "level": 35,
+    "major": false,
+    "id": "iframe2",
+    "name": "회피 무적 ++",
+    "desc": "구르기 무적 0.23초 → 0.26초"
+   },
+   {
+    "level": 40,
+    "major": true,
+    "id": "dash_strike",
+    "name": "회피 반격",
+    "desc": "구르기 직후 0.25초 안에 공격 → 돌진 찌르기(배율 1.5, 관통). 퍼펙트 회피 뒤라면 반드시 치명타"
+   },
+   {
+    "level": 45,
+    "major": false,
+    "id": "roll_cd2",
+    "name": "회피 재사용 -- · 치명 +3%",
+    "desc": "구르기 재사용 0.50초 → 0.45초, 치명타 확률 +3%p"
+   },
+   {
+    "level": 50,
+    "major": true,
+    "id": "combo5",
+    "name": "5타 콤보 · 필살기 충전 ++",
+    "desc": "4타 뒤 공격 → 5타 「낙인 회전참」(배율 2.0, 원형). 필살기 게이지 획득량 ×1.30 (Lv20과 합산 아님, 대체)"
+   },
+   {
+    "level": 55,
+    "major": false,
+    "id": "mp_regen",
+    "name": "MP 순환",
+    "desc": "MP 자연 회복 +25%, 일반 공격 적중 MP +1"
+   },
+   {
+    "level": 60,
+    "major": true,
+    "id": "brand_bloom",
+    "name": "낙인 개화",
+    "desc": "필살기를 쓴 뒤 6초 동안 스킬 MP 소모 0. 칭호별 변형: 영웅=아군(히로인) HP 30% 회복 / 필멸자=그대로 / 타락한 필멸자=처치 시 HP 흡수"
+   }
+  ],
+  "demon_perk_swap": {
+   "combo4": "종언 3연격 3타 뒤 촉수 추가타가 2회로",
+   "combo5": "종언 3연격 회전 베기 범위 +25%, 구조물 피해 ×2.5",
+   "dash_strike": "구르기 대신 「그림자 걸음」(짧은 순간이동, 무적 동일) — 직후 공격 시 내려찍기",
+   "ult_rate1": "파멸 게이지 획득 +15%",
+   "brand_bloom": "멸계강림 뒤 6초 동안 마왕 스킬 MP 소모 0"
+  },
+  "karma": [
+   {
+    "title": "영웅",
+    "cond": "선악 +40 이상",
+    "exp": "퀘스트 EXP +15%. 동료 히로인 레벨 보너스 +1",
+    "growth": "기본 성장",
+    "npc_kill": "마을 사람을 죽이면 EXP ×0.5 (그리고 칭호를 잃는다)"
+   },
+   {
+    "title": "필멸자",
+    "cond": "선악 -39 ~ +39",
+    "exp": "기준",
+    "growth": "기본 성장",
+    "npc_kill": "마을 사람 처치 EXP ×0.5 (악의 길)"
+   },
+   {
+    "title": "타락한 필멸자",
+    "cond": "선악 -40 ~ -59 (강림 전)",
+    "exp": "몹 처치 EXP +10% (굶주림). 선의 퀘스트 의뢰 대부분 거절 → 퀘스트 EXP 감소분을 처치로 메움",
+    "growth": "기본 성장",
+    "npc_kill": "마을 사람 처치 EXP ×0.75, 처치 시 MP +10"
+   },
+   {
+    "title": "마왕",
+    "cond": "마왕 강림 후 (영구)",
+    "exp": "몹 처치 EXP +15%. 어른 NPC·경비병·마을 강자 처치 EXP ×1.0. 구조물 붕괴 단계마다 소량 EXP. 선의 퀘스트 EXP 없음 (악의 길 퀘스트만)",
+    "growth": "마왕 성장 (아래 표)",
+    "npc_kill": "×1.0 (아이는 대상이 아님 — 공격이 통과)"
+   }
+  ],
+  "demon_growth": {
+   "mult": {
+    "hp": 1.25,
+    "atk": 1.3,
+    "mag": 0.8,
+    "mp": 0.6,
+    "crit": 1.5,
+    "def": 1.0
+   },
+   "rule": "강림한 레벨 이후 오르는 레벨부터 레벨당 증가량에 배율을 곱한다(소급 없음). HP·공격이 더 크게 오르고, MP 최대치는 덜 오른다 — 마왕은 MP를 「회복」하지 않고 「빼앗는다」(MP 장 참고).",
+   "points": "분배 포인트는 계속 받는다. 강림 순간 정신(SPI)에 찍은 포인트를 힘·체력으로 1회 무료 재분배할 수 있다(남겨도 됨 — 마왕 스킬도 MP를 쓴다).",
+   "descent_bonus": "강림 순간 1회: 최대 HP +10% (괴수 갑옷), 레벨은 그대로.",
+   "structure_exp": "구조물 붕괴 1단계 = 그 마을 기준 일반 몹 EXP × 0.3",
+   "townsfolk_exp": "마을 사람 처치 EXP = 전투 HP ÷ 10 × 그 마을 지역의 일반 몹 기준 EXP (경비병 HP 30 → 몹 3마리 분량). 강림 전 악의 길은 ×0.5 / ×0.75(타락한 필멸자).",
+   "lock_note": "마왕 루트는 스킬·장비가 잠기지만 레벨 성장·분배 포인트·레벨 보상(대체판)은 계속된다. 고정 장비 「종언」 공격력은 강림 순간 무기 공격 ×1.3, 이후 보스당 +2 (기존 규칙)."
+  },
+  "companion_level": {
+   "rule": "히로인은 따로 EXP를 모으지 않는다. 레벨 = 주인공 레벨 + 호감도 보정 (1 ~ 60). 동행하지 않아도 같이 오른다(파티에서 빠져 있다가 다시 불러도 뒤처지지 않음).",
+   "affinity_offset": [
+    [
+     0,
+     39,
+     -3
+    ],
+    [
+     40,
+     59,
+     -2
+    ],
+    [
+     60,
+     79,
+     -1
+    ],
+    [
+     80,
+     99,
+     0
+    ],
+    [
+     100,
+     100,
+     1
+    ]
+   ],
+   "hero_title_bonus": "주인공이 「영웅」이면 +1 추가.",
+   "stats": "히로인 HP = (히로인 데이터 hp ÷ 50) × 주인공 기본 HP 곡선(그 레벨) × 0.8. 공격 = 주인공 ATK 곡선 × 0.7 + 지역 기준 무기 공격 × 0.5. 분배 포인트·장비 없음.",
+   "affinity_stat": "호감도 보너스: 모든 능력치 +(호감도 ÷ 10)% (호감도 100 = +10%).",
+   "down": "쓰러짐·부활 규칙은 기존 동료 규칙 그대로 (사망 없음). 쓰러져도 EXP 불이익 없음.",
+   "demon": "마왕 루트: 동행 중인 히로인(유나처럼 끌려오는 경우)은 레벨이 강림 순간에 멈춘다."
+  },
+  "quest_exp": {
+   "type_mult": {
+    "사냥": 0.12,
+    "배달": 0.1,
+    "숨은 물건 찾기": 0.08,
+    "호위": 0.14,
+    "연계": 0.16,
+    "잠수": 0.12,
+    "대장간": 0.14,
+    "동료 동행": 0.12,
+    "결투": 0.0,
+    "암살": 0.0,
+    "악의 길": 0.14,
+    "악의 길 (변형)": 0.12
+   },
+   "level_offset": {
+    "연계": 2,
+    "대장간": 2,
+    "잠수": 2,
+    "악의 길": 2,
+    "악의 길 (변형)": 2
+   },
+   "rules": [
+    "결투(⑦)·암살(⑧) 퀘스트는 퀘스트 EXP 0 — 대신 마을 강자 처치 EXP(강자 EXP)를 받는다. 살려 주든 죽이든 같은 EXP라 선택이 EXP로 기울지 않는다.",
+    "동료 퀘스트는 단계가 오를수록 기준 레벨 +2씩 (2단계 +2, 3단계 +4).",
+    "영웅 칭호는 퀘스트 EXP +15% (6장).",
+    "악의 길 퀘스트는 강림 후에도 받을 수 있다."
+   ],
+   "by_quest": {
+    "A1": 10,
+    "A2": 10,
+    "A3": 10,
+    "A4": 20,
+    "A5": 50,
+    "A6": 40,
+    "A7": 0,
+    "A8": 0,
+    "A9": 40,
+    "A10": 40,
+    "A11": 40,
+    "A_TAILOR1": 10,
+    "A_TAILOR2": 40,
+    "A_TAILOR3": 60,
+    "B1": 60,
+    "B2": 80,
+    "B3": 50,
+    "B4": 40,
+    "B5": 130,
+    "B6": 50,
+    "B7": 0,
+    "B8": 0,
+    "B9": 120,
+    "B10": 100,
+    "B11": 120,
+    "H1": 80,
+    "H2": 100,
+    "H3": 50,
+    "H4": 70,
+    "H5": 160,
+    "H6": 120,
+    "H7": 0,
+    "H8": 0,
+    "H9": 140,
+    "H10": 120,
+    "H11": 140,
+    "H_MYSTIC1": 80,
+    "H_MYSTIC2": 120,
+    "H_MYSTIC3": 170,
+    "G1": 190,
+    "G2": 220,
+    "G3": 130,
+    "G4": 160,
+    "G5": 250,
+    "G6": 330,
+    "G7": 0,
+    "G8": 0,
+    "G9": 290,
+    "G10": 250,
+    "G11": 290,
+    "G_DANCER1": 190,
+    "G_DANCER2": 250,
+    "G_DANCER3": 310,
+    "F1": 530,
+    "F2": 350,
+    "F3": 440,
+    "F4": 820,
+    "F5": 620,
+    "F6": 620,
+    "F7": 0,
+    "F8": 0,
+    "F9": 720,
+    "F10": 620,
+    "F11": 720,
+    "F_DIVER1": 530,
+    "F_DIVER2": 620,
+    "F_DIVER3": 710,
+    "E1": 1140,
+    "E2": 950,
+    "E3": 1680,
+    "E4": 1330,
+    "E5": 1260,
+    "E6": 760,
+    "E7": 0,
+    "E8": 0,
+    "E9": 1470,
+    "E10": 1260,
+    "E_TAILOR1": 1140,
+    "E_TAILOR2": 1260,
+    "E_TAILOR3": 1390,
+    "C1": 1520,
+    "C2": 1270,
+    "C3": 1010,
+    "C4": 1770,
+    "C5": 2210,
+    "C6": 1660,
+    "C7": 0,
+    "C8": 0,
+    "C9": 1930,
+    "C10": 1660,
+    "C11": 1930,
+    "C_PRIEST1": 1520,
+    "C_PRIEST2": 1660,
+    "C_PRIEST3": 1800,
+    "D1": 1950,
+    "D2": 2280,
+    "D3": 1300,
+    "D4": 1630,
+    "D5": 2810,
+    "D6": 2110,
+    "D7": 0,
+    "D8": 0,
+    "D9": 2460,
+    "D10": 2110,
+    "D11": 2460,
+    "D_YUNA1": 1950,
+    "D_YUNA2": 2110,
+    "D_YUNA3": 2270
+   }
+  },
+  "enemy_scale": {
+   "rule": "설계 문서의 적 체력(1지역 보스 = 100 기준 상대값)과 공격(하트 단위)은 「그 지역 권장 레벨의 주인공」 기준이다. 실제 값 = 체력 × hp_mult[지역], 공격 = 하트 × 10HP × dmg_mult[지역]. hp_mult는 권장 레벨 주인공의 예상 공격력 비율, dmg_mult는 예상 HP × 방어 보정 비율이다. 그래서 적정 레벨이면 「몇 대 때려야 잡고 몇 대 맞으면 죽는지」가 설계값 그대로이고, 레벨이 높으면 빨리 잡고 덜 아프며, 낮으면 반대가 된다. 마을 사람·강자는 그 마을 기준 레벨의 지역 값을 쓴다.",
+   "areas": [
+    {
+     "area": 1,
+     "hero": {
+      "level": 3,
+      "attack": 17.2,
+      "defense": 4.0,
+      "hp": 54,
+      "weapon": 5.2,
+      "enh": 1,
+      "mag": 18,
+      "mp": 84
+     },
+     "hp_mult": 1.0,
+     "dmg_mult": 1.0
+    },
+    {
+     "area": 2,
+     "hero": {
+      "level": 8,
+      "attack": 27.6,
+      "defense": 7.2,
+      "hp": 64,
+      "weapon": 10.6,
+      "enh": 2,
+      "mag": 28,
+      "mp": 94
+     },
+     "hp_mult": 1.6,
+     "dmg_mult": 1.24
+    },
+    {
+     "area": 3,
+     "hero": {
+      "level": 13,
+      "attack": 37.7,
+      "defense": 10.8,
+      "hp": 74,
+      "weapon": 15.7,
+      "enh": 3,
+      "mag": 38,
+      "mp": 104
+     },
+     "hp_mult": 2.19,
+     "dmg_mult": 1.52
+    },
+    {
+     "area": 4,
+     "hero": {
+      "level": 18,
+      "attack": 43.8,
+      "defense": 14.8,
+      "hp": 84,
+      "weapon": 16.8,
+      "enh": 3,
+      "mag": 48,
+      "mp": 114
+     },
+     "hp_mult": 2.55,
+     "dmg_mult": 1.82
+    },
+    {
+     "area": 5,
+     "hero": {
+      "level": 24,
+      "attack": 53.6,
+      "defense": 20.1,
+      "hp": 100,
+      "weapon": 20.6,
+      "enh": 4,
+      "mag": 60,
+      "mp": 126
+     },
+     "hp_mult": 3.12,
+     "dmg_mult": 2.32
+    },
+    {
+     "area": 6,
+     "hero": {
+      "level": 30,
+      "attack": 61.3,
+      "defense": 24.6,
+      "hp": 118,
+      "weapon": 22.3,
+      "enh": 5,
+      "mag": 72,
+      "mp": 138
+     },
+     "hp_mult": 3.56,
+     "dmg_mult": 2.89
+    },
+    {
+     "area": 7,
+     "hero": {
+      "level": 36,
+      "attack": 76.6,
+      "defense": 28.9,
+      "hp": 136,
+      "weapon": 28.6,
+      "enh": 6,
+      "mag": 84,
+      "mp": 150
+     },
+     "hp_mult": 4.45,
+     "dmg_mult": 3.5
+    },
+    {
+     "area": 8,
+     "hero": {
+      "level": 42,
+      "attack": 92.7,
+      "defense": 33.1,
+      "hp": 156,
+      "weapon": 35.7,
+      "enh": 7,
+      "mag": 96,
+      "mp": 162
+     },
+     "hp_mult": 5.39,
+     "dmg_mult": 4.2
+    },
+    {
+     "area": 9,
+     "hero": {
+      "level": 47,
+      "attack": 108.8,
+      "defense": 36.8,
+      "hp": 176,
+      "weapon": 44.2,
+      "enh": 8,
+      "mag": 106,
+      "mp": 172
+     },
+     "hp_mult": 6.33,
+     "dmg_mult": 4.93
+    },
+    {
+     "area": 10,
+     "hero": {
+      "level": 54,
+      "attack": 134.4,
+      "defense": 42.0,
+      "hp": 204,
+      "weapon": 59.4,
+      "enh": 9,
+      "mag": 120,
+      "mp": 186
+     },
+     "hp_mult": 7.81,
+     "dmg_mult": 6.02
+    }
+   ]
+  },
+  "death": {
+   "choice": "가벼운 페널티",
+   "rules": [
+    "EXP는 잃지 않는다 (레벨 다운 없음).",
+    "「다시 도전」: 보스·강자 방 입구 또는 마지막으로 지나간 화면 입구에서 HP·MP 가득, 필살기 게이지 0. 페널티 없음.",
+    "「마을로」: 마지막으로 들른 마을 여관 앞. 들고 있던 금화 10% 잃음 (최대 500).",
+    "마왕: 「다시 도전」만 가능, 파멸 게이지 0. 금화 손실 없음 (빼앗을 사람이 없다)."
+   ],
+   "why": "회피 구르기만으로 막는 패턴 액션이라 죽음은 「패턴을 배우는 과정」이다. Ys VIII처럼 즉시 재도전을 기본으로 두고, 마을 귀환에만 작은 금화 손실을 둔다."
+  },
+  "mp": {
+   "rename": "기존 「파란 게이지 / 기력 / 정령력」은 모두 MP 하나로 통합한다. 데모의 8칸 게이지 = Lv1 최대 MP 80 (1칸 = 10MP 눈금). 기존 데이터의 「파란 게이지 N칸」은 「MP N×10」으로 읽는다. 스킬 위력은 MAG(마력) 능력치로 분리.",
+   "legacy_unit": 10,
+   "max": "최대 MP = 기본 성장(Lv1 80 → Lv60 198) + 정신 포인트 ×2 + 정령의 물방울(영구 +10, 8개) + 장비(공허의 반지 +10). 마왕은 강림 후 증가량 ×0.6.",
+   "regen": [
+    {
+     "id": "passive",
+     "name": "자연 회복 (전투 중)",
+     "value": "0.6 MP/초 (≈ 1칸 / 17초). 정신 포인트당 +1%, Lv55 보상 +25%, 정령 찻잎 60초 ×2, 서리 부적 +10%, 공허의 반지 +15%"
+    },
+    {
+     "id": "passive_idle",
+     "name": "자연 회복 (비전투)",
+     "value": "화면에 적대 대상이 없고 3초 지나면 자연 회복 ×4 (2.4 MP/초)"
+    },
+    {
+     "id": "hit",
+     "name": "일반 공격 적중",
+     "value": "타격 1회당 +3 MP (콤보 마지막 타 +5). 한 번 휘두름에 최대 2마리까지만 계산. Lv55 보상 +1. 구조물·소품 타격은 0"
+    },
+    {
+     "id": "perfect_dodge",
+     "name": "퍼펙트 회피",
+     "value": "적 공격 판정 직전 0.12초(Lv30: 0.16초) 안에 구르기 → +15 MP(Lv30: +20) + 1.2초 슬로 모션 + 필살기 게이지 +5"
+    },
+    {
+     "id": "kill",
+     "name": "처치",
+     "value": "+1 MP (챔피언 +10)"
+    },
+    {
+     "id": "none",
+     "name": "회복 없음",
+     "value": "스킬 시전 중과 시전 끝난 뒤 0.5초, 필살기·멸계강림 연출 중, 잠수 중에는 모든 MP 회복이 멈춘다"
+    }
+   ],
+   "items": [
+    [
+     "spirit",
+     "정령수",
+     "MP 30 회복 (구 「3칸」)"
+    ],
+    [
+     "spirit_tea",
+     "정령 찻잎",
+     "60초간 MP 자연 회복 ×2"
+    ],
+    [
+     "spirit_hi",
+     "상급 정령수",
+     "MP 전부 회복"
+    ],
+    [
+     "panacea_full",
+     "만능 영약",
+     "HP·MP 전부 회복 + 상태이상 해제"
+    ],
+    [
+     "spirit_drop",
+     "정령의 물방울",
+     "최대 MP +10 (영구, 구 「+1칸」)"
+    ]
+   ],
+   "gear": [
+    [
+     "a_frost_amulet",
+     "서리 부적",
+     "MP 자연 회복 +10%"
+    ],
+    [
+     "h_witch_hat",
+     "화염 마녀의 모자",
+     "스킬 MP 소모 -10%"
+    ],
+    [
+     "o_void_ring",
+     "공허의 반지",
+     "최대 MP +10, 자연 회복 +15%"
+    ]
+   ],
+   "rest": [
+    "마을 여관·집 침대(1박): HP·MP 전부 회복. 영웅·필멸자 무료, 타락한 필멸자(악명) 금화 10 × 지역 번호, 현상금 ★2 이상 마을은 이용 불가.",
+    "마을 분수·우물 옆에 서 있으면 MP 자연 회복 ×4 (전투 불가 구역).",
+    "지역 안 세이브 결정(쉼터 화면): HP 30%, MP 전부 회복 (1회 방문당 1번, 화면을 나갔다 오면 다시).",
+    "마왕: 여관 불가. 폐허의 「검은 왕좌」·검은 성채에서만 휴식 (HP·MP 전부)."
+   ],
+   "ult_separate": "MP와 필살기 게이지는 별개다. MP = 스킬 3칸(Digit1~3)의 자원. 필살기 게이지(0~100, 화면 아래 금색 막대) = 광역 키(Q)의 전체 화면 필살기 자원. 서로 바꿔 쓸 수 없고, MP 회복 수단은 필살기 게이지를 채우지 않는다 (퍼펙트 회피만 둘 다 조금씩).",
+   "skills": [
+    {
+     "group": "보스",
+     "id": "quake",
+     "name": "대지의 수정",
+     "mp": 20,
+     "cooldown": 3.0,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "thread",
+     "name": "수정 실",
+     "mp": 10,
+     "cooldown": 1.5,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "sand",
+     "name": "사중 잠행",
+     "mp": 20,
+     "cooldown": 3.5,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "pact",
+     "name": "망자의 계약",
+     "mp": 30,
+     "cooldown": 6.0,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "water",
+     "name": "해류의 숨결",
+     "mp": 10,
+     "cooldown": 1.2,
+     "note": "잠수 진입은 MP 0 (잠수 중 MP 회복 없음)"
+    },
+    {
+     "group": "보스",
+     "id": "shield",
+     "name": "산호 방패",
+     "mp": 10,
+     "cooldown": 1.0,
+     "note": "들 때 10, 유지 중 초당 4"
+    },
+    {
+     "group": "보스",
+     "id": "fire",
+     "name": "업화의 검",
+     "mp": 20,
+     "cooldown": 2.0,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "bolt",
+     "name": "뇌광 질주",
+     "mp": 20,
+     "cooldown": 2.0,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "time",
+     "name": "시간 정지",
+     "mp": 40,
+     "cooldown": 10,
+     "note": ""
+    },
+    {
+     "group": "보스",
+     "id": "dragon",
+     "name": "삼룡의 각성",
+     "mp": 80,
+     "cooldown": 20,
+     "note": "MP 스킬 중 최대 (Lv1 MP 전부). 필살기 게이지와는 별개"
+    },
+    {
+     "group": "강자",
+     "id": "kalbaram",
+     "name": "바람 가르기",
+     "mp": 20,
+     "cooldown": 4,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "sol",
+     "name": "매의 삼연사",
+     "mp": 25,
+     "cooldown": 5,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "gomsoe",
+     "name": "대지 강권",
+     "mp": 25,
+     "cooldown": 5,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "zahra",
+     "name": "모래 장막",
+     "mp": 20,
+     "cooldown": 6,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "mago",
+     "name": "작살 사슬",
+     "mp": 15,
+     "cooldown": 3,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "garon",
+     "name": "철벽 반격",
+     "mp": 20,
+     "cooldown": 6,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "hanbing",
+     "name": "한기 장풍",
+     "mp": 25,
+     "cooldown": 5,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "강자",
+     "id": "grim",
+     "name": "단죄의 일격",
+     "mp": 40,
+     "cooldown": 12,
+     "note": "어둠 변형 +5MP"
+    },
+    {
+     "group": "인간 보스",
+     "id": "asran",
+     "name": "팔방검",
+     "mp": 45,
+     "cooldown": 8,
+     "note": "아스란 흡수 스킬"
+    },
+    {
+     "group": "전설검",
+     "id": "hs_tak",
+     "name": "천일섭 (탁검)",
+     "mp": 35,
+     "cooldown": 10,
+     "note": "HIDDEN_SWORDS cost 그대로 (MP)"
+    },
+    {
+     "group": "전설검",
+     "id": "hs_gyu",
+     "name": "월영참 (규검)",
+     "mp": 30,
+     "cooldown": 8,
+     "note": "HIDDEN_SWORDS cost 그대로 (MP)"
+    },
+    {
+     "group": "마왕",
+     "id": "dk_black_moon",
+     "name": "흑월참",
+     "mp": 20,
+     "cooldown": 4,
+     "note": "DEMON_KING cost 그대로 (MP)"
+    },
+    {
+     "group": "마왕",
+     "id": "dk_abyss_grasp",
+     "name": "심연의 촉수",
+     "mp": 35,
+     "cooldown": 9,
+     "note": "붙잡은 적마다 MP +3 흡수"
+    },
+    {
+     "group": "마왕",
+     "id": "dk_horn_roar",
+     "name": "뿔관의 포효",
+     "mp": 30,
+     "cooldown": 12,
+     "note": ""
+    }
+   ],
+   "cost_rules": [
+    "빛 변형은 기본형과 같은 MP, 어둠 변형은 +5MP(더 강한 대신 비쌈). 스킬 MP는 레벨이 올라도 고정 → 최대 MP·회복이 늘수록 더 자주 쓴다.",
+    "시전 중 MP가 모자라면 시전하지 않고 「MP 부족」 토스트 (데모의 「기력 부족」을 바꿔 표기).",
+    "화염 마녀의 모자 -10%는 반올림(최소 5).",
+    "일월식(찬검)·멸계강림은 MP가 아니라 필살기 게이지 / 파멸 게이지를 쓴다."
+   ],
+   "demon": {
+    "rule": "마왕은 MP 자연 회복이 없다 (굶주림). 대신 생명을 빼앗아 채운다.",
+    "drain": [
+     [
+      "일반 적 처치",
+      "+6 MP"
+     ],
+     [
+      "챔피언 처치",
+      "+25 MP"
+     ],
+     [
+      "어른 NPC·경비병 처치",
+      "+15 MP"
+     ],
+     [
+      "마을 강자 처치",
+      "MP 전부"
+     ],
+     [
+      "일반 공격(종언 3연격) 적중",
+      "+4 MP (마지막 타 +6)"
+     ],
+     [
+      "구조물 붕괴 1단계",
+      "+2 MP"
+     ],
+     [
+      "퍼펙트 회피(그림자 걸음)",
+      "+10 MP"
+     ],
+     [
+      "심연의 촉수로 붙잡은 적",
+      "적마다 +3 MP"
+     ]
+    ],
+    "items": "물약류는 뒷거래(1.5배)로만 구한다. 마염 제단 소모품(혼석 정제)이 MP 회복을 대신한다.",
+    "max": "최대 MP 증가량 ×0.6 → 작은 통을 자주 채우는 구조."
+   },
+   "companion": {
+    "rule": "히로인은 자기 MP 통을 갖는다: 최대 MP = 40 + 레벨 × 1. 자연 회복 1 MP/초, 일반 공격 적중 +2 MP. 고유 스킬 MP = 재사용 초 × 2.5 (5 단위).",
+    "ai": "AI는 MP가 스킬 비용 이상이고 재사용 대기가 끝났으며 화면 안에 대상이 있을 때만 스킬을 쓴다. 회복형(설화 「눈꽃 축복」)은 주인공 HP 50% 이하일 때만.",
+    "duo": "듀오 합동기(호감도 60): 주인공 필살기 게이지 50 + 히로인 MP 50% 소모. 필살기 게이지가 100이면 단독 필살기와 합동기 중 하나를 고른다(Q 짧게 / 길게).",
+    "potion": "주인공이 쓴 정령수·상급 정령수는 동행 히로인 MP도 같은 비율로 채운다. 여관 휴식도 동일."
+   }
+  },
+  "roll": {
+   "choice": "스태미나 없음 — 구르기는 무료 + 짧은 재사용",
+   "why": "Ys VIII처럼 회피가 유일한 방어이므로 회피를 자원으로 묶으면 패턴 읽기보다 게이지 관리가 앞선다. 데모도 이미 재사용 0.55초 대시라서 그대로 이어 쓴다. 대신 「연속 3회 뒤 피로」로 무한 구르기를 막고, 레벨 보상이 무적·재사용을 조금씩 늘린다.",
+   "base": {
+    "duration": 0.2,
+    "iframes": 0.2,
+    "cooldown": 0.55,
+    "perfect_window": 0.12,
+    "chain": 3,
+    "fatigue": 0.8
+   },
+   "rules": [
+    "구르기 지속 0.20초 전체 무적 (Lv15 0.23 / Lv35 0.26).",
+    "재사용 0.55초 (Lv25 0.50 / Lv45 0.45).",
+    "1.5초 안에 3번 연속 구르면 다음 구르기까지 0.8초 피로 (짧게 숨 고르는 모션). 퍼펙트 회피 성공은 연속 횟수에서 빠진다.",
+    "퍼펙트 회피: 적 공격 판정 직전 0.12초(Lv30 0.16) 안에 구르면 성공 → 1.2초 슬로, MP +15(+20), 필살기 게이지 +5.",
+    "스킬·필살기 시전 중에는 구를 수 없다 (시전 취소 없음)."
+   ]
+  },
+  "ult_gauge": {
+   "name": "필살기 게이지",
+   "range": [
+    0,
+    100
+   ],
+   "gain": [
+    [
+     "일반 공격 적중",
+     "+0.5 (스킬 적중은 0)"
+    ],
+    [
+     "받은 피해",
+     "반 칸(5HP)당 +2"
+    ],
+    [
+     "퍼펙트 회피",
+     "+5"
+    ],
+    [
+     "일반 적 처치",
+     "+1"
+    ],
+    [
+     "챔피언 처치",
+     "+10"
+    ],
+    [
+     "보스 페이즈 전환",
+     "+15"
+    ]
+   ],
+   "use": "광역 키(Q): 게이지 100 전부 → 전체 화면 필살기. 기본은 「낙인 해방」(제안: 화면 전체 피해 15, 보스는 최대 체력 8% 상한, 0.8초 시간 정지 연출), 찬검을 들면 「일월식」(기존 데이터). 마왕은 같은 칸이 파멸 게이지(멸계강림)로 바뀐다.",
+   "keep": "게이지는 지역·마을을 옮겨도 유지, 사망·「다시 도전」 시 0. Lv20·Lv50 보상이 획득량을 올린다."
+  },
+  "pacing": [
+   {
+    "area": 1,
+    "need": 1080,
+    "boss": 320,
+    "champions": 168,
+    "quests": 290,
+    "strongmen": 0,
+    "mob_kills": 43
+   },
+   {
+    "area": 2,
+    "need": 4270,
+    "boss": 830,
+    "champions": 672,
+    "quests": 810,
+    "strongmen": 700,
+    "mob_kills": 46
+   },
+   {
+    "area": 3,
+    "need": 9205,
+    "boss": 1550,
+    "champions": 1464,
+    "quests": 1970,
+    "strongmen": 560,
+    "mob_kills": 56
+   },
+   {
+    "area": 4,
+    "need": 15795,
+    "boss": 2450,
+    "champions": 2520,
+    "quests": 1160,
+    "strongmen": 1030,
+    "mob_kills": 81
+   },
+   {
+    "area": 5,
+    "need": 29910,
+    "boss": 3800,
+    "champions": 4128,
+    "quests": 2980,
+    "strongmen": 2370,
+    "mob_kills": 95
+   },
+   {
+    "area": 6,
+    "need": 44410,
+    "boss": 5400,
+    "champions": 6096,
+    "quests": 2980,
+    "strongmen": 0,
+    "mob_kills": 111
+   },
+   {
+    "area": 7,
+    "need": 61535,
+    "boss": 7260,
+    "champions": 8400,
+    "quests": 10910,
+    "strongmen": 4620,
+    "mob_kills": 80
+   },
+   {
+    "area": 8,
+    "need": 81260,
+    "boss": 9380,
+    "champions": 11064,
+    "quests": 16350,
+    "strongmen": 6010,
+    "mob_kills": 78
+   },
+   {
+    "area": 9,
+    "need": 84615,
+    "boss": 11340,
+    "champions": 13536,
+    "quests": 10435,
+    "strongmen": 0,
+    "mob_kills": 85
+   },
+   {
+    "area": 10,
+    "need": 171165,
+    "boss": 29680,
+    "champions": 26064,
+    "quests": 10435,
+    "strongmen": 7560,
+    "mob_kills": 135
+   }
+  ]
+ }
 }

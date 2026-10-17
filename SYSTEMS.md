@@ -1,6 +1,7 @@
 # 시스템 설계: 무기 강화 · 몬스터 리스폰 · 선악 · 현상금 · 대장간 · 마을 파괴 · 마왕 모드
 
 > 데이터: `data/towns.json` → `enhancement`, `respawn`, `karma`, `bounty`, `skill_evolution`. (설계 문서 — 아직 게임 미구현)
+> 레벨·경험치·능력치 성장·MP(구 파란 게이지)·회피·필살기 게이지는 [LEVELS.md](LEVELS.md).
 
 ## 1. 무기 강화 (+0 ~ +9)
 
