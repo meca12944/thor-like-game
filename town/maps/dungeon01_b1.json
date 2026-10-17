@@ -14,7 +14,7 @@
   "name": "고대 숲 신전",
   "sub": "지하 1층"
  },
- "bgm": "area01_forest",
+ "bgm": "area01_temple",
  "dark": 0.55,
  "tileset": "dungeon",
  "tile": 16,

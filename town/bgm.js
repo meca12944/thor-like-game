@@ -23,6 +23,8 @@
     area6: 'area06_cliff', area7: 'area07_volcano', area8: 'area08_thunder_tower', area9: 'area09_dark_temple', area10: 'area10_dragon_nest',
     townA: 'town_a_fountain', townB: 'town_b_watermill', townH: 'town_h_mine', townG: 'town_g_bazaar', townF: 'town_f_harbor',
     townE: 'town_e_forge', townC: 'town_c_snow_lodge', townD: 'town_d_capital',
+    area1Temple: 'area01_temple', // [bgm] user-supplied Gemini batch 1; the old generated tracks stay as <id>Alt
+    townAAlt: 'town_a_fountainAlt', area1Alt: 'area01_forestAlt', championAlt: 'battle_championAlt', bossAlt: 'battle_bossAlt', boss2Alt: 'battle_boss_phase2Alt',
     endTrue: 'ending_true', endLight: 'ending_light', endTragic: 'ending_tragic', endDemon: 'ending_demon',
   };
   const Q = new URLSearchParams(location.search);
