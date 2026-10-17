@@ -231,7 +231,7 @@ const FEEL={
  walkSpeed:215,accelTicks:2,skidTicks:6,               // Ys VIII-like: near-instant start, short skid stop
  dashSpeed:820,dashTicks:13,dashIframes:11,dashCdTicks:24,dashRecTicks:6, // 회피(잔상 대시) / Flash Move (Shift/K/X): 0.18s i-frames in a 0.22s dash, 0.4s cooldown, fading ghost trail
  arcDeg:150,                          // default swing arc (deg). Each combo hit = forward SECTOR: radius s.range (world px from hero centre, town tile 53.3) x s.arc; the trail is drawn with the same radius/arc
- runMul:1.72,runStartMul:2.3,runStartTicks:10,runSkidTicks:12,dblTap:.25, // double-tap a direction -> dash start + run while held (1.72x walk), short skid on release; no MP/stamina
+ runMul:1.9,runStride:.55,runStartMul:2.3,runStartTicks:10,runSkidTicks:12,dblTap:.25, // double-tap a direction -> dash start + run while held (1.9x walk; runStride = run-cycle phase per walk-distance unit, 8 frames = ~208 world px, no foot sliding), short skid on release; no MP/stamina
  juice:Q.get('juice')!=='0',                        // hit-feel layer (sparks, damage numbers, SFX, kick-shake, squash, finisher zoom, crits). ?juice=0 = old feel (for comparison)
  hitStopMin:4,hitStopFin:9,critChance:.12,critStop:3,critMul:2, // hit-stop ticks: light hits >= 4, finishers/crits 8-10
  kickPx:0,kickFin:0,zoomFin:0,staggerTicks:10,                 // camera kick / finisher micro-zoom: OFF (motion-sickness feedback). Feel comes from hit-stop, flash, sparks, knockback, SFX
@@ -1240,7 +1240,7 @@ function update(dt){
   else{if(hero.run){hero.run=false;hero.runStartT=0;if(Math.hypot(hero.vx,hero.vy)>FEEL.walkSpeed*1.2){hero.skidT=tk(FEEL.runSkidTicks);burst(hero.x+hero.vx*.04,hero.y-2,6,['#e8dcc0','#cbb894'],90,0,3);}} // release -> short skid
    const k=1.6/(hero.skidT>0?FEEL.runSkidTicks:FEEL.skidTicks);hero.vx-=hero.vx*k;hero.vy-=hero.vy*k;if(!(Math.hypot(hero.vx,hero.vy)>=12))hero.vx=hero.vy=0;} // (NaN-safe) // short skid
   if(hero.vx||hero.vy)moveCol(hero,hero.vx*dt,hero.vy*dt,12);
-  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;hero.skid=!hero.moving&&sp>25;hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed)*(hero.run?.62:1):0;
+  {const sp=Math.hypot(hero.vx,hero.vy);hero.moving=sp>25&&l>0&&!busy;hero.skid=!hero.moving&&sp>25;hero.walkT=sp?hero.walkT+dt*Math.max(.6,sp/FEEL.walkSpeed)*(hero.run?FEEL.runStride:1):0;
    if(hero.run&&hero.moving){const ph=Math.floor(hero.walkT*60/16);if(ph!==hero.footPh){hero.footPh=ph;parts.push({x:hero.x-hero.vx*.03,y:hero.y-2,vx:-hero.vx*.15,vy:-25,g:40,t:0,life:.3,c:'#e8dcc0',s:4},{x:hero.x-hero.vx*.03+4,y:hero.y-1,vx:-hero.vx*.1,vy:-15,g:40,t:0,life:.25,c:'#cbb894',s:3});}}} // footfall dust puffs
  }
  // hero knockback / invuln
@@ -1374,9 +1374,11 @@ function heroPose(){const h=hero,a=h.atk,sk=h.sk;
 function heroAnimName(){const h=hero;if(h.deadT>0)return 'death';if(h.hurtT>0)return 'hurt';if(h.atk)return h.atk.s.anim||'atk1';if(h.dash)return 'dash';if(h.run&&h.moving)return h.runStartT>0?'runstart':'run';if(h.skidT>0&&h.skid)return 'skid';if(h.moving||h.skid)return 'walk';return 'idle';}
 function heroDir(){return hero.face==='left'||hero.face==='right'?'right':hero.face;}
 function animFrame(A,tick,loop){tick=Math.max(0,tick);if(loop)tick%=A.ticks;else tick=Math.min(tick,A.ticks-1);let i=0;for(;i<A.frames.length-1;i++){if(tick<A.frames[i][1])break;tick-=A.frames[i][1];}return A.frames[i];}
+function atkAnimP(a){const s=a.s,t=a.t,k=s.strike;if(!k||!(s.a1>s.a0))return t/s.dur; // windup -> [0,k0], active -> [k0,k1], follow-through -> [k1,1]
+ if(t<s.a0)return k[0]*t/Math.max(1e-6,s.a0);if(t<s.a1)return k[0]+(k[1]-k[0])*(t-s.a0)/(s.a1-s.a0);return k[1]+(1-k[1])*Math.min(1,(t-s.a1)/Math.max(1e-6,s.dur-s.a1));}
 function heroCell(){if(!ANIM)return null;const h=hero,base=heroAnimName(),dir=heroDir();const A=ANIM.anims[base+'_'+dir]||ANIM.anims[base+'_right'];if(!A)return null;
  let tick=h.animT||0;
- if(h.atk)tick=h.atk.t/h.atk.s.dur*A.ticks;                 // anim stretched to the weapon's swing timing
+ if(h.atk)tick=atkAnimP(h.atk)*A.ticks;                     // anim stretched to the weapon's swing timing (hit 3: strike frames pinned to the active window)
  else if(base==='dash')tick=h.dash.t/tk(FEEL.dashTicks)*(A.ticks-6); // dodge = lean dash pose
  else if(base==='walk'||base==='run')tick=h.walkT*60;                      // walk phase follows distance (no foot sliding), keeps phase through skids
  const f=animFrame(A,Math.floor(tick),A.loop);let fl=dir==='right'?h.face==='left':(base==='death'&&h.hz==='left');
@@ -1401,7 +1403,8 @@ function drawMound(){const h=hero,t=performance.now()/1000;ctx.fillStyle='#b8914
 function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=DIRV[hero.face];
  if(s.leap&&a.t<s.a0-.03)return;if(s.titleSpin){drawSpinRing(a,'front');return;}
  const tr=s.trail||['120,220,255','255,255,255'];
- const p=(a.t-s.a0*0.5)/(s.a1-s.a0*0.5+.06);if(p<0||p>1.2)return;const fade=(p>1?1-(p-1)/.2:1)*(dv[1]?1:.6);
+ const tl=s.strike?.4:.2; // hit 3: longer follow-through fade of the big trail
+ const p=(a.t-s.a0*0.5)/(s.a1-s.a0*0.5+.06);if(p<0||p>1+tl)return;const fade=(p>1?1-(p-1)/tl:1)*(dv[1]?1:.6);
  if(s.kind==='thrust'){const x0=hero.x+dv[0]*14+(dv[0]?0:(hero.hz==='left'?-6:6)),y0=hero.y-26+dv[1]*12,L=s.len*.85*Math.min(1,p*1.4);
   for(const[w,c]of[[7,`rgba(${tr[0]},${.35*fade})`],[3,`rgba(${tr[1]},${.95*fade})`]]){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+dv[0]*L,y0+dv[1]*L*.8);ctx.stroke();}
   return;}
