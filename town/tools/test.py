@@ -95,7 +95,7 @@ async def main():
     # ---- skill window ----
     await pg.goto(U); await waitready(pg)
     await pg.evaluate("()=>{__game.setManual(true);document.getElementById('hint').style.display='none'}")
-    await pg.keyboard.press('k'); await pg.wait_for_timeout(100)
+    await pg.keyboard.press('o'); await pg.wait_for_timeout(100)
     w1=await pg.evaluate("()=>[__game.winOpen,__game.slots.slice()]")
     await pg.click('.wi[data-id=bolt]'); await pg.click('#wslots .ws:nth-child(2)')
     w2=await pg.evaluate("()=>[__game.slots.slice(),localStorage.getItem('townDemo.skillSlots')]")
@@ -111,7 +111,7 @@ async def main():
     await pg.keyboard.press('Escape')
     await pg.reload(); await waitready(pg)
     w4=await pg.evaluate("()=>__game.slots.slice()")
-    # keys 1/2/3 + X/C/V fire slots (real-time)
+    # keys 1/2/3 fire slots (real-time)
     await pg.evaluate("()=>{__game.gauge=1;document.getElementById('hint').style.display='none'}")
     await pg.keyboard.press('1'); await pg.wait_for_timeout(50); k1=await pg.evaluate("()=>__game.hero.sk&&__game.hero.sk.id")
     await pg.wait_for_timeout(1200); await pg.screenshot(path=D+'shot.png')

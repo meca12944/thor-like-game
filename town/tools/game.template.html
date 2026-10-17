@@ -14,7 +14,7 @@ canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated;image-re
 #atk.on{transform:scale(.92);filter:brightness(1.2)}
 #stick{position:fixed;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:#0004;border:3px solid #fff6;display:none}
 #knob{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#fffc;border:3px solid #333a}
-#hint{transition:opacity 1s;position:fixed;left:50%;bottom:8px;transform:translateX(-50%);color:#fff9;font:12px sans-serif;text-shadow:1px 1px 0 #000}
+#hint{transition:opacity 1s;position:fixed;left:50%;bottom:36px;transform:translateX(-50%);color:#fff9;font:12px sans-serif;text-shadow:1px 1px 0 #000}
 body.touch #atk{display:block} body.touch #hint{display:none}
 /* skill quick slots (3) */
 .slot{position:fixed;width:64px;height:64px;border-radius:50%;pointer-events:auto;background:radial-gradient(circle at 40% 35%,#5a8ef0,#24479c 62%,#132a63);
@@ -50,16 +50,40 @@ body.touch #slotsKeys{display:none}
 .pip{display:inline-block;width:7px;height:9px;background:#1ea6f2;border:1px solid #0a0e1e;margin-right:1px;vertical-align:-1px}
 #wnote{margin-top:8px;color:#ffcf7a;font-size:11px}
 @media (max-width:600px){#wlist{grid-template-columns:1fr}}
+/* controls: HUD key bar, overlays (menu / options / inventory / map), dialog */
+kbd{display:inline-block;min-width:14px;padding:0 4px;margin-right:3px;border:2px solid #e8d6b0;border-bottom-width:3px;border-radius:3px;background:#0b0b14;color:#ffe08a;font:bold 11px monospace;text-align:center}
+#khud{position:fixed;left:12px;bottom:8px;display:flex;flex-wrap:wrap;gap:4px 10px;max-width:calc(100vw - 340px);color:#fff;font:12px sans-serif;text-shadow:1px 1px 0 #000}
+#khud span{background:#0008;padding:2px 6px 2px 3px;border-radius:3px}#khud span.hot{background:#3a5f1acc;outline:1px solid #b6f07a}
+body.touch #khud{display:none}
+#ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000a;pointer-events:auto}#ov.open{display:flex}
+#ovp{width:min(760px,94vw);max-height:92vh;overflow:auto;background:#18203f;color:#fff6e0;font:13px monospace;border:4px solid #e8d6b0;box-shadow:0 0 0 4px #0b0b14,0 0 0 8px #6b5a3a;padding:12px 16px;box-sizing:border-box}
+#ovp h2{margin:0 0 8px;font:bold 20px monospace;color:#ffe08a;text-shadow:2px 2px 0 #000}
+#ovp .sub{font-size:11px;color:#c9d3f0;margin:4px 0}#ovp .hb{margin-top:10px;padding-top:8px;border-top:2px solid #34427a;font-size:12px;color:#e8e0c8}
+.menu .mi{padding:8px 12px;margin:4px 0;background:#222c55;border:3px solid #34427a;cursor:pointer;font:bold 15px monospace;display:flex;justify-content:space-between}
+.menu .mi.sel{border-color:#ffe08a;background:#34407a}.menu .mi.sel:before{content:'▶ ';color:#ffe08a}.mk{color:#ffe08a;font:bold 11px monospace;border:1px solid #ffe08a88;padding:0 4px;margin-left:6px}
+table.km{border-collapse:collapse;width:100%}table.km th{text-align:left;color:#9ec3ff;padding:3px 0 1px;font-size:12px;border-bottom:1px solid #34427a}
+table.km td{padding:1px 4px}table.km td.an{width:42%}table.km td.warn{color:#ff9a8a}table.km tr.cur td.an{color:#ffe08a}
+.kc{display:inline-block;min-width:70px;padding:1px 6px;text-align:center;background:#0c1430;border:2px solid #4a5f9a;cursor:pointer;font:bold 12px monospace}
+.kc.sel{border-color:#ffe08a;background:#2a3460}.kc.rb{border-color:#7aff9a;background:#1a4a2a;animation:blink .6s infinite alternate}.kc.lk{color:#aab}
+@keyframes blink{to{background:#0c1430}}
+#ovp .note{margin:8px 0;padding:6px;background:#0c1430;border:2px solid #4a5f9a;color:#b6f07a;font-size:12px}#ovp .note.bad{color:#ff9a8a;border-color:#a04030}
+.btn{display:inline-block;padding:4px 10px;margin:4px 6px 0 0;background:#7a1610;color:#fff;border:3px solid #e8d6b0;cursor:pointer;font:bold 13px monospace}.btn.sm{padding:1px 6px;font-size:11px;background:#222c55}.btn.on{background:#3a6a1a}
+.inv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.inv>div{background:#0c1430;border:2px solid #34427a;padding:8px;line-height:1.7}.inv .big{font:bold 16px monospace;color:#ffe08a}
+img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
+#dlg{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);width:min(720px,92vw);display:none;background:#18203fee;color:#fff;border:4px solid #e8d6b0;box-shadow:0 0 0 4px #0b0b14;padding:10px 14px;box-sizing:border-box;pointer-events:auto;font:15px sans-serif}
+#dlg.open{display:block}#dlg .dn{color:#ffe08a;font:bold 14px monospace;margin-bottom:4px}#dlg .dt{line-height:1.5;min-height:44px}#dlg .dh{text-align:right;font-size:11px;color:#c9d3f0;margin-top:4px}
+@media (max-width:600px){.inv{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="ui"><div id="stick"><div id="knob"></div></div><div id="atk">공격</div>
 <div class="slot" id="s0"></div><div class="slot" id="s1"></div><div class="slot" id="s2"></div>
-<div id="slotsKeys">1/X · 2/C · 3/V</div>
-<div id="wbtn">스킬창</div>
-<div id="hint">WASD / 방향키 이동 · Z / Space 공격 (횡베기→찌르기→돌려베기) · 1·2·3 또는 X·C·V 스킬 · K / Tab 스킬창 · G 장비 세트</div></div>
-<div id="win"><div id="panel"><h2><span>스킬창 · Skills</span><span id="close">닫기 ✕</span></h2>
+<div id="slotsKeys">1 · 2 · 3</div>
+<div id="wbtn">스킬창 (O)</div>
+<div id="hint">조작 안내</div><div id="khud"></div></div>
+<div id="ov"><div id="ovp"></div></div><div id="dlg"></div>
+<div id="win"><div id="panel"><h2><span id="wtitle">스킬창 · Skills</span><span id="close">닫기 ✕</span></h2>
 <div style="font-size:11px;color:#c9d3f0">스킬을 누르면 빈 슬롯에 장착 · 슬롯이 꽉 찼으면 스킬 선택 후 슬롯 1/2/3을 눌러 교체 · 선택 없이 슬롯을 누르면 해제</div>
 <div id="wslots"></div><div id="wlist"></div>
 <div id="wnote">※ 데모: 10개 스킬 모두 해금 (DEMO.unlockAll). 실제 게임에서는 각 보스를 쓰러뜨리고 흡수해야 습득. 기력(파란 게이지)은 데모용으로 천천히 자동 회복.</div></div></div>
@@ -108,24 +132,294 @@ const ell=(x,y,e)=>((x-e.x)/e.rx)**2+((y-e.y)/e.ry)**2;
 function nearFountain(x,y){return ((x-777)/140)**2+((y-415)/95)**2<1.85;}
 function swimOk(x,y){return ell(x,y,POOL)<1&&ell(x,y,PILLAR)>1;}
 
-// ---------- input ----------
-const keys={};let atkPressed=false;const skPress=[];const skHeld=[false,false,false];
-const SLOTKEYS={'1':0,'2':1,'3':2,'x':0,'c':1,'v':2};
-addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' ','tab'].includes(k))e.preventDefault();
- if(k==='k'||k==='tab'){if(!e.repeat)toggleWin();return;}
- if(k==='g'&&!e.repeat&&!winOpen){cycleGear();return;}
- if(k==='escape'&&winOpen){toggleWin(false);return;}
+// ---------- input: rebindable keyboard map (see CONTROLS.md) ----------
+// Bindings are KeyboardEvent.code values, so they keep working when the Korean IME is on (ㅁ = KeyA).
+// Up to 3 keys per action. Saved in localStorage 'townDemo.keys'. Esc is always menu/back (locked).
+const ACTIONS=[
+ {id:'up',name:'위로 이동',grp:'이동',def:['ArrowUp','KeyW']},
+ {id:'down',name:'아래로 이동',grp:'이동',def:['ArrowDown','KeyS']},
+ {id:'left',name:'왼쪽 이동',grp:'이동',def:['ArrowLeft','KeyA']},
+ {id:'right',name:'오른쪽 이동',grp:'이동',def:['ArrowRight','KeyD']},
+ {id:'attack',name:'공격 (3연타 콤보)',grp:'전투',def:['KeyJ','KeyZ']},
+ {id:'dash',name:'회피 · 대시',grp:'전투',def:['KeyK','KeyX']},
+ {id:'skill1',name:'스킬 슬롯 1',grp:'전투',def:['Digit1']},
+ {id:'skill2',name:'스킬 슬롯 2',grp:'전투',def:['Digit2']},
+ {id:'skill3',name:'스킬 슬롯 3',grp:'전투',def:['Digit3']},
+ {id:'area',name:'광역 스킬 (멸계강림 / 일월식)',grp:'전투',def:['KeyQ']},
+ {id:'target',name:'대상 전환',grp:'전투',def:['Tab']},
+ {id:'potion',name:'빠른 물약',grp:'전투',def:['KeyE']},
+ {id:'interact',name:'상호작용 · 대화',grp:'행동',def:['KeyL','KeyC','Enter']},
+ {id:'dive',name:'잠수 · 물 밖으로 (크라켄)',grp:'행동',def:['Space']},
+ {id:'inventory',name:'인벤토리 · 장비',grp:'창',def:['KeyI']},
+ {id:'skills',name:'스킬창',grp:'창',def:['KeyO','KeyP']},
+ {id:'map',name:'월드맵',grp:'창',def:['KeyM']},
+ {id:'save',name:'빠른 저장',grp:'시스템',def:['F5']},
+ {id:'menu',name:'메뉴 · 일시정지 · 닫기',grp:'시스템',def:['Escape'],lock:'Escape'},
+ {id:'gear',name:'장비 세트 순환 (디버그)',grp:'시스템',def:['KeyG']},
+];
+const ACT=Object.fromEntries(ACTIONS.map(a=>[a.id,a]));
+const MOVE_ACTS=['up','down','left','right'];
+const LSK='townDemo.keys',MAXK=3;
+const RESERVED={F12:'개발자 도구',F11:'전체 화면',MetaLeft:'OS 키',MetaRight:'OS 키',ContextMenu:'메뉴 키'};
+let KEYMAP={},CODE2ACT={};
+function defaultKeys(){const m={};for(const a of ACTIONS)m[a.id]=a.def.slice();return m;}
+function rebuildCodes(){CODE2ACT={};for(const a of ACTIONS)for(const c of KEYMAP[a.id])CODE2ACT[c]=a.id;}
+function loadKeys(){KEYMAP=defaultKeys();
+ try{const v=JSON.parse(localStorage.getItem(LSK));if(v&&typeof v==='object')for(const a of ACTIONS)if(Array.isArray(v[a.id]))KEYMAP[a.id]=v[a.id].filter(c=>typeof c==='string'&&c&&!RESERVED[c]).slice(0,MAXK);}catch(e){}
+ const seen=new Set(['Escape']);KEYMAP.menu=['Escape',...KEYMAP.menu.filter(c=>c!=='Escape')].slice(0,MAXK);
+ for(const a of ACTIONS){if(a.id==='menu')continue;KEYMAP[a.id]=KEYMAP[a.id].filter(c=>!seen.has(c)&&seen.add(c));} // a hand-edited save can't create duplicates
+ for(const c of KEYMAP.menu.slice(1))if(Object.keys(KEYMAP).some(id=>id!=='menu'&&KEYMAP[id].includes(c)))KEYMAP.menu=KEYMAP.menu.filter(x=>x!==c);
+ rebuildCodes();}
+function saveKeys(){try{localStorage.setItem(LSK,JSON.stringify(KEYMAP));}catch(e){}rebuildCodes();refreshHints();}
+function conflictOf(code,except){for(const a of ACTIONS)if(a.id!==except&&KEYMAP[a.id].includes(code))return a.id;return null;}
+function allConflicts(){const seen={},out=[];for(const a of ACTIONS)for(const c of KEYMAP[a.id]){if(seen[c]&&seen[c]!==a.id)out.push([c,seen[c],a.id]);seen[c]=a.id;}return out;}
+const KEYNAME={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→',Space:'Space',Enter:'Enter',NumpadEnter:'Num Enter',Escape:'Esc',Tab:'Tab',ShiftLeft:'L-Shift',ShiftRight:'R-Shift',
+ ControlLeft:'L-Ctrl',ControlRight:'R-Ctrl',AltLeft:'L-Alt',AltRight:'R-Alt',Backspace:'Backspace',Delete:'Del',Insert:'Ins',Home:'Home',End:'End',PageUp:'PgUp',PageDown:'PgDn',
+ Minus:'-',Equal:'=',BracketLeft:'[',BracketRight:']',Semicolon:';',Quote:"'",Comma:',',Period:'.',Slash:'/',Backslash:'\\',Backquote:'`',CapsLock:'Caps',Lang1:'한/영',Lang2:'한자'};
+function keyName(c){if(!c)return '—';if(KEYNAME[c])return KEYNAME[c];if(c.startsWith('Key'))return c.slice(3);if(c.startsWith('Digit'))return c.slice(5);if(c.startsWith('Numpad'))return 'Num '+c.slice(6);return c;}
+function keyLabel(id,max=2){const k=(KEYMAP[id]||[]);return k.length?k.slice(0,max).map(keyName).join('/'):'미지정';}
+function codeOf(e){if(e.code)return e.code;const k=e.key||'';if(/^[a-z]$/i.test(k))return 'Key'+k.toUpperCase();if(/^[0-9]$/.test(k))return 'Digit'+k;if(k===' ')return 'Space';return k;}
+loadKeys();
+
+const keys={};          // held state per action id (movement reads keys.up/down/left/right)
+const pressed=new Set(); // physical codes currently down
+let atkPressed=false,dashPressed=false,areaPressed=false;const skPress=[];const skHeld=[false,false,false];
+const SKILL_ACT={skill1:0,skill2:1,skill3:2};
+let ui=null;            // open overlay: 'menu' | 'options' | 'inv' | 'map' | 'dialog' | null  (game is paused while set)
+let rebind=null;        // options screen: {id, idx, pending}
+function syncHeld(){for(const a of ACTIONS)keys[a.id]=KEYMAP[a.id].some(c=>pressed.has(c));
+ for(const id in SKILL_ACT)skHeld[SKILL_ACT[id]]=keys[id];}
+function releaseAll(){pressed.clear();for(const k in keys)keys[k]=false;for(let i=0;i<3;i++)skHeld[i]=false;atkPressed=dashPressed=areaPressed=false;skPress.length=0;}
+addEventListener('blur',releaseAll);
+addEventListener('keydown',e=>{const code=codeOf(e);
+ if(rebind){e.preventDefault();captureKey(code);return;}
+ const act=CODE2ACT[code];
+ if(act||['Tab','Space','F5','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Backspace'].includes(code))e.preventDefault(); // F5 reload, Tab focus, Space/arrow scroll
+ if(ui){if(!e.repeat)uiKey(code,act);return;}
+ if(!act)return;
+ if(act==='menu'){if(!e.repeat){if(winOpen)toggleWin(false);else openUI('menu');}return;}
+ if(act==='skills'){if(!e.repeat)toggleWin();return;}
  if(winOpen)return;
- if(!keys[k]&&(k==='z'||k===' '||k==='j'))atkPressed=true;
- if(!keys[k]&&k in SLOTKEYS){skPress.push(SLOTKEYS[k]);skHeld[SLOTKEYS[k]]=true;}
- keys[k]=true;});
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys[k]=false;if(k in SLOTKEYS)skHeld[SLOTKEYS[k]]=false;});
+ pressed.add(code);syncHeld();
+ if(e.repeat)return;
+ doAction(act);});
+addEventListener('keyup',e=>{pressed.delete(codeOf(e));syncHeld();});
+function doAction(act){
+ if(act in SKILL_ACT){skPress.push(SKILL_ACT[act]);skHeld[SKILL_ACT[act]]=true;return;}
+ switch(act){
+  case 'attack':atkPressed=true;break;
+  case 'dash':dashPressed=true;break;
+  case 'area':areaPressed=true;break;
+  case 'interact':interact();break;
+  case 'dive':diveAction();break;
+  case 'potion':quickPotion();break;
+  case 'inventory':openUI('inv');break;
+  case 'map':openUI('map');break;
+  case 'save':quickSave();break;
+  case 'target':cycleTarget();break;
+  case 'gear':cycleGear();break;
+  case 'skills':toggleWin();break;
+  case 'menu':if(winOpen)toggleWin(false);else openUI('menu');break;}}
+
+// ---------- action helpers (dash / area skill / potion / dive / target / interact / quick save) ----------
+let msgBox=null;function msg(text,bad){msgBox={text,bad,t:2};}
+let potions=3,areaCd=0,areaFx=null,target=null;
+const AREA={ // Q = map-wide/area skill. Full game: 일월식 needs 찬검 (hero route), 멸계강림 is the 마왕 map skill.
+ chan:{name:'일월식',src:'찬검',col:['#ffe08a','#fff7d0','#6a5acd','#fff'],tint:'20,10,48',ring:'#ffe08a',cd:12,dmg:3},
+ dk:{name:'멸계강림',src:'마왕',col:['#ff3040','#ff9a6a','#2a0008','#fff'],tint:'60,0,8',ring:'#ff3040',cd:12,dmg:4}};
+let areaMode=(()=>{const q=Q.get('area');if(q in AREA)return q;try{const v=localStorage.getItem('townDemo.area');return v in AREA?v:'';}catch(e){return '';}})();
+function setAreaMode(m){areaMode=m in AREA?m:'';try{localStorage.setItem('townDemo.area',areaMode);}catch(e){}refreshHints();}
+function castArea(){const A=AREA[areaMode];
+ if(!A){msg('광역 스킬 없음 — 찬검(일월식) 또는 마왕(멸계강림) 필요 · 데모: '+keyLabel('menu',1)+' → 조작 설정',1);return;}
+ if(uw||hero.swim||!canAct())return;
+ if(areaCd>0){msg(A.name+' 재사용 대기 '+Math.ceil(areaCd)+'초',1);return;}
+ areaCd=A.cd;areaFx={t:0,A,x:hero.x,y:hero.y};shake=14;flash=.45;hitStop=.12;
+ for(const m of live())damageSlime(m,m.x-hero.x,m.y-hero.y,A.dmg,700,{skill:1,fin:1,col:A.col,stop:.12}); // enemies only (children/NPCs are never hit in the demo)
+ msg(A.name+'!  ('+A.src+')');}
+function quickPotion(){if(uw)return;
+ if(potions<=0){msg('회복약이 없다',1);return;}
+ if(hero.hp>=hero.maxHp){msg('체력이 이미 가득 차 있다',1);return;}
+ potions--;hero.hp=Math.min(hero.maxHp,hero.hp+2);burst(hero.x,hero.y-50,18,['#ff6a8a','#ffd0dc','#fff'],150,-120,4,.7);msg('회복약 사용 (하트 +2) · 남은 회복약 '+potions);}
+function diveAction(){
+ if(uw||hero.swim){useSkill('water');return;}
+ if(!unlocked('water')){msg('잠수하려면 크라켄의 힘(해류의 숨결)이 필요하다',1);return;}
+ if(!findSpot()){msg('여기에는 잠수할 물이 없다 (분수 · 숨겨진 물웅덩이 근처에서 '+keyLabel('dive',1)+')',1);return;}
+ useSkill('water');}
+function enemyDist(m){return Math.hypot(m.x-hero.x,(m.y-hero.y)*1.2);}
+function cycleTarget(){const L=live().filter(m=>enemyDist(m)<760).sort((a,b)=>enemyDist(a)-enemyDist(b));
+ if(!L.length){target=null;msg('대상 없음',1);return;}
+ const i=L.indexOf(target);target=L[(i+1)%L.length];}
+function faceTarget(){if(!target||target.dead)return;const dx=target.x-hero.x,dy=target.y-hero.y;
+ if(Math.abs(dx)>Math.abs(dy)*0.9){hero.face=dx>0?'right':'left';hero.hz=hero.face;}else hero.face=dy>0?'down':'up';}
+function updateCtl(dt,ix,iy,l){ // called from update(): dash, area skill, timers
+ if(areaCd>0)areaCd=Math.max(0,areaCd-dt);if(areaFx){areaFx.t+=dt;if(areaFx.t>1.4)areaFx=null;}
+ if(msgBox){msgBox.t-=dt;if(msgBox.t<=0)msgBox=null;}
+ if(target&&target.dead)target=null;
+ if(hero.dashCd>0)hero.dashCd-=dt;
+ if(areaPressed){areaPressed=false;castArea();}
+ if(dashPressed){dashPressed=false;
+  if(!uw&&!hero.atk&&!hero.sk&&!hero.swim&&!hero.dash&&!(hero.dashCd>0)){let dx=ix,dy=iy;if(!l){[dx,dy]=DIRV[hero.face];}
+   const n=Math.hypot(dx,dy)||1;hero.dash={t:0,dx:dx/n,dy:dy/n};hero.dashCd=.55;hero.chainT=0;hero.combo=0;if(Math.abs(dx)>.2)hero.hz=dx>0?'right':'left';}}
+}
+function updateDash(dt){const d=hero.dash;d.t+=dt;const sp=900*(1-d.t/.2*.6);moveCol(hero,d.dx*sp*dt,d.dy*sp*dt*.8,12);hero.walkT+=dt*2;
+ if(Math.random()<.7)parts.push({x:hero.x+(Math.random()-.5)*30,y:hero.y-10-Math.random()*50,vx:-d.dx*80,vy:-d.dy*60-20,g:0,t:0,life:.25,c:'#e8f4ff',s:4});
+ if(d.t>=.2)hero.dash=null;}
+// interact / dialog
+const TALK={
+ spirit:{name:'물의 정령 이슬',lines:[
+  ()=>'필멸자님, 저 여기 있어요! 무슨 일이세요?',
+  ()=>`${keyLabel('attack')} 로 베고, ${keyLabel('dash')} 로 몸을 피해요. 대시 중에는 공격을 맞지 않아요.`,
+  ()=>`${keyLabel('target')} 로 노릴 적을 바꾸면 공격과 스킬이 그쪽을 향해요.`,
+  ()=>`분수나 숨겨진 물가에서 ${keyLabel('dive')} 를 누르면 잠수할 수 있어요. 크라켄의 힘 덕분이죠.`,
+  ()=>`키가 불편하면 ${keyLabel('menu',1)} → 조작 설정에서 바꿀 수 있어요. 바꾼 키는 저장돼요.`]},
+ fountain:{name:'광장 분수',lines:[
+  ()=>'맑은 물이 솟는 오래된 분수다. 바닥에서 무언가 반짝인다.',
+  ()=>unlocked('water')?`${keyLabel('dive')} — 해류의 숨결로 잠수할 수 있을 것 같다.`:'물속까지 숨이 닿지 않는다. 크라켄의 힘이 필요하다.']},
+};
+let dlg=null; // {id,i}
+function interactTarget(){if(nearFountain(hero.x,hero.y))return 'fountain';return 'spirit';} // the spirit always floats next to the hero
+function interact(){if(uw||hero.swim||hero.sk||hero.atk)return;dlg={id:interactTarget(),i:0};openUI('dialog');}
+function dialogNext(){if(!dlg)return;dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){closeUI();return;}renderUI();}
+// quick save (F5) — restored on the next load
+const LSQ='townDemo.quicksave';
+function quickSave(){if(uw||hero.swim||hero.sk||hero.dash){msg('지금은 저장할 수 없다',1);return;}
+ const d={v:1,t:Date.now(),x:Math.round(hero.x),y:Math.round(hero.y),hp:hero.hp,potions,gear:gearIdx};
+ try{localStorage.setItem(LSQ,JSON.stringify(d));}catch(e){msg('저장 실패',1);return;}
+ const t=new Date(d.t);msg('빠른 저장 완료 · '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0'));}
+function loadQuick(){if(Q.has('nosave'))return false;try{const d=JSON.parse(localStorage.getItem(LSQ));if(!d||d.v!==1)return false;
+ if(!blocked(d.x,d.y,12)){hero.x=d.x;hero.y=d.y;}hero.hp=Math.max(1,Math.min(hero.maxHp,d.hp|0));potions=Math.max(0,d.potions|0);gearIdx=(d.gear|0)%GEARSETS.length;return true;}catch(e){return false;}}
+
+// ---------- overlays: menu / options (rebinding) / inventory / world map / dialog ----------
+let uiSel=0,optRow=0,optCol=0,optNote='';
+const ovEl=document.getElementById('ov'),ovp=document.getElementById('ovp'),dlgEl=document.getElementById('dlg');
+function openUI(name){releaseAll();if(winOpen)toggleWin(false);ui=name;uiSel=0;rebind=null;optNote='';if(name==='options'){optRow=0;optCol=0;}
+ stick.id=null;stick.dx=stick.dy=0;stEl.style.display='none';renderUI();}
+function closeUI(){ui=null;rebind=null;dlg=null;ovEl.classList.remove('open');dlgEl.classList.remove('open');releaseAll();}
+const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],['인벤토리 · 장비',()=>openUI('inv')],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
+const MENU_KEY=['menu','','inventory','map','save',''];
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+const kb=c=>`<kbd>${esc(keyName(c))}</kbd>`;
+function hintBar(parts){return `<div class="hb">${parts.map(([k,t])=>`<kbd>${esc(k)}</kbd> ${t}`).join(' · ')}</div>`;}
+function renderUI(){
+ ovEl.classList.toggle('open',!!ui&&ui!=='dialog');dlgEl.classList.toggle('open',ui==='dialog');
+ if(ui==='menu'){ovp.innerHTML=`<h2>일시정지 · 메뉴</h2><div class="menu">${MENU.map(([t],i)=>`<div class="mi${i===uiSel?' sel':''}" data-i="${i}">${t}${MENU_KEY[i]?`<span class="mk">${esc(keyLabel(MENU_KEY[i],1))}</span>`:''}</div>`).join('')}</div>`+
+   hintBar([['↑/↓','선택'],[keyLabel('interact',1)+' · Enter','결정'],['Esc','계속하기']]);
+  ovp.querySelectorAll('.mi').forEach(el=>el.onclick=()=>MENU[+el.dataset.i][1]());return;}
+ if(ui==='options'){const cf=allConflicts();let h=`<h2>조작 설정 · 키 변경</h2><div class="sub">칸을 클릭하거나 방향키로 고른 뒤 Enter → 새 키를 누르세요. 행동마다 키 최대 ${MAXK}개 · 키보드 배치(한/영)와 상관없이 같은 자리 키로 인식합니다.</div><table class="km">`;
+  let grp='';ACTIONS.forEach((a,r)=>{if(a.grp!==grp){grp=a.grp;h+=`<tr><th colspan="4">${grp}</th></tr>`;}
+   const empty=!KEYMAP[a.id].length;h+=`<tr class="${r===optRow?'cur':''}"><td class="an${empty?' warn':''}">${a.name}${empty?' ⚠ 미지정':''}</td>`;
+   for(let c=0;c<MAXK;c++){const code=KEYMAP[a.id][c],isRb=rebind&&rebind.id===a.id&&rebind.idx===c,locked=a.lock&&code===a.lock;
+    h+=`<td><span class="kc${r===optRow&&c===optCol?' sel':''}${isRb?' rb':''}${locked?' lk':''}" data-r="${r}" data-c="${c}">${isRb?'키 입력…':code?esc(keyName(code))+(locked?' 🔒':''):'＋'}</span></td>`;}
+   h+='</tr>';});
+  h+=`</table><div class="note${/⚠|이미/.test(optNote)?' bad':''}">${optNote||(cf.length?'⚠ 충돌: '+cf.map(([c,x,y])=>keyName(c)+' = '+ACT[x].name+' / '+ACT[y].name).join(', '):'충돌 없음 ✓')}</div>`;
+  h+=`<div class="row"><span class="btn" id="kreset">기본값으로 되돌리기</span><span class="btn" id="kback">← 메뉴로</span></div>`;
+  h+=`<div class="sub" style="margin-top:8px">데모 광역 스킬 (${esc(keyLabel('area',1))}): ${[['','없음'],['chan','일월식 (찬검)'],['dk','멸계강림 (마왕)']].map(([m,t])=>`<span class="btn sm${areaMode===m?' on':''}" data-area="${m}">${t}</span>`).join(' ')}</div>`;
+  h+=`<div class="sub">게임패드: ${padName?esc(padName)+' 연결됨':'없음'} (A 공격 · B 대시 · X 상호작용 · Y 물약 · LB/RB/RT 스킬 1/2/3 · LT 광역 · R3 잠수 · L3 대상 · Back 스킬창 · Start 메뉴)</div>`;
+  h+=hintBar([['↑↓←→','칸 이동'],['Enter','키 변경'],['Backspace/Del','키 지우기'],['R','기본값'],['Esc','뒤로']]);
+  ovp.innerHTML=h;
+  ovp.querySelectorAll('.kc').forEach(el=>el.onclick=()=>{optRow=+el.dataset.r;optCol=+el.dataset.c;startRebind();});
+  document.getElementById('kreset').onclick=resetKeys;document.getElementById('kback').onclick=()=>openUI('menu');
+  ovp.querySelectorAll('[data-area]').forEach(el=>el.onclick=()=>{setAreaMode(el.dataset.area);renderUI();});
+  const cur=ovp.querySelector('.kc.sel');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest'});return;}
+ if(ui==='inv'){const g=GEARSETS[gearIdx];
+  ovp.innerHTML=`<h2>인벤토리 · 장비</h2><div class="inv"><div><b>장비 세트</b><div class="big">${esc(g.name)}</div><div class="sub">투구 · 갑옷 · 망토 · 장갑 · 신발 (데모: 세트 단위 표시)</div></div>`+
+   `<div><b>소지품</b><div>회복약 × ${potions} <span class="mk">${esc(keyLabel('potion',1))}</span></div><div>금화 × ${coins}</div><div>잠수 보물 ${diveTaken.length} / ${DIVE.spots.length}</div></div>`+
+   `<div><b>스킬 슬롯</b>${slots.map((id,i)=>`<div><span class="mk">${esc(keyLabel('skill'+(i+1),1))}</span> ${id?esc(SK[id].name):'— 비어 있음 —'}</div>`).join('')}<div><span class="mk">${esc(keyLabel('area',1))}</span> ${areaMode?AREA[areaMode].name+' ('+AREA[areaMode].src+')':'광역 스킬 없음'}</div></div></div>`+
+   hintBar([[keyLabel('gear',1),'장비 세트 바꾸기 (디버그)'],[keyLabel('inventory',1)+' / Esc','닫기']]);return;}
+ if(ui==='map'){ovp.innerHTML=`<h2>월드맵</h2><img class="wmap" src="assets/world_map.jpg" alt="월드맵"><div class="sub">현재 위치: 시작 마을 (데모 맵)</div>`+hintBar([[keyLabel('map',1)+' / Esc','닫기']]);return;}
+ if(ui==='dialog'&&dlg){const T=TALK[dlg.id],last=dlg.i>=T.lines.length-1;
+  dlgEl.innerHTML=`<div class="dn">${esc(T.name)}</div><div class="dt">${esc(T.lines[dlg.i]())}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?'닫기':'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
+  dlgEl.onclick=dialogNext;}}
+function uiKey(code,act){
+ if(ui==='options'){optKey(code);return;}
+ if(code==='Escape'||act==='menu'){closeUI();return;}
+ if(ui==='dialog'){if(act==='interact'||act==='attack'||code==='Space'||code==='Enter')dialogNext();return;}
+ if(ui==='menu'){if(code==='ArrowUp'||act==='up'){uiSel=(uiSel+MENU.length-1)%MENU.length;renderUI();}
+  else if(code==='ArrowDown'||act==='down'){uiSel=(uiSel+1)%MENU.length;renderUI();}
+  else if(code==='Enter'||code==='Space'||act==='interact'||act==='attack')MENU[uiSel][1]();
+  else if(act&&act!=='up'&&act!=='down'&&act!=='left'&&act!=='right'&&['inventory','map','save'].includes(act)){closeUI();doAction(act);}
+  return;}
+ if(ui==='inv'){if(act==='inventory')closeUI();else if(act==='gear'){cycleGear();renderUI();}else if(act==='map')openUI('map');return;}
+ if(ui==='map'){if(act==='map')closeUI();else if(act==='inventory')openUI('inv');return;}}
+function optKey(code){
+ if(code==='Escape'){openUI('menu');return;}
+ const N=ACTIONS.length;
+ if(code==='ArrowUp'){optRow=(optRow+N-1)%N;}else if(code==='ArrowDown'){optRow=(optRow+1)%N;}
+ else if(code==='ArrowLeft'){optCol=(optCol+MAXK-1)%MAXK;}else if(code==='ArrowRight'){optCol=(optCol+1)%MAXK;}
+ else if(code==='Enter'||code==='NumpadEnter'||code==='Space'){startRebind();return;}
+ else if(code==='Backspace'||code==='Delete'){clearSlot();return;}
+ else if(code==='KeyR'){resetKeys();return;}
+ else return;
+ optNote='';renderUI();}
+function startRebind(){const a=ACTIONS[optRow];if(a.lock&&KEYMAP[a.id][optCol]===a.lock){optNote='⚠ Esc 는 메뉴 · 닫기 전용 키라 바꿀 수 없습니다 (다른 칸에 키를 추가할 수는 있음)';renderUI();return;}
+ rebind={id:a.id,idx:Math.min(optCol,KEYMAP[a.id].length),pending:null};optNote=`[${a.name}] 새 키를 누르세요 · Esc 취소 · Backspace 지우기`;renderUI();}
+function clearSlot(){const a=ACTIONS[optRow],code=KEYMAP[a.id][optCol];if(!code)return;
+ if(a.lock&&code===a.lock){optNote='⚠ Esc 는 지울 수 없습니다';renderUI();return;}
+ KEYMAP[a.id].splice(optCol,1);saveKeys();optNote=`[${a.name}] ${keyName(code)} 지움`+(KEYMAP[a.id].length?'':' — ⚠ 이 행동에 키가 없습니다');renderUI();}
+function resetKeys(){KEYMAP=defaultKeys();saveKeys();rebind=null;optNote='기본값으로 되돌렸습니다 ✓';renderUI();}
+function captureKey(code){const r=rebind,a=ACT[r.id];
+ if(code==='Escape'){rebind=null;optNote='취소했습니다';renderUI();return;}
+ if(code==='Backspace'||code==='Delete'){rebind=null;clearSlot();return;}
+ if(RESERVED[code]){optNote=`⚠ ${keyName(code)} 는 ${RESERVED[code]} 용으로 예약된 키입니다`;renderUI();return;}
+ const list=KEYMAP[r.id],old=list[r.idx];
+ if(list.includes(code)){if(old!==code){list.splice(list.indexOf(code),1);list.splice(Math.min(r.idx,list.length),0,code);}rebind=null;saveKeys();optNote=`[${a.name}] ${keyName(code)} ✓`;renderUI();return;}
+ const other=conflictOf(code,r.id);
+ if(other&&r.pending!==code){r.pending=code;optNote=`⚠ ${keyName(code)} 는 이미 [${ACT[other].name}] 에 지정되어 있습니다 — 같은 키를 한 번 더 누르면 서로 맞바꾸고, 다른 키를 누르면 그 키로 지정합니다`;renderUI();return;}
+ if(other){const ol=KEYMAP[other],j=ol.indexOf(code);if(old&&!(ACT[other].lock&&code===ACT[other].lock))ol[j]=old;else ol.splice(j,1);}
+ if(r.idx<list.length)list[r.idx]=code;else list.push(code);
+ rebind=null;saveKeys();optNote=`[${a.name}] ${keyName(code)} ✓`+(other?` · [${ACT[other].name}] ← ${old?keyName(old):'(없음)'}`:'');renderUI();}
+
+// ---------- gamepad (optional, standard mapping) ----------
+const pad={dx:0,dy:0,prev:[]};let padName='';
+const PADMAP={0:'attack',1:'dash',2:'interact',3:'potion',4:'skill1',5:'skill2',7:'skill3',6:'area',8:'skills',9:'menu',10:'target',11:'dive'};
+addEventListener('gamepadconnected',e=>{padName=e.gamepad.id;msg('게임패드 연결: '+e.gamepad.id.slice(0,40));});
+addEventListener('gamepaddisconnected',()=>{padName='';pad.dx=pad.dy=0;});
+function pollPad(){if(!navigator.getGamepads)return;const gp=[...navigator.getGamepads()].find(g=>g&&g.connected);if(!gp){pad.dx=pad.dy=0;return;}
+ const b=i=>!!(gp.buttons[i]&&gp.buttons[i].pressed),edge=i=>b(i)&&!pad.prev[i];
+ let dx=(gp.axes[0]||0)+(b(15)?1:0)-(b(14)?1:0),dy=(gp.axes[1]||0)+(b(13)?1:0)-(b(12)?1:0);if(Math.hypot(dx,dy)<.25)dx=dy=0;
+ if(ui||winOpen){pad.dx=pad.dy=0;
+  if(ui){const nav=edge(12)?'ArrowUp':edge(13)?'ArrowDown':edge(14)?'ArrowLeft':edge(15)?'ArrowRight':edge(0)?'Enter':(edge(1)||edge(9))?'Escape':null;if(nav){if(rebind){if(nav==='Escape')captureKey('Escape');}else uiKey(nav,nav==='Escape'?'menu':null);}}
+  else if(edge(1)||edge(8)||edge(9))toggleWin(false);}
+ else{pad.dx=Math.max(-1,Math.min(1,dx));pad.dy=Math.max(-1,Math.min(1,dy));
+  for(const i in PADMAP){if(edge(+i))doAction(PADMAP[i]);}
+  skHeld[0]=!!keys.skill1||b(4);skHeld[1]=!!keys.skill2||b(5);skHeld[2]=!!keys.skill3||b(7);}
+ pad.prev=gp.buttons.map(x=>x.pressed);}
+
+// ---------- key hints (HUD bottom bar, skill slots, window titles) ----------
+let khudSig='';const khudEl=document.getElementById('khud');
+function refreshHints(){
+ const h=document.getElementById('hint');if(h)h.textContent=`${keyLabel('up',1)}${keyLabel('left',1)}${keyLabel('down',1)}${keyLabel('right',1)} / WASD 이동 · ${keyLabel('attack')} 공격 · ${keyLabel('dash')} 대시 · ${keyLabel('skill1',1)}·${keyLabel('skill2',1)}·${keyLabel('skill3',1)} 스킬 · ${keyLabel('area',1)} 광역 · ${keyLabel('interact')} 대화 · ${keyLabel('menu',1)} 메뉴(키 변경)`;
+ const sk=document.getElementById('slotsKeys');if(sk)sk.textContent=[1,2,3].map(i=>keyLabel('skill'+i,1)).join(' · ');
+ const wb=document.getElementById('wbtn');if(wb)wb.textContent='스킬창 ('+keyLabel('skills',1)+')';
+ const wt=document.getElementById('wtitle');if(wt)wt.textContent='스킬창 · Skills  ['+keyLabel('skills')+' / Esc 닫기]';
+ khudSig='';if(typeof slotSig!=='undefined')slotSig='';}
+function updateKhud(){if(!khudEl)return;const P=[];
+ if(uw)P.push([keyLabel('dive',1)+' / '+keyLabel('attack',1),'물 위로']);
+ else if(hero.swim)P.push([keyLabel('dive',1),'물 밖으로']);
+ else{P.push([keyLabel('attack',1),'공격'],[keyLabel('dash',1),'대시']);
+  if(unlocked('water')&&findSpot())P.push([keyLabel('dive',1),'잠수','hot']);
+  P.push([keyLabel('interact',1),interactTarget()==='fountain'?'분수 살피기':'이슬과 대화',interactTarget()==='fountain'?'hot':'']);
+  P.push([keyLabel('area',1),areaMode?AREA[areaMode].name+(areaCd>0?' '+Math.ceil(areaCd)+'s':''):'광역 —']);
+  P.push([keyLabel('target',1),target?'대상 ✓':'대상']);}
+ P.push([keyLabel('potion',1),'물약 ×'+potions],[keyLabel('menu',1),'메뉴']);
+ const sig=P.map(p=>p.join('|')).join(';');if(sig===khudSig)return;khudSig=sig;
+ khudEl.innerHTML=P.map(([k,t,c])=>`<span${c?' class="hot"':''}><kbd>${esc(k)}</kbd>${esc(t)}</span>`).join('');}
+function drawCtlWorld(){ // world space: target reticle + area-skill effect
+ if(target&&!target.dead){const m=target,r=(m.kind==='boar'?50:30)*Math.min(1.6,m.sc||1),cy=m.y-(m.kind==='boar'?30:18)*(m.sc||1),t=performance.now()/1000,g=r+4+Math.sin(t*6)*3;
+  ctx.save();ctx.strokeStyle='#ff4040';ctx.lineWidth=3;ctx.shadowColor='#000';ctx.shadowBlur=3;
+  for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.moveTo(m.x+sx*g,cy+sy*g*.7-sy*10);ctx.lineTo(m.x+sx*g,cy+sy*g*.7);ctx.lineTo(m.x+sx*g-sx*12,cy+sy*g*.7);ctx.stroke();}ctx.restore();}
+ if(areaFx){const f=areaFx,p=f.t/1.4,A=f.A;ctx.save();ctx.fillStyle=`rgba(${A.tint},${.55*(1-p)})`;ctx.fillRect(0,0,WW,WH);
+  ctx.strokeStyle=A.ring;ctx.globalAlpha=1-p;ctx.lineWidth=10*(1-p)+2;ctx.beginPath();ctx.ellipse(f.x,f.y,40+p*900,(40+p*900)*.6,0,0,7);ctx.stroke();
+  if(A===AREA.chan){ctx.fillStyle='#000';ctx.globalAlpha=(1-p)*.9;ctx.beginPath();ctx.arc(f.x,f.y-260,60,0,7);ctx.fill();ctx.strokeStyle='#ffe08a';ctx.lineWidth=6;ctx.stroke();}
+  ctx.restore();}}
+function drawCtlHUD(){if(!msgBox)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=Math.min(1,msgBox.t*2);ctx.textAlign='center';
+ outlined(msgBox.text,innerWidth/2,innerHeight*0.24,Math.max(14,innerWidth/70),msgBox.bad?'#ff9a8a':'#ffffff');ctx.textAlign='start';ctx.restore();}
 const stick={id:null,ox:0,oy:0,dx:0,dy:0};const stEl=document.getElementById('stick'),knob=document.getElementById('knob'),atkEl=document.getElementById('atk');
 const slotEls=[0,1,2].map(i=>document.getElementById('s'+i));
 function setTouch(){document.body.classList.add('touch');}
 if(matchMedia('(pointer:coarse)').matches)setTouch();
-const isBtn=t=>t===atkEl||slotEls.some(s=>s.contains(t))||t.closest&&t.closest('#wbtn,#win');
-addEventListener('touchstart',e=>{setTouch();if(winOpen)return;for(const t of e.changedTouches){if(isBtn(t.target))continue;
+const isBtn=t=>t===atkEl||slotEls.some(s=>s.contains(t))||t.closest&&t.closest('#wbtn,#win,#ov,#dlg');
+addEventListener('touchstart',e=>{setTouch();if(winOpen||ui)return;for(const t of e.changedTouches){if(isBtn(t.target))continue;
  if(stick.id===null&&t.clientX<innerWidth*0.6){stick.id=t.identifier;stick.ox=t.clientX;stick.oy=t.clientY;stick.dx=stick.dy=0;stEl.style.display='block';stEl.style.left=t.clientX+'px';stEl.style.top=t.clientY+'px';knob.style.transform='';}}
  if(!e.target.closest||!e.target.closest('#win'))e.preventDefault();},{passive:false});
 addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===stick.id){let dx=t.clientX-stick.ox,dy=t.clientY-stick.oy;const l=Math.hypot(dx,dy),m=50;if(l>m){dx*=m/l;dy*=m/l;}
@@ -136,7 +430,7 @@ atkEl.addEventListener('touchstart',e=>{atkPressed=true;atkEl.classList.add('on'
 atkEl.addEventListener('touchend',e=>{atkEl.classList.remove('on');e.preventDefault();},{passive:false});
 atkEl.addEventListener('mousedown',e=>{atkPressed=true;});
 slotEls.forEach((el,i)=>{
- const down=e=>{e.preventDefault();e.stopPropagation();if(winOpen)return;if(!slots[i]){toggleWin(true);return;}skPress.push(i);skHeld[i]=true;el.classList.add('on');};
+ const down=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;if(!slots[i]){toggleWin(true);return;}skPress.push(i);skHeld[i]=true;el.classList.add('on');};
  const up=e=>{e.preventDefault();skHeld[i]=false;el.classList.remove('on');};
  el.addEventListener('touchstart',down,{passive:false});el.addEventListener('touchend',up,{passive:false});el.addEventListener('touchcancel',up,{passive:false});
  el.addEventListener('mousedown',down);el.addEventListener('mouseup',up);el.addEventListener('mouseleave',up);});
@@ -151,7 +445,7 @@ function saveSlots(){try{localStorage.setItem(LS,JSON.stringify(slots));}catch(e
 let winOpen=false,winSel=null;const winEl=document.getElementById('win');
 function icStyle(i){return `background-position:${-i*48}px 0`;}
 function toggleWin(v){winOpen=v===undefined?!winOpen:v;winSel=null;winEl.classList.toggle('open',winOpen);
- for(let i=0;i<3;i++){skHeld[i]=false;slotEls[i].classList.remove('on');}for(const k in keys)keys[k]=false;atkPressed=false;skPress.length=0;
+ releaseAll();for(let i=0;i<3;i++)slotEls[i].classList.remove('on');
  stick.id=null;stick.dx=stick.dy=0;stEl.style.display='none';if(winOpen)renderWin();}
 function renderWin(){
  const ws=document.getElementById('wslots');ws.innerHTML='';
@@ -174,7 +468,7 @@ function slotClick(i){
  saveSlots();renderWin();updateSlotEls(true);}
 let slotSig='';
 function updateSlotEls(force){
- const sig=slots.join();if(force||sig!==slotSig){slotSig=sig;slots.forEach((id,i)=>{slotEls[i].innerHTML=id?`<div class="ic" style="${icStyle(SK[id].icon)}"></div><div class="cd"></div><span class="k">${i+1}</span>`:`<div class="plus">+</div><span class="k">${i+1}</span>`;slotEls[i].title=id?SK[id].name:'빈 슬롯';});}
+ const sig=slots.join();if(force||sig!==slotSig){slotSig=sig;slots.forEach((id,i)=>{slotEls[i].innerHTML=id?`<div class="ic" style="${icStyle(SK[id].icon)}"></div><div class="cd"></div><span class="k">${esc(keyLabel('skill'+(i+1),1))}</span>`:`<div class="plus">+</div><span class="k">${esc(keyLabel('skill'+(i+1),1))}</span>`;slotEls[i].title=id?SK[id].name:'빈 슬롯';});}
  slots.forEach((id,i)=>{if(!id)return;const s=SK[id],c=cool[id]||0,el=slotEls[i];const cd=el.querySelector('.cd');
   cd.style.background=c>0?`conic-gradient(rgba(0,0,0,0) ${360*(1-c/s.cd)}deg,rgba(5,10,30,.72) 0)`:'none';
   el.classList.toggle('low',gauge+1e-6<s.cost/8);});}
@@ -256,7 +550,7 @@ const SKFX={
    if(s.t>=.46)hero.ghost=false;}},
  sand:{dur:1.25,pose:s=>s.t<.18?0:s.t<.32?1:s.t<.95?-1:s.t<1.12?2:3,update(s,dt){
    hero.ghost=s.t>=.18&&s.t<1.0;hero.hidden=s.t>=.32&&s.t<.95;
-   if(s.t>=.3&&s.t<.95){let ix=0,iy=0;if(keys['a']||keys['arrowleft'])ix--;if(keys['d']||keys['arrowright'])ix++;if(keys['w']||keys['arrowup'])iy--;if(keys['s']||keys['arrowdown'])iy++;ix+=stick.dx;iy+=stick.dy;
+   if(s.t>=.3&&s.t<.95){let ix=0,iy=0;if(keys.left)ix--;if(keys.right)ix++;if(keys.up)iy--;if(keys.down)iy++;ix+=stick.dx;iy+=stick.dy;
     let l=Math.hypot(ix,iy);if(l<.2){ix=s.dir[0];iy=s.dir[1];l=.55;}else{ix/=l;iy/=l;l=1;if(Math.abs(ix)>.3){hero.hz=ix>0?'right':'left';s.flip=ix<0;}}
     moveCol(hero,ix*330*l*dt,iy*330*l*dt*.85,12);if(Math.random()<.7)parts.push({x:hero.x+(Math.random()-.5)*50,y:hero.y-4,vx:(Math.random()-.5)*80,vy:-60-Math.random()*90,g:400,t:0,life:.45,c:['#d9b56a','#b8914a','#f0d79a'][Math.floor(Math.random()*3)],s:4});}
    if(!s.done&&s.t>=.95){s.done=1;shake=7;spawnRing(hero.x,hero.y-6,14,150,.42,'255,214,80',12,.55);spawnRing(hero.x,hero.y-6,8,105,.34,'255,250,200',5,.55);
@@ -416,19 +710,20 @@ function drawTwinkle(f){if(f.t<0)return;const p=f.t/f.life,k=Math.sin(p*Math.PI)
 
 function update(dt){
  // hero input
- let ix=0,iy=0;if(keys['a']||keys['arrowleft'])ix--;if(keys['d']||keys['arrowright'])ix++;if(keys['w']||keys['arrowup'])iy--;if(keys['s']||keys['arrowdown'])iy++;
- ix+=stick.dx;iy+=stick.dy;let l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l;l=1;}if(l<.18){ix=iy=0;l=0;}
+ let ix=0,iy=0;if(keys.left)ix--;if(keys.right)ix++;if(keys.up)iy--;if(keys.down)iy++;
+ ix+=stick.dx+pad.dx;iy+=stick.dy+pad.dy;let l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l;l=1;}if(l<.18){ix=iy=0;l=0;}
+ updateCtl(dt,ix,iy,l);
  if(hero.cool>0)hero.cool-=dt;
  for(const k in cool)if(cool[k]>0)cool[k]=Math.max(0,cool[k]-dt);
  gauge=Math.min(1,gauge+DEMO.gaugeRegen*dt);
- while(skPress.length){const i=skPress.shift();if(slots[i])useSkill(slots[i],{slot:i});}
+ while(skPress.length){const i=skPress.shift();if(slots[i]){if(!uw&&!hero.swim&&canAct())faceTarget();useSkill(slots[i],{slot:i});}}
  if(uw){if(atkPressed){atkPressed=false;surface();}updateUW(dt,ix,iy,l);updateFx(dt);for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt;if(p.t>p.life)parts.splice(i,1);}
   if(popup){popup.t-=dt;if(popup.t<=0)popup=null;}if(toast){toast.t-=dt;if(toast.t<=0)toast=null;}return;}
  updateSparkles(dt);
  if(atkPressed){atkPressed=false;
   if(hero.swim||hero.sk){}
   else if(hero.atk){if(hero.atk.t>.03&&hero.atk.i<2)hero.buffered=true;}
-  else if(hero.cool<=0){startSwing(hero.chainT>0&&hero.combo<2?hero.combo+1:0);}
+  else if(hero.cool<=0){faceTarget();startSwing(hero.chainT>0&&hero.combo<2?hero.combo+1:0);}
  }
  const a=hero.atk,sk=hero.sk;
  if(a){a.t+=dt;const s=a.s,dv=DIRV[hero.face];
@@ -443,6 +738,7 @@ function update(dt){
    if(hero.buffered&&a.i<2){startSwing(a.i+1);}else{hero.chainT=a.i<2?CHAIN_WINDOW:0;if(a.i===2){hero.cool=.18;hero.combo=0;}}}
  }else if(sk){sk.t+=dt;const F=SKFX[sk.id];F.update(sk,dt);
   if(sk.end||sk.t>=F.dur){hero.sk=null;hero.ghost=false;hero.hidden=false;}
+ }else if(hero.dash){updateDash(dt);
  }else if(hero.swim){ // swimming in the fountain
   if(l>0){const sp=150*l,nx=hero.x+ix*sp*dt,ny=hero.y+iy*sp*dt*.7;if(swimOk(nx,hero.y))hero.x=nx;if(swimOk(hero.x,ny))hero.y=ny;if(Math.abs(ix)>.2)hero.hz=ix>0?'right':'left';hero.walkT+=dt;}
   if(Math.random()<.08)parts.push({x:hero.x+(hero.hz==='left'?-50:50),y:hero.y-30,vx:(Math.random()-.5)*20,vy:-40,g:-20,t:0,life:.7,c:'#dff8ff',s:3});
@@ -476,7 +772,7 @@ function update(dt){
    if(m.hopT>=D){m.hz=0;m.state='idle';m.squash=1;m.t=.6+Math.random()*1.6;}}
   // contact damage (Coral Shield blocks frontal hits)
   if(m.kind==='boar'&&m.state==='stun'){}else
-  if(hero.inv<=0&&!hero.ghost&&!hero.swim&&!m.spawnT>0&&m.hz<10){const dx=hero.x-m.x,dy=hero.y-m.y;const r=34*m.sc+12;if(dx*dx+(dy*1.6)**2<r*r){
+  if(hero.inv<=0&&!hero.ghost&&!hero.dash&&!hero.swim&&!m.spawnT>0&&m.hz<10){const dx=hero.x-m.x,dy=hero.y-m.y;const r=34*m.sc+12;if(dx*dx+(dy*1.6)**2<r*r){
    if(hero.sk&&hero.sk.id==='shield'&&SKFX.shield.block(hero.sk,m)){}else hurtHero(dx,dy);}}
  }
  for(const n of npcs)updateNpc(n,dt);
@@ -639,7 +935,7 @@ function drawHeart(x,y,p,full){const C=full?{X:'#1a0606',R:'#e0201c',W:'#ffb4a0'
  if(full){ctx.fillStyle='#ff5a40';ctx.fillRect(R(x+8*p),R(y+2*p),R(3*p),Math.max(1,R(p)));}}
 function outlined(t,x,y,px,col='#fff'){ctx.font=`bold ${Math.round(px)}px sans-serif`;ctx.fillStyle=col;ctx.strokeStyle='#000';ctx.lineWidth=Math.max(2,px/7);ctx.strokeText(t,x,y);ctx.fillText(t,x,y);}
 function drawGearToast(){if(gearToast<=0)return;gearToast-=1/60;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=Math.min(1,gearToast*2);
- const t='장비 세트: '+GEARSETS[gearIdx].name+'  (G)';ctx.textAlign='center';outlined(t,innerWidth/2,innerHeight*0.16,Math.max(16,innerWidth/55),'#ffe08a');ctx.textAlign='start';ctx.restore();}
+ const t='장비 세트: '+GEARSETS[gearIdx].name+'  ('+keyLabel('gear',1)+')';ctx.textAlign='center';outlined(t,innerWidth/2,innerHeight*0.16,Math.max(16,innerWidth/55),'#ffe08a');ctx.textAlign='start';ctx.restore();}
 window.__gear=()=>({idx:gearIdx,name:GEARSETS[gearIdx].name});
 function drawHUD(){// positions in world-pixels of the concept (1280x720 base), anchored to visible top-left
  const s=scale,ox=Math.max(0,-camX)*s+offX,oy=Math.max(0,-camY)*s;const u=s; ctx.save();ctx.setTransform(1,0,0,1,0,0);
@@ -689,10 +985,10 @@ function render(){computeView();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothing
   const al=Math.min(1,timeStop/.3);ctx.save();ctx.globalAlpha=.8*al;ctx.globalCompositeOperation='saturation';ctx.fillStyle='hsl(0,0%,50%)';ctx.fillRect(0,0,WW,WH);
   ctx.globalCompositeOperation='multiply';ctx.fillStyle='#9fb2d6';ctx.fillRect(0,0,WW,WH);ctx.restore();drawHeroAll();}
  for(const f of fx)if(f.type==='ring'&&f.noTint)drawRing(f);
- drawBars();
+ drawBars();drawCtlWorld();
  if(flash>0){ctx.fillStyle=`rgba(255,250,230,${Math.min(.7,flash)})`;ctx.fillRect(0,0,WW,WH);}
  if(DEBUG)drawDebug();
- drawHUD();drawGearToast();}
+ drawHUD();drawGearToast();drawCtlHUD();}
 function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillStyle='rgba(255,0,0,.2)';
  for(const o of LVL.blocks){ctx.beginPath();if(o.poly){o.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}else{const[x,y,rx,ry]=o.ellipse;ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);}ctx.fill();ctx.stroke();}
  ctx.strokeStyle='#0cf';ctx.beginPath();ctx.ellipse(POOL.x,POOL.y,POOL.rx,POOL.ry,0,0,7);ctx.stroke();
@@ -709,18 +1005,19 @@ function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillS
 
 // ---------- loop ----------
 let last=0,manual=false;
-function step(dt){if(winOpen)return;if(hitStop>0)hitStop-=dt;else update(dt);}
+function step(dt){if(winOpen||ui)return;if(hitStop>0)hitStop-=dt;else update(dt);}
 function frame(t){const dt=Math.min(1/30,(t-last)/1000||0);last=t;
- if(!manual)step(dt);updateSlotEls();render();requestAnimationFrame(frame);}
+ pollPad();if(!manual)step(dt);updateSlotEls();updateKhud();render();requestAnimationFrame(frame);}
 const jobs=[load('bg','bg_town.jpg')];for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));
 Promise.all(jobs).then(()=>{
  const pose=Q.get('pose');if(pose&&pose.startsWith('attack')){const i=(+pose.slice(6)||1)-1;slimes.forEach(m=>m.t=99);startSwing(i);hero.atk.t=(SWINGS[i].a0+SWINGS[i].a1)/2;hero.atk.hit=new Set(slimes);if(Q.get('face'))hero.face=Q.get('face');hitStop=1e9;shake=0;document.getElementById('hint').style.display='none';}
- updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=randSpot();boar.x=x;boar.y=y;} // champion spawns at a random valid spot on (re)load
+ updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=randSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
  window.__game={hero,slimes,boar,npcs,reloadMap,damageSlime,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
-  setManual(v){manual=v},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
+  setManual(v){manual=v},get ui(){return ui},get potions(){return potions},set potions(v){potions=v},get target(){return target},get areaMode(){return areaMode},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
+  ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
  setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0},5000);
  requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame);});
 }).catch(e=>{console.error(e);document.body.insertAdjacentHTML('beforeend','<p style="color:#fff">'+e.message+'</p>');});
