@@ -10,7 +10,7 @@
   "consumable": 60,
   "shop_equipment": 55,
   "rare_equipment": 35,
-  "quests": 105,
+  "quests": 108,
   "evil_quests": 24,
   "npcs": 80,
   "strongmen": 8,
@@ -25,8 +25,8 @@
   "dk_gear": 5,
   "essential_fallbacks": 14,
   "hidden_swords": 3,
-  "heroines": 6,
-  "companion_quests": 18
+  "heroines": 7,
+  "companion_quests": 21
  },
  "towns": [
   {
@@ -5513,6 +5513,59 @@
      "reward": "대장간 등급 9 + 레시피 「그림자 표창」 두루마리",
      "path": "good",
      "karma_gate": "악명 이하에서는 의뢰인이 거절 (마왕 강림 후에는 대장간 자체를 쓰지 않음)"
+    },
+    {
+     "id": "D_YUNA1",
+     "giver": "d_yuna",
+     "title": "[동료] 하늘에서 떨어진 여자",
+     "type": "동료 동행",
+     "story": "유나이(가) 동료로 합류한다 (1/3단계).",
+     "objective": "성벽 밖 폐허에서 몹에 둘러싸인 유나 구출 후 왕도까지 호위 — 유나 동행",
+     "reward": "호감도 +20, 금화 300",
+     "path": "good",
+     "karma_gate": "악명 이하에서는 히로인이 거절",
+     "companion": {
+      "heroine": "d_yuna",
+      "step": 1,
+      "steps": 3
+     },
+     "chain": "유나 동료 퀘스트"
+    },
+    {
+     "id": "D_YUNA2",
+     "giver": "d_yuna",
+     "title": "[동료] 낙인의 동판",
+     "type": "동료 동행",
+     "story": "유나이(가) 동료로 합류한다 (2/3단계).",
+     "objective": "서고지기 먼지의 단서로 고대 묘지 지하에서 「낙인 동판 조각」 회수, 묘지기 해골 기사 처치",
+     "reward": "호감도 +25, 「고대 문서」 2",
+     "path": "good",
+     "karma_gate": "악명 이하에서는 히로인이 거절",
+     "companion": {
+      "heroine": "d_yuna",
+      "step": 2,
+      "steps": 3
+     },
+     "requires": "D_YUNA1",
+     "chain": "유나 동료 퀘스트"
+    },
+    {
+     "id": "D_YUNA3",
+     "giver": "d_yuna",
+     "title": "[동료] 두 세계의 등불",
+     "type": "동료 동행",
+     "story": "유나이(가) 동료로 합류한다 (3/3단계).",
+     "objective": "왕도 등불 축제 날, 차원 균열에서 새어 나온 그림자 몹을 막아 축제를 지킨다",
+     "reward": "호감도 +20, 외형 「이방인의 초커」",
+     "path": "good",
+     "karma_gate": "악명 이하에서는 히로인이 거절",
+     "companion": {
+      "heroine": "d_yuna",
+      "step": 3,
+      "steps": 3
+     },
+     "requires": "D_YUNA2",
+     "chain": "유나 동료 퀘스트"
     }
    ],
    "strongman": {
@@ -5623,6 +5676,14 @@
     },
     "structure_hp": 2620
    },
+   "guests": [
+    {
+     "id": "d_yuna",
+     "name": "유나",
+     "role": "현세에서 온 이방인 · 왕도 서고의 객원 조사원",
+     "heroine": true
+    }
+   ],
    "shops": {
     "tool": [
      {
@@ -21663,6 +21724,12 @@
    },
    "karma": "선악이 「악명」 이하로 떨어지면 히로인별 반응(떠남/적대/잔류). 마왕 루트에서는 다른 성인 NPC와 마찬가지로 살해할 수 있으며, 살해 시 다시 되돌릴 수 없다."
   },
+  "portrait_exprs": [
+   "normal",
+   "smile",
+   "angry",
+   "blush"
+  ],
   "list": [
    {
     "id": "a_tailor",
@@ -21723,6 +21790,34 @@
       "blonde twin-tail woman in butterfly crop top releasing a paper lantern by a town fountain at night festival, warm lights, smiling at viewer"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "나비예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "a_tailor_normal.png",
+     "smile": "a_tailor_smile.png",
+     "angry": "a_tailor_angry.png",
+     "blush": "a_tailor_blush.png"
+    },
     "quest_ids": [
      "A_TAILOR1",
      "A_TAILOR2",
@@ -21787,6 +21882,34 @@
       "silver-haired woman sitting by a campfire under a starry sky seen through a collapsed mine ceiling, soft violet glow"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "운예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "h_mystic_normal.png",
+     "smile": "h_mystic_smile.png",
+     "angry": "h_mystic_angry.png",
+     "blush": "h_mystic_blush.png"
+    },
     "quest_ids": [
      "H_MYSTIC1",
      "H_MYSTIC2",
@@ -21860,6 +21983,34 @@
       "dark-red haired dancer in micro bikini festival costume dancing on a lantern-lit oasis stage at night, playful smile"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "방울예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "g_dancer_normal.png",
+     "smile": "g_dancer_smile.png",
+     "angry": "g_dancer_angry.png",
+     "blush": "g_dancer_blush.png"
+    },
     "quest_ids": [
      "G_DANCER1",
      "G_DANCER2",
@@ -21924,6 +22075,34 @@
       "black-haired diver wrapped in a towel sitting by a beach campfire under a lighthouse at night, gentle expression"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "숨비예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "f_diver_normal.png",
+     "smile": "f_diver_smile.png",
+     "angry": "f_diver_angry.png",
+     "blush": "f_diver_blush.png"
+    },
     "quest_ids": [
      "F_DIVER1",
      "F_DIVER2",
@@ -21988,6 +22167,34 @@
       "red-haired woman draping a shimmering flame cloak over the viewer beside a cooled lava river at night"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "루비예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "e_tailor_normal.png",
+     "smile": "e_tailor_smile.png",
+     "angry": "e_tailor_angry.png",
+     "blush": "e_tailor_blush.png"
+    },
     "quest_ids": [
      "E_TAILOR1",
      "E_TAILOR2",
@@ -22052,10 +22259,140 @@
       "ice-blue haired priestess holding a warm soup bowl at a snow festival with lanterns, blushing smile"
      ]
     ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "설화예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "c_priest_normal.png",
+     "smile": "c_priest_smile.png",
+     "angry": "c_priest_angry.png",
+     "blush": "c_priest_blush.png"
+    },
     "quest_ids": [
      "C_PRIEST1",
      "C_PRIEST2",
      "C_PRIEST3"
+    ]
+   },
+   {
+    "id": "d_yuna",
+    "town": "D",
+    "name": "유나",
+    "guest": true,
+    "role": "현세에서 온 이방인 · 왕도 서고의 객원 조사원",
+    "age": "25세 (성인)",
+    "special": true,
+    "concept": "현대 세계에서 떨어진 흑발 대학원생. 짧은 검과 「낙인 공명」으로 싸우는 특별 히로인.",
+    "personality": "밝고 붙임성 있지만 속으로는 집이 그리워 밤마다 휴대폰(배터리 0%)을 만지작거린다. 이 세계를 「게임 같다」며 의외로 빨리 적응했다.",
+    "backstory": "서울의 대학원생(고고학). 박물관에서 낙인 문양이 새겨진 동판을 만진 순간 빛에 삼켜져 왕도 성벽 밖 폐허에 떨어졌다. 그녀의 손등에도 옅은 「포식의 낙인」 문양이 떠 있어, 그 낙인이 세계 사이의 문을 여는 열쇠라는 것을 서고지기 먼지와 함께 알아낸다. 귀환 방법은 마룡의 심장에서 흘러나오는 차원 균열뿐 — 필멸자와 함께 끝까지 가야만 선택할 수 있다. 엔딩(호감도 100)에서 귀환할지 남을지 직접 고른다.",
+    "combat": "근접 기동형. 박물관 진열장에서 함께 떨어진 짧은 의례용 검으로 빠른 2연 베기 + 백스텝.",
+    "skill": {
+     "name": "낙인 공명",
+     "desc": "주인공의 포식의 낙인과 공명, 5초간 둘 다 공격력 +20%·흡수 효율 +1 (쿨 18초)"
+    },
+    "hp": 65,
+    "outfit": "흰 오프숄더 크롭 블라우스(풍만한 가슴, 배꼽 노출), 검은 주름 미니스커트와 체인 벨트, 검은 사이하이 스타킹, 하트 펜던트 초커, 허리에 짧은 검. 긴 흑발에 앞머리, 보랏빛 눈.",
+    "art": [
+     "/workspace/town-demo/src/heroines/cg_modern_sample.jpg"
+    ],
+    "visual_en": "curvy adult modern-world woman (mid-20s), long straight black hair with bangs, violet eyes, white off-shoulder puff-sleeve crop top showing midriff, black pleated mini skirt with chain belt, black thigh-high stockings, black choker with heart pendant, short ornate sword at hip, cheerful but homesick vibe",
+    "likes": [
+     "단 과자",
+     "고대 문서",
+     "반짝이는 돌(휴대폰 충전용이라 믿음)"
+    ],
+    "dislikes": [
+     "벌레"
+    ],
+    "quests": [
+     [
+      "하늘에서 떨어진 여자",
+      "성벽 밖 폐허에서 몹에 둘러싸인 유나 구출 후 왕도까지 호위 — 유나 동행",
+      "호감도 +20, 금화 300"
+     ],
+     [
+      "낙인의 동판",
+      "서고지기 먼지의 단서로 고대 묘지 지하에서 「낙인 동판 조각」 회수, 묘지기 해골 기사 처치",
+      "호감도 +25, 「고대 문서」 2"
+     ],
+     [
+      "두 세계의 등불",
+      "왕도 등불 축제 날, 차원 균열에서 새어 나온 그림자 몹을 막아 축제를 지킨다",
+      "호감도 +20, 외형 「이방인의 초커」"
+     ]
+    ],
+    "rewards": {
+     "40": "보조무기 「방전된 휴대폰」 (부적: 던지면 0.5초 섬광 경직, 쿨 30초)",
+     "60": "듀오 합동기 「쌍낙인 폭주」: 낙인 공명 중 동시 돌진 X자 베기, 흡수 게이지 즉시 1칸",
+     "80": "장면 「노을빛 왕도 산책」: 등불 축제 저녁, 성벽 위에서 고향 이야기와 「여기도 나쁘지 않네」",
+     "100": "엔딩 후일담: 차원 균열 앞에서 귀환/잔류 선택 — 잔류 시 필멸자의 집에 함께 사는 장면, 귀환 시 현대 거리에서 낙인이 빛나는 여운"
+    },
+    "karma_route": "악명: 「너 그런 사람 아니었잖아…」 하고 서고에 숨어 동행 거부. 마왕: 포식의 낙인이 공명해 마왕에게 끌려가며 적대하지 않지만 대화 불가 상태로 따라오다가, 아이를 해치는 순간 낙인을 거꾸로 써서 마왕에게 저주(최대 HP -10%)를 건 뒤 적대. 다른 성인처럼 살해 가능 — 살해하면 귀환 엔딩은 영구 소실.",
+    "cg": [
+     [
+      "lantern street greeting",
+      "black-haired woman with bangs in white off-shoulder crop top and black pleated mini skirt waving on a lantern-lit fantasy street at sunset (sample, cg_d_yuna_1.jpg)"
+     ],
+     [
+      "fallen from the sky",
+      "black-haired modern woman in white crop top sitting dazed among glowing ruins outside a castle wall, holding a dead smartphone, short sword beside her"
+     ],
+     [
+      "rampart sunset talk",
+      "black-haired woman in black choker sitting on a castle rampart at dusk beside the viewer, lanterns below, wistful smile"
+     ]
+    ],
+    "lines": [
+     {
+      "when": "첫 만남",
+      "expr": "normal",
+      "text": "유나예요. 잘 부탁해요."
+     },
+     {
+      "when": "퀘스트 완료",
+      "expr": "smile",
+      "text": "역시! 같이 오길 잘했어요."
+     },
+     {
+      "when": "쓰러짐 방치·싫은 선물",
+      "expr": "angry",
+      "text": "…지금 장난해요?"
+     },
+     {
+      "when": "호감도 80",
+      "expr": "blush",
+      "text": "저기… 오늘은 조금 더 같이 있어도 돼요?"
+     }
+    ],
+    "portraits": {
+     "normal": "d_yuna_normal.png",
+     "smile": "d_yuna_smile.png",
+     "angry": "d_yuna_angry.png",
+     "blush": "d_yuna_blush.png"
+    },
+    "quest_ids": [
+     "D_YUNA1",
+     "D_YUNA2",
+     "D_YUNA3"
     ]
    }
   ]

@@ -29,6 +29,7 @@ _시작 마을의 발랄한 재봉사. 바늘 두 개로 싸우는 첫 동료._
 - 의상: 짧은 하늘색 주름 미니스커트, 배꼽이 드러나는 나비 리본 크롭 블라우스, 허리에 바늘꽂이 벨트, 무릎 위 줄무늬 스타킹. 금발 트윈테일.
 - 선물: 좋아함 비단 천, 나비 날개 가루, 꽃 / 싫어함 광석
 - 선악·마왕 루트: 악명: 울면서 재봉소 문을 닫고 B로 떠난다. 마왕: 겁에 질려 도망치며 공격하면 살해 가능 (전투력 낮음).
+- 표정 초상화: `a_tailor_normal.png`, `a_tailor_smile.png`, `a_tailor_angry.png`, `a_tailor_blush.png`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
 |---|---|---|---|
@@ -57,6 +58,7 @@ _광산의 수수께끼 점술가. 수정 구슬로 원거리 마법을 쏜다._
 - 의상: 보라색 반투명 베일, 금 동전 장식 비키니 탑, 옆트임이 허벅지까지 있는 짧은 보라 랩스커트, 팔찌와 발찌 다수. 은빛 긴 생머리.
 - 선물: 좋아함 수정 원석, 향초 / 싫어함 횃불
 - 선악·마왕 루트: 악명: 「예견한 대로군요」 하고 사라져 마왕 루트 최종장에 적으로 재등장(환영 마법). 마왕: 마주치면 적대, 살해 가능.
+- 표정 초상화: `h_mystic_normal.png`, `h_mystic_smile.png`, `h_mystic_angry.png`, `h_mystic_blush.png`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
 |---|---|---|---|
@@ -85,6 +87,7 @@ _짙은 붉은 머리의 사막 무희 상인. 쌍곡도 칼춤으로 싸우는 
 - 의상: 짙은 붉은 긴 웨이브 머리, 금 동전과 방울이 달린 진홍 비키니 탑(풍만한 가슴), 허리에 걸친 짧은 반투명 시폰 스커트, 금팔찌·발찌. 이벤트 변형: 마이크로 비키니 축제 의상(female_sample_microbikini.jpg).
 - 선물: 좋아함 사막 태양석, 향신료, 금 장신구 / 싫어함 모래쥐 고기
 - 선악·마왕 루트: 악명: 장사꾼답게 「거래 끝」을 선언하고 가격 3배. 마왕: 도적 편에 붙어 적대, 살해 가능. 단, 호감도 100이면 단 한 명 「마왕의 무희」로 잔류(동행 유지, 아이를 해치면 떠남).
+- 표정 초상화: `g_dancer_normal.png`, `g_dancer_smile.png`, `g_dancer_angry.png`, `g_dancer_blush.png`
 - 견본 아트: `/workspace/town-demo/src/npcs/female_sample_desert_v2.jpg`, `/workspace/town-demo/src/npcs/female_sample_microbikini.jpg`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
@@ -115,6 +118,7 @@ _항구 최고의 해녀. 작살로 싸우는 건강미 넘치는 특별 히로�
 - 의상: 짧은 흑청색 해녀 비키니 아머(풍만한 가슴), 허리에 그물 사롱, 조개 장식 목걸이, 다리에 물갈퀴 장화. 젖은 흑발 포니테일, 태닝 피부.
 - 선물: 좋아함 진주, 구운 생선 / 싫어함 유령 해적 깃발
 - 선악·마왕 루트: 악명: 항구 사람들을 지키려고 주인공에게 결투를 신청(적대). 마왕: 항구 수호자로 적대, 살해 가능.
+- 표정 초상화: `f_diver_normal.png`, `f_diver_smile.png`, `f_diver_angry.png`, `f_diver_blush.png`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
 |---|---|---|---|
@@ -143,6 +147,7 @@ _도도한 화산 마을 직조공. 불에 안 타는 채찍으로 싸운다._
 - 의상: 검은 가죽 코르셋형 크롭 상의, 루비색 짧은 레이스 미니스커트, 불꽃 무늬 사이하이 부츠, 허리에 감긴 채찍. 붉은 단발과 루비 귀걸이.
 - 선물: 좋아함 불사조 깃털, 흑요석 / 싫어함 물
 - 선악·마왕 루트: 악명: 「실망이야」 한마디로 상점 거래 거부. 마왕: 마왕군과 싸우다 적대, 살해 가능.
+- 표정 초상화: `e_tailor_normal.png`, `e_tailor_smile.png`, `e_tailor_angry.png`, `e_tailor_blush.png`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
 |---|---|---|---|
@@ -171,6 +176,7 @@ _어둠 신전을 두려워하는 설산의 성녀. 유일한 치유형 동료._
 - 의상: 흰 털 장식 짧은 사제복 원피스(허벅지 위 길이, 어깨 노출), 하늘색 보석 비키니형 흉갑, 흰 사이하이 스타킹, 눈꽃 머리장식. 연한 하늘빛 긴 머리.
 - 선물: 좋아함 눈꽃 결정, 따뜻한 수프 / 싫어함 어둠의 파편
 - 선악·마왕 루트: 악명: 신전에 틀어박혀 회복 서비스 거부. 마왕: 마지막 봉인을 지키며 적대(정화 마법이 마왕에게 추가 피해), 살해 가능.
+- 표정 초상화: `c_priest_normal.png`, `c_priest_smile.png`, `c_priest_angry.png`, `c_priest_blush.png`
 
 | 퀘스트 | 제목 | 목표 | 보상 |
 |---|---|---|---|
@@ -187,3 +193,39 @@ _어둠 신전을 두려워하는 설산의 성녀. 유일한 치유형 동료._
 - Visual (EN): gentle adult snow priestess (23), long pale ice-blue hair, soft blue eyes, short white fur-trimmed off-shoulder priest dress above the thigh, ice-jewel bikini-style breastplate, white thigh-high stockings, snowflake hair ornament, frost staff, kind but brave vibe
 - CG `temple`: ice-blue haired priestess in short white fur-trimmed dress praying in a snowy temple with glowing snowflakes
 - CG `snow festival`: ice-blue haired priestess holding a warm soup bowl at a snow festival with lanterns, blushing smile
+
+## 유나 — D 성벽 왕도 ★특별
+
+_현대 세계에서 떨어진 흑발 대학원생. 짧은 검과 「낙인 공명」으로 싸우는 특별 히로인._
+
+- 역할: 현세에서 온 이방인 · 왕도 서고의 객원 조사원 · 25세 (성인) · 동료 HP 65
+- 성격: 밝고 붙임성 있지만 속으로는 집이 그리워 밤마다 휴대폰(배터리 0%)을 만지작거린다. 이 세계를 「게임 같다」며 의외로 빨리 적응했다.
+- 사연: 서울의 대학원생(고고학). 박물관에서 낙인 문양이 새겨진 동판을 만진 순간 빛에 삼켜져 왕도 성벽 밖 폐허에 떨어졌다. 그녀의 손등에도 옅은 「포식의 낙인」 문양이 떠 있어, 그 낙인이 세계 사이의 문을 여는 열쇠라는 것을 서고지기 먼지와 함께 알아낸다. 귀환 방법은 마룡의 심장에서 흘러나오는 차원 균열뿐 — 필멸자와 함께 끝까지 가야만 선택할 수 있다. 엔딩(호감도 100)에서 귀환할지 남을지 직접 고른다.
+- 전투: 근접 기동형. 박물관 진열장에서 함께 떨어진 짧은 의례용 검으로 빠른 2연 베기 + 백스텝. / 스킬 「낙인 공명」 주인공의 포식의 낙인과 공명, 5초간 둘 다 공격력 +20%·흡수 효율 +1 (쿨 18초)
+- 의상: 흰 오프숄더 크롭 블라우스(풍만한 가슴, 배꼽 노출), 검은 주름 미니스커트와 체인 벨트, 검은 사이하이 스타킹, 하트 펜던트 초커, 허리에 짧은 검. 긴 흑발에 앞머리, 보랏빛 눈.
+- 선물: 좋아함 단 과자, 고대 문서, 반짝이는 돌(휴대폰 충전용이라 믿음) / 싫어함 벌레
+- 선악·마왕 루트: 악명: 「너 그런 사람 아니었잖아…」 하고 서고에 숨어 동행 거부. 마왕: 포식의 낙인이 공명해 마왕에게 끌려가며 적대하지 않지만 대화 불가 상태로 따라오다가, 아이를 해치는 순간 낙인을 거꾸로 써서 마왕에게 저주(최대 HP -10%)를 건 뒤 적대. 다른 성인처럼 살해 가능 — 살해하면 귀환 엔딩은 영구 소실.
+- 표정 초상화: `d_yuna_normal.png`, `d_yuna_smile.png`, `d_yuna_angry.png`, `d_yuna_blush.png`
+- 견본 아트: `/workspace/town-demo/src/heroines/cg_modern_sample.jpg`
+
+| 퀘스트 | 제목 | 목표 | 보상 |
+|---|---|---|---|
+| `D_YUNA1` | 하늘에서 떨어진 여자 | 성벽 밖 폐허에서 몹에 둘러싸인 유나 구출 후 왕도까지 호위 — 유나 동행 | 호감도 +20, 금화 300 |
+| `D_YUNA2` | 낙인의 동판 | 서고지기 먼지의 단서로 고대 묘지 지하에서 「낙인 동판 조각」 회수, 묘지기 해골 기사 처치 | 호감도 +25, 「고대 문서」 2 |
+| `D_YUNA3` | 두 세계의 등불 | 왕도 등불 축제 날, 차원 균열에서 새어 나온 그림자 몹을 막아 축제를 지킨다 | 호감도 +20, 외형 「이방인의 초커」 |
+
+| 호감도 | 보상 |
+|---|---|
+| 40 | 보조무기 「방전된 휴대폰」 (부적: 던지면 0.5초 섬광 경직, 쿨 30초) |
+| 60 | 듀오 합동기 「쌍낙인 폭주」: 낙인 공명 중 동시 돌진 X자 베기, 흡수 게이지 즉시 1칸 |
+| 80 | 장면 「노을빛 왕도 산책」: 등불 축제 저녁, 성벽 위에서 고향 이야기와 「여기도 나쁘지 않네」 |
+| 100 | 엔딩 후일담: 차원 균열 앞에서 귀환/잔류 선택 — 잔류 시 필멸자의 집에 함께 사는 장면, 귀환 시 현대 거리에서 낙인이 빛나는 여운 |
+
+- Visual (EN): curvy adult modern-world woman (mid-20s), long straight black hair with bangs, violet eyes, white off-shoulder puff-sleeve crop top showing midriff, black pleated mini skirt with chain belt, black thigh-high stockings, black choker with heart pendant, short ornate sword at hip, cheerful but homesick vibe
+- CG `lantern street greeting`: black-haired woman with bangs in white off-shoulder crop top and black pleated mini skirt waving on a lantern-lit fantasy street at sunset (sample, cg_d_yuna_1.jpg)
+- CG `fallen from the sky`: black-haired modern woman in white crop top sitting dazed among glowing ruins outside a castle wall, holding a dead smartphone, short sword beside her
+- CG `rampart sunset talk`: black-haired woman in black choker sitting on a castle rampart at dusk beside the viewer, lanterns below, wistful smile
+
+## 대사 표정 교체 훅
+
+각 히로인 `lines[]`의 대사마다 `expr`(normal/smile/angry/blush)이 있다. 대화창은 `portraits/<id>_<expr>.png`를 띄우고, 파일이 없으면 `portraits/<id>.png`(normal)로 대체한다. 퀘스트 대사 등 다른 대사에도 같은 `expr` 필드를 붙이면 된다 (game.template.html은 아직 수정하지 않음 — 대화창 렌더에서 이 규칙만 적용하면 됨).

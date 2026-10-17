@@ -7,10 +7,11 @@ from towns_data import *
 import craft_data as _cd
 from towns_data import RECIPES, NPC_DROPS
 # ---------------- 히로인 동료 퀘스트 → 각 마을 서브퀘스트에 편입
-from heroines_data import HEROINES, COMPANION_RULE
+from heroines_data import HEROINES, COMPANION_RULE, PORTRAIT_EXPRS
 for _h in HEROINES:
-    _t=[t for t in TOWNS if t['id']==_h['town']][0]; _n=[n for n in _t['npcs'] if n['id']==_h['id']][0]
-    _n['heroine']=True
+    _t=[t for t in TOWNS if t['id']==_h['town']][0]
+    if _h.get('guest'): _t.setdefault('guests',[]).append(dict(id=_h['id'],name=_h['name'],role=_h['role'],heroine=True))
+    else: [n for n in _t['npcs'] if n['id']==_h['id']][0]['heroine']=True
     _h['quest_ids']=[]
     for _i,(_ti,_ob,_rw) in enumerate(_h['quests'],1):
         _qid=f"{_h['town']}_{_h['id'].split('_')[1].upper()}{_i}"; _h['quest_ids'].append(_qid)
@@ -45,7 +46,7 @@ for t in TOWNS:
     assert sorted(n.get('shop') for n in t['npcs'] if n.get('shop'))==['cosmetic','tool','weapon']
     good=[q for q in t['quests'] if q['path']=='good']; evil=[q for q in t['quests'] if q['path']=='evil']
     assert len(good)>=5 and len(evil)>=2
-    for qq in t['quests']: assert qq['giver'] in ids|{'strongman'},(t['id'],qq['id'])
+    for qq in t['quests']: assert qq['giver'] in ids|{'strongman'}|{g['id'] for g in t.get('guests',[])},(t['id'],qq['id'])
     for i,_ in t['shops']['tool']+t['shops']['black']: assert i in TOOLS,i
     for i,_ in t['shops']['weapon']: assert i in EQ,i
     for i,_ in t['shops']['cosmetic']: assert i in COSMETICS,i
@@ -126,9 +127,9 @@ assert HSW['hs_chan']['skill'].get('area') and '아이' in HSW['hs_chan']['skill
 for r in FUSION_RECIPES: assert r['item'] in HSW and all(i in HSW for i in r['inputs']) and r['forge_tier']==10
 assert '타락' in HIDDEN_SWORD_RULE['hero_only'] and '마왕' in HIDDEN_SWORD_RULE['hero_only']
 COUNTS.update(hidden_swords=len(HIDDEN_SWORDS))
-assert len(HEROINES)>=4 and len({h['town'] for h in HEROINES})==len(HEROINES) and sum(h['special'] for h in HEROINES) in (1,2)
+assert len(HEROINES)>=4 and len({h['town'] for h in HEROINES})==len(HEROINES) and sum(h['special'] for h in HEROINES) in (2,3)
 for _h in HEROINES:
-    assert 2<=len(_h['quests'])<=3 and _h['skill']['name'] and _h['cg'] and _h['visual_en'] and '성인' in _h['age'] and {40,60,80}<=set(_h['rewards'])
+    assert 2<=len(_h['quests'])<=3 and _h['skill']['name'] and _h['cg'] and _h['visual_en'] and '성인' in _h['age'] and {40,60,80}<=set(_h['rewards']) and all(l['expr'] in PORTRAIT_EXPRS for l in _h['lines'])
 COUNTS.update(heroines=len(HEROINES),companion_quests=sum(len(h['quests']) for h in HEROINES))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
@@ -147,7 +148,7 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
  materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
  drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
- heroines=dict(rule=COMPANION_RULE,list=HEROINES),final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
+ heroines=dict(rule=COMPANION_RULE,portrait_exprs=PORTRAIT_EXPRS,list=HEROINES),final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
@@ -202,7 +203,7 @@ for t in TOWNS:
         '### NPC (10명)','','| 이름 | 역할 | 성격 | 인사말 | 악명 이하일 때 반응 | 전투 |','|---|---|---|---|---|---|']
     for n in t['npcs']:
         c=n['combat']; L.append(f"| {n['name']} | {n['role']} | {n['personality']} | “{n['greeting']}” | “{n['greeting_dark']}” | {c['behavior']} · {', '.join(a['name'] for a in c['attacks'])} |")
-    nmap={n['id']:n['name'] for n in t['npcs']}; nmap['strongman']=s['name']
+    nmap={n['id']:n['name'] for n in t['npcs']}; nmap['strongman']=s['name']; nmap.update({g['id']:g['name']+' (손님)' for g in t.get('guests',[])})
     L+=['','### 퀘스트','']
     for qq in t['quests']:
         tag={'good':'선','evil':'악','both':'선/악 분기'}[qq['path']]
@@ -560,10 +561,12 @@ for _h in HEROINES:
       f"- 역할: {_h['role']} · {_h['age']} · 동료 HP {_h['hp']}",f"- 성격: {_h['personality']}",f"- 사연: {_h['backstory']}",
       f"- 전투: {_h['combat']} / 스킬 「{_h['skill']['name']}」 {_h['skill']['desc']}",f"- 의상: {_h['outfit']}",
       f"- 선물: 좋아함 {', '.join(_h['likes'])} / 싫어함 {', '.join(_h['dislikes'])}",f"- 선악·마왕 루트: {_h['karma_route']}"]
+    _HM.append('- 표정 초상화: '+', '.join(f"`{v}`" for v in _h['portraits'].values()))
     if _h.get('art'): _HM.append('- 견본 아트: '+', '.join(f"`{a}`" for a in _h['art']))
     _HM+=['','| 퀘스트 | 제목 | 목표 | 보상 |','|---|---|---|---|']+[f"| `{qid}` | {a} | {b} | {c} |" for qid,(a,b,c) in zip(_h['quest_ids'],_h['quests'])]
     _HM+=['','| 호감도 | 보상 |','|---|---|']+[f"| {k} | {v} |" for k,v in sorted(_h['rewards'].items())]
     _HM+=['',f"- Visual (EN): {_h['visual_en']}"]+[f"- CG `{a}`: {b}" for a,b in _h['cg']]
+_HM+=['','## 대사 표정 교체 훅','','각 히로인 `lines[]`의 대사마다 `expr`(normal/smile/angry/blush)이 있다. 대화창은 `portraits/<id>_<expr>.png`를 띄우고, 파일이 없으면 `portraits/<id>.png`(normal)로 대체한다. 퀘스트 대사 등 다른 대사에도 같은 `expr` 필드를 붙이면 된다 (game.template.html은 아직 수정하지 않음 — 대화창 렌더에서 이 규칙만 적용하면 됨).']
 DOCS['HEROINES.md']=_HM
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
