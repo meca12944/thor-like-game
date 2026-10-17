@@ -5,7 +5,7 @@
 | 파일 | 내용 |
 |---|---|
 | `town_A_npcs.md` / `.json` | A 시작 마을 NPC 10명 대사 전체 + 칭호(영웅/필멸자/필멸자·악명/타락한 필멸자/마왕)별 분기, 마왕 루트 파괴·아이 대피 규칙 |
-| `town_A_events_quests.md` / `.json` | 마을 이벤트 9개(프롤로그~잿빛 분수 터), 퀘스트 A1~A11 대사(offer/progress/done), 보상 아이템 목록 |
+| `town_A_events_quests.md` / `.json` | 마을 이벤트 8개(프롤로그~잿빛 분수 터), 퀘스트 A1~A11 대사(offer/progress/done), 보상 아이템 목록 |
 | `chests_A_area1.md` / `.json` | 마을 A + 1지역 상자: 기존 상자 정리, 찾기 쉬운 숨은 상자, 나중 능력/열쇠 상자 |
 | `heroine_quests.md` / `.json` | 히로인 7명 등장 장면 + 호감도 대화 3단계(20/60/80), 리네트(옛 나비) 동료 퀘스트(A_TAILOR1~3) 대본. 나머지 6명 동료 퀘스트 대본은 다음 작업 |
 | `main_story.md` | **게임 전체 메인 스토리 줄거리** — 「필멸자」(가제). 억겁의 불사자 주인공, 반전 3개, 지역별 장, 칭호별 엔딩 4종, 히로인 엔딩 |
@@ -52,7 +52,7 @@
 7. **없는 몹**: A_TAILOR1의 거미, A_TAILOR2의 까마귀가 1지역 몹 목록(WORLD_PLAN.md)에 없다 → 색 변형 몹(은실거미·까마귀) 제안.
 8. **숲의 단검 위치 불일치**: DIVE_SPOTS.md 표 순서로는 「버섯 군락 옆 늪」, ITEMS.md는 「큰 나무 뿌리 사이 샘」. 상자 JSON은 DIVE_SPOTS 기준.
 9. ~~리네트(옛 나비)의 전투 묘사 불일치~~ → 해결: 바늘 (위 3번). 원래 내용: HEROINES.md는 재봉 바늘 두 자루, towns.json 마을 사람 전투는 「재봉 가위 찌르기·실타래 던지기」. 대본은 바늘로 씀.
-10. **마을 A 지도**: A의 타일 지도 JSON이 없어 마을 상자 위치는 말로만 적었다. 촌장집 연못(잠수 지점)과 탁블레이드가 있는 「분수 옆 연못」이 같은 연못인지 불분명.
+10. **마을 A 지도**: A의 타일 지도 JSON이 없어 마을 상자 위치는 말로만 적었다. 촌장집 연못(잠수 지점)의 위치. (「분수 옆 연못」의 탁블레이드 상자는 숨은 검 해금 조건이 바뀌어 삭제했다.)
 11. **보상 아이템 ID**: 「거친 수정 원석」「물방울 무늬 망토」「어머니의 편지」(→ 어머니 설정 삭제로 「요람의 장부 조각」 `k_cradle_page`)「나비 리본 망토」「망토 염색 무료권」 등은 이름만 있고 ID가 없어 `proposed_id`로 새 ID를 붙였다.
 12. **「나비」가 들어간 아이템 이름**: 「나비 리본 망토」(`c_cape_nabi_ribbon`)·「나비 골무 부적」은 히로인 이름이 아니라 나비(butterfly) 무늬로 보고 그대로 뒀다. 히로인 이름을 딴 상점명은 「리네트 재봉소」로 바꿨다. 아이템명도 바꿀지 팀장 결정.
 
@@ -76,6 +76,8 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 - **게임 코드·화면**: `town/index.html`, `town/tools/game.template.html`, `town/world.js`, `town/world_mobs.js`, `town/tachie.js`, `town/tools/tachie/chars.js`, `town/tools/tachie/chars2.js`, `old_proto.html`
 - **아트 색인**: `art/npcs/INDEX.md`, `art/npcs/portraits/index.json`, `art/icons/INDEX.md`, `art/icons/icons.json`, `art/mobs/INDEX.md`, `town/assets/portraits/index.json`, `town/assets/bust/index.json`, `town/assets/tachie/index.json`, `town/assets/icons/icons.json`, `town/assets/icons/items_demo.json`, `docs_art/bust/README.md`, `town/tools/import_bust.py`, `town/tools/tachie/sheets.py`, `town/tools/tachie/make_index.py`, `town/style_sample/tools/compose.py`
 - **테스트**: `town/tools/test_world.py`, `town/tools/test_tachie.py`, `town/tools/test_inventory.py`, `town/tools/test_shop_sell.py` (이름 문자열을 확인하는 테스트는 데이터와 함께 고쳐야 함)
+- **숨은 검 새 해금 조건 (사장님 확정)**: 탁블레이드 = 3번째 보스(모래 대지렁이) 처치, 규블레이드 = 6번째 보스(산호 거대게) 처치, 찬블레이드 = 8번째 보스(뇌전 와이번) 처치 직후 폭풍지기의 첨탑에서 두 검이 하나가 됨. 옛 조건(강자 8명 생존 + A 연못 상자 `a_chest_tak`, H 지하 수원 잠수 + 보스 10마리, E 대장간 등급 10 + 볼칸 생존 + 금화 5000 융합 `f_hs_chan`)은 모두 삭제한다. 고칠 곳: `ITEMS.md`(숨겨진 전설검 절), `STORY.md`, `SYSTEMS.md`, `TOWNS.md`, `EQUIPMENT.md`, `CRAFTING.md`(융합 레시피), `data/towns.json`(`hs_*` 항목, `f_hs_chan`), `tools/design/story_data.py`(HS 정의), `tools/design/craft_data.py`(`FUSION_RECIPES`), `tools/design/towns_data.py`, `tools/design/gen_docs.py`(「마스터 대장간에서 탁검+규검 융합」 문구·assert), `town/tools/game.template.html` → `town/index.html`(상자·해금 판정), `town/tools/test_shop_sell.py`. 숨은 검 표시 이름도 탁블레이드·규블레이드·찬블레이드로 바꾼다.
+- **은팔찌 흔적 (은팔찌 설정 삭제)**: `SYSTEMS.md` 115행·`data/towns.json`·`tools/design/story_data.py` 80행의 「HUD: 팔찌의 이슬 보석 색」 → 손등 낙인 문양 HUD로 교체(`spirit_removal.md`), `old_proto.html`(옛 프로토타입의 「은빛 팔찌」 대사 2곳).
 - **음악 문서**: `docs_music/gemini_prompts.md`, `docs_music/SFX_LIST.md`, `docs_music/sfx_draft/index.html`, `tools/music/gen_doc.py`, `tools/music/songs/area02_cave.py`
 
 ## 메인 스토리 개편 반영 (2026-10-17)
@@ -92,3 +94,15 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 - `names_world.md`: 마을·지역·던전, 장비 전체, 소모품·재료, 능력 이름의 개편안이다. 숨은 검만 확정이고 나머지는 승인 대기다.
 - `story_full.md`: 프롤로그부터 엔딩 4종까지 장·지역·마을 순으로 엮은 전체 스토리다. `main_story.md`를 기준으로 히로인 퀘스트, 필살기 해방, 반전, 칭호 분기, 숨은 검을 장마다 넣었다.
 - `main_story.md`에 남아 있던 「목을 거두고」 표현 2곳을 「죽여 힘을 거두고」로 고쳤다.
+
+## 은팔찌 삭제 · 숨은 검 해금 조건 변경 (2026-10-17, 사장님 지시)
+
+- **은팔찌 삭제**: 은팔찌와 거기에 딸린 설정을 docs_story 전체에서 뺐다. 선악 표시는 손등 낙인 문양이 맡고, 유품 역할은 「요람의 장부 조각」과 잃은 기억이 맡는다.
+
+| 빠진 것 | 대체 |
+|---|---|
+| `names_world.md` 「어머니의 은팔찌 → 은팔찌」(힘 없는 유품) 줄 | 줄 삭제. 업둥이의 과거를 알려 주는 물건은 「요람의 장부 조각」(A6)이 맡는다 |
+| `spirit_removal.md`의 「팔찌 보석 색 선악 표시」와 「팔찌 오브젝트를 그림에서 지운다」 | 「보석 색 선악 표시」(HUD 보석 아이콘)로 적고, 대체는 그대로 손등 낙인 문양 |
+| `main_story.md` 삭제 목록의 「은팔찌 포함」 | 문구 삭제 |
+
+- **숨은 검 해금 조건 (사장님 확정)**: 탁블레이드는 3번째 보스, 규블레이드는 6번째 보스, 찬블레이드는 8번째 보스를 처치하면 얻는다. `main_story.md`, `story_full.md`, `names_world.md`의 동선을 고쳤다. A 연못 상자(`a_chest_tak`, `chests_A_area1.*`)와 이벤트 「여덟 개의 맹세」(`ev_a_takgeom`, `town_A_events_quests.*`)는 삭제했다.
