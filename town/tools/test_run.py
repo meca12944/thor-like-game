@@ -91,12 +91,12 @@ async def main():
     rl=await pg.evaluate("()=>{const g=__game,h=g.hero;g.advance(1/60);const s=h.atk&&h.atk.s,o={special:s&&s.special,range:s&&g.swingRange(s),r1:g.swingRange(g.SWINGS[0]),arc:s&&s.arc};let w=false,n=0;while(h.atk&&n<120){g.advance(1/60);window.__dm.t=99;window.__dm.state='idle';w=w||g.WAVES.some(x=>x.on);n++}o.wave=w;o.dmg=500-window.__dm.hp;return o}")
     R['charge_levels']=[st['c0']==0 and st['c1']==1 and st['c2']==2,st]
     R['charge_slow_move']=[60<mv['vx']<110 and mv['lv']==2,mv]
-    R['charge_lv2_release']=[rl['special']=='c2' and rl['arc']==100 and rl['range']/rl['r1']>1.35 and rl['wave'] and rl['dmg']>=30,rl]
-    # lv1 release damage = 2x hit 1; a flinching hit cancels the charge
+    R['charge_lv2_release']=[rl['special']=='c2' and rl['arc']==100 and rl['range']/rl['r1']>1.35 and rl['wave'] and abs(rl['dmg']-18)<.01,rl]
+    # lv1 release damage = 1.15x hit 1; a flinching hit cancels the charge
     await pg.evaluate("()=>{const g=__game,h=g.hero;h.cool=0;h.atk=null;const m=window.__dm;m.x=h.x+100;m.y=h.y;m.hp=500;m.kx=m.ky=0}")
     await pg.keyboard.down('KeyJ');await pg.evaluate("()=>{const g=__game;for(let i=0;i<44;i++){g.advance(1/60);window.__dm.t=99;window.__dm.state='idle';window.__dm.kx=window.__dm.ky=0}window.__dm.hp=500}");await pg.keyboard.up('KeyJ')
     l1=await pg.evaluate("()=>{const g=__game,h=g.hero;g.advance(1/60);const sp=h.atk&&h.atk.s.special;let n=0;while(h.atk&&n<120){g.advance(1/60);window.__dm.t=99;window.__dm.state='idle';n++}return {sp,dmg:500-window.__dm.hp}}")
-    R['charge_lv1_release']=[l1['sp']=='c1' and abs(l1['dmg']-20)<.01,l1]
+    R['charge_lv1_release']=[l1['sp']=='c1' and abs(l1['dmg']-11.5)<.01,l1]
     await pg.evaluate("()=>{const g=__game;g.hero.cool=0;window.__dm.dead=true}");await pg.evaluate(adv,20)
     await pg.keyboard.down('KeyJ');hc=await pg.evaluate("()=>{const g=__game,h=g.hero;for(let i=0;i<40;i++)g.advance(1/60);const before=!!h.charge;h.inv=0;g.hurtHero(1,0,1);for(let i=0;i<6;i++)g.advance(1/60);return {before,after:!!h.charge}}");await pg.keyboard.up('KeyJ')
     R['hit_cancels_charge']=[hc['before'] and not hc['after'],hc];await pg.evaluate("()=>{const g=__game,h=g.hero;h.hp=h.maxHp;for(let i=0;i<60;i++)g.advance(1/60)}")

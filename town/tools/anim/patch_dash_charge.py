@@ -8,9 +8,9 @@ def rep(t,a,b,n=1):
 SPECIAL={
  "dash":{"name":"돌진베기","anim":"@hit1","kind":"slash","dur":26,"a0":4,"a1":12,"cancel":12,"stop":5,"kb":420,"lunge":90,"rangeMul":1.0,"arc":100,"dmgMul":1.3,"cool":0.3,"strike":[0.25,0.6]},
  "charge":{"t1":0.6,"t2":1.2,"moveMul":0.4,"hold":{"anim":"@hit3","p":0.18},
-  "lv1":{"name":"모아베기","anim":"@hit3","kind":"overhead","dur":34,"a0":6,"a1":14,"cancel":20,"stop":8,"kb":650,"lunge":24,"rangeMul":1.15,"arc":100,"dmgMul":2,"cool":0.25,"shake":0,"strike":[0.3,0.6],"trail":["150,220,255","255,255,255"]},
-  "lv2":{"name":"극 모아베기","anim":"@hit3","kind":"overhead","dur":40,"a0":6,"a1":16,"cancel":24,"stop":10,"kb":850,"lunge":30,"rangeMul":1.4,"arc":100,"dmgMul":3,"cool":0.3,"shake":"fin","fin":True,"strike":[0.3,0.6],"trail":["255,214,110","255,255,255"],
-         "wave":{"speed":560,"range":260,"rad":28,"dmgMul":1.0,"kb":380,"pierce":True,"col":["255,214,110","120,80,10","255,255,255"]}}}}
+  "lv1":{"name":"모아베기","anim":"@hit3","kind":"overhead","dur":34,"a0":6,"a1":14,"cancel":20,"stop":8,"kb":650,"lunge":24,"rangeMul":1.15,"arc":100,"dmgMul":1.15,"cool":0.25,"shake":0,"strike":[0.3,0.6],"trail":["150,220,255","255,255,255"]},
+  "lv2":{"name":"극 모아베기","anim":"@hit3","kind":"overhead","dur":40,"a0":6,"a1":16,"cancel":24,"stop":10,"kb":850,"lunge":30,"rangeMul":1.4,"arc":100,"dmgMul":1.3,"cool":0.3,"shake":"fin","fin":True,"strike":[0.3,0.6],"trail":["255,214,110","255,255,255"],
+         "wave":{"speed":560,"range":260,"rad":28,"dmgMul":0.5,"kb":380,"pierce":True,"col":["255,214,110","120,80,10","255,255,255"]}}}}
 SPECIAL_DOC=("Attacks besides the 3-hit combo, for every weapon type (per-weapon override: weapons[type].special with the same keys). "
  "dash = 돌진베기: attack while RUNNING (double-tap run) -> forward lunge slash; lunge = travel in town world px (90 = ~1.7 tiles), range = weapon hit-1 range x rangeMul, arc deg, dmgMul x hit-1 damage, cool = s before the next attack (no spam), cancel = dodge-cancel tick. "
  "charge = 모으기: hold attack (tap still = combo; the hold time counts from the press) -> lv1 at t1 s, lv2 at t2 s (glow + sound cue each); release -> lv1 / lv2 slash; moveMul = walk speed while charging; a hit cancels the charge unless super armor; lv2 also fires a forward sword wave (wave.dmgMul x hit-1). "
@@ -80,7 +80,7 @@ def world(t):
 """  const atkT = i => i >= 3 ? atkTS(i) : i === 2 ? ATK3 : ATK;
   // dash attack (run + attack, i 3) / charge attack lv1 / lv2 (hold attack, i 4 / 5): same data as the town (__game.ANIM.special), town px x .3, ticks / 60
   const SPW_DEF = { dash: { dur: 26, a0: 4, a1: 12, lunge: 90, rangeMul: 1, arc: 100, dmgMul: 1.3, cool: .3 }, charge: { t1: .6, t2: 1.2, moveMul: .4,
-    lv1: { dur: 34, a0: 6, a1: 14, lunge: 24, rangeMul: 1.15, arc: 100, dmgMul: 2, cool: .25 }, lv2: { dur: 40, a0: 6, a1: 16, lunge: 30, rangeMul: 1.4, arc: 100, dmgMul: 3, cool: .3, wave: { speed: 560, range: 260, rad: 28, dmgMul: 1 } } } };
+    lv1: { dur: 34, a0: 6, a1: 14, lunge: 24, rangeMul: 1.15, arc: 100, dmgMul: 1.15, cool: .25 }, lv2: { dur: 40, a0: 6, a1: 16, lunge: 30, rangeMul: 1.4, arc: 100, dmgMul: 1.3, cool: .3, wave: { speed: 560, range: 260, rad: 28, dmgMul: .5 } } } };
   function spW() { const g = window.__game; return (g && g.ANIM && g.ANIM.special && g.ANIM.special.dash) ? g.ANIM.special : SPW_DEF; }
   function spOf(i) { const C = spW(); return i === 3 ? C.dash : i === 4 ? C.charge.lv1 : C.charge.lv2; }
   function atkTS(i) { const h = spOf(i); return { dur: h.dur / 60, a0: h.a0 / 60, a1: h.a1 / 60 }; }

@@ -4548,7 +4548,7 @@
     "lunge": 24,
     "rangeMul": 1.15,
     "arc": 100,
-    "dmgMul": 2,
+    "dmgMul": 1.15,
     "cool": 0.25,
     "shake": 0,
     "strike": [
@@ -4573,7 +4573,7 @@
     "lunge": 30,
     "rangeMul": 1.4,
     "arc": 100,
-    "dmgMul": 3,
+    "dmgMul": 1.3,
     "cool": 0.3,
     "shake": "fin",
     "fin": true,
@@ -4589,7 +4589,7 @@
      "speed": 560,
      "range": 260,
      "rad": 28,
-     "dmgMul": 1.0,
+     "dmgMul": 0.5,
      "kb": 380,
      "pierce": true,
      "col": [
