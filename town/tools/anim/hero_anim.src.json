@@ -3786,7 +3786,7 @@
   "potion_down": "potion_right",
   "potion_up": "potion_right"
  },
- "_weapons_doc": "Every combo hit is a SWING (no thrusts, no 360): hit1 slash right->left, hit2 return slash left->right (mirror), hit3 forward overhead/diagonal power swing with longer recovery. Hitbox = forward SECTOR: radius range (world px from the hero centre; town tile 53.3 px -> sword 96 = 1.8 tiles) and arc degrees (150 slashes / 130 overheads); the swing trail is drawn with exactly that radius and arc. hit2 = dedicated return-slash frames (atk2b / <w>2), sweeping across the FRONT in the opposite direction. Only exception: titleCombo['마왕'].hit3 (360 spin + sword waves). Times in 60fps ticks, distances in world px; stop = hit-stop ticks.",
+ "_weapons_doc": "Every combo hit is a SWING (no thrusts, no 360): hit1 slash right->left, hit2 return slash left->right (mirror), hit3 forward overhead/diagonal power swing with longer recovery. Hitbox = forward SECTOR: radius range (world px from the hero centre; town tile 53.3 px -> sword 96 = 1.8 tiles) and arc degrees (150 slashes / 130 overheads); the swing trail is drawn with exactly that radius and arc. hit2 = dedicated return-slash frames (atk2b / <w>2), sweeping across the FRONT in the opposite direction. Only exception: titleCombo['마왕'].hit3 (360 spin + sword waves). Times in 60fps ticks, distances in world px; stop = hit-stop ticks. hit3 = big finishing slash: arc 180-200 deg (dagger 180 / twin 185 / greatsword 200 / others 190, still forward-facing; only the 마왕 title hit 3 spins), reach +20% over the old hit 3, active window +60%, longer follow-through; 'strike' = [anim fraction at a0, at a1] so the swing frames line up with the active window (windup before, follow-through after).",
  "weapons": {
   "sword": {
    "name": "한손검",
@@ -3829,18 +3829,22 @@
      "anim": "atk3",
      "kind": "overhead",
      "name": "내려베기",
-     "dur": 32,
+     "dur": 41,
      "a0": 10,
-     "a1": 16,
-     "cancel": 22,
+     "a1": 20,
+     "cancel": 28,
      "stop": 8,
      "reach": 46,
      "rad": 50,
      "kb": 700,
      "lunge": 30,
      "fin": true,
-     "range": 104,
-     "arc": 130
+     "range": 125,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -3885,18 +3889,22 @@
      "anim": "atk3",
      "kind": "slash",
      "name": "사선 베기",
-     "dur": 28,
+     "dur": 37,
      "a0": 8,
-     "a1": 14,
-     "cancel": 19,
+     "a1": 18,
+     "cancel": 25,
      "stop": 8,
      "reach": 44,
      "rad": 48,
      "kb": 600,
      "lunge": 34,
      "fin": true,
-     "range": 99,
-     "arc": 150
+     "range": 119,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -3941,10 +3949,10 @@
      "anim": "dg3",
      "kind": "overhead",
      "name": "교차 긋기",
-     "dur": 18,
+     "dur": 26,
      "a0": 5,
-     "a1": 10,
-     "cancel": 12,
+     "a1": 13,
+     "cancel": 17,
      "stop": 7,
      "reach": 32,
      "rad": 38,
@@ -3952,8 +3960,12 @@
      "lunge": 20,
      "fin": true,
      "hits": 2,
-     "range": 82,
-     "arc": 130
+     "range": 98,
+     "arc": 180,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -3998,18 +4010,22 @@
      "anim": "gs3",
      "kind": "overhead",
      "name": "내려찍기",
-     "dur": 46,
+     "dur": 55,
      "a0": 16,
-     "a1": 23,
-     "cancel": 34,
+     "a1": 27,
+     "cancel": 40,
      "stop": 10,
      "reach": 54,
      "rad": 60,
      "kb": 900,
      "lunge": 22,
      "fin": true,
-     "range": 132,
-     "arc": 130
+     "range": 158,
+     "arc": 200,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4054,18 +4070,22 @@
      "anim": "sp3",
      "kind": "overhead",
      "name": "대휩쓸기 내려치기",
-     "dur": 36,
+     "dur": 45,
      "a0": 12,
-     "a1": 19,
-     "cancel": 26,
+     "a1": 23,
+     "cancel": 32,
      "stop": 8,
      "reach": 76,
      "rad": 62,
      "kb": 720,
      "lunge": 16,
      "fin": true,
-     "range": 149,
-     "arc": 130
+     "range": 179,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4110,18 +4130,22 @@
      "anim": "atk3",
      "kind": "overhead",
      "name": "내리치기",
-     "dur": 34,
+     "dur": 43,
      "a0": 11,
-     "a1": 18,
-     "cancel": 25,
+     "a1": 22,
+     "cancel": 31,
      "stop": 8,
      "reach": 72,
      "rad": 56,
      "kb": 420,
      "lunge": 10,
      "fin": true,
-     "range": 140,
-     "arc": 130
+     "range": 168,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4168,10 +4192,10 @@
      "anim": "tw3",
      "kind": "overhead",
      "name": "쌍 내려베기",
-     "dur": 28,
+     "dur": 37,
      "a0": 9,
-     "a1": 15,
-     "cancel": 20,
+     "a1": 19,
+     "cancel": 26,
      "stop": 8,
      "reach": 44,
      "rad": 46,
@@ -4179,8 +4203,12 @@
      "lunge": 30,
      "fin": true,
      "hits": 2,
-     "range": 91,
-     "arc": 130
+     "range": 109,
+     "arc": 185,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4237,18 +4265,22 @@
      "anim": "atk3",
      "kind": "overhead",
      "name": "일월 내려베기",
-     "dur": 32,
+     "dur": 41,
      "a0": 10,
-     "a1": 16,
-     "cancel": 22,
+     "a1": 20,
+     "cancel": 28,
      "stop": 9,
      "reach": 52,
      "rad": 56,
      "kb": 760,
      "lunge": 34,
      "fin": true,
-     "range": 108,
-     "arc": 130
+     "range": 130,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4305,18 +4337,22 @@
      "anim": "gs3",
      "kind": "overhead",
      "name": "개기일식 내려베기",
-     "dur": 36,
+     "dur": 45,
      "a0": 12,
-     "a1": 19,
-     "cancel": 26,
+     "a1": 23,
+     "cancel": 32,
      "stop": 10,
      "reach": 58,
      "rad": 64,
      "kb": 900,
      "lunge": 30,
      "fin": true,
-     "range": 130,
-     "arc": 130
+     "range": 156,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   },
@@ -4373,18 +4409,22 @@
      "anim": "atk3",
      "kind": "overhead",
      "name": "종언 내려찍기",
-     "dur": 42,
+     "dur": 51,
      "a0": 14,
-     "a1": 21,
-     "cancel": 30,
+     "a1": 25,
+     "cancel": 36,
      "stop": 10,
      "reach": 58,
      "rad": 64,
      "kb": 1000,
      "lunge": 26,
      "fin": true,
-     "range": 117,
-     "arc": 130
+     "range": 140,
+     "arc": 190,
+     "strike": [
+      0.3,
+      0.6
+     ]
     }
    ]
   }
