@@ -30,6 +30,7 @@
   "#": "cliff",
   "\"": "tallgrass",
   "_": "sand",
+  "S": "steps",
   "T": {
    "ground": "grass",
    "deco": "tree"
@@ -67,6 +68,37 @@
   "f": {
    "ground": "grass",
    "deco": "fence"
+  },
+  "O": {
+   "ground": "dirt",
+   "deco": "pillar_broken"
+  },
+  "c": {
+   "ground": "grass",
+   "deco": "crystal"
+  },
+  "W": {
+   "ground": "grass",
+   "deco": "ruin_wall"
+  },
+  "L": {
+   "ground": "grass",
+   "deco": "log"
+  },
+  "n": {
+   "ground": "grass",
+   "deco": "fern",
+   "solid": false
+  },
+  "X": {
+   "ground": "dirt",
+   "deco": "rubble"
+  },
+  "Z": {
+   "ground": "grass"
+  },
+  "z": {
+   "ground": "dirt"
   }
  },
  "solid": [
@@ -78,7 +110,14 @@
   "r",
   "u",
   "s",
-  "f"
+  "f",
+  "O",
+  "c",
+  "W",
+  "L",
+  "X",
+  "Z",
+  "z"
  ],
  "spawns": {
   "default": [
@@ -128,6 +167,13 @@
    "name": "쉼터 다리"
   },
   {
+   "type": "landmark",
+   "id": "lm_island",
+   "x": 32,
+   "y": 29,
+   "name": "개울 웅덩이의 섬"
+  },
+  {
    "type": "exit",
    "x": 45,
    "y": 4,
@@ -138,15 +184,9 @@
    "label": "고대 숲 신전"
   },
   {
-   "type": "door_deco",
-   "x": 46,
-   "y": 4.6,
-   "sprite": "doorway_big"
-  },
-  {
    "type": "sign",
    "x": 4,
-   "y": 18,
+   "y": 16,
    "text": "← 바람길 · 시작 마을   /   시작의 숲 · 고대 숲 신전 →\n(Shift: 구르기 — 구르는 동안은 무적)"
   },
   {
@@ -163,8 +203,8 @@
   },
   {
    "type": "sign",
-   "x": 42,
-   "y": 22,
+   "x": 41,
+   "y": 20,
    "text": "경고: 이 앞 공터에 거대 왕멧돼지 「돌엄니」 출몰!"
   },
   {
@@ -182,20 +222,20 @@
      2
     ]
    ],
-   "note": "secret: walk through the odd tree (Y) at the top of the glade"
+   "note": "secret: walk through the odd pale tree (Y) at the top of the ring glade"
   },
   {
    "type": "chest",
    "id": "f01_chest_island",
    "x": 32,
-   "y": 31,
+   "y": 30,
    "loot": [
     [
      "heart_piece",
      1
     ]
    ],
-   "note": "secret: stepping stones (:) from the west bank"
+   "note": "secret: stepping stones (:) from the west bank of the pond"
   },
   {
    "type": "chest",
@@ -211,7 +251,8 @@
      "m_a1_shared",
      3
     ]
-   ]
+   ],
+   "note": "under the temple cliff, east of the gorge"
   },
   {
    "type": "hidden",
@@ -225,6 +266,68 @@
     ]
    ],
    "note": "interact in the tall grass where it glints"
+  },
+  {
+   "type": "barrier",
+   "id": "f01_bridge_thread",
+   "x": 30,
+   "y": 7,
+   "w": 5,
+   "h": 2,
+   "need": "boss02",
+   "sprite": "bridge_broken",
+   "verb": "수정 실을 기둥에 걸어 끊어진 다리를 건널 수 있게 됐다!",
+   "text": "끊어진 밧줄 다리. 건너편 기둥에 줄을 걸 수 있다면…\n(수정 동굴의 힘 「수정 실」이 필요하다)"
+  },
+  {
+   "type": "chest",
+   "id": "f01_chest_thread",
+   "x": 26,
+   "y": 7,
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ],
+    [
+     "spirit_drop",
+     1
+    ]
+   ],
+   "note": "return later: needs 수정 실 (area-2 boss flag boss02)"
+  },
+  {
+   "type": "barrier",
+   "id": "f01_rock_quake",
+   "x": 56,
+   "y": 32,
+   "w": 1,
+   "h": 1,
+   "need": "boss01",
+   "sprite": "boulder_cracked",
+   "verb": "대지의 수정으로 바위를 부쉈다!",
+   "text": "금이 간 큰 바위. 안쪽에서 반짝이는 것이 보인다.\n땅을 울리는 힘(대지의 수정)이 있다면…"
+  },
+  {
+   "type": "chest",
+   "id": "f01_chest_quake",
+   "x": 58,
+   "y": 33,
+   "loot": [
+    [
+     "m_a1_shared",
+     4
+    ],
+    [
+     "bomb",
+     2
+    ],
+    [
+     "potion",
+     1
+    ]
+   ],
+   "note": "return later: needs 대지의 수정 (boss01 flag)"
   },
   {
    "type": "heal",
@@ -250,7 +353,7 @@
    "type": "spawn",
    "mob": "rabbit",
    "x": 8,
-   "y": 21,
+   "y": 20,
    "respawn": 25
   },
   {
@@ -264,28 +367,28 @@
    "type": "spawn",
    "mob": "rabbit",
    "x": 17,
-   "y": 18,
+   "y": 19,
    "respawn": 25
   },
   {
    "type": "spawn",
    "mob": "mushroom",
    "x": 6,
-   "y": 12,
+   "y": 10,
    "respawn": 25
   },
   {
    "type": "spawn",
    "mob": "wasp",
    "x": 22,
-   "y": 11,
+   "y": 10,
    "respawn": 25
   },
   {
    "type": "spawn",
    "mob": "squirrel",
    "x": 24,
-   "y": 16,
+   "y": 12,
    "respawn": 25
   },
   {
@@ -298,8 +401,8 @@
   {
    "type": "spawn",
    "mob": "slime",
-   "x": 35,
-   "y": 9,
+   "x": 37,
+   "y": 10,
    "respawn": 25
   },
   {
@@ -312,8 +415,8 @@
   {
    "type": "spawn",
    "mob": "squirrel",
-   "x": 38,
-   "y": 12,
+   "x": 39,
+   "y": 11,
    "respawn": 25
   },
   {
@@ -334,71 +437,180 @@
    "type": "spawn",
    "mob": "sprout",
    "x": 44,
-   "y": 19,
+   "y": 18,
    "respawn": 25
   },
   {
    "type": "spawn",
    "mob": "boar",
-   "x": 57,
-   "y": 31,
-   "respawn": 25
-  },
-  {
-   "type": "spawn",
-   "mob": "sprout",
-   "x": 36,
+   "x": 55,
    "y": 27,
    "respawn": 25
   },
   {
    "type": "spawn",
+   "mob": "sprout",
+   "x": 37,
+   "y": 26,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
    "mob": "scarecrow",
-   "x": 30,
-   "y": 37,
+   "x": 28,
+   "y": 36,
    "respawn": 25
   }
  ],
  "ground": [
-  "PTTTTPTTTTTTPTPTTTTPTTTTTTTTTT~~~TTTTTTTTTTTTPTTTPTTTTTTTTPTTTTT",
-  "PTTPPTPTTPTPPTPPTPTTTTPTTTTTTT~~~PTTPPTPTTTPTTPPTTTPTTTTPTTTTTTT",
-  "TT,.......,..,...'......',,...,~~~..##########################PT",
-  "TT,.,........,.................~~~..##########################TT",
-  "TT..........,.........\"\"\"\"\".'..~~~..#########===##############TP",
-  "TP''..T..TP,..........\"\"\"\"\".....~~~.#########===##############TP",
-  "PT,.'T.PTPPT.'........\"\"\"\"\"....'~~~,...'..,..===.....,,P...'..TT",
-  "TT,..TTTTTTT.........,\"\"\"\"\"P....~~~..........===,.....TP......TT",
-  "TT..TT,P.,TTP......,..,.TPPT.,..~~~......,.,'===.,..,PTPPT....TP",
-  "TT...T.TTPTT........,..TTTTT.T..~~~.,,...,.,,===......T,......PT",
-  "PT...T.T,TP,.....,..,...P'TT.,..~~~...r......===..........,...TP",
-  "PP..,,TTTT'.............TPTTP...~~~......'..====..,.,...,...,,TT",
-  "TT......T.......u...,.....T...,~~~..''.....=====,...,.\"\"\"\"\"...TT",
-  "TT....'...,.R...,.=============bbb=============..,',..\"\"\"\"\".''PT",
-  "TT.......,......===============bbb=============...'.'.\"\"\"\"\"...TP",
-  "TP....u,,.....================bbb=============........\"\"\"\"\"...TP",
-  "TTfffffff..,=========.,.'..,..~~~....,,.==............\"\"\"\"\".,,TT",
-  "...'...,..=========.......,..~~~....,...==...,................TP",
-  "=================..',..r..,..~~~'.,R....==..'...,.R..,...'..,.PT",
-  "===============...,..,.......~~~........==.....,...,.......'..PP",
-  "============='.,...'m...'..R~~~....,,...==.........,u.,...TPT.TT",
-  ".,..'....,..,.,...T.,.......~~~.........==.,'....'....,..T.TT.TT",
-  "TT.......s'......T.T...',,,.~~~...m,....==............'PT.T,TPTT",
-  "TT....,.,,...'.,TTPPT.......~~~'.,...TPT==..===========.TPT.T.TP",
-  "TT..\"\"\"\"\"\",.,,.TTTT..P......~~~,.....TP.==..===========.TTPTT.TT",
-  "TT..\"\"\"\"\"\"......P.P.T..'....~~~...,..TPT==..===========...T.'.TT",
-  "TT..\"\"\"\"\"\"......TPTPT.......~~~,,...,.T.==,.===========....'..TP",
-  "TP........'.................~~~~~~~~.......'===========.......TT",
-  "TT..TTTTTYTTTT,.......'..,..~~~~~~~~,...,...===========..r....TP",
-  "PT..T........T'.,,....,.,.,.~~~~~~~~........===========.....,.PT",
-  "PT..T........T..\"\"\"\"\"\",.T...~~~___~~.,...,..===========T.,,...PT",
-  "TT..T........T..\"\"\"\"\"\"P.TTT.:::___~~........,.....TTT.TTT,..,.TT",
-  "TP..T........T..\"\"\"\"\"\"TTPTTT~~~___~~............T.PT.TPTP.....PT",
-  "TT.,T........TP.\"\"\"\"\"\"T.P..T~~~~~~~~........,......,PTTTT.,,..TP",
-  "TT,,T........TP......PPTT.TP~~~~~~~~....,......PTPT'TTTTTT....TT",
-  "TT.'TTTTTTTTTTP......'TTT.T,..'~~~...,.,........T..PTTP.P,..,.TT",
-  "TT......,.TP.........P..TTT.....~~~..'..,.......TT..TTTT.....,PT",
-  "TT........T..TT.......PTT.T...,.~~~...,.,.......PTTTTTPTP.....TP",
-  "TPTTTPTPPTTTTTTTTTTTTTTTTPTPTTTT~~~TPTTTTTTTTTPPTTTTTPTTPPPTTTTT",
-  "TPTPTTPTTTTTPPTTTTPTTTTTPTTPPTPT~~~TTTTTTTTTTPTTTPPPTTTPTTTTTTTT"
- ]
+  "PTTPTPTTPTTTTTTTTTTTTPTTTPTPT.~~~...PPTPTPPPTTPPTPPPTTPTTTTTTPTT",
+  "TTTTTTTTTTPPTTTTTTTTTTTTTTTPT.~~~...PPTTTPTTTTTTPTTTTTPPPTTPTPTT",
+  "TPPT..TT..,.TTTT..PPTT.TTPTTTT~~~..###########################PT",
+  "TPT....'''......,''...sTTTTTTTT~~~.###########################TT",
+  "TPT.............u..\"\"\"\"TTTTTTTT~~~.##########===##############TP",
+  "TTT.......'.r......\"\"\"\"TTTTTTTT~~~.#########=====#############TT",
+  "TT,,...TTTT......m.\"\"\"\"TT......~~~,..,..,...,==.....,.L..'....TT",
+  "TT....TTTTTT.'..,..\"\"\"\"TT...,'bbbbb..........==..,TTTT.,......PT",
+  "PT...,TT..TT......n.,r,Tu,.,..bbbbb.......,..==,..TTTTT..s....TP",
+  "TT....TTTTTT...........Tu.m..,.~~~....'r,....==..TTTTTT..,...uTT",
+  "TTTT...TTTT,...........Tusuurus~~~.........'===...TTTT..r.,.rRPP",
+  "TTTTTTT'...,......,.,..TTTTTuuR~~~........,.===........n.,..TTTP",
+  "PT'TTTT...n.m,.......m.........~~~..===========,....u\"\"\"\"\"\"...PT",
+  "TT.TTTT.,.u.R.'.....===========bbb============.......\"\"\"\"\"\".'.TT",
+  "PPTTTTT......'...==============bbb===========.,......\"\"\".\"\".'TTT",
+  "TPP.'...,..',================..~~~.......==,.......',\"\"\"\"\"\"'.PTP",
+  "..........==========...TTTT....~~~.u.,...==..........\"\"\"\"\"\"..TTT",
+  "..===============......TTTT.,.~~~.,.,.'..==....'.............TTT",
+  "=============,.......,.TTTT,..~~~..R.....==.....,.R.....'....PTP",
+  "==========,...,.'..'...TTTT..,~~~'.TTTT,'==......,.,..mss....TTT",
+  "==......'...n..........TTTT..~~~.m.TTTT,.==.,,..m.........'...TP",
+  "........u.....,..'...........~~~.,.TTTT,.====............'u...PP",
+  "......'.,........m.......,''.~~~...TTTT..,===='......,.,....,PTP",
+  "TTTT.n....m...,.....'...,.u.R~~~~..,.,u.....==.====..m.......TTT",
+  "TT..\"\"\"\"\"\".,.....,,........'..~~~n..,.m.....'========...'.r..TTP",
+  "TT..\"\"\"\"\"\"..,..r...uL........m~~~.'.........n========....'.,.TTT",
+  "TTT.\"\"\"\"\"\"...,.,...........,~~~~~~~..'.u...,,========..n.,..n.PT",
+  "TTT......n..'....,.......,.~~~~~~~~~...........====''..,n.....TP",
+  "TPP.TTTTTYTTTTP...,...,....~~~~~~~~~...,...m.'m..n...'.......PTT",
+  "TPT.T,...,.,'TP,...',.....~~~~____~~~..,....''m....n...TTTTTTTPP",
+  "TPT.T..m....,TP'\"\"\"\"\"\".'..::::____~~~...n..............TTTTTTTTT",
+  "PTT.T.....,..TP.\"\"\"\"\"\".....~~~~~~~~~,...........,....n..T'.,TTTP",
+  "TTT.T........TP.\"\"\"\"\"\",...m.~~~~~~~......nTTTTTT....',.....'TTTT",
+  "PTT.T,.m..'..TP'\"\"\"\"\"\"TTTT'....~~~......'TTTTTTTT...,.'uu..'TTTT",
+  "PTT.T.......uTP'.....TTTTTT....~~~.......TTTTTTTT'....'Ru...uTTP",
+  "PPT.TTTTTTTTTTP......TTTTTT.,..~~~.......,TTTTTT.'.....suuurrTTP",
+  "TT.,...,TT......,.PTT.TTTTu....~~~,..m'.n...TT..TT.,TP.TursuuTTT",
+  "PT....PPTPTT,..'n.TTTPTT..PTTTT~~~...'....TTPTPTTTTPTT'.PTTT,.TP",
+  "TTTPPTTPPPTPPPTPPPTPTTPTTPTTPTTm~~~..TTTTPTTTTTTTTPPTTTTTTTPPTTP",
+  "TTTTPTTPPPPPPTPPPTTTPPTTTTPTTTT.~~~..TTTTPTPTPTTPTTTTTPPTTTTTTPT"
+ ],
+ "paint": {
+  "props": [
+   {
+    "s": "pine",
+    "x": 36.65928849805137,
+    "y": 3.203347656640352
+   },
+   {
+    "s": "pine",
+    "x": 38.19129609273509,
+    "y": 3.4619166583391627
+   },
+   {
+    "s": "pine",
+    "x": 40.581023283701406,
+    "y": 3.453522534226042
+   },
+   {
+    "s": "oak_b",
+    "x": 52.327360847406815,
+    "y": 3.295683021884681
+   },
+   {
+    "s": "oak_b",
+    "x": 54.56591386029779,
+    "y": 3.262606175677026
+   },
+   {
+    "s": "oak_b",
+    "x": 56.57894473868292,
+    "y": 3.6679724193064858
+   },
+   {
+    "s": "oak_b",
+    "x": 58.45591086239632,
+    "y": 3.5286199660237836
+   },
+   {
+    "s": "oak_b",
+    "x": 60.55416208653942,
+    "y": 3.489597281902668
+   },
+   {
+    "s": "temple_gate",
+    "x": 46.5,
+    "y": 5.05
+   },
+   {
+    "s": "pillar_broken",
+    "x": 41.2,
+    "y": 6.6,
+    "solid": false
+   },
+   {
+    "s": "ruin_wall",
+    "x": 50.5,
+    "y": 6.3
+   }
+  ],
+  "lights": [
+   [
+    9,
+    31,
+    1.2
+   ],
+   [
+    15,
+    7,
+    1
+   ],
+   [
+    36,
+    20,
+    0.9
+   ],
+   [
+    52,
+    10,
+    0.9
+   ],
+   [
+    46,
+    9,
+    1.1
+   ],
+   [
+    20,
+    33,
+    0.8
+   ],
+   [
+    26,
+    7,
+    1
+   ],
+   [
+    58,
+    32,
+    0.8
+   ],
+   [
+    49,
+    25,
+    1
+   ]
+  ],
+  "leaves": 16,
+  "bg": "world/paint/field01_bg.webp"
+ }
 }

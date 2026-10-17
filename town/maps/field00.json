@@ -30,6 +30,7 @@
   "#": "cliff",
   "\"": "tallgrass",
   "_": "sand",
+  "S": "steps",
   "T": {
    "ground": "grass",
    "deco": "tree"
@@ -69,12 +70,35 @@
    "deco": "fence"
   },
   "O": {
-   "ground": "grass",
-   "deco": "pillar"
+   "ground": "dirt",
+   "deco": "pillar_broken"
   },
   "c": {
    "ground": "grass",
    "deco": "crystal"
+  },
+  "W": {
+   "ground": "grass",
+   "deco": "ruin_wall"
+  },
+  "L": {
+   "ground": "grass",
+   "deco": "log"
+  },
+  "n": {
+   "ground": "grass",
+   "deco": "fern",
+   "solid": false
+  },
+  "X": {
+   "ground": "dirt",
+   "deco": "rubble"
+  },
+  "Z": {
+   "ground": "grass"
+  },
+  "z": {
+   "ground": "dirt"
   }
  },
  "solid": [
@@ -88,7 +112,12 @@
   "s",
   "f",
   "O",
-  "c"
+  "c",
+  "W",
+  "L",
+  "X",
+  "Z",
+  "z"
  ],
  "spawns": {
   "default": [
@@ -131,13 +160,13 @@
   {
    "type": "sign",
    "x": 25,
-   "y": 10,
+   "y": 11,
    "text": "↑ 시작 마을    ← 바람의 언덕\n→ 시작의 숲 · 고대 숲 신전    ↓ 수정 동굴 (낙석으로 막힘)"
   },
   {
    "type": "sign",
-   "x": 35,
-   "y": 28,
+   "x": 34,
+   "y": 29,
    "text": "낙석으로 길이 막혀 있다. 수정 동굴(2지역)은 아직 갈 수 없다."
   },
   {
@@ -161,7 +190,54 @@
      "m_hardwood",
      1
     ]
-   ]
+   ],
+   "note": "ruins on the wind hill (stone steps below the cliff)"
+  },
+  {
+   "type": "chest",
+   "id": "f00_chest_canopy",
+   "x": 20,
+   "y": 2,
+   "loot": [
+    [
+     "spirit_drop",
+     1
+    ],
+    [
+     "potion",
+     1
+    ]
+   ],
+   "note": "hidden: path behind the tree canopies from the town road to the hill (rows 2-3)"
+  },
+  {
+   "type": "barrier",
+   "id": "f00_rock_quake",
+   "x": 28,
+   "y": 29,
+   "w": 1,
+   "h": 1,
+   "need": "boss01",
+   "sprite": "boulder_cracked",
+   "verb": "대지의 수정으로 바위를 부쉈다!",
+   "text": "금이 간 큰 바위가 길을 막고 있다.\n땅을 울리는 힘(대지의 수정)이 있다면 부술 수 있을 것 같다…"
+  },
+  {
+   "type": "chest",
+   "id": "f00_chest_quake",
+   "x": 26,
+   "y": 29,
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ],
+    [
+     "m_a1_shared",
+     2
+    ]
+   ],
+   "note": "return later: needs 대지의 수정 (boss01 flag)"
   },
   {
    "type": "npc",
@@ -180,15 +256,22 @@
   {
    "type": "landmark",
    "id": "lm_bridge00",
-   "x": 45,
+   "x": 44,
    "y": 19,
    "name": "개울 다리"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_windhill",
+   "x": 8,
+   "y": 4,
+   "name": "바람의 언덕 유적"
   },
   {
    "type": "spawn",
    "mob": "rabbit",
    "x": 20,
-   "y": 6,
+   "y": 8,
    "respawn": 30
   },
   {
@@ -208,75 +291,123 @@
   {
    "type": "spawn",
    "mob": "slime",
-   "x": 42,
-   "y": 15,
+   "x": 40,
+   "y": 14,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "slime",
    "x": 22,
-   "y": 26,
+   "y": 25,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "squirrel",
    "x": 49,
-   "y": 24,
+   "y": 23,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "mushroom",
    "x": 8,
-   "y": 22,
+   "y": 27,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "rabbit",
-   "x": 51,
-   "y": 11,
+   "x": 50,
+   "y": 16,
    "respawn": 30
   }
  ],
  "ground": [
-  "TTPTTTTTTTTTTTTPTPPTTTPP.'===..TTTTTPTTPTTPTPTTTTTTPTTTT",
-  "TPTTTTTTTTTTPTTTTTTTTTTP..===..TTTTPPTTTTTTPPTPTPTTPPTTP",
-  "TP....,.'.......P..Tffffff===ffffffT..T.........,.....TT",
-  "TT..........'...T.TT......==='....T,PT,'..~~~~~~..,...PT",
-  "TP.,.O=====O.'..P..TT,,..'===....TPTPT.T.~~~~~~~~...T.PT",
-  "TT.'.=======......TTP.,...===.....P..TT..~~~~~~~~'.TTTTT",
-  "TT...=======.....'..'..'.,===,r..'.TTTP.,~~~~~~~~..TTTTT",
-  "PP..,=======..,.,'...,...'===....'..T....~~~~~~~~..T..TT",
-  "PP''.==========.......,...===,.,........'~~~~~~~~..,..PT",
-  "PP...O=====O.,================..........,.~~~~~~.,...,TT",
-  "TP.,.................','..=====,'........,...~~.....,.TT",
-  "TT.....,..,.u..............===='..,',........~~,.....,TT",
-  "PP............u,,......R.,.======........,..~~..\"\"\"\"\".TP",
-  "TP..'TTT,...........T.,,....=====.....u.....~~',\"\"\"\"\".TT",
-  "PP.TTPP..P..,...,..T.T.,...,.======.......,~~.,.\"\"\"\"\".TT",
-  "TT.TTTTTTT....,....,TTT....,,.=======.'....~~...\"\"\"\"\".TT",
-  "PT..TTT.T,T.....'...TP.........========...,~~..,......TP",
-  "TT.TTTTT.T....'.....P,.'.........==========bb===.,.,....",
-  "TT,T,,P.TT,..'...,....'....,.,....=========bb===========",
-  "TT.,PP,T..,.......,,...,......,..,=.=======bb===========",
-  "TT....T,......\"\"\"\"\"\"'...,s'',...'.=...,.'..~~.==========",
-  "TP.,..........\"\"\"\"\"\"...,..,.......=..,..m..~~.....,..',,",
-  "TP.....,......\"\"\"\"\"\",.,.,.,....'..=....,...~~.....R...TT",
-  "TT......,..'.,\"\"\"\"\"\"...,',,.......=.......,~~..,..T...TT",
-  "TT...,...'TPPP..,...,..,....,.....=.\"\"\"\"\"\"..~~..TTTTP.PT",
-  "TP.,,..PTTPTPP'..m........,.r.....='\"\"\"\"\"\"..~~..TT,TTPTT",
-  "TP....'.T.TTPTT...,'..P.,,......'==.\"\"\"\"\"\"..~~...,TTTTTT",
-  "PT....TP.TTPTT..,...T.T.T.,......=,.\"\"\"\"\"\"...~~.T.T.PPTT",
-  "PT.,..,PTPT,PT.,...T..TPTP.....,.=..\"\"\"\"\"\"...~~T.T..PTTT",
-  "TT....TTTTTTP.P....,TTTT.P......R=..,...,....~~TTTTTPPPT",
-  "TP.....T.T.TPPT...TT.PT.TT....rRrRr'...,.....~~.T.T.T.TT",
-  "TP.','TP.TTTTTT.,,.TTPTPTT,....r=r.....TPT...~~.....,.TT",
-  "TT.....T...TPT,.,..TT..TT.,,....=.....,TTTT..~~.......PT",
-  "TT..',...,T.........TPPT..'.....=......TTT...~~.......TT",
-  "PTTPTTPPTPTTTTTTTPTPTTTPTTTTTTTT=TTTTTPPTPTTT~~TTTTPTTPT",
-  "TTTTPTPTPTTTPTTTTTTTPTTTPPTTPTTT=TPPTTTPTTTTT~~PTTTTTTTT"
- ]
+  "PTTPTPTTPTTTTTTTTTTTTTTT..===...TTPTPPTPTPPPTTPPTPPPTTPT",
+  "TTTTTTTTTTTTTTTTTTTTTTTT..===...TTTTPPTTTPTTTTTTPTTTTTPP",
+  "TP.,....,..'.,m.......'.'.===.......TTTTTTTPTT..PT.TTTTP",
+  "TPR.,.Z.,.Z.,.WW....,...'.===..,n..,.....__~~__..m..'.PT",
+  "TP..O=======O'...TPTTPTPu.===...........~~~~~~~~......TT",
+  "TT..=========....TTPPTTP..===...'.,...._~~~~~~~~_..n'.PT",
+  "TT..=========....#.......,===....r....._~~~~~~~~_TTTTTTT",
+  "TTWW========='...#.......'===.,,...,,.,'~~~~~~~~.TTTTPPP",
+  "PT..O=======O..r.#.....,.,===....,m......__~~__..TTTTTTT",
+  "TT...'.......,.,.#........===..m,.'.m.....~~~..'.TTTTPTT",
+  "T#######SS########......'.===,..'..m..s...~~~.',.TTTTTPT",
+  "T#######SS########.......=====...,........~~~,.\"\"TTTTTTP",
+  "PT......==='........,..R=======,.nr.......~~~..\"\"\"\"\"..TT",
+  "TT..m,.,========================'.....u.'.~~~..\"\"\"\"\"..TT",
+  "PPT.u...========================.....'....~~~..\"\"\"\"\".,TP",
+  "TPP.........========m...=========....,.....~~..'....m.TT",
+  "PTT.,''..................==========.....'nn~~.........,.",
+  "PTT...n.,.'.Rm.......L..'..==..============bbb==........",
+  "PTT......m..'....',...,'...===...==========bbb==========",
+  "TTT.............,........s.===m....========bbb==========",
+  "TTP.......,..,\"\"\"\"\"\".,......==........,....~~~'.......==",
+  "TP.........,.'\"\"\"\"\"\"........===.'......,'...~~,.........",
+  "PTTT.......m'.\"\"\"\"\"\"........===m..r...,.....~~.....TT'r.",
+  "TTTT.TTTTTT...\"\"\"\"\"\"......,..===,..u.TT.....~~..''TTTTTP",
+  "TT.'TTTTTTTT,...'.....u.,....===....TTTT..,.~~..,RTTTTTT",
+  "TT.TTTT..TTTT....,....,..'..n===m..TTTTTT...~~...TTTTTTT",
+  "TTTTTT.........,L........'....===..TTTTTT'..~~,..TTTTTTT",
+  "TTTTTT......r......,....n.....===..rTTTT..,.~~...TTTTTTT",
+  "TPPTTTT..TTTT...m...,'n..PTTP.===.'..TT.....~~.,.TTTTTTT",
+  "TPT.TTTTTTTT,....TTTTTT.TT..,..==.....rm.,,.~~...TTTTTTP",
+  "TPT..TTTTTT..,.'TTTTTTTTRu..u,.==.........,.~~..,TTTTTTP",
+  "PTT..,,'.......,TTTTTTTT.susu.m==...........~~~...TTTTTT",
+  "TTT'......,.'...'TTTTTTPu,....XXXXX.,....m.,~~~.'.TTTTPT",
+  "PTTT,.PTTP..TTPPTPu.PTPP....TTXXXXXTTTTTPT..~~~...mTTPTT",
+  "PTTPTTPTTTTPPPTTTTPPTTTTTTTPTTXXXXXTTPTPTTTT~~~TTTTTTPPT",
+  "PPTTTPPTTTTPTTTTPPTPTPTPTPTTTTXXXXXTPTPPTTTPT~~PTPTPPTPT"
+ ],
+ "paint": {
+  "props": [
+   {
+    "s": "arch",
+    "x": 8.5,
+    "y": 4.0
+   },
+   {
+    "s": "tablet",
+    "x": 13.5,
+    "y": 6.3
+   },
+   {
+    "s": "signpost",
+    "x": 22.6,
+    "y": 13.0
+   }
+  ],
+  "lights": [
+   [
+    8,
+    5,
+    1.2
+   ],
+   [
+    20,
+    2,
+    0.9
+   ],
+   [
+    12,
+    25,
+    1
+   ],
+   [
+    36,
+    21,
+    1
+   ],
+   [
+    50,
+    26,
+    0.9
+   ]
+  ],
+  "leaves": 10,
+  "bg": "world/paint/field00_bg.webp"
+ }
 }

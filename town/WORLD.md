@@ -113,6 +113,16 @@ Ys VIII 처럼 마을 문을 나서면 **월드맵 아이콘 이동 없이** 그
 ```
 NPC 머리 위: `!` 줄 수 있는 퀘스트, `…` 진행 중, `?` 완료 보고 가능. 퀘스트를 받으면 자동으로 그 목표로 안내.
 
+### 그린 배경 (`"paint"`, 1지역부터)
+화면은 768×432 버퍼(논리 384×216 의 2배, 타일 1칸 = 32px)에 그리고 sharp-bilinear 로 확대한다. 논리 좌표 · 충돌 · HUD 는 그대로.
+- `"paint": {"bg": "world/paint/<id>_bg.webp", "props": [{"s": "temple_gate", "x": 46.5, "y": 5.05}], "lights": [[x, y, 세기]], "leaves": 16}`
+- 바닥은 `tools/paint_area1.py` 가 타일 격자(충돌 기준)에서 구워 만든다 → 그림 = 충돌. 텍스처 원본은 `assets_src/world/paint/*.jpg`.
+- 나무 · 바위 · 폐허 · 문 · 횃불 같은 키 큰 것은 `assets/world/paint/props.png/json` (`tools/paint_props.py`) 스프라이트로 y 정렬해 그린다. 주인공이 나뭇잎 뒤에 서면 반투명 + 실루엣.
+- 1지역 격자 · 물건은 `tools/area1_layout.py` 가 만든다 (도달성 검사 출력: reach / LATER / UNREACHABLE). 고친 뒤 `python3 tools/area1_layout.py && python3 tools/paint_area1.py`.
+- `barrier` 물건: `{"type": "barrier", "id", "x", "y", "w", "h", "need": "boss01", "sprite": "boulder_cracked"|"bridge_broken", "text", "verb"}` — `SAVE.flags[need]` 가 있을 때 조사(L)하면 열린다 (`SAVE.opened[id]`). 나중에 다시 오는 상자용.
+  `boss01` = 대지의 수정 (1지역 골렘), `boss02` = 수정 실 (2지역 보스, 플래그 이름은 2지역 보스 `boss.flag` 와 맞출 것).
+- 전체 지도 그림: `__world.mapImage('field01').then(c => c.toDataURL())`.
+
 ## 5. 2 – 10 지역 추가하는 법
 
 1. 그림: `#FF00FF` 배경 16비트 3/4 시점 시트를 `assets_src/world/` 에 넣고 `tools/world_assets.py` 에 자르기 규칙 추가 → `python3 tools/world_assets.py` (타일 16×16, 주인공 ≈ 16×27, 나무 2 – 3 주인공 키, 문 ≈ 1.5).

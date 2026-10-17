@@ -54,7 +54,10 @@
   const cv = document.createElement('canvas'); cv.id = 'wc';
   cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:40;display:none;image-rendering:pixelated;background:transparent';
   const ctx = cv.getContext('2d');
-  const low = document.createElement('canvas'); low.width = LW; low.height = LH; const lx = low.getContext('2d');
+  // [paint] the world is drawn into a 768x432 buffer (RS = 2 x the 384x216 logical grid; 1 tile = 32 buffer px): painted backgrounds + props at
+  // native buffer resolution, old 16px-grid sprites at 2x. Logic, collision and HUD stay in logical px. Shown with sharp-bilinear scaling.
+  const RS = 2;
+  const low = document.createElement('canvas'); low.width = LW * RS; low.height = LH * RS; const lx = low.getContext('2d');
   const gateHint = document.createElement('div');
   gateHint.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:35;padding:3px 12px;background:rgba(12,18,44,.7);color:#ffe08a;font:bold 13px sans-serif;border:2px solid #e2c27a;border-radius:3px;pointer-events:none;display:none';
   gateHint.textContent = '▼ 마을 밖으로 (바람길)';
@@ -77,7 +80,7 @@
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
   const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = src; });
   const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
-  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => (MAPS[id] = buildMap(j))); }
+  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => { const m = MAPS[id] = buildMap(j); if (j.paint) m.paintReady = paintLoad(m); return m; }); }
   const ready = getJSON('assets/world/world_atlas.json').then(a => { ATLAS = a;
     return Promise.all([loadImg('field', 'assets/' + a.sheets.field.src), loadImg('dungeon', 'assets/' + a.sheets.dungeon.src), loadImg('spr', 'assets/' + a.sprites.src),
       getJSON('maps/tilesets.json').then(t => TILESETS = t)]); }).then(() => loadMap('world'));
@@ -97,7 +100,7 @@
   function drawSpr(g, name, x, y, o = {}) { // (x,y) = bottom-centre (feet)
     const r = ATLAS.sprites.rects[name]; if (!r) return;
     const s = o.scale || 1, w = r[2] * s, h = r[3] * s * (o.sy || 1);
-    g.save(); g.globalAlpha = o.alpha ?? 1; g.translate(Math.round(x), Math.round(y));
+    g.save(); g.globalAlpha = (o.alpha ?? 1) * SPR_A; g.translate(Math.round(x * RS) / RS, Math.round(y * RS) / RS);
     if (o.rot) g.rotate(o.rot);
     if (o.flip) g.scale(-1, 1);
     const src = o.mode ? sprCanvas(name, o.mode) : null;
@@ -124,6 +127,7 @@
     }
     for (const o of (j.objects || [])) if (!['spawn', 'champion'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc'].includes(o.type)) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    if (j.paint) paintPrep(m);
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -192,6 +196,149 @@
     if (cell.g === 'hill') { g.fillStyle = 'rgba(30,40,10,.45)'; g.beginPath(); g.ellipse(px + T / 2, py + T * .7, T * .45, T * .28, 0, Math.PI, 0); g.fill();
       g.fillStyle = 'rgba(200,220,120,.25)'; g.fillRect(px + T * .3, py + T * .45, T * .25, 1); }
   }
+
+  // ---------------- [paint] area-1 painted backgrounds (maps with "paint": {bg, props, lights, leaves}) ----------------
+  // bg = baked ground at 32 px/tile (tools/paint_area1.py, generated from the tile grid -> art == collision).
+  // Tall things are y-sorted sprites from assets/world/paint/props.png (tools/paint_props.py): trees (canopy fades when the hero is behind),
+  // rocks, ruins, temple gate, doors, torches. Extra visual-only props: paint.props [{s, x, y}] (tile units, y = base line).
+  // barrier objects {id, x, y, w, h, need, sprite, text, verb}: solid until SAVE.flags[need] and the player uses it (return-later chests).
+  let PROPS = null, propsP = null, SPR_A = 1;
+  const PSPR = { tree: 'oak', pine: 'pine', boulder: 'boulder', rocks: 'rocks', bush: 'bush', stump: 'stump', fence: 'fence', pillar_broken: 'pillar_broken', ruin_wall: 'ruin_wall',
+    log: 'log', rubble: 'rubble', crystal: 'crystal', pillar: 'pillar_d' };
+  const PBAKED = new Set(['mushrooms', 'fern']);
+  const phash = (x, y, s = 0) => (((x * 73856093) ^ (y * 19349663) ^ (s * 83492791)) >>> 0);
+  function paintLoad(m) {
+    if (!propsP) propsP = Promise.all([getJSON('assets/world/paint/props.json'), loadImg('props', 'assets/world/paint/props.png')]).then(([j]) => { PROPS = j.rects; });
+    return Promise.all([propsP, new Promise((res, rej) => { const i = new Image(); i.onload = () => { m.bgImg = i; res(); }; i.onerror = () => rej(new Error('load ' + m.paint.bg)); i.src = 'assets/' + m.paint.bg; })]);
+  }
+  function paintPrep(m) {
+    const T = m.T, sol = (x, y) => x < 0 || y < 0 || x >= m.w || y >= m.h || m.solidG[y * m.w + x];
+    for (const d of m.decos) {
+      if (PBAKED.has(d.spr)) { d.hide = true; continue; }
+      const h = phash(d.tx, d.ty, 1); d.pflip = (h & 1) === 1; d.jx = ((h >> 3) % 7 - 3) * .7; d.jy = ((h >> 6) % 5 - 2) * .5;
+      d.pspr = PSPR[d.spr] || d.spr;
+      if (d.spr === 'tree') d.pspr = (h >> 9) % 2 ? 'oak_a' : 'oak_b';
+      if (d.spr === 'bush' && (h >> 9) % 3 === 0) d.pspr = 'bush_flower';
+      d.psc = (d.spr === 'tree' || d.spr === 'pine') ? .8 + ((h >> 12) % 19) / 100 : 1;
+      if (d.spr === 'tree' || d.spr === 'pine') { let deep = true;   // interior of a wood: draw 1 in 3 (canopies overlap anyway, collision is unchanged)
+        for (let y = d.ty - 3; y <= d.ty + 1 && deep; y++) for (let x = d.tx - 2; x <= d.tx + 2; x++) if (!sol(x, y)) { deep = false; break; }
+        d.hide = deep && (h >> 15) % 3 !== 0; d.tree = true; }
+      if (!d.solid && d.spr === 'tree') d.odd = true;            // walk-through secret tree
+    }
+    m.waterCells = []; for (let i = 0; i < m.cells.length; i++) if (m.cells[i].g === 'water') m.waterCells.push(i);
+    m.pprops = (m.paint.props || []).map(p => ({ s: p.s, x: p.x * T, y: p.y * T, flip: !!p.flip }));
+  }
+  function setBarrier(m, o) { for (let y = o.ty; y < o.ty + (o.h || 1); y++) for (let x = o.tx; x < o.tx + (o.w || 1); x++) m.solidG[y * m.w + x] = o.open ? 0 : 1; }
+  function barrierBump(m, o) { const T = m.T, x0 = o.tx * T - 8, x1 = (o.tx + (o.w || 1)) * T + 8, y0 = o.ty * T - 8, y1 = (o.ty + (o.h || 1)) * T + 12; return hero.x > x0 && hero.x < x1 && hero.y > y0 && hero.y < y1; }
+  function useBarrier(m, o) {
+    if (!SAVE.flags[o.need]) { sfx('locked'); S.dialog = { text: o.text }; return; }
+    o.open = true; SAVE.opened[o.id] = true; save(); setBarrier(m, o); sfx('door'); shake(3); banner(o.verb || '길이 열렸다!', 2);
+    const cx = (o.tx + (o.w || 1) / 2) * m.T, cy = (o.ty + (o.h || 1) / 2) * m.T; for (let i = 0; i < 3; i++) addFx('debris', cx + (i - 1) * 6, cy, { life: .7 }); addFx('crystal', cx, cy + 4, { life: .6 });
+  }
+  function blitBg(g, img, sx, sy, BW, BH) { // copy the visible window of a large bg (handles maps smaller than the screen)
+    let x0 = Math.max(0, Math.floor(sx)), y0 = Math.max(0, Math.floor(sy)); const x1 = Math.min(img.width, Math.floor(sx) + BW), y1 = Math.min(img.height, Math.floor(sy) + BH);
+    if (x1 > x0 && y1 > y0) g.drawImage(img, x0, y0, x1 - x0, y1 - y0, x0 - Math.floor(sx), y0 - Math.floor(sy), x1 - x0, y1 - y0);
+  }
+  let _upC = null;
+  function blitLow(x, y, w, h) { // sharp-bilinear: nearest to the next integer multiple, then one smooth resample (even pixels at 1.5x / 2.5x)
+    const s = w / low.width;
+    if (Math.abs(s - Math.round(s)) < 1e-3 || s < 1) { ctx.imageSmoothingEnabled = s < 1; ctx.drawImage(low, x, y, w, h); return; }
+    const n = Math.ceil(s); if (!_upC || _upC.width !== low.width * n) { _upC = document.createElement('canvas'); _upC.width = low.width * n; _upC.height = low.height * n; }
+    const u = _upC.getContext('2d'); u.imageSmoothingEnabled = false; u.drawImage(low, 0, 0, _upC.width, _upC.height);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium'; ctx.drawImage(_upC, x, y, w, h);
+  }
+  function drawP(g, name, x, y, o = {}) { // painted prop, (x, y) = base point in logical px
+    const r = PROPS && PROPS[name]; if (!r) return; const sc = (o.scale || 1) / RS, w = r[2] * sc, h = r[3] * sc;
+    g.save(); g.globalAlpha = o.alpha ?? 1; g.translate(Math.round(x * RS) / RS, Math.round(y * RS) / RS); if (o.flip) g.scale(-1, 1);
+    if (o.scale && o.scale !== 1) g.imageSmoothingEnabled = true;
+    g.drawImage(IMG.props, r[0], r[1], r[2], r[3], -r[4] * sc, -r[5] * sc, w, h); g.restore();
+  }
+  let _shadowC = null;
+  function shadow(g, x, y, rx, ry, a = .35) { if (!_shadowC) { _shadowC = document.createElement('canvas'); _shadowC.width = 64; _shadowC.height = 32; const s = _shadowC.getContext('2d'); const gr = s.createRadialGradient(32, 16, 2, 32, 16, 32); gr.addColorStop(0, 'rgba(10,20,10,1)'); gr.addColorStop(1, 'rgba(10,20,10,0)'); s.setTransform(1, 0, 0, .5, 0, 8); s.fillStyle = gr; s.fillRect(0, -16, 64, 64); }
+    g.globalAlpha = a; g.drawImage(_shadowC, x - rx, y - ry, rx * 2, ry * 2); g.globalAlpha = 1; }
+  function paintDeco(g, d) {
+    if (d.tree) { const r = PROPS[d.pspr]; if (!r) return; const w = r[2] / RS * d.psc, hh = r[3] / RS * d.psc, x = d.x + d.jx, y = d.y + d.jy;
+      let a = 1; if (hero.y < y - 1 && hero.y > y - hh * .95 && Math.abs(hero.x - x) < w * .42) { a = .5; S.occl = true; }   // hero behind the canopy -> see-through + ghost
+      if (d.odd) a = Math.min(a, Math.abs(hero.x - x) < 14 && Math.abs(hero.y - y) < 16 ? .45 : .92);
+      drawP(g, d.pspr, x, y + 2, { scale: d.psc, flip: d.pflip, alpha: a }); return; }
+    drawP(g, d.pspr, d.x + d.jx * .5, d.y + 1, { flip: d.pflip && d.spr !== 'fence' && d.spr !== 'ruin_wall' });
+  }
+  function paintProps(g, m, cx, cy, list) { for (const p of m.pprops) { const r = PROPS[p.s]; if (!r) continue; if (p.x + r[2] / RS < cx || p.x - r[2] / RS > cx + LW || p.y < cy - 10 || p.y - r[3] / RS > cy + LH) continue;
+      list.push({ y: p.y, f: () => drawP(g, p.s, p.x, p.y, { flip: p.flip }) }); } }
+  function paintGround(g, m, cx, cy) {
+    const T = m.T, x0 = Math.floor(cx / T) - 1, x1 = x0 + Math.ceil(LW / T) + 3, y0 = Math.floor(cy / T) - 1, y1 = y0 + Math.ceil(LH / T) + 3;
+    for (const d of m.decos) if (d.tree && !d.broken && d.x > cx - 50 && d.x < cx + LW + 50 && d.y > cy - 10 && d.y < cy + LH + 30) shadow(g, d.x + d.jx + 5, d.y + 1, 18 * d.psc, 6 * d.psc, d.hide ? .18 : .32);
+    else if (!d.hide && !d.broken && d.solid && d.x > cx - 20 && d.x < cx + LW + 20 && d.y > cy - 10 && d.y < cy + LH + 20) shadow(g, d.x + 2, d.y, 11, 4, .3);
+    for (const i of m.waterCells) { const tx = i % m.w, ty = (i / m.w) | 0; if (tx < x0 || tx > x1 || ty < y0 || ty > y1) continue;
+      const h = phash(tx, ty, 9), p = Math.sin(S.t * (1.3 + (h % 7) * .2) + (h % 628) / 100); if (p < .86) continue;
+      const a = (p - .86) * 6, x = tx * T + (h >> 4) % 13 + 2, y = ty * T + (h >> 8) % 11 + 3; g.fillStyle = `rgba(235,255,255,${a})`; g.fillRect(x - 1.5, y, 3, .5); g.fillRect(x, y - 1, .5, 2.5); }
+  }
+  // tall grass in front of the feet of whoever stands in it
+  let _grassC = null;
+  function grassFront(g, m, x, y) { const c = m.cells[Math.floor(y / m.T) * m.w + Math.floor(x / m.T)]; if (!c || c.g !== 'tallgrass') return;
+    if (!_grassC) { _grassC = document.createElement('canvas'); _grassC.width = 44; _grassC.height = 18; const q = _grassC.getContext('2d');
+      for (let i = 0; i < 26; i++) { const bx = 2 + (i * 37 % 40), L = 8 + (i * 13 % 9), lean = ((i * 7) % 7 - 3); q.strokeStyle = i % 3 ? '#2f6a26' : '#4f9a3a'; q.lineWidth = 2; q.beginPath(); q.moveTo(bx, 18); q.lineTo(bx + lean, 18 - L); q.stroke();
+        q.strokeStyle = '#9bd36a'; q.lineWidth = 1; q.beginPath(); q.moveTo(bx + lean * .6, 18 - L * .6); q.lineTo(bx + lean, 18 - L); q.stroke(); } }
+    g.drawImage(_grassC, x - 11, y - 7.5, 22, 9); }
+  function paintAir(g, m, cx, cy) {
+    const L = m.paint.lights || [], T = m.T;
+    if (L.length) { g.save(); g.globalCompositeOperation = 'lighter';
+      for (const [tx, ty, k = 1] of L) { const x = (tx + .5) * T, y = (ty + .5) * T; if (x < cx - 140 || x > cx + LW + 100 || y < cy - 10 || y > cy + LH + 170) continue;
+        const sway = Math.sin(S.t * .35 + tx) * 5, br = .75 + .25 * Math.sin(S.t * .6 + ty);
+        for (let i = 0; i < 3; i++) { const ox = (i - 1) * 13 + sway, w0 = 5 + i * 2.5, top = y - 170, tilt = 70;
+          const gr = g.createLinearGradient(x + ox + tilt, top, x + ox, y); gr.addColorStop(0, 'rgba(255,244,200,0)'); gr.addColorStop(.55, `rgba(255,238,175,${.05 * k * br})`); gr.addColorStop(1, `rgba(255,238,175,${.11 * k * br})`);
+          g.fillStyle = gr; g.beginPath(); g.moveTo(x + ox + tilt - w0, top); g.lineTo(x + ox + tilt + w0, top); g.lineTo(x + ox + w0 * 1.8, y); g.lineTo(x + ox - w0 * 1.8, y); g.fill(); }
+        const pool = g.createRadialGradient(x, y, 2, x, y, 30); pool.addColorStop(0, `rgba(255,240,185,${.14 * k * br})`); pool.addColorStop(1, 'rgba(255,240,185,0)'); g.fillStyle = pool; g.beginPath(); g.ellipse(x, y, 32, 15, 0, 0, TAU); g.fill(); }
+      g.restore(); }
+    const n = m.paint.leaves || 0; if (!n) return; S.leaves = S.leaves || [];
+    while (S.leaves.length < n) S.leaves.push({ x: cx + Math.random() * (LW + 80) - 40, y: cy - 10 - Math.random() * LH, vx: 6 + Math.random() * 8, vy: 12 + Math.random() * 10, ph: Math.random() * 6, c: Math.random() < .5 ? '#d9a441' : '#8dbb4a' });
+    for (const f of S.leaves) { f.x += (f.vx + Math.sin(S.t * 2 + f.ph) * 10) / 60; f.y += f.vy / 60; if (f.y > cy + LH + 10 || f.x > cx + LW + 50 || f.x < cx - 60) { f.x = cx + Math.random() * (LW + 80) - 60; f.y = cy - 10; }
+      g.save(); g.translate(f.x, f.y); g.rotate(S.t * 3 + f.ph); g.fillStyle = f.c; g.fillRect(-1.5, -.75, 3, 1.5); g.restore(); }
+  }
+  function drawBarrier(g, m, o) { const T = m.T, cx = (o.tx + (o.w || 1) / 2) * T, by = (o.ty + (o.h || 1)) * T;
+    if (o.sprite === 'bridge_broken') { const X = o.tx * T, Y = o.ty * T, Wd = (o.w || 1) * T, Hd = (o.h || 1) * T;
+      const plank = (x, w, broken) => { for (let px = x; px < x + w; px += 4.5) { if (broken && ((px * 7) | 0) % 3 === 0) continue; const c = 110 + ((px * 13) | 0) % 30; g.fillStyle = `rgb(${c},${c * .68 | 0},${c * .4 | 0})`; g.fillRect(px, Y + 2, 3.6, Hd - 4); } };
+      if (o.open) { plank(X - 2, Wd + 4, false); g.fillStyle = '#5c3a1c'; g.fillRect(X - 3, Y + 1, Wd + 6, 2.5); g.fillRect(X - 3, Y + Hd - 3.5, Wd + 6, 2.5);
+        g.strokeStyle = `rgba(150,255,210,${.7 + .2 * Math.sin(S.t * 3)})`; g.lineWidth = 1; g.beginPath(); g.moveTo(X - 3, Y - 2); g.lineTo(X + Wd + 3, Y - 2); g.moveTo(X - 3, Y + Hd - 6); g.lineTo(X + Wd + 3, Y + Hd - 6); g.stroke(); }
+      else { plank(X - 2, 10, false); plank(X + Wd - 8, 10, false); g.fillStyle = '#5c3a1c'; g.fillRect(X - 3, Y + 1, 12, 2); g.fillRect(X + Wd - 9, Y + Hd - 3, 12, 2);
+        g.strokeStyle = '#b89a64'; g.lineWidth = .8; g.beginPath(); g.moveTo(X + 9, Y + 1); g.quadraticCurveTo(X + 13, Y + 10 + Math.sin(S.t * 1.5) * 1.5, X + 11, Y + 16); g.moveTo(X + Wd - 9, Y + Hd - 3); g.quadraticCurveTo(X + Wd - 14, Y + Hd + 4, X + Wd - 12, Y + Hd + 9); g.stroke();
+        for (const px of [X - 2, X + Wd - 1]) { g.fillStyle = '#4e321a'; g.fillRect(px - 1.5, Y - 6, 3, Hd + 3); g.fillStyle = '#8c6038'; g.fillRect(px - 1.5, Y - 6, 3, 1.5); } }
+      return; }
+    if (o.open) { drawP(g, 'rubble', cx, by - 2, { scale: .6, alpha: .9 }); return; }
+    drawP(g, o.sprite || 'boulder_cracked', cx, by);
+    if (SAVE.flags[o.need]) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,190,90,${.18 + .14 * Math.sin(S.t * 5)})`; g.beginPath(); g.ellipse(cx, by - 12, 18, 14, 0, 0, TAU); g.fill(); g.restore(); }
+  }
+  // dungeon pieces in the painted style (pits / spike beds / stairs are baked into the bg)
+  function paintObjTile(g, m, o) {
+    if (o.type === 'spikes') { const up = spikeUp(o), wn = spikeWarn(o); if (!up && !wn) return; const X = o.tx * m.T, Y = o.ty * m.T;
+      g.globalAlpha = up ? 1 : .35 + .25 * Math.sin(S.t * 30); for (let i = 0; i < 3; i++) for (let k = 0; k < 3; k++) { const x = X + 3.5 + i * 4, y = Y + 4.5 + k * 4;
+        g.fillStyle = '#c9ccd4'; g.beginPath(); g.moveTo(x - 1.6, y + 1.5); g.lineTo(x, y - (up ? 4 : 1.5)); g.lineTo(x + 1.6, y + 1.5); g.fill(); g.fillStyle = '#6d7180'; g.fillRect(x, y - 1, 1, 2.5); } g.globalAlpha = 1; }
+    if (o.type === 'lever') { g.fillStyle = '#2c2c34'; g.fillRect(o.x - 5, o.y + 2, 10, 4); g.fillStyle = '#4a4a56'; g.fillRect(o.x - 5, o.y + 2, 10, 1); g.strokeStyle = '#c8a860'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(o.x, o.y + 3); g.lineTo(o.x + (o.on ? 6 : -6), o.y - 6); g.stroke(); g.fillStyle = o.on ? '#6f6' : '#f55'; g.beginPath(); g.arc(o.x + (o.on ? 6 : -6), o.y - 7, 1.8, 0, TAU); g.fill(); }
+    if (o.type === 'key' && !SAVE.keys[o.keyId]) { const b = Math.sin(S.t * 4) * 1; g.fillStyle = '#f0c040'; g.beginPath(); g.arc(o.x - 3, o.y - 2 + b, 2.4, 0, TAU); g.fill(); g.fillRect(o.x - 1, o.y - 2.6 + b, 6, 1.3); g.fillRect(o.x + 3, o.y - 2 + b, 1.2, 2.4); g.fillStyle = '#2a2010'; g.beginPath(); g.arc(o.x - 3, o.y - 2 + b, .9, 0, TAU); g.fill();
+      if (Math.sin(S.t * 5) > .6) { g.fillStyle = '#fff8c0'; g.fillRect(o.x + 3, o.y - 6, 1.5, 1.5); } }
+  }
+  function paintDoor(g, o) { const base = o.ty * M().T + M().T;
+    if (o.type === 'door_locked') drawP(g, o.open ? 'doorway' : 'door', o.x, base);
+    if (o.type === 'gate') drawP(g, o.open ? 'doorway' : 'portcullis', o.x, base);
+    if (o.type === 'boss_door') { const ok = ['champ_boar', 'champ_wasp'].every(f => SAVE.flags[f]); drawP(g, ok ? 'doorway' : 'door_sealed', o.x, base);
+      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = ok ? `rgba(120,255,160,${.25 + .1 * Math.sin(S.t * 3)})` : `rgba(255,60,60,${.18 + .12 * Math.sin(S.t * 3)})`; g.beginPath(); g.ellipse(o.x, base - 14, 14, 16, 0, 0, TAU); g.fill(); g.restore(); } }
+  function paintTorch(g, o) { const x = o.x, y = o.y + 8; drawP(g, 'sconce', x, y);
+    const f = Math.sin(S.t * 13 + o.x), f2 = Math.sin(S.t * 19 + o.y); g.save(); g.globalCompositeOperation = 'lighter';
+    g.fillStyle = 'rgba(255,120,30,.75)'; g.beginPath(); g.ellipse(x, y - 13.5, 3.2 + f * .4, 5 + f2 * .8, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,220,120,.9)'; g.beginPath(); g.ellipse(x + f * .4, y - 13, 1.6, 3 + f * .5, 0, 0, TAU); g.fill(); g.restore(); }
+  // debug / docs: whole map (bg + props, no actors) as a canvas  ->  __world.mapImage(id).then(c => c.toDataURL())
+  function mapImage(id) { return loadMap(id).then(m => (m.paintReady || Promise.resolve()).then(() => {
+    const c = document.createElement('canvas'); c.width = m.pw * RS; c.height = m.ph * RS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    if (m.bgImg) g.drawImage(m.bgImg, 0, 0); g.setTransform(RS, 0, 0, RS, 0, 0);
+    const keep = S.map; S.map = m; const list = [];
+    for (const d of m.decos) if (!d.broken && !d.hide) list.push({ y: d.y, f: () => m.bgImg ? paintDeco(g, d) : drawSpr(g, d.spr, d.x, d.y + 1) });
+    if (m.bgImg) m.pprops.forEach(p => list.push({ y: p.y, f: () => drawP(g, p.s, p.x, p.y, { flip: p.flip }) }));
+    for (const o of m.objs) { if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, 'chest', o.x, o.y + 7) });
+      if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawP(g, 'signpost', o.x, o.y + 8) }); if (o.type === 'waystone') list.push({ y: o.y + 6, f: () => drawWaystone(g, o) });
+      if (o.type === 'npc') list.push({ y: o.y + 6, f: () => drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7) }); if (o.type === 'heal') list.push({ y: o.y + 6, f: () => drawBench(g, o) });
+      if (o.type === 'barrier') list.push({ y: (o.ty + (o.h || 1)) * m.T - 1, f: () => drawBarrier(g, m, o) });
+      if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') list.push({ y: o.y + 7, f: () => paintDoor(g, o) }); if (o.type === 'torch') list.push({ y: o.y - 20, f: () => paintTorch(g, o) }); }
+    list.sort((a, b) => a.y - b.y).forEach(o => o.f()); S.map = keep; return c; })); }
 
   // ---------------- runtime state ----------------
   const S = { scene: 'town', map: null, mobs: [], hazards: [], shots: [], fx: [], timers: [], temp: [], banner: null, dialog: null, msg: null, ult: null,
@@ -340,7 +487,7 @@
   function enterScene(to, spawnName) {
     S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
-    return loadMap(to).then(m => {
+    return loadMap(to).then(m => (m.paintReady || Promise.resolve()).then(() => m)).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
       if (!m.groundC) m.groundC = renderGround(m);
       let sp = m.spawns && m.spawns[spawnName];
@@ -356,7 +503,9 @@
       if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
-        if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
+        if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1;
+        if (o.type === 'barrier') { o.open = !!SAVE.opened[o.id]; setBarrier(m, o); } }
+      S.leaves = [];
       updateGate(m, true);
       snapCam();
       if (NAV()) NAV().onEnter(m);
@@ -486,6 +635,7 @@
       const bump = Math.abs(hero.x - o.x) < 10 && hero.y > o.y && hero.y - o.y < m.T * 1.05 && isHeld('up');
       if (o.type === 'boss_door' && bump) bossDoor(o);
       if (o.type === 'door_locked' && !o.open && bump) tryDoor(o);
+      if (o.type === 'barrier' && !o.open && !S.msg && hero.moving && barrierBump(m, o)) msg(o.text.split('\n')[0] + '  [' + keyHint('interact') + '] 조사', 2.4);
     }
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
     if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
@@ -534,6 +684,7 @@
     const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; sfx('potion'); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
+    for (const o of m.objs) if (o.type === 'barrier' && !o.open && fx >= o.tx && fx < o.tx + (o.w || 1) && fy >= o.ty && fy < o.ty + (o.h || 1)) { useBarrier(m, o); return; }
     for (const o of m.objs) {
       if (!((o.tx === fx && o.ty === fy) || Math.hypot(o.x - hero.x, o.y - hero.y) < 15)) continue;
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
@@ -581,7 +732,7 @@
     const showWorld = S.scene !== 'town' && S.map && !(tr && (tr.phase === 'load' || (tr.phase === 'out' && tr.fromTown)));
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
-      drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
+      drawLow(); blitLow(ox, oy, LW * k, LH * k);
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -590,47 +741,62 @@
     }
   }
   function drawLow() {
-    const g = lx, m = M();
-    let cx = Math.round(S.cam[0]), cy = Math.round(S.cam[1]);
+    const g = lx, m = M(), BW = LW * RS, BH = LH * RS;
+    let cx = Math.round(S.cam[0] * RS) / RS, cy = Math.round(S.cam[1] * RS) / RS;
     if (S.shake > 0) { cx += Math.round((Math.random() - .5) * S.shake * 2); cy += Math.round((Math.random() - .5) * S.shake * 2); }
     S.camI = [cx, cy];
-    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; g.fillRect(0, 0, LW, LH);
-    g.drawImage(m.groundC, -cx, -cy);
-    g.translate(-cx, -cy);
+    const world = () => g.setTransform(RS, 0, 0, RS, -cx * RS, -cy * RS);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; g.fillRect(0, 0, BW, BH);
+    if (m.bgImg) blitBg(g, m.bgImg, cx * RS, cy * RS, BW, BH);
+    else { g.setTransform(RS, 0, 0, RS, 0, 0); g.drawImage(m.groundC, -cx, -cy); }
+    world();
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
-    for (const o of m.objs) drawObjTile(g, m, o);
+    const P = !!m.bgImg;
+    for (const o of m.objs) P ? paintObjTile(g, m, o) : drawObjTile(g, m, o);
+    if (P) paintGround(g, m, cx, cy);                         // water glints, barrier bases, contact shadows
     if (NAV()) NAV().drawGround(g, cx, cy);                  // guide route breadcrumbs
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => drawSpr(g, d.spr, d.x, d.y + 1) });
+    for (const d of m.decos) if (!d.broken && !d.hide && d.x > cx - 60 && d.x < cx + LW + 60 && d.y > cy - 10 && d.y < cy + LH + 100) list.push({ y: d.y, f: P ? () => paintDeco(g, d) : () => drawSpr(g, d.spr, d.x, d.y + 1) });
+    if (P) paintProps(g, m, cx, cy, list);
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
-      if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
+      if (o.type === 'sign') list.push({ y: o.y + 6, f: () => P ? drawP(g, 'signpost', o.x, o.y + 8) : drawSpr(g, 'sign', o.x, o.y + 8) });
       if (o.type === 'heal') list.push({ y: o.y + 6, f: () => drawBench(g, o) });
       if (o.type === 'door_deco') list.push({ y: o.y - 8, f: () => drawSpr(g, o.sprite, o.x, o.y + 8) });
       if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.sin(S.t * 3 + o.x) > .8) list.push({ y: o.y, f: () => { g.fillStyle = '#fff8c0'; g.fillRect(o.x - 1, o.y - 7, 2, 3); g.fillRect(o.x - 3, o.y - 6, 6, 1); } });
       if (o.type === 'warp') list.push({ y: o.y, f: () => drawWarp(g, o) });
       if (o.type === 'npc') list.push({ y: o.y + 6, f: () => drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7) });
       if (o.type === 'waystone') list.push({ y: o.y + 6, f: () => drawWaystone(g, o) });
+      if (o.type === 'barrier') list.push({ y: (o.ty + (o.h || 1)) * m.T - 1, f: () => drawBarrier(g, m, o) });
+      if (P && (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door')) list.push({ y: o.y + 7, f: () => paintDoor(g, o) });
+      if (P && o.type === 'torch') list.push({ y: o.y - 20, f: () => paintTorch(g, o) });
     }
     for (const t of S.temp) list.push({ y: t.y + 3, f: () => drawSpr(g, 'crystal', t.x, t.y + 5, { alpha: Math.min(1, t.life * 3) }) });
-    for (const mm of S.mobs) if (!mm.dead) list.push({ y: mm.y + (mm.D.hover ? 8 : 0), f: () => drawMob(g, mm) });
-    list.push({ y: hero.y, f: () => drawHeroSprite(g, 1) });
+    for (const mm of S.mobs) if (!mm.dead) list.push({ y: mm.y + (mm.D.hover ? 8 : 0), f: () => { drawMob(g, mm); if (P && !mm.D.hover && !mm.fly) grassFront(g, m, mm.x, mm.y); } });
+    list.push({ y: hero.y, f: () => { drawHeroSprite(g, 1); if (P) grassFront(g, m, hero.x, hero.y); } });
     for (const f of S.fx) if (f.type === 'heart') list.push({ y: f.y, f: () => drawHeartPick(g, f) });
-    list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+    S.occl = false; list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+    if (S.occl) { SPR_A = .4; g.globalAlpha = .4; drawHeroSprite(g, 1); SPR_A = 1; g.globalAlpha = 1; }   // hero silhouette through overlapping canopies
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
+    if (P) paintAir(g, m, cx, cy);                            // light shafts + drifting leaves (fields)
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, LW, LH);
-      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW, LH); d.globalCompositeOperation = 'destination-out';
+      d.fillStyle = P ? `rgba(3,5,12,${m.dark})` : `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW, LH); d.globalCompositeOperation = 'destination-out';
       const light = (x, y, r) => { const gr = d.createRadialGradient(x - cx, y - cy, 0, x - cx, y - cy, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.6, 'rgba(0,0,0,.7)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - cx - r, y - cy - r, r * 2, r * 2); };
       light(hero.x, hero.y - 10, 100);
-      for (const o of m.objs) if (o.type === 'torch') light(o.x, o.y + 8, 50 + Math.sin(S.t * 9 + o.x) * 3);
+      for (const o of m.objs) if (o.type === 'torch') light(o.x, o.y + 8, (P ? 64 : 50) + Math.sin(S.t * 9 + o.x) * 3);
       for (const dd of m.decos) if (dd.spr === 'crystal') light(dd.x, dd.y - 6, 26);
       for (const mm of S.mobs) if (mm.D.boss) light(mm.x, mm.y - 30, 70);
-      g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(D, 0, 0); g.translate(-cx, -cy);
-      g.globalCompositeOperation = 'lighter'; for (const o of m.objs) if (o.type === 'torch') { g.fillStyle = `rgba(255,140,40,${.12 + Math.sin(S.t * 11 + o.x) * .03})`; g.beginPath(); g.arc(o.x, o.y + 6, 15, 0, TAU); g.fill(); } g.globalCompositeOperation = 'source-over'; }
+      g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(D, 0, 0, BW, BH); g.imageSmoothingEnabled = false; world();
+      g.globalCompositeOperation = 'lighter';
+      for (const o of m.objs) if (o.type === 'torch') { const fl = Math.sin(S.t * 11 + o.x) * .03 + Math.sin(S.t * 23 + o.y) * .02;
+        if (P) { const gr = g.createRadialGradient(o.x, o.y + 4, 1, o.x, o.y + 4, 34); gr.addColorStop(0, `rgba(255,150,50,${.30 + fl})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(o.x, o.y + 8, 36, 30, 0, 0, TAU); g.fill(); }
+        else { g.fillStyle = `rgba(255,140,40,${.12 + fl})`; g.beginPath(); g.arc(o.x, o.y + 6, 15, 0, TAU); g.fill(); } }
+      if (P) for (const dd of m.decos) if (dd.spr === 'crystal') { const gr = g.createRadialGradient(dd.x, dd.y - 8, 1, dd.x, dd.y - 8, 22); gr.addColorStop(0, `rgba(90,255,160,${.22 + .06 * Math.sin(S.t * 3 + dd.x)})`); gr.addColorStop(1, 'rgba(90,255,160,0)'); g.fillStyle = gr; g.fillRect(dd.x - 22, dd.y - 30, 44, 44); }
+      g.globalCompositeOperation = 'source-over'; }
     if (S.ult) drawUlt(g, S.ult);
     g.setTransform(1, 0, 0, 1, 0, 0);
   }
@@ -915,7 +1081,7 @@
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
     hurt, spawn, render, tile: () => [Math.floor(hero.x / S.map.T), Math.floor(hero.y / S.map.T)],
     setHeroTile(x, y, face) { hero.x = (x + .5) * S.map.T; hero.y = (y + .5) * S.map.T; if (face) hero.face = face; snapCam(); },
-    castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
+    castUlt, mapImage, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
   };
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
 })();
