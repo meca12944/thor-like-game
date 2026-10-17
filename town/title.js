@@ -24,6 +24,7 @@
 #ttl .logo{font:900 clamp(40px,8vw,92px)/1.1 serif;letter-spacing:.12em;color:#f3e2b8;
  text-shadow:0 0 18px #b8862b88,0 3px 0 #5a3b12,0 6px 18px #000;animation:ttlGlow 3.2s ease-in-out infinite alternate}
 #ttl .sub{margin-top:10px;font:600 14px sans-serif;letter-spacing:.35em;color:#9a8c70}
+#ttl .snd{margin-top:10px;font:600 13px sans-serif;color:#e8d6b0;opacity:.85}
 #ttl .press{margin-top:64px;font:700 18px sans-serif;letter-spacing:.2em;color:#ffe08a;animation:ttlBlink 1.1s steps(2,start) infinite}
 #ttl ul{list-style:none;margin:56px 0 0;padding:0;min-width:240px;text-align:center}
 #ttl li{font:700 20px sans-serif;padding:7px 18px;margin:4px 0;color:#bfb08f;border:2px solid transparent;border-radius:4px}
@@ -34,7 +35,7 @@
 @keyframes ttlGlow{from{text-shadow:0 0 10px #b8862b55,0 3px 0 #5a3b12,0 6px 18px #000}to{text-shadow:0 0 26px #e0a83caa,0 3px 0 #5a3b12,0 6px 18px #000}}
 @keyframes ttlBlink{to{visibility:hidden}}`;
   const el = document.createElement('div'); el.id = 'ttl';
-  el.innerHTML = '<div class="logo">제목 미정</div><div class="sub">TITLE NOT CHOSEN YET</div><div class="press">PRESS ANY KEY</div>' +
+  el.innerHTML = '<div class="logo">제목 미정</div><div class="sub">TITLE NOT CHOSEN YET</div><div class="press">PRESS ANY KEY</div><div class="snd">아무 키나 눌러 시작 (음악 켜짐)</div>' +
     '<ul hidden></ul><div class="set" hidden></div><div class="foot">↑↓ 선택 · Enter 결정 · Esc 뒤로</div>';
   const mount = () => { document.head.appendChild(css); document.body.appendChild(el); };
   document.body ? mount() : addEventListener('DOMContentLoaded', mount);
@@ -93,5 +94,11 @@
     if (TS.stage === 'press') { toMenu(); return; }
     const li = e.target.closest('li'); if (li) { TS.sel = +li.dataset.i; choose(TS.sel); }
   });
+  // [bgm] audio-lock hint: shown while the browser still blocks audio (no activating key/click yet); hidden once music can play
+  const snd = el.querySelector('.snd');
+  const sndT = setInterval(() => {
+    if (!TS.active) { clearInterval(sndT); return; }
+    const B = window.BGM; snd.hidden = !!(B && !B.locked) || new URLSearchParams(location.search).get('bgm') === 'off';
+  }, 200);
   TS.choose = id => choose(ITEMS.findIndex(it => it.id === id));
 })();

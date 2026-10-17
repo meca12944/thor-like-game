@@ -24,7 +24,7 @@ async def main():
     await pg.keyboard.up('ArrowRight'); await step(4)
     # double tap -> run
     await pg.keyboard.down('ArrowRight');await pg.keyboard.up('ArrowRight');await pg.wait_for_timeout(60);await pg.keyboard.down('ArrowRight')
-    await step(9,'방향키 더블탭 → 출발 대시 + 달리기 (×1.9)')
+    await step(9,'방향키 더블탭 → 출발 대시 + 달리기 (×1.72)')
     await pg.keyboard.up('ArrowRight'); await step(8,'손 떼면 짧은 미끄러짐')
     await pg.evaluate("()=>{const h=__game.hero;h.x=420;h.y=505;h.face='right';h.vx=h.vy=0}")
     label[0]='3연타 — 정면 150° 부채꼴, 궤적 = 판정 (2타 정면 되베기)'

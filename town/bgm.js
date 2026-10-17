@@ -52,14 +52,20 @@
       .then(j => (man = j)).catch(e => { failed = true; console.warn('[bgm] manifest unavailable:', e.message); return null; });
     return manP;
   }
+  // [bgm] Safari (no Ogg Vorbis in decodeAudioData on older versions) -> AAC .m4a copy next to every .ogg; also retried if the ogg fails to decode
+  const OGG_OK = (() => { try { return !!document.createElement('audio').canPlayType('audio/ogg; codecs="vorbis"'); } catch (e) { return true; } })();
+  function fetchDecode(file) {
+    return fetch(BASE + file).then(r => { if (!r.ok) throw new Error(file + ' ' + r.status); return r.arrayBuffer(); })
+      .then(ab => new Promise((res, rej) => ctx.decodeAudioData(ab, res, rej)));
+  }
   function load(id) {
     if (bufs[id]) return Promise.resolve(bufs[id]);
     if (loading[id]) return loading[id];
     return (loading[id] = manifest().then(m => {
       if (!m || !m[id]) throw new Error('unknown track ' + id);
-      return fetch(BASE + m[id].file);
-    }).then(r => { if (!r.ok) throw new Error(id + ' ' + r.status); return r.arrayBuffer(); })
-      .then(ab => new Promise((res, rej) => ctx.decodeAudioData(ab, res, rej)))
+      const ogg = m[id].file, m4a = ogg.replace(/\.ogg$/, '.m4a');
+      return OGG_OK ? fetchDecode(ogg).catch(e => { console.warn('[bgm] ogg failed, trying m4a', id, e && e.message || e); return fetchDecode(m4a); }) : fetchDecode(m4a);
+    })
       .then(b => (bufs[id] = b))
       .catch(e => { console.warn('[bgm] cannot play', id, e && e.message || e); delete loading[id]; throw e; }));
   }
@@ -74,7 +80,8 @@
   }
   // play a track: loops use their intro + loopStart/loopEnd; one-shots (jingles) play once
   function play(id, opt = {}) {
-    if (!ctx || failed) { want = id; return; }
+    want = id;
+    if (!ctx || failed) return;
     if (cur && cur.id === id && !opt.restart) return;
     const token = (play.token = (play.token || 0) + 1);
     load(id).then(buf => {
@@ -127,17 +134,26 @@
   }, 250);
 
   // ---------- start on first input ----------
+  // [bgm] fix: browsers only unlock audio on an "activating" gesture (Escape, Shift, Ctrl, F-keys etc. are NOT activations, and a
+  // keydown can race the title overlay). The old code created the AudioContext on the first keydown/pointerdown of ANY kind and
+  // then removed its listeners, so if that first input was not an activation the context stayed 'suspended' forever (no title
+  // music). Now every gesture retries ctx.resume() until the context is actually running, and then (re)starts the wanted track.
+  function unlocked() { return !!ctx && ctx.state === 'running'; }
   function start() {
-    if (started || forced === 'off') return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { failed = true; return; }
-    started = true;
-    ctx = new AC(); master = ctx.createGain(); master.gain.value = st.muted ? 0 : st.vol; master.connect(ctx.destination);
-    if (ctx.state === 'suspended') ctx.resume();
-    manifest().then(() => { if (want) play(want); });
-    removeEventListener('keydown', start, true); removeEventListener('pointerdown', start, true); removeEventListener('touchend', start, true);
+    if (forced === 'off' || failed) return;
+    if (!started) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { failed = true; return; }
+      started = true;
+      ctx = new AC(); master = ctx.createGain(); master.gain.value = st.muted ? 0 : st.vol; master.connect(ctx.destination);
+      ctx.onstatechange = () => { if (unlocked() && want && !cur) play(want); };
+      manifest().then(() => { if (want) play(want); });
+    }
+    if (ctx.state !== 'running') { const r = ctx.resume(); if (r && r.then) r.then(() => { if (want && !cur) play(want); }).catch(() => {}); }
+    if (unlocked()) for (const ev of GEST) removeEventListener(ev, start, true);
   }
-  addEventListener('keydown', start, true); addEventListener('pointerdown', start, true); addEventListener('touchend', start, true);
+  const GEST = ['keydown', 'keyup', 'pointerdown', 'pointerup', 'mousedown', 'click', 'touchstart', 'touchend'];
+  for (const ev of GEST) addEventListener(ev, start, true);
 
   // ---------- keys (B mute, -/= volume, N jukebox); skipped when the game uses that key or is rebinding ----------
   function gameUses(code) {
@@ -164,6 +180,7 @@
   window.BGM = {
     SCENES, play: id => { jukebox = -1; play(id); }, jingle, scene: name => play(SCENES[name] || name),
     setVolume(v) { st.vol = Math.max(0, Math.min(1, v)); applyVol(); save(); }, toggleMute() { st.muted = !st.muted; applyVol(); save(); },
-    get state() { return { started, failed, current: cur && cur.id, vol: st.vol, muted: st.muted, ctx: ctx && ctx.state, loaded: Object.keys(bufs) }; },
+    get locked() { return !unlocked(); },
+    get state() { return { started, failed, locked: !unlocked(), ogg: OGG_OK, current: cur && cur.id, vol: st.vol, muted: st.muted, ctx: ctx && ctx.state, loaded: Object.keys(bufs) }; },
   };
 })();
