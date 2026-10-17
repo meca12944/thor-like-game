@@ -912,7 +912,7 @@ const npcs=[];
 function damageNpc(n,dmg){n.hp=Math.max(0,n.hp-dmg);n.hitT=.35;n.lagDelay=.3;n.flash=.16;n.alert=6;
  if(n.hp<=0){if(n.lethal===false){n.fainted=2.5;n.hp=0;}else n.dead=true;}}
 function tickHp(e,dt){if(e.hitT>0)e.hitT-=dt;if(e.lagDelay>0)e.lagDelay-=dt;else if(e.hpLag>e.hp)e.hpLag=Math.max(e.hp,e.hpLag-e.maxHp*1.4*dt);}
-function updateNpc(n,dt){tickHp(n,dt);n.t+=dt;const px=n.x,py=n.y;n._m=()=>{n.moving=Math.hypot(n.x-px,n.y-py)>.01;if(Math.abs(n.x-px)>.01)n.face=n.x>px?1:-1;};if(n.dead)return;if(n.flash>0)n.flash-=dt;
+function updateNpc(n,dt){tickHp(n,dt);n.t+=dt;const px=n.x,py=n.y;n._m=()=>{n.moving=Math.hypot(n.x-px,n.y-py)>.01;if(Math.abs(n.x-px)>.01)n.face=n.x>px?1:-1;if(n.moving){const ddx=n.x-px,ddy=n.y-py;n.dir=Math.abs(ddx)>Math.abs(ddy)?(ddx<0?'left':'right'):(ddy>0?'down':'up');}};if(n.dead)return;patrolNpc(n,dt);if(n.flash>0)n.flash-=dt;
  if(n.fainted>0){n.fainted-=dt;if(n.fainted<=0){n.hp=1;n.hpLag=1;n.behavior='flee';}return;}
  if(n.alert>0){n.alert-=dt;const dx=hero.x-n.x,dy=hero.y-n.y,d=Math.hypot(dx,dy)||1,sgn=n.behavior==='flee'?-1:1;
   if(n.behavior==='flee'||d>60)moveCol(n,sgn*dx/d*(n.behavior==='flee'?190:120)*dt,sgn*dy/d*110*dt,14);}n._m();}
@@ -923,10 +923,27 @@ function updateNpc(n,dt){tickHp(n,dt);n.t+=dt;const px=n.x,py=n.y;n._m=()=>{n.mo
 const NPC_ANIM={idleTicks:[20,12,20,12],idleDrop:[0,0,1,0],chest:[1,0,0,0],walkTicks:7,walkBob:[0,1,0,1],walkLean:[0,1,0,1],cut:.42,chestTop:.2,chestBot:.36};
 const NPC_BOUNCE=NPC_ANIM; // legacy export name
 const NPC_BOUNCE_IDS=new Set(["a_tool", "a_tailor", "a_herb", "b_dyer", "b_widow", "b_scholar", "h_tool", "h_surveyor", "h_mystic", "g_tool", "g_tailor", "g_archaeo", "g_dancer", "f_harbor", "f_tailor", "f_keeper", "f_diver", "e_tailor", "c_tool", "c_priest", "d_tool", "d_princess", "sm_G", "sm_F"]);
+// [npc_v2] hero-proportion women (approved v2: 28 logical px = live hero, head 7 px = 4.0 heads, same baseline).
+// Sheet assets/npcs/v2/<id>.png: rows down/left/right/up x [idle 4 (breathing) | walk 8]; meta.json = cell size/anchor/ranges.
+// tweak: NPC_V2_CFG.idleTicks / walkTicks (60 fps ticks per frame), patrol speed (world px/s), stopNear (stop + face hero).
+const NPC_V2_CFG={idleTicks:15,walkTicks:9,speed:42,stopNear:90,paths:{a_tailor:[[0,0],[130,0]]}};
+const NPC_V2={};fetch('assets/npcs/v2/meta.json').then(r=>r.json()).then(j=>{Object.assign(NPC_V2,j);for(const n of npcs)npcV2(n);}).catch(()=>{});
+function npcV2(n){const m=NPC_V2[n.id];if(!m||n.v2)return;const im=new Image();im.onload=()=>{n.v2={m,im};n.headH=(m.ch+3)/LSC/CS;
+  const p=NPC_V2_CFG.paths[n.id];if(p&&!n.path){n.path=p.map(([dx,dy])=>[n.x+dx,n.y+dy]);n.seg=0;}};im.src='assets/npcs/v2/'+n.id+'.png';}
+function patrolNpc(n,dt){if(!n.path||n.alert>0||n.fainted>0||n.dead)return;
+ if(Math.hypot(hero.x-n.x,hero.y-n.y)<NPC_V2_CFG.stopNear){const dx=hero.x-n.x,dy=hero.y-n.y;n.dir=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy>0?'down':'up');return;}
+ const q=n.path[(n.seg+1)%n.path.length],dx=q[0]-n.x,dy=q[1]-n.y,d=Math.hypot(dx,dy),s=NPC_V2_CFG.speed*dt;
+ if(d<=s+.5){n.seg=(n.seg+1)%n.path.length;return;}moveCol(n,dx/d*s,dy/d*s,14);}
+function drawNpcV2(n){const{m,im}=n.v2,L=1/LSC,C=NPC_V2_CFG,tt=Math.floor(n.t*60)+(n.seed||(n.seed=(Math.random()*60)|0));
+ const r=Math.max(0,m.rows.indexOf(n.dir||'down')),fi=n.moving&&!m.static?m.walk[0]+Math.floor(tt/C.walkTicks)%m.walk[1]:m.idle[0]+Math.floor(tt/C.idleTicks)%m.idle[1];
+ shadow(n.x,n.y+1,14*L*.6/CS,10,.35);const x=(Math.round(n.x*LSC)-m.ax)*L,y=(Math.round(n.y*LSC)-m.ay)*L;
+ const sm=ctx.imageSmoothingEnabled;ctx.imageSmoothingEnabled=false;ctx.drawImage(im,fi*m.cw,r*m.ch,m.cw,m.ch,x,y,m.cw*L,m.ch*L);
+ if(n.flash>0){ctx.save();ctx.globalAlpha=.6;ctx.globalCompositeOperation='lighter';ctx.drawImage(im,fi*m.cw,r*m.ch,m.cw,m.ch,x,y,m.cw*L,m.ch*L);ctx.restore();}
+ ctx.imageSmoothingEnabled=sm;}
 function spawnNpc(id,x,y,o={}){const n=Object.assign({id,x,y,h:o.h||120,hp:3,maxHp:3,hpLag:3,hitT:0,lagDelay:0,headH:(o.h||120)+6,behavior:'flee',lethal:!o.child,t:Math.random()*9,moving:false,
-  bounce:NPC_BOUNCE_IDS.has(id)},o);const im=new Image();im.onload=()=>{n.img=im;};im.src='assets/npcs/'+id+'.png';npcs.push(n);return n;}
+  bounce:NPC_BOUNCE_IDS.has(id)},o);const im=new Image();im.onload=()=>{n.img=im;};im.src='assets/npcs/'+id+'.png';npcs.push(n);npcV2(n);return n;}
 let shopNpc=null; // set below once spawnNpc / NPC_BOUNCE are defined
-function drawNpc(n){const im=n.img;if(!im)return;const A=NPC_ANIM,L=1/LSC,h=Math.round(n.h*CS*LSC)*L,w=Math.round(h*im.width/im.height*LSC)*L;
+function drawNpc(n){if(n.v2)return drawNpcV2(n);const im=n.img;if(!im)return;const A=NPC_ANIM,L=1/LSC,h=Math.round(n.h*CS*LSC)*L,w=Math.round(h*im.width/im.height*LSC)*L;
  const tt=Math.floor(n.t*60)+(n.seed||(n.seed=(Math.random()*60)|0));let drop=0,chest=0,bob=0,lean=0;
  if(n.moving){const f=Math.floor(tt/A.walkTicks)%4;bob=A.walkBob[f];lean=A.walkLean[f];}
  else{const cyc=A.idleTicks.reduce((p,q)=>p+q,0);let r=tt%cyc,f=0;while(r>=A.idleTicks[f]){r-=A.idleTicks[f];f++;}drop=A.idleDrop[f];chest=n.bounce?A.chest[f]:0;}
