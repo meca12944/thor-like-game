@@ -524,6 +524,23 @@
   "truePeak": -3.74,
   "bytes": 454886
  },
+ "user_ref_01": {
+  "id": "user_ref_01",
+  "file": "user_ref_01.ogg",
+  "title": "검은 왕 카이렌 (사용자 제공곡)",
+  "en": "user-supplied reference track",
+  "bpm": 130,
+  "key": "E minor (phrygian/harmonic)",
+  "loop": true,
+  "loopStart": 66.54,
+  "loopEnd": 110.848277,
+  "duration": 110.848,
+  "lufs": -12.2,
+  "truePeak": -0.3,
+  "bytes": 2277180,
+  "userSupplied": true,
+  "note": "사용자 제공 음원. 출시 전 사용 권리 확인 필요"
+ },
  "worldmap": {
   "id": "worldmap",
   "file": "worldmap.ogg",

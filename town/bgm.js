@@ -16,7 +16,7 @@
   // situation -> track (for the full game; the demo uses town / champion / dive / victory)
   const SCENES = {
     title: 'title', world: 'worldmap', town: 'town_a_fountain', shop: 'forge_shop', ruin: 'town_ruin',
-    champion: 'battle_champion', boss: 'battle_boss', boss2: 'battle_boss_phase2', aslan: 'battle_aslan', kairen: 'battle_kairen',
+    champion: 'battle_champion', boss: 'battle_boss', boss2: 'battle_boss_phase2', aslan: 'battle_aslan', kairen: 'user_ref_01', kairenAlt: 'battle_kairen',
     demon: 'demon_field', awaken: 'demon_awaken', dive: 'underwater', gameover: 'jingle_gameover', victory: 'jingle_victory',
     area1: 'area01_forest', area2: 'area02_cave', area3: 'area03_desert', area4: 'area04_pyramid', area5: 'area05_coral_sea',
     area6: 'area06_cliff', area7: 'area07_volcano', area8: 'area08_thunder_tower', area9: 'area09_dark_temple', area10: 'area10_dragon_nest',
