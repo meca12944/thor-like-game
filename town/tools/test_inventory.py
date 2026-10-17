@@ -50,8 +50,16 @@ async def main():
     ok('quick_register',await ev("()=>__game.INV.quick==='herb_red'"))
     # left from column 0 goes to equipment column
     await pg.click('#ovp [data-bag="0"]'); await pg.keyboard.press('ArrowLeft'); ok('to_equip_zone',await ev("()=>__game.invZone==='equip'"))
-    # shop tab (2): buy a potion
-    g0=await ev("()=>__game.INV.gold"); await pg.keyboard.press('2'); ok('shop_tab',await ev("()=>__game.invTab===1&&document.querySelectorAll('#ovp .list .row .ic32').length>=17"))
+    # selling is shop-only: Del in the inventory does nothing but explain; tab 2 (상점) is locked away from a shop NPC
+    g0=await ev("()=>__game.INV.gold"); nb=await ev("()=>__game.INV.bag.length"); await pg.click('#ovp [data-bag="7"]'); await pg.keyboard.press('Delete')
+    ok('no_del_sell',await ev("([g,n])=>__game.INV.gold===g&&__game.INV.bag.length===n&&__game.invNote.includes('상점')",[g0,nb]),await ev("()=>__game.invNote"))
+    await pg.keyboard.press('2'); ok('shop_locked',await ev("()=>__game.invTab===0&&__game.invNote.includes('상점 NPC')&&!!document.querySelector('#ovp .tab.lock')"))
+    await pg.keyboard.press('e'); ok('qe_skips_shop',await ev("()=>__game.invTab===2")); await pg.keyboard.press('1')
+    # talk to the shop NPC (미소) -> dialogue -> shop window (tab 2)
+    await pg.keyboard.press('Escape'); await ev("()=>{const h=__game.hero,n=__game.shopNpc;h.x=n.x-60;h.y=n.y+30;}")
+    await pg.keyboard.press('l'); ok('shop_npc_dialog',await ev("()=>__game.ui==='dialog'&&__game.dlg.id==='shop'"))
+    for _ in range(3): await pg.keyboard.press('l')
+    ok('shop_tab',await ev("()=>__game.ui==='inv'&&__game.shopAt==='a_tool'&&__game.invTab===1&&document.querySelectorAll('#ovp .list .row .ic32').length>=17"))
     n0=await ev("()=>__game.invCount('potion')")
     for _ in range(8): await pg.keyboard.press('ArrowDown')
     await pg.keyboard.press('Enter')

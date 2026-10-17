@@ -111,6 +111,18 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 .wi.sel,.ws.sel,.menu .mi.sel,.tab.on,.row.sel,.kc.sel{background:rgba(60,72,130,calc(var(--ui-alpha)*.95))}
 #qslot{background:var(--ui-sub)}
 .menu .mi .ml{flex:1}
+/* ===== rarity stars (RARITY_STARS) + shop sell tab + drop notifications ===== */
+.stars{position:absolute;left:1px;bottom:1px;pointer-events:none;image-rendering:pixelated;background-repeat:no-repeat;background-size:100% 100%;z-index:1}
+.bigw{position:relative;display:inline-block;flex:none;line-height:0}.bigw .stars{left:3px;bottom:3px}
+.tk .rst{color:var(--rc);letter-spacing:-1px}
+.cell .eqlock{position:absolute;right:1px;top:-3px;font:bold 9px monospace;color:#ffb0a0;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;z-index:1}
+.tab.lock{opacity:.45}
+.shopmode{display:flex;gap:6px;align-items:center;margin:0 0 6px}.shopmode .sm{padding:2px 12px;border:2px solid #34427a;background:var(--ui-row);cursor:pointer;font:bold 13px monospace}
+.shopmode .sm.on{border-color:#ffe08a;color:#ffe08a}.shopmode .shopn{margin-left:auto;color:#9ec3ff;font:bold 12px monospace}
+.sellp{margin-top:6px;font:bold 13px monospace;color:#ffe08a}.sellp.no{color:#ff9a8a}
+#dropn{position:fixed;right:16px;top:64px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;z-index:30;pointer-events:none}
+#dropn .dn1{display:flex;align-items:center;gap:8px;padding:3px 12px 3px 3px;background:var(--ui-bg);border:2px solid var(--rc);box-shadow:0 0 0 1px #000c;font:bold 13px sans-serif;color:#fff;text-shadow:0 1px 2px #000;animation:dnin .25s ease-out}
+#dropn .dn1 .cell{cursor:default}#dropn .dn1 b{color:var(--rc)}@keyframes dnin{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
 </style>
 </head>
 <body>
@@ -120,7 +132,7 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 <div id="slotsKeys">1 · 2 · 3</div>
 <div id="wbtn">스킬창 (O)</div>
 <div id="hint">조작 안내</div><div id="khud"></div><div id="qslot" title="퀵슬롯"></div></div>
-<div id="ov"><div id="ovp"></div></div><div id="dlg"></div>
+<div id="ov"><div id="ovp"></div></div><div id="dlg"></div><div id="dropn"></div>
 <div id="win"><div id="panel"><h2><span id="wtitle">스킬창 · Skills</span><span id="close">닫기 ✕</span></h2>
 <div style="font-size:11px;color:#c9d3f0">스킬을 누르면 빈 슬롯에 장착 · 슬롯이 꽉 찼으면 스킬 선택 후 슬롯 1/2/3을 눌러 교체 · 선택 없이 슬롯을 누르면 해제</div>
 <div id="wslots"></div><div id="wlist"></div>
@@ -308,15 +320,19 @@ const TALK={
   ()=>`${keyLabel('target')} 로 노릴 적을 바꾸면 공격과 스킬이 그쪽을 향해요.`,
   ()=>`분수나 숨겨진 물가에서 ${keyLabel('dive')} 를 누르면 잠수할 수 있어요. 크라켄의 힘 덕분이죠.`,
   ()=>`키가 불편하면 ${keyLabel('menu',1)} → 조작 설정에서 바꿀 수 있어요. 바꾼 키는 저장돼요.`]},
+ shop:{name:'미소 · 도구상점 「보따리」',por:'a_tool',then:()=>openShop('a_tool'),lines:[
+  ()=>'어서 와요! 회복약은 넉넉히, 깃털은 꼭 하나!',
+  ()=>({who:'hero',t:'물건 좀 보러 왔어. 팔 것도 있고.'}),
+  ()=>'사실 거면 「구매」, 파실 거면 「판매」 쪽이에요. 장착한 장비는 먼저 벗어 주셔야 사 드려요!']},
  fountain:{name:'광장 분수',lines:[
   ()=>'맑은 물이 솟는 오래된 분수다. 바닥에서 무언가 반짝인다.',
   ()=>unlocked('water')?`${keyLabel('dive')} — 해류의 숨결로 잠수할 수 있을 것 같다.`:'물속까지 숨이 닿지 않는다. 크라켄의 힘이 필요하다.']},
 };
 let dlg=null; // {id,i}
 const HERO_NAME='필멸자';
-function interactTarget(){if(nearFountain(hero.x,hero.y))return 'fountain';return 'spirit';} // the spirit always floats next to the hero
+function interactTarget(){if(nearShopNpc())return 'shop';if(nearFountain(hero.x,hero.y))return 'fountain';return 'spirit';} // the spirit always floats next to the hero
 function interact(){if(uw||hero.swim||hero.sk||hero.atk)return;dlg={id:interactTarget(),i:0};openUI('dialog');}
-function dialogNext(){if(!dlg)return;dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){closeUI();return;}renderUI();}
+function dialogNext(){if(!dlg)return;dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){const T=TALK[dlg.id];closeUI();if(T.then)T.then();return;}renderUI();}
 // quick save (F5) — restored on the next load
 const LSQ='townDemo.quicksave';
 function quickSave(){if(uw||hero.swim||hero.sk||hero.dash){msg('지금은 저장할 수 없다',1);return;}
@@ -339,8 +355,8 @@ let uiSel=0,optRow=0,optCol=0,optNote='';
 const ovEl=document.getElementById('ov'),ovp=document.getElementById('ovp'),dlgEl=document.getElementById('dlg');
 function openUI(name){releaseAll();if(winOpen)toggleWin(false);ui=name;uiSel=0;rebind=null;optNote='';if(name==='options'){optRow=0;optCol=0;}
  stick.id=null;stick.dx=stick.dy=0;stEl.style.display='none';renderUI();}
-function closeUI(){ui=null;rebind=null;dlg=null;ovEl.classList.remove('open');dlgEl.classList.remove('open');releaseAll();}
-const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],[()=>`창 투명도: ${uiTransLabel()}  ◀ ▶`,()=>{stepUiAlpha(1);renderUI();}],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모)',()=>{invTab=1;listSel=0;openUI('inv');}],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
+function closeUI(){ui=null;shopAt=null;sellPend=null;rebind=null;dlg=null;ovEl.classList.remove('open');dlgEl.classList.remove('open');releaseAll();}
+const MENU=[['계속하기',()=>closeUI()],['조작 설정 (키 변경)',()=>openUI('options')],[()=>`창 투명도: ${uiTransLabel()}  ◀ ▶`,()=>{stepUiAlpha(1);renderUI();}],['인벤토리 · 장비',()=>{invTab=0;openUI('inv');}],['상점 (데모 전용 바로가기 · 원래는 상점 NPC에게 말 걸기)',()=>openShop('demo')],['대장간 (데모)',()=>{invTab=2;listSel=0;openUI('inv');}],['월드맵',()=>openUI('map')],['빠른 저장',()=>{closeUI();quickSave();}],['저장 삭제 (빠른 저장)',()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}]];
 const MENU_KEY=['menu','','','inventory','','','map','save',''];
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
 const kb=c=>`<kbd>${esc(keyName(c))}</kbd>`;
@@ -374,11 +390,11 @@ function renderUI(){
   // portraits: line may return {who:'hero',t}; speaker portrait from assets/portraits/<id>.png (NPC id) shown left
   let L=T.lines[dlg.i](),nm=T.name,por=T.por;if(L&&typeof L==='object'){if(L.who==='hero'){nm=HERO_NAME;por='hero';}else if(L.who){nm=L.name||nm;por=L.who;}L=L.t;}
   dlgEl.classList.toggle('hasp',!!por);
-  dlgEl.innerHTML=(por?`<img class="dp" src="assets/portraits/${esc(por)}.png" alt="">`:'')+`<div class="dn">${esc(nm)}</div><div class="dt">${esc(L)}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?'닫기':'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
+  dlgEl.innerHTML=(por?`<img class="dp" src="assets/portraits/${esc(por)}.png" alt="">`:'')+`<div class="dn">${esc(nm)}</div><div class="dt">${esc(L)}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?(T.then?'거래하기 ▶':'닫기'):'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
   dlgEl.onclick=dialogNext;}}
 function uiKey(code,act){
  if(ui==='options'){optKey(code);return;}
- if(code==='Escape'||act==='menu'){closeUI();return;}
+ if((code==='Escape'||act==='menu')&&!(ui==='inv'&&sellPend)){closeUI();return;}
  if(ui==='dialog'){if(act==='interact'||act==='attack'||code==='Space'||code==='Enter')dialogNext();return;}
  if(ui==='menu'){if(code==='ArrowUp'||act==='up'){uiSel=(uiSel+MENU.length-1)%MENU.length;renderUI();}
   else if(code==='ArrowDown'||act==='down'){uiSel=(uiSel+1)%MENU.length;renderUI();}
@@ -445,13 +461,14 @@ function updateKhud(){if(!khudEl)return;const P=[];
  else if(hero.swim)P.push([keyLabel('dive',1),'물 밖으로']);
  else{P.push([keyLabel('attack',1),'공격'],[keyLabel('dash',1),'대시']);
   if(unlocked('water')&&findSpot())P.push([keyLabel('dive',1),'잠수','hot']);
-  P.push([keyLabel('interact',1),interactTarget()==='fountain'?'분수 살피기':'이슬과 대화',interactTarget()==='fountain'?'hot':'']);
+  {const it=interactTarget();P.push([keyLabel('interact',1),it==='shop'?'미소와 거래 (상점)':it==='fountain'?'분수 살피기':'이슬과 대화',it==='spirit'?'':'hot']);}
   P.push([keyLabel('area',1),areaMode?AREA[areaMode].name+(areaCd>0?' '+Math.ceil(areaCd)+'s':''):'광역 —']);
   P.push([keyLabel('target',1),target?'대상 ✓':'대상']);}
  P.push([keyLabel('potion',1),((IT[INV.quick]||{}).n||'물약')+' ×'+invCount(INV.quick)],[keyLabel('menu',1),'메뉴']);
  const sig=P.map(p=>p.join('|')).join(';');if(sig===khudSig)return;khudSig=sig;
  khudEl.innerHTML=P.map(([k,t,c])=>`<span${c?' class="hot"':''}><kbd>${esc(k)}</kbd>${esc(t)}</span>`).join('');}
 function drawCtlWorld(){ // world space: target reticle + area-skill effect
+ if(shopNpc&&!shopNpc.dead&&!(shopNpc.alert>0)){ctx.save();ctx.textAlign='center';outlined('상점 · 미소',shopNpc.x,shopNpc.y-shopNpc.h-12,15,nearShopNpc()?'#ffe08a':'#ffffff');ctx.restore();}
  if(target&&!target.dead){const m=target,r=(m.kind==='boar'?50:30)*Math.min(1.6,m.sc||1),cy=m.y-(m.kind==='boar'?30:18)*(m.sc||1),t=performance.now()/1000,g=r+4+Math.sin(t*6)*3;
   ctx.save();ctx.strokeStyle='#ff4040';ctx.lineWidth=3;ctx.shadowColor='#000';ctx.shadowBlur=3;
   for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.moveTo(m.x+sx*g,cy+sy*g*.7-sy*10);ctx.lineTo(m.x+sx*g,cy+sy*g*.7);ctx.lineTo(m.x+sx*g-sx*12,cy+sy*g*.7);ctx.stroke();}ctx.restore();}
@@ -464,6 +481,8 @@ function drawCtlHUD(){if(!msgBox)return;ctx.save();ctx.setTransform(1,0,0,1,0,0)
 // ---------- inventory / equipment / shop / forge with item ICONS (assets/icons, built by tools/icons.py) ----------
 const ITEMS=/*ITEMS*/;
 const IT=ITEMS?ITEMS.items:{};
+// RARITY_STARS: number of small pixel stars drawn in an icon's corner, per rarity (the one config to tweak)
+const RARITY_STARS={common:0,uncommon:1,rare:2,epic:3,legendary:4,unique:4,corrupt:3};
 const RARITY={common:['#9aa0a8','일반'],uncommon:['#5ac85a','고급'],rare:['#3a8ef0','희귀'],epic:['#b050f0','영웅'],legendary:['#ffb020','전설'],unique:['#ff5a3a','유일'],corrupt:['#8a2ae0','타락']};
 const SLOT_KO={weapon:'무기',helmet:'투구',armor:'갑옷',offhand:'보조',consumable:'소모품',material:'재료'};
 const EQ_SLOTS=['weapon','helmet','armor','offhand'];
@@ -478,6 +497,8 @@ function newInv(){return{gold:1500,quick:'potion',
 let INV=newInv();
 let invMouse=[-1,-1]; // hover selects only on real mouse movement (Chrome re-fires hover after re-render)
 let invTab=0,invZone='bag',invSel=0,eqSel=0,listSel=0,invNote='';
+let shopAt=null,shopMode='buy',sellPend=null; // shop opens only via a shop NPC (or the demo-only Esc shortcut); sell = '판매' mode
+const SHOP_NAMES={a_tool:'미소의 도구상점 「보따리」',demo:'상점 (데모 바로가기)'};
 const INV_TABS=['가방 · 장비','상점','대장간'];
 function stackable(id){const s=IT[id]&&IT[id].s;return s==='consumable'||s==='material';}
 function invCount(id){return INV.bag.filter(b=>b.id===id).reduce((a,b)=>a+b.n,0);}
@@ -488,8 +509,26 @@ function invSet(id,n){const c=invCount(id);if(n>c)invAdd(id,n-c);else if(n<c)inv
 function icSpan(id,size=32,cls=''){const d=IT[id],cols=ITEMS?ITEMS.cols:16,i=d?d.ic:(ITEMS&&ITEMS.ui[id]);if(i===undefined)return '';
  return `<span class="ic${size} ${cls}" style="background-position:${-(i%cols)*size}px ${-Math.floor(i/cols)*size}px"></span>`;}
 function rarCol(id){return (RARITY[(IT[id]||{}).r]||RARITY.common)[0];}
+const STAR_PX=['..#..','.###.','#####','.###.','.#.#.'],starCache={};
+function starStrip(r){const n=RARITY_STARS[r]||0;if(!n)return null;if(starCache[r])return starCache[r];
+ const W=6*n+1,H=7,on=new Set();for(let k=0;k<n;k++)STAR_PX.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch==='#')on.add((1+k*6+x)+','+(1+y));}));
+ const cv2=document.createElement('canvas');cv2.width=W;cv2.height=H;const g=cv2.getContext('2d'),col=(RARITY[r]||RARITY.common)[0];
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(on.has(x+','+y)){g.fillStyle=y<=2?'#fff6d8':col;if(y>2||x%6===3)g.fillRect(x,y,1,1);if(y<=2&&x%6!==3){g.fillStyle=col;g.fillRect(x,y,1,1);}}
+  else{let edge=false;for(let dy=-1;dy<=1&&!edge;dy++)for(let dx=-1;dx<=1;dx++)if(on.has((x+dx)+','+(y+dy))){edge=true;break;}if(edge){g.fillStyle='#05040a';g.fillRect(x,y,1,1);}}}
+ return starCache[r]={url:cv2.toDataURL(),w:W,h:H,n};}
+function starsHTML(id,sc=1){const r=(IT[id]||{}).r,s=starStrip(r);if(!s)return '';
+ return `<span class="stars" data-stars="${s.n}" style="width:${s.w*sc}px;height:${s.h*sc}px;background-image:url(${s.url})"></span>`;}
+function starCount(id){return RARITY_STARS[(IT[id]||{}).r]||0;}
+function nearShopNpc(){const n=shopNpc;return n&&!n.dead&&!(n.fainted>0)&&!(n.alert>0)&&!uw&&Math.hypot(hero.x-n.x,hero.y-n.y)<110?n:null;}
+function openShop(src){shopAt=src;shopMode='buy';invTab=1;listSel=0;invNote='';sellPend=null;openUI('inv');}
+function setInvTab(t){if(t===1&&!shopAt){invNote='⚠ 상점은 상점 NPC(미소 · 도구상점 「보따리」)에게 말을 걸어야 열린다';renderInv();return;}
+ invTab=t;listSel=0;invNote='';sellPend=null;renderInv();}
+function dropNote(id,n=1,verb='획득'){const box=document.getElementById('dropn'),d=IT[id];if(!box||!d)return;
+ const el=document.createElement('div');el.className='dn1';el.dataset.id=id;el.style.setProperty('--rc',rarCol(id));
+ el.innerHTML=`${cellHTML({id,n},'',false)}<span><b>${esc(d.n)}</b>${n>1?' ×'+n:''} ${verb}</span>`;box.appendChild(el);
+ while(box.children.length>4)box.firstChild.remove();setTimeout(()=>el.remove(),2800);}
 function cellHTML(it,attrs,sel){if(!it)return `<div class="cell empty${sel?' sel':''}" ${attrs}></div>`;
- return `<div class="cell${sel?' sel':''}" ${attrs} style="--rc:${rarCol(it.id)}">${icSpan(it.id)}${it.plus?`<span class="pl">+${it.plus}</span>`:''}${stackable(it.id)&&it.n>1||it.n>1?`<span class="cnt">${it.n}</span>`:''}${INV.quick===it.id?'<span class="qk">★</span>':''}</div>`;}
+ return `<div class="cell${sel?' sel':''}" ${attrs} style="--rc:${rarCol(it.id)}">${icSpan(it.id)}${it.plus?`<span class="pl">+${it.plus}</span>`:''}${stackable(it.id)&&it.n>1||it.n>1?`<span class="cnt">${it.n}</span>`:''}${INV.quick===it.id?'<span class="qk">★</span>':''}${starsHTML(it.id)}</div>`;}
 function weaponAtk(it){const d=IT[it.id];if(!d||!d.atk)return null;const e=ITEMS.enh.find(x=>x.l===it.plus);return Math.round(d.atk*(1+(e?e.pct:0)/100));}
 function tipHTML(it,extra=''){if(!it)return `<div class="tip none">칸을 고르면 정보가 표시됩니다.</div>`;
  const d=IT[it.id]||{n:it.id},R=RARITY[d.r]||RARITY.common;let st='';
@@ -497,18 +536,19 @@ function tipHTML(it,extra=''){if(!it)return `<div class="tip none">칸을 고르
  if(d.df!==undefined)st+=`<div class="st">방어 <b>${d.df}</b></div>`;
  const fx=d.fx&&!/^(공격|방어) \d+$/.test(d.fx)?`<div class="fx">${esc(d.fx)}</div>`:'';
  const kind=d.s==='material'?`재료 · ${d.cat||''}`:d.s==='consumable'?`소모품 · ${d.cat||''}`:SLOT_KO[d.s]||'';
- const price=d.p?`<div class="pr">${icSpan('ui_coins',32,'mini')} ${d.p}${d.sell?` · 판매 ${d.sell}`:''}</div>`:(d.sell?`<div class="pr">판매 ${d.sell}</div>`:'');
- return `<div class="tip" style="--rc:${R[0]}"><div class="th">${icSpan(it.id,64,'big')}<div><div class="tn" style="color:${R[0]}">${esc(d.n)}${it.plus?` <span class="tplus">+${it.plus}</span>`:''}</div>
-  <div class="tk">${kind}${d.t?` · 티어 ${d.t}`:''} · <span style="color:${R[0]}">${R[1]}</span>${it.n>1?` · ×${it.n}`:''}</div></div></div>${st}${fx}${d.src?`<div class="src">${esc(d.src)}</div>`:''}${price}${extra}</div>`;}
-function invSelected(){if(invTab===0)return invZone==='equip'?INV.equip[EQ_SLOTS[eqSel]]:INV.bag[invSel];
+ const sv=invTab===1&&shopMode==='sell'?0:d.sell; // sell mode shows its own 판매가 line
+ const price=d.p?`<div class="pr">${icSpan('ui_coins',32,'mini')} ${d.p}${sv?` · 판매 ${sv}`:''}</div>`:(sv?`<div class="pr">판매 ${sv}</div>`:'');
+ return `<div class="tip" style="--rc:${R[0]}"><div class="th"><span class="bigw">${icSpan(it.id,64,'big')}${starsHTML(it.id,2)}</span><div><div class="tn" style="color:${R[0]}">${esc(d.n)}${it.plus?` <span class="tplus">+${it.plus}</span>`:''}</div>
+  <div class="tk">${kind}${d.t?` · 티어 ${d.t}`:''} · <span style="color:${R[0]}">${R[1]}</span>${starCount(it.id)?` <span class="rst">${'★'.repeat(starCount(it.id))}</span>`:''}${it.n>1?` · ×${it.n}`:''}</div></div></div>${st}${fx}${d.src?`<div class="src">${esc(d.src)}</div>`:''}${price}${extra}</div>`;}
+function invSelected(){if(invTab===0||(invTab===1&&shopMode==='sell'))return invZone==='equip'?INV.equip[EQ_SLOTS[eqSel]]:INV.bag[invSel];
  if(invTab===1){const id=ITEMS.shopA[listSel];return id&&{id,n:1,plus:0};}
  const r=forgeRows()[listSel];return r&&(r.kind==='enh'?INV.equip.weapon:{id:r.item,n:1,plus:0});}
 function forgeRows(){const w=INV.equip.weapon,rows=[];
  if(w){const e=ITEMS.enh.find(x=>x.l===w.plus+1);if(e&&w.plus<3)rows.push({kind:'enh',e});else rows.push({kind:'enhmax'});}
  for(const r of ITEMS.recA)rows.push(Object.assign({kind:'rec'},r));return rows;}
 function canCraft(r){return INV.gold>=r.c&&r.mats.every(([m,n])=>invCount(m)>=n);}
-function renderInv(){ovp.classList.add('wide');
- const tabs=`<div class="tabs">${INV_TABS.map((t,i)=>`<span class="tab${i===invTab?' on':''}" data-tab="${i}">${icSpan(['ui_bag','ui_coins','ui_anvil'][i],32,'mini')} ${i+1} ${t}</span>`).join('')}<span class="gold">${icSpan('ui_coins',32,'mini')} ${INV.gold+coins}</span></div>`;
+function renderInv(){ovp.classList.add('wide');if(invTab===1&&!shopAt)invTab=0;
+ const tabs=`<div class="tabs">${INV_TABS.map((t,i)=>`<span class="tab${i===invTab?' on':''}${i===1&&!shopAt?' lock':''}" data-tab="${i}" ${i===1&&!shopAt?'title="상점 NPC에게서만 열림"':''}>${icSpan(['ui_bag','ui_coins','ui_anvil'][i],32,'mini')} ${i+1} ${i===1&&!shopAt?'🔒 ':''}${t}</span>`).join('')}<span class="gold">${icSpan('ui_coins',32,'mini')} ${INV.gold+coins}</span></div>`;
  let body='',hints=[];
  if(invTab===0){
   const eq=EQ_SLOTS.map((s,i)=>`<div class="eqrow"><span class="eql">${SLOT_KO[s]}</span>${cellHTML(INV.equip[s],`data-eq="${i}"`,invZone==='equip'&&eqSel===i)}</div>`).join('');
@@ -516,10 +556,15 @@ function renderInv(){ovp.classList.add('wide');
   const quick=`<div class="eqrow qrow"><span class="eql">퀵 <kbd>${esc(keyLabel('potion',1))}</kbd></span>${cellHTML(qn?{id:q,n:qn}:null,'data-quick="1"',false)}</div>`;
   let grid='';for(let i=0;i<BAG_N;i++)grid+=cellHTML(INV.bag[i],`data-bag="${i}"`,invZone==='bag'&&invSel===i);
   body=`<div class="invmain"><div class="eqcol"><div class="cap">장비</div>${eq}${quick}</div><div><div class="cap">가방 ${INV.bag.length}/${BAG_N}</div><div class="grid">${grid}</div></div><div class="tipcol">${tipHTML(invSelected())}</div></div>`;
-  hints=[['↑↓←→','선택'],['Enter','사용 · 장착 · 해제'],['R','퀵슬롯 등록'],['Del','판매'],['1·2·3 / Q·E','탭'],[keyLabel('inventory',1)+' / Esc','닫기']];}
+  hints=[['↑↓←→','선택'],['Enter','사용 · 장착 · 해제'],['R','퀵슬롯 등록'],['1·2·3 / Q·E','탭'],[keyLabel('inventory',1)+' / Esc','닫기']];}
+ else if(invTab===1&&shopMode==='sell'){
+  const eq=EQ_SLOTS.map((s,i)=>`<div class="eqrow"><span class="eql">${SLOT_KO[s]}</span>${cellHTML(INV.equip[s],`data-eq="${i}"`,invZone==='equip'&&eqSel===i).replace(/<\/div>$/,INV.equip[s]?'<span class="eqlock">장착</span></div>':'</div>')}</div>`).join('');
+  let grid='';for(let i=0;i<BAG_N;i++)grid+=cellHTML(INV.bag[i],`data-bag="${i}"`,invZone==='bag'&&invSel===i);
+  body=`${shopModeBar()}<div class="invmain"><div class="eqcol"><div class="cap">장착 중 (판매 불가)</div>${eq}</div><div><div class="cap">가방 ${INV.bag.length}/${BAG_N} · 팔 물건을 고르세요</div><div class="grid">${grid}</div></div><div class="tipcol">${tipHTML(invSelected(),sellTip())}</div></div>`;
+  hints=[['↑↓←→','선택'],['Enter','판매 (한 번 더 Enter = 확인)'],[keyLabel('target',1),'구매 / 판매'],['1·2·3 / Q·E','탭'],['Esc',sellPend?'취소':'닫기']];}
  else if(invTab===1){
-  body=`<div class="invmain"><div class="list">${ITEMS.shopA.map((id,i)=>{const d=IT[id];return `<div class="row${i===listSel?' sel':''}" data-row="${i}">${cellHTML({id,n:1},'',false)}<span class="rn" style="color:${rarCol(id)}">${esc(d.n)}</span><span class="rs">${esc(d.fx||d.cat||'')}</span><span class="rp${INV.gold+coins<d.p?' bad':''}">${icSpan('ui_coins',32,'mini')} ${d.p}</span><span class="rh">보유 ${invCount(id)||(Object.values(INV.equip).some(e=>e&&e.id===id)?'장착':0)}</span></div>`;}).join('')}</div><div class="tipcol">${tipHTML(invSelected())}</div></div>`;
-  hints=[['↑↓','선택'],['Enter','구매'],['1·2·3 / Q·E','탭'],['Esc','닫기']];}
+  body=`${shopModeBar()}<div class="invmain"><div class="list">${ITEMS.shopA.map((id,i)=>{const d=IT[id];return `<div class="row${i===listSel?' sel':''}" data-row="${i}">${cellHTML({id,n:1},'',false)}<span class="rn" style="color:${rarCol(id)}">${esc(d.n)}</span><span class="rs">${esc(d.fx||d.cat||'')}</span><span class="rp${INV.gold+coins<d.p?' bad':''}">${icSpan('ui_coins',32,'mini')} ${d.p}</span><span class="rh">보유 ${invCount(id)||(Object.values(INV.equip).some(e=>e&&e.id===id)?'장착':0)}</span></div>`;}).join('')}</div><div class="tipcol">${tipHTML(invSelected())}</div></div>`;
+  hints=[['↑↓','선택'],['Enter','구매'],[keyLabel('target',1),'구매 / 판매'],['1·2·3 / Q·E','탭'],['Esc','닫기']];}
  else{
   const rows=forgeRows();
   body=`<div class="invmain"><div class="list">${rows.map((r,i)=>{
@@ -527,27 +572,41 @@ function renderInv(){ovp.classList.add('wide');
    if(r.kind==='enh'){const w=INV.equip.weapon;return `<div class="row${i===listSel?' sel':''}" data-row="${i}">${cellHTML(w,'',false)}<span class="rn" style="color:${rarCol(w.id)}">강화 +${w.plus} → +${r.e.l}</span><span class="rs">${esc(ITEMS.enhT[r.e.mt]||'')} ×${r.e.n} (데모: 금화만) · 성공 ${r.e.ok}%</span><span class="rp${INV.gold+coins<r.e.c?' bad':''}">${icSpan('ui_coins',32,'mini')} ${r.e.c}</span></div>`;}
    const ok=canCraft(r);return `<div class="row${i===listSel?' sel':''}${ok?'':' dimrow'}" data-row="${i}">${cellHTML({id:r.item,n:1},'',false)}<span class="rn" style="color:${rarCol(r.item)}">${esc(IT[r.item].n)}</span><span class="mats">${r.mats.map(([m,n])=>{const h=invCount(m);return `<span class="mat${h<n?' bad':''}" title="${esc(IT[m].n)}">${icSpan(m,32,'mini')}<b>${h}/${n}</b></span>`;}).join('')}</span><span class="rp${INV.gold<r.c?' bad':''}">${icSpan('ui_coins',32,'mini')} ${r.c}</span></div>`;}).join('')}</div><div class="tipcol">${tipHTML(invSelected(),forgeTip(rows[listSel]))}</div></div>`;
   hints=[['↑↓','선택'],['Enter','제작 · 강화'],['1·2·3 / Q·E','탭'],['Esc','닫기']];}
- ovp.innerHTML=`<h2>인벤토리 · 장비 · 상점 · 대장간</h2>${tabs}${body}<div class="note${/⚠/.test(invNote)?' bad':''}">${invNote||'&nbsp;'}</div>`+hintBar(hints);
- ovp.querySelectorAll('[data-tab]').forEach(el=>el.onclick=()=>{invTab=+el.dataset.tab;listSel=0;invNote='';renderInv();});
+ ovp.innerHTML=`<h2>${invTab===1?esc(SHOP_NAMES[shopAt]||'상점'):'인벤토리 · 장비 · 상점 · 대장간'}</h2>${tabs}${body}<div class="note${/⚠/.test(invNote)?' bad':''}">${invNote||'&nbsp;'}</div>`+hintBar(hints);
+ ovp.querySelectorAll('[data-tab]').forEach(el=>el.onclick=()=>setInvTab(+el.dataset.tab));
+ ovp.querySelectorAll('[data-sm]').forEach(el=>el.onclick=()=>{shopMode=el.dataset.sm;sellPend=null;invNote='';renderInv();});
  ovp.querySelectorAll('[data-bag]').forEach(el=>{el.onclick=()=>{invZone='bag';invSel=+el.dataset.bag;renderInv();};el.ondblclick=()=>{invZone='bag';invSel=+el.dataset.bag;invAction();};el.onmousemove=e=>{if(e.clientX===invMouse[0]&&e.clientY===invMouse[1])return;invMouse=[e.clientX,e.clientY];if(invZone!=='bag'||invSel!==+el.dataset.bag){invZone='bag';invSel=+el.dataset.bag;renderInv();}};});
  ovp.querySelectorAll('[data-eq]').forEach(el=>{el.onclick=()=>{invZone='equip';eqSel=+el.dataset.eq;renderInv();};el.ondblclick=()=>{invZone='equip';eqSel=+el.dataset.eq;invAction();};});
  ovp.querySelectorAll('[data-row]').forEach(el=>{el.onclick=()=>{listSel=+el.dataset.row;renderInv();};el.ondblclick=()=>{listSel=+el.dataset.row;invAction();};});
  const s=ovp.querySelector('.row.sel');if(s&&s.scrollIntoView)s.scrollIntoView({block:'nearest'});}
+function shopModeBar(){return `<div class="shopmode"><span class="sm${shopMode==='buy'?' on':''}" data-sm="buy">구매</span><span class="sm${shopMode==='sell'?' on':''}" data-sm="sell">판매</span><span class="shopn">판매는 상점에서만 · 판매가 = 구매가의 절반</span></div>`;}
+function sellTip(){if(invZone==='equip'){const e=INV.equip[EQ_SLOTS[eqSel]];return e?'<div class="sellp no">장착 중 — 가방 · 장비 탭에서 먼저 해제해야 팔 수 있다</div>':'';}
+ const it=INV.bag[invSel];if(!it)return '';const v=(IT[it.id]||{}).sell||0;
+ return v?`<div class="sellp">판매가 ${icSpan('ui_coins',32,'mini')} ${v}${it.n>1?' (1개)':''}</div>`:'<div class="sellp no">팔 수 없는 물건</div>';}
+function sellAction(){
+ if(invZone==='equip'){const e=INV.equip[EQ_SLOTS[eqSel]];if(!e)return;sellPend=null;invNote=`⚠ 장착 중인 ${IT[e.id].n}은(는) 팔 수 없다 — 가방 · 장비 탭에서 먼저 해제하세요`;renderInv();return;}
+ const it=INV.bag[invSel];if(!it)return;const d=IT[it.id],v=d.sell||0;
+ if(!v){sellPend=null;invNote=`⚠ ${d.n}은(는) 팔 수 없는 물건이다`;renderInv();return;}
+ const key=invSel+':'+it.id+':'+(it.plus||0);
+ if(sellPend!==key){sellPend=key;invNote=`${d.n}${it.plus?' +'+it.plus:''} 을(를) 금화 ${v}에 판다? — Enter 확인 · Esc 취소`;renderInv();return;}
+ sellPend=null;INV.gold+=v;if(stackable(it.id))invTake(it.id,1);else INV.bag.splice(invSel,1);
+ invNote=`${d.n}${it.plus?' +'+it.plus:''} 판매 (+${v})`;renderInv();refreshQuick();}
 function forgeTip(r){if(!r||r.kind!=='rec')return '';return `<div class="src">제작: 성공 ${r.ok}% · 금화 ${r.c}<br>${r.mats.map(([m,n])=>`${esc(IT[m].n)} ${invCount(m)}/${n}`).join(' · ')}</div>`;}
 function spend(c){ // coins from dives are spent first, then the demo wallet
  if(INV.gold+coins<c)return false;INV.gold-=c;return true;}
 function invAction(){
+ if(invTab===1&&shopMode==='sell'){sellAction();return;}
  if(invTab===1){const id=ITEMS.shopA[listSel],d=IT[id];if(!id)return;
   if(!spend(d.p)){invNote='⚠ 금화가 부족하다';renderInv();return;}
   if(!invAdd(id,1)){INV.gold+=d.p;invNote='⚠ 가방이 가득 찼다';renderInv();return;}
-  invNote=`${d.n} 구매 (−${d.p})`;renderInv();refreshQuick();return;}
+  invNote=`${d.n} 구매 (−${d.p})`;dropNote(id,1,'구매');renderInv();refreshQuick();return;}
  if(invTab===2){const r=forgeRows()[listSel];if(!r)return;
   if(r.kind==='enhmax'){invNote='⚠ 이 마을 대장간은 +3 까지만 강화할 수 있다';renderInv();return;}
   if(r.kind==='enh'){if(!spend(r.e.c)){invNote='⚠ 금화가 부족하다';renderInv();return;}
    const w=INV.equip.weapon;if(Math.random()*100<r.e.ok||window.__forceSuccess){w.plus=r.e.l;invNote=`강화 성공! ${IT[w.id].n} +${w.plus}`;}else invNote=`⚠ 강화 실패 (단계 유지) — 금화 ${r.e.c} 소모`;renderInv();return;}
   if(!canCraft(r)){invNote='⚠ 재료 또는 금화가 부족하다';renderInv();return;}
   if(INV.bag.length>=BAG_N){invNote='⚠ 가방이 가득 찼다';renderInv();return;}
-  spend(r.c);for(const[m,n]of r.mats)invTake(m,n);invAdd(r.item,1,0);invNote=`${IT[r.item].n} 제작 완료!`;renderInv();return;}
+  spend(r.c);for(const[m,n]of r.mats)invTake(m,n);invAdd(r.item,1,0);invNote=`${IT[r.item].n} 제작 완료!`;dropNote(r.item,1,'제작');renderInv();return;}
  if(invZone==='equip'){const s=EQ_SLOTS[eqSel],e=INV.equip[s];if(!e)return;if(!invAdd(e.id,1,e.plus)){invNote='⚠ 가방이 가득 찼다';renderInv();return;}INV.equip[s]=null;invNote=`${IT[e.id].n} 해제`;renderInv();return;}
  const it=INV.bag[invSel];if(!it)return;const d=IT[it.id];
  if(EQ_SLOTS.includes(d.s)){const old=INV.equip[d.s];INV.bag.splice(invSel,1);if(old)INV.bag.splice(invSel,0,{id:old.id,n:1,plus:old.plus});INV.equip[d.s]={id:it.id,plus:it.plus||0};invNote=`${d.n} 장착`;renderInv();return;}
@@ -560,24 +619,26 @@ function useConsumable(id,inUI){const d=IT[id];if(!d||!invCount(id)){const t=`${
  else invTake(id,1);
  const t=`${d.n} 사용${h?` (하트 +${h>=99?'전부':h})`:' (데모: 효과 생략)'} · 남은 ${invCount(id)}`;inUI?invNote=t:msg(t);refreshQuick();return true;}
 function invMove(dx,dy){
- if(invTab!==0){const n=invTab===1?ITEMS.shopA.length:forgeRows().length;if(dy)listSel=(listSel+dy+n)%n;renderInv();return;}
+ sellPend=null;
+ if(invTab!==0&&!(invTab===1&&shopMode==='sell')){const n=invTab===1?ITEMS.shopA.length:forgeRows().length;if(dy)listSel=(listSel+dy+n)%n;renderInv();return;}
  if(invZone==='equip'){if(dx>0){invZone='bag';invSel=Math.min(BAG_N-1,eqSel*BAG_COLS);}else if(dy)eqSel=(eqSel+dy+EQ_SLOTS.length)%EQ_SLOTS.length;}
  else{let c=invSel%BAG_COLS,r=Math.floor(invSel/BAG_COLS);
   if(dx<0&&c===0){invZone='equip';eqSel=Math.min(EQ_SLOTS.length-1,r);}
   else{c=(c+dx+BAG_COLS)%BAG_COLS;r=(r+dy+BAG_ROWS)%BAG_ROWS;invSel=r*BAG_COLS+c;}}
  invNote='';renderInv();}
 function invKey(code,act){
+ if(code==='Escape'&&sellPend){sellPend=null;invNote='판매 취소';renderInv();return;}
  if(code==='Escape'||act==='menu'||act==='inventory'){closeUI();return;}
+ if(invTab===1&&(code==='Tab'||act==='target')){shopMode=shopMode==='buy'?'sell':'buy';sellPend=null;invNote='';invZone='bag';renderInv();return;}
  if(code==='ArrowUp'||act==='up')return invMove(0,-1);
  if(code==='ArrowDown'||act==='down')return invMove(0,1);
  if(code==='ArrowLeft'||act==='left')return invMove(-1,0);
  if(code==='ArrowRight'||act==='right')return invMove(1,0);
- if(/^Digit[123]$/.test(code)){invTab=+code[5]-1;listSel=0;invNote='';renderInv();return;}
- if(code==='KeyQ'||code==='KeyE'){invTab=(invTab+(code==='KeyE'?1:2))%3;listSel=0;invNote='';renderInv();return;}
+ if(/^Digit[123]$/.test(code)){setInvTab(+code[5]-1);return;}
+ if(code==='KeyQ'||code==='KeyE'){let t=invTab;do t=(t+(code==='KeyE'?1:2))%3;while(t===1&&!shopAt);setInvTab(t);return;}
  if(code==='Enter'||code==='NumpadEnter'||code==='Space'||act==='interact'||act==='attack'){invAction();return;}
  if(invTab===0&&code==='KeyR'){const it=INV.bag[invSel];if(it&&IT[it.id].s==='consumable'){INV.quick=it.id;invNote=`퀵슬롯(${keyLabel('potion',1)}): ${IT[it.id].n}`;refreshQuick();}else invNote='⚠ 소모품만 퀵슬롯에 등록할 수 있다';renderInv();return;}
- if(invTab===0&&(code==='Delete'||code==='Backspace')&&invZone==='bag'){const it=INV.bag[invSel];if(!it)return;const d=IT[it.id];
-  const v=d.sell||Math.floor((d.p||0)*0.4);INV.gold+=v;invTake(it.id,1);if(INV.bag[invSel]&&INV.bag[invSel].id!==it.id){}invNote=`${d.n} 판매 (+${v})`;renderInv();refreshQuick();return;}
+ if(invTab===0&&(code==='Delete'||code==='Backspace')){invNote='⚠ 판매는 상점에서만 할 수 있다 — 상점 NPC(미소)에게 말을 걸어 「판매」를 고르세요';renderInv();return;}
  if(act==='gear'){cycleGear();return;}
  if(act==='map')openUI('map');}
 // HUD quick slot (bottom-left, above the key bar)
@@ -686,10 +747,12 @@ const NPC_BOUNCE={amp:1.5,idleHz:1.3,walkHz:4,top:.17,bot:.36};
 const NPC_BOUNCE_IDS=new Set(["a_tool", "a_tailor", "a_herb", "b_dyer", "b_widow", "b_scholar", "h_tool", "h_surveyor", "h_mystic", "g_tool", "g_tailor", "g_archaeo", "g_dancer", "f_harbor", "f_tailor", "f_keeper", "f_diver", "e_tailor", "c_tool", "c_priest", "d_tool", "d_princess", "sm_G", "sm_F"]);
 function spawnNpc(id,x,y,o={}){const n=Object.assign({id,x,y,h:o.h||120,hp:3,maxHp:3,hpLag:3,hitT:0,lagDelay:0,headH:(o.h||120)+6,behavior:'flee',lethal:!o.child,t:Math.random()*9,moving:false,
   bounce:NPC_BOUNCE_IDS.has(id)},o);const im=new Image();im.onload=()=>{n.img=im;};im.src='assets/npcs/'+id+'.png';npcs.push(n);return n;}
+let shopNpc=null; // set below once spawnNpc / NPC_BOUNCE are defined
 function drawNpc(n){const im=n.img;if(!im)return;const h=n.h,w=h*im.width/im.height,x=Math.round(n.x-w/2),y=Math.round(n.y-h);
  shadow(n.x,n.y+1,w*.6,10,.35);ctx.drawImage(im,x,y,w,h);
  if(n.bounce&&NPC_BOUNCE.amp>0){const B=NPC_BOUNCE,dy=Math.round(B.amp*Math.sin(n.t*2*Math.PI*(n.moving?B.walkHz:B.idleHz)));
   if(dy){const sy0=im.height*B.top,sh=im.height*(B.bot-B.top);ctx.drawImage(im,0,sy0,im.width,sh,x,y+h*B.top+dy,w,h*(B.bot-B.top));}}}
+shopNpc=spawnNpc('a_tool',960,300,{shop:'a_tool'}); // 미소 · 도구상점 「보따리」 — talk (interact) to open the shop
 // "map reload": every non-boss enemy comes back at a random valid spot (not near the hero, not in walls/water).
 function reloadMap(){for(const m of slimes){const[x,y]=randSpot();Object.assign(m,m.kind==='boar'?mkBoar(x,y):mkSlime(x,y,m.sc));m.spawnT=.5;}}
 function randSpot(){for(let k=0;k<200;k++){const x=260+Math.random()*700,y=230+Math.random()*460;if(!blocked(x,y,20)&&Math.hypot(x-hero.x,y-hero.y)>260)return[x,y];}return[600,600];}
@@ -836,7 +899,7 @@ function exitUW(){const r=uw.ret;uw=null;hero.x=r[0];hero.y=r[1];hero.inv=.6;
  spawnRing(hero.x,hero.y,6,70,.5,'210,245,255',5,.4);burst(hero.x,hero.y-20,22,['#dff8ff','#7fd8ff','#fff'],220,500,4);}
 function pickUp(){const s=uw.spot,it=DIVE.items[uw.item];uw.item=null;if(!diveTaken.includes(s.id))diveTaken.push(s.id);saveDive();applySaved();
  if(it.effect==='maxHeart')hero.hp=Math.min(hero.maxHp,hero.hp+it.amount);if(it.effect==='fullHeal')hero.hp=hero.maxHp;
- popup={title:it.name+'!',sub:it.popup,pix:it.pix,t:2.6};burst(DIVE.floorItem[0],DIVE.floorItem[1]-30,26,['#fff','#bff4ff','#ffe08a'],260,-60,5,.8);}
+ popup={title:it.name+'!',sub:it.popup,pix:it.pix,t:2.6};if(IT[s.item])dropNote(s.item);burst(DIVE.floorItem[0],DIVE.floorItem[1]-30,26,['#fff','#bff4ff','#ffe08a'],260,-60,5,.8);}
 function updateUW(dt,ix,iy,l){uw.t+=dt;
  if(uw.leave){uw.leave+=dt;if(uw.leave>.4){exitUW();return;}}else uw.fade=Math.max(0,uw.fade-dt*2.5);
  if(l>0){hero.x=Math.max(90,Math.min(1190,hero.x+ix*230*l*dt));hero.y=Math.max(230,Math.min(600,hero.y+iy*190*l*dt));if(Math.abs(ix)>.2)hero.hz=ix>0?'right':'left';}
@@ -1199,7 +1262,7 @@ Promise.all(jobs).then(()=>{
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
  window.__game={hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
-  setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
+  setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},get shopAt(){return shopAt},get shopMode(){return shopMode},get sellPend(){return sellPend},get shopNpc(){return shopNpc},openShop,dropNote,RARITY_STARS,starCount,IT,setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
  setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0},5000);
  requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame);});

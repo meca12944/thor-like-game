@@ -170,7 +170,9 @@ def tsrc(d):
     return s+(f" / {d['other_source']}" if d.get('other_source') else '')
 # ---------------- ITEMS.md
 I=['# 아이템 카탈로그','',f"> 데이터: `data/towns.json` → `catalog`. 생성기가 개수를 검사한다 (무기 {COUNTS['weapon']} / 방어구 {COUNTS['armor']} (몸 {COUNTS['armor_body']} + 투구 {COUNTS['armor_helmet']}) / 보조무기 {COUNTS['offhand']} / 소모품 {COUNTS['consumable']}).",
- f"> 장비 {len(EQUIP_ITEMS)}종 중 상점 판매 {COUNTS['shop_equipment']}종, 희귀 드롭(보스·챔피언·퀘스트·잠수) {COUNTS['rare_equipment']}종. 티어 1~10 ≈ 지역 번호. 외형 레이어는 [EQUIPMENT.md](EQUIPMENT.md), 강화는 [SYSTEMS.md](SYSTEMS.md).",'']
+ f"> 장비 {len(EQUIP_ITEMS)}종 중 상점 판매 {COUNTS['shop_equipment']}종, 희귀 드롭(보스·챔피언·퀘스트·잠수) {COUNTS['rare_equipment']}종. 티어 1~10 ≈ 지역 번호. 외형 레이어는 [EQUIPMENT.md](EQUIPMENT.md), 강화는 [SYSTEMS.md](SYSTEMS.md).",
+ "> 판매: 상점 NPC의 「판매」 탭에서만 (구매가의 50%, 아이템별 `sell`; 장착 중인 장비는 해제 후). 규칙은 [CRAFTING.md](CRAFTING.md).",
+ "> 희귀도 별 (아이콘 구석의 작은 별): 일반 없음 · 고급 ★ · 희귀 ★★ · 영웅 ★★★ · 전설·유일 ★★★★ (숨겨진 전설검 탁검·규검·찬검) · 타락 ★★★. 설정은 데모의 `RARITY_STARS` 한 곳.",'']
 for c,title in [('weapon','무기 (30)'),('armor','방어구 (30)'),('offhand','보조무기 (30)')]:
     I+=[f"## {title}",'','| ID | 이름 | 종류 | 티어 | 능력치 | 출처 | 스프라이트 · 팔레트 | 외형 |','|---|---|---|---|---|---|---|---|']
     for e in sorted([e for e in EQUIP_ITEMS if cat(e)==c],key=lambda e:(e['tier'],e['source']['type']!='shop',e['id'])):

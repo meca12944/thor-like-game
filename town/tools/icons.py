@@ -234,6 +234,8 @@ def main():
     print('icons',len(order),kinds,'variants',len(variants))
     demo_data(meta)
 
+SELL_RATE=0.5           # shop sell price = 50% of buy price (per item 'sell' in items_demo.json)
+SELL_DROP_PER_TIER=60   # sell price for unpriced rare-drop gear, per tier
 def demo_data(meta):
     """compact item info for the town demo (injected by build.py as /*ITEMS*/)."""
     md=open(ROOT+'/src/monsters/ITEMS.md').read();stat={};src_txt={}
@@ -258,6 +260,10 @@ def demo_data(meta):
             src=' · '.join(x.get('where','') for x in m['sources'][:2]))
     for i,v in items.items():
         v['ic']=meta['icons'][i]['i'];v['r']=meta['icons'][i]['rarity']
+        # sell price (shop 판매 tab only): SELL_RATE x buy price; materials keep their own MATERIALS.md price;
+        # unpriced rare-drop gear = SELL_DROP_PER_TIER x tier; hidden swords / price-0 key items can't be sold (sell 0)
+        if v['s']!='material' or v.get('sell') is None:
+            v['sell']=0 if i.startswith('hs_') else int((v.get('p') or 0)*SELL_RATE) if v.get('p') is not None else SELL_DROP_PER_TIER*(v.get('t') or 1)
         for k in [k for k,x in v.items() if x in (None,'')]:del v[k]
     shopA=[x['id'] for k in ('weapons','armor','offhand') for x in cat[k] if x['source'].get('type')=='shop' and x['source'].get('where')=='A']
     shopA+=[c['id'] for c in cat['consumables'] if any(s['town']=='A' for s in c.get('shops',[]))]
