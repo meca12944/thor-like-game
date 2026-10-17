@@ -16,7 +16,20 @@
   const WORLD_ZOOM = 0.5;          // overworld scale vs field (0.5 => 8px tiles, ~13px hero). Try 0.75 / 1.
   const LW = 384, LH = 216;        // logical screen (DQ6 SFC-like 16:9), integer-scaled to the window
   const HERO_SPEED = 82, WORLD_SPEED = 46;
-  const ROLL = { dur: 0.38, iframe: 0.32, speed: 175, cd: 0.12 };
+  const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
+  // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
+  const ATK_DMG = [10, 10, 14];
+  const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
+  const DIFF0 = { id: 'normal', enemy_hp: 1, enemy_dmg: 1, telegraph: 1, aggression: 1, tokens: 2, potion_cap: 5, iframe_bonus: 0, ult_cap: 0.9, telegraph_floor: { attack: 0.45, aoe: 0.6, charge_line: 0.45, ult: 2.2 } };
+  const DIFF = () => { const g = window.__game; return (g && g.diff) || DIFF0; };
+  const iframe = () => ROLL.iframe + (DIFF().iframe_bonus || 0);
+  // telegraph = authored (normal) value x difficulty, never below the difficulty floor (charge lines / ground AoE / attacks / 필살기)
+  function teleScale(h) { if (!(h.warn > 0)) return; const d = DIFF(), F = d.telegraph_floor || DIFF0.telegraph_floor;
+    const fl = h.kind === 'ult' ? F.ult : h.shape === 'line' ? F.charge_line : (h.dmg ? F.aoe : F.attack); h.warn = Math.max(fl, h.warn * d.telegraph); }
+  // attack tokens: at most N melee + 1 ranged enemies may start an attack at once; a token is handed back ~1.2s later + 0.6s cooldown
+  function token(m, ranged) { if (m.D.boss || m.D.champion) return true; const now = S.t, d = DIFF(); S.tokens = (S.tokens || []).filter(t => t.until > now && !t.m.dead);
+    if (S.tokens.some(t => t.m === m)) return true; const lim = ranged ? 1 : (d.tokens || 2); if (S.tokens.filter(t => !!t.r === !!ranged).length >= lim) return false;
+    S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
   const ATK = { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
   const FADE = 0.35, CARD = 2.1;
   const Q = new URLSearchParams(location.search);
@@ -167,7 +180,7 @@
   // ---------------- runtime state ----------------
   const S = { scene: 'town', map: null, mobs: [], hazards: [], shots: [], fx: [], timers: [], temp: [], banner: null, dialog: null, msg: null, ult: null,
     cam: [0, 0], camI: [0, 0], shake: 0, t: 0, trans: null, townPos: null, pause: false, deadT: 0, engaged: null, bgm: null, bgmCard: null, bossRef: null, jingleT: 0, view: { k: 1, ox: 0, oy: 0 } };
-  const hero = { x: 0, y: 0, face: 'down', hp: 5, maxHp: 5, inv: 0, walkT: 0, moving: false, atk: null, combo: 0, comboT: 0, roll: null, rollCd: 0, slowT: 0, safe: [0, 0], dodgeT: 0 };
+  const hero = { x: 0, y: 0, face: 'down', hp: 50, maxHp: 50, inv: 0, walkT: 0, moving: false, atk: null, combo: 0, comboT: 0, roll: null, rollCd: 0, slowT: 0, safe: [0, 0], dodgeT: 0 };
   let manual = false;
 
   // ---------------- input (captured only while a world scene is active; town keys untouched) ----------------
@@ -202,7 +215,7 @@
   function msg(text, t = 2.2) { S.msg = { text, t }; }
   function banner(text, t = 1.6, small) { S.banner = { text, t, max: t, small }; }
   function after(t, f) { S.timers.push({ t, f }); }
-  function shake(v) { S.shake = Math.max(S.shake, v); }
+  function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
   const NAMES = { potion: '물약', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
     m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재' };
@@ -213,7 +226,7 @@
     return names.join(', '); }
 
   // ---------------- hazards / shots: the only things that can hurt the hero ----------------
-  function hazard(h) { h.t = 0; h.hit = false; S.hazards.push(h); return h; }
+  function hazard(h) { h.t = 0; h.hit = false; teleScale(h); S.hazards.push(h); return h; }
   function inHaz(h, x, y) {
     if (h.shape === 'circle') return Math.hypot(x - h.x, (y - h.y) * 1.15) < h.r + 3;
     if (h.shape === 'ring') { const d = Math.hypot(x - h.x, (y - h.y) * 1.15); return d > h.r0 - 3 && d < h.r + 3; }
@@ -222,12 +235,12 @@
     if (h.shape === 'all') return !ultSafe(h, x, y);
     return false;
   }
-  function hurt(dmg, src) {
+  function hurt(dmg, src, raw) {
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god) return false;
-    if (hero.roll && hero.roll.t < ROLL.iframe) { if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
+    if (hero.roll && hero.roll.t < iframe()) { if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; shake(2);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
@@ -250,7 +263,7 @@
   // ---------------- mobs ----------------
   function spawn(kind, x, y, o = {}) {
     const D = WorldMobs.def[kind]; if (!D) { console.warn('[world] unknown mob', kind); return null; }
-    const m = Object.assign({ kind, D, x, y, home: [x, y], hp: D.hp, maxHp: D.hp, hpLag: D.hp, st: 'idle', t: Math.random(), face: -1, r: D.r, fly: !!D.fly, hitT: 0, flash: 0, hz: 0, kx: 0, ky: 0, spawnT: .4, lagDelay: 0 }, o);
+    const m = Object.assign({ kind, D, x, y, home: [x, y], hp: Math.round(D.hp * DIFF().enemy_hp), maxHp: Math.round(D.hp * DIFF().enemy_hp), hpLag: Math.round(D.hp * DIFF().enemy_hp), st: 'idle', t: Math.random(), face: -1, r: D.r, fly: !!D.fly, hitT: 0, flash: 0, hz: 0, kx: 0, ky: 0, spawnT: .4, lagDelay: 0 }, o);
     if (D.init) D.init(m); S.mobs.push(m); return m;
   }
   function count(kind) { return S.mobs.filter(m => m.kind === kind && !m.dead).length; }
@@ -261,7 +274,7 @@
     m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m);
     if (!D.boss) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
-    addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(dmg), life: .6, color: '#fff' });
+    addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)), life: .6, color: '#fff' });
     if (D.boss || D.champion) engage(m);
     if (m.hp <= 0) killMob(m);
   }
@@ -270,7 +283,7 @@
     addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion });
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
-    if (!D.boss && !D.champion && !m.noDrop && Math.random() < .18) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
+    if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
     if (m.flag) { SAVE.flags[m.flag] = true; save(); }
     if (D.champion) { banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const left = ['champ_boar', 'champ_wasp'].filter(f => !SAVE.flags[f]).length;
       after(2.3, () => msg(left ? '남은 챔피언: ' + left + ' — 모두 쓰러뜨리면 골렘의 방이 열린다' : '숲의 두 우두머리를 쓰러뜨렸다! 신전 B2의 봉인된 문이 열린다.', 3.5)); }
@@ -287,12 +300,12 @@
     after(3.2, () => { addWarp(M()); msg('빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다', 4); });
   }
   function addWarp(m) { if (!m.objs.some(o => o.type === 'warp')) m.objs.push({ type: 'warp', x: m.pw / 2, y: m.ph / 2 + 16, tx: -1, ty: -1, to: m.boss.exit.to, spawn: m.boss.exit.spawn }); }
-  function phase2(m) { banner('2페이즈 — 골렘이 수정 갑옷을 일으킨다!', 2); shake(5); for (let i = 0; i < 14; i++) addFx('crystal', m.x + Math.cos(i / 14 * TAU) * 30, m.y + Math.sin(i / 14 * TAU) * 22, { life: .8 }); }
-  function ult(m, warn) { banner('필살 — 대지 붕괴!  기둥 뒤로 숨거나, 폭발 순간 구르기', 2.6); S.ult = hazard({ shape: 'all', x: m.x, y: m.y, owner: m, warn, act: 0.15, dmg: Math.ceil(hero.maxHp / 2), kind: 'ult' }); }
+  function phase2(m) { banner('2페이즈 — 골렘이 수정 갑옷을 일으킨다!', 2); shake(5); try { const g = window.__game; if (g && g.ULT_CFG) g.ultG = Math.min(g.ULT_CFG.max, g.ultG + g.ULT_CFG.gainBossPhase); } catch (e) {} for (let i = 0; i < 14; i++) addFx('crystal', m.x + Math.cos(i / 14 * TAU) * 30, m.y + Math.sin(i / 14 * TAU) * 22, { life: .8 }); }
+  function ult(m, warn) { banner('필살 — 대지 붕괴!  기둥 뒤로 숨거나, 폭발 순간 구르기', 2.6); S.ult = hazard({ shape: 'all', x: m.x, y: m.y, owner: m, warn, act: 0.05, dmg: Math.ceil(hero.maxHp * Math.min(0.52 * DIFF().enemy_dmg, DIFF().ult_cap || 0.9)), raw: true, kind: 'ult' }); m.ultW = S.ult.warn; } // 52% of max HP (normal), capped so a full-HP hero survives one
   function jingle() { try { if (window.BGM && BGM.jingle) { BGM.jingle('jingle_victory'); S.jingleT = 3.5; } } catch (e) {} }
 
   // the API handed to mob behaviours (world_mobs.js)
-  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, blockedAt: (x, y) => blocked(x, y, 4), dist, spawn, count, engage,
+  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), dist, spawn, count, engage,
     fx: addFx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
 
   // ---------------- scene manager ----------------
@@ -350,7 +363,7 @@
     if (S.townPos) { g.hero.x = S.townPos.x; g.hero.y = S.townPos.y; g.hero.face = 'up'; }
     syncTownHp(); g.setManual(false); S.scene = 'town'; S.bgm = null; held.clear();
   }
-  function syncFromTown() { const g = window.__game; if (!g) return; hero.maxHp = g.hero.maxHp || 5; hero.hp = Math.max(1, g.hero.hp ?? hero.maxHp); }
+  function syncFromTown() { const g = window.__game; if (!g) return; hero.maxHp = g.hero.maxHp || 50; hero.hp = Math.max(1, g.hero.hp ?? hero.maxHp); }
   function syncTownHp() { const g = window.__game; if (g && g.hero) { g.hero.hp = hero.hp; g.hero.maxHp = hero.maxHp; } }
   function die() { S.deadT = 0.01; banner('쓰러졌다…', 2.2); }
   function respawnAfterDeath() { hero.hp = hero.maxHp; syncTownHp(); S.deadT = 0; const m = M(); go(m.type === 'boss' ? 'dungeon01_b2' : m.id, 'default', { card: false }); }
@@ -369,7 +382,7 @@
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; }
   function step(dt) {
-    S.t += dt;
+    S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
     if (S.scene === 'town') return;
     if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
@@ -380,7 +393,7 @@
     if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
     if (S.jingleT > 0) S.jingleT -= dt;
-    S.shake = Math.max(0, S.shake - dt * 10);
+    S.shake = Math.max(0, S.shake - dt * 14);
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 2.2) respawnAfterDeath(); queue.length = 0; return; }
     if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
@@ -414,7 +427,7 @@
     else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; moveCol(hero, dv[0] * 20 * dt, dv[1] * 20 * dt, 5);
       if (a.t >= ATK.a0 && a.t <= ATK.a1) { const hx = hero.x + dv[0] * ATK.reach, hy = hero.y - 6 + dv[1] * ATK.reach * .8, R = ATK.r + (a.i === 2 ? 4 : 0);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-          if (Math.hypot(mm.x - hx, (mm.y - mh * .4) - hy) < R + mm.r + mh * .25) { a.hit.add(mm); hitMob(mm, a.i === 2 ? 2 : 1, Math.atan2(mm.y - hero.y, mm.x - hero.x)); } } }
+          if (Math.hypot(mm.x - hx, (mm.y - mh * .4) - hy) < R + mm.r + mh * .25) { a.hit.add(mm); hitMob(mm, ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x)); } } }
       if (a.t >= ATK.dur) { hero.atk = null; hero.comboT = ATK.chain; } }
     else { const sp = HERO_SPEED * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = !!(ix || iy);
       if (hero.moving) { setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); hero.walkT += dt; } }
@@ -454,7 +467,7 @@
     for (let i = S.hazards.length - 1; i >= 0; i--) { const h = S.hazards[i]; h.t += dt;
       if (h.owner && h.owner.dead && h.t < h.warn) { S.hazards.splice(i, 1); continue; }
       const live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
-      if (live && h.dmg && !h.hit && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
+      if (live && h.dmg && !h.hit && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
       if (h.t >= h.warn && !h.fired) { h.fired = true; if (h.onEnd) h.onEnd(h); hazardFx(h); }
       if (h.linger && h.t >= h.warn + (h.act || 0) && h.t < h.warn + h.act + h.linger && !h.hit && Math.hypot(hero.x - h.x, (hero.y - h.y) * 1.15) < h.r * .8) { if (hurt(1, h)) h.hit = true; }
       if (h.t > h.warn + (h.act || 0) + (h.linger || 0) + .25) { S.hazards.splice(i, 1); if (h === S.ult) S.ult = null; }
@@ -464,7 +477,7 @@
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
-      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { hero.hp = Math.min(hero.maxHp, hero.hp + 1); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+1 ♥', life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
+      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
     const e = S.engaged; let want = m.bgm;
@@ -479,7 +492,8 @@
   const spikeWarn = o => spikePhase(o) > 1.5 && spikePhase(o) <= 2.0;
   const trapAt = (cx, cy) => M().objs.some(o => (o.type === 'spikes' || o.type === 'pit') && Math.abs(o.tx - cx) <= 1 && Math.abs(o.ty - cy) <= 1);
   function usePotion() { const g = window.__game; const n = g ? g.potions : 0; if (!n) { msg('물약이 없다'); return; } if (hero.hp >= hero.maxHp) { msg('체력이 가득하다'); return; }
-    g.potions = n - 1; hero.hp = Math.min(hero.maxHp, hero.hp + 2); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+2)  남은 물약 ' + (n - 1)); }
+    if (g.potionCd > 0) { msg('물약 재사용 대기 ' + g.potionCd.toFixed(1) + '초'); return; }
+    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -611,7 +625,7 @@
     if (h.roll) { const p = h.roll.t / ROLL.dur; // tumble: squash + tilt + white afterimages; cyan aura = i-frames
       for (let i = 1; i <= 2; i++) drawSpr(g, name, h.x - h.roll.dx * i * 6, h.y - h.roll.dy * i * 6, { flip: h.face === 'left', alpha: .25 / i, sy: .7, mode: 'white' });
       drawSpr(g, name, h.x, h.y, { flip: h.face === 'left', sy: .62 + .3 * Math.abs(Math.cos(p * Math.PI * 2)), rot: (h.roll.dx >= 0 ? 1 : -1) * Math.sin(p * Math.PI) * .5 });
-      if (h.roll.t < ROLL.iframe) { g.fillStyle = 'rgba(160,240,255,.3)'; g.beginPath(); g.ellipse(h.x, h.y - 9, 9, 11, 0, 0, TAU); g.fill(); }
+      if (h.roll.t < iframe()) { g.fillStyle = 'rgba(160,240,255,.3)'; g.beginPath(); g.ellipse(h.x, h.y - 9, 9, 11, 0, 0, TAU); g.fill(); }
       return; }
     if (zoom !== 1) { drawSmallHero(g, name, h.x, h.y, zoom); return; }
     drawSpr(g, name, h.x, h.y, { flip: h.face === 'left', mode: (h.inv > .8 && S.scene !== 'world') ? 'white' : null });
@@ -730,8 +744,10 @@
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
-      for (let i = 0; i < hero.maxHp; i++) heart(ox + (14 + i * 18) * u, oy + 14 * u, 7 * u, i < hero.hp);
-      const g = window.__game; textOut(`물약 ${g ? g.potions : 0} [${keyHint('potion')}]`, ox + (14 + hero.maxHp * 18 + 4) * u, oy + 19 * u, 11 * u, '#cfe8ff', '#000', 'left');
+      { const bw = Math.round(96 * u), bh = Math.max(3, Math.round(4 * u)), bx = Math.round(ox + 12 * u), by = Math.round(oy + 10 * u), f = Math.max(0, hero.hp / hero.maxHp); // [balance] numeric HP bar (matches the town HUD)
+        ctx.fillStyle = '#05060c'; ctx.fillRect(bx - 1, by - 1, bw + 2, bh + 2); ctx.fillStyle = '#1a1c2a'; ctx.fillRect(bx, by, bw, bh); ctx.fillStyle = f > .3 ? '#3ccf5a' : '#e0302c'; ctx.fillRect(bx, by, Math.round(bw * f), bh);
+        textOut(Math.ceil(hero.hp) + '/' + hero.maxHp, bx + bw + 4 * u, by + bh, 10 * u, '#d8f5dc', '#000', 'left'); }
+      const g = window.__game; textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, oy + 26 * u, 11 * u, '#cfe8ff', '#000', 'left');
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }

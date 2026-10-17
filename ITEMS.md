@@ -21,10 +21,10 @@
 | `w_reed_leaf` | 갈대잎 검 | 무기 | 2 | 공격 9 | B 강변 물레방아 마을 상점 (480) | `wpn_leaf` · reed_green | 버들잎처럼 가운데가 불룩한 초록빛 날. 휘두르면 연두색 잔상. | `r_w_reed_leaf` (A, 100%) |
 | `w_spider_fang` | 여왕거미 독니검 | 무기 | 2 | 공격 13 · 타격 시 15% 독 | 보스: 2지역 수정 여왕거미 (첫 격파 확정) | `wpn_curved` · spider_violet | 보랏빛 수정 독니가 휜 날이 된 검, 날 끝에서 독 방울이 떨어진다. | `r_w_spider_fang` (E, 70%) |
 | `w_desert_crescent` | 사막 초승달검 | 무기 | 3 | 공격 14 | G 사막 바자르 상점 (1200) | `wpn_curved` · desert_gold | 초승달처럼 휜 금빛 곡도, 붉은 술 장식. 금색 궤적. | `r_w_desert_crescent` (B, 100%) |
-| `w_sun_sting` | 태양침 독검 | 무기 | 3 | 공격 15 · 찌르기 독 30% | 챔피언: 3지역 황금 전갈 '태양침' (6%) | `wpn_leaf` · scorpion_amber | 황금 전갈 꼬리 마디로 이은 호박색 날, 끝은 독침. | `r_w_sun_sting` (B, 100%) |
+| `w_sun_sting` | 태양침 독검 | 무기 | 3 | 공격 15 · 베기 독 30% | 챔피언: 3지역 황금 전갈 '태양침' (6%) | `wpn_leaf` · scorpion_amber | 황금 전갈 꼬리 마디로 이은 호박색 날, 끝은 독침. | `r_w_sun_sting` (B, 100%) |
 | `w_sun_sigil` | 태양 문양 검 | 무기 | 4 | 공격 15 | G 사막 바자르 상점 (1350) | `wpn_straight_long` · sun_gold | 곧은 금날 전체에 태양 문양 음각, 가드 중앙에 붉은 보석. | `r_w_sun_sigil` (G, 100%) |
 | `w_pharaoh_scepter` | 황금가면 왕홀검 | 무기 | 4 | 공격 17 · 처치 시 하트 반칸 흡수 10% | 보스: 4지역 황금가면 미라왕 (첫 격파 확정) | `wpn_scepter` · pharaoh_gold | 남색 손잡이 위 금빛 왕홀 머리, 날은 상형문자가 새겨진 짧은 금날. 궤적에 상형문자. | `r_w_pharaoh_scepter` (E, 70%) |
-| `w_harpoon_blade` | 작살검 | 무기 | 5 | 공격 18 · 찌르기 사거리 +20% | F 남쪽 항구 마을 상점 (1950) | `wpn_harpoon` · sea_blue | 끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 찌르기(2타) 사거리 +20%. | `r_w_harpoon_blade` (F, 100%) |
+| `w_harpoon_blade` | 작살검 | 무기 | 5 | 공격 18 · 베기 사거리 +20% | F 남쪽 항구 마을 상점 (1950) | `wpn_harpoon` · sea_blue | 끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 휘두르기 사거리 +20% (긴 날 끝이 호를 넓힌다). | `r_w_harpoon_blade` (F, 100%) |
 | `w_wave_blade` | 파도 검 | 무기 | 5 | 공격 17 | F 남쪽 항구 마을 상점 (1700) | `wpn_wavy` · sea_blue | 물결치듯 구불구불한 바다색 날(플랑베르주형). 궤적이 물보라처럼 흩어진다. | `r_w_wave_blade` (F, 100%) |
 | `w_kraken_whip` | 크라켄 촉수검 | 무기 | 5 | 공격 19 · 3타 범위 +25% | 보스: 5지역 심해 크라켄 뱀 (첫 격파 확정) | `wpn_whip` · kraken_purple | 빨판 달린 보라 촉수가 칼날처럼 굳은 채찍검, 3타 범위 +25%. | `r_w_kraken_whip` (E, 70%) |
 | `w_anchor_great` | 닻 대검 | 무기 | 6 | 공격 18 · 넉백 +30% | F 남쪽 항구 마을 상점 (1850) | `wpn_broad` · anchor_steel | 닻 모양 가드가 달린 넓은 회철 대검, 손잡이에 밧줄 감김. | `r_w_anchor_great` (F, 100%) |
@@ -32,7 +32,7 @@
 | `w_forge_great` | 용광로 대검 | 무기 | 7 | 공격 23 · 3타 내려찍기 화상 | E 화산 기슭 대장장이 마을 상점 (2900) | `wpn_broad` · forge_red | 넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다. | `r_w_forge_great` (E, 90%) |
 | `w_obsidian` | 흑요석 검 | 무기 | 7 | 공격 21 | E 화산 기슭 대장장이 마을 상점 (2600) | `wpn_crystal` · obsidian_ember | 검은 유리 같은 흑요석 날, 가장자리만 주황 불씨처럼 빛남. 주황 궤적. | `r_w_obsidian` (E, 90%) |
 | `w_hellfire` | 업화의 흑검 | 무기 | 7 | 공격 24 · 모든 타격 화상 20% | 제작 전용: E 마스터 대장간 (재료: 흑기사의 업화 핵) (보스 첫 격파 시 핵 + 레시피 두루마리 확정 (장비 자체는 드롭 안 함)) | `wpn_flame` · hellfire | 흑기사의 검. 검은 날 전체가 불꽃 모양으로 일렁이며 늘 불이 붙어 있다. | `r_w_hellfire` (E, 70%, 제작 전용) |
-| `w_frost_crystal` | 서리 결정검 | 무기 | 8 | 공격 25 · 2타 찌르기 둔화 | C 설산 산장 마을 상점 (3600) | `wpn_crystal` · ice_pale | 얼음 결정이 겹겹이 자란 창백한 하늘색 날, 서리 김이 피어오름. | `r_w_frost_crystal` (E, 90%) |
+| `w_frost_crystal` | 서리 결정검 | 무기 | 8 | 공격 25 · 2타 되베기 둔화 | C 설산 산장 마을 상점 (3600) | `wpn_crystal` · ice_pale | 얼음 결정이 겹겹이 자란 창백한 하늘색 날, 서리 김이 피어오름. | `r_w_frost_crystal` (E, 90%) |
 | `w_northwind` | 북풍 장검 | 무기 | 8 | 공격 26 | C 설산 산장 마을 상점 (3900) | `wpn_straight_long` · silver_fur | 은빛 장검, 손잡이에 흰 털가죽, 가드 끝에 늑대 머리. | `r_w_northwind` (E, 90%) |
 | `w_storm_spear` | 뇌전 창검 | 무기 | 8 | 공격 27 · 3타 연쇄 번개 | 보스: 8지역 뇌전 와이번 (첫 격파 확정) | `wpn_spear` · storm_yellow | 와이번 뿔로 만든 창날 검, 날 위로 잔번개가 튄다. 노란 지그재그 궤적. | `r_w_storm_spear` (E, 70%) |
 | `w_mithril` | 미스릴 장검 | 무기 | 9 | 공격 31 | D 성벽 왕도 상점 (5600) | `wpn_straight_long` · mithril | 은청색으로 은은히 빛나는 미스릴 장검, 날 위로 룬 문자가 흐른다. | `r_w_mithril` (E, 80%) |
@@ -61,7 +61,7 @@
 | `b_bosun_coat` | 갑판장 코트 | 방어구(몸) | 5 | 방어 5 · 수영 속도 +15% | F 남쪽 항구 마을 상점 (1600) | `body_coat` · pirate_brass | 남색 긴 코트에 놋쇠 단추 두 줄, 옷자락이 바람에 휘날린다. | `r_b_bosun_coat` (F, 100%) |
 | `b_scale_mail` | 비늘 사슬갑옷 | 방어구(몸) | 5 | 방어 5 | F 남쪽 항구 마을 상점 (1400) | `body_mail` · sea_scale | 청록 물고기 비늘 모양 사슬갑옷, 어깨에 조개 장식. | `r_b_scale_mail` (F, 100%) |
 | `h_nautilus` | 앵무조개 투구 | 방어구(투구) | 5 | 방어 3 | F 남쪽 항구 마을 상점 (1100) | `head_shell` · shell_coral | 앵무조개 껍데기를 깎은 산호빛 투구. | `r_h_nautilus` (F, 100%) |
-| `b_crab_shell` | 거대게 껍질 갑옷 | 방어구(몸) | 6 | 방어 7 · 산호 방패 지속 +0.5초 | 보스: 6지역 산호 거대게 (첫 격파 확정) | `body_shell` · crab_red | 붉은 게 껍질 판을 이어 붙인 갑옷, 어깨에 작은 가시. | `r_b_crab_shell` (E, 70%) |
+| `b_crab_shell` | 거대게 껍질 갑옷 | 방어구(몸) | 6 | 방어 7 · 산호 방패 결계 지속 +0.5초 | 보스: 6지역 산호 거대게 (첫 격파 확정) | `body_shell` · crab_red | 붉은 게 껍질 판을 이어 붙인 갑옷, 어깨에 작은 가시. | `r_b_crab_shell` (E, 70%) |
 | `b_ghost_coat` | 유령 선장의 코트 | 방어구(몸) | 6 | 방어 6 · 피격 시 8% 확률 무효 | 챔피언: 6지역 유령 해적 선장 (6%) | `body_coat` · ghost_teal | 반투명한 청록 코트, 옷자락 끝이 연기처럼 흩어진다. | `r_b_ghost_coat` (F, 100%) |
 | `b_black_plate` | 흑철 판금 흉갑 | 방어구(몸) | 7 | 방어 7 · 화상 피해 -50% | E 화산 기슭 대장장이 마을 상점 (2200) | `body_plate` · black_iron_red | 검은 판금 흉갑, 붉은 리벳과 어깨 판갑. | `r_b_black_plate` (E, 90%) |
 | `h_horned` | 뿔 달린 흑철 투구 | 방어구(투구) | 7 | 방어 4 | E 화산 기슭 대장장이 마을 상점 (1700) | `head_helm_horn` · black_iron_red | 검은 투구 양옆에 굽은 뿔, 눈구멍에서 붉은 빛. | `r_h_horned` (E, 90%) |
@@ -93,10 +93,10 @@
 | `o_worm_fang` | 대지렁이 이빨 부메랑 | 투척무기 | 3 | 공격 8 · 왕복 2타, 관통 | 보스: 3지역 모래 대지렁이 (첫 격파 확정) | `off_throw_ring` · boar_ivory | 갈고리 모양 상아빛 이빨 부메랑. | `r_o_worm_fang` (E, 70%) |
 | `a_dune_boots` | 사막 질주 장화 | 장화 | 4 | 이동 속도 +10% | G 사막 바자르 상점 (950) | `acc_boots` · sand_gold | 모래색 긴 장화에 금 버클, 걸을 때 모래 먼지. | `r_a_dune_boots` (G, 100%) |
 | `o_golden_scarab` | 황금 풍뎅이 부적 | 부적 | 4 | 하루 1회 쓰러질 때 하트 1칸으로 버팀 | 잠수: 4지역 무너진 방 침수 구역 | `acc_amulet` · scarab_gold | 청록 날개의 황금 풍뎅이 펜던트. | `r_o_golden_scarab` (G, 100%) |
-| `a_coral_buckler` | 산호 버클러 | 방패 | 5 | 방어 2 | F 남쪽 항구 마을 상점 (1300) | `off_shield_round` · shell_coral | 분홍 산호가 박힌 작은 방패. 산호 방패 스킬 퍼펙트 판정 +0.05초. | `r_a_coral_buckler` (F, 100%) |
+| `a_coral_buckler` | 산호 버클러 | 방패 | 5 | 방어 2 | F 남쪽 항구 마을 상점 (1300) | `off_shield_round` · shell_coral | 분홍 산호가 박힌 작은 방패. 산호 방패(결계) 흡수량 +5. | `r_a_coral_buckler` (F, 100%) |
 | `o_shell_orb` | 조개 오브 | 오브 | 5 | 공격 4 · 자동 사격 2초 | F 남쪽 항구 마을 상점 (1500) | `off_orb` · shell_coral | 어깨 옆에 떠다니는 분홍 진주 조개. 2초마다 가까운 적에게 물방울 탄. | `r_o_shell_orb` (F, 100%) |
 | `o_shark_fin` | 백상어 지느러미 방패 | 방패 | 5 | 방어 4 · 막기 성공 시 반격 피해 3 | 챔피언: 5지역 백상어 장군 (7%) | `off_shield_kite` · shark_grey | 회색 상어 지느러미 모양 방패, 가장자리가 톱날. | `r_o_shark_fin` (F, 100%) |
-| `o_crab_claw` | 거대게 집게 방패 | 방패 | 6 | 방어 5 · 정면 40%, 산호 방패 퍼펙트 +0.08초 | 보스: 6지역 산호 거대게 (35%) | `off_shield_round` · crab_red | 붉은 게 집게를 통째로 방패로 쓴다. 막을 때 집게가 딸깍. | `r_o_crab_claw` (E, 70%) |
+| `o_crab_claw` | 거대게 집게 방패 | 방패 | 6 | 방어 5 · 산호 방패 결계 흡수량 +8 | 보스: 6지역 산호 거대게 (35%) | `off_shield_round` · crab_red | 붉은 게 집게를 통째로 방패로 쓴다. 막을 때 집게가 딸깍. | `r_o_crab_claw` (E, 70%) |
 | `a_flame_bracer` | 화염 팔찌 | 팔보호대 | 7 | 업화의 검 피해 +20% | E 화산 기슭 대장장이 마을 상점 (2000) | `acc_bracer` · forge_red | 손목의 흑철 팔찌, 붉은 홈이 은은히 빛남. | `r_a_flame_bracer` (E, 90%) |
 | `o_ember_orb` | 불씨 오브 | 오브 | 7 | 공격 8 · 자동 사격 1.5초, 화상 10% | E 화산 기슭 대장장이 마을 상점 (2400) | `off_orb` · lava_core | 주황 불씨가 소용돌이치는 구슬, 1.5초마다 화염탄. | `r_o_ember_orb` (E, 90%) |
 | `o_forge_tower` | 흑철 대방패 | 방패 | 7 | 방어 7 · 정지 시 정면 피해 40% 막기, 이동 속도 -5% | E 화산 기슭 대장장이 마을 상점 (2500) | `off_shield_tower` · black_iron_red | 몸을 거의 가리는 검은 사각 대방패, 가운데 붉은 용광로 문양. 이동 -5%. | `r_o_forge_tower` (E, 90%) |

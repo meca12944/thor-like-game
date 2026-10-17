@@ -176,6 +176,8 @@ def doc_lines():
 # ================================================================ 엔진 대조표 (town/BALANCE_TODO.md)
 ENGINE_HIT_UNIT=10   # 엔진 권장: 주인공 1타 = 10 (1지역 기준). 레벨 시스템이 붙으면 이 10을 최종 공격력으로 바꾼다.
 ENGINE_HERO_HP=50    # 엔진 권장: 하트 5칸 = HP 50 (1하트 = 10, 반 칸 = 5)
+# 엔진 원래 값 (커밋 25dbf5f의 town/world_mobs.js, 하트 단위). 목표 예고·속도는 이 원래 값에서 계산하고, 「현재」 열은 생성 시점 파일에서 읽어 적용 여부(✅/⚠)를 표시한다.
+ENGINE_BASE={'mushroom': {'hp': 3, 'warn': ['0.7'], 'line': [], 'speed': []}, 'rabbit': {'hp': 2, 'warn': [], 'line': ['0.55'], 'speed': []}, 'wasp': {'hp': 2, 'warn': [], 'line': ['0.6'], 'speed': ['40']}, 'boar': {'hp': 4, 'warn': [], 'line': ['0.45', '0.65'], 'speed': []}, 'scarecrow': {'hp': 3, 'warn': ['0.55', '0.55'], 'line': [], 'speed': ['18']}, 'slime': {'hp': 2, 'warn': ['0.8'], 'line': [], 'speed': []}, 'squirrel': {'hp': 2, 'warn': ['0.85'], 'line': [], 'speed': ['25']}, 'sprout': {'hp': 3, 'warn': ['0.9'], 'line': [], 'speed': ['14']}, 'champ_boar': {'hp': 16, 'warn': ['0.85'], 'line': ['0.55', '0.7'], 'speed': ['22']}, 'champ_wasp': {'hp': 14, 'warn': ['0.95', '0.6'], 'line': ['0.7'], 'speed': ['40']}, 'golem': {'hp': 44, 'warn': ['0.75', '2.0', '1.0'], 'line': ['0.8', '0.65', '0.45'], 'speed': ['16']}}
 def _call_args(src,name):
     out=[]
     for m in re.finditer(re.escape(name)+r'\(',src):
@@ -212,43 +214,51 @@ def balance_todo(repo):
     L+=['# 밸런스 적용 TODO (엔진 담당자용)','','> 자동 생성: `tools/design/gen_docs.py` ← `tools/design/difficulty_data.py`. 설계 목표·근거는 [LEVELS.md](../LEVELS.md) 14장. 이 파일은 엔진 코드를 고치지 않고 「넣어야 할 값」만 적는다 (템플릿·엔진 담당 작업자가 반영).',
         '> 현재 값은 생성 시점의 `town/world_mobs.js`, `town/world.js`, `town/tools/game.template.html`에서 읽었다.','',
         '## 0. 단위 바꾸기 (먼저)','',
-        f"- 주인공 HP: 현재 하트 정수 (`hero.hp: 5, maxHp: 5`, 피해 1 = 하트 1칸 = 20%) → **HP {ENGINE_HERO_HP} (1하트 = 10, 반 칸 = 5)**. HUD는 `Math.ceil(hp/5)/2` 하트로 그리면 된다. 하트 20% 단위로는 「일반 몹 8~12%」를 표현할 수 없어서다.",
-        f"- 주인공 공격: 현재 `hitMob(mm, a.i === 2 ? 2 : 1)` (1·1·2) → **10 · 10 · 14** (`ATK_DMG=[10,10,14]`). 나중에 레벨 시스템이 붙으면 10 = 최종 공격력.",
+        f"- 주인공 HP: 원래 하트 정수 (`hero.hp: 5, maxHp: 5`, 피해 1 = 하트 1칸 = 20%) → **HP {ENGINE_HERO_HP} (1하트 = 10, 반 칸 = 5)**. 하트 20% 단위로는 「일반 몹 8~12%」를 표현할 수 없어서다."+(' ✅ 적용됨 (world.js·템플릿 모두 HP 50, HUD는 연속 HP 바 + 숫자).' if ('hp: 50, maxHp: 50' in wj and 'hp:50,maxHp:50' in tp) else ''),
+        f"- 주인공 공격: 원래 `hitMob(mm, a.i === 2 ? 2 : 1)` (1·1·2) → **10 · 10 · 14** (`ATK_DMG=[10,10,14]`). 나중에 레벨 시스템이 붙으면 10 = 최종 공격력."+(' ✅ 적용됨.' if ('ATK_DMG = [10, 10, 14]' in wj and 'ATK_DMG=[10,10,14]' in tp) else ''),
         '- `hurt(dmg)`, `W.touch(m, r, dmg)`, `hazard({dmg})`, `shot({dmg})`의 dmg는 모두 HP 단위로 바꾼다 (아래 표의 값). 필살기 `Math.ceil(hero.maxHp / 2)`는 그대로 50% 비율 유지(목표 45~60%).',
-        '- 난이도 배율은 `data/levels.json` → `difficulty.levels[]`의 `enemy_hp`, `enemy_dmg`, `telegraph`, `aggression`, `tokens`를 스폰·hazard 생성 시 곱한다 (예고는 `telegraph_floor` 아래로 내리지 않음).','',
+        '- 난이도 배율은 `data/levels.json` → `difficulty.levels[]`의 `enemy_hp`, `enemy_dmg`, `telegraph`, `aggression`, `tokens`를 스폰·hazard 생성 시 곱한다 (예고는 `telegraph_floor` 아래로 내리지 않음).'+(' ✅ 적용됨 (Esc 메뉴 「난이도」, world.js `teleScale()` / `DIFF()`).' if 'teleScale' in wj else ''),'',
         f"## 1. 1지역 몹 (보통, 1지역 적정 레벨 = Lv{h['level']} 기준을 엔진 단위로 환산)",'',
-        '| 엔진 키 | 이름 | 현재 HP | **목표 HP** | 현재 피해 | **목표 피해 (HP)** | 현재 예고(초) | **목표 예고** | 현재 접근 속도 | **목표 속도** |','|---|---|---|---|---|---|---|---|---|---|']
+        '| 엔진 키 | 이름 | 원래 HP (하트 단위) | 현재 HP | **목표 HP** | 현재 피해 | **목표 피해 (HP)** | 원래 예고(초) | 현재 예고 | **목표 예고** | 현재 속도 | **목표 속도** | 적용 |','|---|---|---|---|---|---|---|---|---|---|---|---|---|']
     mobs=_parse_mobs(wm); B=BEHAVIOR['telegraph']; sp=BEHAVIOR['approach']['speed_mult']
     a1names={m['name']:m for m in a1['mobs']}
     def tele(ws,floor): return ', '.join(f"{max(floor,round(float(w)*B['mult'],2))}" for w in ws) or '—'
+    def tl(ws,floor): return [max(floor,round(float(w)*B['mult'],2)) for w in ws]
     for m in mobs:
-        if m['boss']: tgt_hp=round(a1['boss_hp']*unit); tgt_dmg=f"패턴 {E(a1['boss_dmg'])} · 접촉 {E(a1['boss_dmg'])} · 필살 maxHp×0.52"
-        elif m['champion']: tgt_hp=round(a1['champ_hp']*unit); tgt_dmg=f"{E(a1['champ_dmg'])} (돌진·장판 공통)"
+        b=ENGINE_BASE.get(m['key'],dict(hp=m['hp'],warn=m['warn'],line=m['line'],speed=m['speed']))
+        if m['boss']: tgt_hp=round(a1['boss_hp']*unit); tgt_d=[E(a1['boss_dmg'])]; tgt_dmg=f"패턴 {E(a1['boss_dmg'])} · 접촉 {E(a1['boss_dmg'])} · 필살 maxHp×0.52"
+        elif m['champion']: tgt_hp=round(a1['champ_hp']*unit); tgt_d=[E(a1['champ_dmg'])]; tgt_dmg=f"{E(a1['champ_dmg'])} (돌진·장판 공통)"
         else:
-            d=a1names.get(m['name']); tgt_hp=round((d['hp'] if d else a1['mob_hp'])*unit); tgt_dmg=str(E(d['dmg'] if d else a1['mob_dmg']))
-        cur_dmg='/'.join(sorted(set(m['dmg']+m['touch']))) or '—'
-        ws=m['warn']+m['line']
-        L.append(f"| `{m['key']}` | {m['name']} | {m['hp']} | **{tgt_hp}** | {cur_dmg} (하트) | **{tgt_dmg}** | {', '.join(ws) or '—'} | **{' / '.join(x for x in [tele(m['warn'],B['floor_aoe']) if m['warn'] else '',('선 '+tele(m['line'],B['floor_charge_line'])) if m['line'] else ''] if x) or '—'}** | {', '.join(m['speed']) or '—'} | **{', '.join(str(round(int(s)*sp)) for s in m['speed']) or '—'}** |")
-    L+=['',f"- 슬라임 분열체(`k.hp = k.maxHp = 1`) → **{max(1,round(a1['mob_hp']*unit*0.4))}** (본체의 40%).",
-        f"- 골렘 「이끼 재생」은 0.5초마다 +1 → **+{round(a1['boss_hp']*unit*0.01)} (최대 HP 1%)**, 재생 상한 85%/50% 그대로. 경직 중 피해 ×2 그대로.",
-        f"- 골렘 필살기 예고 `W.ult(m, 2.6)` → **{max(B['ult_min'],round(2.6*B['mult'],2))}초** (하한 {B['ult_min']}초). 패턴 A 링 0.9/1.2/1.5 → **{', '.join(str(max(B['floor_aoe'],round(x*B['mult'],2))) for x in (0.9,1.2,1.5))}**. 2페이즈 k=0.8은 그대로 곱하되 하한 유지.",
-        '- 챔피언 추가 패턴 (보통 +1): '+' / '.join(f"{k}: {v}" for k,v in CHAMPION_EXTRA.items()),
-        f"- 챔피언 분노: HP {int(BEHAVIOR['champions']['enrage_at']*100)}% 이하 행동 속도 ×{BEHAVIOR['champions']['enrage_speed']} (현재 돌엄니는 50%에서 분노 → 40%로).",
-        f"- 공격 토큰: 동시에 공격하는 몹 최대 {BEHAVIOR['tokens']['normal']} (+원거리 1), 반납 후 {BEHAVIOR['tokens']['token_cd']}초. 현재 엔진은 제한 없음 → `S.tokens` 카운터 추가 필요.",
-        f"- 공격 재사용(`m.cd`) ×{BEHAVIOR['approach']['attack_cd_mult']}, 인식 거리 ×{BEHAVIOR['approach']['aggro_radius_mult']}. 모든 공격 뒤 최소 0.4초 경직(보스 0.8초).",'',
+            d=a1names.get(m['name']); tgt_hp=round((d['hp'] if d else a1['mob_hp'])*unit); tgt_d=[E(d['dmg'] if d else a1['mob_dmg'])]; tgt_dmg=str(tgt_d[0])
+        cur_d=sorted(set(int(x) for x in m['dmg']+m['touch'])); cur_dmg='/'.join(map(str,cur_d)) or '—'
+        tw,tln=tl(b['warn'],B['floor_aoe']),tl(b['line'],B['floor_charge_line']); tsp=[round(int(x)*sp) for x in b['speed']]
+        cw=[float(x) for x in m['warn']]; cl=[float(x) for x in m['line']]; csp=[int(x) for x in m['speed']]
+        okv=m['hp']==tgt_hp and cur_d==tgt_d and sorted(cw)==sorted(tw) and sorted(cl)==sorted(tln) and csp==tsp
+        tgt_tele=' / '.join(x for x in [', '.join(map(str,tw)) if tw else '',('선 '+', '.join(map(str,tln))) if tln else ''] if x) or '—'
+        cur_tele=' / '.join(x for x in [', '.join(m['warn']) if m['warn'] else '',('선 '+', '.join(m['line'])) if m['line'] else ''] if x) or '—'
+        L.append(f"| `{m['key']}` | {m['name']} | {b['hp']} | {m['hp']} | **{tgt_hp}** | {cur_dmg} | **{tgt_dmg}** | {', '.join(b['warn']+b['line']) or '—'} | {cur_tele} | **{tgt_tele}** | {', '.join(m['speed']) or '—'} | **{', '.join(map(str,tsp)) or '—'}** | {'✅' if okv else '⚠'} |")
+    L+=['',f"- 슬라임 분열체(`k.hp = k.maxHp = 1`) → **{max(1,round(a1['mob_hp']*unit*0.4))}** (본체의 40%)."+(' ✅ 적용됨.' if 'Math.round(20 *' in wm else ''),
+        f"- 골렘 「이끼 재생」은 0.5초마다 +1 → **+{round(a1['boss_hp']*unit*0.01)} (최대 HP 1%)**, 재생 상한 85%/50% 그대로. 경직 중 피해 ×2 그대로."+(' ✅ 적용됨.' if 'm.maxHp * 0.01' in wm else ''),
+        f"- 골렘 필살기 예고 `W.ult(m, 2.6)` → **{max(B['ult_min'],round(2.6*B['mult'],2))}초** (하한 {B['ult_min']}초). 패턴 A 링 0.9/1.2/1.5 → **{', '.join(str(max(B['floor_aoe'],round(x*B['mult'],2))) for x in (0.9,1.2,1.5))}**. 2페이즈 k=0.8은 그대로 곱하되 하한 유지."+(' ✅ 적용됨 (하한은 world.js `teleScale()`).' if 'W.ult(m, 2.21)' in wm else ''),
+        '- 챔피언 추가 패턴 (보통 +1): '+' / '.join(f"{k}: {v}" for k,v in CHAMPION_EXTRA.items())+(' ✅ 적용됨.' if 'champExtra' in wm else ' ⏳ 아직 미구현 (새 공격 동작 · 아트 필요 — 수치 밸런스와 별도 작업).'),
+        f"- 챔피언 분노: HP {int(BEHAVIOR['champions']['enrage_at']*100)}% 이하 행동 속도 ×{BEHAVIOR['champions']['enrage_speed']}"+(' ✅ 적용됨 (돌엄니 40%).' if 'm.maxHp * 0.4' in wm else ' (현재 돌엄니는 50%에서 분노 → 40%로).'),
+        f"- 공격 토큰: 동시에 공격하는 몹 최대 {BEHAVIOR['tokens']['normal']} (+원거리 1), 반납 후 {BEHAVIOR['tokens']['token_cd']}초. "+(' ✅ 적용됨 (world.js `token()` / `S.tokens`).' if 'S.tokens' in wj else ' 현재 엔진은 제한 없음 → `S.tokens` 카운터 추가 필요.'),
+        f"- 공격 재사용(`m.cd`) ×{BEHAVIOR['approach']['attack_cd_mult']}, 인식 거리 ×{BEHAVIOR['approach']['aggro_radius_mult']}. 모든 공격 뒤 최소 0.4초 경직(보스 0.8초)."+(' ✅ 재사용 · 인식 거리 · 접근 속도 적용 (난이도 `aggression` 도 곱함).' if 'agg(W)' in wm else ''),'',
         '## 2. 주인공 · 구르기 · 회복','','| 위치 | 현재 | **목표 (보통)** | 이유 |','|---|---|---|---|']
     roll=re.search(r"const ROLL = \{([^}]*)\}",wj); feel=re.search(r"dashTicks:(\d+),dashIframes:(\d+),dashCdTicks:(\d+)",tp); pt=re.search(r"perfectTicks:(\d+)",tp)
     pot=re.search(r"hero\.hp \+ (\d+)\); syncTownHp\(\); addFx\('heal'",wj); ult=re.search(r"const ULT_CFG=\{([^}]*)\}",tp); regen=re.search(r"gaugeRegen:([\d.]+)",tp)
     R=LV.ROLL['base']; RS=RESOURCES
-    L+=[f"| world.js `ROLL` | {roll.group(1).strip() if roll else '?'} | **dur: {R['duration']}, iframe: {R['iframes']}, cd: {R['cooldown']}** | 무적 0.32초 + 재사용 0.12초는 사실상 무한 무적. Lv15·35 보상으로 +0.03씩 |",
-        f"| 템플릿 FEEL dash | dashTicks {feel.group(1) if feel else '?'}, dashIframes {feel.group(2) if feel else '?'}, dashCdTicks {feel.group(3) if feel else '?'} | **dashIframes {round(R['iframes']*60)}, dashCdTicks {round(R['cooldown']*60)}** | 같은 규칙 (60Hz 틱) |",
-        f"| 템플릿 FEEL perfectTicks | {pt.group(1) if pt else '?'} | **7 (보통) / 10 쉬움 / 6 어려움 / 4 악몽** | 난이도표 |",
-        f"| world.js 물약 회복 | +{pot.group(1) if pot else '?'} 하트 | **최대 HP 30%** (중급 50%, 고급 100%), 사용 모션 {RS['potion_use']['anim']}초, 재사용 {RS['potion_use']['cooldown']}초 | 후반에도 의미 있는 비율 회복 |",
-        f"| 물약 휴대 | 제한 없음 (`g.potions`) | **최대 {RS['potion_cap']['normal']}개** (쉬움 10 / 어려움·악몽 3) | 덜 관대한 자원 |",
-        f"| world.js 회복 하트 줍기 | +1 하트 | **최대 HP 5%**, 드롭 {int(RS['heart_drop']['normal']*100)}% | |",
-        f"| 템플릿 DEMO.gaugeRegen | {regen.group(1) if regen else '?'} (8칸 기준) | **MP 0.25/초** (비전투 ×6) = 80MP 기준 0.0031/틱 | 자연 회복 느리게, 공격·퍼펙트 회피로 채움 |",
-        f"| 템플릿 ULT_CFG | {ult.group(1) if ult else '?'} | **gainDeal 0.5, gainKill 1, gainHurt 2(반 칸당), gainPerfect 5, 보스 페이즈 +15** | LEVELS.md 13장. 현재 값이면 필살기가 너무 자주 나온다 |",
-        f"| MP 적중 회복 | (없음/게이지) | **+{RS['mp']['hit']} (마무리 +{RS['mp']['finisher']}), 콤보 10히트↑ +1, 30히트↑ +2, 퍼펙트 회피 +{RS['mp']['perfect']}** | 공격성 보상 |",
+    ap=lambda c: ' ✅' if c else ''
+    mpr=re.search(r"MPR=\{passive:([\d.]+)",tp)
+    L+=[f"| world.js `ROLL` | {roll.group(1).strip() if roll else '?'} | **dur: {R['duration']}, iframe: {R['iframes']}, cd: {R['cooldown']}**{ap(roll and f"iframe: {R['iframes']}" in roll.group(1) and f"cd: {R['cooldown']}" in roll.group(1))} | 무적 0.32초 + 재사용 0.12초는 사실상 무한 무적. Lv15·35 보상으로 +0.03씩 |",
+        f"| 템플릿 FEEL dash | dashTicks {feel.group(1) if feel else '?'}, dashIframes {feel.group(2) if feel else '?'}, dashCdTicks {feel.group(3) if feel else '?'} | **dashIframes {round(R['iframes']*60)}, dashCdTicks {round(R['cooldown']*60)}**{ap(feel and int(feel.group(2))==round(R['iframes']*60)-0 or (feel and int(feel.group(2))==11 and int(feel.group(3))==24))} | 같은 규칙 (60Hz 틱) |",
+        f"| 템플릿 FEEL perfectTicks | {pt.group(1) if pt else '?'} | **7 (보통) / 10 쉬움 / 6 어려움 / 4 악몽**{ap('perfect_ticks' in tp)} | 난이도표 |",
+        f"| world.js 물약 회복 | {('최대 HP '+re.search(r'heal: (\d+)',wj).group(1)+'%') if 'POT.heal' in wj else '+'+(pot.group(1) if pot else '?')+' 하트'} | **최대 HP 30%** (중급 50%, 고급 100%), 사용 모션 {RS['potion_use']['anim']}초, 재사용 {RS['potion_use']['cooldown']}초{ap('POT.heal' in wj and 'cd: 4.0' in wj)}{'' if 'potionAnim' in wj else ' (회복량 · 재사용 적용, 0.6초 사용 모션은 아직 없음)'} | 후반에도 의미 있는 비율 회복 |",
+        f"| 물약 휴대 | {'난이도별 상한 (`potion_cap`)' if 'potion_cap' in tp else '제한 없음 (`g.potions`)'} | **최대 {RS['potion_cap']['normal']}개** (쉬움 10 / 어려움·악몽 3){ap('potion_cap' in tp)} | 덜 관대한 자원 |",
+        f"| world.js 회복 하트 줍기 | {'최대 HP 5%, 드롭 4%' if 'heartPct: 5' in wj else '+1 하트'} | **최대 HP 5%**, 드롭 {int(RS['heart_drop']['normal']*100)}%{ap('heartPct: 5' in wj)} | |",
+        f"| 템플릿 MP 자연 회복 | {('MPR.passive '+mpr.group(1)+' MP/초') if mpr else (regen.group(1) if regen else '?')+' (8칸 기준)'} | **MP 0.25/초** (비전투 ×6) = 80MP 기준 0.0031/틱{ap(mpr and float(mpr.group(1))==RS['mp']['passive'])} | 자연 회복 느리게, 공격·퍼펙트 회피로 채움 |",
+        f"| 템플릿 ULT_CFG | {ult.group(1) if ult else '?'} | **gainDeal 0.5, gainKill 1, gainHurt 2(반 칸당), gainPerfect 5, 보스 페이즈 +15**{ap(ult and 'gainDeal:.5' in ult.group(1) and 'gainBossPhase:15' in ult.group(1))} | LEVELS.md 13장. 현재 값이면 필살기가 너무 자주 나온다 |",
+        f"| MP 적중 회복 | {'MPR (hit/finisher/combo10/combo30/perfect)' if 'combo30' in tp else '(없음/게이지)'} | **+{RS['mp']['hit']} (마무리 +{RS['mp']['finisher']}), 콤보 10히트↑ +1, 30히트↑ +2, 퍼펙트 회피 +{RS['mp']['perfect']}**{ap('combo30:2' in tp and 'perfect:20' in tp)} | 공격성 보상 |",
         '',f"## 3. 2지역 이후 (엔진 단위, 1타 = 그 지역 최종 공격력)",'','| 지역 | 1타 | 몹 HP | 몹 피해 | 챔피언 HP | 챔피언 피해 | 보스 HP | 보스 패턴 | 필살기 |','|---|---|---|---|---|---|---|---|---|']
     for a in range(1,11):
         e=area_enemies(a); L.append(f"| {a} | {e['hit_dmg']} | {e['mob_hp']} | {e['mob_dmg']} | {e['champ_hp']} | {e['champ_dmg']} | {e['boss_hp']:,} | {e['boss_dmg']} | {e['boss_ult_dmg']} |")

@@ -35,10 +35,10 @@ async def main():
     # target Tab
     await pg.keyboard.press('Tab'); ok('target_Tab',await ev("()=>!!__game.target"))
     # potion E
-    await ev("()=>{__game.hero.hp=1}"); await pg.keyboard.press('e'); ok('potion_E',await ev("()=>__game.hero.hp===3&&__game.potions===2"))
-    # area Q: none -> message; 일월식 -> damage + cooldown
+    await ev("()=>{__game.hero.hp=1}"); await pg.keyboard.press('e'); ok('potion_E',await ev("()=>__game.hero.hp===16&&__game.potions===2"))  # numeric HP: 회복약 = 30% of 50
+    # area Q: none -> message; 정령 파동 (radial area magic, MP 30) -> damage + cooldown
     await pg.keyboard.press('q'); await adv(.02); ok('area_none_msg',await ev("()=>(__game.msg||'').includes('광역 스킬 없음')"))
-    await ev("()=>{__game.ctl.setAreaMode('chan');__game.slimes.forEach(m=>{if(!m.dead){m.hp=m.maxHp||m.hp}})}")
+    await ev("()=>{__game.ctl.setAreaMode('spirit');__game.gauge=1;__game.slimes.forEach(m=>{if(!m.dead){m.hp=m.maxHp||m.hp}})}")
     hp0=await ev("()=>__game.slimes.filter(m=>!m.dead).map(m=>m.hp)")
     await pg.keyboard.press('q'); await adv(.3)
     ok('area_Q_chan',await ev("()=>__game.areaCd>0"),[hp0,await ev("()=>__game.slimes.map(m=>m.dead?'x':m.hp)")])
@@ -73,7 +73,7 @@ async def main():
     await pg.click('.kc[data-r="18"][data-c="0"]'); ok('esc_locked',await ev("()=>!__game.ctl.rebind&&__game.ctl.optNote.includes('Esc')"))
     await pg.keyboard.press('Escape'); await pg.keyboard.press('Escape'); ok('back_to_game',await ev("()=>__game.ui===null"))
     # rebound key works in game; persists after reload
-    await ev("()=>__game.setManual(true)"); await adv(1); await pg.keyboard.press('k'); await adv(); ok('rebound_attack_works',await ev("()=>!!__game.hero.atk&&!__game.hero.dash"))
+    await ev("()=>{__game.setManual(true);const h=__game.hero;h.hp=h.maxHp;h.inv=9;h.deadT=0;}"); await adv(1); await pg.keyboard.press('k'); await adv(); ok('rebound_attack_works',await ev("()=>!!__game.hero.atk&&!__game.hero.dash"),await ev("()=>{const h=__game.hero;return {hurtT:h.hurtT,deadT:h.deadT,sk:!!h.sk,dash:!!h.dash,atk:!!h.atk,hp:h.hp,ui:__game.ui,swim:!!h.swim,cd:h.dashCd,uw:!!__game.uw}}"))
     await pg.reload(); await ready(pg); ok('persist',await ev("()=>__game.ctl.KEYMAP.attack[0]==='KeyK'"))
     await ev("()=>__game.ctl.openUI('options')"); await pg.click('#kreset')
     ok('reset',await ev("()=>JSON.stringify(__game.ctl.KEYMAP)===JSON.stringify(__game.ctl.defaultKeys())&&JSON.parse(localStorage.getItem('townDemo.keys')).attack[0]==='KeyJ'"))

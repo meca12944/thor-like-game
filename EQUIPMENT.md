@@ -109,12 +109,12 @@
 | `a_leather_bracer` | 가죽 팔보호대 | 보조무기 | `acc_bracer` | leather_brown `#2a1608` `#5a3418` `#8a5a2e` `#c08a52` | — | 양 팔뚝에 갈색 가죽 보호대 (버클 2개). |
 | `a_ore_amulet` | 광석 부적 | 보조무기 | `acc_amulet` | copper_green `#1a3a30` `#3a7a5a` `#c07a3a` `#a0f0c0` | — | 가슴에 매단 녹청 구리 펜던트, 원석이 박혀 있다. |
 | `a_dune_boots` | 사막 질주 장화 | 보조무기 | `acc_boots` | sand_gold `#5a4420` `#a08050` `#d8c090` `#fff0c8` | — | 모래색 긴 장화에 금 버클, 걸을 때 모래 먼지. |
-| `a_coral_buckler` | 산호 버클러 | 보조무기 | `off_shield_round` | shell_coral `#6a2a3a` `#c05a6a` `#ff9aa0` `#ffe0d8` | — | 분홍 산호가 박힌 작은 방패. 산호 방패 스킬 퍼펙트 판정 +0.05초. |
+| `a_coral_buckler` | 산호 버클러 | 보조무기 | `off_shield_round` | shell_coral `#6a2a3a` `#c05a6a` `#ff9aa0` `#ffe0d8` | — | 분홍 산호가 박힌 작은 방패. 산호 방패(결계) 흡수량 +5. |
 | `a_flame_bracer` | 화염 팔찌 | 보조무기 | `acc_bracer` | forge_red `#1a0e0a` `#3a1a10` `#ff3a10` `#fff0c0` | — | 손목의 흑철 팔찌, 붉은 홈이 은은히 빛남. |
 | `a_frost_amulet` | 서리 부적 | 보조무기 | `acc_amulet` | ice_pale `#3a5a7a` `#6a9ac0` `#a0d8ff` `#ffffff` | — | 눈송이 모양 얼음 펜던트. |
 | `a_royal_kite` | 왕실 문장 방패 | 보조무기 | `off_shield_kite` | royal_silver_gold `#3a3a50` `#8a8ca0` `#ffd860` `#ffffff` | — | 파란 바탕에 금 사자 문장의 연(鳶)형 방패. |
 | `w_hunter_machete` | 사냥꾼 마체테 | 무기 | `wpn_machete` | iron `#3a4250` `#6a7686` `#9aa8b8` `#d8e0e8` | `#e0e0e0` `#8a8a8a` | 끝이 넓적한 외날 정글도, 손잡이에 짐승 이빨 장식. 짧고 두꺼운 회색 궤적. |
-| `w_harpoon_blade` | 작살검 | 무기 | `wpn_harpoon` | sea_blue `#0a2a5a` `#1a5aa0` `#30a0e0` `#e0f8ff` | `#e0f8ff` `#3a7ab0` | 끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 찌르기(2타) 사거리 +20%. |
+| `w_harpoon_blade` | 작살검 | 무기 | `wpn_harpoon` | sea_blue `#0a2a5a` `#1a5aa0` `#30a0e0` `#e0f8ff` | `#e0f8ff` `#3a7ab0` | 끝이 미늘 달린 작살촉인 장검, 손잡이 끝에 밧줄 고리. 휘두르기 사거리 +20% (긴 날 끝이 호를 넓힌다). |
 | `w_forest_dagger` | 숲의 단검 | 무기 | `wpn_dagger` | forest_leaf `#14301a` `#2e6a34` `#5aa84a` `#c8f0a0` | `#e0ffd0` `#5aa84a` | 나뭇잎 잎맥이 새겨진 짧은 초록 단검, 휘두르면 잎사귀가 흩날린다. |
 | `w_boar_tusk` | 돌엄니 송곳검 | 무기 | `wpn_broad` | boar_ivory `#3a2a1a` `#7a5a3a` `#d8c8a0` `#fff8e0` | `#fff8e0` `#a08060` | 거대 멧돼지 엄니를 통째로 깎은 상아빛 칼날, 밑동에 털가죽. |
 | `w_spider_fang` | 여왕거미 독니검 | 무기 | `wpn_curved` | spider_violet `#2a1440` `#5a2a8a` `#a070e0` `#e8d8ff` | `#f0e0ff` `#a070e0` | 보랏빛 수정 독니가 휜 날이 된 검, 날 끝에서 독 방울이 떨어진다. |

@@ -43,8 +43,9 @@ async def main():
     # equip with Enter -> swapped into weapon slot
     await pg.keyboard.press('Enter'); ok('equip',await ev("()=>__game.INV.equip.weapon.id==='w_boar_tusk'&&__game.INV.equip.weapon.plus===5&&__game.INV.bag.some(b=>b.id==='w_bronze_long'&&b.plus===3)"))
     # use a potion from the bag (Enter) -> heals
+    await ev("()=>{__game.hero.hp=20;__game.potionCd=0}"); hp0=20
     pidx=await ev("()=>__game.INV.bag.findIndex(b=>b.id==='potion')"); await pg.click(f'#ovp [data-bag="{pidx}"]'); await pg.keyboard.press('Enter')
-    ok('use_potion',await ev("()=>__game.hero.hp===4&&__game.potions===2"))
+    ok('use_potion',await ev("()=>__game.hero.hp===35&&__game.potions===2"))
     # register herb as quick item (R), press E in game
     hidx=await ev("()=>__game.INV.bag.findIndex(b=>b.id==='herb_red')"); await pg.click(f'#ovp [data-bag="{hidx}"]'); await pg.keyboard.press('r')
     ok('quick_register',await ev("()=>__game.INV.quick==='herb_red'"))
@@ -75,7 +76,7 @@ async def main():
     await pg.screenshot(path='/tmp/inv_forge.png')
     await pg.keyboard.press('Escape'); ok('close',await ev("()=>__game.ui===null"))
     # E in game uses quick item (herb +1)
-    await ev("()=>{__game.hero.hp=1}"); await pg.keyboard.press('e'); ok('quick_E_herb',await ev("()=>__game.hero.hp===2&&__game.invCount('herb_red')===4"))
+    await ev("()=>{__game.hero.hp=1;__game.potionCd=0}"); await pg.keyboard.press('e'); ok('quick_E_herb',await ev("()=>__game.hero.hp===6&&__game.invCount('herb_red')===4"))  # 빨간 약초 = 10% of 50
     # inventory survives quick save/load
     await pg.keyboard.press('F5'); await pg.reload(); await ready(pg)
     ok('save_inv',await ev("()=>__game.INV.equip.weapon.id==='w_boar_tusk'&&__game.INV.quick==='herb_red'"))
