@@ -12,16 +12,20 @@
 
 | id | 이름 | 비고 |
 |---|---|---|
-| hero | 필멸자 | 주인공 |
+| hero | 「낙인의 자식」 필멸자 | 주인공 |
 | a_tailor | 리네트 | |
 | h_mystic | 베일라 | |
 | g_dancer | 자이라 | |
 | f_diver | 마렌 | |
 | e_tailor | 로자린드 | |
 | c_priest | 이벨린 | |
-| d_yuna | 유나 | 현대 의상은 유나만 |
+| d_yuna | 「차원을 건넌 이방인」 유나 | 현대 의상은 유나만, v5 의상 완료 |
 
 표정(`<expr>`): `neutral` `smile` `angry` `sad` `surprised` `blush`. 빠진 표정은 게임에서 neutral로 대체된다(neutral은 필수).
+
+## 의상
+
+- 의상은 승인된 `docs_art/outfits_v3/` (v5, 2D 애니 셀 셰이딩 + 밀착 슈트) 디자인과 동일하게 그린다. 미리보기: `bust/preview_bust.png`.
 
 ## 게임에 넣기
 

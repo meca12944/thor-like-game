@@ -27,6 +27,23 @@ def make_alpha(img):
     a[near]=soft[near]; a[bg]=np.clip((dist[bg]-25)/90,0,1)
     return cv2.GaussianBlur(a,(3,3),0)
 alpha=make_alpha(base)
+if os.environ.get('UNION_RM'):
+    core=cv2.erode((rm>0.5).astype(np.uint8),np.ones((5,5),np.uint8)).astype(np.float32)
+    alpha=np.maximum(alpha,cv2.GaussianBlur(core,(5,5),0))
+    dist0=255-base.min(2).astype(np.float32)
+    pw=(dist0<10).astype(np.uint8)
+    n,l,st,_=cv2.connectedComponentsWithStats(pw,8)
+    kill=np.zeros(pw.shape,np.uint8)
+    for i in range(1,n):
+        if st[i,4]<40: continue
+        x,y,w,h=st[i,:4]; sub=(l[max(0,y-6):y+h+6,max(0,x-6):x+w+6]==i).astype(np.uint8)
+        ring=cv2.dilate(sub,np.ones((9,9),np.uint8))-sub
+        dd=dist0[max(0,y-6):y+h+6,max(0,x-6):x+w+6][ring>0]
+        if dd.size and (dd>100).mean()>0.35: kill[l==i]=1
+    kill[(yy0:=0):0]=0
+    kill=cv2.dilate(kill,np.ones((3,3),np.uint8))
+    alpha=np.where(kill>0,np.minimum(alpha,np.clip((dist0-4)/30,0,1)),alpha)
+    alpha=cv2.GaussianBlur(alpha.astype(np.float32),(3,3),0)
 yy,xx=np.mgrid[0:H,0:W]
 d=((xx-fx)/rx)**2+((yy-fy)/ry)**2
 mask=np.clip((1.0-d)/0.35,0,1)  # feathered ellipse
