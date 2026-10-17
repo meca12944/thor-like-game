@@ -10,8 +10,11 @@ base=np.array(Image.open(f'gen/{cid}_neutral.jpg').convert('RGB'))
 H,W=base.shape[:2]
 sess=new_session('isnet-anime')
 rm=np.array(remove(Image.fromarray(base),session=sess,only_mask=True,post_process_mask=True)).astype(np.float32)/255
+BGC=None
+if os.environ.get('BGEST'):
+    c=np.concatenate([base[:20,:20].reshape(-1,3),base[:20,-20:].reshape(-1,3)]); BGC=np.median(c,0).astype(np.float32)
 def make_alpha(img):
-    dist=255-img.min(2).astype(np.float32)
+    dist=(np.abs(img.astype(np.float32)-BGC).max(2)) if BGC is not None else 255-img.min(2).astype(np.float32)
     cand=(dist<48).astype(np.uint8)
     n,lab,st,_=cv2.connectedComponentsWithStats(cand,8)
     border=set(np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])))
@@ -30,7 +33,7 @@ alpha=make_alpha(base)
 if os.environ.get('UNION_RM'):
     core=cv2.erode((rm>0.5).astype(np.uint8),np.ones((5,5),np.uint8)).astype(np.float32)
     alpha=np.maximum(alpha,cv2.GaussianBlur(core,(5,5),0))
-    dist0=255-base.min(2).astype(np.float32)
+    dist0=(np.abs(base.astype(np.float32)-BGC).max(2)) if BGC is not None else 255-base.min(2).astype(np.float32)
     pw=(dist0<10).astype(np.uint8)
     n,l,st,_=cv2.connectedComponentsWithStats(pw,8)
     kill=np.zeros(pw.shape,np.uint8)
@@ -62,7 +65,7 @@ for e in EX:
         print(e,'shift',warp[:,2].round(1))
         img=(im*mask+base*(1-mask)).astype(np.uint8)
     a3=np.clip(alpha,1e-3,1)[...,None]
-    dec=np.clip((img.astype(np.float32)-255*(1-a3))/a3,0,255)
+    dec=np.clip((img.astype(np.float32)-(BGC if BGC is not None else 255)*(1-a3))/a3,0,255)
     edge=((alpha>0.02)&(alpha<0.98))[...,None]
     img=np.where(edge,dec,img).astype(np.uint8)
     rgba=np.dstack([img,(alpha*255).astype(np.uint8)])
