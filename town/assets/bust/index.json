@@ -33,12 +33,12 @@
     "blush": "hero/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "a_tailor": {
@@ -53,12 +53,12 @@
     "blush": "a_tailor/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "h_mystic": {
@@ -73,12 +73,12 @@
     "blush": "h_mystic/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "g_dancer": {
@@ -93,12 +93,12 @@
     "blush": "g_dancer/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "f_diver": {
@@ -113,12 +113,12 @@
     "blush": "f_diver/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "e_tailor": {
@@ -133,12 +133,12 @@
     "blush": "e_tailor/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "c_priest": {
@@ -153,12 +153,12 @@
     "blush": "c_priest/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   },
   "d_yuna": {
@@ -173,12 +173,12 @@
     "blush": "d_yuna/blush.webp"
    },
    "source": {
-    "neutral": "temp",
-    "smile": "temp",
-    "angry": "temp",
-    "sad": "temp",
-    "surprised": "temp",
-    "blush": "temp"
+    "neutral": "art",
+    "smile": "art",
+    "angry": "art",
+    "sad": "art",
+    "surprised": "art",
+    "blush": "art"
    }
   }
  }
