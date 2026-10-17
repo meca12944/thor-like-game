@@ -423,63 +423,80 @@ const THEMES = {
 /* 시작 위치/능력치 */
 const START = { room:'town1', x:9, y:8, hp:6, sword:'wood' };
 
-/* ---------- ASSETS : 그림 파일(일러스트) 교체 ----------
-   assets/ 폴더의 그림을 쓰려면 enabled:true 로 바꾸세요. 목록에 없는 그림이나 불러오지 못한 그림은
-   자동으로 코드로 그린 기본 그래픽으로 대체됩니다. (파일명만 바꿔 넣으면 바로 교체됩니다.)
-   스프라이트 항목 형식:  '파일.png'  또는  { src:'파일.png', frames:가로 프레임 수, fps:초당 프레임,
-                         h:게임 안 높이(논리 px, 화면 전체는 320x240), w:너비(생략 시 비율 유지),
-                         ax,ay: 기준점(0~1, 기본 0.5,1 = 발밑 가운데) }
-   스프라이트는 투명 PNG, 프레임은 가로로 이어 붙인 한 장(스트립).                                   */
+/* ---------- ASSETS : 그림 파일(무료 라이선스 LPC 팩) ----------
+   그림은 assets/ 폴더에 있고 tools/build_art.py 가 원본 팩에서 만들어 냅니다(출처·라이선스: CREDITS.md).
+   enabled:false 이거나 그림을 못 불러오면 자동으로 코드로 그린 기본 그래픽을 씁니다. (?noassets 로 시험 가능)
+   ■ 스프라이트 항목
+     lpc:true  → LPC 표준 캐릭터 시트(64x64 칸; 걷기 8~11행 = 위·왼·아래·오른, 다침 20행). slash: 192x192 공격 시트
+     그 밖     → { src, fw,fh(한 칸 크기), cols(행당 프레임 수), rows:{u,l,d,r}(방향별 행 번호; 없는 방향은 d 또는 r 좌우반전),
+                   fps, scale(그림 1px = 게임 몇 px, 기본 .5), foot(발 위치: 칸 위에서부터 px), flip:true(r 행을 좌우반전해 l 로) }
+   ■ 소품(props): 맵 글자 → props.png 안의 이름(배열이면 칸마다 번갈아). 'H' 는 집(HHHH 덩어리 하나에 한 채)
+   ■ tileset: 테마별 바닥/지형. base(기본 바닥: 블록 이름 또는 타일 이름 배열), auto([[블록, 맵글자들], ...] 경계가 자연스럽게 이어지는 지형),
+             fill({맵글자: 타일 이름 배열}), wall(벽 앞면 타일), top(벽 윗면 색), rim(벽 테두리 색)
+     블록 이름: grass dirt dirt2 water sand pit chasm darkstone lava   /   타일 이름: tiles 목록(tools/build_art.py 의 singles)        */
 const ASSETS = {
-  enabled: false,                 // ← 그림 파일 사용 여부 (URL에 ?assets=폴더/ 를 붙여 시험할 수도 있음)
+  enabled: true,
   dir: 'assets/',
-  smooth: true,                   // 일러스트는 부드럽게(안티에일리어싱) 그림
-  // 주인공: 방향(d=아래,u=위,r=오른쪽; l=왼쪽은 r을 좌우 반전, 따로 넣어도 됨) × 동작
-  hero: {
-    h: 36, codeBlade: false,      // codeBlade:false → 그림 속 칼을 쓰고 코드 칼날은 그리지 않음(베기 궤적 효과는 유지)
-    d: { idle:{src:'hero_d_idle.png',frames:2,fps:2}, walk:{src:'hero_d_walk.png',frames:4,fps:8}, atk:{src:'hero_d_atk.png',frames:3,fps:14}, jump:'hero_d_jump.png', hurt:'hero_d_hurt.png' },
-    u: { idle:{src:'hero_u_idle.png',frames:2,fps:2}, walk:{src:'hero_u_walk.png',frames:4,fps:8}, atk:{src:'hero_u_atk.png',frames:3,fps:14}, jump:'hero_u_jump.png', hurt:'hero_u_hurt.png' },
-    r: { idle:{src:'hero_r_idle.png',frames:2,fps:2}, walk:{src:'hero_r_walk.png',frames:4,fps:8}, atk:{src:'hero_r_atk.png',frames:3,fps:14}, jump:'hero_r_jump.png', hurt:'hero_r_hurt.png' }
-  },
-  // 적/보스: ENEMIES 의 키(예: slime) 또는 look 이름으로 찾음. 오른쪽을 볼 때 좌우 반전하려면 flip:true
-  enemies: {
-    slime:  {src:'enemy_slime.png',  frames:2, fps:3, h:20},
-    bat:    {src:'enemy_bat.png',    frames:2, fps:8, h:20},
-    wisp:   {src:'enemy_wisp.png',   frames:2, fps:4, h:22},
-    skel:   {src:'enemy_skel.png',   frames:2, fps:4, h:32},
-    knight: {src:'enemy_knight.png', frames:2, fps:4, h:36},
-    mage:   {src:'enemy_mage.png',   frames:2, fps:3, h:34},
-    snapper:{src:'enemy_snapper.png',frames:2, fps:4, h:28},
-    golem:  {src:'boss_golem.png',   frames:2, fps:2, h:60},
-    wyvern: {src:'boss_wyvern.png',  frames:2, fps:5, h:58},
-    priest: {src:'boss_priest.png',  frames:2, fps:2, h:54}
-  },
-  // 정령: SPIRITS 의 id
-  spirits: { water:{src:'spirit_water.png',h:24}, fire:{src:'spirit_fire.png',h:24}, shadow:{src:'spirit_shadow.png',h:24}, plant:{src:'spirit_plant.png',h:24} },
-  // 마을 사람: NPC 의 img 값 또는 이름(name)
-  npcs: {
+  scale: .5,                       // 그림 32px 타일 = 게임 16px 한 칸
+  tiles: 'tiles.png', propsImg: 'props.png',   // 타일·소품 아틀라스
+  hero: { src:'hero.png', lpc:true, slash:'hero_slash.png' },
+  npcs: {                          // NPC 의 img 값 → 이름(name) → _default 순서로 찾음
     '촌장 오르만':'npc_elder.png', '대장장이 브로':'npc_smith.png', '여관 주인 리나':'npc_inn.png', '소녀 에나':'npc_girl.png',
     '꼬마 토비':'npc_boy.png', '무기상 카심':'npc_merchant.png', '항구 여관 마르타':'npc_inn2.png', '늙은 선원':'npc_sailor.png',
-    _default: 'npc_villager.png', _h: 34
+    _default:'npc_villager.png'
   },
-  // 소품(맵 글자): T 나무, o 바위, B 미는 블록, X 발판 위 블록, C 상자, c 열린 상자, t 꺼진 횃불, L 켜진 횃불 받침, A 제단
-  props: { T:{src:'prop_tree.png',h:56}, o:{src:'prop_rock.png',h:18}, B:{src:'prop_block.png',h:22}, X:{src:'prop_block.png',h:22},
-           C:{src:'prop_chest.png',h:17}, c:{src:'prop_chest_open.png',h:17}, t:{src:'prop_torch.png',h:24}, L:{src:'prop_torch.png',h:24}, A:{src:'prop_altar.png',h:26} },
-  // 방 배경(그린 그림 한 장, 4:3 비율 권장 1280x960): MAPS 의 충돌 데이터는 그대로 쓰고 그림만 바꿈.
-  //   hide: 배경 그림에 이미 그려 넣은 소품 글자(그 소품은 따로 그리지 않음). 퍼즐로 바뀐 칸은 자동으로 기본 타일을 덧그림.
-  rooms: {
-    town1:{src:'bg_town1.jpg',hide:'T'}, town2:{src:'bg_town2.jpg',hide:'T'}, plain:{src:'bg_plain.jpg',hide:'T'},
-    d1a:{src:'bg_d1a.jpg'}, d1b:{src:'bg_d1b.jpg'}, canyon:{src:'bg_canyon.jpg',hide:'T'},
-    d2a:{src:'bg_d2a.jpg'}, d2b:{src:'bg_d2b.jpg'}, d2c:{src:'bg_d2c.jpg'}, d3a:{src:'bg_d3a.jpg'}, d3b:{src:'bg_d3b.jpg'}
+  enemies: {                       // ENEMIES 의 키 또는 look 이름
+    slime:  { src:'enemy_slime.png',  fw:32, fh:32, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:5, foot:30 },
+    bat:    { src:'enemy_bat.png',    fw:32, fh:32, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:10, foot:30 },
+    wisp:   { src:'enemy_wisp.png',   fw:40, fh:46, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:44 },
+    snapper:{ src:'enemy_snapper.png',fw:60, fh:76, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:5, foot:72, scale:.42 },
+    skel:   { src:'enemy_skel.png',   lpc:true },
+    knight: { src:'enemy_knight.png', lpc:true },
+    mage:   { src:'enemy_mage.png',   lpc:true },
+    golem:  { src:'boss_golem.png',   fw:64, fh:64, cols:7, rows:{u:0,l:1,d:2,r:3}, fps:7, foot:62, scale:1 },
+    wyvern: { src:'boss_wyvern.png',  fw:205, fh:161, cols:4, rows:{r:1}, flip:true, fps:8, foot:150, scale:.46 },
+    priest: { src:'boss_priest.png',  lpc:true, scale:.95 }
   },
-  title: 'title.jpg'              // 타이틀 배경(4:3)
+  spirits: {
+    water: { src:'spirit_water.png',  fw:40, fh:46, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:44, scale:.42 },
+    fire:  { src:'spirit_fire.png',   fw:40, fh:46, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:44, scale:.42 },
+    shadow:{ src:'spirit_shadow.png', fw:40, fh:46, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:44, scale:.42 },
+    plant: { src:'spirit_plant.png',  fw:40, fh:46, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:44, scale:.42 }
+  },
+  props: { T:['tree','pine','tree','tree2'], o:'rock', B:'block', X:'block', C:'chest', c:'chest_open', t:'torch', L:'torch_lit', A:'altar', H:'house' },
+  propScale: { tree:.36, tree2:.4, pine:.34, house:.5 },
+  tileset: {
+    town:   { base:'grass', auto:[['dirt','w'],['water','~']], fill:{ f:['flowers0','flowers1','flowers2'] }, wall:'face_town', top:'#3a3a30', rim:'#8a8a70' },
+    field:  { base:'grass', auto:[['dirt','w'],['water','~']], fill:{ f:['flowers0','flowers1','flowers2'] }, wall:'face_town', top:'#3a3a30', rim:'#8a8a70' },
+    sand:   { base:'sand',  auto:[['grass',','],['dirt','w'],['water','~']], fill:{ f:['flowers0','flowers1','flowers2'] }, wall:'face_town', top:'#4a4030', rim:'#a89870' },
+    canyon: { base:'dirt2', auto:[['dirt','w'],['pit','_'],['chasm','v=']], wall:'face_canyon', top:'#4a2414', rim:'#b06a40' },
+    cave:   { base:'dirt2', auto:[['pit','_'],['chasm','v=']], wall:'face_cave', top:'#22180f', rim:'#7a5a40' },
+    tower:  { base:['stone0','stone1','stone2','stone3'], auto:[['chasm','_v=']], wall:'face_grey', top:'#1c1c2c', rim:'#6a6a8a' },
+    temple: { base:['teal0','teal1'], auto:[['chasm','v=_']], wall:'face_temple', top:'#101c12', rim:'#4a7a50' }
+  },
+  credits: [                       // 타이틀의 '크레딧' 화면 (전체 목록은 CREDITS.md)
+    '그림: Liberated Pixel Cup (LPC) 팩 — OpenGameArt.org',
+    'LPC Base Assets: Lanea Zimmerman (Sharm), Stephen Challener (Redshrike),',
+    '  Charles Sanchez (CharlesGabriel), Manuel Riecke (MrBeast), Daniel Armstrong',
+    '  — CC-BY-SA 3.0 / GPL 3.0',
+    'LPC Tile Atlas: 위 작가들 + Casper Nilsson, Daniel Eddeland,',
+    '  Johann Charlot, Skyler Robert Colladay — CC-BY-SA 3.0 / GPL 3.0',
+    'Universal LPC Character Generator 레이어: bluecarrot16, JaidynReiman,',
+    '  Benjamin K. Smith, Eliza Wyatt, Johannes Sjölund (wulax), Matthew Krohn,',
+    '  Nila122, Michael Whitlock 외 — CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0',
+    '[LPC] Golem: Stephen Challener (Redshrike) — CC-BY 3.0',
+    'Red Dragon: Buko Studios — CC-BY 3.0 (색 변경)',
+    '',
+    '게임·이야기·음악: 오리지널',
+    '자세한 목록: CREDITS.md'
+  ]
 };
 
 /* ===================== 데이터 블록 끝 / 엔진 시작 ===================== */
 const W=320,H=240,T=16,CW=20,CH=15;let RS=3;
 const cv=document.getElementById('c'),cx=cv.getContext('2d');
 let cssScale=1,bgDirty=true;
-function resize(){const s=Math.min(innerWidth/W,innerHeight/H);cssScale=s;RS=(typeof AON!=='undefined'&&AON)?Math.max(3,Math.min(4,Math.ceil(s*(devicePixelRatio||1)-.15))):3;cv.style.imageRendering=(typeof AON!=='undefined'&&AON)?'auto':'pixelated';cv.width=W*RS;cv.height=H*RS;
+function resize(){const s=Math.min(innerWidth/W,innerHeight/H);cssScale=s;RS=(typeof AON!=='undefined'&&AON)?4:3;cv.style.imageRendering=(typeof AON!=='undefined'&&AON)?'auto':'pixelated';cv.width=W*RS;cv.height=H*RS;
  cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.style.left=(innerWidth-W*s)/2+'px';cv.style.top=(innerHeight-H*s)/2+'px';bgDirty=true;}
 addEventListener('resize',resize);
 ['gesturestart','gesturechange','dblclick','contextmenu'].forEach(e=>document.addEventListener(e,ev=>ev.preventDefault(),{passive:false}));
@@ -744,8 +761,9 @@ function enemyUpdate(e){if(e.spawn>0){e.spawn--;return;}e.timer++;if(e.hurt>0)e.
 function update(){tick++;readInput();
  if(pr('n')){muted=!muted;say(muted?'소리 끔':'소리 켬');if(master)master.gain.value=muted?0:.8;}
  if(toast){toast.l--;if(toast.l<=0)toast=null;}else if(toastQ.length)toast={s:toastQ.shift(),l:110};
- if(state==='title'){playMusic('title');const opts=hasSave()?2:1;const nd=navDir();if(nd===1||nd===3){titleSel=(titleSel+1)%opts;SFX.select();}
-  if(pr('a')||pr('j')){au();SFX.select();if(titleSel===1&&hasSave())loadGame();else{try{localStorage.removeItem(SAVE_KEY);}catch(e){}newGame();}}return;}
+ if(state==='title'){playMusic('title');const TO=titleOpts();titleSel=Math.min(titleSel,TO.length-1);const nd=navDir();if(nd===1||nd===3){titleSel=(titleSel+(nd===1?TO.length-1:1))%TO.length;SFX.select();}
+  if(pr('a')||pr('j')){au();SFX.select();const o=TO[titleSel];if(o==='cont')loadGame();else if(o==='cred'){state='credits';credY=0;}else{try{localStorage.removeItem(SAVE_KEY);}catch(e){}newGame();}}return;}
+ if(state==='credits'){credY++;if(pr('a')||pr('j')||pr('m')){SFX.select();state='title';}return;}
  if(state==='over'){const nd=navDir();if(nd===1||nd===3){overSel^=1;SFX.select();}if(pr('a')){if(overSel===0&&loadGame()){G.hp=G.maxHp;}else{state='title';titleSel=0;}}return;}
  if(state==='win'){if(dlg){dlgUpdate();return;}if(pr('a')){state='title';titleSel=0;try{localStorage.removeItem(SAVE_KEY);}catch(e){}}return;}
  if(dlg){dlgUpdate();partsUpdate();return;}
@@ -1107,7 +1125,7 @@ function drawObj(o){const X=o.tx*16,Y=o.ty*16,c=o.c,th=R.theme;
  if(c==='A'){shadow(X+8,Y+15,18);D(objCanvas('A'),X-2,Y+16-23);ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(90,210,255,${.15+Math.sin(tick*.08)*.08})`;ctx.beginPath();ctx.arc(X+8,Y-1,9,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}}
 const OUTDOOR={field:1,town:1,canyon:1,sand:1};
 let LC=null;
-function lighting(){if(!LC){LC=document.createElement('canvas');LC.width=W;LC.height=H;}const g=LC.getContext('2d');g.globalCompositeOperation='source-over';g.clearRect(0,0,W,H);g.fillStyle=R.theme==='tower'?'rgba(10,6,30,.5)':'rgba(6,2,20,.72)';g.fillRect(0,0,W,H);
+function lighting(){if(!LC){LC=document.createElement('canvas');LC.width=W;LC.height=H;}const g=LC.getContext('2d');g.globalCompositeOperation='source-over';g.clearRect(0,0,W,H);g.fillStyle=R.theme==='tower'?(AON?'rgba(10,6,30,.38)':'rgba(10,6,30,.5)'):(AON?'rgba(6,2,20,.58)':'rgba(6,2,20,.72)');g.fillRect(0,0,W,H);
  g.globalCompositeOperation='destination-out';const hole=(x,y,r,a)=>{const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,`rgba(0,0,0,${a})`);gr.addColorStop(.55,`rgba(0,0,0,${a*.7})`);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);};
  hole(P.x,P.y-8,82,1);const fl=Math.sin(tick*.3)*3;for(let ty=0;ty<CH;ty++)for(let tx=0;tx<CW;tx++){const c=grid[ty][tx];if(c==='L')hole(tx*16+8,ty*16-4,52+fl,1);else if(c==='F')hole(tx*16+8,ty*16+6,34+fl,.9);else if(c==='A'||c==='>')hole(tx*16+8,ty*16+6,26,.6);}
  if(spirit)hole(spirit.x,spirit.y,40,.8);for(const s of shots)if(s.owner==='e')hole(s.x,s.y,14,.6);for(const e of ents)if(e.c.look==='wisp'||e.c.look==='priest')hole(e.x,e.y-8,24,.5);
@@ -1162,14 +1180,14 @@ function drawTitle(){const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'
  const hs=heroSprite('u','idle',0);shadow(W/2,203,18);D(hs,W/2-13,177);
  ctx.save();ctx.shadowColor='rgba(255,200,80,.6)';ctx.shadowBlur=12;gtxt(STORY.title,W/2,64,30,'#fff8d0','#e09020');ctx.restore();gtxt(STORY.title,W/2,64,30,'#fff8d0','#e09020');
  ctx.fillStyle='#f2cf6a';ctx.fillRect(W/2-80,72,160,.7);txt('― '+STORY.subtitle+' ―',W/2,85,'#bfe0ff',10.5);
- const opts=hasSave()?['새로 시작','이어하기']:['새로 시작'];opts.forEach((o,i)=>{const y=146+i*16;if(i===titleSel)cursor(W/2-38,y-3.5);txt(o,W/2,y,i===titleSel?'#ffffff':'#9aa0c8',10.5);});
+ titleOpts().forEach((o,i)=>{const y=146+i*15;if(i===titleSel)cursor(W/2-38,y-3.5);txt(TITLE_LABEL[o],W/2,y,i===titleSel?'#ffffff':'#9aa0c8',10.5);});
  if(tick%60<40)txt(document.body.classList.contains('touch')?'공격 버튼으로 선택':'Z / Enter 로 선택',W/2,224,'#e8dcf0',7.5);
  txt('이동 방향키·WASD  공격 Z  점프 C  정령 X  무기 V  메뉴 Tab  소리 N',W/2,234,'#b0a0c8',6.2);}
 function draw(){cx.setTransform(RS,0,0,RS,0,0);cx.imageSmoothingEnabled=false;ctx=cx;
- if(state==='title'){drawTitle();return;}
+ if(state==='title'){drawTitle();return;}if(state==='credits'){drawCredits();return;}
  if(bgDirty)renderBg();ctx=cx;const sx=shake?Math.round((Math.random()-.5)*shake*.6):0,sy=shake?Math.round((Math.random()-.5)*shake*.6):0;
  cx.setTransform(RS,0,0,RS,0,0);ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);cx.setTransform(RS,0,0,RS,sx*RS,sy*RS);
- {const ab=AON&&aRoomBg();if(ab){ctx.save();ctx.setTransform(1,0,0,1,sx*RS,sy*RS);ctx.drawImage(ab,0,0);ctx.restore();}else ctx.drawImage(BGF[(tick>>3)%BGF.length],0,0);}
+ {if(AON&&BGT){ctx.save();ctx.setTransform(1,0,0,1,sx*RS,sy*RS);ctx.drawImage(BGT,0,0);ctx.restore();}else ctx.drawImage(BGF[(tick>>3)%BGF.length],0,0);}
  for(const a of ANIM){const X=a.tx*16,Y=a.ty*16;if(a.c==='F'){for(let k=0;k<3;k++)D(flameCanvas((tick>>2)+k+a.tx,0),X-2+k*5,Y+1-((k&1)*3));}
   else if(a.c==='S'||a.c==='Q'){ctx.globalCompositeOperation='lighter';ctx.fillStyle=a.c==='S'?`rgba(170,90,255,${.5+Math.sin(tick*.12)*.3})`:'rgba(80,255,130,.7)';ctx.fillRect(X+5,Y+6,6,6);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fillRect(X+7,Y+8,2,2);ctx.globalCompositeOperation='source-over';}}
  for(const p of pickups){if(p.l<120&&tick%8<4)continue;const b=Math.sin(tick*.1+p.x)*1.5;shadow(p.x,p.y+4,8);
@@ -1181,7 +1199,7 @@ function draw(){cx.setTransform(RS,0,0,RS,0,0);cx.imageSmoothingEnabled=false;ct
  for(const s of shots){if(s.kind==='fall')continue;if(s.owner==='p'){const w=s.w;if(w.type==='bomb'){shadow(s.x,s.y+3,8);D(iconCanvas('bomb',w.color),s.x-7,s.y-9-s.z);if(s.life-s.t<15&&tick%4<2){ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,200,120,.6)';ctx.beginPath();ctx.arc(s.x,s.y-4-s.z,6,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}}
    else{const ic=iconCanvas(w.icon,w.color);ctx.save();ctx.translate(Math.round(s.x),Math.round(s.y));ctx.rotate(w.type==='boomerang'?s.t*.5:Math.atan2(s.vy,s.vx)+Math.PI/4);ctx.drawImage(ic,-7,-7);ctx.restore();}}
   else{ctx.globalCompositeOperation='lighter';const c=s.kind==='fire'?'255,120,30':s.kind==='bone'?'220,220,200':'190,70,255';const gr=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,7);gr.addColorStop(0,`rgba(255,255,255,.95)`);gr.addColorStop(.35,`rgba(${c},.9)`);gr.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=gr;ctx.fillRect(s.x-7,s.y-7,14,14);ctx.globalCompositeOperation='source-over';}}
- if(spirit){const s=spirit.s,x=spirit.x,y=spirit.y+Math.sin(tick*.15)*2;ctx.globalCompositeOperation='lighter';const gr=ctx.createRadialGradient(x,y,0,x,y,16);gr.addColorStop(0,s.color);gr.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=.55;ctx.fillStyle=gr;ctx.fillRect(x-16,y-16,32,32);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';{const se=AON&&spiritE(s.id);if(!se||!aDraw(se,aFrame(se,tick),x,y+se.h*.5,spirit.x>P.x))D(spiritCanvas(s.color,(tick>>2)&3),x-10,y-10);}}
+ if(spirit){const s=spirit.s,x=spirit.x,y=spirit.y+Math.sin(tick*.15)*2;ctx.globalCompositeOperation='lighter';const gr=ctx.createRadialGradient(x,y,0,x,y,16);gr.addColorStop(0,s.color);gr.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=.55;ctx.fillStyle=gr;ctx.fillRect(x-16,y-16,32,32);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';{const se=AON&&sEnt((ASSETS.spirits||{})[s.id]);if(se)sDraw(se,'walk',faceTo(P.x-x,P.y-y),tick,x,y+9,{});else D(spiritCanvas(s.color,(tick>>2)&3),x-10,y-10);}}
  for(const p of parts){const a=Math.max(0,Math.min(1,p.l/14));if(p.puff){ctx.globalAlpha=a*.55;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,1.5+(30-p.l)*.15,0,7);ctx.fill();}else{ctx.globalAlpha=a;px(p.x-.5,p.y-.5,2,2,p.col);}}ctx.globalAlpha=1;
  ctx.globalCompositeOperation='lighter';for(const s of sparks){const k=1-s.l/12,r=3+k*9;ctx.strokeStyle=`rgba(255,250,200,${s.l/12})`;ctx.lineWidth=1.4*(s.l/12)+.4;ctx.beginPath();for(let i=0;i<4;i++){const a=s.a+i*Math.PI/2;ctx.moveTo(s.x+Math.cos(a)*r*.25,s.y+Math.sin(a)*r*.25);ctx.lineTo(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r);}ctx.stroke();
   ctx.fillStyle=`rgba(255,255,255,${s.l/12})`;ctx.beginPath();ctx.arc(s.x,s.y,2.5*(s.l/12)+.5,0,7);ctx.fill();}ctx.globalCompositeOperation='source-over';
@@ -1204,77 +1222,128 @@ function fxUpdate(){for(const s of sparks)s.l--;sparks=sparks.filter(s=>s.l>0);
   if(P.moving&&P.z===0&&P.walkT%16===8&&OUTDOOR[R.theme])parts.push({x:P.x+(Math.random()-.5)*4,y:P.y+5,vx:-P.fx*.2,vy:-.15,l:22,col:'rgba(230,220,200,1)',puff:1});}}
 let last=performance.now(),acc=0;
 function loop(t){acc+=Math.min(100,t-last);last=t;let n=0;while(acc>=1000/60&&n<4){update();fxUpdate();acc-=1000/60;n++;}draw();requestAnimationFrame(loop);}
-/* ===================== IMAGE ASSET LAYER (ASSETS 블록) ===================== */
-const AIMG={};let AON=false,AREADY=false;
-(function(){const q=new URLSearchParams(location.search);if(q.has('assets')){ASSETS.enabled=true;const d=q.get('assets');if(d)ASSETS.dir=d;}if(q.has('noassets'))ASSETS.enabled=false;})();
-function aEnt(e,defH){if(!e)return null;if(typeof e==='string')e={src:e};return Object.assign({frames:1,fps:6,ax:.5,ay:1,h:defH||24},e);}
-function aList(){const L=[];if(!ASSETS.enabled)return L;const H=ASSETS.hero||{};
- for(const d of['d','u','r','l'])if(H[d])for(const p in H[d])L.push(aEnt(H[d][p],H.h||36));
- for(const k in ASSETS.enemies||{})L.push(aEnt(ASSETS.enemies[k]));for(const k in ASSETS.spirits||{})L.push(aEnt(ASSETS.spirits[k],24));
- const N=ASSETS.npcs||{};for(const k in N)if(k!=='_h')L.push(aEnt(N[k],N._h||34));for(const k in ASSETS.props||{})L.push(aEnt(ASSETS.props[k]));
- for(const k in ASSETS.rooms||{})L.push(aEnt(ASSETS.rooms[k]));if(ASSETS.title)L.push(aEnt(ASSETS.title));return L;}
-function aLoad(){const L=aList();if(!L.length){AREADY=true;return;}let left=0;const seen={};
- for(const e of L){if(seen[e.src])continue;seen[e.src]=1;left++;const im=new Image();im.decoding='async';
-  im.onload=()=>{AIMG[e.src]=im;AON=true;if(--left===0){AREADY=true;resize();}};im.onerror=()=>{if(--left===0){AREADY=true;resize();}};im.src=ASSETS.dir+e.src;}}
-function aImg(e){return e&&AIMG[e.src]||null;}
-/* draw sprite entry: (x,y)=anchor point in logical px; frame index; flip horizontally; alpha */
-function aDraw(e,fi,x,y,flip,alpha,hOver){const im=aImg(e);if(!im)return false;const n=e.frames||1,fw=im.width/n,fh=im.height,h=hOver||e.h,w=e.w||h*fw/fh,f=((fi%n)+n)%n;
- ctx.save();ctx.imageSmoothingEnabled=ASSETS.smooth!==false;ctx.imageSmoothingQuality='high';if(alpha!=null)ctx.globalAlpha=alpha;
- ctx.translate(x,y);if(flip)ctx.scale(-1,1);ctx.drawImage(im,f*fw,0,fw,fh,-w*e.ax,-h*e.ay,w,h);ctx.restore();return true;}
-function aFrame(e,t){return Math.floor(t*(e.fps||6)/60);}
-const _AE={};function aE(group,key,defH){const k=group+'|'+key;if(k in _AE)return _AE[k];const src=(ASSETS[group]||{})[key];const e=src?aEnt(src,defH):null;return _AE[k]=e;}
-function heroE(dir,pose){const H=ASSETS.hero||{},flip=dir==='l'&&!H.l,d=flip?'r':dir;const set=H[d]||{};
- const e=aEnt(set[pose]||(pose==='hurt'||pose==='jump'?set.idle:pose==='atk'?set.walk:set.idle),H.h||36);return e&&aImg(e)?{e,flip}:null;}
-function enemyE(e){const c=e.c;const k=Object.keys(ENEMIES).find(k=>ENEMIES[k]===c);const en=(k&&aE('enemies',k))||aE('enemies',c.look);return en&&aImg(en)?en:null;}
-function npcE(n){const N=ASSETS.npcs||{};const e=aEnt(N[n.img]||N[n.name]||N._default,N._h||34);return e&&aImg(e)?e:null;}
-function spiritE(id){const e=aE('spirits',id,24);return e&&aImg(e)?e:null;}
-function propE(c){const e=aE('props',c);return e&&aImg(e)?e:null;}
-function roomE(){const e=R&&aE('rooms',G.room);return e&&aImg(e)?e:null;}
-
-/* ---- wrap renderer functions (fallback = code art) ---- */
-const _drawHero=drawHero;drawHero=function(){if(!AON)return _drawHero();const dir=heroDir(),pose=heroPose(),he=heroE(dir,pose);if(!he)return _drawHero();
- const sw=SW[G.sword]||SWORDS[0],x=P.x,y=P.y-P.z;shadow(P.x,P.y+6,Math.max(8,18-P.z/2));
- for(const t of trail){const h2=heroE(t.d,'walk');if(h2)aDraw(h2.e,1,t.x,t.y+7,h2.flip,t.a*.45);}
+/* ===================== IMAGE ASSET LAYER (ASSETS 블록; 없으면 코드 그래픽) ===================== */
+const AIMG={};let AON=false,AREADY=false,credY=0;
+(function(){const q=new URLSearchParams(location.search);if(q.has('noassets'))ASSETS.enabled=false;if(q.has('assets')){ASSETS.enabled=true;const d=q.get('assets');if(d)ASSETS.dir=d;}})();
+const LPC={fw:64,fh:64,foot:60,walk:{u:8,l:9,d:10,r:11},hurt:20,slash:{fw:192,fh:192,foot:124,rows:{u:0,l:1,d:2,r:3},n:6}};
+function aSrcs(){if(!ASSETS.enabled)return[];const L=[ASSETS.tiles,ASSETS.propsImg],add=e=>{if(!e)return;if(typeof e==='string')L.push(e);else{L.push(e.src);if(e.slash)L.push(e.slash);}};
+ add(ASSETS.hero);for(const k in ASSETS.npcs||{})add(ASSETS.npcs[k]);for(const k in ASSETS.enemies||{})add(ASSETS.enemies[k]);for(const k in ASSETS.spirits||{})add(ASSETS.spirits[k]);return[...new Set(L.filter(Boolean))];}
+function aLoad(){const L=aSrcs();if(!L.length){AREADY=true;return;}let left=L.length;const done=()=>{if(--left===0){AREADY=true;AON=!!(AIMG[ASSETS.tiles]&&AIMG[ASSETS.propsImg]);bgDirty=true;resize();}};
+ for(const s of L){const im=new Image();im.onload=()=>{AIMG[s]=im;done();};im.onerror=done;im.src=ASSETS.dir+s;}}
+function aI(s){return s&&AIMG[s]||null;}
+/* --- sprite sheets --- */
+function sEnt(e){if(!e)return null;if(typeof e==='string')e={src:e,lpc:true};return aI(e.src)?e:null;}
+const DIRS={u:1,l:1,d:1,r:1};
+/* draw frame: x,y = feet position (logical px) */
+function sFrame(im,fw,fh,col,row,foot,sc,x,y,flip,alpha,light){const w=fw*sc,h=fh*sc;ctx.save();ctx.imageSmoothingEnabled=false;if(alpha!=null)ctx.globalAlpha=alpha;
+ ctx.translate(Math.round(x*RS)/RS,Math.round(y*RS)/RS);if(flip)ctx.scale(-1,1);ctx.drawImage(im,col*fw,row*fh,fw,fh,-w/2,-foot*sc,w,h);
+ if(light){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=light;ctx.drawImage(im,col*fw,row*fh,fw,fh,-w/2,-foot*sc,w,h);}ctx.restore();}
+/* generic: anim 'walk'|'idle'|'atk'|'hurt'; t = frame counter (60/s) */
+function sDraw(e,anim,dir,t,x,y,o){o=o||{};const sc=(e.scale||ASSETS.scale)*(o.mul||1);
+ if(e.lpc){if(anim==='atk'&&e.slash&&aI(e.slash)){const S=LPC.slash,f=Math.min(S.n-1,Math.max(0,o.frac!=null?Math.floor(o.frac*S.n):Math.floor(t/4)%S.n));
+    return sFrame(aI(e.slash),S.fw,S.fh,f,S.rows[dir],S.foot,sc,x,y,false,o.alpha,o.light);}
+  const im=aI(e.src);if(anim==='hurt')return sFrame(im,64,64,Math.min(1,(t>>3)),LPC.hurt,LPC.foot,sc,x,y,false,o.alpha,o.light);
+  const col=anim==='walk'?1+((t/(60/(o.fps||10)))|0)%8:anim==='jump'?2:0;return sFrame(im,64,64,col,LPC.walk[dir],LPC.foot,sc,x,y,false,o.alpha,o.light);}
+ const im=aI(e.src);let row=e.rows[dir],flip=false;if(row==null){if(dir==='l'&&e.rows.r!=null){row=e.rows.r;flip=!!e.flip||true;}else row=e.rows.d!=null?e.rows.d:e.rows.r!=null?e.rows.r:0;}
+ else if(e.flip&&dir==='l'){row=e.rows.r;flip=true;}
+ const col=((t/(60/(e.fps||6)))|0)%(e.cols||1);sFrame(im,e.fw,e.fh,col,row,e.foot||e.fh*.92,sc,x,y,flip,o.alpha,o.light);return true;}
+function faceTo(dx,dy){return Math.abs(dx)>Math.abs(dy)?(dx<0?'l':'r'):(dy<0?'u':'d');}
+/* --- props --- */
+let PROPR=null;   // name -> [x,y,w,h] in props.png  (props.png 는 build_art.py 가 만든 순서; 아래 표와 같이 생성됨)
+const PROP_RECTS={"tree":[0,30,95,117],"tree2":[97,57,60,90],"pine":[159,0,63,147],"rock":[224,120,60,27],"block":[286,115,32,32],"chest":[320,115,32,32],"chest_open":[354,115,32,32],"torch_lit":[388,91,16,56],"torch":[406,96,16,51],"altar":[424,93,32,54],"house":[458,19,128,128]};
+function propName(c,tx,ty){const p=(ASSETS.props||{})[c];if(!p)return null;return Array.isArray(p)?p[(tx*7+ty*3)%p.length]:p;}
+function drawProp(name,x,y,alpha,mul){const r=(PROPR||PROP_RECTS)[name];if(!r)return false;const sc=((ASSETS.propScale||{})[name]||ASSETS.scale)*(mul||1);const im=aI(ASSETS.propsImg);
+ ctx.save();ctx.imageSmoothingEnabled=false;if(alpha!=null)ctx.globalAlpha=alpha;ctx.drawImage(im,r[0],r[1],r[2],r[3],Math.round((x-r[2]*sc/2)*RS)/RS,Math.round((y-r[3]*sc)*RS)/RS,r[2]*sc,r[3]*sc);ctx.restore();return true;}
+/* --- tile background --- */
+const TILE_POS={"block":{"grass":[0,0],"dirt":[96,0],"dirt2":[192,0],"water":[288,0],"sand":[384,0],"pit":[480,0],"chasm":[576,0],"darkstone":[672,0],"lava":[768,0]},"tile":{"flowers0":[0,192],"flowers1":[32,192],"flowers2":[64,192],"cobble0":[96,192],"cobble1":[128,192],"cobble2":[160,192],"stone0":[192,192],"stone1":[224,192],"stone2":[256,192],"stone3":[288,192],"teal0":[320,192],"teal1":[352,192],"cream0":[384,192],"cream1":[416,192],"plank":[448,192],"stairs":[480,192],"plate":[512,192],"crack":[544,192],"door":[576,192],"face_grey":[608,192],"face_cave":[640,192],"face_temple":[672,192],"face_canyon":[704,192],"face_town":[736,192]}};
+const WALLC='#KSQD';
+function tileBg(gridArr,theme){const TS=(ASSETS.tileset||{})[theme]||ASSETS.tileset.field,im=aI(ASSETS.tiles),c=document.createElement('canvas');c.width=W*RS;c.height=H*RS;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ const K=16*RS,q=K/2,at=(x,y)=>(y<0||y>=CH||x<0||x>=CW)?null:gridArr[y][x];
+ const blk=(n,sx,sy,dx,dy,sz)=>{const b=TILE_POS.block[n];if(b)g.drawImage(im,b[0]+sx,b[1]+sy,sz,sz,dx,dy,sz/32*K,sz/32*K);};
+ const one=(n,dx,dy)=>{const t=TILE_POS.tile[n];if(t)g.drawImage(im,t[0],t[1],32,32,dx,dy,K,K);};
+ const hsh=(x,y)=>((x*73856093)^(y*19349663))>>>0;
+ const base=(x,y)=>{const b=TS.base;if(Array.isArray(b))one(b[hsh(x,y)%b.length],x*K,y*K);else blk(b,32*(hsh(x,y)%3),160,x*K,y*K,32);};
+ for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){const ch=gridArr[y][x];if(ch===' '){g.fillStyle='#000';g.fillRect(x*K,y*K,K,K);continue;}base(x,y);
+  const f=TS.fill&&TS.fill[ch];if(f)one(f[hsh(x,y)%f.length],x*K,y*K);}
+ for(const [bn,chars] of TS.auto||[]){const ins=(x,y)=>{const v=at(x,y);return v===null||chars.includes(v);};
+  for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){if(!chars.includes(gridArr[y][x]))continue;
+   for(let qy=0;qy<2;qy++)for(let qx=0;qx<2;qx++){const sx=qx?1:-1,sy=qy?1:-1,hN=ins(x+sx,y),vN=ins(x,y+sy),dN=ins(x+sx,y+sy);let tx,ty;
+    if(hN&&vN&&!dN){tx=(qx?1:2)*32+qx*16;ty=(qy?0:1)*32+qy*16;}       // inner corner
+    else{const hx=hN?1:(qx?2:0),hy=vN?1:(qy?2:0);if(hN&&vN){tx=32+qx*16;ty=160+qy*16;tx=32*(hsh(x,y)%3)+qx*16;}else{tx=hx*32+qx*16;ty=(2+hy)*32+qy*16;}}
+    blk(bn,tx,ty,x*K+qx*q,y*K+qy*q,16);}}}
+ for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){const ch=gridArr[y][x],X=x*K,Y=y*K;
+  if(WALLC.includes(ch)){const below=at(x,y+1),face=below!==null&&!WALLC.includes(below);
+   if(face){one(TS.wall,X,Y);g.fillStyle='rgba(0,0,0,.18)';g.fillRect(X,Y,K,RS*2);}else{g.fillStyle=TS.top;g.fillRect(X,Y,K,K);g.fillStyle='rgba(255,255,255,.04)';if(hsh(x,y)%3===0)g.fillRect(X+K*.2,Y+K*.3,K*.3,K*.2);}
+   g.fillStyle=TS.rim;const r=Math.max(1,RS*.75);if(!face){if(at(x,y-1)!==null&&!WALLC.includes(at(x,y-1)))g.fillRect(X,Y,K,r);if(at(x-1,y)!==null&&!WALLC.includes(at(x-1,y)))g.fillRect(X,Y,r,K);if(at(x+1,y)!==null&&!WALLC.includes(at(x+1,y)))g.fillRect(X+K-r,Y,r,K);if(below!==null&&!WALLC.includes(below))g.fillRect(X,Y+K-r,K,r);}
+   else{g.fillRect(X,Y,K,r);}
+   if(ch==='K')one('crack',X,Y);if(ch==='D')one('door',X,Y);}
+  else if(ch==='='){one('plank',X,Y);}
+  else if(ch==='>'){one('stairs',X,Y);}
+  else if(ch==='P'||ch==='s'){one('plate',X,Y);if(ch==='s'){g.fillStyle='#c8b070';g.beginPath();g.arc(X+K/2,Y+K/2,K*.18,0,7);g.fill();g.fillStyle='#6a5020';g.beginPath();g.arc(X+K/2,Y+K/2+RS*.6,K*.12,0,7);g.fill();}}
+  if(!WALLC.includes(ch)&&y>0&&WALLC.includes(at(x,y-1))){const gr=g.createLinearGradient(0,Y,0,Y+K*.45);gr.addColorStop(0,'rgba(0,0,0,.35)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(X,Y,K,K*.45);}}
+ return c;}
+function housesOf(gridArr){const L=[],isH=(x,y)=>y>=0&&y<CH&&x>=0&&x<CW&&(gridArr[y][x]==='H'||gridArr[y][x]==='n');
+ for(let y=0;y<CH;y++)for(let x=0;x<CW;x++)if(isH(x,y)&&!isH(x-1,y)&&!isH(x,y-1)){let w=0,h=0;while(isH(x+w,y))w++;while(isH(x,y+h))h++;L.push({c:'H',tx:x,ty:y,w,h,y:(y+h)*16-1});}return L;}
+let BGT=null;
+const _renderBg=renderBg;renderBg=function(){_renderBg();if(AON&&ASSETS.tileset[R.theme]){BGT=tileBg(grid,R.theme);OBJS=OBJS.concat(housesOf(grid));}else BGT=null;};
+/* --- hero --- */
+const _drawHero=drawHero;drawHero=function(){const he=AON&&sEnt(ASSETS.hero);if(!he)return _drawHero();
+ const sw=SW[G.sword]||SWORDS[0],x=P.x,y=P.y+6-P.z;shadow(P.x,P.y+6,Math.max(8,16-P.z/2));
+ for(const t of trail)sDraw(he,'walk',t.d,tick,t.x,t.y+6,{alpha:t.a*.4,light:.5});
  if(P.inv>0&&P.inv<=44&&(tick>>2)%2)return;
- const fi=pose==='walk'?(P.walkT>>2):pose==='atk'?Math.floor((1-P.atk/Math.max(1,P.atkLen||1))*(he.e.frames||1)*.999):aFrame(he.e,tick);
- const behind=dir==='u'||(dir==='l'&&!P.atk&&!P.spin);const code=(ASSETS.hero||{}).codeBlade;
- if(behind&&(code||P.atk||P.spin||P.dslash))drawSword(sw,x,y);
- aDraw(he.e,P.atk>0?fi:pose==='walk'?fi:fi,x,y+7,he.flip);
- if(P.inv>50&&tick%4<2){ctx.save();ctx.globalCompositeOperation='lighter';aDraw(he.e,fi,x,y+7,he.flip,.6);ctx.restore();}
- if(!behind&&(code||P.atk||P.spin||P.dslash))drawSword(sw,x,y);
- if(P.hold>40){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(${tick%6<3?'255,240,160':'160,220,255'},.35)`;ctx.beginPath();ctx.arc(x,y-8,13+Math.sin(tick*.5)*2,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}};
-const _blade=blade;blade=function(sw,x,y,a,L){if(AON&&heroE('d','idle')&&!(ASSETS.hero||{}).codeBlade)return;_blade(sw,x,y,a,L);};
-const _drawEnemy=drawEnemy;drawEnemy=function(e){const en=AON&&enemyE(e);if(!en)return _drawEnemy(e);if(e.spawn>0&&tick%4<2)return;const c=e.c;
+ const dir=heroDir(),pose=heroPose(),fl=P.inv>50&&tick%4<2?.6:0;
+ if(pose==='atk'){const frac=P.spin>0?((tick>>1)%6)/6:P.dslash?.55:1-P.atk/Math.max(1,P.atkLen||1);drawSword(sw,P.x,P.y-P.z);sDraw(he,'atk',dir,tick,x,y,{frac,light:fl});}
+ else sDraw(he,pose==='walk'?'walk':pose,dir,pose==='walk'?P.walkT*1.2:tick,x,y,{fps:P.dash>0?18:11,light:fl});
+ if(P.hold>40){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(${tick%6<3?'255,240,160':'160,220,255'},.35)`;ctx.beginPath();ctx.arc(P.x,P.y-8-P.z,13+Math.sin(tick*.5)*2,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}};
+const _blade=blade;blade=function(sw,x,y,a,L){if(AON&&sEnt(ASSETS.hero))return;_blade(sw,x,y,a,L);};
+/* --- enemies --- */
+function enemyEnt(e){const c=e.c;const k=Object.keys(ENEMIES).find(k=>ENEMIES[k]===c);const E=ASSETS.enemies||{};return sEnt(E[k])||sEnt(E[c.look]);}
+const _drawEnemy=drawEnemy;drawEnemy=function(e){const en=AON&&enemyEnt(e);if(!en)return _drawEnemy(e);if(e.spawn>0&&tick%4<2)return;const c=e.c;
  const fly=e.fly?8+Math.sin(e.timer*.1)*2:0,bw=Math.max(10,e.r*2.2);shadow(e.x,e.y+e.r*.6,bw*(fly?.8:1));const ox=e.shk?(tick%2?1:-1):0;
- const flip=en.flip?((e.vx||0)>0||(P.x>e.x)):false;aDraw(en,aFrame(en,e.timer||tick),e.x+ox,e.y+e.r*.6+1-fly,flip);
- if(e.hurt>0&&tick%4<2){ctx.save();ctx.globalCompositeOperation='lighter';aDraw(en,aFrame(en,e.timer||tick),e.x+ox,e.y+e.r*.6+1-fly,flip,.55);ctx.restore();}
+ const dx=e.x-(e._lx??e.x),dy=e.y-(e._ly??e.y);e._lx=e.x;e._ly=e.y;if(Math.abs(dx)+Math.abs(dy)>.05)e._dir=faceTo(dx,dy);else if(!e._dir||tick%30===0)e._dir=faceTo(P.x-e.x,P.y-e.y);
+ if(c.look==='priest'||c.look==='wisp'){ctx.globalCompositeOperation='lighter';const ax=e.x,ay=e.y-14-fly,gr=ctx.createRadialGradient(ax,ay,0,ax,ay,c.boss?40:16);gr.addColorStop(0,'rgba(170,80,255,.35)');gr.addColorStop(1,'rgba(170,80,255,0)');ctx.fillStyle=gr;ctx.fillRect(ax-40,ay-40,80,80);ctx.globalCompositeOperation='source-over';}
+ const moving=Math.abs(dx)+Math.abs(dy)>.05;sDraw(en,en.lpc?(moving?'walk':'idle'):'walk',e._dir||'d',(e.timer||tick)+(en.lpc?0:0),e.x+ox,e.y+e.r*.6+1-fly,{fps:8,light:e.hurt>0&&tick%4<2?.7:0});
  if(e.boss){const bx=40,by=H-16,bw2=W-80;panel(bx-4,by-11,bw2+8,20,.85);txt(c.name,W/2,by-1.5,'#ffe8a0',7.5);px(bx+2,by+1.5,bw2-4,4,'#200818');const g=ctx.createLinearGradient(0,by,0,by+5);g.addColorStop(0,'#ff8098');g.addColorStop(1,'#a01030');ctx.fillStyle=g;ctx.fillRect(bx+2,by+1.5,(bw2-4)*Math.max(0,e.hp)/e.max,4);}
- else if(e.hp<e.max){const y0=e.y+e.r*.6-en.h-4-fly;px(e.x-7,y0,14,3,'#100818');px(e.x-6,y0+.5,12*e.hp/e.max,2,'#ff5060');}};
-const _drawNPC=drawNPC;drawNPC=function(n){const ne=AON&&npcE(n);if(!ne)return _drawNPC(n);const x=n.x*T+8,y=n.y*T+8;shadow(x,y+6,16);
- aDraw(ne,aFrame(ne,tick+n.x*20),x,y+8,!!n.flip);if(n.shop)D(iconCanvas('coin'),x+6,y-ne.h);if(n.inn!=null)D(iconCanvas('potion','#ffffff'),x+6,y-ne.h);
- if(Math.hypot(P.x-x,P.y-y)<30){const by=y-ne.h-6+Math.sin(tick*.15)*1.5;ctx.fillStyle='#120818';rr(x-5,by-1,10,10,3);ctx.fill();ctx.fillStyle='#fff';rr(x-4,by,8,8,2.5);ctx.fill();txt('!',x,by+7,'#e02040',7.5);}};
-const _drawObj=drawObj;drawObj=function(o){const re=AON&&roomE();if(re&&re.hide&&re.hide.includes(o.c))return;const pe=AON&&propE(o.c);if(!pe)return _drawObj(o);
- const X=o.tx*16,Y=o.ty*16,c=o.c;shadow(X+8,Y+14,c==='T'?30:16);aDraw(pe,aFrame(pe,tick+o.tx*7),X+8,Y+16,false);
- if(c==='L'){const fc=flameCanvas((tick>>2)+o.tx,0);D(fc,X+1,Y+16-pe.h-10);}
- if(c==='A'){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(90,210,255,${.15+Math.sin(tick*.08)*.08})`;ctx.beginPath();ctx.arc(X+8,Y-1,9,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}};
-const _spiritCanvas=spiritCanvas;
-/* painted room background: image + procedural patches for tiles that changed from the base map (doors, bridges, blocks...) */
-let ABG=null,ABGkey='';
-function aRoomBg(){const re=roomE();if(!re)return null;const key=G.room+'|'+RS+'|'+grid.map(r=>r.join('')).join('');if(ABG&&ABGkey===key)return ABG;
- const c=ABG||document.createElement('canvas');c.width=W*RS;c.height=H*RS;const g=c.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(aImg(re),0,0,c.width,c.height);
- const b=baseGrid(G.room);g.imageSmoothingEnabled=false;for(let ty=0;ty<CH;ty++)for(let tx=0;tx<CW;tx++)if(grid[ty][tx]!==b[ty][tx]&&!'CcBX'.includes(grid[ty][tx])&&!'CcBX'.includes(b[ty][tx]))g.drawImage(BGF[0],tx*16,ty*16,16,16,tx*16*RS,ty*16*RS,16*RS,16*RS);
- ABG=c;ABGkey=key;return c;}
-const _drawTitle=drawTitle;drawTitle=function(){const te=AON&&ASSETS.title&&aImg(aEnt(ASSETS.title));if(!te)return _drawTitle();
- ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(te,0,0,W,H);ctx.restore();ctx.fillStyle='rgba(8,6,24,.25)';ctx.fillRect(0,0,W,H);
- ctx.save();ctx.shadowColor='rgba(255,200,80,.6)';ctx.shadowBlur=12;gtxt(STORY.title,W/2,64,30,'#fff8d0','#e09020');ctx.restore();gtxt(STORY.title,W/2,64,30,'#fff8d0','#e09020');
- ctx.fillStyle='#f2cf6a';ctx.fillRect(W/2-80,72,160,.7);txt('― '+STORY.subtitle+' ―',W/2,85,'#ffffff',10.5);
- const opts=hasSave()?['새로 시작','이어하기']:['새로 시작'];opts.forEach((o,i)=>{const y=146+i*16;if(i===titleSel)cursor(W/2-38,y-3.5);txt(o,W/2,y,i===titleSel?'#ffffff':'#c8cce8',10.5);});
+ else if(e.hp<e.max){const y0=e.y-e.r*2-12-fly;px(e.x-7,y0,14,3,'#100818');px(e.x-6,y0+.5,12*e.hp/e.max,2,'#ff5060');}};
+/* --- NPC --- */
+function npcEnt(n){const N=ASSETS.npcs||{};return sEnt(N[n.img])||sEnt(N[n.name])||sEnt(N._default);}
+const _drawNPC=drawNPC;drawNPC=function(n){const ne=AON&&npcEnt(n);if(!ne)return _drawNPC(n);const x=n.x*T+8,y=n.y*T+8,near=Math.hypot(P.x-x,P.y-y)<40;shadow(x,y+6,14);
+ sDraw(ne,'idle',near?faceTo(P.x-x,P.y-y):'d',tick,x,y+7,{});if(n.shop)D(iconCanvas('coin'),x+6,y-26);if(n.inn!=null)D(iconCanvas('potion','#ffffff'),x+6,y-26);
+ if(Math.hypot(P.x-x,P.y-y)<30){const by=y-36+Math.sin(tick*.15)*1.5;ctx.fillStyle='#120818';rr(x-5,by-1,10,10,3);ctx.fill();ctx.fillStyle='#fff';rr(x-4,by,8,8,2.5);ctx.fill();txt('!',x,by+7,'#e02040',7.5);}};
+/* --- props --- */
+const _drawObj=drawObj;drawObj=function(o){if(!AON)return _drawObj(o);const X=o.tx*16,Y=o.ty*16,c=o.c;
+ if(c==='H'){const w=o.w*16;return drawProp('house',X+w/2,Y+o.h*16,null,w/64);}
+ const nm=propName(c,o.tx,o.ty);if(!nm)return _drawObj(o);
+ if(c==='T'){const r=PROP_RECTS[nm],sc=(ASSETS.propScale||{})[nm]||.5,top=Y+16-r[3]*sc,behind=P&&P.y<Y+12&&P.y>top-4&&Math.abs(P.x-(X+8))<r[2]*sc/2;shadow(X+8,Y+14,20);return drawProp(nm,X+8,Y+16,behind?.55:null);}
+ shadow(X+8,Y+14,c==='o'?18:14);drawProp(nm,X+8,Y+(c==='C'||c==='c'||c==='B'||c==='X'?16:15));
+ if(c==='X'){ctx.fillStyle='rgba(80,255,130,.25)';ctx.fillRect(X+2,Y+12,12,3);}
+ if(c==='L'){const fc=flameCanvas((tick>>2)+o.tx,0);D(fc,X+1,Y-12);}
+ if(c==='A'){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(90,210,255,${.15+Math.sin(tick*.08)*.08})`;ctx.beginPath();ctx.arc(X+8,Y-4,10,0,7);ctx.fill();ctx.globalCompositeOperation='source-over';}};
+/* --- portraits --- */
+const _portraitOf=portraitOf;portraitOf=function(name){if(AON&&name){let e=null;if(name===STORY.hero)e=sEnt(ASSETS.hero);
+  else{const sp_=SPIRITS.find(s=>s.name===name);if(!sp_){const n=(R&&R.npcs||[]).find(n=>n.name===name)||[].concat(...TOWNS.map(t=>t.npcs||[])).find(n=>n.name===name);if(n)e=npcEnt(n);
+   else{const k=Object.keys(ENEMIES).find(k=>ENEMIES[k].name===name);if(k){const E=ASSETS.enemies||{};e=sEnt(E[k])||sEnt(E[ENEMIES[k].look]);}}}}
+  if(e){const im=aI(e.src);if(e.lpc)return{c:im,crop:[14,10*64+6,36,34]};return{c:im,crop:[0,(e.rows.d!=null?e.rows.d:0)*e.fh,e.fw,e.fh]};}}return _portraitOf(name);};
+/* --- title + credits --- */
+let TITLEBG=null;
+function titleOpts(){return hasSave()?['new','cont','cred']:['new','cred'];}
+const TITLE_LABEL={new:'새로 시작',cont:'이어하기',cred:'크레딧'};
+const _drawTitle=drawTitle;drawTitle=function(){if(!AON)return _drawTitle();
+ if(!TITLEBG&&ROOMS.town1){const gA=baseGrid('town1');const th=ROOMS.town1.theme;TITLEBG=tileBg(gA,th);const g=TITLEBG.getContext('2d');const sv=ctx;ctx=g;g.setTransform(RS,0,0,RS,0,0);
+  const objs=[];for(let y=0;y<CH;y++)for(let x=0;x<CW;x++)if(gA[y][x]==='T'||gA[y][x]==='A')objs.push({c:gA[y][x],tx:x,ty:y,y:y*16+15});housesOf(gA).forEach(h=>objs.push(h));objs.sort((a,b)=>a.y-b.y);
+  for(const o of objs){if(o.c==='H')drawProp('house',o.tx*16+o.w*8,o.ty*16+o.h*16,null,o.w*16/64);else drawProp(propName(o.c,o.tx,o.ty),o.tx*16+8,o.ty*16+16);}ctx=sv;}
+ if(TITLEBG){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(TITLEBG,0,0);ctx.restore();}
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(8,10,40,.78)');g.addColorStop(.5,'rgba(10,10,40,.35)');g.addColorStop(1,'rgba(8,6,24,.8)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ SPIRITS.forEach((s,i)=>{const a=tick*.02+i*Math.PI*2/SPIRITS.length,x=W/2+Math.cos(a)*84,y=118+Math.sin(a)*14;const se=sEnt((ASSETS.spirits||{})[s.id]);ctx.globalCompositeOperation='lighter';const gr=ctx.createRadialGradient(x,y-8,0,x,y-8,16);gr.addColorStop(0,s.color);gr.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=.6;ctx.fillStyle=gr;ctx.fillRect(x-16,y-24,32,32);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';if(se)sDraw(se,'walk','d',tick+i*9,x,y,{});});
+ const he=sEnt(ASSETS.hero);if(he){shadow(W/2,206,14);sDraw(he,'walk','d',tick,W/2,206,{fps:8});}
+ ctx.save();ctx.shadowColor='rgba(255,200,80,.6)';ctx.shadowBlur=12;gtxt(STORY.title,W/2,58,30,'#fff8d0','#e09020');ctx.restore();gtxt(STORY.title,W/2,58,30,'#fff8d0','#e09020');
+ ctx.fillStyle='#f2cf6a';ctx.fillRect(W/2-80,66,160,.7);txt('― '+STORY.subtitle+' ―',W/2,79,'#ffffff',10.5);
+ const TO=titleOpts();TO.forEach((o,i)=>{const y=144+i*15;if(i===titleSel)cursor(W/2-38,y-3.5);txt(TITLE_LABEL[o],W/2,y,i===titleSel?'#ffffff':'#c8cce8',10.5);});
  if(tick%60<40)txt(document.body.classList.contains('touch')?'공격 버튼으로 선택':'Z / Enter 로 선택',W/2,224,'#ffffff',7.5);
  txt('이동 방향키·WASD  공격 Z  점프 C  정령 X  무기 V  메뉴 Tab  소리 N',W/2,234,'#e0d8f0',6.2);};
-const _portraitOf=portraitOf;portraitOf=function(name){if(AON&&name){let e=null;if(name===STORY.hero){const h=heroE('d','idle');e=h&&h.e;}
-  else{const sp_=SPIRITS.find(s=>s.name===name);if(sp_)e=spiritE(sp_.id);else{const n=(R&&R.npcs||[]).find(n=>n.name===name)||[].concat(...TOWNS.map(t=>t.npcs||[])).find(n=>n.name===name);if(n)e=npcE(n);
-   else{const k=Object.keys(ENEMIES).find(k=>ENEMIES[k].name===name);if(k){const en=aE('enemies',k)||aE('enemies',ENEMIES[k].look);if(en&&aImg(en))e=en;}}}}
-  if(e){const im=aImg(e),fw=im.width/(e.frames||1);return{c:im,crop:[0,0,fw,Math.min(im.height,fw*.85)],smooth:1};}}return _portraitOf(name);};
+function drawCredits(){drawTitle();ctx.fillStyle='rgba(6,6,20,.86)';ctx.fillRect(0,0,W,H);panel(14,10,W-28,H-20,.9);gtxt('크레딧',W/2,30,14,'#fff8d0','#e09020');
+ const L=ASSETS.credits||[];ctx.save();ctx.beginPath();ctx.rect(20,38,W-40,H-62);ctx.clip();L.forEach((s,i)=>txt(s,26,52+i*11.5-Math.max(0,credY-60)*.0,s.startsWith('  ')?'#c8d0f0':'#ffffff',7,'left'));ctx.restore();
+ txt('공격·점프·메뉴 버튼: 돌아가기',W/2,H-16,'#e8dcf0',7);}
 
 aLoad();resize();requestAnimationFrame(loop);
 /* hidden debug hook (자동 테스트용, UI에 노출되지 않음) */
@@ -1282,5 +1351,5 @@ Object.defineProperty(window,'__dbg',{enumerable:false,value:{
  get G(){return G},get P(){return P},get state(){return state},get room(){return G&&G.room},get ents(){return ents},get dlg(){return dlg},get spirit(){return spirit},get shop(){return shop},
  grid:()=>grid.map(r=>r.join('')),god:v=>{god=v!==false;},warp:(id,tx,ty)=>{loadRoom(id,tx*T+8,ty*T+8);},pos:(x,y,fx,fy)=>{P.x=x*T+8;P.y=y*T+8;if(fx!=null){P.fx=fx;P.fy=fy;}},
  give:g=>give(g),skipDlg:()=>{let n=0;while(dlg&&n++<50){const d=dlg.onDone;dlg=null;d&&d();}},rooms:()=>Object.keys(ROOMS),
- set tick(v){tick=v},get tick(){return tick},cacheSize:()=>Object.keys(SC).length,layout:()=>{renderBg();return BGF[0].toDataURL();},assets:()=>({on:AON,ready:AREADY,RS,loaded:Object.keys(AIMG)})}});
+ set tick(v){tick=v},get tick(){return tick},cacheSize:()=>Object.keys(SC).length,layout:()=>{renderBg();return BGF[0].toDataURL();},credits:()=>{state='credits';},assets:()=>({on:AON,ready:AREADY,RS,loaded:Object.keys(AIMG),srcs:aSrcs()})}});
 </script></body></html>

@@ -204,54 +204,72 @@ field: { bpm:132, lead:'A4 C5 E5 - D5 ...', bass:'A2 A3 ...', drum:true }
 - 회전 베기: 공격 버튼을 꾹 눌렀다가 떼기
 - 점프 내려찍기: 공중에서 공격
 
-## 그래픽 엔진 (v3)
+## 그래픽 (v4) — 무료 공개 라이선스 그림 팩
 
-모든 그래픽은 코드로 직접 그리는 오리지널 아트입니다(외부 이미지·ROM 에셋 없음).
+이제 기본 그래픽은 **Liberated Pixel Cup(LPC)** 계열의 무료 공개 라이선스 그림 팩(OpenGameArt.org)을 씁니다. 작가와 라이선스는 `CREDITS.md`, `assets/LICENSES/` 폴더, 게임 타이틀 화면의 **크레딧** 메뉴에 있습니다.
 
-- 캐릭터·적·소품은 "재질 버퍼"에 도형으로 그린 뒤 자동 음영(5단계 색 램프 + 디더링)과 외곽선을 입혀 한 번만 구워서 캐시합니다.
-- 그래서 `ENEMIES`의 `look`/`color`, NPC의 `look:{body,hair,skin}`, `THEMES`의 색만 바꿔도 음영과 외곽선이 자동으로 맞춰집니다.
-- 타일은 방에 들어갈 때 픽셀 단위로 렌더링합니다(노이즈, 디더링, 그림자). 물과 불은 4프레임으로 애니메이션됩니다.
-- 동굴(cave), 신전(temple), 탑(tower) 테마에는 조명 효과가 적용되고, 야외(field/town/canyon/sand)에는 구름 그림자가 지나갑니다.
-- 내부 해상도는 320x240 논리 좌표이고 3배 해상도로 출력합니다. 맵 데이터 형식은 그대로입니다.
+- 배경은 **방의 글자 지도(`MAPS`/`TOWNS`)를 타일로 그려서** 만듭니다. 그래서 그림과 충돌(벽·물·구덩이)이 항상 맞습니다. 지도를 고치면 그림도 저절로 바뀝니다.
+- 잔디·흙길·물·구덩이의 경계는 자동 타일(autotile)로 이어 붙입니다.
+- 주인공·NPC·해골·기사·마법사·사제는 LPC 캐릭터 시트(64x64 칸, 위·왼·아래·오른쪽 방향, 걷기 9프레임, 베기 6프레임)를 씁니다.
+- 그림을 불러오지 못하면 예전처럼 코드로 그린 그래픽이 자동으로 쓰입니다.
+  - 주소 뒤에 `?noassets` 를 붙이면 코드 그래픽으로 볼 수 있습니다.
+  - `?assets=폴더/` 를 붙이면 다른 그림 폴더를 시험할 수 있습니다.
+- 동굴(cave), 신전(temple), 탑(tower)에는 조명 효과가 있습니다.
+- 내부 좌표는 320x240(한 칸 16)이고, 그림을 쓸 때는 4배로 출력합니다. 32px 타일 한 장이 한 칸에 딱 맞습니다.
 
-## 그림 파일(일러스트)로 교체하기 — ASSETS 블록
+## 그림 바꾸기 — ASSETS 블록
 
-`index.html` 위쪽 데이터 블록의 `ASSETS` 에서 그림 파일을 지정합니다.
+`index.html` 데이터 블록의 `ASSETS` 에서 지정합니다. `enabled:false` 로 두면 코드 그래픽을 씁니다.
 
-- `enabled: true` 로 바꾸면 `assets/` 폴더의 그림을 사용합니다.
-  - 목록에 없거나 불러오지 못한 그림은 자동으로 코드로 그린 기본 그래픽으로 대체되므로, 일부만 교체해도 됩니다.
-  - 단, 목록에 적힌 파일이 실제로 없으면 브라우저 콘솔에 404 오류가 남으니, 없는 파일은 목록에서 지우세요.
-- 시험해 볼 때는 주소 뒤에 붙입니다.
-  - `?assets=폴더/` : 그림 사용
-  - `?noassets` : 코드 그래픽
-- 스프라이트 항목은 `'파일.png'` 또는 `{src, frames, fps, h, w, ax, ay, flip}` 형식입니다.
-  - `h` 는 게임 안 높이입니다(논리 px, 화면은 320x240, 한 칸은 16).
-  - 기준점 기본값은 발밑 가운데(`ax:.5, ay:1`)입니다.
-  - 여러 프레임은 가로로 이어 붙인 한 장(스트립)입니다.
-- 항목별 찾는 방법:
-  - `hero`: `d/u/r` 방향 × `idle/walk/atk/jump/hurt`. 왼쪽은 `r` 을 좌우 반전합니다. `codeBlade:false` 이면 그림 속 칼을 쓰고, 베기 궤적 효과만 코드로 그립니다.
-  - `enemies`: `ENEMIES` 의 키 또는 `look` 이름(보스 포함)으로 찾습니다.
-  - `spirits`: `SPIRITS` 의 `id` 로 찾습니다.
-  - `npcs`: NPC 의 `img` 값 → `name` → `_default` 순서로 찾습니다.
-  - `props`: 맵 글자(`T o B X C c t L A`)로 찾습니다.
-  - `rooms`: 방 `id` 마다 배경 그림 한 장(4:3, 1280x960 권장)입니다.
-  - `title`: 타이틀 배경입니다.
-- 방 배경 그림은 그림일 뿐이고, 충돌·퍼즐은 그대로 `MAPS` 의 글자 지도로 동작합니다.
-  - 그림은 `assets_src/guides/<방>_collision.png`(칸 도식)와 `<방>_layout.png`(기본 그래픽)에 맞춰 그려야 벽·물 위치가 맞습니다.
-  - 상자·블록·횃불·제단처럼 바뀌는 소품은 배경에 그리지 말고 `props` 로 그립니다.
-  - 나무처럼 배경에 이미 그린 소품은 `hide:'T'` 로 따로 그리지 않게 합니다.
-  - 퍼즐로 바뀐 칸(열린 문, 부서진 벽, 생긴 다리 등)은 자동으로 기본 타일을 덧그립니다.
-- 그림을 쓰면 화면 해상도가 기기에 맞춰 최대 4배로 올라가고 부드럽게(비픽셀) 그립니다.
+| 항목 | 뜻 |
+|---|---|
+| `hero:{src, lpc:true, slash}` | 주인공 LPC 시트와 베기 시트(192x192 칸) |
+| `npcs:{'이름':'파일.png', _default}` | NPC `name` 으로 찾는 LPC 시트 |
+| `enemies:{키:{...}}` | `ENEMIES` 키(보스 포함)마다 스프라이트 |
+| `spirits:{id:{...}}` | 정령 스프라이트 |
+| `props:{글자:이름}` | 지도 글자 → `props.png` 안 소품 이름. `T` 처럼 배열이면 칸마다 골고루 섞어 씁니다. |
+| `propScale:{이름:배율}` | 나무·집 같은 큰 소품의 크기 |
+| `tileset:{테마:{...}}` | 테마별 바닥 타일 |
+| `credits:[...]` | 게임 안 크레딧 화면에 보이는 줄 |
 
-### 후처리 도구 (`tools/asset_pipeline.py`, Python + Pillow + numpy)
+스프라이트 항목의 형식은 두 가지입니다.
+
+- LPC 시트: `{src:'enemy_skel.png', lpc:true, scale:.95}`
+- 일반 격자 시트: `{src:'enemy_slime.png', fw:32, fh:32, cols:3, rows:{u:0,l:1,d:2,r:3}, fps:6, foot:28, scale:.5}`
+  - `fw/fh`: 한 프레임 크기(px)
+  - `cols`: 가로 프레임 수
+  - `rows`: 방향별 줄 번호. 한 방향만 있으면 `flip:true` 로 좌우 반전합니다.
+  - `foot`: 프레임 안 발밑의 y 좌표
+  - `scale`: 게임 안 배율(.5 이면 32px 그림이 한 칸 크기)
+  - 색을 바꾼 강화판(보스, 정령 등)은 `tools/build_art.py` 에서 색을 입혀 따로 PNG로 만듭니다.
+
+`tileset` 테마 항목은 다음과 같습니다.
+
+- `base`: 바닥 타일 이름(배열이면 무작위로 섞음)
+- `auto:[[타일, '지도글자들'], ...]`: 해당 글자 칸을 자동 경계 타일로 그립니다(예: `['water','~']`).
+- `fill:{글자:타일}`: 그 칸을 한 장짜리 타일로 그립니다.
+- `wall`: 벽 앞면 타일, `top`/`rim`: 벽 윗면 색
+
+타일과 소품 이름은 `assets_src/atlas_meta.json` 에 모두 나와 있습니다.
+
+### 그림 다시 만들기 (`tools/build_art.py`, Python + Pillow)
 
 ```
-python3 tools/asset_pipeline.py split 시트.png --cols 4 --rows 1 -o work/walk_%d.png   # 격자 시트 자르기
-python3 tools/asset_pipeline.py sprite work/walk_0.png work/walk_1.png ... -o assets/hero_d_walk.png --height 144
-python3 tools/asset_pipeline.py bg 그림.png -o assets/bg_town1.jpg                       # 4:3 자르기 + 1280x960 JPG
-python3 tools/asset_pipeline.py check                                                 # 목록 대비 빠진 파일 확인
-python3 tools/make_guides.py                                                          # 방 배치 가이드 다시 만들기
+python3 tools/build_art.py
 ```
 
-- `sprite` 는 단색 배경(테두리와 이어진 영역)을 투명하게 지우고, 프레임들을 발밑 기준으로 정렬해 스트립으로 저장합니다.
-- 프레임 높이는 게임 안 높이 × 4 정도를 권장합니다(주인공 144px, 보스 220px 정도).
+- 원본 팩을 OpenGameArt.org와 GitHub에서 직접 내려받습니다(`assets_src/packs/` 에 캐시되고, 저장소에는 올리지 않습니다).
+- 내려받은 팩을 잘라 `assets/` 의 PNG(타일 아틀라스, 소품 아틀라스, 캐릭터 시트)로 합칩니다.
+- `CREDITS.md` 와 `assets/LICENSES/` 를 새로 쓰고, `index.html` 의 `PROP_RECTS`·`TILE_POS` 줄을 갱신합니다.
+- 캐릭터 옷차림은 파일 안의 `HERO`, `CHARS` 목록에서 LPC 레이어(몸, 머리, 옷, 무기)를 바꿔 정합니다. 사용한 레이어의 작가는 크레딧에 자동으로 들어갑니다.
+
+### 직접 그린 그림이나 다른 팩으로 바꾸려면
+
+1. `assets/` 에 PNG를 넣습니다.
+2. `ASSETS` 의 해당 항목 `src` 와 프레임 정보를 맞춥니다.
+3. 라이선스가 공개 게임에서 **재배포를 허용하는지** 꼭 확인합니다.
+   - 사용할 수 있는 것: CC0, CC-BY, CC-BY-SA, OGA-BY, GPL
+   - 쓰면 안 되는 것: NC(비영리 전용), ND(변경 금지), 재배포 금지 팩
+4. `CREDITS.md` 와 `ASSETS.credits` 에 작가, 출처 주소, 라이선스를 적습니다.
+
+> 주의: LPC 그림은 CC-BY-SA 3.0 / GPL 3.0 입니다. 이 그림을 고쳐 만든 그림도 같은 라이선스로 공개해야 하며, 작가 표기를 지우면 안 됩니다.
