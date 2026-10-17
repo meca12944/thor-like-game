@@ -3,8 +3,9 @@ import numpy as np, cv2, os, json
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from rembg import remove, new_session
 OUT='/workspace/thor-like-game/docs_art/outfits_v3'; os.makedirs(OUT,exist_ok=True)
-PICK=[('hero','r07','필멸자 (주인공)'),('a_tailor','v3_a_tailor','나비'),('h_mystic','r13','운'),('g_dancer','r12','방울'),
-      ('f_diver','r10','숨비'),('e_tailor','r04','루비'),('c_priest','r11','설화'),('d_yuna','r06','유나 (현대복)')]
+PICK=[('hero','s1','필멸자','낙인의 자식'),('a_tailor','s2','리네트','은바늘의'),('h_mystic','s3','베일라','별을 엮는 점성녀'),
+      ('g_dancer','s4','자이라','사막방울의 무희'),('f_diver','s5','마렌','잿물결의 해녀'),('e_tailor','s6','로자린드','불꽃실의 직녀'),
+      ('c_priest','s7','이벨린','서리 성녀'),('d_yuna','s8','유나','차원을 건넌 이방인')]
 BODY=1200; CW,CH=900,1320; TOP=60; BASE=TOP+BODY
 sess=new_session('isnet-anime')
 def make_alpha(img,cid=''):
@@ -29,7 +30,7 @@ def make_alpha(img,cid=''):
         if s2[i,4]<400: a[l2==i]=0
     return a
 meta={}
-for cid,src,name in PICK:
+for cid,src,name,title in PICK:
     img=np.array(Image.open(f'gen/{src}.jpg').convert('RGB'))
     a=make_alpha(img,cid)
     a3=np.clip(a,1e-3,1)[...,None]; dec=np.clip((img-255*(1-a3))/a3,0,255)
@@ -50,23 +51,25 @@ for cid,src,name in PICK:
     ox=round(CW/2-cx*s); oy=round(BASE-feet*s)
     canvas.paste(big,(ox,oy),big)
     canvas.save(f'{OUT}/{cid}.png',optimize=True)
-    meta[cid]=dict(name=name,src_scale=round(s,3),clipped=bool(ox>0 or ox+big.width<CW) and False)
+    meta[cid]=dict(name=name,title=title,label=f'「{title}」 {name}',file=f'{cid}.png',src_scale=round(s,3))
     print(cid,'scale',round(s,2),'head',head,'feet',feet,'cx',cx)
 # lineup
-sc=0.5; tw=int(CW*sc*0.9); W=tw*len(PICK)+80; H=int(CH*sc)+150
+sc=0.5; tw=int(CW*sc*0.9); W=tw*len(PICK)+80; H=int(CH*sc)+165
 L=Image.new('RGBA',(W,H),(32,34,40,255)); d=ImageDraw.Draw(L)
 try: font=ImageFont.truetype('/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc',26); small=ImageFont.truetype('/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',18)
 except Exception:
     import glob; f=[p for p in glob.glob('/usr/share/fonts/**/*CJK*',recursive=True)]+glob.glob('/usr/share/fonts/**/*Nanum*',recursive=True)
     font=ImageFont.truetype(f[0],26) if f else ImageFont.load_default(); small=ImageFont.truetype(f[0],18) if f else font
 y0=60
+tiny=ImageFont.truetype(font.path,15) if hasattr(font,'path') else small
 for yy,lab in [(y0+TOP*sc,'head'),(y0+BASE*sc,'baseline')]:
     d.line([(20,yy),(W-20,yy)],fill=(90,95,110,255),width=2)
-d.text((20,15),'outfits_v3 — hero + 7 heroines (same body height / baseline)',font=small,fill=(220,220,230,255))
-for i,(cid,src,name) in enumerate(PICK):
+d.text((20,15),'outfits_v3 (v4 skin-tight) — 주인공 + 히로인 7 · 같은 몸 높이·기준선',font=small,fill=(220,220,230,255))
+for i,(cid,src,name,title) in enumerate(PICK):
     im=Image.open(f'{OUT}/{cid}.png'); im=im.resize((int(CW*sc),int(CH*sc)),Image.LANCZOS)
     x=40+i*tw+tw//2-im.width//2; L.alpha_composite(im,(x,y0))
     tx=40+i*tw+tw//2
-    d.text((tx,y0+CH*sc+8),name,font=font,fill='white',anchor='ma'); d.text((tx,y0+CH*sc+44),cid,font=small,fill=(170,175,190,255),anchor='ma')
+    d.text((tx,y0+CH*sc+6),f'「{title}」',font=small,fill=(200,180,130,255),anchor='ma')
+    d.text((tx,y0+CH*sc+32),name,font=font,fill='white',anchor='ma'); d.text((tx,y0+CH*sc+70),cid,font=tiny,fill=(150,155,170,255),anchor='ma')
 L.save(f'{OUT}/lineup.png',optimize=True)
 json.dump(dict(size=[CW,CH],body_height=BODY,top=TOP,baseline=BASE,chars=meta),open(f'{OUT}/index.json','w'),ensure_ascii=False,indent=1)
