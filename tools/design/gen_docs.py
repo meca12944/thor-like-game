@@ -6,6 +6,19 @@ HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 from towns_data import *
 import craft_data as _cd
 from towns_data import RECIPES, NPC_DROPS
+# ---------------- 히로인 동료 퀘스트 → 각 마을 서브퀘스트에 편입
+from heroines_data import HEROINES, COMPANION_RULE
+for _h in HEROINES:
+    _t=[t for t in TOWNS if t['id']==_h['town']][0]; _n=[n for n in _t['npcs'] if n['id']==_h['id']][0]
+    _n['heroine']=True
+    _h['quest_ids']=[]
+    for _i,(_ti,_ob,_rw) in enumerate(_h['quests'],1):
+        _qid=f"{_h['town']}_{_h['id'].split('_')[1].upper()}{_i}"; _h['quest_ids'].append(_qid)
+        _q=dict(id=_qid,giver=_h['id'],title=f"[동료] {_ti}",type='동료 동행',story=f"{_h['name']}이(가) 동료로 합류한다 ({_i}/{len(_h['quests'])}단계).",
+                objective=_ob,reward=_rw,path='good',karma_gate='악명 이하에서는 히로인이 거절',companion=dict(heroine=_h['id'],step=_i,steps=len(_h['quests'])))
+        if _i>1: _q['requires']=_h['quest_ids'][-2]
+        _q['chain']=f"{_h['name']} 동료 퀘스트"
+        _t['quests'].append(_q)
 REPO=os.path.abspath(os.path.join(HERE,'..','..'))
 COPY_DIRS=['/workspace/town-demo/src/monsters']
 EQ={e['id']:e for e in EQUIP_ITEMS}
@@ -113,6 +126,10 @@ assert HSW['hs_chan']['skill'].get('area') and '아이' in HSW['hs_chan']['skill
 for r in FUSION_RECIPES: assert r['item'] in HSW and all(i in HSW for i in r['inputs']) and r['forge_tier']==10
 assert '타락' in HIDDEN_SWORD_RULE['hero_only'] and '마왕' in HIDDEN_SWORD_RULE['hero_only']
 COUNTS.update(hidden_swords=len(HIDDEN_SWORDS))
+assert len(HEROINES)>=4 and len({h['town'] for h in HEROINES})==len(HEROINES) and sum(h['special'] for h in HEROINES) in (1,2)
+for _h in HEROINES:
+    assert 2<=len(_h['quests'])<=3 and _h['skill']['name'] and _h['cg'] and _h['visual_en'] and '성인' in _h['age'] and {40,60,80}<=set(_h['rewards'])
+COUNTS.update(heroines=len(HEROINES),companion_quests=sum(len(h['quests']) for h in HEROINES))
 # ---------------- JSON
 def shopj(t): return {k:[{'item':i,'price':p} for i,p in v] for k,v in t['shops'].items()}
 def item_json(e): return {k:v for k,v in e.items()}
@@ -130,7 +147,7 @@ data=dict(version=2,note='게임에 아직 연결하지 않은 편집용 데이�
  strongman_rule=STRONGMAN_RULE,townsfolk_rule=TOWNSFOLK_RULE,
  materials=list(MATERIALS.values()),recipes=list(RECIPES.values()),
  drops=dict(monsters=MOB_DROPS,townsfolk=NPC_DROPS),forges=dict(rules=FORGE_RULES,towns=FORGES),
- final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
+ heroines=dict(rule=COMPANION_RULE,list=HEROINES),final_human=FINAL_HUMAN,raze=dict(rule=RAZE_RULE,towns=RAZE),demon_king=DEMON_KING,hidden_swords=dict(rule=HIDDEN_SWORD_RULE,items=HIDDEN_SWORDS,palettes=HIDDEN_PALETTES,fusion=FUSION_RECIPES),magma_altar=[dict(item=i,materials=[dict(mat=m,count=c) for m,c in ms],souls=so) for i,ms,so in MAGMA_ALTAR])
 os.makedirs(os.path.join(REPO,'data'),exist_ok=True)
 json.dump(data,open(os.path.join(REPO,'data','towns.json'),'w'),ensure_ascii=False,indent=1)
 DOCS={}
@@ -535,6 +552,19 @@ E+=['',f"합계: 장비 {len(EQUIP_ITEMS)}종 → 레이어 스프라이트 {len
 E+=[f"| `{h['id']}` | {h['name']} | `{h['visual']['sprite']}` | {h['visual']['palette']} "+' '.join(f"`{c}`" for c in HIDDEN_PALETTES[h['visual']['palette']])+' | '+' '.join(f"`{c}`" for c in h['visual']['trail'])+f" | {h['visual']['look']} |" for h in HIDDEN_SWORDS]
 E+=['',f"아트: {HIDDEN_SWORD_RULE['art']}"]
 assert sum(len(v) for v in SP.values())==90
+_HM=['# 히로인과 동료 퀘스트','','> 데이터: `tools/design/heroines_data.py` → `data/towns.json` → `heroines`. 동료 퀘스트는 각 마을 `quests`에도 `companion` 필드와 함께 들어 있다. 모든 히로인은 성인이며 장면은 비노출이다.','','## 동료 시스템','']
+_HM+=[f"- **{k}**: {v}" for k,v in COMPANION_RULE.items() if k!='thresholds']
+_HM+=['','| 호감도 | 보상 |','|---|---|']+[f"| {k} | {v} |" for k,v in COMPANION_RULE['thresholds'].items()]
+for _h in HEROINES:
+    _HM+=['',f"## {_h['name']} — {lbl(_h['town'])}"+(' ★특별' if _h['special'] else ''),'',f"_{_h['concept']}_",'',
+      f"- 역할: {_h['role']} · {_h['age']} · 동료 HP {_h['hp']}",f"- 성격: {_h['personality']}",f"- 사연: {_h['backstory']}",
+      f"- 전투: {_h['combat']} / 스킬 「{_h['skill']['name']}」 {_h['skill']['desc']}",f"- 의상: {_h['outfit']}",
+      f"- 선물: 좋아함 {', '.join(_h['likes'])} / 싫어함 {', '.join(_h['dislikes'])}",f"- 선악·마왕 루트: {_h['karma_route']}"]
+    if _h.get('art'): _HM.append('- 견본 아트: '+', '.join(f"`{a}`" for a in _h['art']))
+    _HM+=['','| 퀘스트 | 제목 | 목표 | 보상 |','|---|---|---|---|']+[f"| `{qid}` | {a} | {b} | {c} |" for qid,(a,b,c) in zip(_h['quest_ids'],_h['quests'])]
+    _HM+=['','| 호감도 | 보상 |','|---|---|']+[f"| {k} | {v} |" for k,v in sorted(_h['rewards'].items())]
+    _HM+=['',f"- Visual (EN): {_h['visual_en']}"]+[f"- CG `{a}`: {b}" for a,b in _h['cg']]
+DOCS['HEROINES.md']=_HM
 for name,lines in DOCS.items():
     p=os.path.join(REPO,name); open(p,'w').write('\n'.join(lines)+'\n')
     for d in COPY_DIRS:
