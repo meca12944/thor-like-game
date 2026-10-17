@@ -1,0 +1,283 @@
+{
+ "_doc": "ONE source of truth for every hero/heroine sprite motion (idle, walk, run, dodge, attacks ...). Rows are pixel rows on the 768x432 sprite grid (= 2x the 384x216 live logical grid); row 0 = top pixel of the head (crown), the sole line is the row BELOW the last foot pixel (so a standing body occupies rows 0..59 = 60 px). x is relative to the body centre column. Every motion is drawn by tools/hero_v3_pix.py against these rows; only 'bob' (whole upper body dy, +down) and 'lean' (forward shear above the belt) may move them, and only by the per-frame amounts listed in the motion table. Timing: every hold is in 60 fps game ticks. Gait anims are distance-synced exactly like the game (town/tools/game.template.html: walkT += dt*max(.6, speed/FEEL.walkSpeed)*(run ? FEEL.runStride : 1)), so 'ticks' here are anim ticks at the reference speed of that gait.",
+ "grid": {
+  "w": 768,
+  "h": 432,
+  "liveScale": 0.5,
+  "worldToGrid": 0.6,
+  "spriteCanvas": [
+   56,
+   66
+  ],
+  "canvasCrownRow": 3,
+  "canvasCenterX": 28
+ },
+ "bodies": {
+  "male": {
+   "_doc": "hero (필멸자). 60 px, head 14 (4.3 heads), legs 23 (crotch->sole).",
+   "rows": {
+    "crown": 0,
+    "eye": 8,
+    "chin": 14,
+    "shoulder": 14,
+    "chest": 21,
+    "waist": 29,
+    "crotch": 37,
+    "knee": 48,
+    "bootTop": 51,
+    "ankle": 57,
+    "sole": 60
+   },
+   "halfWidths": {
+    "head": 5.5,
+    "shoulder": 9.5,
+    "chest": 7.5,
+    "waist": 5.5,
+    "hip": 6.5,
+    "thigh": 3.0,
+    "shin": 2.3
+   },
+   "joints": {
+    "shoulderX": 7.5,
+    "shoulderY": 17,
+    "elbowY": 26,
+    "wristY": 34,
+    "handBottom": 37,
+    "hipX": 3.2,
+    "hipY": 34
+   }
+  },
+  "female": {
+   "_doc": "the 7 heroines: SAME grid; differences only: 2 px shorter at the crown (crown row 2, head 12 -> chin 14 shared), narrower shoulders, narrower waist, wider hips. Crotch, knee, sole rows are identical so legs stay long (owner ref user_proportion_ref.png).",
+   "rows": {
+    "crown": 2,
+    "eye": 9,
+    "chin": 14,
+    "shoulder": 15,
+    "chest": 21,
+    "waist": 29,
+    "crotch": 37,
+    "knee": 48,
+    "bootTop": 49,
+    "ankle": 57,
+    "sole": 60
+   },
+   "halfWidths": {
+    "head": 5.0,
+    "shoulder": 7.5,
+    "chest": 6.5,
+    "waist": 4.0,
+    "hip": 6.5,
+    "thigh": 2.8,
+    "shin": 2.0
+   },
+   "joints": {
+    "shoulderX": 6.0,
+    "shoulderY": 17,
+    "elbowY": 26,
+    "wristY": 33,
+    "handBottom": 36,
+    "hipX": 3.3,
+    "hipY": 34
+   }
+  }
+ },
+ "timing": {
+  "tickHz": 60,
+  "walkSpeedWorldPxPerS": 215,
+  "runMul": 1.9,
+  "runStride": 0.55,
+  "walk": {
+   "frames": 8,
+   "ticks": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+   ],
+   "cycleTicks": 24,
+   "_doc": "24 anim ticks at walk speed = 0.400 s, 86.0 world px = 51.6 grid px per cycle -> 25.8 grid px per step; drawn planted-foot travel ~6.4 px/frame (no sliding)."
+  },
+  "run": {
+   "frames": 8,
+   "ticks": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+   ],
+   "cycleTicks": 24,
+   "_doc": "24 anim ticks; anim rate at full run = runMul*runStride = 1.9*0.55 = 1.045 anim ticks per game tick -> 2.87 real ticks per frame, 22.97 real ticks = 0.383 s per cycle, 93.9 grid px (156 world px) per cycle at 245 grid px/s. Chosen (instead of the old 4-tick / 208 px cycle) so the drawn stance-foot sweep (~10.6 px/frame) matches the ground travel (11.7 px/frame). Ground phase 2 frames/step, float 1 frame/step."
+  },
+  "dodge": {
+   "frames": 6,
+   "ticks": [
+    2,
+    3,
+    3,
+    3,
+    4,
+    6
+   ],
+   "cycleTicks": 21,
+   "_doc": "same holds as hero_anim.src.json dash_* (2,3,3,3,4,6). Game: FEEL.dashTicks 13 real ticks of travel (frames 0-4 = the first 15 anim ticks are stretched over them: tick = t/dashTicks*(21-6)), then FEEL.dashRecTicks 6 = frame 5 recovery. Travel = integral of max(820*(1-p)^2*1.5+90, carry) over 13 ticks = 108 world px = 65 grid px (walk start). Ghost trail: game draws it (every 2 ticks, 0.24 s fade); previews draw it the same way."
+  }
+ },
+ "motions": {
+  "walk": {
+   "poses": [
+    "contactR",
+    "downR",
+    "passR",
+    "upR",
+    "contactL",
+    "downL",
+    "passL",
+    "upL"
+   ],
+   "bob": [
+    0,
+    1,
+    0,
+    -1,
+    0,
+    1,
+    0,
+    -1
+   ],
+   "lean": 0,
+   "followLagFrames": 1
+  },
+  "run": {
+   "poses": [
+    "contactR",
+    "downR",
+    "pushR",
+    "floatR",
+    "contactL",
+    "downL",
+    "pushL",
+    "floatL"
+   ],
+   "bob": [
+    0,
+    1,
+    0,
+    -2,
+    0,
+    1,
+    0,
+    -2
+   ],
+   "lean": 2,
+   "followLagFrames": 1
+  },
+  "dodge": {
+   "poses": [
+    "anticipation",
+    "launch",
+    "dashLow",
+    "glide",
+    "brake",
+    "recover"
+   ],
+   "bob": [
+    3,
+    4,
+    4,
+    3,
+    3,
+    1
+   ],
+   "lean": [
+    1,
+    6,
+    7,
+    5,
+    -1,
+    0
+   ],
+   "followLagFrames": 1,
+   "_doc": "bob/lean beyond +-1 are allowed ONLY here (crouch)."
+  }
+ },
+ "slots": {
+  "_doc": "paperdoll slots of the hand-built rig (EQUIPMENT.md 'layer paperdoll' + corruption / 마왕 강림 set). Every frame exports anchors (frames/*.json 'anchors': crown, eye, neck, capeRoot, belt, hip, handR/L, kneeR/L, ankleR/L in sprite-canvas px) and a part map (grp ids) so any slot can be drawn on the SAME frames later. z = draw order inside one frame (higher = nearer); per-view order follows EQUIPMENT.md.",
+  "order": {
+   "down": [
+    "aura_back",
+    "back_attach",
+    "cape",
+    "body",
+    "eyes_corrupt",
+    "veins",
+    "boots",
+    "armor",
+    "helmet",
+    "horns_halo",
+    "offhand",
+    "weapon",
+    "aura_front"
+   ],
+   "up": [
+    "weapon",
+    "offhand",
+    "body",
+    "boots",
+    "armor",
+    "helmet",
+    "horns_halo",
+    "cape",
+    "back_attach",
+    "aura_front"
+   ],
+   "right": [
+    "offhand",
+    "back_attach",
+    "cape",
+    "body",
+    "eyes_corrupt",
+    "boots",
+    "armor",
+    "helmet",
+    "horns_halo",
+    "weapon",
+    "aura_front"
+   ],
+   "left": "right mirrored geometry (drawn natively: pauldron + light stay correct)"
+  },
+  "anchorsBySlot": {
+   "helmet": "crown/eye",
+   "horns_halo": "crown",
+   "eyes_corrupt": "eye",
+   "armor": "neck..belt + handR/L (bracers)",
+   "boots": "kneeR/L..ankleR/L",
+   "cape": "capeRoot (variants: royal = current, tattered = 찢어진 어둠 망토: same polygon, hem cut by a noise mask)",
+   "back_attach": "capeRoot (심연의 촉수 tentacles: drawn behind the cape in down/right, above it in up)",
+   "weapon": "handR (종언 greatsword; side view = near hand, z above near arm)",
+   "offhand": "handL",
+   "aura_back/aura_front": "hip (particles behind/in front of the body)",
+   "shadow": "ankle midpoint on the sole row (3-headed dragon shadow at 각인 6+)"
+  },
+  "partIds": {
+   "0": "empty",
+   "1": "leg (near)",
+   "2": "leg (far)",
+   "3": "torso/pelvis/collar/belt",
+   "4": "arm (near/R)",
+   "5": "arm (far/L)",
+   "6": "head/face/neck",
+   "7": "hair",
+   "8": "cape",
+   "9": "pauldron"
+  }
+ }
+}
