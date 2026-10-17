@@ -166,6 +166,78 @@
    "file": "b_scholar.png",
    "batch": "B",
    "height_factor": 1.0
+  },
+  "h_foreman": {
+   "name": "무쇠",
+   "title": "곡괭이 반장",
+   "label": "「곡괭이 반장」 무쇠",
+   "file": "h_foreman.png",
+   "batch": "H",
+   "height_factor": 1.0
+  },
+  "h_tool": {
+   "name": "등잔",
+   "title": "램프와 밧줄",
+   "label": "「램프와 밧줄」 등잔",
+   "file": "h_tool.png",
+   "batch": "H",
+   "height_factor": 1.0
+  },
+  "h_smith": {
+   "name": "단단",
+   "title": "불꽃 망치",
+   "label": "「불꽃 망치」 단단",
+   "file": "h_smith.png",
+   "batch": "H",
+   "height_factor": 1.0
+  },
+  "h_jeweler": {
+   "name": "반짝이",
+   "title": "원석 공방",
+   "label": "「원석 공방」 반짝이",
+   "file": "h_jeweler.png",
+   "batch": "H",
+   "height_factor": 1.0
+  },
+  "h_surveyor": {
+   "name": "다림",
+   "title": "측량사",
+   "label": "「측량사」 다림",
+   "file": "h_surveyor.png",
+   "batch": "H",
+   "height_factor": 1.0
+  },
+  "h_widow": {
+   "name": "숯검정 할매",
+   "title": "광부 식당",
+   "label": "「광부 식당」 숯검정 할매",
+   "file": "h_widow.png",
+   "batch": "H",
+   "height_factor": 0.88
+  },
+  "h_boy": {
+   "name": "광차",
+   "title": "견습 광부",
+   "label": "「견습 광부」 광차",
+   "file": "h_boy.png",
+   "batch": "H",
+   "height_factor": 0.7
+  },
+  "h_old": {
+   "name": "도르크",
+   "title": "늙은 광부",
+   "label": "「늙은 광부」 도르크",
+   "file": "h_old.png",
+   "batch": "H",
+   "height_factor": 0.97
+  },
+  "h_guard": {
+   "name": "철모",
+   "title": "광산 입구 경비",
+   "label": "「광산 입구 경비」 철모",
+   "file": "h_guard.png",
+   "batch": "H",
+   "height_factor": 1.0
   }
  },
  "batches": {
@@ -200,6 +272,21 @@
     "b_scholar"
    ],
    "lineup": "batch_B.png"
+  },
+  "H": {
+   "title": "수정 광산 마을",
+   "ids": [
+    "h_foreman",
+    "h_tool",
+    "h_smith",
+    "h_jeweler",
+    "h_surveyor",
+    "h_widow",
+    "h_boy",
+    "h_old",
+    "h_guard"
+   ],
+   "lineup": "batch_H.png"
   }
  },
  "proportion": {

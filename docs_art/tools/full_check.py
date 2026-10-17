@@ -1,7 +1,7 @@
 import sys,json
 from PIL import Image, ImageDraw, ImageFont
 D='/workspace/thor-like-game/docs_art/'
-ids=[l.split()[0] for l in open('/workspace/art_work/prop/lm_full.txt')]
+ids=[l.split()[0] for l in open('/workspace/art_work/prop/landmarks.txt') if l.strip() and not l.startswith('#')]
 out=sys.argv[1]; sc=float(sys.argv[2]); names=json.loads(open(sys.argv[3]).read()) if len(sys.argv)>3 else {}
 per=int(sys.argv[4]) if len(sys.argv)>4 else 14
 w,h=int(900*sc),int(1320*sc); top=40

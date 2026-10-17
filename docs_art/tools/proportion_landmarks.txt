@@ -27,3 +27,12 @@ characters/b_ferry 185 255 433
 characters/b_widow 255 330 475
 characters/b_twins 612 668 450 crotch=1009 child group
 characters/b_scholar 185 245 411
+characters/h_foreman 148 240 450
+characters/h_tool 170 241 450
+characters/h_smith 163 230 450
+characters/h_jeweler 191 243 451
+characters/h_surveyor 169 235 448
+characters/h_widow 344 399 450
+characters/h_boy 502 582 450 child
+characters/h_old 190 260 451
+characters/h_guard 127 205 450
