@@ -193,7 +193,7 @@ def field00():
      {'type':'sign','x':35,'y':28,'text':'낙석으로 길이 막혀 있다. 수정 동굴(2지역)은 아직 갈 수 없다.'},
      {'type':'waystone','id':'ws_windhill','x':8,'y':6,'name':'바람의 언덕 비석'},
      {'type':'chest','id':'f00_chest_hill','x':6,'y':8,'loot':[['potion',1],['m_hardwood',1]]},
-     {'type':'npc','id':'npc_bori','x':30,'y':8,'sprite':'npc_bard','name':'나그네 보리','quests':['q_forest_chiefs','q_temple_golem'],
+     {'type':'npc','id':'npc_bori','x':30,'y':8,'sprite':'npc_bard','name':'순례자 퀸트','title':'「바람길의 순례자」','quests':['q_forest_chiefs','q_temple_golem'],
       'idle':'바람이 좋은 날이군. 숲 쪽 길은 이 길을 따라 동쪽이야.'},
      {'type':'landmark','id':'lm_bridge00','x':45,'y':19,'name':'개울 다리'},
     ]

@@ -393,13 +393,13 @@
 | 301 | `tf_page` | 찢어진 책장 | 재료 | common | src/icons/mat_2.jpg#2 |
 | 302 | `tf_holy` | 성물 조각 | 재료 | common | src/icons/mat_3.jpg#14 |
 | 303 | `tf_soul` | 원한 서린 혼석 | 재료 | rare | src/icons/mat_3.jpg#5 |
-| 304 | `tk_kalbaram` | 칼바람의 징표 | 재료 | epic | src/icons/mat_6.jpg#3 |
-| 305 | `tk_sol` | 매눈 솔의 징표 | 재료 | epic | src/icons/mat_6.jpg#4 |
-| 306 | `tk_gomsoe` | 곰쇠의 징표 | 재료 | epic | src/icons/mat_6.jpg#5 |
+| 304 | `tk_kalbaram` | 바렌의 징표 | 재료 | epic | src/icons/mat_6.jpg#3 |
+| 305 | `tk_sol` | 매눈 솔렌의 징표 | 재료 | epic | src/icons/mat_6.jpg#4 |
+| 306 | `tk_gomsoe` | 고름의 징표 | 재료 | epic | src/icons/mat_6.jpg#5 |
 | 307 | `tk_zahra` | 자흐라의 징표 | 재료 | epic | src/icons/mat_6.jpg#6 |
 | 308 | `tk_mago` | 마고의 징표 | 재료 | epic | src/icons/mat_7.jpg#16 |
 | 309 | `tk_garon` | 가론의 징표 | 재료 | epic | src/icons/mat_6.jpg#8 |
-| 310 | `tk_hanbing` | 한빙의 징표 | 재료 | epic | src/icons/mat_6.jpg#9 |
+| 310 | `tk_hanbing` | 하르빅의 징표 | 재료 | epic | src/icons/mat_6.jpg#9 |
 | 311 | `tk_grim` | 그림의 징표 | 재료 | epic | src/icons/mat_6.jpg#10 |
 | 312 | `m_aeon_core` | 영겁의 핵 | 재료 | legendary | src/icons/mat_3.jpg#12 |
 | 313 | `m_round_shard` | 원탁의 파편 | 재료 | legendary | src/icons/mat_6.jpg#11 |

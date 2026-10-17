@@ -17,7 +17,7 @@ async def main():
     await pg.goto(U);await pg.wait_for_function('window.__game&&window.__game.ready&&window.__tachie',timeout=30000)
     await pg.evaluate("()=>{const g=__game;g.slimes.forEach(m=>{m.dead=true;m.respawn=1e9});}")
     R['chars']=[sorted(await pg.evaluate("()=>__tachie.chars()"))==sorted(['hero','a_tailor','h_mystic','g_dancer','f_diver','e_tailor','c_priest','d_yuna']),await pg.evaluate("()=>__tachie.chars()")]
-    # walk-up interaction with 나비 in town
+    # walk-up interaction with 리네트 in town
     n=await pg.evaluate("()=>{const n=__tachie.nabi,h=__game.hero;h.x=n.x-60;h.y=n.y;return [n.x,n.y]}")
     await pg.wait_for_timeout(200);await pg.keyboard.press('KeyE');await pg.wait_for_timeout(100)
     tgt=await pg.evaluate("()=>__game.ui");key=None

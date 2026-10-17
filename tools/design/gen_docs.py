@@ -286,7 +286,7 @@ S=['# 시스템 설계: 무기 강화 · 몬스터 리스폰 · 선악 · 현상
  '## 1. 무기 강화 (+0 ~ +9)','','- 대상: **무기만**. 방어구·보조무기는 강화 없음.',f"- 강화 담당: {ENH_RULES['npc']}",
  '- 파괴 없음. +1~+6 실패는 단계 유지(재료·금화만 소모), **+7 이상 시도 실패 시 1단계 하락**.',
  f"- 실패 보정: {ENH_RULES['pity']}",'- 성공률 보정: '+' / '.join(ENH_RULES['boosts']),f"- 보호 아이템: {ENH_RULES['protection']}",
- '- 장인 불칼(E)이 죽으면 E의 +5%p 보너스와 +9 강화가 사라지고 쇠메가 +6까지만 맡는다 (TOWNSFOLK_COMBAT.md).','',
+ '- 장인 볼칸(E)이 죽으면 E의 +5%p 보너스와 +9 강화가 사라지고 쇠메가 +6까지만 맡는다 (TOWNSFOLK_COMBAT.md).','',
  '### 단계별 표','','| 단계 | 성공률 | 재료 | 금화 | 공격력 보너스(누적) | 실패 시 |','|---|---|---|---|---|---|']
 for l in ENH_LEVELS: S.append(f"| +{l['level']} | {l['success']}% | {TT[l['tier']]['name']} ×{l['count']} | {l['coins']} | +{l['atk_pct']}% | {l['fail']} |")
 S+=['',ENH_RULES['stat_note'],'','### 강화 재료 티어 (챔피언 전용 드롭)','','| 티어 | 재료 | 나오는 지역 | 쓰는 강화 단계 |','|---|---|---|---|']
@@ -439,7 +439,7 @@ S=DOCS['SYSTEMS.md']
 S+=['','## 5. 대장간 · 제작 · 내구도','','상세 레시피는 [CRAFTING.md](CRAFTING.md), 재료와 드롭 표는 [MATERIALS.md](MATERIALS.md).','']+[f"- {x}" for x in FR['services']]
 S+=['- 대장간 등급: '+' / '.join(f"{f['town']} {f['tier']}→{f['tier_after']}" for f in FORGES)+' (E는 마스터 대장간, 핵 레시피 전용)',
     '- 성공률: '+', '.join(f"{a} {b}%" for a,b in FR['success'])+'. '+FR['fail'],
-    '- 장인 불칼(E)이 죽으면 마스터 대장간도 사라진다. 그 뒤로는 핵 레시피를 만들 수 없다 (핵은 판매·각인 봉헌용).','',
+    '- 장인 볼칸(E)이 죽으면 마스터 대장간도 사라진다. 그 뒤로는 핵 레시피를 만들 수 없다 (핵은 판매·각인 봉헌용).','',
     f"- {FR['demon']}",'',
     '## 6. 마을 파괴 (마왕의 길, 자유 파괴)','',f"**발동**: {RAZE_RULE['trigger']}",'','### 구조물','','| 종류 | 이름 | HP | 붕괴 단계 |','|---|---|---|---|']+[f"| `{a}` | {b} | {c} | {d} |" for a,b,c,d in RAZE_RULE['structures']['types']]+['',
     f"- 단계: {RAZE_RULE['structures']['stages']}",f"- 피해: {RAZE_RULE['structures']['damage']}",f"- 저장: {RAZE_RULE['structures']['persist']}",

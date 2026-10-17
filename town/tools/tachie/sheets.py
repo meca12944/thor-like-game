@@ -4,7 +4,7 @@ from PIL import Image,ImageDraw,ImageFont
 A=os.path.join(os.path.dirname(os.path.abspath(__file__)),'../../assets/tachie/')
 O=sys.argv[1];os.makedirs(O,exist_ok=True)
 ids=['hero','a_tailor','h_mystic','g_dancer','f_diver','e_tailor','c_priest','d_yuna']
-names={'hero':'필멸자','a_tailor':'나비','h_mystic':'운','g_dancer':'방울','f_diver':'숨비','e_tailor':'루비','c_priest':'설화','d_yuna':'유나'}
+names={'hero':'필멸자','a_tailor':'리네트','h_mystic':'베일라','g_dancer':'자이라','f_diver':'마렌','e_tailor':'로자린드','c_priest':'이벨린','d_yuna':'유나'}
 EX=['neutral','smile','angry','sad','surprised','blush']
 fp=[f for f in ['/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc','/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'] if os.path.exists(f)]
 import glob

@@ -62,8 +62,8 @@ function sandals(c,col){let s='';for(const k of[-1,1]){const x=CX+k*42;s+=c.part
  s+=c.line(`M${x-14},${1652} L${x+14},${1676} M${x+14},${1652} L${x-14},${1676} M${x-16},${1626} Q${x},${1636} ${x+16},${1626}`,col.base,3);}return s;}
 
 const H={};
-// ======================= 나비 (a_tailor) — fantasy seamstress =======================
-H.a_tailor={name:'나비',skin:pal('#ffe7da','#f2bca8','#fff6ee','#7a4a3c'),hair:pal('#f8d878','#dba944','#fff4b8','#8a5a1c'),eyes:'#e0952a',eyesLight:'#ffe9a0',eyesDark:'#5a2a10',lash:'#3a2418',
+// ======================= 리네트 (a_tailor) — fantasy seamstress =======================
+H.a_tailor={name:'리네트',skin:pal('#ffe7da','#f2bca8','#fff6ee','#7a4a3c'),hair:pal('#f8d878','#dba944','#fff4b8','#8a5a1c'),eyes:'#e0952a',eyesLight:'#ffe9a0',eyesDark:'#5a2a10',lash:'#3a2418',
  draw(c){const hc=this.hair,{add,part,line,fillp}=c;
   // twin tails (back)
   const tail=[[236,104],[190,116,.2],[146,190,.1],[126,300,-.1],[146,420,.12],[124,540,-.1],[150,650,.1],[128,760],[170,700,-.05],[190,600,.1],[176,480,-.1],[196,360,.1],[190,250,-.1],[222,160,.1]];

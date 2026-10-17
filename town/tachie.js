@@ -79,17 +79,17 @@ function hook(){if(typeof renderUI!=='function'||typeof closeUI!=='function'||ty
  return true;}
 // ---- heroine conversations (data-driven; lines carry speaker + expression) ----
 const HL={
- a_tailor:[['n','나비예요! 「나비 재봉소」에 온 걸 환영해요.'],['h','neutral','망토를 하나 맞추고 싶은데.'],['smile','역시! 같이 오길 잘했어요. 색은 제가 골라 드릴게요!'],['surprised','에엣, 숲에 같이 가자고요? 거미가 있는 그 숲?!'],['sad','…사실 저, 혼자서는 무서워서 못 가요.'],['h','smile','내가 지켜 줄게.'],['blush','저기… 그럼 오늘은 조금 더 같이 있어도 돼요?'],['angry','…방금 웃었죠? 지금 장난해요?']],
- h_mystic:[['n','운이에요. 수정이 당신이 올 걸 알려 주었죠.'],['h','surprised','내가 올 걸 알고 있었다고?'],['smile','후후, 운명은 두 갈래. 어느 쪽을 고를지는 당신 몫이에요.'],['sad','정해진 미래만 보는 건… 꽤 쓸쓸한 일이랍니다.'],['angry','수정을 함부로 만지지 마세요. 갈라진 운명이 흐려져요.'],['surprised','어머… 이 환시는 처음 봐요.'],['blush','…당신 옆에서는 미래가 잘 안 보여요. 이상하죠?']],
- g_dancer:[['n','어서 와, 손님! 방울의 바자르 장신구는 사막 최고야.'],['smile','흥정은 대환영! 대신 약속은 꼭 지키는 게 내 방식이야.'],['h','neutral','태양 방울을 찾고 있다고 들었어.'],['sad','…엄마의 유품이야. 도적들이 가져갔지.'],['angry','그놈들, 다음에 만나면 칼춤으로 혼쭐을 내 줄 거야!'],['surprised','같이 가 준다고? 정말?'],['blush','후후… 축제 날, 너만을 위한 춤을 춰 줄까?']],
- f_diver:[['n','숨비다. 항구 최고의 해녀지!'],['smile','진주 캐기 대결, 한판 어때? 지면 생선 구이 사기다!'],['h','surprised','바다 속까지 같이 들어가자고?'],['angry','유령 해적 놈들… 아버지 배를 가라앉힌 놈들이야.'],['sad','아버지 작살만은… 꼭 되찾고 싶어.'],['surprised','어? 너 숨 오래 참는구나!'],['blush','…고마워. 이런 말, 잘 안 하는데.']],
+ a_tailor:[['n','리네트예요! 「리네트 재봉소」에 온 걸 환영해요.'],['h','neutral','망토를 하나 맞추고 싶은데.'],['smile','역시! 같이 오길 잘했어요. 색은 제가 골라 드릴게요!'],['surprised','에엣, 숲에 같이 가자고요? 거미가 있는 그 숲?!'],['sad','…사실 저, 혼자서는 무서워서 못 가요.'],['h','smile','내가 지켜 줄게.'],['blush','저기… 그럼 오늘은 조금 더 같이 있어도 돼요?'],['angry','…방금 웃었죠? 지금 장난해요?']],
+ h_mystic:[['n','베일라예요. 수정이 당신이 올 걸 알려 주었죠.'],['h','surprised','내가 올 걸 알고 있었다고?'],['smile','후후, 운명은 두 갈래. 어느 쪽을 고를지는 당신 몫이에요.'],['sad','정해진 미래만 보는 건… 꽤 쓸쓸한 일이랍니다.'],['angry','수정을 함부로 만지지 마세요. 갈라진 운명이 흐려져요.'],['surprised','어머… 이 환시는 처음 봐요.'],['blush','…당신 옆에서는 미래가 잘 안 보여요. 이상하죠?']],
+ g_dancer:[['n','어서 와, 손님! 자이라의 바자르 장신구는 사막 최고야.'],['smile','흥정은 대환영! 대신 약속은 꼭 지키는 게 내 방식이야.'],['h','neutral','태양 방울을 찾고 있다고 들었어.'],['sad','…엄마의 유품이야. 도적들이 가져갔지.'],['angry','그놈들, 다음에 만나면 칼춤으로 혼쭐을 내 줄 거야!'],['surprised','같이 가 준다고? 정말?'],['blush','후후… 축제 날, 너만을 위한 춤을 춰 줄까?']],
+ f_diver:[['n','마렌이다. 항구 최고의 해녀지!'],['smile','진주 캐기 대결, 한판 어때? 지면 생선 구이 사기다!'],['h','surprised','바다 속까지 같이 들어가자고?'],['angry','유령 해적 놈들… 아버지 배를 가라앉힌 놈들이야.'],['sad','아버지 작살만은… 꼭 되찾고 싶어.'],['surprised','어? 너 숨 오래 참는구나!'],['blush','…고마워. 이런 말, 잘 안 하는데.']],
  e_tailor:[['n','「불꽃 옷감」에 무슨 볼일이죠? 구경만 할 거면 나가 줘요.'],['h','neutral','불사조 깃털을 찾는 동료가 필요하다며.'],['surprised','…어떻게 알았죠?'],['angry','흥, 실력도 없으면서 화산 정상에 오르겠다고요?'],['smile','좋아요. 그 눈빛, 마음에 들어요.'],['sad','타지 않는 천… 아무도 믿어 주지 않았어요.'],['blush','치, 칭찬해 봤자 할인은 없어! …정말 없다니까.']],
- c_priest:[['n','눈의 신전에 오신 걸 환영해요. 저는 설화예요.'],['smile','추우셨죠? 따뜻한 수프 드릴게요.'],['h','neutral','순례길에 설인이 나온다던데.'],['sad','…어둠 신전 사람들이 또 움직이고 있어요.'],['surprised','같이 가 주신다고요? 위험한 길인데…'],['angry','봉인을 해치려는 자는, 성녀로서 용서하지 않아요.'],['blush','눈꽃 축제… 같이 걸어 주실래요?']],
+ c_priest:[['n','눈의 신전에 오신 걸 환영해요. 저는 이벨린이에요.'],['smile','추우셨죠? 따뜻한 수프 드릴게요.'],['h','neutral','순례길에 설인이 나온다던데.'],['sad','…어둠 신전 사람들이 또 움직이고 있어요.'],['surprised','같이 가 주신다고요? 위험한 길인데…'],['angry','봉인을 해치려는 자는, 성녀로서 용서하지 않아요.'],['blush','눈꽃 축제… 같이 걸어 주실래요?']],
  d_yuna:[['n','어, 저기! 혹시 말 통해요? 다행이다…'],['surprised','여기 진짜 게임 같은 세계구나. 휴대폰은 배터리 0%고.'],['h','surprised','하늘에서 떨어졌다고?'],['smile','유나라고 해요! 서울에서 고고학 공부하던 대학원생.'],['sad','…집에 가는 방법, 있긴 한 걸까.'],['angry','벌레만은 진짜 싫어! 저리 가!'],['blush','그래도… 너랑 같이면, 여기도 나쁘지 않을지도.']],
 };
 function addTalks(){for(const id in HL){const nm=(IDX&&IDX.chars[id]&&IDX.chars[id].name)||id;
   TALK['tachie_'+id]={name:nm,por:id,tachie:id,lines:HL[id].map(l=>{if(l[0]==='h')return ()=>({who:'hero',expr:l[1],t:l[2]});if(l[0]==='n')return ()=>({who:id,expr:'neutral',t:l[1]});return ()=>({who:id,expr:l[0],t:l[1]});})};}}
-// 나비 stands in the start town (her home); talk to her with the interact key
+// 리네트 stands in the start town (her home); talk to her with the interact key
 let nabi=null;const NABI_POS=[400,570];
 function nearNabi(){const n=nabi;return n&&!n.dead&&!(n.fainted>0)&&!(n.alert>0)&&!(typeof uw!=='undefined'&&uw)&&Math.hypot(hero.x-n.x,hero.y-n.y)<110?n:null;}
 function placeNabi(){if(typeof spawnNpc!=='function'||typeof interactTarget!=='function')return;let [x,y]=NABI_POS;

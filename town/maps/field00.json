@@ -169,7 +169,8 @@
    "x": 30,
    "y": 8,
    "sprite": "npc_bard",
-   "name": "나그네 보리",
+   "name": "순례자 퀸트",
+   "title": "「바람길의 순례자」",
    "quests": [
     "q_forest_chiefs",
     "q_temple_golem"

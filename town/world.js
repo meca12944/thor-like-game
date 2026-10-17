@@ -537,7 +537,8 @@
     for (const o of m.objs) {
       if (!((o.tx === fx && o.ty === fy) || Math.hypot(o.x - hero.x, o.y - hero.y) < 15)) continue;
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
-      if (o.type === 'npc') { S.dialog = { text: NAV() ? NAV().talk(o) : (o.idle || '…') }; return; }
+      if (o.type === 'npc') { SAVE.met = SAVE.met || {}; const first = !SAVE.met[o.id]; if (first) { SAVE.met[o.id] = 1; save(); } // name tag: title subtitle only on the first meeting
+        S.dialog = { name: o.name || '', title: first ? (o.title || '') : '', text: NAV() ? NAV().talk(o) : (o.idle || '…') }; return; }
       if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20);
         S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
       if (o.type === 'chest') { if (SAVE.chests[o.id]) { sfx('locked'); msg('빈 상자다'); return; } SAVE.chests[o.id] = true; save(); sfx('chest'); banner('보물상자! ' + giveLoot(o.loot || []), 2.2); addFx('sparkle', o.x, o.y - 10, { life: .8 }); return; }
@@ -810,8 +811,10 @@
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
-    if (S.dialog) { const x = ox + 30 * u, y = oy + SH - 108 * u, w = SW - 60 * u; panel(x, y, w, 84 * u); S.dialog.text.split('\n').forEach((l, i) => textOut(l, x + 18 * u, y + (28 + i * 20) * u, 13 * u, '#fff', '#000', 'left'));
-      textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + 76 * u, 10 * u, '#ffe08a', '#000', 'right'); }
+    if (S.dialog) { const D = S.dialog, hd = D.name ? (D.title ? 34 : 20) : 0, x = ox + 30 * u, y = oy + SH - (108 + hd) * u, w = SW - 60 * u; panel(x, y, w, (84 + hd) * u);
+      if (D.name) { textOut(D.name, x + 18 * u, y + 24 * u, 13 * u, '#ffe08a', '#000', 'left'); if (D.title) { ctx.globalAlpha = .7; textOut(D.title, x + 18 * u, y + 38 * u, 10 * u, '#d8c9a0', '#000', 'left'); ctx.globalAlpha = 1; } }
+      D.text.split('\n').forEach((l, i) => textOut(l, x + 18 * u, y + (hd + 28 + i * 20) * u, 13 * u, '#fff', '#000', 'left'));
+      textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + (hd + 76) * u, 10 * u, '#ffe08a', '#000', 'right'); }
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }

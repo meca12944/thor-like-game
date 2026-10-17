@@ -62,8 +62,8 @@ BASIC=[('m_iron_ingot','철 주괴',1,'metal','#9aa8b8',15),('m_leather_strap','
  ('m_steel_ingot','강철 주괴',3,'metal','#7fb0e0',45),('m_magic_thread','마력 실',4,'cloth','#c0a0ff',60),('m_blacksteel_ingot','흑철 주괴',6,'metal','#3a3a44',120),('m_mithril_ingot','미스릴 주괴',9,'metal','#80e0ff',320)]
 TOWNSFOLK_MATS=[('tf_cloth','피 묻은 천 조각','cloth','#a03030'),('tf_scrap','녹슨 쇠붙이','scrap','#8a5a3a'),('tf_herb','말린 약초 다발','wood','#7a9a4a'),('tf_tool','손때 묻은 연장','metal','#8a8a90'),
  ('tf_jewel','작은 장신구','crystal','#ffd860'),('tf_page','찢어진 책장','cloth','#e8d8b0'),('tf_holy','성물 조각','crystal','#fff8e0'),('tf_soul','원한 서린 혼석','core','#6a0a2a')]
-STRONG_TOKENS={'A':('tk_kalbaram','칼바람의 징표'),'B':('tk_sol','매눈 솔의 징표'),'H':('tk_gomsoe','곰쇠의 징표'),'G':('tk_zahra','자흐라의 징표'),
- 'F':('tk_mago','마고의 징표'),'E':('tk_garon','가론의 징표'),'C':('tk_hanbing','한빙의 징표'),'D':('tk_grim','그림의 징표')}
+STRONG_TOKENS={'A':('tk_kalbaram','바렌의 징표'),'B':('tk_sol','매눈 솔렌의 징표'),'H':('tk_gomsoe','고름의 징표'),'G':('tk_zahra','자흐라의 징표'),
+ 'F':('tk_mago','마고의 징표'),'E':('tk_garon','가론의 징표'),'C':('tk_hanbing','하르빅의 징표'),'D':('tk_grim','그림의 징표')}
 
 MATERIALS={}; MOB_DROPS=[]
 def M(id,name,tier,typ,color,sources,sell,note=None):
@@ -125,17 +125,17 @@ FORGE_RULES=dict(
  upgrade='아래 티어 장비를 재료로 넣는 「승급 제작」: 같은 분류·같은 종류의 바로 아래 장비 1개를 넣으면 기본·지역 재료가 40% 줄어든다(핵·챔피언 재료는 그대로). 강화 단계는 1단계 낮아진 채로 이어진다.',
 )
 FORGES=[
- dict(town='A',npc='a_smith',name='강철의 대장간',tier=1,tier_after=2,quest='A11',sells=['m_iron_ingot','m_leather_strap','m_hardwood']),
+ dict(town='A',npc='a_smith',name='브란트의 대장간',tier=1,tier_after=2,quest='A11',sells=['m_iron_ingot','m_leather_strap','m_hardwood']),
  dict(town='B',npc='b_smith',name='담금의 물레 대장간',tier=2,tier_after=3,quest='B11',sells=['m_iron_ingot','m_leather_strap','m_hardwood']),
  dict(town='H',npc='h_smith',name='불꽃 망치 제련소',tier=2,tier_after=3,quest='H11',sells=['m_iron_ingot','m_leather_strap','m_hardwood','m_steel_ingot']),
  dict(town='G',npc='g_smith',name='칼림의 곡도 공방',tier=3,tier_after=4,quest='G11',sells=['m_iron_ingot','m_leather_strap','m_steel_ingot','m_magic_thread']),
  dict(town='F',npc='f_smith',name='너울의 조선 대장간',tier=5,tier_after=6,quest='F11',sells=['m_steel_ingot','m_leather_strap','m_hardwood','m_magic_thread','m_blacksteel_ingot']),
- dict(town='E',npc='e_master',name='불칼의 마스터 대장간',tier=7,tier_after=10,quest='E3',sells=['m_steel_ingot','m_magic_thread','m_blacksteel_ingot','m_mithril_ingot'],master=True),
+ dict(town='E',npc='e_master',name='볼칸의 마스터 대장간',tier=7,tier_after=10,quest='E3',sells=['m_steel_ingot','m_magic_thread','m_blacksteel_ingot','m_mithril_ingot'],master=True),
  dict(town='C',npc='c_smith',name='서리망치 대장간',tier=7,tier_after=8,quest='C11',sells=['m_steel_ingot','m_magic_thread','m_blacksteel_ingot']),
  dict(town='D',npc='d_smith',name='왕실 무기고',tier=8,tier_after=9,quest='D11',sells=['m_steel_ingot','m_magic_thread','m_blacksteel_ingot','m_mithril_ingot']),
 ]
 FORGE_QUESTS={
- 'A':('A11','강철의 첫 망치','강철은 필멸자가 쓸 검을 직접 벼려 보고 싶어 한다. 「검은 휘두르는 놈 손을 닮지. 재료는 네 손으로 구해 와.」','멧돼지 가죽 5 + 단단한 도토리 껍질 3 + 철 주괴 3 전달','대장간 등급 2 + 레시피 「돌엄니 송곳검」 두루마리'),
+ 'A':('A11','브란트의 첫 망치','브란트는 필멸자가 쓸 검을 직접 벼려 보고 싶어 한다. 「검은 휘두르는 놈 손을 닮지. 재료는 네 손으로 구해 와.」','멧돼지 가죽 5 + 단단한 도토리 껍질 3 + 철 주괴 3 전달','대장간 등급 2 + 레시피 「돌엄니 송곳검」 두루마리'),
  'B':('B11','물레 망치의 비밀','담금은 물레방아 힘으로 망치를 돌리는 장치를 고치고 싶다.','가시덩굴 줄기 4 + 박쥐 날개 4 + 강철 주괴 1','대장간 등급 3 + 레시피 「흡혈 박쥐왕의 반지」 두루마리'),
  'H':('H11','수정 담금질','단단은 수정 슬라임 핵으로 담금질하면 날이 빛난다고 믿는다.','수정 슬라임 핵 5 + 동굴 수정 파편 6','대장간 등급 3 + 투척 곡괭이 강화 레시피'),
  'G':('G11','곡도의 혼','칼림은 아버지가 남긴 미완성 곡도 도면을 완성하고 싶다. 도면의 마지막 장은 피라미드에 있다.','피라미드 벽화 방에서 도면 조각 획득 + 저주받은 금박 6','대장간 등급 4 + 레시피 「태양침 독검」 두루마리'),

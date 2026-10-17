@@ -13,12 +13,12 @@
 | id | 이름 | 표정 |
 |---|---|---|
 | hero | 필멸자 | neutral smile angry sad surprised blush |
-| a_tailor | 나비 | 〃 |
-| h_mystic | 운 | 〃 |
-| g_dancer | 방울 | 〃 |
-| f_diver | 숨비 | 〃 |
-| e_tailor | 루비 | 〃 |
-| c_priest | 설화 | 〃 |
+| a_tailor | 리네트 | 〃 |
+| h_mystic | 베일라 | 〃 |
+| g_dancer | 자이라 | 〃 |
+| f_diver | 마렌 | 〃 |
+| e_tailor | 로자린드 | 〃 |
+| c_priest | 이벨린 | 〃 |
 | d_yuna | 유나 (현대 의상은 유나만) | 〃 |
 
 별칭: normal→neutral, happy→smile, mad→angry, cry→sad, shock→surprised, shy→blush. 없는 표정은 neutral로 대체.
@@ -28,8 +28,8 @@
 `TALK[id].lines[i]()`가 `{who:'hero'|'<charId>'|'none', expr:'smile', t:'대사'}`를 반환하면 된다.
 - `who` 생략 = 대화 상대(`TALK[id].tachie` 또는 `TALK[id].por`), `'none'` = 내레이션(둘 다 어둡게).
 - `TALK[id].expr` = 상대 기본 표정, `TALK[id].heroExpr` = 주인공 기본 표정, `withHero:false` = 주인공 일러스트 숨김.
-- 상대에게 바스트 일러스트가 있으면 대화창 안 작은 얼굴 초상화 대신 바스트가 뜬다. 없으면(이슬·미소 등) 기존 작은 초상화 유지, 주인공 대사가 있는 대화면 주인공 바스트만 왼쪽에 선다.
-- 시작 마을에 나비 NPC(400,570) 배치 — 근처에서 상호작용 키로 대화. 테스트/미리보기: `index.html?talk=<id>` 또는 `__tachie.openTalk('<id>')`.
+- 상대에게 바스트 일러스트가 있으면 대화창 안 작은 얼굴 초상화 대신 바스트가 뜬다. 없으면(에스라·미라벨 등) 기존 작은 초상화 유지, 주인공 대사가 있는 대화면 주인공 바스트만 왼쪽에 선다.
+- 시작 마을에 리네트 NPC(400,570) 배치 — 근처에서 상호작용 키로 대화. 테스트/미리보기: `index.html?talk=<id>` 또는 `__tachie.openTalk('<id>')`.
 
 ## 파일
 

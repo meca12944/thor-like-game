@@ -15,8 +15,8 @@ function slit(c,cl,y0,y1,w0,w1,o={}){ // tight H-line / wrap skirt; slit on view
 function earrings(c,col,y=230){return [-1,1].map(k=>gem(c,CX+k*80,y,5,col)).join('');}
 function orbs(c,col){let s='';for(const [x,y,r] of[[150,640,30],[470,560,24]]){s+=c.circ(x,y,r*1.8,c.rad([[0,col,.45],[1,col,0]]))+c.circ(x,y,r,c.rad([[0,'#ffffff'],[.4,col],[1,'#3a1060']],.35,.3,.75),'stroke="#e0c8ff" stroke-width="2"')+c.ell(x-r*.35,y-r*.4,r*.3,r*.18,'#fff','opacity=".8"');}return s;}
 
-// ======================= 운 (h_mystic) =======================
-H.h_mystic={name:'운',skin:pal('#fbe6dc','#e8beb0','#fff6f0','#7a4a4c'),hair:pal('#e6e6f2','#b4b4cc','#ffffff','#6a6a8a'),eyes:'#9a5ae0',eyesLight:'#f0d0ff',eyesDark:'#2a1050',lash:'#2a2038',brow:'#8a8aa8',
+// ======================= 베일라 (h_mystic) =======================
+H.h_mystic={name:'베일라',skin:pal('#fbe6dc','#e8beb0','#fff6f0','#7a4a4c'),hair:pal('#e6e6f2','#b4b4cc','#ffffff','#6a6a8a'),eyes:'#9a5ae0',eyesLight:'#f0d0ff',eyesDark:'#2a1050',lash:'#2a2038',brow:'#8a8aa8',
  draw(c){const hc=this.hair,{add,part,line,fillp,lin}=c;const pur=pal('#7a3cb0','#52207e','#c69af0','#2a0e48');
   add(8,fillp(`M${CX-120},${90} Q${CX-200},${600} ${CX-170},${1000} Q${CX},${1060} ${CX+170},${1000} Q${CX+200},${600} ${CX+120},${90}Z`,lin([[0,'#b080e0',.5],[1,'#b080e0',.12]]),'stroke="#c8a8f0" stroke-width="1.5" stroke-opacity=".6"')); // veil back
   add(10,longBack(c,hc,{w:100,len:960,wave:4,n:9,dip:20}));
@@ -33,8 +33,8 @@ H.h_mystic={name:'운',skin:pal('#fbe6dc','#e8beb0','#fff6f0','#7a4a4c'),hair:pa
    line(`M${CX-84},${126} Q${CX},${100} ${CX+84},${126}`,'#e0b040',4)+gem(c,CX,112,8,'#b070ff')+[-2,-1,1,2].map(i=>coin(c,CX+i*34,118+Math.abs(i)*5,4)).join('')+earrings(c,'#b070ff'));
   add(120,orbs(c,'#b070ff'));
  }};
-// ======================= 방울 (g_dancer) =======================
-H.g_dancer={name:'방울',skin:pal('#d79a6c','#b0704a','#f4c8a0','#5a3020'),hair:pal('#9a2232','#6a1020','#e0606a','#3a0810'),eyes:'#e0a020',eyesLight:'#fff0a0',eyesDark:'#4a2008',lash:'#2a1010',
+// ======================= 자이라 (g_dancer) =======================
+H.g_dancer={name:'자이라',skin:pal('#d79a6c','#b0704a','#f4c8a0','#5a3020'),hair:pal('#9a2232','#6a1020','#e0606a','#3a0810'),eyes:'#e0a020',eyesLight:'#fff0a0',eyesDark:'#4a2008',lash:'#2a1010',
  draw(c){const hc=this.hair,{add,part,line,fillp,lin}=c;const red=pal('#c0203a','#880f22','#ff7a80','#3a0610'),gold=pal('#f0c850','#b08a20','#fff4c0','#5a4008');
   add(10,longBack(c,hc,{w:116,len:980,wave:16,n:9,flare:20,dip:24}));
   add(36,sandals(c,gold)+[-1,1].map(k=>c.ell(CX+k*40,1604,24,5,'none','stroke="#e8c060" stroke-width="3"')+coin(c,CX+k*34,1612,4)+coin(c,CX+k*48,1612,4)).join(''));
@@ -49,8 +49,8 @@ H.g_dancer={name:'방울',skin:pal('#d79a6c','#b0704a','#f4c8a0','#5a3020'),hair
   add(100,bangs(c,hc,{n:9,tipY:176,edgeLen:40,sideL:[[206,440],[196,280]],sideR:[[394,440],[404,280]],str:['M300,70 Q290,120 296,170','M260,90 Q240,150 250,190','M344,84 Q360,140 350,186']}));
   add(108,line(`M${CX-86},${130} Q${CX},${150} ${CX+86},${130}`,'#e0b040',3)+line(`M${CX-70},${110} Q${CX},${126} ${CX+70},${110}`,'#e0b040',2.4)+gem(c,CX,148,7,'#ff3040')+coin(c,CX-40,144,4)+coin(c,CX+40,144,4)+earrings(c,'#ffd040',238));
  }};
-// ======================= 숨비 (f_diver) =======================
-H.f_diver={browGap:1,name:'숨비',skin:pal('#c98c5e','#a0663e','#ecc09a','#4a2a18'),hair:pal('#22262e','#0e1016','#5a6a80','#05060a'),eyes:'#2ab89a',eyesLight:'#c0fff0',eyesDark:'#06302a',lash:'#0a0a0a',
+// ======================= 마렌 (f_diver) =======================
+H.f_diver={browGap:1,name:'마렌',skin:pal('#c98c5e','#a0663e','#ecc09a','#4a2a18'),hair:pal('#22262e','#0e1016','#5a6a80','#05060a'),eyes:'#2ab89a',eyesLight:'#c0fff0',eyesDark:'#06302a',lash:'#0a0a0a',
  draw(c){const hc=this.hair,{add,part,line,fillp,lin}=c;const teal=pal('#1e8a8a','#0e5a60','#7ae0d8','#062a30');
   // high ponytail
   add(10,lock(c,hc,[[290,70],[330,30,.1],[400,40,.15],[440,120,.1],[452,260,-.08],[470,420,.1],[440,560],[430,420,-.1],[410,280,.08],[400,160,-.1],[350,100,.1]],.1,{extra:strands(c,hc,['M400,60 Q440,200 450,380','M380,80 Q420,220 430,420'])})+
@@ -69,8 +69,8 @@ H.f_diver={browGap:1,name:'숨비',skin:pal('#c98c5e','#a0663e','#ecc09a','#4a2a
    c.ell(CX+60,76,14,8,'#2ab89a','stroke="#062a30" stroke-width="2"'));
   add(120,c.ell(CX+144,800,20,24,c.C.skin.base,`stroke="${c.C.skin.line}" stroke-width="2.4"`)); // hand gripping the harpoon
  }};
-// ======================= 루비 (e_tailor) =======================
-H.e_tailor={name:'루비',skin:pal('#fde4d8','#ecb8a6','#fff6f0','#6a3a34'),hair:pal('#d02a34','#981624','#ff8a8a','#4a0810'),eyes:'#d02040',eyesLight:'#ffb0b0',eyesDark:'#3a0610',lash:'#1a0808',
+// ======================= 로자린드 (e_tailor) =======================
+H.e_tailor={name:'로자린드',skin:pal('#fde4d8','#ecb8a6','#fff6f0','#6a3a34'),hair:pal('#d02a34','#981624','#ff8a8a','#4a0810'),eyes:'#d02040',eyesLight:'#ffb0b0',eyesDark:'#3a0610',lash:'#1a0808',
  draw(c){const hc=this.hair,{add,part,line,fillp,lin}=c;const blk=pal('#2a2a32','#121218','#7a7a90','#000000');
   add(10,lock(c,hc,[[300,60],[396,100,-.12],[412,220,-.1],[404,330,-.1],[392,350],[300,300],[208,350],[196,330],[188,220,-.1],[204,100,-.12]],.1));
   // flame thigh-high boots
@@ -89,8 +89,8 @@ H.e_tailor={name:'루비',skin:pal('#fde4d8','#ecb8a6','#fff6f0','#6a3a34'),hair
   add(100,bangs(c,hc,{n:9,tipY:168,edgeLen:30,sideL:[[204,330],[198,250]],sideR:[[396,330],[402,250]],str:['M300,70 Q286,120 290,168','M340,80 Q356,130 348,176','M250,92 Q236,150 240,200']}));
   add(108,earrings(c,'#ff2040',236));
  }};
-// ======================= 설화 (c_priest) =======================
-H.c_priest={name:'설화',skin:pal('#fff0ea','#ecc8c0','#ffffff','#7a5050'),hair:pal('#c6e4ff','#8ab8e8','#ffffff','#4a70a0'),eyes:'#4a8ae0',eyesLight:'#d0f0ff',eyesDark:'#0a2050',lash:'#203050',brow:'#7a9ac8',
+// ======================= 이벨린 (c_priest) =======================
+H.c_priest={name:'이벨린',skin:pal('#fff0ea','#ecc8c0','#ffffff','#7a5050'),hair:pal('#c6e4ff','#8ab8e8','#ffffff','#4a70a0'),eyes:'#4a8ae0',eyesLight:'#d0f0ff',eyesDark:'#0a2050',lash:'#203050',brow:'#7a9ac8',
  draw(c){const hc=this.hair,{add,part,line,fillp,lin}=c;const wht=pal('#ffffff','#d4e0ee','#ffffff','#6a7a98'),fur=pal('#ffffff','#dde6f0','#ffffff','#8a9ab0');
   add(5,line(`M${CX-150},${200} L${CX-150},${1660}`,'#8a9ab8',8)+line(`M${CX-150},${200} L${CX-150},${1660}`,'#e8f0ff',3.5)+
    [0,60,120].map(a=>`<g transform="rotate(${a} ${CX-150} 170)">${part(`M${CX-150},${120} L${CX-140},${170} L${CX-150},${220} L${CX-160},${170}Z`,pal('#d0f0ff','#7ac0f0','#ffffff','#3a70b0'),{lw:1.6})}</g>`).join('')+c.circ(CX-150,170,8,'#bfe8ff','stroke="#3a70b0" stroke-width="2"'));

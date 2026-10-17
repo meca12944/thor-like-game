@@ -1,4 +1,4 @@
-# 2지역 수정 동굴 — 「수정 속의 자장가」  C# minor, 132 BPM.  Echoing crystal bells, syncopated slap bass, a little lullaby (돌님).
+# 2지역 수정 동굴 — 「수정 속의 자장가」  C# minor, 132 BPM.  Echoing crystal bells, syncopated slap bass, a little lullaby (넬).
 LULL = 'g#5/4 e5/4 c#5/4 e5/4 | f#5/4 a5/4 g#5/8 | f#5/4 d#5/4 b4/4 d#5/4 | e5/8 d#5/8'
 A = ('c#5/6 e5/2 g#5/4 c#6/4 | b5/2 a5/2 e5/4 c#5/8 | d#5/4 f#5/4 b5/6 a5/2 | ~g#5/16 |'
      'e5/4 g#5/4 c#6/4 e6/4 | ~e6/8 c#6/4 a5/4 | f#5/4 a5/4 c#6/4 b5/2 a5/2 | ~g#5/8 c6/4 d#6/4')

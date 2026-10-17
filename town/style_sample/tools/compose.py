@@ -44,7 +44,7 @@ def row(y, items, mag, title, col):
         if im is None: x+=40; continue
         b=im.resize((im.width*mag,im.height*mag),Image.NEAREST); sheet.paste(b,(x+10,bottom-b.height),b); x+=b.width+24
 row(20,[oldcell(i) for i in (15,16,17,18)]+[None]+[oldcell(i) for i in (9,10,11,12)]+[None]+[oldcell(i) for i in (21,22)]+[None,None]+[oldfem('a_tool'),oldfem('g_tool')],8,
-    'OLD  (current game, 384x216 grid) - hero 28px walk down / right / up, female NPC 20px (a_tool 미소, g_tool 사프란) - shown x8',(255,200,160))
+    'OLD  (current game, 384x216 grid) - hero 28px walk down / right / up, female NPC 20px (a_tool 미라벨, g_tool 사프란) - shown x8',(255,200,160))
 row(330,[nc_(nh,c) for c in nj['down']]+[None]+[nc_(nh,c) for c in nj['right'][:4]]+[None]+[nc_(nh,c) for c in nj['up'][:2]]+[None]+[nc_(nf,c) for c in fj['down']],4,
     'NEW  (768x432 grid) - hero 56px walk down / right / up, adult female NPC 68px walk (7.9 heads, legs 0.50) - shown x4 (= same screen size as x8 above)',(170,255,170))
 # 1:1 in-game size strip

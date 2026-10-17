@@ -22,7 +22,7 @@
  },
  "chars": {
   "a_tailor": {
-   "name": "나비",
+   "name": "리네트",
    "expr": {
     "neutral": "a_tailor/neutral.png",
     "smile": "a_tailor/smile.png",

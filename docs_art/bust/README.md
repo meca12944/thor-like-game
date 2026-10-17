@@ -13,12 +13,12 @@
 | id | 이름 | 비고 |
 |---|---|---|
 | hero | 필멸자 | 주인공 |
-| a_tailor | 나비 | |
-| h_mystic | 운 | |
-| g_dancer | 방울 | |
-| f_diver | 숨비 | |
-| e_tailor | 루비 | |
-| c_priest | 설화 | |
+| a_tailor | 리네트 | |
+| h_mystic | 베일라 | |
+| g_dancer | 자이라 | |
+| f_diver | 마렌 | |
+| e_tailor | 로자린드 | |
+| c_priest | 이벨린 | |
 | d_yuna | 유나 | 현대 의상은 유나만 |
 
 표정(`<expr>`): `neutral` `smile` `angry` `sad` `surprised` `blush`. 빠진 표정은 게임에서 neutral로 대체된다(neutral은 필수).

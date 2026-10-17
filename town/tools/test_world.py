@@ -129,7 +129,7 @@ async def main():
         await pg.wait_for_timeout(80); await pg.screenshot(path=D+'shot_field01.png')
         await ev("()=>__world.killAll(m=>m.kind==='champ_boar')")
         # walk the road to the temple gate
-        # objective -> 고대 숲 신전 입구 via G (auto objective now = report to 보리), then follow the guide line
+        # objective -> 고대 숲 신전 입구 via G (auto objective now = report to 하로), then follow the guide line
         for i in range(6):
             if await ev("()=>(WorldNav.currentDest()||{}).kind==='dungeon'"): break
             await ev("()=>{__world.tap('KeyG');__world.advance(.05)}")

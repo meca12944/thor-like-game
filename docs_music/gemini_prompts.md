@@ -24,7 +24,7 @@ cheerful bouncy shop loop, G mixolydian, light and friendly. Tempo 116 BPM. Inst
 
 ## 3. 2지역 수정 동굴 — `area02_cave` (scene `area2`)
 
-**장면:** 빛나는 수정과 메아리, 돌님의 자장가 같은 신비로움.
+**장면:** 빛나는 수정과 메아리, 넬의 자장가 같은 신비로움.
 
 ```
 mysterious echoing cave exploration, C# minor, gentle lullaby-like motif with underlying tension. Tempo 132 BPM. Instruments: crystal bells and celesta arpeggios with long delay, soft strings, harp, syncopated bass, soft lead. Seamlessly loopable: short intro, then a main section that loops cleanly back to its start with no fade-out at the loop point. Length: 2:00-2:30. Instrumental only, no vocals. Original composition, no imitation of any existing song. 16-bit SNES-era inspired orchestral game music in the style of 1990s Japanese action RPGs (like Story of Thor / Beyond Oasis), warm sampled-synth orchestra with crisp retro character.

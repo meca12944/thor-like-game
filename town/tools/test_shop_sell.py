@@ -1,4 +1,4 @@
-# Headless test: shop-only selling (판매 tab inside the shop, opened by talking to the shop NPC 미소) + rarity stars
+# Headless test: shop-only selling (판매 tab inside the shop, opened by talking to the shop NPC 미라벨) + rarity stars
 # on icons (bag, equipment, shop, forge, tooltip, drop notification). Writes shot_shop_sell.png.
 import asyncio, json
 from playwright.async_api import async_playwright
@@ -37,7 +37,7 @@ async def main():
     await key('Escape'); ok('menu_demo_label',await ev("()=>[...document.querySelectorAll('.menu .mi')].some(e=>e.textContent.includes('상점 (데모 전용'))")); await key('Escape')
     # --- shop NPC: walk up, khud hint, talk -> shop
     await ev("()=>{const h=__game.hero,n=__game.shopNpc;h.x=n.x-60;h.y=n.y+30;h.hz='right';}"); await pg.wait_for_timeout(300)
-    ok('khud_shop',await ev("()=>document.getElementById('khud').textContent.includes('미소와 거래')"))
+    ok('khud_shop',await ev("()=>document.getElementById('khud').textContent.includes('미라벨과 거래')"))
     await key('l'); ok('shop_dialog_portrait',await ev("()=>__game.dlg&&__game.dlg.id==='shop'&&document.querySelector('#dlg .dp').src.includes('a_tool')"))
     for _ in range(3): await key('l')
     ok('shop_open',await ev("()=>__game.ui==='inv'&&__game.invTab===1&&__game.shopAt==='a_tool'&&__game.shopMode==='buy'&&document.querySelector('#ovp h2').textContent.includes('보따리')"))

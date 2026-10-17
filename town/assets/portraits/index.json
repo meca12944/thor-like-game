@@ -1,24 +1,24 @@
 {
  "a_chief": {
-  "name": "촌장 한결",
+  "name": "촌장 오스왈드",
   "file": "a_chief.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r1c1"
  },
  "a_tool": {
-  "name": "미소",
+  "name": "미라벨",
   "file": "a_tool.png",
   "sheet": "raw/por_fix.jpg",
   "cell": "r1c1"
  },
  "a_smith": {
-  "name": "강철",
+  "name": "브란트",
   "file": "a_smith.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r1c3"
  },
  "a_tailor": {
-  "name": "나비",
+  "name": "리네트",
   "file": "a_tailor.png",
   "sheet": "raw/por_fix.jpg",
   "cell": "r1c2",
@@ -80,37 +80,37 @@
   }
  },
  "a_granny": {
-  "name": "물결 할머니",
+  "name": "엘스베트",
   "file": "a_granny.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r1c5"
  },
  "a_kid": {
-  "name": "도토리",
+  "name": "토비",
   "file": "a_kid.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r2c1"
  },
  "a_guard": {
-  "name": "바위",
+  "name": "베른",
   "file": "a_guard.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r2c2"
  },
  "a_farmer": {
-  "name": "보리",
+  "name": "하로",
   "file": "a_farmer.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r2c3"
  },
  "a_herb": {
-  "name": "소담",
+  "name": "세레스",
   "file": "a_herb.png",
   "sheet": "raw/por_fix.jpg",
   "cell": "r1c3"
  },
  "a_bard": {
-  "name": "가락",
+  "name": "라우렌",
   "file": "a_bard.png",
   "sheet": "raw/por_A.jpg",
   "cell": "r2c5"
@@ -164,7 +164,7 @@
   "cell": "r2c3"
  },
  "b_scholar": {
-  "name": "책벌레 연",
+  "name": "책벌레 이브넬",
   "file": "b_scholar.png",
   "sheet": "raw/por_B.jpg",
   "cell": "r2c4"
@@ -218,7 +218,7 @@
   "cell": "r2c2"
  },
  "h_old": {
-  "name": "은퇴 광부 돌쇠",
+  "name": "은퇴 광부 도르크",
   "file": "h_old.png",
   "sheet": "raw/por_H.jpg",
   "cell": "r2c3"
@@ -230,7 +230,7 @@
   "cell": "r2c4"
  },
  "h_mystic": {
-  "name": "보랏빛 점술가 운",
+  "name": "보랏빛 점술가 베일라",
   "file": "h_mystic.png",
   "sheet": "raw/por_H.jpg",
   "cell": "r2c5",
@@ -334,7 +334,7 @@
   "cell": "r2c2"
  },
  "g_dancer": {
-  "name": "방울",
+  "name": "자이라",
   "file": "g_dancer.png",
   "sheet": "raw/por_G.jpg",
   "cell": "r2c3",
@@ -432,7 +432,7 @@
   "cell": "r1c4"
  },
  "f_captain": {
-  "name": "외눈 선장 거북",
+  "name": "외눈 선장 토르투",
   "file": "f_captain.png",
   "sheet": "raw/por_F.jpg",
   "cell": "r1c5"
@@ -444,7 +444,7 @@
   "cell": "r2c1"
  },
  "f_diver": {
-  "name": "해녀 숨비",
+  "name": "해녀 마렌",
   "file": "f_diver.png",
   "sheet": "raw/por_F.jpg",
   "cell": "r2c2",
@@ -524,7 +524,7 @@
   "cell": "r2c5"
  },
  "e_master": {
-  "name": "대장장이 장인 불칼",
+  "name": "대장장이 장인 볼칸",
   "file": "e_master.png",
   "sheet": "raw/por_E.jpg",
   "cell": "r1c1"
@@ -542,7 +542,7 @@
   "cell": "r1c3"
  },
  "e_tailor": {
-  "name": "잿빛 루비",
+  "name": "로자린드",
   "file": "e_tailor.png",
   "sheet": "raw/por_E.jpg",
   "cell": "r1c4",
@@ -616,7 +616,7 @@
   "cell": "r2c1"
  },
  "e_knight": {
-  "name": "떠돌이 기사 은갑",
+  "name": "떠돌이 기사 실반",
   "file": "e_knight.png",
   "sheet": "raw/por_E.jpg",
   "cell": "r2c2"
@@ -688,7 +688,7 @@
   "cell": "r2c3"
  },
  "c_priest": {
-  "name": "성녀 설화",
+  "name": "성녀 이벨린",
   "file": "c_priest.png",
   "sheet": "raw/por_C.jpg",
   "cell": "r2c4",
@@ -798,7 +798,7 @@
   "cell": "r2c2"
  },
  "d_archivist": {
-  "name": "서고지기 먼지",
+  "name": "서고지기 더스턴",
   "file": "d_archivist.png",
   "sheet": "raw/por_D.jpg",
   "cell": "r2c3"
@@ -816,19 +816,19 @@
   "cell": "r2c5"
  },
  "sm_A": {
-  "name": "칼바람",
+  "name": "바렌",
   "file": "sm_A.png",
   "sheet": "raw/por_SM.jpg",
   "cell": "r1c1"
  },
  "sm_B": {
-  "name": "매눈 솔",
+  "name": "매눈 솔렌",
   "file": "sm_B.png",
   "sheet": "raw/por_SM.jpg",
   "cell": "r1c2"
  },
  "sm_H": {
-  "name": "바위주먹 곰쇠",
+  "name": "바위주먹 고름",
   "file": "sm_H.png",
   "sheet": "raw/por_SM.jpg",
   "cell": "r1c3"
@@ -852,7 +852,7 @@
   "cell": "r2c2"
  },
  "sm_C": {
-  "name": "설산의 무승 한빙",
+  "name": "설산의 은자 하르빅",
   "file": "sm_C.png",
   "sheet": "raw/por_SM.jpg",
   "cell": "r2c3"
@@ -882,7 +882,7 @@
   "cell": "r1c3"
  },
  "spirit_iseul": {
-  "name": "이슬",
+  "name": "에스라",
   "file": "spirit_iseul.png",
   "sheet": "raw/por_X.jpg",
   "cell": "r1c4"
@@ -950,7 +950,7 @@
   }
  },
  "a_tailor_normal": {
-  "name": "나비",
+  "name": "리네트",
   "file": "a_tailor_normal.png",
   "sheet": "raw/expr_a_tailor.jpg",
   "cell": "normal",
@@ -958,7 +958,7 @@
   "expr": "normal"
  },
  "a_tailor_smile": {
-  "name": "나비",
+  "name": "리네트",
   "file": "a_tailor_smile.png",
   "sheet": "raw/expr_a_tailor.jpg",
   "cell": "smile",
@@ -966,7 +966,7 @@
   "expr": "smile"
  },
  "a_tailor_angry": {
-  "name": "나비",
+  "name": "리네트",
   "file": "a_tailor_angry.png",
   "sheet": "raw/expr_a_tailor.jpg",
   "cell": "angry",
@@ -974,7 +974,7 @@
   "expr": "angry"
  },
  "a_tailor_blush": {
-  "name": "나비",
+  "name": "리네트",
   "file": "a_tailor_blush.png",
   "sheet": "raw/expr_a_tailor.jpg",
   "cell": "blush",
@@ -982,7 +982,7 @@
   "expr": "blush"
  },
  "h_mystic_normal": {
-  "name": "운",
+  "name": "베일라",
   "file": "h_mystic_normal.png",
   "sheet": "raw/expr_h_mystic.jpg",
   "cell": "normal",
@@ -990,7 +990,7 @@
   "expr": "normal"
  },
  "h_mystic_smile": {
-  "name": "운",
+  "name": "베일라",
   "file": "h_mystic_smile.png",
   "sheet": "raw/expr_h_mystic.jpg",
   "cell": "smile",
@@ -998,7 +998,7 @@
   "expr": "smile"
  },
  "h_mystic_angry": {
-  "name": "운",
+  "name": "베일라",
   "file": "h_mystic_angry.png",
   "sheet": "raw/expr_h_mystic.jpg",
   "cell": "angry",
@@ -1006,7 +1006,7 @@
   "expr": "angry"
  },
  "h_mystic_blush": {
-  "name": "운",
+  "name": "베일라",
   "file": "h_mystic_blush.png",
   "sheet": "raw/expr_h_mystic.jpg",
   "cell": "blush",
@@ -1014,7 +1014,7 @@
   "expr": "blush"
  },
  "g_dancer_normal": {
-  "name": "방울",
+  "name": "자이라",
   "file": "g_dancer_normal.png",
   "sheet": "raw/expr_g_dancer.jpg",
   "cell": "normal",
@@ -1022,7 +1022,7 @@
   "expr": "normal"
  },
  "g_dancer_smile": {
-  "name": "방울",
+  "name": "자이라",
   "file": "g_dancer_smile.png",
   "sheet": "raw/expr_g_dancer.jpg",
   "cell": "smile",
@@ -1030,7 +1030,7 @@
   "expr": "smile"
  },
  "g_dancer_angry": {
-  "name": "방울",
+  "name": "자이라",
   "file": "g_dancer_angry.png",
   "sheet": "raw/expr_g_dancer.jpg",
   "cell": "angry",
@@ -1038,7 +1038,7 @@
   "expr": "angry"
  },
  "g_dancer_blush": {
-  "name": "방울",
+  "name": "자이라",
   "file": "g_dancer_blush.png",
   "sheet": "raw/expr_g_dancer.jpg",
   "cell": "blush",
@@ -1046,7 +1046,7 @@
   "expr": "blush"
  },
  "f_diver_normal": {
-  "name": "숨비",
+  "name": "마렌",
   "file": "f_diver_normal.png",
   "sheet": "raw/expr_f_diver.jpg",
   "cell": "normal",
@@ -1054,7 +1054,7 @@
   "expr": "normal"
  },
  "f_diver_smile": {
-  "name": "숨비",
+  "name": "마렌",
   "file": "f_diver_smile.png",
   "sheet": "raw/expr_f_diver.jpg",
   "cell": "smile",
@@ -1062,7 +1062,7 @@
   "expr": "smile"
  },
  "f_diver_angry": {
-  "name": "숨비",
+  "name": "마렌",
   "file": "f_diver_angry.png",
   "sheet": "raw/expr_f_diver.jpg",
   "cell": "angry",
@@ -1070,7 +1070,7 @@
   "expr": "angry"
  },
  "f_diver_blush": {
-  "name": "숨비",
+  "name": "마렌",
   "file": "f_diver_blush.png",
   "sheet": "raw/expr_f_diver.jpg",
   "cell": "blush",
@@ -1078,7 +1078,7 @@
   "expr": "blush"
  },
  "e_tailor_normal": {
-  "name": "루비",
+  "name": "로자린드",
   "file": "e_tailor_normal.png",
   "sheet": "raw/expr_e_tailor.jpg",
   "cell": "normal",
@@ -1086,7 +1086,7 @@
   "expr": "normal"
  },
  "e_tailor_smile": {
-  "name": "루비",
+  "name": "로자린드",
   "file": "e_tailor_smile.png",
   "sheet": "raw/expr_e_tailor.jpg",
   "cell": "smile",
@@ -1094,7 +1094,7 @@
   "expr": "smile"
  },
  "e_tailor_angry": {
-  "name": "루비",
+  "name": "로자린드",
   "file": "e_tailor_angry.png",
   "sheet": "raw/expr_e_tailor.jpg",
   "cell": "angry",
@@ -1102,7 +1102,7 @@
   "expr": "angry"
  },
  "e_tailor_blush": {
-  "name": "루비",
+  "name": "로자린드",
   "file": "e_tailor_blush.png",
   "sheet": "raw/expr_e_tailor.jpg",
   "cell": "blush",
@@ -1110,7 +1110,7 @@
   "expr": "blush"
  },
  "c_priest_normal": {
-  "name": "설화",
+  "name": "이벨린",
   "file": "c_priest_normal.png",
   "sheet": "raw/expr_c_priest.jpg",
   "cell": "normal",
@@ -1118,7 +1118,7 @@
   "expr": "normal"
  },
  "c_priest_smile": {
-  "name": "설화",
+  "name": "이벨린",
   "file": "c_priest_smile.png",
   "sheet": "raw/expr_c_priest.jpg",
   "cell": "smile",
@@ -1126,7 +1126,7 @@
   "expr": "smile"
  },
  "c_priest_angry": {
-  "name": "설화",
+  "name": "이벨린",
   "file": "c_priest_angry.png",
   "sheet": "raw/expr_c_priest.jpg",
   "cell": "angry",
@@ -1134,7 +1134,7 @@
   "expr": "angry"
  },
  "c_priest_blush": {
-  "name": "설화",
+  "name": "이벨린",
   "file": "c_priest_blush.png",
   "sheet": "raw/expr_c_priest.jpg",
   "cell": "blush",

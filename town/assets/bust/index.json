@@ -42,7 +42,7 @@
    }
   },
   "a_tailor": {
-   "name": "나비",
+   "name": "리네트",
    "side": "right",
    "expr": {
     "neutral": "a_tailor/neutral.webp",
@@ -62,7 +62,7 @@
    }
   },
   "h_mystic": {
-   "name": "운",
+   "name": "베일라",
    "side": "right",
    "expr": {
     "neutral": "h_mystic/neutral.webp",
@@ -82,7 +82,7 @@
    }
   },
   "g_dancer": {
-   "name": "방울",
+   "name": "자이라",
    "side": "right",
    "expr": {
     "neutral": "g_dancer/neutral.webp",
@@ -102,7 +102,7 @@
    }
   },
   "f_diver": {
-   "name": "숨비",
+   "name": "마렌",
    "side": "right",
    "expr": {
     "neutral": "f_diver/neutral.webp",
@@ -122,7 +122,7 @@
    }
   },
   "e_tailor": {
-   "name": "루비",
+   "name": "로자린드",
    "side": "right",
    "expr": {
     "neutral": "e_tailor/neutral.webp",
@@ -142,7 +142,7 @@
    }
   },
   "c_priest": {
-   "name": "설화",
+   "name": "이벨린",
    "side": "right",
    "expr": {
     "neutral": "c_priest/neutral.webp",

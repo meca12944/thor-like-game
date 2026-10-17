@@ -71,7 +71,7 @@ table.km td{padding:1px 4px}table.km td.an{width:42%}table.km td.warn{color:#ff9
 .inv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.inv>div{background:#0c1430;border:2px solid #34427a;padding:8px;line-height:1.7}.inv .big{font:bold 16px monospace;color:#ffe08a}
 img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 #dlg{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);width:min(720px,92vw);display:none;background:#18203fee;color:#fff;border:4px solid #e8d6b0;box-shadow:0 0 0 4px #0b0b14;padding:10px 14px;box-sizing:border-box;pointer-events:auto;font:15px sans-serif}
-#dlg.hasp{padding-left:122px;min-height:124px}#dlg .dp{position:absolute;left:8px;top:8px;width:104px;height:104px;image-rendering:pixelated;border:2px solid #e8d6b0;background:#0b0b14}#dlg.open{display:block}#dlg .dn{color:#ffe08a;font:bold 14px monospace;margin-bottom:4px}#dlg .dt{line-height:1.5;min-height:44px}#dlg .dh{text-align:right;font-size:11px;color:#c9d3f0;margin-top:4px}
+#dlg.hasp{padding-left:122px;min-height:124px}#dlg .dp{position:absolute;left:8px;top:8px;width:104px;height:104px;image-rendering:pixelated;border:2px solid #e8d6b0;background:#0b0b14}#dlg.open{display:block}#dlg .dn{color:#ffe08a;font:bold 14px monospace;margin-bottom:4px}#dlg .dn .dst{display:block;margin-top:1px;color:#d8c9a0;opacity:.7;font:normal 11px sans-serif;letter-spacing:.02em}#dlg .dt{line-height:1.5;min-height:44px}#dlg .dh{text-align:right;font-size:11px;color:#c9d3f0;margin-top:4px}
 @media (max-width:600px){.inv{grid-template-columns:1fr}}
 /* item icons (assets/icons/icons32.png / icons64.png, map in icons.json) */
 .ic32{display:inline-block;width:32px;height:32px;background:url(assets/icons/icons32.png) no-repeat;image-rendering:pixelated;vertical-align:middle;flex:none}
@@ -465,14 +465,14 @@ function perfectDodge(){SFX.ev.justDodge();addMp(MPR.perfect);addUlt(ULT_CFG.gai
  spawnRing(hero.x,hero.y-12,6,90,.35,'200,240,255',6,.5);burst(hero.x,hero.y-20,10,['#dff8ff','#fff'],160,0,3);}
 // interact / dialog
 const TALK={
- spirit:{name:'물의 정령 이슬',por:'spirit_iseul',lines:[
-  ()=>({who:'hero',t:'이슬, 잠깐 이야기 좀 할까.'}),
+ spirit:{name:'에스라',por:'spirit_iseul',lines:[
+  ()=>({who:'hero',t:'에스라, 잠깐 이야기 좀 할까.'}),
   ()=>'필멸자님, 저 여기 있어요! 무슨 일이세요?',
   ()=>`${keyLabel('attack')} 로 베고, ${keyLabel('dash')} 로 몸을 피해요. 대시 중에는 공격을 맞지 않아요.`,
   ()=>`${keyLabel('target')} 로 노릴 적을 바꾸면 공격과 스킬이 그쪽을 향해요.`,
   ()=>`분수나 숨겨진 물가에서 ${keyLabel('dive')} 를 누르면 잠수할 수 있어요. 크라켄의 힘 덕분이죠.`,
   ()=>`키가 불편하면 ${keyLabel('menu',1)} → 조작 설정에서 바꿀 수 있어요. 바꾼 키는 저장돼요.`]},
- shop:{name:'미소 · 도구상점 「보따리」',por:'a_tool',then:()=>openShop('a_tool'),lines:[
+ shop:{name:'미라벨 · 도구상점 「보따리」',por:'a_tool',then:()=>openShop('a_tool'),lines:[
   ()=>'어서 와요! 회복약은 넉넉히, 깃털은 꼭 하나!',
   ()=>({who:'hero',t:'물건 좀 보러 왔어. 팔 것도 있고.'}),
   ()=>'사실 거면 「구매」, 파실 거면 「판매」 쪽이에요. 장착한 장비는 먼저 벗어 주셔야 사 드려요!']},
@@ -482,6 +482,17 @@ const TALK={
 };
 let dlg=null; // {id,i}
 const HERO_NAME='필멸자';
+// Name-tag subtitle: the character's title (docs_story/town_A_npcs.json `title`, docs_story/names_eldenring.md for the rest),
+// shown small + dim under the name only during the conversation where you first meet that character (remembered in localStorage).
+const CHAR_TITLES={a_chief:'「분수 마을의 장로」',a_tool:'「보따리의」',a_smith:'「무쇠손」',a_tailor:'「은바늘의」',a_granny:'「샘지기 노파」',a_kid:'꼬마',
+ a_guard:'「떨리는 창」',a_farmer:'「허수아비지기」',a_herb:'「쓴잎의」',a_bard:'「떠도는 현(絃)」',npc_bori:'「바람길의 순례자」',spirit_iseul:'「샘의 정령」',
+ h_mystic:'「별을 엮는 점성녀」',g_dancer:'「사막방울의 무희」',f_diver:'「잿물결의 해녀」',e_tailor:'「불꽃실의 직녀」',c_priest:'「서리 성녀」',d_yuna:'「차원을 건넌 이방인」',
+ sm_A:'「질풍의 사범」',sm_B:'「매눈의」',sm_H:'「바위주먹」',sm_G:'「모래매」',sm_F:'「작살잡이」',sm_E:'「철벽」',sm_C:'「설산의 은자」',sm_D:'「무명의 처형인」',
+ d_archivist:'「금서고의 서고지기」',b_scholar:'「책벌레」',e_knight:'「은빛 기사」',e_master:'「선대의 대장장이」',f_captain:'「외눈 선장」',h_old:'「늙은 광부」'};
+const LSMET='townDemo.met';const MET=new Set((()=>{if(Q.has('nosave'))return [];try{const v=JSON.parse(localStorage.getItem(LSMET)||'[]');return Array.isArray(v)?v:[];}catch(e){return [];}})());
+function meetTitle(id){if(!id||!CHAR_TITLES[id])return '';if(!dlg.fresh)dlg.fresh={};
+ if(!MET.has(id)){MET.add(id);dlg.fresh[id]=1;if(!Q.has('nosave'))try{localStorage.setItem(LSMET,JSON.stringify([...MET]));}catch(e){}}
+ return dlg.fresh[id]?CHAR_TITLES[id]:'';}
 function interactTarget(){if(nearShopNpc())return 'shop';if(nearFountain(hero.x,hero.y))return 'fountain';return 'spirit';} // the spirit always floats next to the hero
 function interact(){if(uw||hero.swim||hero.sk||hero.atk)return;dlg={id:interactTarget(),i:0};openUI('dialog');}
 function dialogNext(){if(!dlg)return;SFX.ev.blip();dlg.i++;if(dlg.i>=TALK[dlg.id].lines.length){const T=TALK[dlg.id];closeUI();if(T.then)T.then();return;}renderUI();}
@@ -540,9 +551,10 @@ function renderUI(){
  if(ui==='map'){ovp.innerHTML=`<h2>월드맵</h2><img class="wmap" src="assets/world_map.jpg" alt="월드맵"><div class="sub">현재 위치: 시작 마을 (데모 맵)</div>`+hintBar([[keyLabel('map',1)+' / Esc','닫기']]);return;}
  if(ui==='dialog'&&dlg){const T=TALK[dlg.id],last=dlg.i>=T.lines.length-1;
   // portraits: line may return {who:'hero',t}; speaker portrait from assets/portraits/<id>.png (NPC id) shown left
-  let L=T.lines[dlg.i](),nm=T.name,por=T.por;if(L&&typeof L==='object'){if(L.who==='hero'){nm=HERO_NAME;por='hero';}else if(L.who){nm=L.name||nm;por=L.who;}L=L.t;}
+  let L=T.lines[dlg.i](),nm=T.name,por=T.por,cid=T.por;if(L&&typeof L==='object'){if(L.who==='hero'){nm=HERO_NAME;por='hero';cid=null;}else if(L.who==='none'){cid=null;}else if(L.who){nm=L.name||nm;por=L.who;cid=L.who;}L=L.t;}
+  const sub=meetTitle(cid); // title subtitle only in the first-meeting conversation
   dlgEl.classList.toggle('hasp',!!por);
-  dlgEl.innerHTML=(por?`<img class="dp" src="assets/portraits/${esc(por)}.png" alt="">`:'')+`<div class="dn">${esc(nm)}</div><div class="dt">${esc(L)}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?(T.then?'거래하기 ▶':'닫기'):'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
+  dlgEl.innerHTML=(por?`<img class="dp" src="assets/portraits/${esc(por)}.png" alt="">`:'')+`<div class="dn">${esc(nm)}${sub?`<span class="dst">${esc(sub)}</span>`:''}</div><div class="dt">${esc(L)}</div><div class="dh"><kbd>${esc(keyLabel('interact'))}</kbd> ${last?(T.then?'거래하기 ▶':'닫기'):'다음 ▶'} · <kbd>Esc</kbd> 닫기</div>`;
   dlgEl.onclick=dialogNext;}}
 function uiKey(code,act){if(ui!=='dialog'&&ui!=='options')uiSfx(code,act);
  if(ui==='options'){optKey(code);return;}
@@ -613,14 +625,14 @@ function updateKhud(){if(!khudEl)return;const P=[];
  else if(hero.swim)P.push([keyLabel('dive',1),'물 밖으로']);
  else{P.push([keyLabel('attack',1),'공격'],[keyLabel('dash',2),'회피']);
   if(unlocked('water')&&findSpot())P.push([keyLabel('dive',1),'잠수','hot']);
-  {const it=interactTarget();P.push([keyLabel('interact',1),it==='shop'?'미소와 거래 (상점)':it==='fountain'?'분수 살피기':'이슬과 대화',it==='spirit'?'':'hot']);}
+  {const it=interactTarget();P.push([keyLabel('interact',1),it==='shop'?'미라벨과 거래 (상점)':it==='fountain'?'분수 살피기':'에스라와 대화',it==='spirit'?'':'hot']);}
   P.push([keyLabel('area',1),areaMode?AREA[areaMode].name+(areaCd>0?' '+Math.ceil(areaCd)+'s':''):'광역 —']);
   P.push([keyLabel('target',1),target?'대상 ✓':'대상']);}
  P.push([keyLabel('potion',1),((IT[INV.quick]||{}).n||'물약')+' ×'+invCount(INV.quick)],[keyLabel('menu',1),'메뉴']);
  const sig=P.map(p=>p.join('|')).join(';');if(sig===khudSig)return;khudSig=sig;
  khudEl.innerHTML=P.map(([k,t,c])=>`<span${c?' class="hot"':''}><kbd>${esc(k)}</kbd>${esc(t)}</span>`).join('');}
 function drawCtlWorld(){ // world space: target reticle + area-skill effect
- if(shopNpc&&!shopNpc.dead&&!(shopNpc.alert>0)){ctx.save();ctx.textAlign='center';outlined('상점 · 미소',shopNpc.x,shopNpc.y-shopNpc.h*CS-12,15,nearShopNpc()?'#ffe08a':'#ffffff');ctx.restore();}
+ if(shopNpc&&!shopNpc.dead&&!(shopNpc.alert>0)){ctx.save();ctx.textAlign='center';outlined('상점 · 미라벨',shopNpc.x,shopNpc.y-shopNpc.h*CS-12,15,nearShopNpc()?'#ffe08a':'#ffffff');ctx.restore();}
  if(target&&!target.dead){const m=target,r=(m.kind==='boar'?50:30)*Math.min(1.6,m.sc||1),cy=m.y-(m.kind==='boar'?30:18)*(m.sc||1),t=performance.now()/1000,g=r+4+Math.sin(t*6)*3;
   ctx.save();ctx.strokeStyle='#ff4040';ctx.lineWidth=3;ctx.shadowColor='#000';ctx.shadowBlur=3;
   for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.moveTo(m.x+sx*g,cy+sy*g*.7-sy*10);ctx.lineTo(m.x+sx*g,cy+sy*g*.7);ctx.lineTo(m.x+sx*g-sx*12,cy+sy*g*.7);ctx.stroke();}ctx.restore();}
@@ -648,7 +660,7 @@ let INV=newInv();
 let invMouse=[-1,-1]; // hover selects only on real mouse movement (Chrome re-fires hover after re-render)
 let invTab=0,invZone='bag',invSel=0,eqSel=0,listSel=0,invNote='';
 let shopAt=null,shopMode='buy',sellPend=null; // shop opens only via a shop NPC (or the demo-only Esc shortcut); sell = '판매' mode
-const SHOP_NAMES={a_tool:'미소의 도구상점 「보따리」',demo:'상점 (데모 바로가기)'};
+const SHOP_NAMES={a_tool:'미라벨의 도구상점 「보따리」',demo:'상점 (데모 바로가기)'};
 const INV_TABS=['가방 · 장비','상점','대장간'];
 function stackable(id){const s=IT[id]&&IT[id].s;return s==='consumable'||s==='material';}
 function invCount(id){return INV.bag.filter(b=>b.id===id).reduce((a,b)=>a+b.n,0);}
@@ -671,7 +683,7 @@ function starsHTML(id,sc=1){const r=(IT[id]||{}).r,s=starStrip(r);if(!s)return '
 function starCount(id){return RARITY_STARS[(IT[id]||{}).r]||0;}
 function nearShopNpc(){const n=shopNpc;return n&&!n.dead&&!(n.fainted>0)&&!(n.alert>0)&&!uw&&Math.hypot(hero.x-n.x,hero.y-n.y)<110?n:null;}
 function openShop(src){shopAt=src;shopMode='buy';invTab=1;listSel=0;invNote='';sellPend=null;openUI('inv');}
-function setInvTab(t){if(t===1&&!shopAt){invNote='⚠ 상점은 상점 NPC(미소 · 도구상점 「보따리」)에게 말을 걸어야 열린다';renderInv();return;}
+function setInvTab(t){if(t===1&&!shopAt){invNote='⚠ 상점은 상점 NPC(미라벨 · 도구상점 「보따리」)에게 말을 걸어야 열린다';renderInv();return;}
  invTab=t;listSel=0;invNote='';sellPend=null;renderInv();}
 function dropNote(id,n=1,verb='획득'){const box=document.getElementById('dropn'),d=IT[id];if(!box||!d)return;
  const el=document.createElement('div');el.className='dn1';el.dataset.id=id;el.style.setProperty('--rc',rarCol(id));
@@ -790,7 +802,7 @@ function invKey(code,act){
  if(code==='KeyQ'||code==='KeyE'){let t=invTab;do t=(t+(code==='KeyE'?1:2))%3;while(t===1&&!shopAt);setInvTab(t);return;}
  if(code==='Enter'||code==='NumpadEnter'||code==='Space'||act==='interact'||act==='attack'){invAction();return;}
  if(invTab===0&&code==='KeyR'){const it=INV.bag[invSel];if(it&&IT[it.id].s==='consumable'){INV.quick=it.id;invNote=`퀵슬롯(${keyLabel('potion',1)}): ${IT[it.id].n}`;refreshQuick();}else invNote='⚠ 소모품만 퀵슬롯에 등록할 수 있다';renderInv();return;}
- if(invTab===0&&(code==='Delete'||code==='Backspace')){invNote='⚠ 판매는 상점에서만 할 수 있다 — 상점 NPC(미소)에게 말을 걸어 「판매」를 고르세요';renderInv();return;}
+ if(invTab===0&&(code==='Delete'||code==='Backspace')){invNote='⚠ 판매는 상점에서만 할 수 있다 — 상점 NPC(미라벨)에게 말을 걸어 「판매」를 고르세요';renderInv();return;}
  if(act==='gear'){cycleGear();return;}
  if(act==='map')openUI('map');}
 // HUD quick slot (bottom-left, above the key bar)
@@ -953,7 +965,7 @@ function drawNpc(n){if(n.v2)return drawNpcV2(n);const im=n.img;if(!im)return;con
  ctx.drawImage(im,0,0,iw,ih*cut,x+lean*L,y+drop*L,w,h*cut);                             // head + torso (breath drop / walk lean)
  if(chest)ctx.drawImage(im,0,ih*A.chestTop,iw,ih*(A.chestBot-A.chestTop),x+lean*L,y+drop*L+h*A.chestTop-chest*L,w,h*(A.chestBot-A.chestTop)); // soft 1px chest rise
  ctx.restore();}
-shopNpc=spawnNpc('a_tool',960,300,{shop:'a_tool'}); // 미소 · 도구상점 「보따리」 — talk (interact) to open the shop
+shopNpc=spawnNpc('a_tool',960,300,{shop:'a_tool'}); // 미라벨 · 도구상점 「보따리」 — talk (interact) to open the shop
 // "map reload": every non-boss enemy comes back at a random valid spot (not near the hero, not in walls/water).
 function reloadMap(){for(const m of slimes){const[x,y]=m.kind==='boar'?boarSpot():randSpot();Object.assign(m,m.kind==='boar'?mkBoar(x,y):mkSlime(x,y,m.sc));m.spawnT=.5;}}
 const BOAR_ZONE={x0:300,x1:800,y0:500,y1:680}; // champion boar roams the open south plaza only (never the shop / house fronts)
