@@ -1,0 +1,20 @@
+{
+ "note": "Tile rules shared by all maps. Tile names = assets/world/world_atlas.json sheets.*.index (built by tools/world_assets.py). See WORLD.md.",
+ "alias": {"forest": "grass_dark", "mountain": "soil", "snowpeak": "snow", "hill": "grass", "tallgrass": "tallgrass"},
+ "variants": {
+  "grass": ["grass", "grass", "grass", "grass_tuft"],
+  "dirt": ["dirt", "dirt", "dirt_pebble"],
+  "water": ["water", "water2"],
+  "floor": ["floor", "floor", "floor2", "floor_crack", "floor"],
+  "floor_moss": ["floor_moss", "floor_moss2"]
+ },
+ "soft": {
+  "dirt": {"group": ["dirt", "bridge_h"], "under": "grass"},
+  "water": {"group": ["water", "bridge_h", "stones"], "under": "sand", "rim": "#cdb27a"},
+  "water_deep": {"group": ["water_deep", "bridge_h"], "under": "sand", "rim": "#cdb27a"},
+  "sand": {"group": ["sand", "water"], "under": "grass"}
+ },
+ "bridgeUnder": "water",
+ "field": {},
+ "dungeon": {}
+}

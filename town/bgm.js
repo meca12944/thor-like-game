@@ -94,6 +94,8 @@
   let fightT = 0, lastBoarDead = null;
   function desired() {
     if (forced && forced !== 'off') return forced;
+    const sc = window.__scene; // [world] outside-world scenes (world.js) pick their own track; null = keep playing
+    if (sc && sc.active) return sc.bgm || null;
     const g = window.__game;
     if (!g || !g.ready) return SCENES.town;
     if (g.uw) return SCENES.dive;

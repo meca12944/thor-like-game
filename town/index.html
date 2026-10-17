@@ -1517,5 +1517,7 @@ Promise.all(jobs).then(()=>{
 }).catch(e=>{console.error(e);document.body.insertAdjacentHTML('beforeend','<p style="color:#fff">'+e.message+'</p>');});
 </script>
 <script src="bgm.js"></script><!-- BGM manager (tools/music, audio/bgm) -->
+<!-- [world] outside world: scene manager, Ys-style connected fields, dungeon, boss, minimap/map screen/route guide (world.js, world_mobs.js, world_nav.js, maps/*.json; see WORLD.md) -->
+<script src="world_mobs.js"></script><script src="world_nav.js"></script><script src="world.js"></script>
 </body>
 </html>
