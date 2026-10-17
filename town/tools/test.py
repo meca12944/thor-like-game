@@ -122,6 +122,25 @@ async def main():
     await pp.screenshot(path=D+'shot_touch_landscape.png')
     pq=await page({'width':390,'height':844},touch=True); await pq.wait_for_timeout(500)
     await pq.screenshot(path=D+'shot_portrait.png')
+    # ---- HP bars + CHAMPION label ----
+    await pg.goto(U); await waitready(pg)
+    await pg.evaluate(SETUP,dict(hx=520,hy=520,sl=[[640,500],[610,600],[430,470]]))
+    await pg.evaluate("()=>{const b=__game.boar;Object.assign(b,{dead:false,x:665,y:560,hp:8,hpLag:8,state:'idle',t:99,spawnT:0,kx:0,ky:0,face:-1})}")
+    hb={}
+    hb['before']=await pg.evaluate("()=>__game.slimes.map(m=>[m.kind,m.hp,m.maxHp,m.champion||false])")
+    await pg.evaluate("()=>{const g=__game;g.press();g.advance(.11);g.press();g.advance(.3);g.press();g.advance(.2)}")
+    hb['justHit']=await pg.evaluate("()=>__game.slimes.map(m=>[m.kind,m.hp,+m.hpLag.toFixed(2),+m.hitT.toFixed(2),m.dead])")
+    await pg.evaluate("()=>{const g=__game,b=g.boar;g.damageSlime(g.slimes[1],1,0,1,0,{skill:1});g.advance(.25);g.damageSlime(b,1,0,2,0,{skill:1});g.advance(.06);g.hero.atk=null;b.state='idle';b.t=99;b.kx=b.ky=0;g.slimes.forEach(m=>{m.kx=m.ky=0})}")
+    hb['shotState']=await pg.evaluate("()=>__game.slimes.map(m=>[m.kind,m.hp,+m.hpLag.toFixed(2),+m.lagDelay.toFixed(2)])")
+    await pg.wait_for_timeout(80); await pg.screenshot(path=D+'shot_hpbars.png')
+    await pg.evaluate("()=>__game.advance(1.2)")
+    hb['caughtUp']=await pg.evaluate("()=>__game.slimes.map(m=>[m.kind,m.hp,+m.hpLag.toFixed(2)])")
+    # boar charge + wall stun, enhanced label render, map reload at random valid spots
+    hb['charge']=await pg.evaluate("()=>{const g=__game,b=g.boar;g.hero.x=300;g.hero.y=560;Object.assign(b,{x:700,y:560,state:'idle',t:0,hp:8,hpLag:8});const st=[];for(let i=0;i<120;i++){g.advance(1/60);if(!st.includes(b.state))st.push(b.state);}return st}")
+    hb['wallStun']=await pg.evaluate("()=>{const g=__game,b=g.boar;g.hero.x=600;g.hero.y=560;const B=g.blocked;let x=600;while(!B(x,560,26)&&x>0)x-=4;Object.assign(b,{x:x+40,y:560,state:'charge',t:.9,vx:-430,vy:0});const st=[];for(let i=0;i<30;i++){g.advance(1/60);if(!st.includes(b.state))st.push(b.state);}return st}")
+    hb['enhancedRender']=await pg.evaluate("()=>{const b=__game.boar;b.champion='enhanced';__game.render();b.champion=true;return true}")
+    hb['reload']=await pg.evaluate("()=>{const g=__game;g.reloadMap();return g.slimes.map(m=>{const d=Math.hypot(m.x-g.hero.x,m.y-g.hero.y);return [m.kind,m.x|0,m.y|0,d>260&&!g.blocked(m.x,m.y,20),m.hp]})}")
+    res['hpbars']=hb
     res['errs']=errs
     print(json.dumps(res,ensure_ascii=False,indent=0))
     await b.close()

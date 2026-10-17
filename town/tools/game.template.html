@@ -194,9 +194,26 @@ const CHAIN_WINDOW=.24;
 function startSwing(i){const s=SWINGS[i];hero.atk={i,t:0,hit:new Set(),s};hero.combo=i;hero.buffered=false;
  if(i===2)shake=6;}
 const slimes=[];const parts=[];const fx=[];let shake=0;
-function mkSlime(x,y,sc){return{x,y,sc,hp:2,state:'idle',t:Math.random()*1.5,hopT:0,hz:0,vx:0,vy:0,kx:0,ky:0,flash:0,dead:0,respawn:0,face:1,squash:0};}
+function mkSlime(x,y,sc){return{kind:'slime',x,y,sc,hp:2,maxHp:2,hpLag:2,hitT:0,lagDelay:0,headH:72,state:'idle',t:Math.random()*1.5,hopT:0,hz:0,vx:0,vy:0,kx:0,ky:0,flash:0,dead:0,respawn:0,face:1,squash:0};}
 slimes.push(mkSlime(548,544,1),mkSlime(857,612,.62),mkSlime(330,300,.8));
 Object.assign(slimes[2],{dead:true,respawn:5});
+// Champion test enemy (boar 'champ01'): more HP, telegraphed charge, stuns itself on walls.
+// champion:true -> gold CHAMPION label; champion:'enhanced' (area-10 strengthened champions) -> purple label.
+function mkBoar(x,y){return{kind:'boar',champion:true,x,y,sc:1.55,hp:8,maxHp:8,hpLag:8,hitT:0,lagDelay:0,headH:SPR.champ_boar.headH,
+ state:'idle',t:1.2+Math.random(),hz:0,vx:0,vy:0,kx:0,ky:0,flash:0,dead:false,respawn:0,face:-1,squash:0,anim:0};}
+const boar=mkBoar(760,600);slimes.push(boar);
+// Town NPCs: none are placed on this demo map, but the HP-bar / fight-or-flee code is generic.
+// npc = {x,y,hp,maxHp,headH,behavior:'fight'|'flee',lethal:false for children (faint at 0 HP, never die)}
+const npcs=[];
+function damageNpc(n,dmg){n.hp=Math.max(0,n.hp-dmg);n.hitT=.35;n.lagDelay=.3;n.flash=.16;n.alert=6;
+ if(n.hp<=0){if(n.lethal===false){n.fainted=2.5;n.hp=0;}else n.dead=true;}}
+function tickHp(e,dt){if(e.hitT>0)e.hitT-=dt;if(e.lagDelay>0)e.lagDelay-=dt;else if(e.hpLag>e.hp)e.hpLag=Math.max(e.hp,e.hpLag-e.maxHp*1.4*dt);}
+function updateNpc(n,dt){tickHp(n,dt);if(n.dead)return;if(n.flash>0)n.flash-=dt;
+ if(n.fainted>0){n.fainted-=dt;if(n.fainted<=0){n.hp=1;n.hpLag=1;n.behavior='flee';}return;}
+ if(n.alert>0){n.alert-=dt;const dx=hero.x-n.x,dy=hero.y-n.y,d=Math.hypot(dx,dy)||1,sgn=n.behavior==='flee'?-1:1;
+  if(n.behavior==='flee'||d>60)moveCol(n,sgn*dx/d*(n.behavior==='flee'?190:120)*dt,sgn*dy/d*110*dt,14);}}
+// "map reload": every non-boss enemy comes back at a random valid spot (not near the hero, not in walls/water).
+function reloadMap(){for(const m of slimes){const[x,y]=randSpot();Object.assign(m,m.kind==='boar'?mkBoar(x,y):mkSlime(x,y,m.sc));m.spawnT=.5;}}
 function randSpot(){for(let k=0;k<200;k++){const x=260+Math.random()*700,y=230+Math.random()*460;if(!blocked(x,y,20)&&Math.hypot(x-hero.x,y-hero.y)>260)return[x,y];}return[600,600];}
 const live=()=>slimes.filter(m=>!m.dead);
 function nearest(x,y,max=1e9){let b=null,bd=max;for(const m of live()){const d=Math.hypot(m.x-x,(m.y-y)*1.2);if(d<bd){bd=d;b=m;}}return b;}
@@ -205,12 +222,13 @@ function heroFlip(dv){return dv[0]<0||(dv[0]===0&&hero.hz==='left');}
 
 // ---------- damage ----------
 function damageSlime(m,dx,dy,dmg,kb,o={}){if(m.dead)return;const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
- m.hp-=dmg;m.flash=.16;const k=kb/(0.6+m.sc*.4);m.kx=dx*k;m.ky=dy*k*.8;m.state='idle';m.t=.5;m.hz=0;
+ m.hp-=dmg;m.flash=.16;m.hitT=.35;m.lagDelay=.3;const k=kb/(0.6+m.sc*.4);m.kx=dx*k;m.ky=dy*k*.8;if(m.kind==='boar'){if(m.state!=='stun'){m.state='idle';m.t=.7;}}else{m.state='idle';m.t=.5;}m.hz=0;
  hitStop=Math.max(hitStop,o.stop??.04);if(o.shake)shake=Math.max(shake,o.shake);if(!o.skill)gauge=Math.min(1,gauge+0.02);
  const cols=o.col||['#fff','#9ef0a0'];
  for(let i=0;i<(o.fin?14:8);i++)parts.push({x:m.x,y:m.y-28*m.sc,vx:(Math.random()-.5)*260+dx*120,vy:-Math.random()*200,g:600,t:0,life:.4+Math.random()*.2,c:cols[i%cols.length],s:4});
  if(m.hp<=0){m.dead=true;m.respawn=4+Math.random()*3;if(!o.skill)gauge=Math.min(1,gauge+.06);
-  for(let i=0;i<22;i++){const a=Math.random()*Math.PI*2,sp=80+Math.random()*200;parts.push({x:m.x,y:m.y-25*m.sc,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*.6-120,g:500,t:0,life:.5+Math.random()*.3,c:['#7ccf3a','#4f9a1e','#c8f58a','#fff'][i%4],s:5});}}}
+  for(let i=0;i<22;i++){const a=Math.random()*Math.PI*2,sp=80+Math.random()*200;parts.push({x:m.x,y:m.y-25*m.sc,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*.6-120,g:500,t:0,life:.5+Math.random()*.3,c:(m.kind==='boar'?['#6a4a30','#3a2618','#d8b070','#fff']:['#7ccf3a','#4f9a1e','#c8f58a','#fff'])[i%4],s:5});}
+  if(m.kind==='boar'){m.respawn=9;shake=Math.max(shake,8);}}}
 function hurtHero(dx,dy){hero.hp--;hero.inv=1;const l=Math.hypot(dx,dy)||1;hero.kx=dx/l*320;hero.ky=dy/l*260;shake=4;
  if(hero.hp<=0){hero.hp=hero.maxHp;}}
 let hitStop=0;
@@ -442,22 +460,25 @@ function update(dt){
  // slimes (frozen during Time Stop)
  if(timeStop>0)timeStop=Math.max(0,timeStop-dt);
  for(const m of slimes){
-  if(m.dead){m.respawn-=dt;if(m.respawn<=0){const[x,y]=randSpot();Object.assign(m,mkSlime(x,y,m.sc));m.spawnT=.5;}continue;}
-  m.flash=Math.max(0,m.flash-dt);
+  if(m.dead){m.respawn-=dt;if(m.respawn<=0){const[x,y]=randSpot();Object.assign(m,m.kind==='boar'?mkBoar(x,y):mkSlime(x,y,m.sc));m.spawnT=.5;}continue;}
+  m.flash=Math.max(0,m.flash-dt);tickHp(m,dt);
   if(timeStop>0)continue;
   if(m.spawnT>0)m.spawnT-=dt;
   m.t-=dt;
   if(m.kx||m.ky){moveCol(m,m.kx*dt,m.ky*dt,14*m.sc);m.kx*=Math.pow(.004,dt);m.ky*=Math.pow(.004,dt);if(Math.hypot(m.kx,m.ky)<6)m.kx=m.ky=0;}
-  if(m.state==='idle'){m.squash=Math.max(0,m.squash-dt*4);
+  if(m.kind==='boar'){updateBoar(m,dt);}
+  else if(m.state==='idle'){m.squash=Math.max(0,m.squash-dt*4);
    if(m.t<=0){m.state='crouch';m.t=.18;}}
   else if(m.state==='crouch'){if(m.t<=0){m.state='hop';m.hopT=0;let ang=Math.random()*Math.PI*2;const d=Math.hypot(hero.x-m.x,hero.y-m.y);
     if(d<320&&Math.random()<.55)ang=Math.atan2(hero.y-m.y,hero.x-m.x)+(Math.random()-.5);const sp=(70+Math.random()*50)*(0.7+m.sc*.3);m.vx=Math.cos(ang)*sp;m.vy=Math.sin(ang)*sp*.8;if(m.vx)m.face=m.vx>0?1:-1;}}
   else if(m.state==='hop'){m.hopT+=dt;const D=.42;m.hz=Math.sin(Math.min(1,m.hopT/D)*Math.PI)*26*m.sc;moveCol(m,m.vx*dt,m.vy*dt,14*m.sc);
    if(m.hopT>=D){m.hz=0;m.state='idle';m.squash=1;m.t=.6+Math.random()*1.6;}}
   // contact damage (Coral Shield blocks frontal hits)
+  if(m.kind==='boar'&&m.state==='stun'){}else
   if(hero.inv<=0&&!hero.ghost&&!hero.swim&&!m.spawnT>0&&m.hz<10){const dx=hero.x-m.x,dy=hero.y-m.y;const r=34*m.sc+12;if(dx*dx+(dy*1.6)**2<r*r){
    if(hero.sk&&hero.sk.id==='shield'&&SKFX.shield.block(hero.sk,m)){}else hurtHero(dx,dy);}}
  }
+ for(const n of npcs)updateNpc(n,dt);
  updateFx(dt);
  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt;if(p.t>p.life)parts.splice(i,1);}
  if(shake>0)shake=Math.max(0,shake-dt*30);
@@ -482,6 +503,36 @@ function updateFx(dt){
    else if(!fade&&f.t>.5){const tx=hero.x+(hero.hz==='left'?90:-90),ty=hero.y-10;f.x+=(tx-f.x)*Math.min(1,dt*2);f.y+=(ty-f.y)*Math.min(1,dt*2);}}
   else if(f.t>f.life)fx.splice(i,1);
  }}
+
+function updateBoar(m,dt){m.anim+=dt;const dx=hero.x-m.x,dy=hero.y-m.y,d=Math.hypot(dx,dy)||1;
+ if(m.state==='idle'){if(Math.abs(dx)>8)m.face=dx>0?1:-1;
+  if(m.t>1.4){moveCol(m,Math.cos(m.anim*.7)*30*dt,Math.sin(m.anim*.5)*20*dt,26);}
+  if(m.t<=0){if(d<560){m.state='dig';m.t=.55;}else m.t=.8;}}
+ else if(m.state==='dig'){m.face=dx>0?1:-1;if(Math.random()<.5)parts.push({x:m.x-m.face*40,y:m.y-4,vx:-m.face*(60+Math.random()*80),vy:-60-Math.random()*60,g:400,t:0,life:.4,c:['#d8b070','#a07a40'][Math.random()*2|0],s:4});
+  if(m.t<=0){m.state='charge';m.t=.95;m.vx=dx/d*430;m.vy=dy/d*430*.8;shake=Math.max(shake,2);}}
+ else if(m.state==='charge'){const ok=moveCol(m,m.vx*dt,m.vy*dt,26);
+  if(Math.random()<.7)parts.push({x:m.x-Math.sign(m.vx)*50,y:m.y-2,vx:-m.vx*.15,vy:-40-Math.random()*50,g:300,t:0,life:.35,c:'#d8b070',s:4});
+  if(ok===false){m.state='stun';m.t=1.2;shake=Math.max(shake,6);burst(m.x+Math.sign(m.vx)*60,m.y-40,14,['#c8b088','#8a7050','#fff'],220,500);}
+  else if(m.t<=0){m.state='idle';m.t=1.3+Math.random()*1.2;}}
+ else if(m.state==='stun'){if(m.t<=0){m.state='idle';m.t=1;}}}
+function drawBoar(m){if(m.dead)return;const sc=m.spawnT>0?1-m.spawnT*1.6:1;if(sc<=0)return;const F=SPR.champ_boar.frames;
+ let fi=F.idle,jx=0;if(m.state==='charge')fi=F.charge[Math.floor(m.anim*14)%4];else if(m.state==='stun')fi=F.stun;else if(m.state==='dig'){fi=F.charge[0];jx=Math.sin(m.anim*60)*2;}
+ const fl=m.face>0; // sheet faces left
+ ctx.save();ctx.translate(m.x+jx,m.y);drawFrame('champ_boar',fi,0,0,fl,sc);
+ if(m.flash>0&&Math.floor(m.flash*40)%2){ctx.globalCompositeOperation='lighter';drawFrame('champ_boar',fi,0,0,fl,sc,.55);}ctx.restore();}
+// ---------- HP bars (every monster / NPC; always visible) ----------
+// thin bar above the head; on hit it shakes + flashes and a white->yellow "lag" segment trails the real HP.
+function drawHpBar(e,x,yTop,w){const h=4,o=1;const sh=e.hitT>0?Math.sin(e.hitT*90)*e.hitT*6:0;x=Math.round(x-w/2+sh);const y=Math.round(yTop);
+ const fr=Math.max(0,e.hp/e.maxHp),lg=Math.max(fr,(e.hpLag??e.hp)/e.maxHp);
+ ctx.fillStyle=e.hitT>.15?`rgba(255,255,255,${.5+(e.hitT-.15)*2.5})`:'rgba(8,6,14,.85)';ctx.fillRect(x-o,y-o,w+2*o,h+2*o); // border flashes white on hitctx.fillStyle='#3a1010';ctx.fillRect(x,y,w,h);
+ if(lg>fr){ctx.fillStyle=e.lagDelay>0?'#ffffff':'#ffd84a';ctx.fillRect(x+Math.round(w*fr),y,Math.round(w*(lg-fr)),h);}
+ const c=fr>.5?['#46d84a','#a8f58a']:fr>.25?['#f0c030','#fff0a0']:['#e83a2a','#ff9a8a'];
+ ctx.fillStyle=c[0];ctx.fillRect(x,y,Math.round(w*fr),h);ctx.fillStyle=c[1];ctx.fillRect(x,y,Math.round(w*fr),1);
+ if(e.champion){const enh=e.champion==='enhanced';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.lineJoin='round';
+  ctx.lineWidth=3;ctx.strokeStyle=enh?'#2a0848':'#5a0a0a';ctx.strokeText('CHAMPION',x+w/2,y-4);ctx.fillStyle=enh?'#c890ff':'rgb(255,205,50)';ctx.fillText('CHAMPION',x+w/2,y-4);ctx.textAlign='start';}}
+function drawBars(){for(const m of slimes){if(m.dead||m.spawnT>0)continue;const big=m.kind==='boar';
+  drawHpBar(m,m.x,m.y-m.hz-(big?m.headH:m.headH*m.sc)-10,big?96:Math.round(30+18*m.sc));}
+ for(const n of npcs)if(!n.dead)drawHpBar(n,n.x,n.y-(n.headH||150)-8,44);}
 
 // ---------- view ----------
 let scale=1,offX=0,offY=0,camX=0,camY=0,viewW=WW,viewH=WH,dpr=1;
@@ -615,10 +666,10 @@ function render(){computeView();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothing
  drawFrame('decal_puddle',0,868,572,false); // hidden dive spot (rain puddle)
  for(const f of fx)if(f.type==='twinkle')drawTwinkle(f);
  if(!hero.swim&&!hero.hidden&&!(hero.sk&&hero.sk.z>2))shadow(hero.x-8,hero.y+2,44,14,.4);else if(hero.sk&&hero.sk.z)shadow(hero.x,hero.y+2,30,9,.25);
- for(const m of slimes)if(!m.dead)shadow(m.x-3,m.y+1,32*m.sc*(1-m.hz/80),10*m.sc,.38);
+ for(const m of slimes)if(!m.dead)m.kind==='boar'?shadow(m.x,m.y+1,62,14,.38):shadow(m.x-3,m.y+1,32*m.sc*(1-m.hz/80),10*m.sc,.38);
  const L=[];const heroY=hero.swim||(hero.sk&&(hero.sk.id==='dive'||hero.sk.id==='undive'))?Math.max(hero.y,419):hero.y;
  const drawHeroAll=()=>{if(hero.atk&&hero.atk.s.kind==='spin')drawSpinRing(hero.atk,'back');drawHero();drawSlash();drawSkillOverlay();};
- L.push({y:heroY,f:drawHeroAll});for(const m of slimes)L.push({y:m.y,f:()=>drawSlime(m)});
+ L.push({y:heroY,f:drawHeroAll});for(const m of slimes)L.push({y:m.y,f:()=>m.kind==='boar'?drawBoar(m):drawSlime(m)});
  L.push({y:spirit.y+40,f:drawSpirit});
  for(const f of fx)if(f.type!=='ring'&&f.type!=='twinkle')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
  for(const o of LVL.overlayImgs)L.push({y:o.sortY,ov:1,f:()=>ctx.drawImage(IMG['ov_'+o.name],o.x,o.y)});
@@ -629,6 +680,7 @@ function render(){computeView();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothing
   const al=Math.min(1,timeStop/.3);ctx.save();ctx.globalAlpha=.8*al;ctx.globalCompositeOperation='saturation';ctx.fillStyle='hsl(0,0%,50%)';ctx.fillRect(0,0,WW,WH);
   ctx.globalCompositeOperation='multiply';ctx.fillStyle='#9fb2d6';ctx.fillRect(0,0,WW,WH);ctx.restore();drawHeroAll();}
  for(const f of fx)if(f.type==='ring'&&f.noTint)drawRing(f);
+ drawBars();
  if(flash>0){ctx.fillStyle=`rgba(255,250,230,${Math.min(.7,flash)})`;ctx.fillRect(0,0,WW,WH);}
  if(DEBUG)drawDebug();
  drawHUD();}
@@ -654,10 +706,10 @@ function frame(t){const dt=Math.min(1/30,(t-last)/1000||0);last=t;
 const jobs=[load('bg','bg_town.jpg')];for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));
 Promise.all(jobs).then(()=>{
  const pose=Q.get('pose');if(pose&&pose.startsWith('attack')){const i=(+pose.slice(6)||1)-1;slimes.forEach(m=>m.t=99);startSwing(i);hero.atk.t=(SWINGS[i].a0+SWINGS[i].a1)/2;hero.atk.hit=new Set(slimes);if(Q.get('face'))hero.face=Q.get('face');hitStop=1e9;shake=0;document.getElementById('hint').style.display='none';}
- updateSlotEls(true);applySaved();hero.hp=hero.maxHp;
+ updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=randSpot();boar.x=x;boar.y=y;} // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
- window.__game={hero,slimes,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
+ window.__game={hero,slimes,boar,npcs,reloadMap,damageSlime,spirit,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
  setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0},5000);

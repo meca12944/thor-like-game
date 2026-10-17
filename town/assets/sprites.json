@@ -490,5 +490,25 @@
   "n": 1,
   "ax": 48,
   "ay": 22
+ },
+ "champ_boar": {
+  "src": "champ_boar.png",
+  "w": 264,
+  "h": 203,
+  "n": 6,
+  "ax": 132,
+  "ay": 186,
+  "flipNative": true,
+  "frames": {
+   "charge": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "idle": 4,
+   "stun": 5
+  },
+  "headH": 120
  }
 }
