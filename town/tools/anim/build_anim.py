@@ -77,12 +77,21 @@ def bob(f, px):  # drop the upper body by px (seam at the belt, ~45% of height) 
     low = f[cut:cut + px]; m = (o[cut:cut + px, :, 3] == 0) & (low[..., 3] > 0); o[cut:cut + px][m] = low[m]
     return o
 
+def lean(f, px):  # run lean: shear the upper body forward (+x) by up to px at the crown, 0 at the belt; legs stay planted
+    if not px: return f
+    a = f[..., 3] > 0; ys = np.where(a.any(1))[0]; top, bot = ys.min(), ys.max(); cut = int(top + (bot - top) * .55)
+    o = np.zeros((f.shape[0], f.shape[1] + px, 4), f.dtype); o[:, :f.shape[1]] = f
+    for y in range(top, cut):
+        sh = int(round(px * (cut - y) / max(1, cut - top)))
+        if sh: o[y] = 0; o[y, sh:sh + f.shape[1]] = f[y]
+    return o
+
 uniq = {}; cells = []
 def cell(sheet, idx, opt):
-    fl = bool(opt.get('flip')); key = (sheet, idx, opt.get('bob', 0), fl)
+    fl = bool(opt.get('flip')); key = (sheet, idx, opt.get('bob', 0), fl, opt.get('lean', 0))
     if key in uniq: return uniq[key]
     src = SH[sheet][idx][:, ::-1].copy() if fl else SH[sheet][idx]   # flip: mirrored frame (front/back views: same swing from the other side)
-    f = bob(src, opt.get('bob', 0)); ax, ay = anchor(src)
+    f = lean(bob(src, opt.get('bob', 0)), opt.get('lean', 0)); ax, ay = anchor(src)
     cells.append(dict(img=f, ax=ax, ay=ay)); uniq[key] = len(cells) - 1; return uniq[key]
 
 anims = {}
