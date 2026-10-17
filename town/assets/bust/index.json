@@ -53,12 +53,12 @@
     "blush": "a_tailor/blush.webp"
    },
    "source": {
-    "neutral": "art",
-    "smile": "art",
-    "angry": "art",
-    "sad": "art",
-    "surprised": "art",
-    "blush": "art"
+    "neutral": "temp",
+    "smile": "temp",
+    "angry": "temp",
+    "sad": "temp",
+    "surprised": "temp",
+    "blush": "temp"
    }
   },
   "h_mystic": {
