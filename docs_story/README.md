@@ -84,3 +84,4 @@ docs_story 안 md/json 전체에 `names_eldenring.md` 이름을 적용했다(`sp
 - docs_story 안의 정령·어머니 대사를 교체함: 프롤로그 에스라 대사 → 엘스베트 「세 번째 붉은 물」, 골렘 귀환 → 바렌, 원탁의 심연 → 오스왈드, 여덟 맹세 → 나레이션. 오스왈드·엘스베트의 「네 어미」 대사 → 「스무 해 전 바구니」로 바꿈. A6 보상 「어머니의 편지」(`k_mother_letter`) → 「요람의 장부 조각」(`k_cradle_page`, 신규 ID 제안). 필살기 해방 문서는 정령 없이 다시 씀.
 - 아이템 ID(`spirit`·`spirit_hi`·`spirit_drop`)는 그대로 두고 표시 이름만 바꾸기를 제안함(`spirit_removal.md`).
 - **팀장이 수정해야 함 (docs_story 밖)**: `spirit_removal.md`의 「코드·데이터에서 바꿀 곳」 목록 참고.
+- **목 베기 개념 삭제 (사장님 지시)**: 불사자는 보통의 죽음이면 기억을 잃고 다시 태어나고, 다른 불사자의 손에 죽으면 완전히 끝나며 죽인 쪽이 힘과 기억을 흡수한다. docs_story 전체에서 목 베기 표현을 「죽인다」로 바꿨다. A8 제목 「스승의 목」 → 「스승의 최후」(**팀장 수정 필요**: `data/towns.json`·`TOWNS.md`·`tools/design/towns_data.py`의 A8 제목).
