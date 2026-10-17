@@ -1,0 +1,3849 @@
+{
+ "version": 1,
+ "note": "게임에 아직 연결하지 않은 편집용 데이터. tools/towns_data.py 를 고치고 tools/gen_docs.py 를 실행하면 이 파일과 TOWNS.md/EQUIPMENT.md/SYSTEMS.md 가 함께 갱신된다.",
+ "towns": [
+  {
+   "id": "A",
+   "name": "시작 마을",
+   "subtitle": "분수 마을",
+   "map_xy_1024": [
+    505,
+    315
+   ],
+   "theme": "광장 분수를 중심으로 붉은 지붕 집들이 둘러싼 평화로운 시작 마을. 주인공이 물의 정령을 만나는 곳이며, 모든 길이 이 광장에서 갈라진다.",
+   "connects": {
+    "areas": [
+     1
+    ],
+    "towns": [
+     "B",
+     "D",
+     "F",
+     "G"
+    ]
+   },
+   "arrival": "프롤로그(게임 시작). 1지역 시작의 숲으로 떠나기 전 거점이며, 이후 모든 여정의 중간 기착지.",
+   "enhance_max": 3,
+   "npcs": [
+    {
+     "id": "a_chief",
+     "name": "촌장 한결",
+     "role": "촌장",
+     "personality": "온화하지만 걱정이 많다. 마을 사람 이름을 전부 외운다.",
+     "greeting": "오늘도 분수 소리가 맑구나. 별일 없겠지?"
+    },
+    {
+     "id": "a_tool",
+     "name": "미소",
+     "role": "도구상점 「보따리」 주인",
+     "personality": "수다스럽고 셈이 빠르다. 단골에겐 덤을 준다.",
+     "greeting": "어서 와요! 회복약은 넉넉히, 깃털은 꼭 하나!",
+     "shop": "tool"
+    },
+    {
+     "id": "a_smith",
+     "name": "강철",
+     "role": "무기상점 겸 대장장이 (강화 +3까지)",
+     "personality": "무뚝뚝한 장인. 칭찬엔 귀가 빨개진다.",
+     "greeting": "검은 휘두르는 놈 손을 닮지. 보여 줘 봐.",
+     "shop": "weapon"
+    },
+    {
+     "id": "a_tailor",
+     "name": "나비",
+     "role": "외형상점 「나비 재봉소」 주인",
+     "personality": "유행에 민감하고 밝다. 망토 색 이야기만 나오면 눈이 반짝인다.",
+     "greeting": "그 빨간 망토도 멋지지만… 하늘색도 어울릴걸?",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "a_granny",
+     "name": "물결 할머니",
+     "role": "분수지기",
+     "personality": "옛이야기를 좋아하는 느긋한 노인. 분수 밑에 뭔가 있다고 믿는다.",
+     "greeting": "분수 물이 반짝이는 날엔 좋은 일이 생긴단다."
+    },
+    {
+     "id": "a_kid",
+     "name": "도토리",
+     "role": "마을 꼬마",
+     "personality": "장난꾸러기. 주인공을 영웅이라 부르며 따라다닌다.",
+     "greeting": "형! 오늘은 무슨 몬스터 잡으러 가?"
+    },
+    {
+     "id": "a_guard",
+     "name": "바위",
+     "role": "마을 경비병",
+     "personality": "성실하지만 겁이 많다. 밤 순찰을 무서워한다.",
+     "greeting": "이, 이상 없음! …정말 없겠죠?"
+    },
+    {
+     "id": "a_farmer",
+     "name": "보리",
+     "role": "농부",
+     "personality": "느긋하고 사람 좋다. 허수아비를 자식처럼 아낀다.",
+     "greeting": "올해 호박은 크게 컸는데 허수아비가 영 이상해."
+    },
+    {
+     "id": "a_herb",
+     "name": "소담",
+     "role": "약초꾼",
+     "personality": "조용하고 꼼꼼하다. 약초 이름을 틀리면 바로 고쳐 준다.",
+     "greeting": "독버섯이랑 식용 버섯은 갓 무늬로 구별해요."
+    },
+    {
+     "id": "a_bard",
+     "name": "가락",
+     "role": "떠돌이 음유시인",
+     "personality": "자유분방. 소문을 노래로 퍼뜨린다.",
+     "greeting": "바람이 전하길, 동쪽 사막에 황금 전갈이 산다지!"
+    }
+   ],
+   "quests": [
+    {
+     "id": "A1",
+     "giver": "a_farmer",
+     "title": "밭을 망치는 뿔토끼",
+     "type": "사냥",
+     "story": "뿔토끼 떼가 밤마다 당근밭을 뚫고 지나간다. 보리는 울타리를 고칠 시간이 필요하다.",
+     "objective": "시작의 숲 입구 화면 1~2에서 뿔토끼 6마리 처치",
+     "reward": "금화 60 + 회복약 2"
+    },
+    {
+     "id": "A2",
+     "giver": "a_herb",
+     "title": "약초 꾸러미 배달",
+     "type": "배달",
+     "story": "소담이 말린 약초를 강변 마을 방앗간에 보내야 하는데 길에 말벌이 많다.",
+     "objective": "약초 꾸러미를 B 강변 물레방아 마을의 방앗간 주인 맷돌에게 전달 (도중 말벌 출몰)",
+     "reward": "금화 80 + 해독초 3"
+    },
+    {
+     "id": "A3",
+     "giver": "a_kid",
+     "title": "도토리의 보물지도",
+     "type": "숨은 물건 찾기",
+     "story": "도토리가 그린 엉터리 보물지도. 표시 세 곳에 장난감을 숨겨 두었다고 한다.",
+     "objective": "마을 안 세 곳(대장간 뒤 빗물통 옆, 촌장집 울타리, 분수 꽃밭)에서 나무 장난감 3개 찾기",
+     "reward": "하트 조각 1"
+    },
+    {
+     "id": "A4",
+     "giver": "a_guard",
+     "title": "겁쟁이 경비병의 순찰",
+     "type": "호위",
+     "story": "바위가 숲 입구 감시탑까지 순찰을 가야 하는데 혼자 못 가겠다고 한다.",
+     "objective": "바위를 시작의 숲 감시탑까지 호위 (독버섯·말벌 습격, 바위 체력 0이 되면 실패)",
+     "reward": "강화 재료 「거친 수정 원석」 1 + 금화 100"
+    },
+    {
+     "id": "A5",
+     "giver": "a_farmer",
+     "title": "허수아비의 밤 ①~③",
+     "type": "연계",
+     "story": "보리의 허수아비가 밤마다 움직인다. 알고 보니 숲의 호박 허수아비들이 섞여 들어온 것.",
+     "objective": "① 밭에서 호박 허수아비 3마리 처치 → ② 허수아비 속 쪽지를 음유시인 가락에게 전달 → ③ 쪽지가 가리킨 숲 공터에서 챔피언 「거대 왕멧돼지 돌엄니」 처치",
+     "reward": "금화 300 + 외형 「밀짚 농부 의상」",
+     "chain": [
+      "호박 허수아비 3",
+      "쪽지 전달",
+      "돌엄니 처치"
+     ]
+    },
+    {
+     "id": "A6",
+     "giver": "a_granny",
+     "title": "분수 밑의 반짝임",
+     "type": "잠수",
+     "story": "물결 할머니는 어릴 적 분수에 진주를 떨어뜨렸다고 한다. 잠수를 배우면 다시 와 달라고.",
+     "objective": "5지역 보스 후(잠수 습득) 광장 분수에 잠수해 생명의 진주를 찾고 할머니에게 보여 주기",
+     "reward": "외형 「물방울 무늬 망토」 (진주는 주인공이 가짐)",
+     "requires": "잠수(5지역 크라켄 격파)"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion",
+      "price": 20
+     },
+     {
+      "item": "antidote",
+      "price": 15
+     },
+     {
+      "item": "spirit",
+      "price": 30
+     },
+     {
+      "item": "torch",
+      "price": 10
+     },
+     {
+      "item": "feather",
+      "price": 50
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_iron_trainee",
+      "price": 120
+     },
+     {
+      "item": "w_bronze_long",
+      "price": 280
+     },
+     {
+      "item": "b_cloth_tunic",
+      "price": 80
+     },
+     {
+      "item": "h_leather_hood",
+      "price": 60
+     },
+     {
+      "item": "a_wood_round",
+      "price": 100
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_sky",
+      "price": 50
+     },
+     {
+      "item": "c_cape_green",
+      "price": 50
+     },
+     {
+      "item": "c_outfit_farmer",
+      "price": 150
+     },
+     {
+      "item": "c_hair_ribbon",
+      "price": 40
+     }
+    ]
+   }
+  },
+  {
+   "id": "B",
+   "name": "강변 물레방아 마을",
+   "subtitle": "",
+   "map_xy_1024": [
+    270,
+    285
+   ],
+   "theme": "강 위에 떠 있는 듯한 수상 마을. 커다란 물레방아와 방앗간, 나무다리, 낚시꾼들. 강물을 따라 서쪽 광산과 남쪽 바다로 이어진다.",
+   "connects": {
+    "areas": [
+     1
+    ],
+    "towns": [
+     "A",
+     "H",
+     "C"
+    ]
+   },
+   "arrival": "1지역 시작의 숲 보스(이끼 수정 골렘) 격파 후. 서쪽 광산 마을 H와 2지역 수정 동굴로 가는 관문.",
+   "enhance_max": 3,
+   "npcs": [
+    {
+     "id": "b_miller",
+     "name": "맷돌",
+     "role": "방앗간 주인",
+     "personality": "허허 웃는 호인. 물레방아 소리로 날씨를 맞힌다.",
+     "greeting": "물레가 빨리 돌면 비가 온다네. 오늘은 맑음!"
+    },
+    {
+     "id": "b_tool",
+     "name": "조약돌",
+     "role": "도구상점 「강돌 잡화」 주인",
+     "personality": "꼼꼼하고 절약 정신이 강하다. 거스름돈을 1전까지 센다.",
+     "greeting": "물에 빠져도 안 젖는 포장! 우리 가게만 해요.",
+     "shop": "tool"
+    },
+    {
+     "id": "b_smith",
+     "name": "담금",
+     "role": "무기상점 겸 대장장이 (강화 +3까지)",
+     "personality": "강철 담금질에 집착하는 젊은 대장장이. 강물로 식힌 검을 자랑한다.",
+     "greeting": "강물에 담근 검은 쉽게 안 무뎌져. 진짜야.",
+     "shop": "weapon"
+    },
+    {
+     "id": "b_dyer",
+     "name": "쪽빛",
+     "role": "외형상점 「강물 염색방」 주인",
+     "personality": "차분한 염색 장인. 천을 강물에 헹구며 노래한다.",
+     "greeting": "강물 색 그대로 물들인 망토, 한번 걸쳐 볼래요?",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "b_fisher",
+     "name": "낚싯대 영감",
+     "role": "낚시꾼",
+     "personality": "말수 적고 끈기 있다. 큰 물고기 이야기는 늘 과장.",
+     "greeting": "쉿… 물고기 도망간다."
+    },
+    {
+     "id": "b_ferry",
+     "name": "노을",
+     "role": "나룻배 사공",
+     "personality": "쾌활하고 노래를 잘한다. 강 구석구석을 안다.",
+     "greeting": "어디든 강 따라라면 데려다줄게!"
+    },
+    {
+     "id": "b_widow",
+     "name": "버들",
+     "role": "빨래터 아주머니",
+     "personality": "참견쟁이지만 정이 많다. 마을 소문의 원천.",
+     "greeting": "어머, 새 얼굴이네! 숲에서 왔어? 골렘 잡았다며?"
+    },
+    {
+     "id": "b_twins",
+     "name": "물총·물방울",
+     "role": "쌍둥이 남매",
+     "personality": "경쟁심 강한 남매. 무엇이든 내기를 건다.",
+     "greeting": "누가 더 빨리 다리 끝까지 가나 내기할래?"
+    },
+    {
+     "id": "b_scholar",
+     "name": "책벌레 연",
+     "role": "떠돌이 학자",
+     "personality": "조심스럽고 박식하다. 수정 동굴을 연구 중.",
+     "greeting": "동굴 수정이 빛을 반사하는 원리를 아시나요?"
+    },
+    {
+     "id": "b_mayor",
+     "name": "물레 촌장",
+     "role": "마을 대표",
+     "personality": "실리적이고 계산이 빠르다. 다리 보수 예산 걱정뿐.",
+     "greeting": "다리 하나 고치는 데 금화가 얼마나 드는지 아나?"
+    }
+   ],
+   "quests": [
+    {
+     "id": "B1",
+     "giver": "b_miller",
+     "title": "물레방아를 멈춘 범인",
+     "type": "사냥",
+     "story": "물레방아 바퀴에 숲 슬라임이 끼어 분열하며 바퀴를 막았다.",
+     "objective": "방앗간 수로에서 숲 슬라임 8마리 처치 (분열체 포함)",
+     "reward": "금화 90 + 회복약 3"
+    },
+    {
+     "id": "B2",
+     "giver": "b_ferry",
+     "title": "노을의 첫 손님",
+     "type": "호위",
+     "story": "상인 아저씨를 태운 나룻배가 강 하류에서 도토리 다람쥐의 열매 세례를 받는다.",
+     "objective": "나룻배 위에서 상인을 지키며 하류 선착장까지 (도토리 다람쥐 10마리 출현, 배 체력 0이면 실패)",
+     "reward": "금화 120 + 외형 「뱃사공 밀짚모자」"
+    },
+    {
+     "id": "B3",
+     "giver": "b_scholar",
+     "title": "동굴로 보내는 편지",
+     "type": "배달",
+     "story": "연은 광산 마을 H의 측량사에게 수정 동굴 지도를 부탁하고 싶다.",
+     "objective": "연의 편지를 H 서쪽 광산 마을의 측량사 다림에게 전달하고 답장 받아오기",
+     "reward": "「거친 수정 원석」 2"
+    },
+    {
+     "id": "B4",
+     "giver": "b_twins",
+     "title": "쌍둥이의 내기",
+     "type": "숨은 물건 찾기",
+     "story": "쌍둥이가 마을 곳곳에 조개 5개를 숨기고 누가 먼저 찾나 내기를 걸었다.",
+     "objective": "마을 안 숨은 조개 5개 찾기 (다리 밑, 빨래터, 물레방아 뒤, 나룻배, 낚시터)",
+     "reward": "하트 조각 1"
+    },
+    {
+     "id": "B5",
+     "giver": "b_fisher",
+     "title": "전설의 강 잉어 ①~③",
+     "type": "연계",
+     "story": "낚싯대 영감은 평생 놓친 「황금 잉어」를 아직 꿈꾼다.",
+     "objective": "① 시작의 숲 「폭포 아래 웅덩이」에서 미끼용 반딧불 이끼 채집 → ② 영감에게 전달 → ③ 잠수 습득 후 폭포 아래 웅덩이에 잠수해 황금 잉어 비늘 찾기",
+     "reward": "금화 400 + 무기 「갈대잎 검」 (상점가 480)",
+     "requires": "③단계는 잠수 필요",
+     "chain": [
+      "이끼 채집",
+      "전달",
+      "잠수"
+     ]
+    },
+    {
+     "id": "B6",
+     "giver": "b_mayor",
+     "title": "다리 보수 자재",
+     "type": "배달",
+     "story": "강을 건너는 큰 다리가 낡았다. 시작의 숲 나무 정령 새싹이 떨어뜨리는 단단한 나뭇가지가 필요하다.",
+     "objective": "나무 정령 새싹을 쓰러뜨려 단단한 가지 5개 모아 촌장에게 전달",
+     "reward": "금화 150 + 귀환의 깃털 2"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion",
+      "price": 20
+     },
+     {
+      "item": "potion_m",
+      "price": 60
+     },
+     {
+      "item": "spirit",
+      "price": 30
+     },
+     {
+      "item": "antidote",
+      "price": 15
+     },
+     {
+      "item": "feather",
+      "price": 50
+     },
+     {
+      "item": "smoke",
+      "price": 40
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_mill_steel",
+      "price": 520
+     },
+     {
+      "item": "w_reed_leaf",
+      "price": 480
+     },
+     {
+      "item": "b_quilted",
+      "price": 260
+     },
+     {
+      "item": "h_steel_circlet",
+      "price": 200
+     },
+     {
+      "item": "a_leather_bracer",
+      "price": 240
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_river",
+      "price": 80
+     },
+     {
+      "item": "c_hat_boatman",
+      "price": 120
+     },
+     {
+      "item": "c_outfit_fisher",
+      "price": 200
+     },
+     {
+      "item": "c_trail_water",
+      "price": 150
+     }
+    ]
+   }
+  },
+  {
+   "id": "H",
+   "name": "서쪽 광산 마을",
+   "subtitle": "(신규, 지도에 H 표시)",
+   "map_xy_1024": [
+    95,
+    330
+   ],
+   "theme": "수정 동굴 아래 절벽 틈에 자리한 광부들의 마을. 광차 레일, 램프 불빛, 곡괭이 소리. 동굴에서 캐낸 수정 원석 거래의 중심.",
+   "connects": {
+    "areas": [
+     1,
+     2
+    ],
+    "towns": [
+     "B"
+    ]
+   },
+   "arrival": "1지역 클리어 후 B를 거쳐 도착. 2지역 수정 동굴 진입 직전 거점.",
+   "enhance_max": 3,
+   "npcs": [
+    {
+     "id": "h_foreman",
+     "name": "곡괭이 반장 무쇠",
+     "role": "광산 반장",
+     "personality": "호탕하고 목소리가 크다. 부하를 끔찍이 아낀다.",
+     "greeting": "하하! 동굴 들어갈 거면 헬멧부터 써라!"
+    },
+    {
+     "id": "h_tool",
+     "name": "등잔",
+     "role": "도구상점 「램프와 밧줄」 주인",
+     "personality": "신중하고 걱정이 많다. 횃불을 꼭 두 개씩 권한다.",
+     "greeting": "동굴은 생각보다 어두워요. 횃불, 두 개요.",
+     "shop": "tool"
+    },
+    {
+     "id": "h_smith",
+     "name": "불꽃 망치 단단",
+     "role": "무기상점 겸 대장장이 (강화 +3까지)",
+     "personality": "과묵하지만 수정 가공 실력은 최고.",
+     "greeting": "수정을 검에 박으면… 빛이 달라지지.",
+     "shop": "weapon"
+    },
+    {
+     "id": "h_jeweler",
+     "name": "반짝이",
+     "role": "외형상점 「원석 공방」 주인",
+     "personality": "허영심 있지만 미적 감각은 진짜. 반짝이는 건 다 좋아한다.",
+     "greeting": "망토에 수정 단추 하나만 달아도 격이 달라져요!",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "h_surveyor",
+     "name": "다림",
+     "role": "측량사",
+     "personality": "논리적이고 지도에 집착한다. 틀린 지도를 못 참는다.",
+     "greeting": "동굴 지도 3층부터가 틀렸어요. 누가 그린 거야."
+    },
+    {
+     "id": "h_widow",
+     "name": "숯검정 할매",
+     "role": "광부 식당 주인",
+     "personality": "욕쟁이지만 음식은 푸짐하다.",
+     "greeting": "배고프면 동굴에서 쓰러진다! 먹고 가!"
+    },
+    {
+     "id": "h_boy",
+     "name": "광차",
+     "role": "견습 광부 소년",
+     "personality": "용감한 척하지만 박쥐를 무서워한다.",
+     "greeting": "나도 언젠간 동굴 맨 끝까지 갈 거야… 박쥐만 없으면."
+    },
+    {
+     "id": "h_old",
+     "name": "은퇴 광부 돌쇠",
+     "role": "은퇴한 광부",
+     "personality": "말이 느리지만 동굴 지름길을 안다.",
+     "greeting": "막다른 길… 거기 물소리 들리지? 거기가…"
+    },
+    {
+     "id": "h_guard",
+     "name": "철모",
+     "role": "광산 입구 경비",
+     "personality": "규칙에 철저하다. 통행증 없인 아무도 못 지나간다.",
+     "greeting": "통행증. …아, 반장님이 보냈다고? 들어가."
+    },
+    {
+     "id": "h_mystic",
+     "name": "보랏빛 점술가 운",
+     "role": "점술가",
+     "personality": "몽환적이고 수수께끼처럼 말한다.",
+     "greeting": "당신의 검에… 수정빛이 깃들 운명이 보여요."
+    }
+   ],
+   "quests": [
+    {
+     "id": "H1",
+     "giver": "h_foreman",
+     "title": "갱도의 박쥐 떼",
+     "type": "사냥",
+     "story": "2번 갱도에 박쥐가 무리 지어 광부들의 피를 빨고 있다.",
+     "objective": "수정 동굴 화면 1~3에서 박쥐 12마리 처치",
+     "reward": "금화 150 + 회복약 3"
+    },
+    {
+     "id": "H2",
+     "giver": "h_boy",
+     "title": "겁쟁이 광차의 첫 출근",
+     "type": "호위",
+     "story": "광차가 처음으로 갱도에 들어가는 날. 반장 몰래 따라가 달라고 부탁한다.",
+     "objective": "광차를 동굴 화면 2의 채굴장까지 호위 (동굴 거미·동굴 두더지 기습)",
+     "reward": "외형 「견습 광부 두건」 + 금화 100"
+    },
+    {
+     "id": "H3",
+     "giver": "h_surveyor",
+     "title": "틀린 지도 바로잡기",
+     "type": "숨은 물건 찾기",
+     "story": "다림은 동굴 안에 옛 측량 표지 3개가 숨어 있다고 확신한다.",
+     "objective": "수정 동굴에서 반딧불 지렁이가 비추는 곳에 숨은 측량 표지 3개 찾기 (횃불 끄면 보임)",
+     "reward": "하트 조각 1 + 금화 120"
+    },
+    {
+     "id": "H4",
+     "giver": "h_widow",
+     "title": "할매의 도시락 배달",
+     "type": "배달",
+     "story": "동굴 깊은 곳에서 고립된 광부들에게 도시락을 날라야 한다. 식기 전에!",
+     "objective": "제한 시간 4분 안에 도시락을 동굴 화면 4의 광부 3명에게 전달",
+     "reward": "중급 회복약 3"
+    },
+    {
+     "id": "H5",
+     "giver": "h_foreman",
+     "title": "도깨비 대장의 폭탄 수레 ①~③",
+     "type": "연계",
+     "story": "누군가 광산 레일에 폭탄 수레를 굴려 보낸다. 범인은 광부 도깨비 대장.",
+     "objective": "① 곡괭이 바위도깨비 6마리 처치해 폭탄 도면 조각 확보 → ② 도면을 대장장이 단단에게 보여 해제법 듣기 → ③ 챔피언 「광부 도깨비 대장」 처치",
+     "reward": "금화 350 + 「거친 수정 원석」 3",
+     "chain": [
+      "도깨비 6",
+      "도면 해석",
+      "챔피언 처치"
+     ]
+    },
+    {
+     "id": "H6",
+     "giver": "h_old",
+     "title": "막다른 길의 물소리",
+     "type": "잠수",
+     "story": "돌쇠는 동굴 막다른 길 아래 지하수에 옛 동료가 잃어버린 주머니가 있다고 한다.",
+     "objective": "잠수 습득 후 수정 동굴 「막다른 길 지하수」에 잠수해 금화 주머니(대) 회수 → 돌쇠에게 보고",
+     "reward": "외형 「수정 단추 망토 장식」 (주머니 금화는 주인공 몫)",
+     "requires": "잠수"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_m",
+      "price": 60
+     },
+     {
+      "item": "torch",
+      "price": 10
+     },
+     {
+      "item": "spirit",
+      "price": 30
+     },
+     {
+      "item": "bomb",
+      "price": 35
+     },
+     {
+      "item": "antidote",
+      "price": 15
+     },
+     {
+      "item": "feather",
+      "price": 50
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_crystal_edge",
+      "price": 780
+     },
+     {
+      "item": "w_miner_broad",
+      "price": 860
+     },
+     {
+      "item": "b_miner_vest",
+      "price": 540
+     },
+     {
+      "item": "h_miner_helmet",
+      "price": 380
+     },
+     {
+      "item": "a_ore_amulet",
+      "price": 600
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_hood_miner",
+      "price": 90
+     },
+     {
+      "item": "c_cape_crystal_btn",
+      "price": 180
+     },
+     {
+      "item": "c_cape_purple",
+      "price": 90
+     },
+     {
+      "item": "c_outfit_miner",
+      "price": 260
+     }
+    ]
+   }
+  },
+  {
+   "id": "G",
+   "name": "사막 바자르",
+   "subtitle": "",
+   "map_xy_1024": [
+    760,
+    195
+   ],
+   "theme": "오아시스를 둘러싼 천막 시장. 향신료 냄새와 낙타 방울 소리, 흥정하는 상인들. 사막과 피라미드 원정의 보급지.",
+   "connects": {
+    "areas": [
+     3,
+     4
+    ],
+    "towns": [
+     "A",
+     "E"
+    ]
+   },
+   "arrival": "2지역 수정 동굴 보스 격파 후. 3지역 모래 사막과 4지역 피라미드의 거점.",
+   "enhance_max": 6,
+   "npcs": [
+    {
+     "id": "g_sultan",
+     "name": "바자르장 하심",
+     "role": "시장 총괄",
+     "personality": "능글맞은 협상가. 모든 걸 거래로 본다.",
+     "greeting": "친구! 사막에선 물 한 모금도 거래라네."
+    },
+    {
+     "id": "g_tool",
+     "name": "사프란",
+     "role": "도구상점 「오아시스 잡화」 주인",
+     "personality": "친절하지만 바가지 직전까지 가격을 부른다.",
+     "greeting": "물주머니 없이 사막 가면… 큰일 나요, 진짜로.",
+     "shop": "tool"
+    },
+    {
+     "id": "g_smith",
+     "name": "칼림",
+     "role": "무기상점 겸 대장장이 (강화 +6까지)",
+     "personality": "자부심 강한 곡도 장인. 직검을 약간 무시한다.",
+     "greeting": "곧은 검? 사막 바람은 휘어진 날을 좋아하지.",
+     "shop": "weapon"
+    },
+    {
+     "id": "g_tailor",
+     "name": "자스민",
+     "role": "외형상점 「비단 천막」 주인",
+     "personality": "우아하고 사교적. 손님 체형을 한눈에 맞힌다.",
+     "greeting": "이 비단 망토, 바람에 날리면 노을처럼 보여요.",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "g_camel",
+     "name": "낙타지기 우드",
+     "role": "낙타 상인",
+     "personality": "느릿느릿하지만 길눈이 밝다.",
+     "greeting": "낙타는 거짓말을 안 해. 물 있는 곳을 안다네."
+    },
+    {
+     "id": "g_thief",
+     "name": "모래쥐",
+     "role": "소매치기 소녀",
+     "personality": "날렵하고 냉소적. 사실 고아들을 먹여 살린다.",
+     "greeting": "지갑 조심해. …농담이야, 아마도."
+    },
+    {
+     "id": "g_archaeo",
+     "name": "고고학자 레일라",
+     "role": "피라미드 연구자",
+     "personality": "열정적이고 무모하다. 저주 따윈 믿지 않는다.",
+     "greeting": "저주? 그건 학문적 근거가 없어요! …아마도."
+    },
+    {
+     "id": "g_dancer",
+     "name": "방울",
+     "role": "무희",
+     "personality": "명랑하고 소문에 밝다.",
+     "greeting": "오늘 밤 오아시스 축제에 와요! 노래도 있어요!"
+    },
+    {
+     "id": "g_guard",
+     "name": "창잡이 파루크",
+     "role": "바자르 경비대장",
+     "personality": "엄격하지만 공정하다. 사막 도적을 원수로 여긴다.",
+     "greeting": "도적 두목의 목에 걸린 현상금, 아직 유효하다."
+    },
+    {
+     "id": "g_oracle",
+     "name": "눈먼 예언자 사바",
+     "role": "예언자",
+     "personality": "차분하고 무게 있다. 앞을 못 보지만 모든 걸 안다.",
+     "greeting": "모래가 속삭이는구나… 땅속의 큰 벌레가 깨어났다고."
+    }
+   ],
+   "quests": [
+    {
+     "id": "G1",
+     "giver": "g_guard",
+     "title": "사막 도적 소탕",
+     "type": "사냥",
+     "story": "바자르로 오는 대상(隊商)이 사막 도적에게 습격당하고 있다.",
+     "objective": "모래 사막에서 사막 도적 10마리 처치 + 챔피언 「사막 도적 두목」 처치",
+     "reward": "금화 500 + 「사막 태양석」 2"
+    },
+    {
+     "id": "G2",
+     "giver": "g_camel",
+     "title": "길 잃은 낙타 대상",
+     "type": "호위",
+     "story": "우드의 낙타 대상이 모래폭풍 속에 길을 잃었다.",
+     "objective": "낙타 3마리를 오아시스까지 호위 (개미귀신 함정, 대머리 독수리 급강하 주의; 낙타 1마리 이상 생존)",
+     "reward": "금화 300 + 외형 「낙타 방울 망토 장식」"
+    },
+    {
+     "id": "G3",
+     "giver": "g_archaeo",
+     "title": "레일라의 탁본",
+     "type": "숨은 물건 찾기",
+     "story": "피라미드 벽화 탁본 4장이 필요하다. 벽화는 뱀 머리 석상이 지키는 방에 숨어 있다.",
+     "objective": "피라미드에서 숨은 벽화 4곳 찾아 탁본 (뱀 머리 석상의 석화 시선 피하기)",
+     "reward": "하트 조각 1 + 금화 250"
+    },
+    {
+     "id": "G4",
+     "giver": "g_thief",
+     "title": "모래쥐의 부탁",
+     "type": "배달",
+     "story": "모래쥐가 몰래 모은 식량 자루를 사막 외곽 고아들의 움막에 전해 달라고 한다. 경비대장에겐 비밀.",
+     "objective": "식량 자루를 경비에게 들키지 않고 사막 화면 3의 움막까지 전달 (사막 도적 매복)",
+     "reward": "외형 「모래쥐 스카프」 + 연막 구슬 3"
+    },
+    {
+     "id": "G5",
+     "giver": "g_oracle",
+     "title": "오아시스 밑바닥의 빛",
+     "type": "잠수",
+     "story": "사바는 오아시스 밑에서 생명의 빛이 잠들어 있다고 말한다.",
+     "objective": "잠수 습득 후 모래 사막 「오아시스」에 잠수해 생명의 진주를 찾고 사바에게 보고",
+     "reward": "외형 「별빛 터번」",
+     "requires": "잠수"
+    },
+    {
+     "id": "G6",
+     "giver": "g_archaeo",
+     "title": "태양침의 독 ①~③",
+     "type": "연계",
+     "story": "레일라가 황금 전갈의 독에 쏘였다. 해독제엔 그 전갈의 독주머니가 필요하다.",
+     "objective": "① 전갈 8마리의 꼬리 수집 → ② 도구상 사프란에게 가져가 해독 기초약 제조 → ③ 챔피언 「황금 전갈 태양침」 처치해 독주머니 확보 후 레일라에게",
+     "reward": "금화 600 + 액세서리 「사막 질주 장화」",
+     "chain": [
+      "전갈 꼬리 8",
+      "해독약 제조",
+      "태양침 처치"
+     ]
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_m",
+      "price": 60
+     },
+     {
+      "item": "water_skin",
+      "price": 25
+     },
+     {
+      "item": "antidote",
+      "price": 15
+     },
+     {
+      "item": "spirit_hi",
+      "price": 120
+     },
+     {
+      "item": "smoke",
+      "price": 40
+     },
+     {
+      "item": "feather",
+      "price": 50
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_desert_crescent",
+      "price": 1200
+     },
+     {
+      "item": "w_sun_sigil",
+      "price": 1350
+     },
+     {
+      "item": "b_desert_silk",
+      "price": 900
+     },
+     {
+      "item": "h_turban",
+      "price": 700
+     },
+     {
+      "item": "a_dune_boots",
+      "price": 950
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_sunset",
+      "price": 150
+     },
+     {
+      "item": "c_turban_star",
+      "price": 200
+     },
+     {
+      "item": "c_outfit_desert",
+      "price": 320
+     },
+     {
+      "item": "c_trail_gold",
+      "price": 250
+     }
+    ]
+   }
+  },
+  {
+   "id": "F",
+   "name": "남쪽 항구 마을",
+   "subtitle": "",
+   "map_xy_1024": [
+    610,
+    430
+   ],
+   "theme": "나무 부두와 등대, 갈매기가 우는 항구. 어부와 선원, 해적 소문이 오가는 곳. 바다(5지역)로 나가는 배가 여기서 출항한다.",
+   "connects": {
+    "areas": [
+     5,
+     6
+    ],
+    "towns": [
+     "A"
+    ]
+   },
+   "arrival": "4지역 피라미드 보스 격파 후. 배를 타고 5지역 산호 바다로, 해안길로 6지역 해안 절벽으로.",
+   "enhance_max": 6,
+   "npcs": [
+    {
+     "id": "f_harbor",
+     "name": "항구장 닻별",
+     "role": "항구 관리자",
+     "personality": "깐깐하지만 바다를 사랑한다. 출항 허가는 그녀 손에.",
+     "greeting": "출항 허가? 크라켄 소문 들었지? 그래도 갈 거야?"
+    },
+    {
+     "id": "f_tool",
+     "name": "소금이",
+     "role": "도구상점 「소금 바람 상회」 주인",
+     "personality": "유쾌하고 장난기 많다. 생선 농담을 좋아한다.",
+     "greeting": "잠수 기름 있어요! 물고기처럼 숨 오래 참기!",
+     "shop": "tool"
+    },
+    {
+     "id": "f_smith",
+     "name": "조선공 너울",
+     "role": "무기상점 겸 대장장이 (강화 +6까지)",
+     "personality": "배 만들던 장인. 무기도 배처럼 튼튼하게.",
+     "greeting": "배 용골처럼 단단하게 두드렸지. 안 부러져.",
+     "shop": "weapon"
+    },
+    {
+     "id": "f_tailor",
+     "name": "진주",
+     "role": "외형상점 「파도 옷방」 주인",
+     "personality": "몽상가. 인어 전설에 푹 빠져 있다.",
+     "greeting": "인어 비늘 같은 망토, 본 적 있어요? 여기 있어요!",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "f_captain",
+     "name": "외눈 선장 거북",
+     "role": "은퇴한 선장",
+     "personality": "무서운 얼굴과 달리 다정하다. 유령 해적과 악연.",
+     "greeting": "그 유령선… 내 옛 배였지."
+    },
+    {
+     "id": "f_keeper",
+     "name": "등대지기 빛나",
+     "role": "등대지기",
+     "personality": "외로움을 타지만 성실하다. 밤마다 바다를 지켜본다.",
+     "greeting": "등불이 꺼지면 배들이 길을 잃어. 그래서 난 안 자."
+    },
+    {
+     "id": "f_diver",
+     "name": "해녀 숨비",
+     "role": "해녀",
+     "personality": "당차고 숨이 길다. 잠수를 가르쳐 줄 수 있다고 큰소리.",
+     "greeting": "물속은 조용해서 좋아. 너도 곧 알게 될걸."
+    },
+    {
+     "id": "f_cook",
+     "name": "생선구이 장",
+     "role": "부두 식당 주인",
+     "personality": "시끄럽고 친절하다.",
+     "greeting": "갓 잡은 생선! 먹고 힘내서 크라켄 잡아!"
+    },
+    {
+     "id": "f_kid",
+     "name": "갈매기 소녀 끼룩",
+     "role": "부두 아이",
+     "personality": "호기심 많다. 갈매기에게 물건을 자주 뺏긴다.",
+     "greeting": "갈매기가 또 내 리본을 가져갔어!"
+    },
+    {
+     "id": "f_merchant",
+     "name": "밀수꾼 그림자",
+     "role": "수상한 상인",
+     "personality": "말을 돌리고 의뭉스럽다. 의외로 의리가 있다.",
+     "greeting": "…진짜 귀한 물건은 장부에 안 적지."
+    }
+   ],
+   "quests": [
+    {
+     "id": "F1",
+     "giver": "f_harbor",
+     "title": "항로의 해파리",
+     "type": "사냥",
+     "story": "출항 항로에 해파리가 떼로 몰려 배가 감전된다.",
+     "objective": "산호 바다 화면 1~2에서 해파리 10마리 + 전기 뱀장어 4마리 처치",
+     "reward": "금화 600 + 중급 회복약 3"
+    },
+    {
+     "id": "F2",
+     "giver": "f_kid",
+     "title": "갈매기 도둑",
+     "type": "숨은 물건 찾기",
+     "story": "갈매기들이 끼룩의 물건을 해안 절벽 둥지 곳곳에 숨겼다.",
+     "objective": "해안 절벽에서 갈매기 둥지 4곳을 찾아 리본·방울·구슬·편지 회수",
+     "reward": "하트 조각 1"
+    },
+    {
+     "id": "F3",
+     "giver": "f_keeper",
+     "title": "등대의 불씨",
+     "type": "배달",
+     "story": "등대 기름이 떨어져 간다. E 화산 기슭 마을의 불타는 기름이 필요하다.",
+     "objective": "E 대장장이 마을에서 「꺼지지 않는 기름」 받아와 등대지기에게 전달 (나중에 E 도착 후 완료 가능)",
+     "reward": "금화 500 + 외형 「등대지기 망토」",
+     "requires": "E 마을 방문"
+    },
+    {
+     "id": "F4",
+     "giver": "f_captain",
+     "title": "유령선의 저주 ①~③",
+     "type": "연계",
+     "story": "거북 선장은 자기 옛 배를 빼앗은 유령 해적 선장을 잠재우고 싶다.",
+     "objective": "① 해적 해골 10마리 처치해 낡은 항해일지 조각 확보 → ② 일지를 밀수꾼 그림자에게 해독 의뢰 → ③ 챔피언 「유령 해적 선장」 처치",
+     "reward": "금화 900 + 「심해 진주각」 3",
+     "chain": [
+      "해적 해골 10",
+      "일지 해독",
+      "유령 선장 처치"
+     ]
+    },
+    {
+     "id": "F5",
+     "giver": "f_diver",
+     "title": "숨비의 시험",
+     "type": "잠수",
+     "story": "숨비가 진짜 잠수부인지 시험하겠다고 한다.",
+     "objective": "잠수 습득 후 해안 절벽 「등대 아래 만」에 잠수해 해적 선장의 커틀러스(도감 장비) 회수 → 숨비에게 보여 주기",
+     "reward": "외형 「해녀 물안경」 + 잠수 기름 3",
+     "requires": "잠수"
+    },
+    {
+     "id": "F6",
+     "giver": "f_merchant",
+     "title": "밀수품 호송",
+     "type": "호위",
+     "story": "그림자의 짐수레를 해안 절벽 반대편 은신처까지 몰래 옮겨야 한다. 해적 앵무새가 소리로 적을 부른다.",
+     "objective": "짐수레를 해안 절벽 화면 4까지 호위 (해적 앵무새를 먼저 처치하면 적 증원 없음)",
+     "reward": "금화 700 + 행운의 숫돌 1"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_m",
+      "price": 60
+     },
+     {
+      "item": "potion_hi",
+      "price": 180
+     },
+     {
+      "item": "spirit_hi",
+      "price": 120
+     },
+     {
+      "item": "goggles_oil",
+      "price": 80
+     },
+     {
+      "item": "antidote",
+      "price": 15
+     },
+     {
+      "item": "feather",
+      "price": 50
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_wave_blade",
+      "price": 1700
+     },
+     {
+      "item": "w_anchor_great",
+      "price": 1850
+     },
+     {
+      "item": "b_scale_mail",
+      "price": 1400
+     },
+     {
+      "item": "h_nautilus",
+      "price": 1100
+     },
+     {
+      "item": "a_coral_buckler",
+      "price": 1300
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_mermaid",
+      "price": 220
+     },
+     {
+      "item": "c_goggles_diver",
+      "price": 160
+     },
+     {
+      "item": "c_outfit_sailor",
+      "price": 380
+     },
+     {
+      "item": "c_cape_keeper",
+      "price": 200
+     }
+    ]
+   }
+  },
+  {
+   "id": "E",
+   "name": "화산 기슭 대장장이 마을",
+   "subtitle": "",
+   "map_xy_1024": [
+    675,
+    120
+   ],
+   "theme": "화산 열기로 쇠를 녹이는 대장장이들의 마을. 굴뚝 연기와 망치 소리가 끊이지 않는다. 대륙 최고의 강화 장인이 산다.",
+   "connects": {
+    "areas": [
+     7
+    ],
+    "towns": [
+     "G",
+     "D"
+    ]
+   },
+   "arrival": "6지역 해안 절벽 보스 격파 후. 7지역 화산 성채로 가는 거점. 강화 +9까지 가능한 유일한 장인 마을(성공률 보너스).",
+   "enhance_max": 9,
+   "npcs": [
+    {
+     "id": "e_master",
+     "name": "대장장이 장인 불칼",
+     "role": "강화 장인 (강화 +9, 성공률 +5%p)",
+     "personality": "말수 적고 고집 세다. 실패한 강화도 끝까지 책임진다.",
+     "greeting": "검이 운다… 아직 더 강해지고 싶다고."
+    },
+    {
+     "id": "e_tool",
+     "name": "숯돌이",
+     "role": "도구상점 「불씨 잡화」 주인",
+     "personality": "덜렁대지만 화상 연고 제조는 최고.",
+     "greeting": "화상 연고는 두 통! 화산은 진짜 뜨거워요!",
+     "shop": "tool"
+    },
+    {
+     "id": "e_smith",
+     "name": "쇠메",
+     "role": "무기상점 주인 (불칼의 수제자)",
+     "personality": "열정 과다. 스승을 존경하면서도 이기고 싶어 한다.",
+     "greeting": "스승님 검보다 내 검이 더 날카롭다고! …아마.",
+     "shop": "weapon"
+    },
+    {
+     "id": "e_tailor",
+     "name": "잿빛 루비",
+     "role": "외형상점 「불꽃 옷감」 주인",
+     "personality": "도도하고 자신만만. 불에 안 타는 천을 짠다.",
+     "greeting": "불꽃 무늬 망토, 화산에서도 멀쩡해요.",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "e_miner",
+     "name": "유황 광부 노랑",
+     "role": "유황 채굴꾼",
+     "personality": "투덜대지만 손이 빠르다.",
+     "greeting": "유황 냄새? 익숙해지면 향기야."
+    },
+    {
+     "id": "e_chef",
+     "name": "용암 구이 화덕",
+     "role": "식당 주인",
+     "personality": "호쾌하고 매운 걸 좋아한다.",
+     "greeting": "용암석에 구운 고기, 맵다! 그래서 맛있다!"
+    },
+    {
+     "id": "e_knight",
+     "name": "떠돌이 기사 은갑",
+     "role": "몰락한 기사",
+     "personality": "과묵하고 비장하다. 흑기사와 인연이 있다.",
+     "greeting": "그 흑기사… 한때 나의 형제였다."
+    },
+    {
+     "id": "e_apprentice",
+     "name": "견습 풀무",
+     "role": "견습 대장장이 소녀",
+     "personality": "부지런하고 실수가 잦다.",
+     "greeting": "풀무질만 3년째예요… 언젠간 망치 들 거예요!"
+    },
+    {
+     "id": "e_monk",
+     "name": "화산 수도승 잿불",
+     "role": "수도승",
+     "personality": "명상적이고 차분하다. 불사조를 신성시한다.",
+     "greeting": "잿불 불사조는 재 속에서 다시 태어난다…"
+    },
+    {
+     "id": "e_trader",
+     "name": "광석상 금괴",
+     "role": "광석 상인",
+     "personality": "계산적이다. 강화 재료 시세를 꿰고 있다.",
+     "greeting": "화뢰 정수 시세가 또 올랐어. 챔피언 사냥꾼들 덕분이지."
+    }
+   ],
+   "quests": [
+    {
+     "id": "E1",
+     "giver": "e_miner",
+     "title": "유황 갱의 용암 슬라임",
+     "type": "사냥",
+     "story": "유황 갱도에 용암 슬라임이 불어나 분열하며 길을 막는다.",
+     "objective": "화산 성채 외곽 화면 1~3에서 용암 슬라임 15마리 처치 (분열체 포함)",
+     "reward": "금화 900 + 화상 연고 4"
+    },
+    {
+     "id": "E2",
+     "giver": "e_apprentice",
+     "title": "풀무의 첫 작품",
+     "type": "배달",
+     "story": "풀무가 처음 만든 단검을 F 항구 조선공 너울에게 평가받고 싶어 한다.",
+     "objective": "풀무의 단검을 F 남쪽 항구 마을 너울에게 전달하고 평가서 받아오기",
+     "reward": "금화 600 + 행운의 숫돌 1"
+    },
+    {
+     "id": "E3",
+     "giver": "e_master",
+     "title": "장인의 시험 ①~③",
+     "type": "연계",
+     "story": "불칼은 +7 이상 강화를 맡기기 전에 주인공의 각오를 시험한다.",
+     "objective": "① 용암 바위 골렘 5마리의 핵 수집 → ② 흑요석 궁수 8마리 처치 → ③ 챔피언 「용암 거인 수문장」 처치해 「화뢰 정수」를 직접 가져오기",
+     "reward": "수호의 부적 2 + 이후 E에서 강화 성공률 +5%p 상시 적용",
+     "chain": [
+      "골렘 핵 5",
+      "흑요석 궁수 8",
+      "용암 거인 처치"
+     ]
+    },
+    {
+     "id": "E4",
+     "giver": "e_knight",
+     "title": "형제의 검",
+     "type": "호위",
+     "story": "은갑이 흑기사의 성채 입구까지 가서 옛 맹세를 확인하려 한다.",
+     "objective": "은갑을 화산 성채 정문까지 호위 (화염 사냥개·저주받은 갑옷 습격)",
+     "reward": "금화 800 + 외형 「몰락한 기사의 검은 망토」"
+    },
+    {
+     "id": "E5",
+     "giver": "e_chef",
+     "title": "온천 밑의 보물",
+     "type": "잠수",
+     "story": "화덕은 화산 온천 바닥에 손님이 빠뜨린 약병이 있다고 한다.",
+     "objective": "잠수로 화산 성채 「온천」에 잠수해 고급 회복약 회수 → 화덕에게 보고",
+     "reward": "금화 500 + 하트 조각 1",
+     "requires": "잠수"
+    },
+    {
+     "id": "E6",
+     "giver": "e_monk",
+     "title": "잿불의 깃털",
+     "type": "숨은 물건 찾기",
+     "story": "잿불 불사조 새끼가 남긴 불타지 않는 깃털 3개가 성채 곳곳에 떨어져 있다.",
+     "objective": "화산 성채에서 숨은 불사조 깃털 3개 찾기 (용암 위 발판, 무너진 탑, 대장간 폐허)",
+     "reward": "외형 「불사조 깃털 머리장식」 + 상급 정령수 2"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_hi",
+      "price": 180
+     },
+     {
+      "item": "burn_salve",
+      "price": 30
+     },
+     {
+      "item": "spirit_hi",
+      "price": 120
+     },
+     {
+      "item": "elixir",
+      "price": 800
+     },
+     {
+      "item": "charm_guard",
+      "price": 1500
+     },
+     {
+      "item": "charm_luck",
+      "price": 600
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_obsidian",
+      "price": 2600
+     },
+     {
+      "item": "w_forge_great",
+      "price": 2900
+     },
+     {
+      "item": "b_black_plate",
+      "price": 2200
+     },
+     {
+      "item": "h_horned",
+      "price": 1700
+     },
+     {
+      "item": "a_flame_bracer",
+      "price": 2000
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_flame",
+      "price": 260
+     },
+     {
+      "item": "c_feather_phoenix",
+      "price": 300
+     },
+     {
+      "item": "c_outfit_smith",
+      "price": 420
+     },
+     {
+      "item": "c_trail_ember",
+      "price": 350
+     }
+    ]
+   }
+  },
+  {
+   "id": "C",
+   "name": "설산 산장 마을",
+   "subtitle": "",
+   "map_xy_1024": [
+    200,
+    175
+   ],
+   "theme": "눈 덮인 산자락의 통나무 산장 마을. 벽난로 연기, 썰매, 털옷 입은 사람들. 번개 치는 설산 탑과 어둠 신전이 가깝다.",
+   "connects": {
+    "areas": [
+     8,
+     9
+    ],
+    "towns": [
+     "B",
+     "D"
+    ]
+   },
+   "arrival": "7지역 화산 성채 보스 격파 후. 8지역 설산 뇌전 탑의 거점. (9지역 어둠 신전 입구도 가깝지만 D에서 출발)",
+   "enhance_max": 9,
+   "npcs": [
+    {
+     "id": "c_innkeeper",
+     "name": "산장지기 곰",
+     "role": "산장 주인",
+     "personality": "덩치 크고 온화하다. 따뜻한 수프를 공짜로 준다.",
+     "greeting": "춥지? 들어와, 수프 데워 놨다."
+    },
+    {
+     "id": "c_tool",
+     "name": "고드름",
+     "role": "도구상점 「눈꽃 잡화」 주인",
+     "personality": "차갑게 말하지만 속은 따뜻하다.",
+     "greeting": "해빙 연고. 안 사면 얼어요. 그게 다예요.",
+     "shop": "tool"
+    },
+    {
+     "id": "c_smith",
+     "name": "서리망치 혹한",
+     "role": "무기상점 겸 대장장이 (강화 +9까지)",
+     "personality": "말이 짧고 정확하다. 얼음 담금질의 대가.",
+     "greeting": "얼음물에 식힌 날은 쉽게 이가 안 나간다.",
+     "shop": "weapon"
+    },
+    {
+     "id": "c_tailor",
+     "name": "털실",
+     "role": "외형상점 「털실 뜨개방」 주인",
+     "personality": "수다스러운 할머니. 손주 이야기가 끝이 없다.",
+     "greeting": "우리 손주 목도리 짜다 남은 실로 망토 장식 해 줄까?",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "c_hunter",
+     "name": "늑대사냥꾼 송곳",
+     "role": "사냥꾼",
+     "personality": "냉정하고 실력 있다. 어미 설인을 쫓고 있다.",
+     "greeting": "발자국이 크다… 어미가 가까이 있다."
+    },
+    {
+     "id": "c_sled",
+     "name": "썰매꾼 쌩쌩",
+     "role": "썰매 배달부",
+     "personality": "성격 급하고 빠르다.",
+     "greeting": "썰매로 30초! 더 빠르면 공짜!"
+    },
+    {
+     "id": "c_scholar",
+     "name": "기상학자 번개",
+     "role": "기상 연구가",
+     "personality": "흥분하면 말이 빨라진다. 뇌운 연구에 미쳐 있다.",
+     "greeting": "저 탑 꼭대기 번개, 자연 현상이 아니에요!"
+    },
+    {
+     "id": "c_child",
+     "name": "눈사람 꼬마 하얀",
+     "role": "마을 아이",
+     "personality": "순수하고 외로움을 탄다.",
+     "greeting": "내 눈사람 친구가 밤에 사라졌어…"
+    },
+    {
+     "id": "c_priest",
+     "name": "성녀 설화",
+     "role": "눈의 신전 사제",
+     "personality": "온화하지만 어둠 신전에 대한 두려움을 숨긴다.",
+     "greeting": "어둠 신전의 종소리가… 요즘 다시 들려요."
+    },
+    {
+     "id": "c_penguin",
+     "name": "펭귄 집사 펭",
+     "role": "말하는 펭귄 (정령 계약자)",
+     "personality": "점잖고 격식을 따진다.",
+     "greeting": "어서 오십시오. 펭귄 기사단은 제 사촌들입니다만, 무례를 사과드리죠."
+    }
+   ],
+   "quests": [
+    {
+     "id": "C1",
+     "giver": "c_hunter",
+     "title": "늑대 무리 사냥",
+     "type": "사냥",
+     "story": "서리 늑대가 울부짖으며 무리를 모아 산장을 노린다.",
+     "objective": "설산 화면 1~3에서 서리 늑대 12마리 처치 (울부짖는 개체 우선)",
+     "reward": "금화 1100 + 해빙 연고 4"
+    },
+    {
+     "id": "C2",
+     "giver": "c_sled",
+     "title": "썰매 특급 배달",
+     "type": "배달",
+     "story": "쌩쌩의 썰매가 부서졌다. 산장의 약을 D 왕도 의원에게 대신 날라야 한다.",
+     "objective": "제한 시간 6분 안에 약 상자를 D 성벽 왕도의 의원에게 전달 (도중 얼음 거북 빙판)",
+     "reward": "금화 900 + 귀환의 깃털 3"
+    },
+    {
+     "id": "C3",
+     "giver": "c_child",
+     "title": "사라진 눈사람",
+     "type": "숨은 물건 찾기",
+     "story": "하얀의 눈사람이 사라졌다. 설인 새끼들이 눈덩이로 굴려 갔다는 소문.",
+     "objective": "설산에서 눈사람의 당근 코·단추 2개·목도리 4개 부품 찾기 → 하얀과 다시 만들기",
+     "reward": "하트 조각 1 + 외형 「눈사람 목도리」"
+    },
+    {
+     "id": "C4",
+     "giver": "c_scholar",
+     "title": "번개 측정기 설치",
+     "type": "호위",
+     "story": "번개가 탑 중턱에 측정기를 설치하러 간다. 뇌운 새가 번개를 떨어뜨린다.",
+     "objective": "번개를 설산 뇌전 탑 중턱 관측대까지 호위 (뇌운 새·폭풍 가고일)",
+     "reward": "금화 1200 + 상급 정령수 3"
+    },
+    {
+     "id": "C5",
+     "giver": "c_hunter",
+     "title": "어미 설인의 분노 ①~③",
+     "type": "연계",
+     "story": "송곳은 새끼를 잃은 어미 설인이 왜 미쳐 날뛰는지 알고 싶어 한다.",
+     "objective": "① 설인 새끼 4마리를 쓰러뜨리지 않고 「진정 열매」로 잠재우기 → ② 새끼들이 지키던 빙굴의 단서를 사제 설화에게 → ③ 챔피언 「어미 설인」 처치(또는 격퇴)",
+     "reward": "금화 1500 + 「화뢰 정수」 3",
+     "chain": [
+      "새끼 진정 4",
+      "단서 전달",
+      "어미 설인"
+     ]
+    },
+    {
+     "id": "C6",
+     "giver": "c_priest",
+     "title": "얼어붙은 호수의 서리 망토",
+     "type": "잠수",
+     "story": "설화는 얼어붙은 호수 밑에 옛 성녀의 망토가 잠들어 있다고 한다.",
+     "objective": "설산 「얼어붙은 호수 (얼음 깨진 곳)」에 잠수해 서리 망토 회수 → 설화에게 보여 주기",
+     "reward": "외형 「서리 성녀 망토」 + 액세서리 「서리 부적」",
+     "requires": "잠수"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_hi",
+      "price": 180
+     },
+     {
+      "item": "thaw",
+      "price": 30
+     },
+     {
+      "item": "spirit_hi",
+      "price": 120
+     },
+     {
+      "item": "elixir",
+      "price": 800
+     },
+     {
+      "item": "feather",
+      "price": 50
+     },
+     {
+      "item": "charm_luck",
+      "price": 650
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_frost_crystal",
+      "price": 3600
+     },
+     {
+      "item": "w_northwind",
+      "price": 3900
+     },
+     {
+      "item": "b_snow_fur",
+      "price": 3000
+     },
+     {
+      "item": "h_fur_helm",
+      "price": 2300
+     },
+     {
+      "item": "a_frost_amulet",
+      "price": 2800
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_scarf_snowman",
+      "price": 180
+     },
+     {
+      "item": "c_cape_frost",
+      "price": 300
+     },
+     {
+      "item": "c_outfit_winter",
+      "price": 460
+     },
+     {
+      "item": "c_trail_frost",
+      "price": 380
+     }
+    ]
+   }
+  },
+  {
+   "id": "D",
+   "name": "성벽 왕도",
+   "subtitle": "",
+   "map_xy_1024": [
+    455,
+    125
+   ],
+   "theme": "높은 성벽과 푸른 지붕 성이 있는 왕국의 수도. 기사단, 대성당, 큰 시장. 어둠 신전과 마룡의 둥지로 가는 마지막 관문.",
+   "connects": {
+    "areas": [
+     9,
+     10
+    ],
+    "towns": [
+     "A",
+     "C",
+     "E"
+    ]
+   },
+   "arrival": "8지역 설산 뇌전 탑 보스 격파 후 왕의 부름으로 입성. 9지역 어둠 신전, 최종 10지역 마룡의 둥지 출발지.",
+   "enhance_max": 9,
+   "npcs": [
+    {
+     "id": "d_king",
+     "name": "국왕 아르덴",
+     "role": "국왕",
+     "personality": "위엄 있지만 지쳐 있다. 마룡의 부활을 두려워한다.",
+     "greeting": "그대가 아홉 괴수의 힘을 모은 자인가."
+    },
+    {
+     "id": "d_tool",
+     "name": "왕실 약사 정향",
+     "role": "도구상점 「왕립 약방」 주인",
+     "personality": "깐깐하고 위생에 철저하다.",
+     "greeting": "유통기한 지난 약은 안 팔아요. 왕립이니까요.",
+     "shop": "tool"
+    },
+    {
+     "id": "d_smith",
+     "name": "왕실 무기고장 백련",
+     "role": "무기상점 겸 대장장이 (강화 +9까지)",
+     "personality": "엄격한 군인 출신. 장비 손질 상태로 사람을 판단한다.",
+     "greeting": "칼날에 녹이 있군. 기사라면 매일 닦아라.",
+     "shop": "weapon"
+    },
+    {
+     "id": "d_tailor",
+     "name": "궁정 의상가 비단결",
+     "role": "외형상점 「궁정 의상실」 주인",
+     "personality": "화려하고 과장된 말투.",
+     "greeting": "오오! 그 망토, 왕실 무도회엔 조금… 수수하군요!",
+     "shop": "cosmetic"
+    },
+    {
+     "id": "d_captain",
+     "name": "기사단장 레온",
+     "role": "기사단장",
+     "personality": "정의감 강하고 엄격하다. 실력을 인정하면 깍듯하다.",
+     "greeting": "실력을 보여라. 그럼 기사단 깃발을 내주지."
+    },
+    {
+     "id": "d_princess",
+     "name": "공주 세린",
+     "role": "공주",
+     "personality": "호기심 많고 몰래 성을 빠져나간다.",
+     "greeting": "쉿! 나 여기 있는 거 아무한테도 말하지 마!"
+    },
+    {
+     "id": "d_doctor",
+     "name": "의원 허준필",
+     "role": "왕도 의원",
+     "personality": "바쁘고 피곤하다. 환자를 진심으로 걱정한다.",
+     "greeting": "설산 산장에서 약 왔어? 고마워, 정말로."
+    },
+    {
+     "id": "d_archivist",
+     "name": "서고지기 먼지",
+     "role": "왕립 서고 관리인",
+     "personality": "은둔형, 책 먼지 알레르기.",
+     "greeting": "에취! 마룡 전설서는… 금서 구역에 있어요."
+    },
+    {
+     "id": "d_bishop",
+     "name": "대주교 루미엘",
+     "role": "대성당 대주교",
+     "personality": "온화하지만 어둠 신전의 공허 대사제와 과거가 있다.",
+     "greeting": "빛은 어둠이 있어야 비로소 보이는 법."
+    },
+    {
+     "id": "d_beggar",
+     "name": "거지 왕 넝마",
+     "role": "변장한 정보상",
+     "personality": "능청스럽고 모든 소문을 안다.",
+     "greeting": "동전 한 닢이면 비밀 하나. 싸지?"
+    }
+   ],
+   "quests": [
+    {
+     "id": "D1",
+     "giver": "d_captain",
+     "title": "기사단 입단 시험",
+     "type": "사냥",
+     "story": "레온은 어둠 신전 외곽의 해골 창병과 고블린을 정리하면 기사단 깃발을 주겠다고 한다.",
+     "objective": "어둠 신전 외곽 화면 1~3에서 해골 창병 10마리(재조립 포함) + 고블린 8마리 처치",
+     "reward": "외형 「왕국 기사단 망토」 + 금화 1500"
+    },
+    {
+     "id": "D2",
+     "giver": "d_princess",
+     "title": "공주의 가출",
+     "type": "호위",
+     "story": "세린이 몰래 성 밖 시장에 가고 싶어 한다. 들키면 큰일!",
+     "objective": "세린을 경비병 시야를 피해 왕도 남문 밖 꽃밭까지 호위 후 무사히 귀환 (도중 그림자 암살자 습격 이벤트)",
+     "reward": "하트 조각 1 + 외형 「공주의 리본 장식」"
+    },
+    {
+     "id": "D3",
+     "giver": "d_archivist",
+     "title": "금서 구역의 열쇠",
+     "type": "숨은 물건 찾기",
+     "story": "먼지가 금서 구역 열쇠 조각 3개를 잃어버렸다. 서고 어딘가에 흩어졌다.",
+     "objective": "왕립 서고에서 책장 퍼즐 없이 숨은 열쇠 조각 3개 찾기 (책 더미, 촛대 뒤, 지도 밑)",
+     "reward": "금화 1200 + 「공허 결정」 1"
+    },
+    {
+     "id": "D4",
+     "giver": "d_bishop",
+     "title": "대사제의 편지",
+     "type": "배달",
+     "story": "루미엘은 C 설산의 성녀 설화에게 어둠 신전 봉인에 관한 편지를 보내려 한다.",
+     "objective": "편지를 C 설산 산장 마을의 성녀 설화에게 전달하고 봉인 성수를 받아오기",
+     "reward": "상급 정령수 3 + 생명의 영약 1"
+    },
+    {
+     "id": "D5",
+     "giver": "d_beggar",
+     "title": "왕도의 그림자 ①~③",
+     "type": "연계",
+     "story": "넝마는 왕도에 그림자 쌍검사의 첩자가 숨어 있다고 귀띔한다.",
+     "objective": "① 왕도 밤거리에서 수상한 인물 3명 미행 → ② 단서를 기사단장 레온에게 보고 → ③ 어둠 신전에서 챔피언 「그림자 쌍검사」 처치",
+     "reward": "금화 2500 + 「공허 결정」 3",
+     "chain": [
+      "미행 3",
+      "레온 보고",
+      "그림자 쌍검사"
+     ]
+    },
+    {
+     "id": "D6",
+     "giver": "d_bishop",
+     "title": "성수반의 진주",
+     "type": "잠수",
+     "story": "대성당 지하와 이어진 어둠 신전 「성수반」에 옛 순례자의 진주가 가라앉아 있다.",
+     "objective": "어둠 신전 「성수반」에 잠수해 생명의 진주 회수 → 대주교에게 보고",
+     "reward": "외형 「대성당 순백 의상」",
+     "requires": "잠수"
+    }
+   ],
+   "shops": {
+    "tool": [
+     {
+      "item": "potion_hi",
+      "price": 180
+     },
+     {
+      "item": "spirit_hi",
+      "price": 120
+     },
+     {
+      "item": "elixir",
+      "price": 750
+     },
+     {
+      "item": "charm_guard",
+      "price": 1800
+     },
+     {
+      "item": "charm_luck",
+      "price": 600
+     },
+     {
+      "item": "feather",
+      "price": 50
+     }
+    ],
+    "weapon": [
+     {
+      "item": "w_royal_knight",
+      "price": 4800
+     },
+     {
+      "item": "w_mithril",
+      "price": 5600
+     },
+     {
+      "item": "b_mithril_plate",
+      "price": 4500
+     },
+     {
+      "item": "h_knight_plume",
+      "price": 3200
+     },
+     {
+      "item": "a_royal_kite",
+      "price": 3800
+     }
+    ],
+    "cosmetic": [
+     {
+      "item": "c_cape_royal",
+      "price": 400
+     },
+     {
+      "item": "c_outfit_noble",
+      "price": 600
+     },
+     {
+      "item": "c_cape_black_gold",
+      "price": 480
+     },
+     {
+      "item": "c_trail_rainbow",
+      "price": 700
+     }
+    ]
+   }
+  }
+ ],
+ "catalog": {
+  "tools": {
+   "potion": {
+    "name": "회복약",
+    "effect": "하트 2칸 회복"
+   },
+   "potion_m": {
+    "name": "중급 회복약",
+    "effect": "하트 4칸 회복"
+   },
+   "potion_hi": {
+    "name": "고급 회복약",
+    "effect": "하트 전부 회복"
+   },
+   "elixir": {
+    "name": "생명의 영약",
+    "effect": "쓰러질 때 자동으로 하트 절반 회복하며 부활"
+   },
+   "spirit": {
+    "name": "정령수",
+    "effect": "파란 게이지 3칸 회복"
+   },
+   "spirit_hi": {
+    "name": "상급 정령수",
+    "effect": "파란 게이지 전부 회복"
+   },
+   "antidote": {
+    "name": "해독초",
+    "effect": "독 해제 + 10초 독 면역"
+   },
+   "torch": {
+    "name": "횃불",
+    "effect": "어두운 맵에서 60초 시야 확대"
+   },
+   "feather": {
+    "name": "귀환의 깃털",
+    "effect": "마지막으로 들른 마을로 즉시 귀환"
+   },
+   "burn_salve": {
+    "name": "화상 연고",
+    "effect": "화상 해제 + 20초 화상 면역"
+   },
+   "thaw": {
+    "name": "해빙 연고",
+    "effect": "빙결 해제 + 20초 빙결 면역"
+   },
+   "water_skin": {
+    "name": "물주머니",
+    "effect": "사막 열사병 게이지 초기화"
+   },
+   "smoke": {
+    "name": "연막 구슬",
+    "effect": "주변 몬스터 3초 혼란"
+   },
+   "bomb": {
+    "name": "작은 폭탄",
+    "effect": "금 간 벽 파괴, 주변 피해 3"
+   },
+   "goggles_oil": {
+    "name": "잠수 기름",
+    "effect": "잠수 시간 +30초 (해당 맵 1회)"
+   },
+   "charm_guard": {
+    "name": "수호의 부적",
+    "effect": "강화 실패 시 단계 하락 방지 (1회용, +7 이상 시도에만 의미)"
+   },
+   "charm_luck": {
+    "name": "행운의 숫돌",
+    "effect": "강화 성공 확률 +10%p (1회용)"
+   }
+  },
+  "cosmetics": {
+   "c_cape_sky": {
+    "kind": "cape",
+    "name": "하늘색 망토",
+    "layer": "cape",
+    "palette": [
+     "#1e4a8a",
+     "#3a7ad0",
+     "#7ab8ff",
+     "#d0ecff"
+    ],
+    "look": "맑은 하늘색 망토."
+   },
+   "c_cape_green": {
+    "kind": "cape",
+    "name": "숲빛 망토",
+    "layer": "cape",
+    "palette": [
+     "#1a3a1a",
+     "#2e6a2e",
+     "#4ea04e",
+     "#a0e090"
+    ],
+    "look": "짙은 초록 숲빛 망토."
+   },
+   "c_outfit_farmer": {
+    "kind": "outfit",
+    "name": "밀짚 농부 의상",
+    "layer": "armor_skin",
+    "palette": [
+     "#4a3a20",
+     "#8a7040",
+     "#c8a860",
+     "#f0e0a0"
+    ],
+    "look": "멜빵바지와 밀짚모자 세트 (투구 칸이 비면 모자 표시)."
+   },
+   "c_hair_ribbon": {
+    "kind": "head",
+    "name": "빨간 머리끈",
+    "layer": "head_deco",
+    "palette": [
+     "#6a0a10",
+     "#c02030",
+     "#ff5060",
+     "#ffb0b8"
+    ],
+    "look": "뒷머리에 묶은 짧은 빨간 끈."
+   },
+   "c_cape_river": {
+    "kind": "cape",
+    "name": "강물 쪽빛 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a2a4a",
+     "#1a4a7a",
+     "#3a7ab0",
+     "#8ac0e8"
+    ],
+    "look": "쪽빛 염색, 끝단이 물결 무늬."
+   },
+   "c_hat_boatman": {
+    "kind": "head",
+    "name": "뱃사공 밀짚모자",
+    "layer": "head_deco",
+    "palette": [
+     "#5a4420",
+     "#a08040",
+     "#d8b860",
+     "#fff0b0"
+    ],
+    "look": "넓은 챙의 밀짚모자."
+   },
+   "c_outfit_fisher": {
+    "kind": "outfit",
+    "name": "낚시꾼 조끼",
+    "layer": "armor_skin",
+    "palette": [
+     "#2a3a2a",
+     "#4a6a4a",
+     "#7a9a6a",
+     "#c0d8a8"
+    ],
+    "look": "주머니 많은 녹색 조끼와 장화."
+   },
+   "c_trail_water": {
+    "kind": "trail",
+    "name": "물결 궤적",
+    "layer": "trail",
+    "palette": [
+     "#bff4ff",
+     "#5fd0ff"
+    ],
+    "look": "베기 궤적이 물보라처럼 흩어짐."
+   },
+   "c_hood_miner": {
+    "kind": "head",
+    "name": "견습 광부 두건",
+    "layer": "head_deco",
+    "palette": [
+     "#3a2a10",
+     "#6a4a20",
+     "#a07030",
+     "#e0b060"
+    ],
+    "look": "흙 묻은 갈색 두건."
+   },
+   "c_cape_crystal_btn": {
+    "kind": "cape",
+    "name": "수정 단추 망토 장식",
+    "layer": "cape_deco",
+    "palette": [
+     "#0e4a5a",
+     "#2a9aaa",
+     "#5ee0e0",
+     "#e0ffff"
+    ],
+    "look": "망토 목깃에 반짝이는 수정 단추 두 개."
+   },
+   "c_cape_purple": {
+    "kind": "cape",
+    "name": "보랏빛 망토",
+    "layer": "cape",
+    "palette": [
+     "#2a0e3a",
+     "#4e1e6a",
+     "#8040a8",
+     "#c890e8"
+    ],
+    "look": "신비한 보랏빛 망토."
+   },
+   "c_outfit_miner": {
+    "kind": "outfit",
+    "name": "광부 작업복",
+    "layer": "armor_skin",
+    "palette": [
+     "#2a2a2a",
+     "#5a4a30",
+     "#8a7040",
+     "#c0a060"
+    ],
+    "look": "그을린 작업복과 무릎 보호대."
+   },
+   "c_cape_sunset": {
+    "kind": "cape",
+    "name": "노을 비단 망토",
+    "layer": "cape",
+    "palette": [
+     "#5a1a10",
+     "#b0401a",
+     "#ff8a30",
+     "#ffd080"
+    ],
+    "look": "바람에 날리면 노을빛 그라데이션."
+   },
+   "c_turban_star": {
+    "kind": "head",
+    "name": "별빛 터번",
+    "layer": "head_deco",
+    "palette": [
+     "#1a1a4a",
+     "#3a3a8a",
+     "#ffffff",
+     "#ffe080"
+    ],
+    "look": "남색 터번에 작은 별 자수."
+   },
+   "c_outfit_desert": {
+    "kind": "outfit",
+    "name": "사막 유목민 의상",
+    "layer": "armor_skin",
+    "palette": [
+     "#5a4420",
+     "#a08050",
+     "#e0c890",
+     "#fff4d8"
+    ],
+    "look": "헐렁한 모래색 겉옷과 허리띠."
+   },
+   "c_trail_gold": {
+    "kind": "trail",
+    "name": "황금 궤적",
+    "layer": "trail",
+    "palette": [
+     "#fff0b0",
+     "#e0b030"
+    ],
+    "look": "금가루가 흩날리는 궤적."
+   },
+   "c_cape_mermaid": {
+    "kind": "cape",
+    "name": "인어 비늘 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a3a4a",
+     "#1a7a8a",
+     "#40c0c0",
+     "#b0fff0"
+    ],
+    "look": "청록 비늘 무늬가 반짝이는 망토."
+   },
+   "c_goggles_diver": {
+    "kind": "head",
+    "name": "해녀 물안경",
+    "layer": "head_deco",
+    "palette": [
+     "#2a2a2a",
+     "#4a4a4a",
+     "#80d0ff",
+     "#ffffff"
+    ],
+    "look": "이마에 걸친 둥근 물안경."
+   },
+   "c_outfit_sailor": {
+    "kind": "outfit",
+    "name": "선원 줄무늬 옷",
+    "layer": "armor_skin",
+    "palette": [
+     "#0a1a3a",
+     "#1a3a7a",
+     "#ffffff",
+     "#e0e8ff"
+    ],
+    "look": "흰·남색 줄무늬 셔츠와 반바지."
+   },
+   "c_cape_keeper": {
+    "kind": "cape",
+    "name": "등대지기 망토",
+    "layer": "cape",
+    "palette": [
+     "#3a2a0a",
+     "#8a6a1a",
+     "#e0c040",
+     "#fff4a0"
+    ],
+    "look": "노란 방수 망토."
+   },
+   "c_cape_flame": {
+    "kind": "cape",
+    "name": "불꽃 무늬 망토",
+    "layer": "cape",
+    "palette": [
+     "#3a0a0a",
+     "#a01a0a",
+     "#ff6a10",
+     "#ffd040"
+    ],
+    "look": "끝단이 불꽃 모양으로 갈라진 망토."
+   },
+   "c_feather_phoenix": {
+    "kind": "head",
+    "name": "불사조 깃털 머리장식",
+    "layer": "head_deco",
+    "palette": [
+     "#6a1a0a",
+     "#e04010",
+     "#ffa020",
+     "#fff0a0"
+    ],
+    "look": "귀 옆에 꽂은 타오르는 깃털."
+   },
+   "c_outfit_smith": {
+    "kind": "outfit",
+    "name": "대장장이 앞치마",
+    "layer": "armor_skin",
+    "palette": [
+     "#1a1008",
+     "#4a3018",
+     "#8a5a30",
+     "#c08a52"
+    ],
+    "look": "두꺼운 가죽 앞치마와 걷어 올린 소매."
+   },
+   "c_trail_ember": {
+    "kind": "trail",
+    "name": "불씨 궤적",
+    "layer": "trail",
+    "palette": [
+     "#ffd0a0",
+     "#ff6a20"
+    ],
+    "look": "궤적 끝에 불씨가 튀는 효과."
+   },
+   "c_scarf_snowman": {
+    "kind": "head",
+    "name": "눈사람 목도리",
+    "layer": "neck_deco",
+    "palette": [
+     "#6a0a10",
+     "#c02030",
+     "#ffffff",
+     "#ffd0d0"
+    ],
+    "look": "빨강·흰 줄무늬 목도리."
+   },
+   "c_cape_frost": {
+    "kind": "cape",
+    "name": "서리 망토",
+    "layer": "cape",
+    "palette": [
+     "#3a5a7a",
+     "#6a9ac0",
+     "#c0e8ff",
+     "#ffffff"
+    ],
+    "look": "서리 결정 무늬의 창백한 망토."
+   },
+   "c_outfit_winter": {
+    "kind": "outfit",
+    "name": "털 겨울옷",
+    "layer": "armor_skin",
+    "palette": [
+     "#3a2a1a",
+     "#6a4a2a",
+     "#d8ccb8",
+     "#ffffff"
+    ],
+    "look": "털 달린 갈색 겨울 코트."
+   },
+   "c_trail_frost": {
+    "kind": "trail",
+    "name": "서리 궤적",
+    "layer": "trail",
+    "palette": [
+     "#ffffff",
+     "#a0d8ff"
+    ],
+    "look": "궤적 자리에 잠깐 서리가 맺힘."
+   },
+   "c_cape_royal": {
+    "kind": "cape",
+    "name": "왕실 청금 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a1a4a",
+     "#1a3a9a",
+     "#3a6ae0",
+     "#ffd860"
+    ],
+    "look": "남색 바탕에 금 테두리 왕실 망토."
+   },
+   "c_outfit_noble": {
+    "kind": "outfit",
+    "name": "귀족 예복",
+    "layer": "armor_skin",
+    "palette": [
+     "#1a0a2a",
+     "#4a1a6a",
+     "#8a4ac0",
+     "#ffd860"
+    ],
+    "look": "보라 예복과 금 단추."
+   },
+   "c_cape_black_gold": {
+    "kind": "cape",
+    "name": "흑금 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a0a0a",
+     "#1a1a1a",
+     "#3a3a3a",
+     "#ffd860"
+    ],
+    "look": "검은 망토에 금실 자수."
+   },
+   "c_trail_rainbow": {
+    "kind": "trail",
+    "name": "삼룡 무지개 궤적",
+    "layer": "trail",
+    "palette": [
+     "#ff4060",
+     "#6aa8ff",
+     "#ffd060"
+    ],
+    "look": "빨강·파랑·금 삼색 궤적 (삼룡의 각성 오마주)."
+   },
+   "c_cape_droplet": {
+    "kind": "cape",
+    "name": "물방울 무늬 망토",
+    "layer": "cape",
+    "palette": [
+     "#1e3a6a",
+     "#3a6ab0",
+     "#9ad8ff",
+     "#ffffff"
+    ],
+    "look": "하늘색 바탕에 흰 물방울 무늬. (A6 보상)",
+    "quest_only": true
+   },
+   "c_cape_camelbell": {
+    "kind": "cape_deco",
+    "name": "낙타 방울 망토 장식",
+    "layer": "cape_deco",
+    "palette": [
+     "#5a3a08",
+     "#a0700a",
+     "#e0b030",
+     "#fff0b0"
+    ],
+    "look": "망토 끝에 달린 작은 금방울, 걸을 때 딸랑. (G2 보상)",
+    "quest_only": true
+   },
+   "c_scarf_sandrat": {
+    "kind": "neck_deco",
+    "name": "모래쥐 스카프",
+    "layer": "neck_deco",
+    "palette": [
+     "#3a2a1a",
+     "#7a5a3a",
+     "#c09060",
+     "#f0d8b0"
+    ],
+    "look": "낡았지만 멋스러운 모래색 스카프. (G4 보상)",
+    "quest_only": true
+   },
+   "c_cape_fallen_knight": {
+    "kind": "cape",
+    "name": "몰락한 기사의 검은 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a0a10",
+     "#1a1a24",
+     "#3a3a4a",
+     "#8a1a1a"
+    ],
+    "look": "찢어진 끝단, 안감은 핏빛. (E4 보상)",
+    "quest_only": true
+   },
+   "c_cape_frost_saint": {
+    "kind": "cape",
+    "name": "서리 성녀 망토",
+    "layer": "cape",
+    "palette": [
+     "#4a6a8a",
+     "#8ab0d0",
+     "#e0f4ff",
+     "#ffffff"
+    ],
+    "look": "은은히 빛나는 순백 망토. (C6 보상)",
+    "quest_only": true
+   },
+   "c_cape_order": {
+    "kind": "cape",
+    "name": "왕국 기사단 망토",
+    "layer": "cape",
+    "palette": [
+     "#0a1a4a",
+     "#1a3a8a",
+     "#ffffff",
+     "#ffd860"
+    ],
+    "look": "기사단 문장이 수놓인 남·백 망토. (D1 보상)",
+    "quest_only": true
+   },
+   "c_ribbon_princess": {
+    "kind": "head",
+    "name": "공주의 리본 장식",
+    "layer": "head_deco",
+    "palette": [
+     "#6a1a4a",
+     "#c0408a",
+     "#ff90c8",
+     "#ffe0f0"
+    ],
+    "look": "분홍 리본. (D2 보상)",
+    "quest_only": true
+   },
+   "c_outfit_cathedral": {
+    "kind": "outfit",
+    "name": "대성당 순백 의상",
+    "layer": "armor_skin",
+    "palette": [
+     "#8a8a9a",
+     "#c8c8d8",
+     "#f4f4ff",
+     "#ffd860"
+    ],
+    "look": "금 자수의 흰 순례자 의상. (D6 보상)",
+    "quest_only": true
+   }
+  }
+ },
+ "equipment": {
+  "slots": [
+   {
+    "id": "weapon",
+    "name": "무기",
+    "layer": "weapon",
+    "desc": "검 스프라이트(날 모양·색)와 베기 궤적 색이 바뀐다. 3단 콤보(횡베기·찌르기·돌려베기)와 스킬 포즈 모두에 적용."
+   },
+   {
+    "id": "armor",
+    "name": "방어구",
+    "layer": "armor",
+    "desc": "튜닉/갑옷 레이어. 몸통·팔·허리 부분 외형이 바뀐다."
+   },
+   {
+    "id": "helmet",
+    "name": "투구",
+    "layer": "helmet",
+    "desc": "머리 장비(선택). 비우면 기본 갈색 머리가 그대로 보인다."
+   },
+   {
+    "id": "accessory",
+    "name": "보조장비",
+    "layer": "offhand",
+    "desc": "방패·팔보호대·부적·장화. 방패는 왼팔, 팔보호대는 팔뚝, 부적은 가슴, 장화는 발 레이어로 보인다."
+   }
+  ],
+  "layer_order": [
+   "body",
+   "boots",
+   "armor",
+   "helmet",
+   "cape",
+   "weapon",
+   "offhand"
+  ],
+  "cosmetic_rule": "외형상점 아이템은 능력치가 없는 순수 외형 덮어쓰기. 망토 색은 망토 레이어 팔레트를, 의상 스킨은 방어구 레이어의 그림만(능력치는 장착 방어구 유지), 머리 장식은 투구 레이어가 비었거나 \"투구 숨기기\"일 때 표시, 궤적 스킨은 무기 궤적 색을 덮어쓴다.",
+  "palettes": {
+   "iron": [
+    "#3a4250",
+    "#6a7686",
+    "#9aa8b8",
+    "#d8e0e8"
+   ],
+   "bronze": [
+    "#4a2a10",
+    "#8a5420",
+    "#c88a3a",
+    "#ffd9a0"
+   ],
+   "steel_blue": [
+    "#22304a",
+    "#4a6a96",
+    "#7fb0e0",
+    "#e8f4ff"
+   ],
+   "reed_green": [
+    "#1e3a1a",
+    "#3e7a36",
+    "#6ac060",
+    "#e0ffd0"
+   ],
+   "crystal_cyan": [
+    "#0e4a5a",
+    "#2a9aaa",
+    "#5ee0e0",
+    "#e0ffff"
+   ],
+   "dark_iron_copper": [
+    "#1a1a20",
+    "#3a3a44",
+    "#a86a3a",
+    "#f0d0b0"
+   ],
+   "desert_gold": [
+    "#5a3a08",
+    "#a0700a",
+    "#e0b030",
+    "#fff0b0"
+   ],
+   "sun_gold": [
+    "#6a4000",
+    "#b08000",
+    "#ffcf40",
+    "#fffbe0"
+   ],
+   "sea_blue": [
+    "#0a2a5a",
+    "#1a5aa0",
+    "#30a0e0",
+    "#e0f8ff"
+   ],
+   "anchor_steel": [
+    "#2a3038",
+    "#4a5664",
+    "#6a7a8a",
+    "#f0f0f0"
+   ],
+   "obsidian_ember": [
+    "#0a0a10",
+    "#20202a",
+    "#ff6a20",
+    "#ffd0a0"
+   ],
+   "forge_red": [
+    "#1a0e0a",
+    "#3a1a10",
+    "#ff3a10",
+    "#fff0c0"
+   ],
+   "ice_pale": [
+    "#3a5a7a",
+    "#6a9ac0",
+    "#a0d8ff",
+    "#ffffff"
+   ],
+   "silver_fur": [
+    "#4a505a",
+    "#8a92a0",
+    "#c0c8d8",
+    "#f8fbff"
+   ],
+   "royal_silver_gold": [
+    "#3a3a50",
+    "#8a8ca0",
+    "#ffd860",
+    "#ffffff"
+   ],
+   "mithril": [
+    "#2a4a5a",
+    "#4a8aa0",
+    "#80e0ff",
+    "#f0ffff"
+   ],
+   "tunic_blue": [
+    "#0e1a3a",
+    "#1e3a7a",
+    "#2e5ab0",
+    "#5a8ae0"
+   ],
+   "quilted_beige": [
+    "#4a3a2a",
+    "#8a7458",
+    "#c8b090",
+    "#f0e2c8"
+   ],
+   "leather_brown": [
+    "#2a1608",
+    "#5a3418",
+    "#8a5a2e",
+    "#c08a52"
+   ],
+   "sand_gold": [
+    "#5a4420",
+    "#a08050",
+    "#d8c090",
+    "#fff0c8"
+   ],
+   "sea_scale": [
+    "#0a3a3a",
+    "#1a6a64",
+    "#30a090",
+    "#9ae0d0"
+   ],
+   "black_iron_red": [
+    "#0a0a0e",
+    "#24242c",
+    "#4a4a56",
+    "#c02020"
+   ],
+   "fur_white_grey": [
+    "#4a4e56",
+    "#8a909a",
+    "#d8dce4",
+    "#ffffff"
+   ],
+   "mithril_gold": [
+    "#2a4a5a",
+    "#5a9ab0",
+    "#a0e8ff",
+    "#ffd860"
+   ],
+   "miner_yellow": [
+    "#5a4000",
+    "#b08a00",
+    "#f0c820",
+    "#fff4a0"
+   ],
+   "turban_white_ruby": [
+    "#8a8070",
+    "#d8d0c0",
+    "#ffffff",
+    "#d01030"
+   ],
+   "shell_coral": [
+    "#6a2a3a",
+    "#c05a6a",
+    "#ff9aa0",
+    "#ffe0d8"
+   ],
+   "wood": [
+    "#3a2410",
+    "#6a4420",
+    "#9a6a36",
+    "#c89a5a"
+   ],
+   "copper_green": [
+    "#1a3a30",
+    "#3a7a5a",
+    "#c07a3a",
+    "#a0f0c0"
+   ]
+  },
+  "items": {
+   "w_iron_trainee": {
+    "slot": "weapon",
+    "name": "견습 철검",
+    "atk": 4,
+    "visual": {
+     "sprite": "wpn_straight",
+     "palette": "iron",
+     "trail": [
+      "#d8e0e8",
+      "#9aa8b8"
+     ],
+     "look": "짧고 곧은 회색 철날, 갈색 가죽 손잡이. 기본 검보다 날이 한 뼘 길다."
+    }
+   },
+   "w_bronze_long": {
+    "slot": "weapon",
+    "name": "청동 장검",
+    "atk": 6,
+    "visual": {
+     "sprite": "wpn_straight_long",
+     "palette": "bronze",
+     "trail": [
+      "#ffd9a0",
+      "#c88a3a"
+     ],
+     "look": "구릿빛 청동 장검, 둥근 가드. 궤적이 옅은 주황색."
+    }
+   },
+   "w_mill_steel": {
+    "slot": "weapon",
+    "name": "물레 강철검",
+    "atk": 8,
+    "visual": {
+     "sprite": "wpn_straight",
+     "palette": "steel_blue",
+     "trail": [
+      "#e8f4ff",
+      "#7fb0e0"
+     ],
+     "look": "푸른 기가 도는 강철날, 가드에 물레바퀴 문양."
+    }
+   },
+   "w_reed_leaf": {
+    "slot": "weapon",
+    "name": "갈대잎 검",
+    "atk": 9,
+    "visual": {
+     "sprite": "wpn_leaf",
+     "palette": "reed_green",
+     "trail": [
+      "#e0ffd0",
+      "#6ac060"
+     ],
+     "look": "버들잎처럼 가운데가 불룩한 초록빛 날. 휘두르면 연두색 잔상."
+    }
+   },
+   "w_crystal_edge": {
+    "slot": "weapon",
+    "name": "수정날 검",
+    "atk": 11,
+    "visual": {
+     "sprite": "wpn_crystal",
+     "palette": "crystal_cyan",
+     "trail": [
+      "#e0ffff",
+      "#5ee0e0"
+     ],
+     "look": "반투명 하늘색 수정 날, 날 안쪽에서 빛이 일렁인다. 궤적에 수정 파편 반짝임."
+    }
+   },
+   "w_miner_broad": {
+    "slot": "weapon",
+    "name": "광부의 두꺼운 검",
+    "atk": 12,
+    "visual": {
+     "sprite": "wpn_broad",
+     "palette": "dark_iron_copper",
+     "trail": [
+      "#f0d0b0",
+      "#a86a3a"
+     ],
+     "look": "넓고 두꺼운 검은 철날에 구리 띠 세 줄. 묵직한 갈색 궤적."
+    },
+    "effect": {
+     "kb": "+20%"
+    }
+   },
+   "w_desert_crescent": {
+    "slot": "weapon",
+    "name": "사막 초승달검",
+    "atk": 14,
+    "visual": {
+     "sprite": "wpn_curved",
+     "palette": "desert_gold",
+     "trail": [
+      "#fff0b0",
+      "#e0b030"
+     ],
+     "look": "초승달처럼 휜 금빛 곡도, 붉은 술 장식. 금색 궤적."
+    }
+   },
+   "w_sun_sigil": {
+    "slot": "weapon",
+    "name": "태양 문양 검",
+    "atk": 15,
+    "visual": {
+     "sprite": "wpn_straight_long",
+     "palette": "sun_gold",
+     "trail": [
+      "#fffbe0",
+      "#ffcf40"
+     ],
+     "look": "곧은 금날 전체에 태양 문양 음각, 가드 중앙에 붉은 보석."
+    }
+   },
+   "w_wave_blade": {
+    "slot": "weapon",
+    "name": "파도 검",
+    "atk": 17,
+    "visual": {
+     "sprite": "wpn_wavy",
+     "palette": "sea_blue",
+     "trail": [
+      "#e0f8ff",
+      "#30a0e0"
+     ],
+     "look": "물결치듯 구불구불한 바다색 날(플랑베르주형). 궤적이 물보라처럼 흩어진다."
+    }
+   },
+   "w_anchor_great": {
+    "slot": "weapon",
+    "name": "닻 대검",
+    "atk": 18,
+    "visual": {
+     "sprite": "wpn_broad",
+     "palette": "anchor_steel",
+     "trail": [
+      "#f0f0f0",
+      "#6a7a8a"
+     ],
+     "look": "닻 모양 가드가 달린 넓은 회철 대검, 손잡이에 밧줄 감김."
+    },
+    "effect": {
+     "kb": "+30%"
+    }
+   },
+   "w_obsidian": {
+    "slot": "weapon",
+    "name": "흑요석 검",
+    "atk": 21,
+    "visual": {
+     "sprite": "wpn_crystal",
+     "palette": "obsidian_ember",
+     "trail": [
+      "#ffd0a0",
+      "#ff6a20"
+     ],
+     "look": "검은 유리 같은 흑요석 날, 가장자리만 주황 불씨처럼 빛남. 주황 궤적."
+    }
+   },
+   "w_forge_great": {
+    "slot": "weapon",
+    "name": "용광로 대검",
+    "atk": 23,
+    "visual": {
+     "sprite": "wpn_broad",
+     "palette": "forge_red",
+     "trail": [
+      "#fff0c0",
+      "#ff3a10"
+     ],
+     "look": "넓은 흑철 날 가운데 금 간 홈에서 붉은 용암빛이 새어 나온다."
+    },
+    "effect": {
+     "burn": "3타 돌려베기 화상"
+    }
+   },
+   "w_frost_crystal": {
+    "slot": "weapon",
+    "name": "서리 결정검",
+    "atk": 25,
+    "visual": {
+     "sprite": "wpn_crystal",
+     "palette": "ice_pale",
+     "trail": [
+      "#ffffff",
+      "#a0d8ff"
+     ],
+     "look": "얼음 결정이 겹겹이 자란 창백한 하늘색 날, 서리 김이 피어오름."
+    },
+    "effect": {
+     "slow": "2타 찌르기 둔화"
+    }
+   },
+   "w_northwind": {
+    "slot": "weapon",
+    "name": "북풍 장검",
+    "atk": 26,
+    "visual": {
+     "sprite": "wpn_straight_long",
+     "palette": "silver_fur",
+     "trail": [
+      "#f8fbff",
+      "#c0c8d8"
+     ],
+     "look": "은빛 장검, 손잡이에 흰 털가죽, 가드 끝에 늑대 머리."
+    }
+   },
+   "w_royal_knight": {
+    "slot": "weapon",
+    "name": "왕실 기사검",
+    "atk": 28,
+    "visual": {
+     "sprite": "wpn_ornate",
+     "palette": "royal_silver_gold",
+     "trail": [
+      "#ffffff",
+      "#ffd860"
+     ],
+     "look": "은날에 금 상감, 십자 가드에 파란 왕실 보석. 흰·금 이중 궤적."
+    }
+   },
+   "w_mithril": {
+    "slot": "weapon",
+    "name": "미스릴 장검",
+    "atk": 31,
+    "visual": {
+     "sprite": "wpn_straight_long",
+     "palette": "mithril",
+     "trail": [
+      "#f0ffff",
+      "#80e0ff"
+     ],
+     "look": "은청색으로 은은히 빛나는 미스릴 장검, 날 위로 룬 문자가 흐른다."
+    }
+   },
+   "b_cloth_tunic": {
+    "slot": "armor",
+    "name": "천 튜닉",
+    "defense": 1,
+    "visual": {
+     "sprite": "body_tunic",
+     "palette": "tunic_blue",
+     "look": "기본과 같은 파란 튜닉에 갈색 허리띠 (컨셉 아트 기본 모습)."
+    }
+   },
+   "b_quilted": {
+    "slot": "armor",
+    "name": "누빔 갑옷",
+    "defense": 2,
+    "visual": {
+     "sprite": "body_quilted",
+     "palette": "quilted_beige",
+     "look": "베이지색 누빔 천 갑옷, 가슴에 마름모 박음질."
+    }
+   },
+   "b_miner_vest": {
+    "slot": "armor",
+    "name": "광부 가죽 조끼",
+    "defense": 3,
+    "visual": {
+     "sprite": "body_leather",
+     "palette": "leather_brown",
+     "look": "튜닉 위에 두꺼운 갈색 가죽 조끼와 구리 버클 멜빵."
+    }
+   },
+   "b_desert_silk": {
+    "slot": "armor",
+    "name": "사막 비단 경갑",
+    "defense": 4,
+    "visual": {
+     "sprite": "body_light",
+     "palette": "sand_gold",
+     "look": "모래색 비단 위 얇은 금 테 경갑, 허리에 붉은 띠."
+    }
+   },
+   "b_scale_mail": {
+    "slot": "armor",
+    "name": "비늘 사슬갑옷",
+    "defense": 5,
+    "visual": {
+     "sprite": "body_mail",
+     "palette": "sea_scale",
+     "look": "청록 물고기 비늘 모양 사슬갑옷, 어깨에 조개 장식."
+    }
+   },
+   "b_black_plate": {
+    "slot": "armor",
+    "name": "흑철 판금 흉갑",
+    "defense": 7,
+    "visual": {
+     "sprite": "body_plate",
+     "palette": "black_iron_red",
+     "look": "검은 판금 흉갑, 붉은 리벳과 어깨 판갑."
+    },
+    "effect": {
+     "fire_res": "화상 피해 -50%"
+    }
+   },
+   "b_snow_fur": {
+    "slot": "armor",
+    "name": "설원 털가죽 갑옷",
+    "defense": 8,
+    "visual": {
+     "sprite": "body_fur",
+     "palette": "fur_white_grey",
+     "look": "흰 털가죽 깃과 회색 사슬 조끼, 소매 끝 털 장식."
+    },
+    "effect": {
+     "cold_res": "빙결 시간 -50%"
+    }
+   },
+   "b_mithril_plate": {
+    "slot": "armor",
+    "name": "미스릴 판금",
+    "defense": 10,
+    "visual": {
+     "sprite": "body_plate",
+     "palette": "mithril_gold",
+     "look": "은청색 미스릴 판금에 금 테두리, 가슴에 세 용 문장."
+    }
+   },
+   "h_leather_hood": {
+    "slot": "helmet",
+    "name": "가죽 두건",
+    "defense": 1,
+    "visual": {
+     "sprite": "head_hood",
+     "palette": "leather_brown",
+     "look": "갈색 가죽 두건, 앞머리가 살짝 보인다."
+    }
+   },
+   "h_steel_circlet": {
+    "slot": "helmet",
+    "name": "강철 머리띠",
+    "defense": 1,
+    "visual": {
+     "sprite": "head_circlet",
+     "palette": "steel_blue",
+     "look": "이마를 두르는 얇은 강철 머리띠, 가운데 작은 푸른 돌."
+    }
+   },
+   "h_miner_helmet": {
+    "slot": "helmet",
+    "name": "광부 헬멧",
+    "defense": 2,
+    "visual": {
+     "sprite": "head_cap_lamp",
+     "palette": "miner_yellow",
+     "look": "노란 둥근 헬멧, 앞에 작은 램프 (동굴에서 주변이 약간 밝아짐)."
+    },
+    "effect": {
+     "light": "어두운 맵 시야 +1"
+    }
+   },
+   "h_turban": {
+    "slot": "helmet",
+    "name": "루비 터번",
+    "defense": 2,
+    "visual": {
+     "sprite": "head_turban",
+     "palette": "turban_white_ruby",
+     "look": "흰 터번에 붉은 루비 핀, 뒤로 천 자락이 흩날림."
+    }
+   },
+   "h_nautilus": {
+    "slot": "helmet",
+    "name": "앵무조개 투구",
+    "defense": 3,
+    "visual": {
+     "sprite": "head_shell",
+     "palette": "shell_coral",
+     "look": "앵무조개 껍데기를 깎은 산호빛 투구."
+    }
+   },
+   "h_horned": {
+    "slot": "helmet",
+    "name": "뿔 달린 흑철 투구",
+    "defense": 4,
+    "visual": {
+     "sprite": "head_helm_horn",
+     "palette": "black_iron_red",
+     "look": "검은 투구 양옆에 굽은 뿔, 눈구멍에서 붉은 빛."
+    }
+   },
+   "h_fur_helm": {
+    "slot": "helmet",
+    "name": "털모자 투구",
+    "defense": 4,
+    "visual": {
+     "sprite": "head_helm_fur",
+     "palette": "fur_white_grey",
+     "look": "쇠 투구 안쪽과 귀덮개에 흰 털."
+    }
+   },
+   "h_knight_plume": {
+    "slot": "helmet",
+    "name": "깃털 기사 투구",
+    "defense": 5,
+    "visual": {
+     "sprite": "head_helm_visor",
+     "palette": "royal_silver_gold",
+     "look": "은빛 면갑 투구 위 파란 깃털 장식."
+    }
+   },
+   "a_wood_round": {
+    "slot": "accessory",
+    "name": "나무 원형방패",
+    "defense": 1,
+    "visual": {
+     "sprite": "off_shield_round",
+     "palette": "wood",
+     "look": "왼팔에 작은 둥근 나무 방패 (철 테). 정지 상태에서 정면 피해 25% 확률 막기."
+    },
+    "effect": {
+     "kind": "shield"
+    }
+   },
+   "a_leather_bracer": {
+    "slot": "accessory",
+    "name": "가죽 팔보호대",
+    "defense": 0,
+    "visual": {
+     "sprite": "acc_bracer",
+     "palette": "leather_brown",
+     "look": "양 팔뚝에 갈색 가죽 보호대 (버클 2개)."
+    },
+    "effect": {
+     "kind": "bracer",
+     "atk_speed": "+5%"
+    }
+   },
+   "a_ore_amulet": {
+    "slot": "accessory",
+    "name": "광석 부적",
+    "defense": 0,
+    "visual": {
+     "sprite": "acc_amulet",
+     "palette": "copper_green",
+     "look": "가슴에 매단 녹청 구리 펜던트, 원석이 박혀 있다."
+    },
+    "effect": {
+     "kind": "amulet",
+     "drop": "강화 재료 드롭 +5%p"
+    }
+   },
+   "a_dune_boots": {
+    "slot": "accessory",
+    "name": "사막 질주 장화",
+    "defense": 0,
+    "visual": {
+     "sprite": "acc_boots",
+     "palette": "sand_gold",
+     "look": "모래색 긴 장화에 금 버클, 걸을 때 모래 먼지."
+    },
+    "effect": {
+     "kind": "boots",
+     "move": "+10%"
+    }
+   },
+   "a_coral_buckler": {
+    "slot": "accessory",
+    "name": "산호 버클러",
+    "defense": 2,
+    "visual": {
+     "sprite": "off_shield_round",
+     "palette": "shell_coral",
+     "look": "분홍 산호가 박힌 작은 방패. 산호 방패 스킬 퍼펙트 판정 +0.05초."
+    },
+    "effect": {
+     "kind": "shield"
+    }
+   },
+   "a_flame_bracer": {
+    "slot": "accessory",
+    "name": "화염 팔찌",
+    "defense": 0,
+    "visual": {
+     "sprite": "acc_bracer",
+     "palette": "forge_red",
+     "look": "손목의 흑철 팔찌, 붉은 홈이 은은히 빛남."
+    },
+    "effect": {
+     "kind": "bracer",
+     "skill": "업화의 검 피해 +20%"
+    }
+   },
+   "a_frost_amulet": {
+    "slot": "accessory",
+    "name": "서리 부적",
+    "defense": 0,
+    "visual": {
+     "sprite": "acc_amulet",
+     "palette": "ice_pale",
+     "look": "눈송이 모양 얼음 펜던트."
+    },
+    "effect": {
+     "kind": "amulet",
+     "gauge": "파란 게이지 회복 +10%"
+    }
+   },
+   "a_royal_kite": {
+    "slot": "accessory",
+    "name": "왕실 문장 방패",
+    "defense": 4,
+    "visual": {
+     "sprite": "off_shield_kite",
+     "palette": "royal_silver_gold",
+     "look": "파란 바탕에 금 사자 문장의 연(鳶)형 방패."
+    },
+    "effect": {
+     "kind": "shield"
+    }
+   }
+  }
+ },
+ "travel": {
+  "rule": "한 화면 = 1280×720 (현재 타운 데모 한 화면 크기). 마을↔지역, 마을↔마을 길은 8~12화면. 화면당 몹 2~5마리, 3~4화면마다 몹 없는 쉼터 화면 1개. 길의 몹은 인접 지역 졸몹(일반 8종) 중에서만 나오며 챔피언은 길에 나오지 않는다(10지역 길 제외).",
+  "roads": [
+   {
+    "frm": "A",
+    "to": "1지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~3",
+      "뿔토끼, 독버섯 (드문드문 2~3마리)"
+     ],
+     [
+      "4~6",
+      "말벌, 도토리 다람쥐, 숲 슬라임"
+     ],
+     [
+      "7~8",
+      "멧돼지, 호박 허수아비, 나무 정령 새싹"
+     ]
+    ],
+    "note": "튜토리얼 길. 3화면마다 쉼터(벤치)"
+   },
+   {
+    "frm": "A",
+    "to": "B",
+    "screens": 9,
+    "mobs": [
+     [
+      "1~3",
+      "뿔토끼, 독버섯"
+     ],
+     [
+      "4~6",
+      "숲 슬라임, 말벌"
+     ],
+     [
+      "7~9",
+      "도토리 다람쥐 (강 건너 다리 위)"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "A",
+    "to": "D",
+    "screens": 11,
+    "mobs": [
+     [
+      "1~4",
+      "멧돼지, 호박 허수아비"
+     ],
+     [
+      "5~8",
+      "고블린, 해골 창병 (왕도 근처 잔당)"
+     ],
+     [
+      "9~11",
+      "성벽 순찰 기사(중립 NPC), 몹 없음"
+     ]
+    ],
+    "note": "D 입성은 8지역 후 이벤트로 개방"
+   },
+   {
+    "frm": "A",
+    "to": "F",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~3",
+      "뿔토끼, 말벌"
+     ],
+     [
+      "4~7",
+      "갈매기, 집게 병사"
+     ],
+     [
+      "8~10",
+      "소라게, 불가사리 (해변)"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "A",
+    "to": "G",
+    "screens": 12,
+    "mobs": [
+     [
+      "1~4",
+      "멧돼지, 숲 슬라임"
+     ],
+     [
+      "5~8",
+      "전갈, 대머리 독수리 (초원→사막 경계)"
+     ],
+     [
+      "9~12",
+      "모래 독사, 사막 도적"
+     ]
+    ],
+    "note": "사막 구간부터 열사병 게이지(물주머니로 해소)"
+   },
+   {
+    "frm": "B",
+    "to": "1지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~4",
+      "숲 슬라임, 도토리 다람쥐"
+     ],
+     [
+      "5~8",
+      "나무 정령 새싹, 멧돼지"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "B",
+    "to": "H",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~3",
+      "숲 슬라임, 말벌"
+     ],
+     [
+      "4~7",
+      "가시덩굴, 박쥐 (절벽길)"
+     ],
+     [
+      "8~10",
+      "곡괭이 바위도깨비, 동굴 거미"
+     ]
+    ],
+    "note": "절벽 사잇길, 낙석 구간 2곳"
+   },
+   {
+    "frm": "B",
+    "to": "C",
+    "screens": 12,
+    "mobs": [
+     [
+      "1~4",
+      "멧돼지, 나무 정령 새싹"
+     ],
+     [
+      "5~8",
+      "서리 늑대, 얼음 슬라임"
+     ],
+     [
+      "9~12",
+      "설인 새끼, 서리 요정"
+     ]
+    ],
+    "note": "눈길: 9화면부터 빙판 미끄럼"
+   },
+   {
+    "frm": "H",
+    "to": "1지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~4",
+      "가시덩굴, 동굴 두더지"
+     ],
+     [
+      "5~8",
+      "독버섯, 뿔토끼, 나무 정령 새싹"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "H",
+    "to": "2지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~3",
+      "박쥐, 반딧불 지렁이"
+     ],
+     [
+      "4~6",
+      "수정 딱정벌레, 동굴 거미"
+     ],
+     [
+      "7~8",
+      "수정 슬라임, 곡괭이 바위도깨비"
+     ]
+    ],
+    "note": "광산 레일 따라 진입, 어두운 화면 3곳"
+   },
+   {
+    "frm": "G",
+    "to": "3지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~3",
+      "전갈, 모래 독사"
+     ],
+     [
+      "4~6",
+      "선인장 골렘, 대머리 독수리"
+     ],
+     [
+      "7~8",
+      "개미귀신, 모래 정령"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "G",
+    "to": "4지역",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~4",
+      "사막 도적, 낙타 거북"
+     ],
+     [
+      "5~7",
+      "스카라베 떼, 모래 해골 궁수"
+     ],
+     [
+      "8~10",
+      "저주 항아리, 아누비스 경비병 (피라미드 앞)"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "G",
+    "to": "E",
+    "screens": 11,
+    "mobs": [
+     [
+      "1~4",
+      "모래 정령, 대머리 독수리"
+     ],
+     [
+      "5~8",
+      "불 도롱뇽, 용암 슬라임 (화산 경계)"
+     ],
+     [
+      "9~11",
+      "불꽃 임프, 화염 사냥개"
+     ]
+    ],
+    "note": "용암 강 위 다리 구간"
+   },
+   {
+    "frm": "F",
+    "to": "5지역",
+    "screens": 9,
+    "mobs": [
+     [
+      "1~3",
+      "갈매기, 해파리 (얕은 바다)"
+     ],
+     [
+      "4~6",
+      "가시 복어, 문어 먹물병"
+     ],
+     [
+      "7~9",
+      "상어 돌격병, 전기 뱀장어"
+     ]
+    ],
+    "note": "배 항로: 화면마다 바다 위 전투, 크라켄 격파 후엔 잠수 루트도 개방"
+   },
+   {
+    "frm": "F",
+    "to": "6지역",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~3",
+      "집게 병사, 갈매기"
+     ],
+     [
+      "4~7",
+      "해적 해골, 해적 앵무새"
+     ],
+     [
+      "8~10",
+      "따개비 골렘, 바다 거북 방패병"
+     ]
+    ],
+    "note": "해안 절벽길, 파도 정령 밀쳐내기 구간"
+   },
+   {
+    "frm": "E",
+    "to": "7지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~3",
+      "용암 슬라임, 불 도롱뇽"
+     ],
+     [
+      "4~6",
+      "용암 바위 골렘, 잿불 불사조 새끼"
+     ],
+     [
+      "7~8",
+      "저주받은 갑옷, 흑요석 궁수"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "E",
+    "to": "D",
+    "screens": 11,
+    "mobs": [
+     [
+      "1~4",
+      "불꽃 임프, 화염 사냥개"
+     ],
+     [
+      "5~8",
+      "폭풍 가고일, 뇌운 새"
+     ],
+     [
+      "9~11",
+      "고블린, 보라 도깨비불"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "C",
+    "to": "8지역",
+    "screens": 9,
+    "mobs": [
+     [
+      "1~3",
+      "서리 늑대, 펭귄 기사"
+     ],
+     [
+      "4~6",
+      "얼음 거북, 서리 요정"
+     ],
+     [
+      "7~9",
+      "뇌운 새, 폭풍 가고일"
+     ]
+    ],
+    "note": "탑 아래 눈사태 구간"
+   },
+   {
+    "frm": "C",
+    "to": "9지역",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~3",
+      "설인 새끼, 서리 늑대"
+     ],
+     [
+      "4~7",
+      "보라 도깨비불, 가고일 석상"
+     ],
+     [
+      "8~10",
+      "그림자 암살자, 저주 인형"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "C",
+    "to": "D",
+    "screens": 10,
+    "mobs": [
+     [
+      "1~4",
+      "얼음 슬라임, 서리 요정"
+     ],
+     [
+      "5~8",
+      "고블린, 해골 창병"
+     ],
+     [
+      "9~10",
+      "몹 없음 (왕도 외성)"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "D",
+    "to": "9지역",
+    "screens": 8,
+    "mobs": [
+     [
+      "1~3",
+      "해골 창병, 고블린"
+     ],
+     [
+      "4~6",
+      "어둠 마법사, 공허 눈알"
+     ],
+     [
+      "7~8",
+      "그림자 암살자, 가고일 석상"
+     ]
+    ],
+    "note": ""
+   },
+   {
+    "frm": "D",
+    "to": "10지역",
+    "screens": 12,
+    "mobs": [
+     [
+      "1~4",
+      "강화 독버섯·뿔토끼·말벌 (보랏빛 오라)"
+     ],
+     [
+      "5~8",
+      "강화 전갈·미라·어인"
+     ],
+     [
+      "9~12",
+      "강화 해골 창병·서리 늑대·용암 슬라임 + 강화 챔피언 1마리"
+     ]
+    ],
+    "note": "최종 길. 3화면마다 정령 샘(파란 게이지 회복)"
+   }
+  ]
+ },
+ "enhancement": {
+  "rules": {
+   "weapons_only": true,
+   "max_level": 9,
+   "destroy": false,
+   "pity": "같은 단계에서 실패할 때마다 다음 시도 성공률 +5%p (최대 +20%p), 성공하면 초기화",
+   "boosts": [
+    "행운의 숫돌: 1회 +10%p",
+    "E 장인 불칼: 상시 +5%p (E3 완료 후)",
+    "성공률 상한 95%"
+   ],
+   "protection": "수호의 부적 (소모품): +7 이상 시도 실패 시 단계 하락 방지. E 도구상점 1500, D 도구상점 1800, 7~10지역 챔피언 희귀 드롭",
+   "npc": "각 마을 무기상점 대장장이가 강화 담당. 마을별 최대 단계: A·B·H +3 / G·F +6 / E·C·D +9 (E는 성공률 보너스)",
+   "visuals": [
+    {
+     "level": 4,
+     "fx": "glow",
+     "desc": "검날 가장자리에 무기 팔레트 밝은색 1px 외곽 발광, 2초 주기로 은은히 깜빡임"
+    },
+    {
+     "level": 7,
+     "fx": "aura",
+     "desc": "검 주변에 재료 티어 색(화뢰 정수 주황) 아지랑이 오라 + 베기 궤적 두께 1.5배"
+    },
+    {
+     "level": 9,
+     "fx": "aura_max",
+     "desc": "검 전체가 공허 결정 보라·흰 빛으로 빛나고, 걸을 때 빛 입자가 떨어짐. 3타 돌려베기 링이 무기 궤적색 이중 링으로 바뀜"
+    }
+   ],
+   "stat_note": "공격력 보너스는 무기 기본 공격력에 대한 누적 %. 표시는 정수 반올림 (예: 공격 20 무기 +5 → 24.8 → 25)"
+  },
+  "tiers": [
+   {
+    "tier": 1,
+    "name": "거친 수정 원석",
+    "areas": [
+     1,
+     2
+    ],
+    "color": "#7fe0d0"
+   },
+   {
+    "tier": 2,
+    "name": "사막 태양석",
+    "areas": [
+     3,
+     4
+    ],
+    "color": "#ffcf40"
+   },
+   {
+    "tier": 3,
+    "name": "심해 진주각",
+    "areas": [
+     5,
+     6
+    ],
+    "color": "#9ad8ff"
+   },
+   {
+    "tier": 4,
+    "name": "화뢰 정수",
+    "areas": [
+     7,
+     8
+    ],
+    "color": "#ff7a30"
+   },
+   {
+    "tier": 5,
+    "name": "공허 결정",
+    "areas": [
+     9,
+     10
+    ],
+    "color": "#a070ff"
+   }
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "success": 95,
+    "tier": 1,
+    "count": 2,
+    "coins": 100,
+    "atk_pct": 4,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 2,
+    "success": 90,
+    "tier": 1,
+    "count": 3,
+    "coins": 200,
+    "atk_pct": 8,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 3,
+    "success": 80,
+    "tier": 2,
+    "count": 2,
+    "coins": 400,
+    "atk_pct": 12,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 4,
+    "success": 70,
+    "tier": 2,
+    "count": 3,
+    "coins": 700,
+    "atk_pct": 18,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 5,
+    "success": 60,
+    "tier": 3,
+    "count": 2,
+    "coins": 1100,
+    "atk_pct": 24,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 6,
+    "success": 50,
+    "tier": 3,
+    "count": 3,
+    "coins": 1600,
+    "atk_pct": 30,
+    "fail": "단계 유지, 재료·금화 소모"
+   },
+   {
+    "level": 7,
+    "success": 40,
+    "tier": 4,
+    "count": 2,
+    "coins": 2300,
+    "atk_pct": 40,
+    "fail": "1단계 하락 (+6이 됨). 수호의 부적 사용 시 하락 없음"
+   },
+   {
+    "level": 8,
+    "success": 30,
+    "tier": 4,
+    "count": 3,
+    "coins": 3200,
+    "atk_pct": 50,
+    "fail": "1단계 하락 (+7이 됨). 수호의 부적 사용 시 하락 없음"
+   },
+   {
+    "level": 9,
+    "success": 20,
+    "tier": 5,
+    "count": 3,
+    "coins": 5000,
+    "atk_pct": 65,
+    "fail": "1단계 하락 (+8이 됨). 수호의 부적 사용 시 하락 없음"
+   }
+  ],
+  "champion_drops": [
+   {
+    "area": 1,
+    "champion": "거대 왕멧돼지 '돌엄니'",
+    "tier": 1,
+    "drop": 50
+   },
+   {
+    "area": 1,
+    "champion": "여왕 말벌",
+    "tier": 1,
+    "drop": 50
+   },
+   {
+    "area": 2,
+    "champion": "흡혈 박쥐왕",
+    "tier": 1,
+    "drop": 45
+   },
+   {
+    "area": 2,
+    "champion": "광부 도깨비 대장",
+    "tier": 1,
+    "drop": 45
+   },
+   {
+    "area": 3,
+    "champion": "황금 전갈 '태양침'",
+    "tier": 2,
+    "drop": 40
+   },
+   {
+    "area": 3,
+    "champion": "사막 도적 두목",
+    "tier": 2,
+    "drop": 40
+   },
+   {
+    "area": 4,
+    "champion": "쌍둥이 아누비스",
+    "tier": 2,
+    "drop": 40,
+    "note": "둘 다 쓰러뜨려야 판정, 각자 따로 굴림"
+   },
+   {
+    "area": 4,
+    "champion": "저주받은 대신관",
+    "tier": 2,
+    "drop": 40
+   },
+   {
+    "area": 5,
+    "champion": "백상어 장군",
+    "tier": 3,
+    "drop": 35
+   },
+   {
+    "area": 5,
+    "champion": "심해 아귀 여왕",
+    "tier": 3,
+    "drop": 35
+   },
+   {
+    "area": 6,
+    "champion": "유령 해적 선장",
+    "tier": 3,
+    "drop": 35
+   },
+   {
+    "area": 6,
+    "champion": "거대 바닷가재",
+    "tier": 3,
+    "drop": 35
+   },
+   {
+    "area": 7,
+    "champion": "용암 거인 수문장",
+    "tier": 4,
+    "drop": 30,
+    "guard": 3
+   },
+   {
+    "area": 7,
+    "champion": "화염 마녀",
+    "tier": 4,
+    "drop": 30,
+    "guard": 3
+   },
+   {
+    "area": 8,
+    "champion": "어미 설인",
+    "tier": 4,
+    "drop": 30,
+    "guard": 3
+   },
+   {
+    "area": 8,
+    "champion": "번개 그리폰",
+    "tier": 4,
+    "drop": 30,
+    "guard": 3
+   },
+   {
+    "area": 9,
+    "champion": "그림자 쌍검사",
+    "tier": 5,
+    "drop": 25,
+    "guard": 3
+   },
+   {
+    "area": 9,
+    "champion": "공허의 수문장",
+    "tier": 5,
+    "drop": 25,
+    "guard": 3
+   },
+   {
+    "area": 10,
+    "champion": "강화 챔피언 18종 (1~9지역 챔피언의 강화판)",
+    "tier": 5,
+    "drop": 30,
+    "guard": 5,
+    "note": "원래 티어 재료도 60%로 추가 드롭"
+   }
+  ]
+ },
+ "respawn": {
+  "rule": "보스를 제외한 모든 몬스터(일반·챔피언)는 플레이어가 맵(화면)을 떠났다가 다시 들어오면 새 무작위 위치에 다시 등장한다. 보스는 한 번 쓰러뜨리면 영구히 사라진다.",
+  "unit": "맵 = 화면 1개(1280×720). 인접 화면으로 나갔다 돌아와도 리스폰.",
+  "champions": "챔피언도 리스폰(강화 재료 파밍용). 단 보스 문 개방 조건은 \"각 챔피언 최초 격파\" 플래그로 저장되어, 한 번 열린 보스 문은 챔피언이 다시 나타나도 계속 열려 있다.",
+  "boss": "boss_defeated[지역] = true 저장. 보스 방은 이후 빈 방(능력 흡수 제단만 남음).",
+  "save_flags": [
+   "champion_first_kill[지역][챔피언id]",
+   "boss_door_open[지역] (두 챔피언 최초 격파 시 true, 이후 false로 되돌아가지 않음)",
+   "boss_defeated[지역]"
+  ],
+  "spawn_zones": "각 맵 데이터에 spawnZones(다각형/사각형 목록)와 몹 종류별 가중치를 둔다. 챔피언은 champZone(넓은 공터) 1곳에만.",
+  "placement": [
+   "스폰 후보 점을 spawnZones 안에서 무작위로 뽑는다 (최대 30회 시도).",
+   "입장 지점(이번에 들어온 문/화면 가장자리)에서 반경 260px(약 화면 폭의 1/5) 안은 금지.",
+   "벽·건물·바위 등 충돌 영역(blocked)과 물·용암·구덩이 타일 안은 금지. 몹 충돌 반경만큼 여유를 두고 검사.",
+   "다른 몬스터와 최소 72px, NPC·상자·스위치와 최소 48px 떨어질 것.",
+   "수중 전용 몹(어인·상어 등)은 반대로 물 영역 안에서만 스폰.",
+   "30회 안에 못 찾으면 맵에 미리 정한 고정 스폰 지점 목록(fallbackPoints) 중 입장 지점에서 가장 먼 곳 사용.",
+   "등장 연출: 0.5초 동안 커지며 나타남(타운 데모 슬라임과 동일), 그동안 접촉 피해 없음."
+  ],
+  "counts": "화면당 일반 몹 수는 맵 데이터의 min~max 사이 무작위(길 2~5, 지역 3~6). 챔피언은 champZone 화면에만 1마리.",
+  "anti_abuse": "선택 규칙: 같은 챔피언을 10분 안에 3번 넘게 잡으면 재료 드롭률 절반 (파밍은 가능하되 과도한 반복 완화)."
+ }
+}
