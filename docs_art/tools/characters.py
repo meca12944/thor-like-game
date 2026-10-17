@@ -1,5 +1,6 @@
 # full-body character profile normalizer (same canvas/body/baseline as outfits_v3)
 # usage: characters.py <batch_name> "<title>" id=src:name:title:hf[:special] ...
+#  special: comma list of fit | clampw | hat=<px in source> (headwear height to exclude)
 #  hf = height factor vs adult BODY (1.0 adult, ~0.62 child, monsters can be >1 / fit)
 import numpy as np, cv2, os, sys, json
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -45,7 +46,9 @@ for cid,src,name,title,hf,sp in specs:
     if 'fit' in sp:   # monsters: fit whole silhouette into canvas
         x0,x1=xs.min(),xs.max(); s=min((BODY*hf)/(feet-top_all),(CW-40)/(x1-x0)); cx=(x0+x1)//2
     else:
-        s=BODY*hf/(feet-head)
+        hat=next((float(t[4:]) for t in sp.split(',') if t.startswith('hat=')),0.0)
+        s=BODY*hf/(feet-head-hat)       # headwear excluded from head-to-feet measure
+        s=min(s,(BASE-4)/(feet-head))   # never clip headwear at canvas top
         x0,x1=xs.min(),xs.max(); s=min(s,(CW-20)/max(1,2*max(cx-x0,x1-cx))) if 'clampw' in sp else s
     rgba=Image.fromarray(np.dstack([img,(a*255).astype(np.uint8)]),'RGBA')
     big=rgba.resize((round(rgba.width*s),round(rgba.height*s)),Image.LANCZOS)

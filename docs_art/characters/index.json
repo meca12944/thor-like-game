@@ -86,6 +86,86 @@
    "file": "npc_bori.png",
    "batch": "A",
    "height_factor": 1.0
+  },
+  "b_mayor": {
+   "name": "물레 촌장",
+   "title": "마을 대표",
+   "label": "「마을 대표」 물레 촌장",
+   "file": "b_mayor.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_miller": {
+   "name": "맷돌",
+   "title": "방앗간 주인",
+   "label": "「방앗간 주인」 맷돌",
+   "file": "b_miller.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_tool": {
+   "name": "조약돌",
+   "title": "강돌 잡화",
+   "label": "「강돌 잡화」 조약돌",
+   "file": "b_tool.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_smith": {
+   "name": "담금",
+   "title": "대장장이",
+   "label": "「대장장이」 담금",
+   "file": "b_smith.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_dyer": {
+   "name": "쪽빛",
+   "title": "강물 염색방",
+   "label": "「강물 염색방」 쪽빛",
+   "file": "b_dyer.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_fisher": {
+   "name": "낚싯대 영감",
+   "title": "낚시꾼",
+   "label": "「낚시꾼」 낚싯대 영감",
+   "file": "b_fisher.png",
+   "batch": "B",
+   "height_factor": 0.95
+  },
+  "b_ferry": {
+   "name": "노을",
+   "title": "나룻배 사공",
+   "label": "「나룻배 사공」 노을",
+   "file": "b_ferry.png",
+   "batch": "B",
+   "height_factor": 1.0
+  },
+  "b_widow": {
+   "name": "버들",
+   "title": "빨래터 아주머니",
+   "label": "「빨래터 아주머니」 버들",
+   "file": "b_widow.png",
+   "batch": "B",
+   "height_factor": 0.95
+  },
+  "b_twins": {
+   "name": "물총·물방울",
+   "title": "쌍둥이 남매",
+   "label": "「쌍둥이 남매」 물총·물방울",
+   "file": "b_twins.png",
+   "batch": "B",
+   "height_factor": 0.6
+  },
+  "b_scholar": {
+   "name": "이브넬",
+   "title": "책벌레",
+   "label": "「책벌레」 이브넬",
+   "file": "b_scholar.png",
+   "batch": "B",
+   "height_factor": 1.0
   }
  },
  "batches": {
@@ -104,6 +184,22 @@
     "npc_bori"
    ],
    "lineup": "batch_A.png"
+  },
+  "B": {
+   "title": "강변 물레방아 마을",
+   "ids": [
+    "b_mayor",
+    "b_miller",
+    "b_tool",
+    "b_smith",
+    "b_dyer",
+    "b_fisher",
+    "b_ferry",
+    "b_widow",
+    "b_twins",
+    "b_scholar"
+   ],
+   "lineup": "batch_B.png"
   }
  }
 }
