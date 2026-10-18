@@ -25,15 +25,15 @@ def flag(d,hit,S,R,H,f0,f1,head,Wmax,age):
     """세련된 반투명 검기: 안쪽 가장자리(칼끝 경로)에 가는 흰-청록 심, 바깥으로 넓고 부드러운 반투명 청록 몸통, 바깥 테두리 가는 밝은 선.
     알파: 머리(칼끝) 0.85 -> 꼬리 0.15. 사라짐 = 알파만 낮춤(조각내지 않음)."""
     sh=head-P(d,hit,S,R,H,f1); acc=np.zeros((CH,CW,4),float)
-    fade=[1,.35/.55,.18/.55,.06/.55][age]; N=220
+    fade=[1,.20/.33,.10/.33,.03/.33][age]; N=220
     from PIL import ImageDraw as _D
     layers=[]
-    for (b0,b1,col,am) in [(0,.0,(236,255,255),1.0),(.0,.85,(70,200,245),.55),(.85,1.,(180,245,255),.75)]:
+    for (b0,b1,col,am) in [(0,.0,(236,255,255),1.0),(.0,.85,(70,200,245),1.0),(.85,1.,(180,245,255),.9)]:
         im=Image.new('L',(CW,CH)); dr=_D.Draw(im); a=np.zeros((CH,CW))
         for i in range(N+1):
             t=i/N; p=P(d,hit,S,R,H,f0+(f1-f0)*t)+sh; n=p-(S+sh); n/=np.linalg.norm(n)+1e-6
-            w=1.+(Wmax-1.)*t**1.2; al=(.05+.50*t)*am*fade
-            if b1==0: dr.point(tuple(np.round(p)),fill=int(min(1,al*1.6)*255)); continue  # 1px 흰 심
+            w=1.+(Wmax-1.)*t**1.2; al=(.03+.30*t)*am*fade
+            if b1==0: dr.point(tuple(np.round(p)),fill=int(.6*(.1+.9*t)*fade*255)); continue  # 1px 흰 심
             dr.line([tuple(p+n*w*b0),tuple(p+n*w*b1+n*.6)],fill=int(al*255),width=1 if b0>=.85 else 2)
         layers.append((np.array(im)/255.,col))
     out=np.zeros((CH,CW,4),float)

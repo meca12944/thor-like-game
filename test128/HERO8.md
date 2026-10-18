@@ -32,3 +32,6 @@
 - Field/dungeon (world.js): hero basic attack hits 1-3 use the town H8HB table (per hit/direction, x29/96 town->field px, weapon scale kept, enemy margin r+h*.2). `?hitbox=1` / F2 draws the sector + enemy margins in the field too.
 - idle_up: left leg moved 4px inward (feet together like other idles); 3% checks unchanged (H -2.2%, headw -2.7%, shw 0%).
 - Sword trail thinner/more transparent: widths ~55% (hit3 head 16px), alpha head 55% -> tail 5%, fade frames 35/18/6%, 1px white core, additive glow 0.20. Gif: v3/preview/combo3_ref_vs_thin_4dir.gif.
+
+## 2026-10-18 very transparent thin sword trails
+- Trail body alpha head ~33% -> tail 3%, fade frames 20/10/3%, 1px white core ~60%, additive glow 0.15, widths ~55% (hit3 head 16px), tip anchoring kept. Gif: v3/preview/combo3_ref_vs_thin_4dir.gif (refined vs new).
