@@ -27,3 +27,33 @@ rep("castRec={t:0,f0:H8.cast[d].rs};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(
 rep("castRec={t:0,f0:H8.cast[d].e};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(d):d].e};}")
 rep("H8.cast.right.n;","(H8.v3?H8.cast['s1_right']:H8.cast.right).n;")
 open(P,'w',encoding='utf-8').write(s); print('patched',len(s))
+# ---- hitboxes matching the combo3_arc trails (2026-10-18 18:40) ----
+import json as _j, numpy as _np
+from PIL import Image as _I
+_V='/workspace/town-demo/char_v4/pixellab/hero/vid'; _J=_j.load(open(_V+'/v3/combo3_arc.json'))['combos']
+HB={}
+for d in ('right','down','up'):
+    R=[]
+    for hit in (1,2,3):
+        m=_np.zeros((256,304),bool)
+        for k,f in enumerate(_J[d]['frames']):
+            if f['hit']==hit: m|=_np.array(_I.open(f'{_V}/px_combo3arc_{d}/fx_{k:03d}.png'))[...,3]>0
+        ys,xs=_np.where(m); R.append(float(_np.hypot((xs-152)/1.5,(ys-188)/1.5/.75).max())*1.1)  # trail reach (world px, from hero.y-8, 3/4 squash) +10%
+    R[2]=max(R[2],1.1*max(R[0],R[1]))  # finisher = biggest
+    HB[d]=[round(r) for r in R]
+HB['left']=HB['right']; HBA=[150,170,160]
+print('hitbox radii',HB,'arcs',HBA)
+s=open(P,encoding='utf-8').read()
+def rep2(old,new):
+    global s
+    assert s.count(old)==1,old[:80]; s=s.replace(old,new)
+rep2("else hit=inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg);",
+     "else{const hb=h8hb(s,a.i);hit=hb?inSector(m,hero.x,hero.y-8,dv,hb[0]+14*(m.sc||1),hb[1]):inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg);}")
+rep2("function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=face8V();",
+     "const H8HB="+_j.dumps({'r':HB,'arc':HBA})+"; // hero v3 hitboxes = combo3_arc trail reach +10% (world px), arcs per hit\n"
+     "let HBDBG=new URLSearchParams(location.search).get('hitbox')==='1';addEventListener('keydown',e=>{if(e.code==='F2'){HBDBG=!HBDBG;e.preventDefault();}});\n"
+     "function h8hb(s,i){if(!(H8&&H8.v3)||s.special||s.leap||s.titleSpin||s.kind==='thrust'||i>2)return null;return [H8HB.r[sdir()][i],H8HB.arc[i]];}\n"
+     "function drawHitbox(){const a=hero.atk;if(!HBDBG||!a)return;const s=a.s,hb=h8hb(s,a.i)||[swingRange(s),s.arc||FEEL.arcDeg],dv=face8V(),on=a.t>=s.a0&&a.t<=s.a1,b=Math.atan2(dv[1],dv[0]),h=hb[1]*Math.PI/360;\n"
+     " ctx.save();ctx.translate(hero.x,hero.y-8);ctx.scale(1,.75);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,hb[0],b-h,b+h);ctx.closePath();ctx.fillStyle=on?'rgba(255,40,40,.35)':'rgba(255,255,0,.12)';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=on?'#ff3030':'#ffff00';ctx.stroke();ctx.restore();}\n"
+     "function drawSlash(){drawHitbox();const a=hero.atk;if(!a)return;const s=a.s;const dv=face8V();")
+open(P,'w',encoding='utf-8').write(s); print('hitbox patched')

@@ -1362,7 +1362,7 @@ function update(dt){
    for(const m of slimes){if(m.dead||a.hit.has(m))continue;let hit=false,kx=dv[0],ky=dv[1];
     if(s.kind==='thrust')hit=inBeam(m,hero.x,hero.y-(dv[1]?0:4),dv,s.len,s.half);
     else if(s.titleSpin){hit=inEll(m,hero.x,hero.y-8,s.rad,s.rad*.72);kx=m.x-hero.x;ky=m.y-hero.y;} // 마왕 only: 360 spin
-    else hit=inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg); // forward sector only (same radius/arc as the trail)
+    else{const hb=h8hb(s,a.i);hit=hb?inSector(m,hero.x,hero.y-8,dv,hb[0]+14*(m.sc||1),hb[1]):inSector(m,hero.x,hero.y-8,dv,swingRange(s)+14*(m.sc||1),s.arc||FEEL.arcDeg);} // forward sector only (same radius/arc as the trail)
     if(hit){a.hit.add(m);const fin3=a.i===2&&!s.special&&!a.finFx;if(fin3)a.finFx=1;damageSlime(m,kx,ky,(s.dmgMul?ATK_DMG[0]*s.dmgMul:ATK_DMG[Math.min(2,a.i)])*(s.hits||1),s.kb,{stop:tk(s.stop||3),shake:s.shake!==undefined?s.shake:(s.fin?'fin':0),fin:s.fin?1:0,col:s.trail?s.trail.map(c=>'rgb('+c+')'):undefined,melee:1});if(fin3)finisherImpact(m,dv);}}}
   if(s.v3c!==undefined&&!s.special&&hero.buffered&&a.i<2&&a.t>=s.v3c){startSwing(a.i+1);}else if(a.t>=s.dur){hero.atk=null;hero.z=0;
    if(hero.buffered&&a.i<2){startSwing(a.i+1);}else{hero.chainT=a.i<2?CHAIN_WINDOW:0;if(H8&&!s.special&&!s.leap)hero.rec={n:a.i===0?'rec1':a.i===1?'rec2':'rec3',t:0};if(a.i>=2){hero.cool=s.cool||.18;hero.combo=0;}}}
@@ -1623,7 +1623,12 @@ function drawCharge(front){const C=hero.charge;if(!C)return;const lv=C.lv,col=lv
   const n=(lv+1)*3;ctx.fillStyle=`rgba(${col},.95)`;for(let i=0;i<n;i++){const an=C.t*5+i*Math.PI*2/n,d=r*(1-((C.t*2.2+i*.37)%1));ctx.fillRect(cx+Math.cos(an)*d*.8-2,cy+Math.sin(an)*d-2,4,4);}
   if(C.flash>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(.8,C.flash*3)})`;ctx.beginPath();ctx.ellipse(cx,cy,r*.5,r*.7,0,0,Math.PI*2);ctx.fill();}}
  ctx.restore();}
-function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=face8V();
+const H8HB={"r": {"right": [161, 123, 177], "down": [184, 133, 203], "up": [186, 158, 205], "left": [161, 123, 177]}, "arc": [150, 170, 160]}; // hero v3 hitboxes = combo3_arc trail reach +10% (world px), arcs per hit
+let HBDBG=new URLSearchParams(location.search).get('hitbox')==='1';addEventListener('keydown',e=>{if(e.code==='F2'){HBDBG=!HBDBG;e.preventDefault();}});
+function h8hb(s,i){if(!(H8&&H8.v3)||s.special||s.leap||s.titleSpin||s.kind==='thrust'||i>2)return null;return [H8HB.r[sdir()][i],H8HB.arc[i]];}
+function drawHitbox(){const a=hero.atk;if(!HBDBG||!a)return;const s=a.s,hb=h8hb(s,a.i)||[swingRange(s),s.arc||FEEL.arcDeg],dv=face8V(),on=a.t>=s.a0&&a.t<=s.a1,b=Math.atan2(dv[1],dv[0]),h=hb[1]*Math.PI/360;
+ ctx.save();ctx.translate(hero.x,hero.y-8);ctx.scale(1,.75);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,hb[0],b-h,b+h);ctx.closePath();ctx.fillStyle=on?'rgba(255,40,40,.35)':'rgba(255,255,0,.12)';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=on?'#ff3030':'#ffff00';ctx.stroke();ctx.restore();}
+function drawSlash(){drawHitbox();const a=hero.atk;if(!a)return;const s=a.s;const dv=face8V();
  if(s.leap&&a.t<s.a0-.03)return;if(s.titleSpin){drawSpinRing(a,'front');return;}
  const tr=s.trail||['120,220,255','255,255,255'];
  const tl=s.strike?.4:.2; // hit 3: longer follow-through fade of the big trail
