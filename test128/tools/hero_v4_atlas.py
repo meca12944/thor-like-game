@@ -20,7 +20,7 @@ DIRS={'down':'south','up':'north','right':'east','left':'west'}
 ROOT=(128,189)
 def even(n,k): b=[n//k]*k; [b.__setitem__(i,b[i]+1) for i in range(n%k)]; return b
 # combo: existing H8.combo timing unchanged (hit1 dur14 hit@5, hit2 dur18 hit@6, hit3 dur27 hit@9). CONTACT = source frame shown from the hit tick (per dir).
-CONTACT={'hit1':{'down':4,'up':3,'right':4,'left':4},'hit2':{'down':3,'up':3,'right':4,'left':4},'hit3':{'down':5,'up':3,'right':4,'left':4}}
+CONTACT={'hit1':{'down':4,'up':3,'right':4,'left':4},'hit2':{'down':3,'up':3,'right':4,'left':4},'hit3':{'down':5,'up':2,'right':4,'left':4}}
 def combo_ticks(hit,d,n=8):
     C=OLD['combo'][int(hit[-1])-1]; c=CONTACT[hit][d]; return even(C['hit'],c)+even(C['dur']-C['hit'],n-c)
 # 60 fps ticks per frame: idle 7t=117ms, walk/run = gait (distance) ~90/~70 ms at 215/408 px/s, dash 4 frames 4-5t (67-83ms) in the unchanged 17-tick dash,
