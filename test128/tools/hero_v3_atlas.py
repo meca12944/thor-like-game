@@ -1,11 +1,11 @@
 # hero_v3_atlas.py — v3 hero motions -> assets/anim/hero8_*.webp + hero8.json (same H8 format as hero8_atlas.py, + per-frame fx layers)
-#  idle=px_idle4, walk=px_walk5, run=px_run4, hit1-3=px_combo3arc (+fx_, combo3_arc.json), cast_s1/s2/s3=px_cast_proj/wave/slam (+magic circle back/front),
+#  idle=px_idle4, walk=px_walk5, run=px_run4, hit1-3=px_combo3arc (+fx_, combo3_ref.json), cast_s1/s2/s3=px_cast_proj/wave/slam (+magic circle back/front),
 #  dash=px_dash4, hurt=px_hurt4.  Dirs right/down/up (left = runtime mirror). Anchor = locked root (feet): 224x176 -> (112,160), combo 304x256 -> (152,200), cast fx 288x248 -> (144,208).
 import json,os,glob,numpy as np
 from PIL import Image
 VID='/workspace/town-demo/char_v4/pixellab/hero/vid'; V3=VID+'/v3'; MC=V3+'/fx/magic_circle'; OUT='/workspace/town-demo/assets/anim'
 M=json.load(open(V3+'/motion_v3.json'))['tags']; MD=json.load(open(V3+'/motion_v3_dh.json'))['tags']
-CA=json.load(open(V3+'/combo3_arc.json'))['combos']; MCJ=json.load(open(MC+'/fx_magic_circle.json'))
+CA=json.load(open(V3+'/combo3_ref.json'))['combos']; MCJ=json.load(open(MC+'/fx_magic_circle.json'))
 DIRS=['right','down','up']; frames={}
 def add(sheet,path,root):
     f=np.asarray(Image.open(path).convert('RGBA')); a=f[...,3]>0
@@ -31,8 +31,8 @@ for d in DIRS:
         L=[]
         for k,fi in enumerate(C['frames']):
             if fi['hit']!=hit: continue
-            e=add('atk',f'{VID}/px_combo3arc_{d}/{k:03d}.png',RC)+[fi['ticks']]
-            fx=add('atkfx',f'{VID}/px_combo3arc_{d}/fx_{k:03d}.png',RC)
+            e=add('atk',f'{VID}/px_combo3ref_{d}/{k:03d}.png',RC)+[fi['ticks']]
+            fx=add('atkfx',f'{VID}/px_combo3ref_{d}/fx_{k:03d}.png',RC)
             L.append(e+(fx if fx else []))
         anims[f'hit{hit}_'+d]=L
     anims['rec1_'+d]=[anims['hit1_'+d][-1][:2]+[12]]; anims['rec2_'+d]=[anims['hit2_'+d][-1][:2]+[12]]

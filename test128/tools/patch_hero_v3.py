@@ -21,8 +21,8 @@ rep("const A=k=>H8.anims[k+'_'+d];let e=null,bob=0;","const A=k=>H8.anims[(H8.v3
 rep("const L=A(nm);e=h8seq(L,Math.min(.999,h.atk.t/s.dur)*h8tot(L));}","const L=A(nm);e=h8seq(L,H8.v3&&!s.special?h.atk.t*60:Math.min(.999,h.atk.t/s.dur)*h8tot(L));}")
 rep("else{e=A('idle')[0];const q=","else if(H8.v3){const L=A('idle');e=h8seq(L,(h.idleT||0)%h8tot(L));}\n else{e=A('idle')[0];const q=")
 rep("if(!e)return null;const c=H8.cells[e[0]][e[1]];return {c,dx:0,dy:0,fl,sy:1,h8:e[0],bob};}",
-    "if(!e)return null;const c=H8.cells[e[0]][e[1]];const o={c,dx:0,dy:0,fl,sy:1,h8:e[0],bob};\n if(H8.v3&&e.length>3){if(/cast/.test(String(h.sk||h.castRec?'cast':''))&&e.length>=7){if(e[3]>=0)o.fxb=[e[3],e[4]];if(e[5]>=0)o.fxf=[e[5],e[6]];}else if(e.length>=5&&e[3]>=0)o.fxf=[e[3],e[4]];}\n return o;}\nfunction h8fx(r,fl){const h=hero;blitHero({c:H8.cells[r[0]][r[1]],dx:0,dy:0,fl,h8:r[0]},h.x,h.y-(h.z||0));}")
-rep("const o=heroCell();if(o){blitHero(o,h.x,h.y-(h.z||0));","const o=heroCell();if(o){if(o.fxb)h8fx(o.fxb,o.fl);blitHero(o,h.x,h.y-(h.z||0));if(o.fxf)h8fx(o.fxf,o.fl);")
+    "if(!e)return null;const c=H8.cells[e[0]][e[1]];const o={c,dx:0,dy:0,fl,sy:1,h8:e[0],bob};\n if(H8.v3&&e.length>3){if(/cast/.test(String(h.sk||h.castRec?'cast':''))&&e.length>=7){if(e[3]>=0)o.fxb=[e[3],e[4]];if(e[5]>=0)o.fxf=[e[5],e[6]];}else if(e.length>=5&&e[3]>=0){o.fxf=[e[3],e[4]];o.fxg=1;}}\n return o;}\nfunction h8fx(r,fl){const h=hero;blitHero({c:H8.cells[r[0]][r[1]],dx:0,dy:0,fl,h8:r[0]},h.x,h.y-(h.z||0));}")
+rep("const o=heroCell();if(o){blitHero(o,h.x,h.y-(h.z||0));","const o=heroCell();if(o){if(o.fxb)h8fx(o.fxb,o.fl);blitHero(o,h.x,h.y-(h.z||0));if(o.fxf){h8fx(o.fxf,o.fl);if(o.fxg){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha*=.35;h8fx(o.fxf,o.fl);ctx.restore();}}") # trail: alpha PNG + faint additive glow
 rep("castRec={t:0,f0:H8.cast[d].rs};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(d):d].rs};}")
 rep("castRec={t:0,f0:H8.cast[d].e};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(d):d].e};}")
 rep("H8.cast.right.n;","(H8.v3?H8.cast['s1_right']:H8.cast.right).n;")
@@ -30,14 +30,14 @@ open(P,'w',encoding='utf-8').write(s); print('patched',len(s))
 # ---- hitboxes matching the combo3_arc trails (2026-10-18 18:40) ----
 import json as _j, numpy as _np
 from PIL import Image as _I
-_V='/workspace/town-demo/char_v4/pixellab/hero/vid'; _J=_j.load(open(_V+'/v3/combo3_arc.json'))['combos']
+_V='/workspace/town-demo/char_v4/pixellab/hero/vid'; _J=_j.load(open(_V+'/v3/combo3_ref.json'))['combos']
 HB={}
 for d in ('right','down','up'):
     R=[]
     for hit in (1,2,3):
         m=_np.zeros((256,304),bool)
         for k,f in enumerate(_J[d]['frames']):
-            if f['hit']==hit: m|=_np.array(_I.open(f'{_V}/px_combo3arc_{d}/fx_{k:03d}.png'))[...,3]>0
+            if f['hit']==hit: m|=_np.array(_I.open(f'{_V}/px_combo3ref_{d}/fx_{k:03d}.png'))[...,3]>0
         ys,xs=_np.where(m); R.append(float(_np.hypot((xs-152)/1.5,(ys-188)/1.5/.75).max())*1.1)  # trail reach (world px, from hero.y-8, 3/4 squash) +10%
     R[2]=max(R[2],1.1*max(R[0],R[1]))  # finisher = biggest
     HB[d]=[round(r) for r in R]
