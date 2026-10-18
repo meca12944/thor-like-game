@@ -22,7 +22,7 @@ rep("const L=A(nm);e=h8seq(L,Math.min(.999,h.atk.t/s.dur)*h8tot(L));}","const L=
 rep("else{e=A('idle')[0];const q=","else if(H8.v3){const L=A('idle');e=h8seq(L,(h.idleT||0)%h8tot(L));}\n else{e=A('idle')[0];const q=")
 rep("if(!e)return null;const c=H8.cells[e[0]][e[1]];return {c,dx:0,dy:0,fl,sy:1,h8:e[0],bob};}",
     "if(!e)return null;const c=H8.cells[e[0]][e[1]];const o={c,dx:0,dy:0,fl,sy:1,h8:e[0],bob};\n if(H8.v3&&e.length>3){if(/cast/.test(String(h.sk||h.castRec?'cast':''))&&e.length>=7){if(e[3]>=0)o.fxb=[e[3],e[4]];if(e[5]>=0)o.fxf=[e[5],e[6]];}else if(e.length>=5&&e[3]>=0){o.fxf=[e[3],e[4]];o.fxg=1;}}\n return o;}\nfunction h8fx(r,fl){const h=hero;blitHero({c:H8.cells[r[0]][r[1]],dx:0,dy:0,fl,h8:r[0]},h.x,h.y-(h.z||0));}")
-rep("const o=heroCell();if(o){blitHero(o,h.x,h.y-(h.z||0));","const o=heroCell();if(o){if(o.fxb)h8fx(o.fxb,o.fl);blitHero(o,h.x,h.y-(h.z||0));if(o.fxf){h8fx(o.fxf,o.fl);if(o.fxg){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha*=.35;h8fx(o.fxf,o.fl);ctx.restore();}}") # trail: alpha PNG + faint additive glow
+rep("const o=heroCell();if(o){blitHero(o,h.x,h.y-(h.z||0));","const o=heroCell();if(o){if(o.fxb)h8fx(o.fxb,o.fl);blitHero(o,h.x,h.y-(h.z||0));if(o.fxf){h8fx(o.fxf,o.fl);if(o.fxg){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha*=.2;h8fx(o.fxf,o.fl);ctx.restore();}}") # trail: alpha PNG + faint additive glow
 rep("castRec={t:0,f0:H8.cast[d].rs};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(d):d].rs};}")
 rep("castRec={t:0,f0:H8.cast[d].e};}","castRec={t:0,f0:H8.cast[H8.v3?h8castKey(d):d].e};}")
 rep("H8.cast.right.n;","(H8.v3?H8.cast['s1_right']:H8.cast.right).n;")
@@ -56,4 +56,5 @@ rep2("function drawSlash(){const a=hero.atk;if(!a)return;const s=a.s;const dv=fa
      "function drawHitbox(){const a=hero.atk;if(!HBDBG||!a)return;const s=a.s,hb=h8hb(s,a.i)||[swingRange(s),s.arc||FEEL.arcDeg],dv=face8V(),on=a.t>=s.a0&&a.t<=s.a1,b=Math.atan2(dv[1],dv[0]),h=hb[1]*Math.PI/360;\n"
      " ctx.save();ctx.translate(hero.x,hero.y-8);ctx.scale(1,.75);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,hb[0],b-h,b+h);ctx.closePath();ctx.fillStyle=on?'rgba(255,40,40,.35)':'rgba(255,255,0,.12)';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=on?'#ff3030':'#ffff00';ctx.stroke();ctx.restore();}\n"
      "function drawSlash(){drawHitbox();const a=hero.atk;if(!a)return;const s=a.s;const dv=face8V();")
+rep2("window.__game={H128,","window.__game={get H8HB(){return H8HB},get HBDBG(){return HBDBG},set HBDBG(v){HBDBG=v},H128,")
 open(P,'w',encoding='utf-8').write(s); print('hitbox patched')

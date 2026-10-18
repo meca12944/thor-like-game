@@ -473,7 +473,7 @@
       hero.walkT += dt * 3;
       if (r.t >= RD) { hero.roll = null; hero.rollCd = DG() ? DG().cdTicks / 60 : ROLL.cd; if (r.carry) { hero.run = true; } } }
     else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const AT = atkT(a.i), lv = a.i >= 3 ? (a.t < AT.a1 ? (spOf(a.i).lunge || 0) * .3 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : 20; moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
-      if (a.t >= AT.a0 && a.t <= AT.a1) { const R = swingR(a.i), cosA = Math.cos(arcW(a.i) / 2 * Math.PI / 180);
+      if (a.t >= AT.a0 && a.t <= AT.a1) { const R = hbR(a.i), cosA = Math.cos(hbA(a.i) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
           const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
           if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); hitMob(mm, a.i >= 3 ? ATK_DMG[0] * (spOf(a.i).dmgMul || 1) : ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (a.i >= 3) sfx(a.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
@@ -731,7 +731,7 @@
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
     drawH128(h128Cell(), h.x, h.y, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x, h.y, k, .5, 'white');
-    if (h.atk && !h128().H8) drawSlashHi(k); } // hero8 attack frames carry their own painted slash trail
+    if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
     const sweep = (a.i % 2 ? -1 : 1), half = arcW(a.i) / 2 * Math.PI / 180, a0 = base - sweep * half, a1 = a0 + sweep * 2 * half * Math.min(1, p / (AT.a1 / AT.dur));
@@ -756,7 +756,7 @@
       return; }
     if (zoom !== 1) { drawSmallHero(g, name, h.x, h.y, zoom); return; }
     drawSpr(g, name, h.x, h.y, { flip: h.face === 'left', mode: (h.inv > .8 && S.scene !== 'world') ? 'white' : null });
-    if (h.atk) drawSlash(g);
+    if (h.atk) drawSlash(g); if (h.atk && !h128()) drawHB(g);
   }
   const smallCache = {};
   function drawSmallHero(g, name, x, y, z) { // world map: pre-scaled with smoothing so the tiny hero stays readable
@@ -766,6 +766,14 @@
       const d = cg.getImageData(0, 0, c.width, c.height); for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 100 ? 255 : 0; cg.putImageData(d, 0, 0); smallCache[key] = c; }
     g.save(); g.translate(Math.round(x), Math.round(y)); if (hero.face === 'left') g.scale(-1, 1); g.drawImage(c, -Math.round(c.width / 2), -c.height); g.restore();
   }
+  // test128: hero basic-attack hitbox = town H8HB table (per hit & direction, town px -> field px x29/96, weapon scale kept); specials keep swingR/arcW
+  function hbKey() { const f = hero.face || 'down', T = (window.__game || {}).H8HB; return T && T.r[f] ? f : /left/.test(f) ? 'left' : /right/.test(f) ? 'right' : /up/.test(f) ? 'up' : 'down'; }
+  function hbR(i) { const g = window.__game, T = g && g.H8HB; if (!T || i > 2) return swingR(i); let k = 1; try { if (g.swingRange && g.SWINGS) k = g.swingRange(g.SWINGS[0]) / 96; } catch (e) { } return T.r[hbKey()][i] * 29 / 96 * k; }
+  function hbA(i) { const T = (window.__game || {}).H8HB; return T && i <= 2 ? T.arc[i] : arcW(i); }
+  function drawHB(g, k) { const G = window.__game, a = hero.atk; if (!G || !G.HBDBG || !a) return; if (k) { const [sx, sy] = W2S(0, 0); g.save(); g.translate(sx, sy); g.scale(k, k); drawHB(g); g.restore(); return; } /* k: hi-res ctx (screen) pass */ const AT = atkT(a.i), on = a.t >= AT.a0 && a.t <= AT.a1, dv = FACEV[hero.face], b = Math.atan2(dv[1], dv[0]), h = hbA(a.i) * Math.PI / 360, R = hbR(a.i);
+    g.save(); g.translate(hero.x, hero.y - 4); g.scale(1, .8); g.fillStyle = on ? 'rgba(255,40,40,.28)' : 'rgba(255,220,40,.14)'; g.strokeStyle = on ? '#ff3030' : '#ffd030'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, R, b - h, b + h); g.closePath(); g.fill(); g.stroke(); g.restore();
+    g.strokeStyle = 'rgba(80,200,255,.8)'; for (const mm of S.mobs) { if (mm.dead) continue; const mh = (mm.D.h || 20) * (mm.scale || 1); g.beginPath(); g.ellipse(mm.x, mm.y - mh * .3, mm.r + mh * .2, (mm.r + mh * .2) * .8, 0, 0, TAU); g.stroke(); } }
   function swingR(i) { const g = window.__game; let k = 1; try { if (g && g.swingRange && g.SWINGS) k = g.swingRange(g.SWINGS[0]) / 96; } catch (e) { } return SWING.range * k * (i === 2 ? SWING.r3 : i >= 3 ? (spOf(i).rangeMul || 1) : 1); }
   function drawSlash(g) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]);
     if (p > (a.i === 2 ? .9 : .85)) return; const sweep = (a.i % 2 ? -1 : 1), R = swingR(a.i) - 2, half = arcW(a.i) / 2 * Math.PI / 180; // trail = hitbox radius/arc; hit2 sweeps back across the FRONT
@@ -985,7 +993,7 @@
   window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = {
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
-    go, dirTap, RUN, SWING, swingR, spOf, arcW, setManual(v) { manual = v; },
+    go, dirTap, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
     tap(code) { queue.push(code); },

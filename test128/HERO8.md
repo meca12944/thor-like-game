@@ -26,3 +26,9 @@
 - 검기 combo3_ref: 반투명 RGBA(칼끝 85% → 꼬리 15%), 가는 흰 심 + 반투명 청록 몸통 + 밝은 바깥선, 알파로 2~3프레임 사라짐, lighter 합성 옅은 빛(0.35).
 - 판정 반경 재계산: 오른쪽/왼쪽 161/123/177, 아래 185/136/204, 위 186/182/205.
 - idle_up: walk4_up 007에서 픽셀 편집한 숨쉬기 12프레임(8틱).
+
+## 2026-10-18 hit2 blob fix, field hitboxes, idle_up stance, thinner trail
+- RIGHT hit2 contact frames (9,10): stray head-like blob near the legs pixel-edited out (left = mirror). Other separated components in all combo frames = blade/hilt pieces (legit).
+- Field/dungeon (world.js): hero basic attack hits 1-3 use the town H8HB table (per hit/direction, x29/96 town->field px, weapon scale kept, enemy margin r+h*.2). `?hitbox=1` / F2 draws the sector + enemy margins in the field too.
+- idle_up: left leg moved 4px inward (feet together like other idles); 3% checks unchanged (H -2.2%, headw -2.7%, shw 0%).
+- Sword trail thinner/more transparent: widths ~55% (hit3 head 16px), alpha head 55% -> tail 5%, fade frames 35/18/6%, 1px white core, additive glow 0.20. Gif: v3/preview/combo3_ref_vs_thin_4dir.gif.
