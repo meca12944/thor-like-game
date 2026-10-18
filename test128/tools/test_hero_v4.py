@@ -55,9 +55,6 @@ async def main():
                 if t%2==0: fr.append(await grab())
             G[d]['combo']=(fr,33); busy=[x for x in S if x['atk']>=0]
             r['combo']=dict(hits=sorted(set(x['atk'] for x in busy)),ticks=len(busy),fx=sum(x['fx'] for x in busy),cells=cells(busy))
-            await reset(d); ok=await pg.evaluate("()=>__game.heroPose('guard')"); fr=[]; S=[]
-            for i in range(16): S+=await adv(3); fr.append(await grab())
-            G[d]['guard']=(fr,50); r['guard']=dict(ok=ok,ticks=sum(1 for x in S if x['pose']=='guard'),cells=cells(S,lambda x:x['pose']=='guard'))
             await reset(d); ok=await pg.evaluate("()=>__game.heroPose('jump')"); fr=[]; S=[]
             for i in range(14): S+=await adv(3); fr.append(await grab())
             G[d]['jump']=(fr,50); r['jump']=dict(ok=ok,cells=cells(S,lambda x:x['pose']=='jump'))
