@@ -704,14 +704,16 @@
   const H128FIG = 30; // figure height in field px (tile 16): about the old hero's 28px
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || S.deadT > 0) return null; const f8 = h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down');
-    const A = k => H.anims[k + '_' + f8], seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
+    const sd = /^(right|left|up|down)$/.test(f8) ? f8 : (f8.includes('right') ? 'right' : 'left'), fl = sd === 'left', d = fl ? 'right' : sd; // 4-way sprite, diagonals = side, left = mirror
+    const A = k => H.anims[k + '_' + d], seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
+    { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y), m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? 46 : 32)) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (h.atk) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A('hurt'); e = seq(L, (1 - hero.inv) * 60); }
-    else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor(h.walkT * 60 / (h.run ? 3 : 4)) % L.length]; }
+    else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
     else e = A('idle')[0];
-    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; return c; }
+    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; return c; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
     else if (h.atk) { const i = h.atk.i, AT = atkT(i); an = i >= 4 || i === 2 ? 'attack3' : i === 1 ? 'attack2' : 'attack1'; const k = AT.a1 / AT.dur; const q = h.atk.t / AT.dur; p = q < AT.a0 / AT.dur ? .25 * q / (AT.a0 / AT.dur) : q < k ? .25 + .35 * (q - AT.a0 / AT.dur) / Math.max(1e-6, k - AT.a0 / AT.dur) : .6 + .4 * Math.min(1, (q - k) / Math.max(1e-6, 1 - k)); }
@@ -722,9 +724,9 @@
     const L = H.anims[an + '_' + dir] || H.anims[an + '_down'], n = L.length;
     let f = p != null ? Math.min(n - 1, Math.floor(p * n)) : (an === 'idle' ? Math.floor(tick) % n : (an === 'walk' || an === 'run') ? 1 + Math.floor(tick) % (n - 1) : Math.min(n - 1, Math.floor(tick)));
     return H.cells[L[f]]; }
-  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, [0, 0, c[2], c[3], c[4], c[5]], x, y, k, alpha); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha); }
-  function drawH128Raw(im, c, x, y, k, alpha) { const sc = k * H128FIG / 117, [sx, sy] = W2S(x, y);
-    ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
+  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, [0, 0, c[2], c[3], c[4], c[5]], x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
+  function drawH128Raw(im, c, x, y, k, alpha, fl) { const sc = k * H128FIG / 117, [sx, sy] = W2S(x, y);
+    ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; if (fl) { ctx.translate(Math.round(sx), 0); ctx.scale(-1, 1); ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); } else ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
