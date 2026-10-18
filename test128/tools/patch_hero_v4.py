@@ -33,6 +33,13 @@ rep("function drawDash8(){",
     "const GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};\nfunction drawGhosts8(){const G=hero.gh;if(!G||!G.length||!H8||!IMG.h8_0)return;for(let i=0;i<G.length;i++){const g=G[i],r=G.length-1-i,a=GH8.alpha[r]*Math.max(0,Math.min(1,(GH8.life-g.a)/(GH8.life-GH8.fadeFrom)));if(a>0)blitHero(g.c,g.x,g.y,a,'dodge');}}\nfunction drawDash8(){")
 rep("function drawHero(){const h=hero;","function drawHero(){const h=hero;drawGhosts8();")
 rep("window.__game={","window.__game={get heroGhosts(){return hero.gh},heroPose:(n)=>{const L=H8&&H8.anims[n+'_down'];if(!L)return false;hero.pose={n,t:0,max:h8tot(L)+30};return true;},")
+
+# touch DASH button (mobile): left of the skill cluster, 76 px, same dash as ShiftLeft (town: joystick dir or facing; field: synthetic ShiftLeft key -> world.js dash)
+rep("body.touch #atk{display:block}","#dashb{position:fixed;right:max(212px,calc(env(safe-area-inset-right) + 184px));bottom:max(30px,env(safe-area-inset-bottom));width:76px;height:76px;border-radius:50%;\n background:radial-gradient(circle at 40% 35%,#7ee8ff,#1f8fb8 60%,#0d4a66);border:4px solid #062433;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;\n color:#fff6e0;font:bold 19px/76px sans-serif;text-align:center;text-shadow:2px 2px 0 #06324a;pointer-events:auto;display:none}\n#dashb.on{transform:scale(.92);filter:brightness(1.2)}\nbody.touch #dashb{display:block} body.touch #atk{display:block}")
+rep('<div id="atk">공격</div>','<div id="atk">공격</div><div id="dashb">대시</div>')
+rep("const isBtn=t=>t===atkEl||","const dashEl=document.getElementById('dashb');\nconst isBtn=t=>t===atkEl||t===dashEl||")
+rep("atkEl.addEventListener('mousedown',e=>{atkPressed=true;});",
+ "atkEl.addEventListener('mousedown',e=>{atkPressed=true;});\nconst dashTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;dashEl.classList.add('on');dashPressed=true;dispatchEvent(new KeyboardEvent('keydown',{code:'ShiftLeft',key:'Shift',bubbles:true}));setTimeout(()=>dispatchEvent(new KeyboardEvent('keyup',{code:'ShiftLeft',key:'Shift',bubbles:true})),40);};\ndashEl.addEventListener('touchstart',dashTap,{passive:false});dashEl.addEventListener('mousedown',dashTap);\n['touchend','touchcancel','mouseup','mouseleave'].forEach(n=>dashEl.addEventListener(n,()=>dashEl.classList.remove('on')));")
 open(P,'w',encoding='utf-8').write(s); print('patched',P,len(s))
 w=open(B+'test128_world.js.new',encoding='utf-8').read()
 def repw(old,new):
