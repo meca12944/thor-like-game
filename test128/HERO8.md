@@ -35,3 +35,13 @@
 
 ## 2026-10-18 very transparent thin sword trails
 - Trail body alpha head ~33% -> tail 3%, fade frames 20/10/3%, 1px white core ~60%, additive glow 0.15, widths ~55% (hit3 head 16px), tip anchoring kept. Gif: v3/preview/combo3_ref_vs_thin_4dir.gif (refined vs new).
+
+## 2026-10-18 hero v4 (PixelLab v3 캐릭터 fb140a07 전 동작 교체)
+- 그림: `char_v4/pixellab/hero/v3gen_20261018/` — moves_v1 idle · walk · run · dash · hurt · death · cast · guard · jump + combo3_v2 hit1-3. **진짜 4방향** (왼쪽 = west 그림, 더 이상 반전 아님).
+- 경로는 `tools/hero_v4_atlas.py` 맨 위 `SRC` 한 곳에서만 지정 (hurt · dash 교체 시 거기만 바꾸고 `hero_v4_atlas.py` → `patch_hero_v4.py`).
+- 기준점 = 256 캔버스의 고정 발 루트 (128,189), 모든 동작 · 방향 · 프레임 동일 (흔들림 없음). 배율 1:1 (최근접, 리샘플 없음): 서 있는 키 124px (기존 121px).
+- 타이밍: idle 7틱(117ms), walk/run 거리 기준 한 주기 155/228 px (215/408 px/s 에서 약 90/70ms), dash 4장 4-5틱 (17틱 대시 그대로), hurt 4장 5틱 (20틱 그대로), death 8장 6틱(100ms) 후 마지막 장 유지 (필드도), cast 5틱/장 (윈드업 0-2 · 채널 3-5 · 발사 6-7 · 마무리 4,1,0; 기존 S1-S3 마법진 fx 위상 맞춰 유지, 왼쪽은 반전), 연타 = 기존 H8.combo 타이밍 · 타격 틱 그대로 (방향별 접촉 프레임).
+- 대시 잔상: 현재 프레임 4개, 2틱 간격 위치, 청록 틴트, 55/38/22/10%, 대시 끝 후 약 10틱 동안 사라짐 (기존 5잔상 대체).
+- 검기 fx 레이어(hero8_atkfx) 제거: combo3_v2 프레임에 휘두름 스미어가 그려져 있음.
+- guard · jump: 게임에 입력/판정 없음 → 아틀라스에만 포함, 미리보기 `__game.heroPose('guard'|'jump')` (시각 전용, 아무 행동이나 하면 취소).
+- 판정 · 게임 로직 변경 없음. 시험: `python3 tools/test_hero_v4.py <웹 루트>`.
