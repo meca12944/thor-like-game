@@ -10,7 +10,8 @@ import json,os,glob,shutil,numpy as np
 from PIL import Image
 G='/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018'; OUT='/workspace/town-demo/assets/anim'
 OLDDIR='/workspace/town-demo/_backup_hero8_pre_v4_20261018/assets_anim'; OLD=json.load(open(OLDDIR+'/hero8.json'))
-SRC={'idle':G+'/moves_v1/idle','walk':G+'/moves_v1/walk','run':G+'/moves_v1/run',
+SRC={'idle':G+'/moves_v1/idle','walk':G+'/moves_v1/walk','run':G+'/edit_v1/run_v2',   # run_v2 = PixelLab edits (owner 00:21)
+     
      'dash':G+'/moves_v1/dash',    # glide dash_v2 handled by another worker
      'hurt':G+'/moves_v1/hurt',    # <- to be redone (hurt_v2)
      'death':G+'/cast_death_guard_v2/death','cast':G+'/cast_death_guard_v2/cast','jump':G+'/moves_v1/jump',   # death v2 (9f, blood) + cast v2 (7f) approved 23:35; guard removed (owner)
