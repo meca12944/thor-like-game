@@ -50,6 +50,15 @@ rep("(hero.runReq||alwaysRun)&&!hero.run)","(hero.runReq||alwaysRun||touchRun)&&
 rep("alwaysRun(){return alwaysRun}","alwaysRun(){return alwaysRun||touchRun},get touchRun(){return touchRun}")
 rep("dashEl.addEventListener('touchstart',dashTap,{passive:false});",
  "dashEl.addEventListener('touchstart',dashTap,{passive:false});\nconst runTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;touchRun=!touchRun;runEl.classList.toggle('on',touchRun);};\nrunEl.addEventListener('touchstart',runTap,{passive:false});runEl.addEventListener('mousedown',runTap);")
+
+
+# run toggle must always give the run gait/anim (town): force hero.run while touchRun && moving; anim picks run when touchRun
+rep("const runK=hero.charge?","if(touchRun&&l>0&&!busy&&!hero.charge&&!hero.run){hero.run=true;hero.runStartT=0;}\n  const runK=hero.charge?")
+rep("const L=A(h.run?'run':'walk');e=L[","const L=A(h.run||(touchRun&&h.moving)?'run':'walk');e=L[")
+rep("get alwaysRun","get stick(){return stick},get alwaysRun")
+# combo advance (owner): each basic hit drives forward 9/11/14 px (eased over the windup->hit, existing moveCol collision, hitbox follows hero)
+rep("if(a.t<s.a1&&(s.lunge||a.runSlash)){const p=a.t/s.a1,f=((s.lunge||0)+",
+    "const LG=H8&&H8.v4&&!s.special&&!s.leap&&!s.fin2?(H8.lunge||[9,11,14])[Math.min(2,a.i|0)]:(s.lunge||0);if(a.t<s.a1&&(LG||a.runSlash)){const p=a.t/s.a1,f=(LG+")
 open(P,'w',encoding='utf-8').write(s); print('patched',P,len(s))
 w=open(B+'test128_world.js.new',encoding='utf-8').read()
 def repw(old,new):
@@ -64,4 +73,11 @@ repw("    else e = A('idle')[0];\n    if (!e) return null; const c = H.cells",
 # field death: H8 death_<dir> (S.deadT counts up 0 -> 2.2 s)
 repw("if (!H || !G.H8img(0) || S.deadT > 0) return null;","if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null;")
 repw("    if (h.atk) { const i = h.atk.i, AT = atkT(i), L = A(","    if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);\n    else if (h.atk) { const i = h.atk.i, AT = atkT(i), L = A(")
+
+repw(": a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : 20;",
+     ": a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : H.v4 ? (a.t < AT.a1 ? (H.lunge || [9, 11, 14])[Math.min(2, a.i)] * 29 / 96 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : 20; // hero v4: per-hit forward advance (town px scaled to field)")
+
+# touch joystick in the field (town stick shared through __game.stick) -> movement; run toggle = __game.alwaysRun (alwaysRun||touchRun)
+repw("function dirInput() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; } return [ix, iy]; }",
+     "function dirInput() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }\n    if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }")
 open(PW,'w',encoding='utf-8').write(w); print('patched',PW)
