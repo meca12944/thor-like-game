@@ -40,6 +40,16 @@ rep('<div id="atk">공격</div>','<div id="atk">공격</div><div id="dashb">대�
 rep("const isBtn=t=>t===atkEl||","const dashEl=document.getElementById('dashb');\nconst isBtn=t=>t===atkEl||t===dashEl||")
 rep("atkEl.addEventListener('mousedown',e=>{atkPressed=true;});",
  "atkEl.addEventListener('mousedown',e=>{atkPressed=true;});\nconst dashTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;dashEl.classList.add('on');dashPressed=true;dispatchEvent(new KeyboardEvent('keydown',{code:'ShiftLeft',key:'Shift',bubbles:true}));setTimeout(()=>dispatchEvent(new KeyboardEvent('keyup',{code:'ShiftLeft',key:'Shift',bubbles:true})),40);};\ndashEl.addEventListener('touchstart',dashTap,{passive:false});dashEl.addEventListener('mousedown',dashTap);\n['touchend','touchcancel','mouseup','mouseleave'].forEach(n=>dashEl.addEventListener(n,()=>dashEl.classList.remove('on')));")
+
+# touch RUN toggle (달리기): tap = run on/off (session only, highlighted while on); joystick movement then runs like double-tap / '달리기 기본'
+rep("body.touch #dashb{display:block}","#runb{position:fixed;right:max(212px,calc(env(safe-area-inset-right) + 184px));bottom:max(120px,calc(env(safe-area-inset-bottom) + 90px));width:76px;height:76px;border-radius:50%;\n background:radial-gradient(circle at 40% 35%,#c9f08a,#5f9a2a 60%,#2f5512);border:4px solid #142408;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;\n color:#fff6e0;font:bold 17px/76px sans-serif;text-align:center;text-shadow:2px 2px 0 #1f3a08;pointer-events:auto;display:none}\n#runb.on{filter:brightness(1.35);box-shadow:0 0 0 3px #fff inset,0 0 14px 4px #e8ff9a,0 4px 0 #000a}\nbody.touch #runb{display:block} body.touch #dashb{display:block}")
+rep('<div id="dashb">대시</div>','<div id="dashb">대시</div><div id="runb">달리기</div>')
+rep("const isBtn=t=>t===atkEl||t===dashEl||","const runEl=document.getElementById('runb');\nconst isBtn=t=>t===atkEl||t===dashEl||t===runEl||")
+rep("let alwaysRun=false;","let alwaysRun=false,touchRun=false;")
+rep("(hero.runReq||alwaysRun)&&!hero.run)","(hero.runReq||alwaysRun||touchRun)&&!hero.run)")
+rep("alwaysRun(){return alwaysRun}","alwaysRun(){return alwaysRun||touchRun},get touchRun(){return touchRun}")
+rep("dashEl.addEventListener('touchstart',dashTap,{passive:false});",
+ "dashEl.addEventListener('touchstart',dashTap,{passive:false});\nconst runTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;touchRun=!touchRun;runEl.classList.toggle('on',touchRun);};\nrunEl.addEventListener('touchstart',runTap,{passive:false});runEl.addEventListener('mousedown',runTap);")
 open(P,'w',encoding='utf-8').write(s); print('patched',P,len(s))
 w=open(B+'test128_world.js.new',encoding='utf-8').read()
 def repw(old,new):

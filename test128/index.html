@@ -19,7 +19,11 @@ canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated;image-re
  background:radial-gradient(circle at 40% 35%,#7ee8ff,#1f8fb8 60%,#0d4a66);border:4px solid #062433;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;
  color:#fff6e0;font:bold 19px/76px sans-serif;text-align:center;text-shadow:2px 2px 0 #06324a;pointer-events:auto;display:none}
 #dashb.on{transform:scale(.92);filter:brightness(1.2)}
-body.touch #dashb{display:block} body.touch #atk{display:block} body.touch #hint{display:none}
+#runb{position:fixed;right:max(212px,calc(env(safe-area-inset-right) + 184px));bottom:max(120px,calc(env(safe-area-inset-bottom) + 90px));width:76px;height:76px;border-radius:50%;
+ background:radial-gradient(circle at 40% 35%,#c9f08a,#5f9a2a 60%,#2f5512);border:4px solid #142408;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;
+ color:#fff6e0;font:bold 17px/76px sans-serif;text-align:center;text-shadow:2px 2px 0 #1f3a08;pointer-events:auto;display:none}
+#runb.on{filter:brightness(1.35);box-shadow:0 0 0 3px #fff inset,0 0 14px 4px #e8ff9a,0 4px 0 #000a}
+body.touch #runb{display:block} body.touch #dashb{display:block} body.touch #atk{display:block} body.touch #hint{display:none}
 /* skill quick slots (3) */
 .slot{position:fixed;width:64px;height:64px;border-radius:50%;pointer-events:auto;background:radial-gradient(circle at 40% 35%,#5a8ef0,#24479c 62%,#132a63);
  border:4px solid #0b1430;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;overflow:hidden}
@@ -134,7 +138,7 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui"><div id="stick"><div id="knob"></div></div><div id="atk">공격</div><div id="dashb">대시</div>
+<div id="ui"><div id="stick"><div id="knob"></div></div><div id="atk">공격</div><div id="dashb">대시</div><div id="runb">달리기</div>
 <div class="slot" id="s0"></div><div class="slot" id="s1"></div><div class="slot" id="s2"></div>
 <div id="slotsKeys">1 · 2 · 3</div>
 <div id="wbtn">스킬창 (O)</div>
@@ -345,7 +349,7 @@ addEventListener('keydown',e=>{const code=codeOf(e);
  if(e.repeat)return;
  doAction(act);});
 addEventListener('keyup',e=>{pressed.delete(codeOf(e));syncHeld();});
-const lastTap={};let alwaysRun=false;try{alwaysRun=localStorage.getItem('alwaysRun')==='1';}catch(e){}
+const lastTap={};let alwaysRun=false,touchRun=false;try{alwaysRun=localStorage.getItem('alwaysRun')==='1';}catch(e){}
 function toggleAlwaysRun(){alwaysRun=!alwaysRun;try{localStorage.setItem('alwaysRun',alwaysRun?'1':'0');}catch(e){}}
 function dirTap(d){const now=performance.now()/1000;if(now-(lastTap[d]??-9)<=FEEL.dblTap)hero.runReq=true;lastTap[d]=now;} // double-tap (press->press <= .25s); diagonal: double-tap either key
 function doAction(act){
@@ -834,7 +838,8 @@ const slotEls=[0,1,2].map(i=>document.getElementById('s'+i));
 function setTouch(){document.body.classList.add('touch');}
 if(matchMedia('(pointer:coarse)').matches)setTouch();
 const dashEl=document.getElementById('dashb');
-const isBtn=t=>t===atkEl||t===dashEl||slotEls.some(s=>s.contains(t))||t.closest&&t.closest('#wbtn,#win,#ov,#dlg');
+const runEl=document.getElementById('runb');
+const isBtn=t=>t===atkEl||t===dashEl||t===runEl||slotEls.some(s=>s.contains(t))||t.closest&&t.closest('#wbtn,#win,#ov,#dlg');
 addEventListener('touchstart',e=>{setTouch();if(winOpen||ui)return;for(const t of e.changedTouches){if(isBtn(t.target))continue;
  if(stick.id===null&&t.clientX<innerWidth*0.6){stick.id=t.identifier;stick.ox=t.clientX;stick.oy=t.clientY;stick.dx=stick.dy=0;stEl.style.display='block';stEl.style.left=t.clientX+'px';stEl.style.top=t.clientY+'px';knob.style.transform='';}}
  if(!e.target.closest||!e.target.closest('#win'))e.preventDefault();},{passive:false});
@@ -846,7 +851,9 @@ atkEl.addEventListener('touchstart',e=>{atkPressed=true;atkEl.classList.add('on'
 atkEl.addEventListener('touchend',e=>{atkEl.classList.remove('on');e.preventDefault();},{passive:false});
 atkEl.addEventListener('mousedown',e=>{atkPressed=true;});
 const dashTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;dashEl.classList.add('on');dashPressed=true;dispatchEvent(new KeyboardEvent('keydown',{code:'ShiftLeft',key:'Shift',bubbles:true}));setTimeout(()=>dispatchEvent(new KeyboardEvent('keyup',{code:'ShiftLeft',key:'Shift',bubbles:true})),40);};
-dashEl.addEventListener('touchstart',dashTap,{passive:false});dashEl.addEventListener('mousedown',dashTap);
+dashEl.addEventListener('touchstart',dashTap,{passive:false});
+const runTap=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;touchRun=!touchRun;runEl.classList.toggle('on',touchRun);};
+runEl.addEventListener('touchstart',runTap,{passive:false});runEl.addEventListener('mousedown',runTap);dashEl.addEventListener('mousedown',dashTap);
 ['touchend','touchcancel','mouseup','mouseleave'].forEach(n=>dashEl.addEventListener(n,()=>dashEl.classList.remove('on')));
 slotEls.forEach((el,i)=>{
  const down=e=>{e.preventDefault();e.stopPropagation();if(winOpen||ui)return;if(!slots[i]){toggleWin(true);return;}skPress.push(i);skHeld[i]=true;el.classList.add('on');};
@@ -1383,7 +1390,7 @@ function update(dt){
  }else{
   if(hero.chainT>0){hero.chainT-=dt;if(hero.chainT<=0)hero.combo=0;}
   const busy=hero.deadT>0||hero.hurtT>0;
-  if(l>0&&!busy&&!hero.charge&&(hero.runReq||alwaysRun)&&!hero.run){hero.run=true;hero.runStartT=tk(FEEL.runStartTicks);burst(hero.x-ix*10,hero.y-2,8,['#e8dcc0','#cbb894'],130,0,3);} // dash start: burst + dust kick-up
+  if(l>0&&!busy&&!hero.charge&&(hero.runReq||alwaysRun||touchRun)&&!hero.run){hero.run=true;hero.runStartT=tk(FEEL.runStartTicks);burst(hero.x-ix*10,hero.y-2,8,['#e8dcc0','#cbb894'],130,0,3);} // dash start: burst + dust kick-up
   hero.runReq=false;if(hero.runStartT>0)hero.runStartT-=dt;if(hero.skidT>0)hero.skidT-=dt;
   const runK=hero.charge?hero.charge.mv:hero.run?FEEL.runMul+(FEEL.runStartMul-FEEL.runMul)*Math.max(0,hero.runStartT/tk(FEEL.runStartTicks)):1;
   if(l>0&&!busy){const k=1/FEEL.accelTicks;const gm=moveMul();hero.vx+=(ix*FEEL.walkSpeed*gm*runK*l-hero.vx)*k;hero.vy+=(iy*FEEL.walkSpeed*gm*runK*l-hero.vy)*k; // near-instant accel (run: 1.72x)
@@ -1801,7 +1808,7 @@ Promise.all(jobs).then(()=>{
  updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=boarSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
- window.__game={get heroGhosts(){return hero.gh},heroPose:(n)=>{const L=H8&&H8.anims[n+'_down'];if(!L)return false;hero.pose={n,t:0,max:h8tot(L)+30};return true;},get H8HB(){return H8HB},get HBDBG(){return HBDBG},set HBDBG(v){HBDBG=v},H128,H8,moveCol:(o,dx,dy,r)=>moveCol(o,dx,dy,r),H8img:i=>IMG['h8_'+i],h8tinted:(im,c,t)=>h8tinted(im,c,t),heroCell8:()=>H8&&heroCell8(),face8:()=>face8(),get IMG(){return IMG},hurtHeroForTest:(x,y,d)=>hurtHero(x,y,d),get H128img(){return IMG.hero128},get H128tint(){return HERO_TINT.h128},openShop,shopList,DODGE,dodgeDist,get dodgePhase(){if(!hero.dash)return null;const p=hero.dash.t/tk(FEEL.dashTicks),F=DODGE.frames.town||[];const f=F.find(f=>p<=f.until);return f&&f.phase;},ECON,goldFor,addGold,get goldEarned(){return goldEarned},gearAtkMul,heroDmgType,affOf,townMobDef,get DNUM(){return DNUM},CC,canAct,skillCancelOk,get skBuf(){return skBuf},startSwingForTest:i=>startSwing(i),SP_I,spCfg,dirTap,toggleAlwaysRun,get alwaysRun(){return alwaysRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,expNext,ultId,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
+ window.__game={get heroGhosts(){return hero.gh},heroPose:(n)=>{const L=H8&&H8.anims[n+'_down'];if(!L)return false;hero.pose={n,t:0,max:h8tot(L)+30};return true;},get H8HB(){return H8HB},get HBDBG(){return HBDBG},set HBDBG(v){HBDBG=v},H128,H8,moveCol:(o,dx,dy,r)=>moveCol(o,dx,dy,r),H8img:i=>IMG['h8_'+i],h8tinted:(im,c,t)=>h8tinted(im,c,t),heroCell8:()=>H8&&heroCell8(),face8:()=>face8(),get IMG(){return IMG},hurtHeroForTest:(x,y,d)=>hurtHero(x,y,d),get H128img(){return IMG.hero128},get H128tint(){return HERO_TINT.h128},openShop,shopList,DODGE,dodgeDist,get dodgePhase(){if(!hero.dash)return null;const p=hero.dash.t/tk(FEEL.dashTicks),F=DODGE.frames.town||[];const f=F.find(f=>p<=f.until);return f&&f.phase;},ECON,goldFor,addGold,get goldEarned(){return goldEarned},gearAtkMul,heroDmgType,affOf,townMobDef,get DNUM(){return DNUM},CC,canAct,skillCancelOk,get skBuf(){return skBuf},startSwingForTest:i=>startSwing(i),SP_I,spCfg,dirTap,toggleAlwaysRun,get alwaysRun(){return alwaysRun||touchRun},get touchRun(){return touchRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,expNext,ultId,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},get shopAt(){return shopAt},get shopMode(){return shopMode},get sellPend(){return sellPend},get shopNpc(){return shopNpc},openShop,dropNote,RARITY_STARS,EQ_SLOTS,gearStats,recalcGear,migrateInv,shopList,useConsumable,get buffs(){return BUFFS},get itemCd(){return itemCd},invTake,renderInv,get eqSel(){return eqSel},starCount,IT,setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},set areaMode(v){areaMode=v},castArea,get areaCd(){return areaCd},set areaCd(v){areaCd=v},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};
