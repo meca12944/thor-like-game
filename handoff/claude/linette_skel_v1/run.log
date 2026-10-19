@@ -1,3 +1,5 @@
 2026-10-19 16:09:13 estimate start_run_east.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-19 16:17:02 animate run_east_B east seed 21 usage {"type": "generations", "generations": 3.0}
 2026-10-19 16:18:31 animate run_east_A east seed 21 usage {"type": "generations", "generations": 3.0}
+2026-10-19 16:57:51 animate run_east_B2 east seed 21 usage {"type": "generations", "generations": 3.0}
+2026-10-19 16:58:57 animate run_east_A2 east seed 21 usage {"type": "generations", "generations": 3.0}
