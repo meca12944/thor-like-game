@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Powerful forward-stepping sword slash with the sword in the right hand: the fast slash part of the swing. The sword reaches far out in front of the body and keeps its full length. Sword in the right hand. Front foot forward, back foot braced, NO bow-legged or crab stance. The cape flows with the body. Long straight hair, only the ends sway. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. A thin, faint, semi-transparent white-to-lavender crescent slash trail following the sword tip along the full blade length; no other glow or sparks.",
+    "frame_count": 4,
+    "directions": [
+      "south"
+    ],
+    "animation_name": "combo3_trailB_hit1",
+    "keep_first_frame": false,
+    "seed": 202,
+    "start_index": 1,
+    "end_index": 5
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "71e5a2c5-41f7-430d-bf78-51b1528168d9"
+    ],
+    "directions": [
+      "south"
+    ],
+    "animation_group_id": "0ca8164a-5642-4cb0-b1f1-7703c2508daf",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

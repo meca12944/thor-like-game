@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Idle loop, looping: standing ready, subtle breathing, sword in right hand lowered, cape and hair ends gently swaying. Sword in the right hand. Long straight black hair, only the ends sway. The cape flows with the body. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO glow, sparks, dust, flashes or any effects. Keep facing the same direction the whole time. Stay in side profile.",
+    "frame_count": 8,
+    "directions": [
+      "east",
+      "west"
+    ],
+    "animation_name": "idle_v1",
+    "keep_first_frame": false,
+    "seed": 421,
+    "animation_group_id": "6e819b4d-1ad4-4037-9702-e6ea5272732d"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "7836e7fd-35eb-4588-a3a4-960091fbe317"
+    ],
+    "directions": [
+      "east"
+    ],
+    "animation_group_id": "6e819b4d-1ad4-4037-9702-e6ea5272732d",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

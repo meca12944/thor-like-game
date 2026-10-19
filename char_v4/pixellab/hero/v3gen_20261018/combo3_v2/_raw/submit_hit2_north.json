@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Hit 2, continuing from the follow-through of hit 1: DYNAMIC, powerful slash with full body weight thrown forward: a deep lunge step, hips and shoulders rotating into the swing, the torso leaning forward, the sword sweeping in a wide arc in front of the body at full arm extension; strong anticipation windup and a sharp follow-through. This slash sweeps the opposite way (reverse backhand). Sword in the right hand. Front foot forward, back foot braced, NO bow-legged or crab stance. The cape flows with the body. Long straight hair, only the ends sway. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO slash trail, glow, sparks or any effects. No glow, sparks, flashes or energy effects. Keep the back to the camera the whole time. Seen from behind: the sword must never be hidden behind the body; keep it visible above or out to the sides.",
+    "frame_count": 8,
+    "directions": [
+      "north"
+    ],
+    "animation_name": "combo3v2_hit2",
+    "keep_first_frame": false,
+    "seed": 202,
+    "animation_group_id": "63b64843-6158-4e31-ae52-e52dedddf2a9",
+    "custom_start_frame_path": "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_v2/hit1/north/007.png"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "5823cd45-3cc6-41d5-a199-2a206587193d"
+    ],
+    "directions": [
+      "north"
+    ],
+    "animation_group_id": "63b64843-6158-4e31-ae52-e52dedddf2a9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

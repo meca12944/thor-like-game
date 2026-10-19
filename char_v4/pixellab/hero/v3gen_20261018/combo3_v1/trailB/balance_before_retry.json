@@ -1,0 +1,13 @@
+{
+  "credits": {
+    "type": "usd",
+    "usd": 0.0
+  },
+  "subscription": {
+    "type": "generations",
+    "status": "active",
+    "plan": "Tier 3: Pixel Architect",
+    "generations": 9174.75,
+    "total": 10000.0
+  }
+}

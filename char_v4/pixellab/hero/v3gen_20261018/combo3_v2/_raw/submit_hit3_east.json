@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Hit 3, continuing from hit 2: BIG finishing slash: a huge wide sweeping cut with the whole body, the biggest windup (sword drawn far back), then an explosive full-arc swing across the front with a big forward lunge; the heaviest, most dramatic hit; hold the follow-through. Sword in the right hand. Front foot forward, back foot braced, NO bow-legged or crab stance. The cape flows with the body. Long straight hair, only the ends sway. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO slash trail, glow, sparks or any effects. No glow, sparks, flashes or energy effects. Keep facing right in profile the whole time.",
+    "frame_count": 8,
+    "directions": [
+      "east"
+    ],
+    "animation_name": "combo3v2_hit3",
+    "keep_first_frame": false,
+    "seed": 202,
+    "animation_group_id": "96be0b8e-ee14-488d-8841-f22b46f6fe89",
+    "custom_start_frame_path": "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_v2/hit2/east/007.png"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "92e66b24-eeee-4a49-b46b-8de64ff349f5"
+    ],
+    "directions": [
+      "east"
+    ],
+    "animation_group_id": "96be0b8e-ee14-488d-8841-f22b46f6fe89",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Fast running cycle, looping: upper body leaning forward, sword held low trailing behind, arms swinging opposite the legs, the cape streaming behind. Sword in the right hand. Long straight black hair, only the ends sway. The cape flows with the body. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO glow, sparks, dust, flashes or any effects. Keep facing the same direction the whole time.",
+    "frame_count": 8,
+    "directions": [
+      "south",
+      "north"
+    ],
+    "animation_name": "run_v1",
+    "keep_first_frame": false,
+    "seed": 411
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "0b760f4b-101c-4e49-a005-6d26b3b15b93",
+      "d6db53aa-729b-456f-b7b6-ee6089eeda9a"
+    ],
+    "directions": [
+      "south",
+      "north"
+    ],
+    "animation_group_id": "ef3625e3-f009-4725-a7a5-630124003082",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Skill cast: plants feet, raises the left hand forward and the sword in the right hand to the side, gathers power, then releases with a push forward. No magic effects. Sword in the right hand. Long straight black hair, only the ends sway. The cape flows with the body. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO glow, sparks, dust, flashes or any effects. Keep facing the same direction the whole time. Stay in side profile.",
+    "frame_count": 8,
+    "directions": [
+      "east",
+      "west"
+    ],
+    "animation_name": "cast_v1",
+    "keep_first_frame": false,
+    "seed": 424,
+    "animation_group_id": "bc6b3bad-334e-49ba-84df-b1947537aa2f"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "c3495fff-7513-4552-bf4a-eb12be17d2bb",
+      "a3e13881-091d-4942-995c-e2fdd09dede6"
+    ],
+    "directions": [
+      "east",
+      "west"
+    ],
+    "animation_group_id": "bc6b3bad-334e-49ba-84df-b1947537aa2f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

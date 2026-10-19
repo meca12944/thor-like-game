@@ -1,0 +1,24 @@
+{
+ "selection": {
+  "hit1/east/003": "_cand/a/e1_s501/hit1_003.png",
+  "hit1/east/004": "_cand/a/e1_s501/hit1_004.png",
+  "hit1/east/006": "_cand/b/e3_s601/hit1_006.png",
+  "hit1/east/007": "_cand/b/e3_s601/hit1_007.png",
+  "hit2/east/002": "_cand/a/e2_s502/hit2_002.png",
+  "hit2/east/003": "_cand/a/e2_s502/hit2_003.png",
+  "hit2/east/004": "_cand/a/e2_s502/hit2_004.png",
+  "hit2/east/005": "_cand/b/e3_s601/hit2_005.png"
+ },
+ "body_lock": true,
+ "note": "PixelLab edit-animation-v2 outputs; body lock keeps original pixels outside the trail zone; west = mirror of east; south/north unchanged (no trail behind the body found); north hit2 = full PixelLab edit to back view (n2 a/b s701), trail re-edited on f3/f4 (n2 c s702); no body lock there because the pose view changed",
+ "replace": {
+  "hit2/north/000": "_cand/n2/a_s701/hit2_000.png",
+  "hit2/north/001": "_cand/n2/a_s701/hit2_001.png",
+  "hit2/north/002": "_cand/n2/a_s701/hit2_002.png",
+  "hit2/north/003": "_cand/n2/c_s702/hit2_003.png",
+  "hit2/north/004": "_cand/n2/c_s702/hit2_004.png",
+  "hit2/north/005": "_cand/n2/b_s701/hit2_005.png",
+  "hit2/north/006": "_cand/n2/b_s701/hit2_006.png",
+  "hit2/north/007": "_cand/n2/b_s701/hit2_007.png"
+ }
+}

@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Finisher: a big powerful overhead downward slash with a strong forward lunge, the heaviest hit, then hold the recovery pose. Sword in the right hand. Front foot forward, back foot braced, NO bow-legged or crab stance. The cape flows with the body. Long straight hair, only the ends sway. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO slash trail, glow, sparks or any effects. Keep facing left in profile the whole time.",
+    "frame_count": 8,
+    "directions": [
+      "west"
+    ],
+    "animation_name": "combo3_noeffect_hit3",
+    "keep_first_frame": false,
+    "seed": 202,
+    "animation_group_id": "d3c700e0-05d4-4e38-8577-c8e55178e647",
+    "custom_start_frame_path": "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_v1/hit2/west/007.png"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "e620514f-d30c-4f77-bc9b-170d716edd92"
+    ],
+    "directions": [
+      "west"
+    ],
+    "animation_group_id": "d3c700e0-05d4-4e38-8577-c8e55178e647",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

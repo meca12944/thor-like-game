@@ -1,0 +1,25 @@
+[0s] before 9229.75
+[54s] submit run ['south', 'north'] 200 
+[67s] submit run ['east', 'west'] 200 
+[99s] submit dash ['south', 'north'] 200 
+[102s] submit dash ['east', 'west'] 200 
+[104s] submit jump ['south', 'north'] 429 {
+  "detail": "Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs."
+}
+[106s] submit jump ['east', 'west'] 429 {
+  "detail": "Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs."
+}
+[115s] FAILED run south {
+  "usage": {
+    "type": "usd",
+    "usd": 0.0
+  },
+  "id": "0b760f4b-101c-4e49-a005-6d26b3b15b93",
+  "status": "failed",
+  "created_at": "2026-10-18T13:21:05.213916+00:00",
+  "last_response": {
+    "code": 500,
+    "type": "error",
+    "error": "Generation failed due to heavy load. Please try again in a moment.",
+    "trace": null,
+    "action": "Fast running cycle, looping: upper body leaning 

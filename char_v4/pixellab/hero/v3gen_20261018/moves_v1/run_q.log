@@ -1,0 +1,7 @@
+[0s] before 9229.75
+[9s] submit FAIL jump ['south', 'north'] 429 {
+  "detail": "Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs."
+}
+[27s] submit FAIL jump ['south', 'north'] 429 {
+  "detail": "Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs."
+}

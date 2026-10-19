@@ -1,0 +1,15 @@
+{
+ "desc": "Seen from BEHIND (back view, face not shown). The black cape must not cover the body: swing the cape out to the side or let it hang behind the legs, with the red lining and gold trim visible and the cape shading a little brighter so it separates from the black coat. Keep the back, long black hair, sword arm and the steel sword clearly visible in every frame; the sword is never hidden. Keep the same character and size. No flashes or glow.",
+ "frames": [
+  "combo3_v2/hit3/north/004.png",
+  "combo3_v2/hit3/north/005.png",
+  "combo3_v2/hit3/north/006.png",
+  "combo3_v2/hit3/north/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "3ff24254-5dd0-44e9-b386-3e7f32ca9e11",
+  "status": "processing"
+ }
+}

@@ -1,0 +1,11 @@
+{
+ "desc": "Front view running straight TOWARD the camera, face visible, fair pale skin like the reference. Same character as the reference (left = base front view, right = the run pose to match): real fast run with forward lean toward the viewer, long stride (one knee driving up, other leg pushing back), arms pumping, sword carried low in the right hand. Keep the face, long black hair, coat with gold trim, red cape lining, gold pauldron and the same size. No effects.",
+ "in": "moves_v1/run/south/006.png",
+ "ref": "edit_v1/ref_south_run.png",
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "4a3d62ef-25f9-4c0c-af0d-3161c59b3764",
+  "status": "processing"
+ }
+}

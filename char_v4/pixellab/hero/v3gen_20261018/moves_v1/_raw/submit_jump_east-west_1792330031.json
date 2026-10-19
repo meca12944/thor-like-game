@@ -1,0 +1,31 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Jump in place: crouch to anticipate, spring up with knees tucked, the cape and hair lifting, land with a knee bend, recover. Sword in the right hand. Long straight black hair, only the ends sway. The cape flows with the body. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO glow, sparks, dust, flashes or any effects. Keep facing the same direction the whole time. Stay in side profile.",
+    "frame_count": 8,
+    "directions": [
+      "east",
+      "west"
+    ],
+    "animation_name": "jump_v1",
+    "keep_first_frame": false,
+    "seed": 413,
+    "animation_group_id": "c51afb3d-ec65-423d-b699-495b220a52a2"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "4d6d7adb-d240-4c69-a795-2b01f1caba83",
+      "978503d2-9bd3-41bc-ac15-d59121e9d23d"
+    ],
+    "directions": [
+      "east",
+      "west"
+    ],
+    "animation_group_id": "c51afb3d-ec65-423d-b699-495b220a52a2",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

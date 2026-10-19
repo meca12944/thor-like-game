@@ -1,0 +1,15 @@
+{
+ "desc": "Edit only the white slash trail (sword smear): erase every part of the white trail that is behind the character's back, on the LEFT side of his body and behind him. The trail must appear only IN FRONT of him, on the RIGHT side, in the direction he is facing and attacking. Keep the character, his body, face, hair, cape, outfit, pose, the sword and all colors exactly the same; only the slash trail changes.",
+ "frames": [
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/east/002.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/east/003.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/east/004.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/east/005.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "98f2f65d-80e5-4296-8058-8c09072f6a20",
+  "status": "processing"
+ }
+}

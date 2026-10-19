@@ -1,0 +1,14 @@
+11:32:05 a/e1_s501 job submitted; spent_before 0
+11:32:06 a/e2_s502 job submitted; spent_before 0
+11:34:13 a/e2_s502 done frames 4 usage {'type': 'generations', 'generations': 25.0} spent_total 25.0
+11:34:22 a/e1_s501 done frames 4 usage {'type': 'generations', 'generations': 25.0} spent_total 50.0
+11:36:21 b/e3_s602 job submitted; spent_before 50.0
+11:36:21 b/e3_s601 job submitted; spent_before 50.0
+11:38:45 b/e3_s602 done frames 3 usage {'type': 'generations', 'generations': 25.0} spent_total 75.0
+11:38:45 b/e3_s601 done frames 3 usage {'type': 'generations', 'generations': 25.0} spent_total 100.0
+11:46:09 n2/a_s701 job submitted; spent_before 0
+11:46:10 n2/b_s701 job submitted; spent_before 0
+11:48:26 n2/b_s701 done frames 4 usage {'type': 'generations', 'generations': 25.0} spent_total 25.0
+11:48:27 n2/a_s701 done frames 4 usage {'type': 'generations', 'generations': 25.0} spent_total 50.0
+11:49:55 n2/c_s702 job submitted; spent_before 50.0
+11:51:45 n2/c_s702 done frames 3 usage {'type': 'generations', 'generations': 25.0} spent_total 75.0

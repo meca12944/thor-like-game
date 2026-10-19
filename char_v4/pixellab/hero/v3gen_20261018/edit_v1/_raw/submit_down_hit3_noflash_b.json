@@ -1,0 +1,15 @@
+{
+ "desc": "Remove the bright orange, yellow and white flash / slash effect completely. Keep the character body, the black coat with gold trim, the long black hair and the steel sword exactly as they are. No glow, no flash, no sparks.",
+ "frames": [
+  "/workspace/w/south_hit3_orig/004.png",
+  "/workspace/w/south_hit3_orig/005.png",
+  "/workspace/w/south_hit3_orig/006.png",
+  "/workspace/w/south_hit3_orig/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "6b28abf3-d7ce-4ab0-9d54-85049b4d96e6",
+  "status": "processing"
+ }
+}

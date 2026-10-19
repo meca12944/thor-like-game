@@ -1,0 +1,28 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Quick evasive forward dash: crouch, burst forward low with the body leaning hard, the cape and hair flaring back, then recover to stance. Sword in the right hand. Long straight black hair, only the ends sway. The cape flows with the body. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO glow, sparks, dust, flashes or any effects. Keep facing the same direction the whole time. Stay in side profile.",
+    "frame_count": 8,
+    "directions": [
+      "west"
+    ],
+    "animation_name": "dash_v1",
+    "keep_first_frame": false,
+    "seed": 412,
+    "animation_group_id": "2bf88250-3107-4e40-99b3-d2e8b69dc2c9"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "f7bb40d4-e162-4aae-8ee9-176d7088e42a"
+    ],
+    "directions": [
+      "west"
+    ],
+    "animation_group_id": "2bf88250-3107-4e40-99b3-d2e8b69dc2c9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

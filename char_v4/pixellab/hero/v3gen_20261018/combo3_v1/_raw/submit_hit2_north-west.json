@@ -1,0 +1,29 @@
+{
+  "request": {
+    "character_id": "fb140a07-3f50-40a1-9a11-ca71de7b3c49",
+    "mode": "v3",
+    "action_description": "Continue from the follow-through of the first slash: a quick reverse backhand horizontal slash the other way, stepping forward again, the sword reaching far out in front at full length. Sword in the right hand. Front foot forward, back foot braced, NO bow-legged or crab stance. The cape flows with the body. Long straight hair, only the ends sway. Gold pauldron on the left shoulder. Face and outfit identical to the idle. Bold outlines, no flickering pixels. NO slash trail, glow, sparks or any effects. Seen from behind: the sword must never be hidden behind the body; keep it visible above or out to the sides.",
+    "frame_count": 8,
+    "directions": [
+      "north-west"
+    ],
+    "animation_name": "combo3_noeffect_hit2",
+    "keep_first_frame": false,
+    "seed": 202,
+    "animation_group_id": "7e91ba62-3fb0-4295-8c75-7a7138e65dce",
+    "custom_start_frame_path": "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_v1/hit1/north-west/007.png"
+  },
+  "http_status": 200,
+  "body": {
+    "background_job_ids": [
+      "32413dad-6fa6-49e5-8c33-dc0be231a0aa"
+    ],
+    "directions": [
+      "north-west"
+    ],
+    "animation_group_id": "7e91ba62-3fb0-4295-8c75-7a7138e65dce",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+  }
+}

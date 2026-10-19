@@ -1,0 +1,70 @@
+[0s] balance now 9214.75
+[1s] FAILED run/south try 1 Generation failed due to heavy load. Please try again in a moment. -> queued
+[6s] submit FAIL run ['south'] 429 Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs.
+[34s] submit FAIL run ['south'] 429 Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs.
+[82s] submit FAIL run ['south'] 429 Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs.
+[98s] done run/north 8 frames usage 8.0
+[102s] done run/east 8 frames usage 8.0
+[109s] done run/west 8 frames usage 8.0
+[113s] done dash/south 8 frames usage 8.0
+[129s] done walk/south 8 frames usage 8.0
+[137s] done walk/north 8 frames usage 8.0
+[142s] done walk/east 8 frames usage 8.0
+[147s] done walk/west 8 frames usage 8.0
+[147s] MOTION COMPLETE walk ok walk ['south', 'north', 'east', 'west'] 8 (56, 56, 204, 199) 
+[153s] submit run ['south']
+[163s] submit dash ['west']
+[172s] submit jump ['south', 'north']
+[174s] submit jump ['east', 'west']
+[178s] submit idle ['south', 'north']
+[184s] submit idle ['east', 'west']
+[216s] done dash/north 8 frames usage 8.0
+[220s] done dash/east 8 frames usage 8.0
+[225s] submit FAIL idle ['west'] 429 Maximum 20 concurrent background jobs allowed (Tier 3). You have 20 active jobs.
+[258s] submit idle ['west']
+[260s] submit hurt ['south', 'north']
+[433s] done run/south 8 frames usage 8.0
+[433s] MOTION COMPLETE run ok run ['south', 'north', 'east', 'west'] 8 (44, 54, 203, 202) 
+[440s] done jump/south 8 frames usage 8.0
+[463s] submit hurt ['east', 'west']
+[515s] done dash/west 8 frames usage 8.0
+[515s] MOTION COMPLETE dash ok dash ['south', 'north', 'east', 'west'] 8 (42, 58, 218, 199) 
+[521s] done jump/east 8 frames usage 8.0
+[526s] done jump/west 8 frames usage 8.0
+[536s] done idle/south 8 frames usage 8.0
+[540s] done idle/north 8 frames usage 8.0
+[544s] done idle/east 8 frames usage 8.0
+[549s] done idle/west 8 frames usage 8.0
+[550s] MOTION COMPLETE idle ok idle ['south', 'north', 'east', 'west'] 8 (53, 60, 202, 197) 
+[559s] done hurt/south 8 frames usage 8.0
+[563s] done hurt/north 8 frames usage 8.0
+[568s] submit death ['south', 'north']
+[572s] submit death ['east', 'west']
+[575s] submit cast ['south', 'north']
+[582s] submit cast ['east', 'west']
+[588s] submit guard ['south']
+[602s] done jump/north 8 frames usage 8.0
+[603s] MOTION COMPLETE jump ok jump ['south', 'north', 'east', 'west'] 8 (43, 47, 220, 200) 
+[612s] submit guard ['north']
+[632s] done hurt/west 8 frames usage 8.0
+[640s] submit guard ['east']
+[653s] done hurt/east 8 frames usage 8.0
+[654s] MOTION COMPLETE hurt ok hurt ['south', 'north', 'east', 'west'] 8 (56, 57, 214, 197) 
+[664s] submit guard ['west']
+[839s] done death/south 8 frames usage 8.0
+[844s] done death/west 8 frames usage 8.0
+[851s] done cast/south 8 frames usage 8.0
+[857s] done cast/north 8 frames usage 8.0
+[862s] done cast/east 8 frames usage 8.0
+[874s] done cast/west 8 frames usage 8.0
+[875s] MOTION COMPLETE cast ok cast ['south', 'north', 'east', 'west'] 8 (7, 16, 220, 198) 
+[879s] done guard/south 8 frames usage 8.0
+[885s] done guard/north 8 frames usage 8.0
+[890s] done guard/east 8 frames usage 8.0
+[899s] done guard/west 8 frames usage 8.0
+[899s] MOTION COMPLETE guard ok guard ['south', 'north', 'east', 'west'] 8 (39, 60, 227, 197) 
+[913s] done death/north 8 frames usage 8.0
+[918s] done death/east 8 frames usage 8.0
+[918s] MOTION COMPLETE death ok death ['south', 'north', 'east', 'west'] 8 (21, 62, 238, 202) 
+[923s] after 8688.75 usage sum 288.0
+[923s] final {'run/south': 'completed', 'run/north': 'completed', 'run/east': 'completed', 'run/west': 'completed', 'dash/south': 'completed', 'dash/north': 'completed', 'dash/east': 'completed', 'dash/west': 'completed', 'walk/south': 'completed', 'walk/north': 'completed', 'walk/east': 'completed', 'walk/west': 'completed', 'jump/south': 'completed', 'jump/north': 'completed', 'jump/east': 'completed', 'jump/west': 'completed', 'idle/south': 'completed', 'idle/north': 'completed', 'idle/east': 'completed', 'idle/west': 'completed', 'hurt/south': 'completed', 'hurt/north': 'completed', 'hurt/east': 'completed', 'hurt/west': 'completed', 'death/south': 'completed', 'death/north': 'completed', 'death/east': 'completed', 'death/west': 'completed', 'cast/south': 'completed', 'cast/north': 'completed', 'cast/east': 'completed', 'cast/west': 'completed', 'guard/south': 'completed', 'guard/north': 'completed', 'guard/east': 'completed', 'guard/west': 'completed'}

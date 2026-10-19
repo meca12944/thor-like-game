@@ -1,0 +1,9 @@
+{
+  "run/south": "0b760f4b-101c-4e49-a005-6d26b3b15b93",
+  "run/north": "d6db53aa-729b-456f-b7b6-ee6089eeda9a",
+  "run/east": "1de118ae-716d-4d7c-ad26-ee039f436ea0",
+  "run/west": "c687d372-ff40-42a7-b7dd-7506e5b738c3",
+  "dash/south": "05d73215-e99f-47f7-a8ee-a994ed59fa25",
+  "dash/north": "a5661724-6f7d-4c9f-a0f0-943cf8c2046a",
+  "dash/east": "153e05ac-91cb-467f-9e10-d8539fd052a9"
+}

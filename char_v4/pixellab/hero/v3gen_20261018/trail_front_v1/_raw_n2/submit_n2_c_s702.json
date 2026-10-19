@@ -1,0 +1,14 @@
+{
+ "desc": "Back view of the swordsman attacking up the screen. Edit ONLY the golden-white slash trail: it must be ABOVE his head, higher than the top of his hair, up the screen in front of him, a thin arc at the far tip of the sword. Erase any trail pixels that overlap his hair, head, shoulders, cape, body or legs, and any trail lower than his head. Keep the character, back view, pose, sword and colors exactly the same.",
+ "frames": [
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/trail_front_v1/_stage_n2/hit2/north/003.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/trail_front_v1/_stage_n2/hit2/north/004.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/trail_front_v1/_stage_n2/hit2/north/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "eb43527b-19a1-430e-9f46-c721165615ec",
+  "status": "processing"
+ }
+}

@@ -1,0 +1,15 @@
+{
+ "desc": "Turn this walk into a real fast RUN cycle: strong forward body lean, long strides, a clear flight phase where both feet are off the ground, knees driving high, arms pumping, the sword carried low in the right hand. Hair and cape flow back. Keep the exact same character, head, face, long black hair, black coat with gold trim, red cape lining, gold pauldron, and the same size. No effects. Keep the back view, face never shown, sword visible.",
+ "frames": [
+  "moves_v1/run/north/004.png",
+  "moves_v1/run/north/005.png",
+  "moves_v1/run/north/006.png",
+  "moves_v1/run/north/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "826385a0-626d-4bb4-8bb8-30a28efe8f79",
+  "status": "processing"
+ }
+}

@@ -1,0 +1,21 @@
+[1s] before 9333.75
+[1s] resume hit 2 south
+[1s] resume hit 2 east
+[2s] resume hit 2 north
+[2s] resume hit 1 west
+[11s] done hit 1 west 8 frames {'type': 'generations', 'generations': 8.0}
+[16s] submitted hit 2 west
+[73s] done hit 2 south 8 frames {'type': 'generations', 'generations': 8.0}
+[78s] submitted hit 3 south
+[100s] done hit 2 north 8 frames {'type': 'generations', 'generations': 8.0}
+[103s] submitted hit 3 north
+[293s] done hit 2 east 8 frames {'type': 'generations', 'generations': 8.0}
+[296s] submitted hit 3 east
+[388s] done hit 2 west 8 frames {'type': 'generations', 'generations': 8.0}
+[392s] submitted hit 3 west
+[397s] done hit 3 north 8 frames {'type': 'generations', 'generations': 8.0}
+[411s] done hit 3 south 8 frames {'type': 'generations', 'generations': 8.0}
+[597s] done hit 3 east 8 frames {'type': 'generations', 'generations': 8.0}
+[662s] done hit 3 west 8 frames {'type': 'generations', 'generations': 8.0}
+[663s] after 9229.75
+[663s] summary {1: '64f0bbd2-ec46-4337-95e8-418415a7dd88', 2: '7e91ba62-3fb0-4295-8c75-7a7138e65dce', 3: 'd3c700e0-05d4-4e38-8577-c8e55178e647'} sum 72.0

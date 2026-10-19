@@ -1,0 +1,15 @@
+{
+ "desc": "Make this final sword slash BIGGER: a wider, longer arc with the sword reaching further out in front at full arm extension, a stronger deep forward lunge of the body, and a bigger white crescent smear following the full blade length to a larger radius. Keep facing right, keep the exact same character, face, hair, coat with gold trim, red cape lining and size.",
+ "frames": [
+  "combo3_v3/hit3/east/004.png",
+  "combo3_v3/hit3/east/005.png",
+  "combo3_v3/hit3/east/006.png",
+  "combo3_v3/hit3/east/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "1279cfd7-2d96-4115-a97a-20c4a0c20644",
+  "status": "processing"
+ }
+}

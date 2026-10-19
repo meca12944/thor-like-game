@@ -1,0 +1,3 @@
+[0s] before 9229.75
+[15s] submit walk ['south', 'north'] 200 
+[24s] submit walk ['east', 'west'] 200 

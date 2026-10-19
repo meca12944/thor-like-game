@@ -1,0 +1,243 @@
+{
+  "jobs": {
+    "run/south": {
+      "job": "72a54b71-acdc-4814-ae56-8ccb9ada0646",
+      "tries": 2,
+      "status": "completed",
+      "elapsed_s": 433
+    },
+    "run/north": {
+      "job": "d6db53aa-729b-456f-b7b6-ee6089eeda9a",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 98
+    },
+    "run/east": {
+      "job": "1de118ae-716d-4d7c-ad26-ee039f436ea0",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 102
+    },
+    "run/west": {
+      "job": "c687d372-ff40-42a7-b7dd-7506e5b738c3",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 109
+    },
+    "dash/south": {
+      "job": "05d73215-e99f-47f7-a8ee-a994ed59fa25",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 113
+    },
+    "dash/north": {
+      "job": "a5661724-6f7d-4c9f-a0f0-943cf8c2046a",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 216
+    },
+    "dash/east": {
+      "job": "153e05ac-91cb-467f-9e10-d8539fd052a9",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 220
+    },
+    "dash/west": {
+      "job": "f7bb40d4-e162-4aae-8ee9-176d7088e42a",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 515
+    },
+    "walk/south": {
+      "job": "9dca14ba-3c91-47bc-a6e5-07532530f5fe",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 129
+    },
+    "walk/north": {
+      "job": "4817c893-70e1-403d-9118-31fbfd40d04a",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 137
+    },
+    "walk/east": {
+      "job": "d24d6670-acc1-4640-971a-b12c1b87b3ab",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 142
+    },
+    "walk/west": {
+      "job": "8e270843-8a4b-4f92-9dc1-916ed22dd248",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 147
+    },
+    "jump/south": {
+      "job": "d048a144-b876-4334-aa76-3a3107cf00cb",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 440
+    },
+    "jump/north": {
+      "job": "0e8cd786-7f62-412d-8136-a009816a773f",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 602
+    },
+    "jump/east": {
+      "job": "4d6d7adb-d240-4c69-a795-2b01f1caba83",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 521
+    },
+    "jump/west": {
+      "job": "978503d2-9bd3-41bc-ac15-d59121e9d23d",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 526
+    },
+    "idle/south": {
+      "job": "f3b2749a-87ae-44ce-8332-13ac6b6f466e",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 536
+    },
+    "idle/north": {
+      "job": "fe11ac8b-c415-4940-93b3-4fba3feb0f07",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 540
+    },
+    "idle/east": {
+      "job": "7836e7fd-35eb-4588-a3a4-960091fbe317",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 544
+    },
+    "idle/west": {
+      "job": "dadf2407-ed9e-48e1-88af-08d504ae890e",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 549
+    },
+    "hurt/south": {
+      "job": "06f7b9c7-096a-4bdc-91bd-5ca54edd4ceb",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 559
+    },
+    "hurt/north": {
+      "job": "1d37f6cd-d457-4f25-bbf2-eb26d4f3137e",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 563
+    },
+    "hurt/east": {
+      "job": "c150c1dc-ff1e-4136-9b54-a9bc0fc6246b",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 653
+    },
+    "hurt/west": {
+      "job": "515d9c78-6684-4a86-ad21-04f267b5acf7",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 632
+    },
+    "death/south": {
+      "job": "ad34ee42-7c39-4185-98b4-1c2549e595ba",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 839
+    },
+    "death/north": {
+      "job": "9a3bd5d1-7e96-494f-b3b7-8e781ca4d84f",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 913
+    },
+    "death/east": {
+      "job": "705f2b21-a670-4ad2-a769-f46fa85422cd",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 918
+    },
+    "death/west": {
+      "job": "a045ec44-76f7-4688-bb4c-1d182b47b842",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 844
+    },
+    "cast/south": {
+      "job": "7d2644c3-52a7-4107-a862-2e8663288d06",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 851
+    },
+    "cast/north": {
+      "job": "754356f8-636d-4640-bd4a-b0afe9c8f052",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 857
+    },
+    "cast/east": {
+      "job": "c3495fff-7513-4552-bf4a-eb12be17d2bb",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 862
+    },
+    "cast/west": {
+      "job": "a3e13881-091d-4942-995c-e2fdd09dede6",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 874
+    },
+    "guard/south": {
+      "job": "20f58815-2005-446d-b2bd-af1c5de6fe46",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 879
+    },
+    "guard/north": {
+      "job": "463d1a47-d507-4e3f-b758-5a260600d3ca",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 885
+    },
+    "guard/east": {
+      "job": "0f888f0e-c7b3-4da2-8ba4-b2eb329d69a7",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 890
+    },
+    "guard/west": {
+      "job": "4b744d95-1a00-45e4-b83e-721d3b12a90f",
+      "tries": 1,
+      "status": "completed",
+      "elapsed_s": 899
+    }
+  },
+  "gid": {
+    "walk": "16f34b68-02df-423f-9c5b-cdf472e0bac6",
+    "run": "ef3625e3-f009-4725-a7a5-630124003082",
+    "dash": "2bf88250-3107-4e40-99b3-d2e8b69dc2c9",
+    "jump": "c51afb3d-ec65-423d-b699-495b220a52a2",
+    "idle": "6e819b4d-1ad4-4037-9702-e6ea5272732d",
+    "hurt": "a746b839-b2c5-4832-97c7-06ca1a8bd028",
+    "death": "bbe0aa5d-ab7a-463e-b670-6ef5d0680074",
+    "cast": "bc6b3bad-334e-49ba-84df-b1947537aa2f",
+    "guard": "4fe15944-f35e-416d-81e4-1a59fb00249a"
+  },
+  "total": 288.0,
+  "sheet": {
+    "walk": true,
+    "run": true,
+    "dash": true,
+    "idle": true,
+    "jump": true,
+    "hurt": true,
+    "cast": true,
+    "guard": true,
+    "death": true
+  }
+}

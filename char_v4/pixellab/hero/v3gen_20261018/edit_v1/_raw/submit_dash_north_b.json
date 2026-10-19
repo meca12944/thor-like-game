@@ -1,0 +1,15 @@
+{
+ "desc": "Back view, gliding straight away from the camera. Exactly ONE sword in the right hand in every frame. Legs close together under the body, NOT spread sideways: one foot slightly forward and one trailing, both feet low near the ground, no lifted foot, no turning; low forward lean, sliding. Keep the exact same character, hair, coat, red cape lining and size. No effects.",
+ "frames": [
+  "dash_v2/alt_north_n1/north/004.png",
+  "dash_v2/alt_north_n1/north/005.png",
+  "dash_v2/alt_north_n1/north/006.png",
+  "dash_v2/alt_north_n1/north/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "8b0db961-7545-4014-9bc4-baf14b7ab65b",
+  "status": "processing"
+ }
+}

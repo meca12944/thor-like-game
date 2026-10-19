@@ -1,0 +1,15 @@
+{
+ "desc": "Turn the character into a TRUE BACK VIEW: we see him from behind, the back of his head and his long black hair, his back and his cape; NO face, no eyes, no chest, no front of the coat. He is attacking UP the screen, away from the camera. Keep the same pose, the same stance and feet position, the same size, the same sword position and angle in each frame. The slash trail (sword smear) is only in FRONT of him: up the screen, beyond his head and shoulders at the far end of the sword; erase any trail that crosses over his body, his waist or his legs, or that is below his shoulders. Same character design: long straight black hair, dark coat with gold trim, cape with red lining, gold pauldron.",
+ "frames": [
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/north/004.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/north/005.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/north/006.png",
+  "/workspace/town-demo/char_v4/pixellab/hero/v3gen_20261018/combo3_final/hit2/north/007.png"
+ ],
+ "status": 202,
+ "resp": {
+  "usage": null,
+  "background_job_id": "ccfb2db2-1612-46de-bff8-2c65a2084dda",
+  "status": "processing"
+ }
+}

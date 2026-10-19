@@ -1,0 +1,27 @@
+[0s] before 9078.75
+[160s] submitted hit 1 south
+[163s] submitted hit 1 north
+[164s] submitted hit 1 east
+[165s] submitted hit 1 west
+[299s] done hit 1 south 8 frames {'type': 'generations', 'generations': 8.0}
+[306s] submitted hit 2 south
+[313s] done hit 1 north 8 frames {'type': 'generations', 'generations': 8.0}
+[313s] done hit 1 east 8 frames {'type': 'generations', 'generations': 8.0}
+[315s] submitted hit 2 north
+[319s] submitted hit 2 east
+[333s] done hit 1 west 8 frames {'type': 'generations', 'generations': 8.0}
+[346s] submitted hit 2 west
+[540s] done hit 2 north 8 frames {'type': 'generations', 'generations': 8.0}
+[549s] submitted hit 3 north
+[562s] done hit 2 south 8 frames {'type': 'generations', 'generations': 8.0}
+[569s] submitted hit 3 south
+[595s] done hit 2 east 8 frames {'type': 'generations', 'generations': 8.0}
+[596s] done hit 2 west 8 frames {'type': 'generations', 'generations': 8.0}
+[604s] submitted hit 3 east
+[606s] submitted hit 3 west
+[695s] done hit 3 north 8 frames {'type': 'generations', 'generations': 8.0}
+[767s] done hit 3 east 8 frames {'type': 'generations', 'generations': 8.0}
+[791s] done hit 3 west 8 frames {'type': 'generations', 'generations': 8.0}
+[849s] done hit 3 south 8 frames {'type': 'generations', 'generations': 8.0}
+[851s] after 8661.75
+[851s] summary {1: '89c5bdac-d0d3-427c-b97d-fbaa62d7f3b9', 2: '63b64843-6158-4e31-ae52-e52dedddf2a9', 3: '96be0b8e-ee14-488d-8841-f22b46f6fe89'} sum 96.0

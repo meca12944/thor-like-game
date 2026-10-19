@@ -1,0 +1,26 @@
+{
+ "usage": {
+  "type": "generations",
+  "generations": 25.0
+ },
+ "id": "c1e2d17e-8ec3-4ec1-bf0c-671b2107f14d",
+ "status": "completed",
+ "created_at": "2026-10-19T02:46:09.049809+00:00",
+ "last_response": {
+  "seed": 701,
+  "type": "done",
+  "action": "Touching up pixels",
+  "progress": 0.85,
+  "billing_usage": {
+   "usd": 0.0,
+   "type": "generations",
+   "generations": 25
+  },
+  "generation_id": "ea2b7fc9-11ba-4325-877f-dfe3a8240696",
+  "usage_cost_usd": 0.15,
+  "billing_charged": true,
+  "generation_started_at": "2026-10-19T02:46:12.228164+00:00",
+  "original_image_n_colors": 7343,
+  "quantized_image_n_colors": 35
+ }
+}
