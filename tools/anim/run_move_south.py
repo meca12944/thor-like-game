@@ -32,8 +32,9 @@ COMMON=(" Same character in every frame exactly as the idle image: same face and
  "Feet on the same ground line, clean pixels, no effects.")
 HIT={1:("Walk cycle, 8 frames, seamless loop: a natural walk toward the camera. The legs clearly alternate with visible steps (left foot forward, passing, right foot forward, passing), "
         "knees bend, the free left arm swings opposite to the legs, slight up-and-down body bob of 1-2 pixels."),
-     2:("Run cycle, 8 frames, seamless loop: a fast run toward the camera. Body leans slightly forward, legs pump with high knees and long strides, one frame with both feet off the ground, "
-        "the free left arm swings strongly, hair and cape stream back behind the shoulders.")}
+     2:("Run cycle, 8 frames, seamless loop: a FAST SPRINT toward the camera with a STRONG FORWARD LEAN: the upper body is pitched far forward toward the viewer, "
+        "head low and pushed forward ahead of the hips, shoulders hunched forward, so we see the top of his head and shoulders more than in the idle. "
+        "Legs drive hard with high knees and long strides, one frame with both feet off the ground; the free left arm pumps strongly; hair and cape stream back behind him.")}
 FACE={'south':" TRUE FRONT VIEW every frame: he faces the camera and moves DOWN the screen toward the viewer; he never turns sideways or away."}
 FACE4=FACE
 usage=[]; T0=time.time(); lock=threading.Lock()
