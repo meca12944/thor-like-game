@@ -2,6 +2,7 @@
 # rotated so the run direction is +x, resampled to N frames -> 3D joints (x fwd, y up, z right)
 import numpy as np,sys
 sys.path.insert(0,'.');from bvh import load
+GAP=float(__import__("os").environ.get("CYCLE_GAP","0.17"))
 def cycle(fn,N=12):
     n,P,ft=load(fn);ix=lambda s:n.index(s)
     H=P[:,ix('Hips')];d=H[-1]-H[0];ang=np.arctan2(d[2],d[0]);c,s=np.cos(-ang),np.sin(-ang)
@@ -9,7 +10,7 @@ def cycle(fn,N=12):
     h=P[:,ix('LeftToeBase') if 'LeftToeBase' in n else ix('LeftFoot'),1]
     # contacts = local minima of left toe height with the foot moving backward relative to the hips
     cand=[k for k in range(3,len(h)-3) if h[k]<=h[k-3:k+4].min()+0.05]
-    cs=[];[cs.append(k) for k in cand if not cs or k-cs[-1]>20]
+    cs=[];[cs.append(k) for k in cand if not cs or k-cs[-1]>int(GAP/ft)]
     a,b=cs[0],cs[1]
     t=np.linspace(a,b,N+1)[:-1];F=np.array([Q[int(np.floor(x))]*(1-(x%1))+Q[min(len(Q)-1,int(np.floor(x))+1)]*(x%1) for x in t])
     return n,F,(b-a)*ft

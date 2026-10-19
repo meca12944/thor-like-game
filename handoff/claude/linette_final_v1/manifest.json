@@ -1,0 +1,1095 @@
+{
+ "_doc": "Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.",
+ "motions": {
+  "idle": {
+   "right": {
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "src": "linette_moves_v1/idle/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "left": {
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "src": "linette_moves_v1/idle/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "down": {
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "src": "linette_moves_v1/idle/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "up": {
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "src": "linette_moves_v1/idle/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   }
+  },
+  "walk": {
+   "right": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "src": "linette_skel_v1/walk_east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   },
+   "left": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "src": "linette_skel_v1/walk_east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   },
+   "down": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/walk/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "up": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/walk/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   }
+  },
+  "run": {
+   "right": {
+    "ticks": [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/run_east_B4",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   },
+   "left": {
+    "ticks": [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/run_east_B4 (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   },
+   "down": {
+    "ticks": [
+     5,
+     4,
+     5,
+     4,
+     5,
+     4,
+     5,
+     4
+    ],
+    "src": "linette_moves_v1/run/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "up": {
+    "ticks": [
+     5,
+     4,
+     5,
+     4,
+     5,
+     4,
+     5,
+     4
+    ],
+    "src": "linette_moves_v1/run/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   }
+  },
+  "dash": {
+   "right": {
+    "ticks": [
+     3,
+     3,
+     4,
+     4,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/dash_east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "left": {
+    "ticks": [
+     3,
+     3,
+     4,
+     4,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/dash_east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "down": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "src": "linette_moves_v1/dash/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "up": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "src": "linette_moves_v1/dash/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  "hurt": {
+   "right": {
+    "ticks": [
+     3,
+     4,
+     5,
+     4,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/hurt_east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "left": {
+    "ticks": [
+     3,
+     4,
+     5,
+     4,
+     3,
+     3
+    ],
+    "src": "linette_skel_v1/hurt_east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "down": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/hurt/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "up": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/hurt/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  "death": {
+   "right": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/death/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "left": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/death/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "down": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/death/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "up": {
+    "ticks": [
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "src": "linette_moves_v1/death/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   }
+  },
+  "cast": {
+   "right": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/cast/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "left": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/cast/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "down": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/cast/south",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "up": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "src": "linette_moves_v1/cast/north",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   }
+  },
+  "atk1": {
+   "right": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk1/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "left": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk1/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "down": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk1/south-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "up": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk1/north-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   }
+  },
+  "atk2": {
+   "right": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk2/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "left": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk2/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "down": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk2/south-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "up": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     10,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk2/north-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   }
+  },
+  "atk3": {
+   "right": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     18,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk3/east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "left": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     18,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk3/east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "down": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     18,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk3/south-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   },
+   "up": {
+    "ticks": [
+     2,
+     1,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     18,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "src": "linette_thrust_v1/atk3/north-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     7,
+     6,
+     5,
+     4,
+     0
+    ]
+   }
+  }
+ }
+}
