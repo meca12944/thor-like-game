@@ -10,3 +10,15 @@
 2026-10-19 18:22:52 estimate start_idle_east.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-19 18:29:29 animate dash_east east seed 41 usage {"type": "generations", "generations": 3.0}
 2026-10-19 18:29:44 animate hurt_east east seed 42 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:20:09 estimate start_idle_south.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-19 23:20:21 estimate start_idle_north.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-19 23:26:54 animate dash_north north seed 523835 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:27:40 animate hurt_north north seed 524286 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:28:02 animate dash_south south seed 55082 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:29:26 animate hurt_south south seed 57567 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:34:57 animate dash_south south seed 61 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:37:45 animate dash_north north seed 61 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:37:45 animate hurt_south south seed 61 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:46:41 animate hurt_north north seed 62 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:47:31 animate dash_south_s2 south seed 77 usage {"type": "generations", "generations": 3.0}
+2026-10-19 23:53:14 animate dash_south_v3 south seed 61 usage {"type": "generations", "generations": 3.0}

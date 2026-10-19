@@ -11,8 +11,8 @@ SRC={ # motion: {dir: (folder, frame filter or seq spec, ticks)}
  'idle':{'right':(V1+'/idle/east',list(range(8)),[7]*8),'down':(V1+'/idle/south',list(range(8)),[7]*8),'up':(V1+'/idle/north',list(range(8)),[7]*8)},
  'walk':{'right':(SK+'/walk_east',None,[4]*12),'down':(V1+'/walk/south',list(range(8)),[6]*8),'up':(V1+'/walk/north',list(range(8)),[6]*8)},
  'run':{'right':(SK+'/run_east_B4',None,[3]*12),'down':(V1+'/run/south',list(range(8)),[5,4]*4),'up':(V1+'/run/north',list(range(8)),[5,4]*4)},
- 'dash':{'right':(SK+'/dash_east',None,[3,3,4,4,3,3]),'down':(V1+'/dash/south',None,[4]*5),'up':(V1+'/dash/north',None,[4]*5)},
- 'hurt':{'right':(SK+'/hurt_east',None,[3,4,5,4,3,3]),'down':(V1+'/hurt/south',None,[5]*5),'up':(V1+'/hurt/north',[0,1,2,3],[5]*4)},  # north f4 had a baked cyan effect -> dropped
+ 'dash':{'right':(SK+'/dash_east',None,[3,3,4,4,3,3]),'down':(SK+'/dash_south_v3',None,[3,3,4,4,3,3]),'up':(SK+'/dash_north',None,[3,3,4,4,3,3])},
+ 'hurt':{'right':(SK+'/hurt_east',None,[3,4,5,4,3,3]),'down':(SK+'/hurt_south',None,[3,4,5,4,3,3]),'up':(SK+'/hurt_north',None,[3,4,5,4,3,3])},  # front/back dash+hurt redone with skeleton (v1 text frames had splayed crab legs)
  'death':{'right':(V1+'/death/east',None,[6]*9),'down':(V1+'/death/south',None,[6]*9),'up':(V1+'/death/north',None,[6]*9)},
  'cast':{'right':(V1+'/cast/east',None,[5]*9),'down':(V1+'/cast/south',None,[5]*9),'up':(V1+'/cast/north',None,[5]*9)},
  'atk1':{'right':(TH+'/atk1/east',)+atk(10)[1:],'down':(TH+'/atk1/south-east',)+atk(10)[1:],'up':(TH+'/atk1/north-east',)+atk(10)[1:]},

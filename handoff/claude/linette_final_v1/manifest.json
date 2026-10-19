@@ -356,36 +356,40 @@
    },
    "down": {
     "ticks": [
+     3,
+     3,
      4,
      4,
-     4,
-     4,
-     4
+     3,
+     3
     ],
-    "src": "linette_moves_v1/dash/south",
+    "src": "linette_skel_v1/dash_south_v3",
     "pick": [
      0,
      1,
      2,
      3,
-     4
+     4,
+     5
     ]
    },
    "up": {
     "ticks": [
+     3,
+     3,
      4,
      4,
-     4,
-     4,
-     4
+     3,
+     3
     ],
-    "src": "linette_moves_v1/dash/north",
+    "src": "linette_skel_v1/dash_north",
     "pick": [
      0,
      1,
      2,
      3,
-     4
+     4,
+     5
     ]
    }
   },
@@ -430,34 +434,40 @@
    },
    "down": {
     "ticks": [
+     3,
+     4,
      5,
-     5,
-     5,
-     5,
-     5
+     4,
+     3,
+     3
     ],
-    "src": "linette_moves_v1/hurt/south",
+    "src": "linette_skel_v1/hurt_south",
     "pick": [
      0,
      1,
      2,
      3,
-     4
+     4,
+     5
     ]
    },
    "up": {
     "ticks": [
+     3,
+     4,
      5,
-     5,
-     5,
-     5
+     4,
+     3,
+     3
     ],
-    "src": "linette_moves_v1/hurt/north",
+    "src": "linette_skel_v1/hurt_north",
     "pick": [
      0,
      1,
      2,
-     3
+     3,
+     4,
+     5
     ]
    }
   },
