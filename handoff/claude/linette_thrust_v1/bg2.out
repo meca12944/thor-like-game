@@ -1,0 +1,7 @@
+[2026-10-19 14:27:58] run_all: spent 66.0 need 57 cap 175
+[2026-10-19 14:27:59] state submit atk2 200 {'usage': None, 'background_job_id': '08730482-ff09-4644-96c1-066ea38cb0d0', 'character_id': '4acc942f-fbba-4b16-a0e6-c6723ff4c8b2', 'status': 'queued'}
+[2026-10-19 14:33:40] state atk2 completed usage {'type': 'generations', 'generations': 25.0} keys ['character_id', 'storage_urls', 'billing_usage'] cid 4acc942f-fbba-4b16-a0e6-c6723ff4c8b2
+[2026-10-19 14:36:42] anim atk2 west completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:37:17] anim atk2 south-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:37:23] anim atk2 east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:38:00] anim atk2 north-east completed usage {'type': 'generations', 'generations': 8.0}

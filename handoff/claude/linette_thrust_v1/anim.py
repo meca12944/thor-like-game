@@ -5,9 +5,9 @@ name,d,fc,end,act=sys.argv[1],sys.argv[2],int(sys.argv[3]),sys.argv[4],sys.argv[
 body={'character_id':CID,'mode':'v3','action_description':act,'frame_count':fc,'directions':[d],'animation_name':name,'keep_first_frame':True,'seed':seed}
 if end!='-': body['end_frame']=b64(end)
 st,r=req('POST','/characters/animations',body)
-open(f'{RAW}/submit_{name}.json','w').write(scrub({'http':st,'body':r,'request':{k:v for k,v in body.items() if k!='end_frame'}}))
+open(f'{RAW}/submit_{name}_{d}.json','w').write(scrub({'http':st,'body':r,'request':{k:v for k,v in body.items() if k!='end_frame'}}))
 if st!=200: log('SUBMIT FAIL',name,st,scrub(r)[:400]); sys.exit(1)
-j=wait(r['background_job_ids'][0],name)
-log('anim',name,j.get('status'),'usage',j.get('usage'))
+j=wait(r['background_job_ids'][0],f'{name}_{d}')
+log('anim',name,d,j.get('status'),'usage',j.get('usage'))
 out=f'{C}/{name}/{d}'; os.makedirs(out,exist_ok=True)
 for i,u in enumerate(j['last_response']['storage_urls']['frames']): dl(u,f'{out}/{i:03d}.png')

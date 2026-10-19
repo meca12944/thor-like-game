@@ -2,12 +2,12 @@
  "http": 200,
  "body": {
   "background_job_ids": [
-   "83653c9d-7bcd-45d5-a9d8-f670f2560e50"
+   "41613c75-2bcd-4b25-a821-cd9aa6798faf"
   ],
   "directions": [
-   "east"
+   "west"
   ],
-  "animation_group_id": "7bd5fcb7-76f8-4d8b-a5a9-eb9cc1bc2ea1",
+  "animation_group_id": "f94ae0c1-f5c5-48d6-a352-911d79cac554",
   "status": "processing",
   "enhanced_prompt": null,
   "enhance_usage": null
@@ -15,10 +15,10 @@
  "request": {
   "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
   "mode": "v3",
-  "action_description": "Attack 1: a quick fencing lunge with the RIGHT-hand needle. From the stance she draws the right needle back slightly, then explodes forward with a long step and thrusts the right needle straight ahead toward the RIGHT, ending exactly in the lunge pose of the end frame. STRICT SIDE VIEW facing RIGHT every frame, chest never turns toward the camera. Same character, outfit and size in every frame; no effects.",
+  "action_description": "Attack 1 of 3: a quick fencing lunge with the RIGHT-hand needle. From the stance she draws the right needle back slightly, then explodes forward with a long step and thrusts the right needle straight ahead, ending exactly in the lunge pose of the end frame. STRICT SIDE VIEW facing LEFT every frame, chest never turns toward the camera; she moves toward the LEFT. Same character, outfit and size in every frame; no effects, no trails.",
   "frame_count": 8,
   "directions": [
-   "east"
+   "west"
   ],
   "animation_name": "atk1",
   "keep_first_frame": true,
