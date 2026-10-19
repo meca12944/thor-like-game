@@ -1,0 +1,10 @@
+[13:24:51] jobs=1 est=8 spent_so_far=0 cap=350
+[13:24:54] submitted lin_idle_south_s5100
+[13:29:01] done lin_idle_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:29:02] spent total from job records: 8.0
+[13:29:23] jobs=39 est=280 spent_so_far=8.0 cap=350
+[13:29:28] submitted lin_idle_west_s5100
+[13:29:29] submitted lin_walk_south_s5100
+[13:29:29] submitted lin_walk_north_s5100
+[13:29:31] submitted lin_walk_east_s5100
+[13:29:31] submitted lin_idle_north_s5100
