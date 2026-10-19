@@ -24,3 +24,5 @@
 [2026-10-19 14:37:17] anim atk2 south-east completed usage {'type': 'generations', 'generations': 8.0}
 [2026-10-19 14:37:23] anim atk2 east completed usage {'type': 'generations', 'generations': 8.0}
 [2026-10-19 14:38:00] anim atk2 north-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:38:07] run_all spent total from job records: 123.0
+2026-10-19 14:38:42 thrust set complete. spent total (states 75 + anims 12x8=96) = 171 / cap 175
