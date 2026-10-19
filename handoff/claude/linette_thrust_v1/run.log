@@ -1,3 +1,5 @@
 [2026-10-19 14:05:12] state submit lunge 200 {'usage': None, 'background_job_id': '396a0109-b6ac-4544-b51c-2913d783a89d', 'character_id': '0b059a7b-0656-414f-b6f3-e4d6f8eecbce', 'status': 'queued'}
 [2026-10-19 14:09:32] state lunge completed usage {'type': 'generations', 'generations': 25.0} keys ['character_id', 'storage_urls', 'billing_usage'] cid 0b059a7b-0656-414f-b6f3-e4d6f8eecbce
 [2026-10-19 14:13:41] anim atk1 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:16:48] run_all: spent 33.0 need 138 cap 170
+[2026-10-19 14:16:48] BUDGET STOP
