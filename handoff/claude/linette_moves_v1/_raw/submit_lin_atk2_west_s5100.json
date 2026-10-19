@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 2 of 3: a quick straight thrust with the left-hand needle, the other needle pulled back, brief hold, then pull back to the stance. STRICT SIDE VIEW every frame: facing LEFT in profile, chest never turns toward the camera; everything moves toward the LEFT. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 8,
+  "directions": [
+   "west"
+  ],
+  "animation_name": "lin_atk2_west_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "b8fda25e-bdca-43c3-8c4d-80b46f9f1e21"
+  ],
+  "directions": [
+   "west"
+  ],
+  "animation_group_id": "56121ba0-f1f4-4c4f-9a7b-6cb18213b0d2",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Hit reaction: she is struck, flinches backward with the head snapped back and arms thrown out, then recovers to the stance. STRICT SIDE VIEW every frame: facing RIGHT in profile, chest never turns toward the camera; everything moves toward the RIGHT. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 4,
+  "directions": [
+   "east"
+  ],
+  "animation_name": "lin_hurt_east_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "c3ddc10f-327a-4d81-ba97-b82ddd99104c"
+  ],
+  "directions": [
+   "east"
+  ],
+  "animation_group_id": "026d7fa2-86a4-4da7-883a-22418df48491",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}
