@@ -1,0 +1,9 @@
+{
+ "http": 200,
+ "body": {
+  "usage": null,
+  "background_job_id": "daaf4f33-3041-43cd-9595-34343092e884",
+  "character_id": "f5e73433-1415-4113-8ee3-52dedabc00e3",
+  "status": "queued"
+ }
+}
