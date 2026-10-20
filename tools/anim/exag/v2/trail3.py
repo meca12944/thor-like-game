@@ -15,11 +15,15 @@ def tip(im):
         d=np.hypot(xs-px,ys-py);j=d.argmax()
         if best is None or d[j]>best[2]: best=(xs[j],ys[j],d[j])
     return best
-def arc(center,R,a_tip,sgn,span,lead=35,T=None,sq=1.0):
-    T=T or 0.34*R
-    cx,cy=center;a0=a_tip-sgn*span;a1=a_tip+sgn*lead;us=[i/40 for i in range(41)]
-    ang=lambda u:math.radians(a0+(a1-a0)*u);th=lambda u:T*math.sin(math.pi*u)**0.55  # fat moon crescent, tapered tips
-    im=Image.new('RGBA',(256,256));d=ImageDraw.Draw(im)
-    outer=[(cx+(R+6)*math.cos(ang(u)),cy+(R+6)*sq*math.sin(ang(u))) for u in us]
-    inner=[(cx+(R+6-th(u))*math.cos(ang(u)),cy+(R+6-th(u))*sq*math.sin(ang(u))) for u in reversed(us)]
-    d.polygon(outer+inner,fill=(238,238,252,255),outline=(196,196,232,255));return im
+def arc(center,R,a_tip,sgn,span,lead=8,T=None,sq=1.0):
+    # Ys8-like: thin clean half-moon, sharp tail, a hair ahead of the blade tip
+    T=T or min(9,0.15*R);cx,cy=center;a0=a_tip-sgn*span;a1=a_tip+sgn*lead;us=[i/48 for i in range(49)]
+    ang=lambda u:math.radians(a0+(a1-a0)*u)
+    th=lambda u:T*(u**1.3)*max(0.0,1-max(0,(u-0.85)/0.15))**0.5  # grows from the tail, thickest near the tip, rounds off at the front
+    im=Image.new('RGBA',(256,256));d=ImageDraw.Draw(im);Ro=R+2
+    outer=[(cx+Ro*math.cos(ang(u)),cy+Ro*sq*math.sin(ang(u))) for u in us]
+    inner=[(cx+(Ro-th(u))*math.cos(ang(u)),cy+(Ro-th(u))*sq*math.sin(ang(u))) for u in reversed(us)]
+    d.polygon(outer+inner,fill=(240,242,255,235))
+    inner2=[(cx+(Ro-th(u)*0.45)*math.cos(ang(u)),cy+(Ro-th(u)*0.45)*sq*math.sin(ang(u))) for u in reversed(us)]
+    d.polygon(outer+inner2,fill=(255,255,255,255))  # bright edge
+    return im

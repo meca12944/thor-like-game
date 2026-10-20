@@ -15,7 +15,7 @@ from oneblade import fix as oneblade
 def body_box(im):
     a=np.array(im)[...,3]>0;ys,xs=np.nonzero(a);return xs.min(),ys.min(),xs.max(),ys.max()
 sys.path.insert(0,'fix');import trail3
-SPAN=[60,100,115,115,115,115]
+SPAN=[60,95,110,110,110,110]
 def retrail(n,seq,src):
     h,dr=n.split('_');out=[]
     tk=[i for i in range(len(man[f'{h}_down'])) if trail(L(f'all/{h}_{"down" if dr=="up" else dr}/k{i}.png'),420)[1]]
