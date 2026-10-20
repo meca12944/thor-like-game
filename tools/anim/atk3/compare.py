@@ -8,7 +8,7 @@ SH={}
 def cell(s,c):
     if s not in SH: SH[s]=Image.open(A+H['sheets'][s]).convert('RGBA')
     x,y,w,h,ax,ay=H['cells'][s][c];im=Image.new('RGBA',(256,256));im.paste(SH[s].crop((x,y,x+w,y+h)),(128-ax,189-ay));return im
-old=[[(cell(e[0],e[1]),e[2]) for e in H['anims'][f'hit{n}_{d}']] for d in ('right','left','down','up')]
+old=[[(cell(e[0],e[1]),e[2]) for e in H['anims'][f'hit{n}_{d}']] for d in ('right','left')]  # the game has no diagonal attack yet: only → ← are compared
 ld=lambda d:[Image.open(f'{d}/{i:03d}.png').convert('RGBA') for i in range(len(TK))]
 E,SE,NE=ld(de),ld(dse),ld(dne)
 new=[list(zip(E,TK)),list(zip([ImageOps.mirror(i) for i in E],TK)),list(zip(SE,TK)),list(zip(NE,TK))]
@@ -28,6 +28,7 @@ for slow in (1,1,1,3,3):
             im=Image.new('RGB',(W*S*4,Hh*S*2+40),(58,62,70));g=ImageDraw.Draw(im)
             for c in range(4):
                 for row,src in enumerate((old,new)):
+                    if c>=len(src): continue
                     fr=at(src[c],t).crop(C).resize((W*S,Hh*S),Image.NEAREST);im.paste(fr,(c*W*S,40+row*Hh*S),fr)
                 g.text((c*W*S+10,8),lab[c],fill=(255,255,255),font=FT)
             g.text((8,40+4),'지금 게임',fill=(255,220,120),font=FT);g.text((8,40+Hh*S+4),f'새 {n}타',fill=(120,230,140),font=FT)
