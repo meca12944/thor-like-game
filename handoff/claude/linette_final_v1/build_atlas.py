@@ -3,7 +3,7 @@
 import glob,json,os
 from PIL import Image
 H=os.path.dirname(os.path.abspath(__file__)); IN=H+'/frames_polished'; OUT=H+'/atlas'; os.makedirs(OUT,exist_ok=True)
-man=json.load(open(H+'/manifest.json'))['motions']; DIRS=['down','up','right','left','downl','upl']; RX,RY=128,189; MAXW=2048   # downl/upl: attacks only (diagonal art mirrored)
+man=json.load(open(H+'/manifest.json'))['motions']; DIRS=['down','up','right','left','downl','upl','south','north']; RX,RY=128,189; MAXW=2048   # downl/upl: attacks only (diagonal art mirrored)
 sheets=[];cells=[];anims={}
 for si,m in enumerate(man):
     items=[]

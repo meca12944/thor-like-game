@@ -138,7 +138,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/idle_north-east_sidearms",
+    "src": "linette_skel_v1/idle_north-east_diag",
     "pick": [
      0,
      1,
@@ -170,7 +170,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/idle_north-east_sidearms (mirrored)",
+    "src": "linette_skel_v1/idle_north-east_diag (mirrored)",
     "pick": [
      0,
      1,
@@ -332,7 +332,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_north-east_sidearms",
+    "src": "linette_skel_v1/walk_north-east_diag",
     "pick": [
      0,
      1,
@@ -364,7 +364,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_north-east_sidearms (mirrored)",
+    "src": "linette_skel_v1/walk_north-east_diag (mirrored)",
     "pick": [
      0,
      1,
@@ -378,6 +378,54 @@
      9,
      10,
      11
+    ]
+   },
+   "south": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/walk_south_ns",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "north": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/walk_north_ns",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
     ]
    }
   },
@@ -526,7 +574,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_north-east_sidearms",
+    "src": "linette_skel_v1/run_north-east_diag",
     "pick": [
      0,
      1,
@@ -558,7 +606,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_north-east_sidearms (mirrored)",
+    "src": "linette_skel_v1/run_north-east_diag (mirrored)",
     "pick": [
      0,
      1,
@@ -572,6 +620,54 @@
      9,
      10,
      11
+    ]
+   },
+   "south": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/run_south_ns",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "north": {
+    "ticks": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/run_north_ns",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
     ]
    }
   },
