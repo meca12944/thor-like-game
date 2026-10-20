@@ -5,3 +5,8 @@
 - 적용: 샌드박스(test128/sandbox, 게임 진입 화면) 기본 켬(V 로 끄기), 마을 데모 hit3_* 교체(tools/anim/apply_hit3_skyblue.py).
 - 같이 들어간 샌드박스 변경: 방향키 2개 동시 = 대각선 공격(↘↙↗↖).
 - 빌드 스크립트: tools/anim/hit3_skyblue_build.py (스크래치 경로 기준), 영상 hit3_skyblue.mp4.
+
+## v1 fix (같은 날)
+- 옆(→←) 3타에서 칼날 흰 부분이 반달과 같이 지워지던 문제: 칼막이(금색)부터 칼 길이 58px 띠를 보호해서 칼 복구.
+- 원래 그림에 남던 흰 속도선도 같은 연하늘 반투명으로 바꿈.
+- 영상: hit3_skyblue_fix.mp4
