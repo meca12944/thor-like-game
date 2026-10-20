@@ -238,6 +238,34 @@
    "x": 51,
    "y": 11,
    "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 31,
+   "y": 11,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 33,
+   "y": 18,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 26,
+   "y": 15,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 34,
+   "y": 25,
+   "respawn": 30
   }
  ],
  "ground": [

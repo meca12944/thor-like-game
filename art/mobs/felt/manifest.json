@@ -1,0 +1,34 @@
+[
+{
+"id": "c1_01_silmamul",
+"name": "실마물 (Thread Crawler)",
+"kind": "breathe",
+"w": 204,
+"h": 224,
+"n": 8
+},
+{
+"id": "c1_02_thread_puppet",
+"name": "실 꼭두각시 (Thread Puppet)",
+"kind": "breathe",
+"w": 133,
+"h": 222,
+"n": 8
+},
+{
+"id": "c1_03_needle_spider",
+"name": "바늘 거미 (Needle Spiderling)",
+"kind": "breathe",
+"w": 214,
+"h": 177,
+"n": 8
+},
+{
+"id": "c1_04_unrotting_hound",
+"name": "썩지 않는 들개 (Unrotting Hound)",
+"kind": "breathe",
+"w": 201,
+"h": 158,
+"n": 8
+}
+]

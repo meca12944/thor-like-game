@@ -35,6 +35,31 @@
   const near = (m, W, d) => W.dist(m, W.hero) < d;
   const tok = (m, W, r) => !W.token || W.token(m, r);
 
+  // chapter-1 Felt mobs (strip-animated, see def.c1_*): approach, then melee when close or a 4-way shot pattern (alternating) at range
+  const T60 = a => a.reduce((s, v) => s + v, 0) / 60;
+  function startAnim(m, name, a, key, warn) { // play strip `name`; frames before `key` stretch so frame `key` lands at `warn` s (the telegraph end)
+    m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)); }
+  function felt(o) {
+    return Object.assign({ felt: true, update(m, W, dt) {
+      const h = W.hero, A = this.anim; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; const d = W.dist(m, h);
+      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { set(m, 'idle'); m.anim = 'walk'; } return; }
+      m.anim = 'walk'; const x0 = m.x, y0 = m.y;
+      if (m.cd <= 0 && !m.intent) m.intent = Math.random() < 1 / 3 ? 'melee' : 'shoot'; // each cooldown: rush in (1/3) or shoot from mid range (2/3)
+      const want = m.intent === 'melee' ? this.melee.range : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
+      if (d < 200) { if (d > want + 6) toward(m, W, dt, this.sp, h.x, h.y); else if (d < want - 14) toward(m, W, dt, -this.sp * .7, h.x, h.y); else m.face = h.x > m.x ? 1 : -1; }
+      else wander(m, W, dt, this.sp * .5);
+      m.moving = Math.abs(m.x - x0) + Math.abs(m.y - y0) > 1e-3;
+      if (m.cd > 0 || d > 150) return;
+      if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
+        const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
+        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 / agg(W); return; }
+      if (m.intent === 'shoot' && d > 40 && tok(m, W, true)) { m.intent = null; m.pi = ((m.pi ?? Math.floor(Math.random() * 2)) + 1) % 2; const p = this.shots[m.pi]; m.face = h.x > m.x ? 1 : -1;
+        let tw = 0.6; for (let i = 0; i < 4; i++) tw = lineTele(W, m, i * Math.PI / 2, Math.min(150, p.sp * 1.4), 0.6, 6);
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'shoot'); m.cd = 2.4 / agg(W);
+        for (const w of p.waves) W.after(tw + w, () => { if (m.dead) return; for (let i = 0; i < 4; i++) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a: i * Math.PI / 2, sp: p.sp, owner: m }, p.shot)); }); }
+    } }, o);
+  }
+
   const def = {
     // ------------------------------------------------ area 1 regulars (WORLD_PLAN.md / MONSTERS.md)
     mushroom: { name: '독버섯', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 50, spr: 'mushroom', h: 20, r: 6, mat: 'm_spore',
@@ -210,6 +235,30 @@
       },
       onHit(m) { if (m.st === 'pC') m.regenHits = (m.regenHits || 0) + 1; },
       dmgMul(m) { return m.st === 'stagger' ? 2 : 1; } },
+
+    // ------------------------------------------------ chapter 1 펠트 (art/mobs/felt): PixelLab walk / attack / shoot strips, drawn hi-res by world.js drawFeltHi.
+    // 3 patterns each = 1 melee (circle in front; the strip's strike frame lands when the telegraph fills) + 2 four-way shots (right/down/left/up,
+    // line telegraphs first). Projectiles are drawn in code (world.js drawShot kinds). Spec + preview: art/mobs/felt/patterns.json, felt_mobs_*.mp4.
+    c1_silmamul: felt({ name: '실마물', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 50, h: 26, r: 7, sp: 22,
+      melee: { range: 24, rad: 14, dmg: 5 },
+      shots: [{ name: '바늘 사방 사격', sp: 150, waves: [0], shot: { kind: 'needle', r: 2, dmg: 4, life: 1.1 } },
+        { name: '실타래 탄', sp: 70, waves: [0], shot: { kind: 'threadball', r: 4, dmg: 4, life: 2.2, slow: 1.0 } }], // hit = bound (slowed) 1s
+      anim: { src: 'assets/mobs_felt/c1_01_silmamul', F: 36, walk: { n: 8, ticks: [7,  7,  7,  7,  7,  7,  7,  7] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 7, ticks: [5,  5,  10,  5,  5,  5,  5], release: 2 } } }),
+    c1_thread_puppet: felt({ name: '실 꼭두각시', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 55, h: 30, r: 6, sp: 20,
+      melee: { range: 26, rad: 15, dmg: 6 },
+      shots: [{ name: '가위날 투척', sp: 105, waves: [0], shot: { kind: 'blade', r: 4, dmg: 5, life: 1.6, ret: true } }, // flies out, comes back
+        { name: '시침핀 3연사', sp: 135, waves: [0, 0.13, 0.27], shot: { kind: 'pin', r: 2, dmg: 3, life: 1.2 } }],
+      anim: { src: 'assets/mobs_felt/c1_02_thread_puppet', F: 40, walk: { n: 8, ticks: [7,  7,  7,  7,  7,  7,  7,  7] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 12, ticks: [5,  5,  5,  5,  5,  10,  5,  5,  5,  5,  5,  5], release: 5 } } }),
+    c1_needle_spider: felt({ name: '바늘 거미', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 45, h: 22, r: 7, sp: 30,
+      melee: { range: 20, rad: 12, dmg: 5 },
+      shots: [{ name: '거미줄 탄', sp: 85, waves: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // leaves a slowing web where it ends
+        { name: '독침 2파', sp: 128, waves: [0, 0.4], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
+      anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [7,  7,  7,  7,  7,  7,  7,  7] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4 } } }),
+    c1_unrotting_hound: felt({ name: '썩지 않는 들개', aff: { weak: ['blunt'], resist: ['slash'] }, hp: 60, h: 24, r: 8, sp: 34,
+      melee: { range: 28, rad: 15, dmg: 6 },
+      shots: [{ name: '독기 구체', sp: 80, waves: [0], shot: { kind: 'orb', r: 5, dmg: 5, life: 2.0 } },
+        { name: '돌껍질 파편 2파', sp: 120, waves: [0, 0.23], shot: { kind: 'stone', r: 3, dmg: 4, life: 1.3 } }],
+      anim: { src: 'assets/mobs_felt/c1_04_unrotting_hound', F: 36, walk: { n: 8, ticks: [7,  7,  7,  7,  7,  7,  7,  7] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4 } } }),
   };
   window.WorldMobs = { def };
 })();
