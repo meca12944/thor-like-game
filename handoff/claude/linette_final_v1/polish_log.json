@@ -84,10 +84,10 @@
   ]
  },
  "walk_south": {
-  "scale": 0.966,
+  "scale": 1.0,
   "offset": [
-   1,
-   5
+   -8,
+   0
   ]
  },
  "walk_north": {
