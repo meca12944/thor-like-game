@@ -612,9 +612,9 @@ const SLOT_KO={weapon:'무기',helmet:'투구',armor:'갑옷',offhand:'보조',g
 // 무기 + 보조 + 방어구 5칸(투구·갑옷·장갑·하의·신발) + 장신구 3칸(반지·목걸이·귀걸이). Order keeps the old 4 first (data-eq indices / old saves).
 const EQ_SLOTS=['weapon','helmet','armor','offhand','gloves','legs','boots','ring','necklace','earring'];
 const SLOT_ALIAS={body:'armor',chest:'armor',head:'helmet',shield:'offhand',glove:'gloves',hands:'gloves',pants:'legs',leg:'legs',boot:'boots',feet:'boots',shoes:'boots',accessory:'ring',acc:'ring',amulet:'necklace',neck:'necklace',ear:'earring',earrings:'earring',rings:'ring'};
-const SHOP_TOWN={a_tool:'A',demo:'A',b_smith:'B',b_armor:'B',b_acc:'B',b_alch:'B',b_tool:'B',h_smith:'H',h_tool:'H',h_gem:'H'};
+const SHOP_TOWN={a_tool:'A',demo:'A',f_weapon:'A',f_tool:'A',b_smith:'B',b_armor:'B',b_acc:'B',b_alch:'B',b_tool:'B',h_smith:'H',h_tool:'H',h_gem:'H'};
 // town B (maps/townB.json doors): each shop shows only its slots of ITEMS.shops.B
-const SHOP_SLOTS={b_smith:['weapon','offhand'],b_armor:['helmet','armor','gloves','legs','boots'],b_acc:['ring','necklace','earring'],b_alch:['consumable','potion'],h_smith:['weapon','offhand'],h_tool:['consumable','potion'],h_gem:['ring','necklace','earring']}; // shop id -> town (ITEMS.shops[town] = new-item stock by town tier, tools/new_items.py)
+const SHOP_SLOTS={f_weapon:['weapon','offhand'],f_tool:['consumable','potion'],b_smith:['weapon','offhand'],b_armor:['helmet','armor','gloves','legs','boots'],b_acc:['ring','necklace','earring'],b_alch:['consumable','potion'],h_smith:['weapon','offhand'],h_tool:['consumable','potion'],h_gem:['ring','necklace','earring']}; // shop id -> town (ITEMS.shops[town] = new-item stock by town tier, tools/new_items.py)
 const HEAL=POTION.heal; // legacy name (now % of max HP)
 const BAG_COLS=8,BAG_ROWS=5,BAG_N=BAG_COLS*BAG_ROWS;
 function newInv(){return{gold:1500,quick:'potion',

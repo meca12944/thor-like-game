@@ -1008,4 +1008,5 @@
     castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
   };
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
+  if (Q.get('start')) ready.then(() => { const id = Q.get('start'), t0 = Date.now(); const tryGo = () => { const g = window.__game; if (g && g.ready && go(id, 'default', { card: false })) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
 })();
