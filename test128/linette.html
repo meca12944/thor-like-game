@@ -65,7 +65,7 @@ function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt')return;P.combo=1;start('atk','atk1_'+atkDir());}
 function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+P.lastH);}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+P.lastH);}
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function hurt(){if(P.dead)return;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;start('death','death_'+P.lastH);}
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
@@ -107,5 +107,5 @@ function draw(){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=3').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=3';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=4').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=4';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
