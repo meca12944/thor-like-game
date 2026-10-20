@@ -98,7 +98,9 @@ const norm=v=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l]};
 // trail origin + direction for the current aim: pure up/down = straight up/down from the body; otherwise the blade tip/dir of the art
 function trailOf(){const vert=!P.aim[0];const th=A.thr['hit'+P.combo+'_'+P.ak];
   if(vert){const v=P.aim[1];return {x:P.x+P.lastH*6,y:P.y-P.z+(v>0?-30:-100),dir:[0,v],th};}
-  return {x:P.x+th.tip[0],y:P.y-P.z+th.tip[1],dir:th.dir,th};}
+  const dir=P.aim[1]?[P.aim[0]*DIAG[0],P.aim[1]*DIAG[1]]:[P.aim[0],0];   // diagonals: one fixed screen angle for ↘ ↙ ↗ ↖
+  return {x:P.x+th.tip[0],y:P.y-P.z+th.tip[1],dir,th};}
+const DIAG=[Math.cos(Math.PI/6),Math.sin(Math.PI/6)];   // 30 deg
 function spawn(){foes=[
   {k:'slime',x:260,y:60,hp:5},{k:'slime',x:-260,y:-120,hp:5},{k:'slime',x:60,y:260,hp:5},{k:'spirit',x:120,y:-300,hp:6},{k:'boar',x:600,y:40,hp:16}
  ].map(e=>Object.assign(e,{max:e.hp,kbx:0,kby:0,t:Math.random()*60|0,cd:60+Math.random()*80|0,flash:0,dead:0,gone:false,f:-1,st:'idle',
@@ -109,6 +111,13 @@ function hitBeam(x,y,d,C,heavy){let any=false;
     if(Math.hypot(qx,qy)<e.r+C.w+6){any=true;e.hp-=C.dmg;e.flash=8;const kb=C.kb*(e.heavy?.35:1);e.kbx=d[0]*kb;e.kby=d[1]*kb;if(e.st==='wind'||e.st==='lunge')e.st='idle',e.cd=50;
       pops.push({x:e.x,y:e.y-e.h-14,t:0,s:String(C.dmg),big:heavy});for(let i=0;i<6;i++)SPARKS.push({x:e.x,y:e.y-e.h/2,vx:(Math.random()-.5)*4+d[0]*2,vy:(Math.random()-.5)*4+d[1]*2,t:0});BURST.push({x:e.x,y:e.y-e.h/2,t:0});if(e.hp<=0){e.dead=60;snd('kill');}}}
   if(any)snd(heavy?'hit_heavy':'hit_light');return any;}
+// beam geometry shared by drawing and hit test: head races out in 4 ticks, tail breaks off after tick 12; half width = drawn outer band
+const beamGeo=b=>{const t=b.t,L=b.len,k=t<12?1:Math.max(0,1-(t-12)/12);return {head:L*Math.min(1,(t+1)/4),tail:t<12?0:L*Math.pow((t-12)/12,1.3)*.95,half:b.w*(t<3?1.35:1)*Math.sqrt(k)+3};};
+function beamHits(b){if(b.t>=16)return;const g=beamGeo(b),[dx,dy]=b.dir;let any=false;
+  for(const e of foes){if(e.dead||e.gone||b.hit.has(e))continue;const px=e.x-b.x,py=e.y-e.h/2-b.y,u=px*dx+py*dy;if(u<g.tail-e.r||u>g.head+e.r)continue;
+    const q=Math.abs(-px*dy+py*dx);if(q<e.r*.8+g.half){b.hit.add(e);any=true;const C=b.C;e.hp-=C.dmg;e.flash=8;e.shock=26;const kb=C.kb*(e.heavy?.35:1);e.kbx=dx*kb;e.kby=dy*kb;if(e.st==='wind'||e.st==='lunge')e.st='idle',e.cd=60;
+      pops.push({x:e.x,y:e.y-e.h-14,t:0,s:String(C.dmg),big:true});BURST.push({x:b.x+dx*u,y:b.y+dy*u,t:0});for(let i=0;i<6;i++)SPARKS.push({x:e.x,y:e.y-e.h/2,vx:(Math.random()-.5)*4+dx*2,vy:(Math.random()-.5)*4+dy*2,t:0});if(e.hp<=0){e.dead=60;snd('kill');}}}
+  if(any){snd('hit_heavy');stop=Math.max(stop,3);SHAKE=Math.max(SHAKE,3);}}
 function hitFoes(cx,cy,dir,C,heavy){let any=false;
   for(const e of foes){if(e.dead||e.gone||P.z>=30)continue;
     if(inSector(cx,cy,dir,C.r,C.arc,e.x,e.y-e.h/2,e.r)){any=true;e.hp-=C.dmg;e.flash=8;const kb=C.kb*(e.heavy?.35:1);e.kbx=dir[0]*kb;e.kby=dir[1]*kb;if(e.st==='wind'||e.st==='lunge')e.st='idle',e.cd=50;
@@ -120,6 +129,7 @@ function foeStep(e){
   const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy)||1;if(e.st!=='charge'&&e.st!=='lunge'){e.f=dx>0?1:-1;e.v=[dx/d,dy/d];}
   const near=()=>!P.dead&&P.z<20&&Math.hypot(P.x-e.x,(P.y-e.y)*1.4)<e.r+HERO_R;
   if(e.flash>4)return;
+  if(e.shock>0){e.shock--;e.st='idle';e.cd=Math.max(e.cd,30);return;}
   if(e.k==='boar'){
     if(e.st==='charge'){e.x+=e.v[0]*6.5;e.y+=e.v[1]*6.5;if(--e.ct<=0){e.st='idle';e.cd=100;}if(near())hurt(e.v[0],e.v[1],2);return;}
     if(e.st==='wind'){if(--e.wt<=0){e.st='charge';e.ct=40;}return;}
@@ -150,7 +160,7 @@ function step(){
       if(P.t<hit-4)moveHero(v[0]*.6,v[1]*.6);if(P.t>=hit-4&&P.t<hit)moveHero(v[0]*H.push/4,v[1]*H.push/4);   // lunge along the aim
       if(!P.hitDone&&P.t>=hit){P.hitDone=true;const t2=trailOf();stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);
         const d2=norm(t2.dir);
-        if(P.combo===3){BEAMS.push({x:t2.x,y:t2.y,dir:d2,t:0,n:3,len:C.len,w:C.w});FLASH=4;WAVES.push({x:t2.x+d2[0]*C.len,y:t2.y+d2[1]*C.len,t:0});hitBeam(t2.x,t2.y,d2,C,true);}
+        if(P.combo===3){BEAMS.push({x:t2.x,y:t2.y,dir:d2,t:0,n:3,len:C.len,w:C.w,C,hit:new Set()});FLASH=4;WAVES.push({x:t2.x+d2[0]*C.len,y:t2.y+d2[1]*C.len,t:0});beamHits(BEAMS[BEAMS.length-1]);}
         else{CTR.push({x:t2.x,y:t2.y,dir:t2.dir,t:0,heavy:false,big:P.combo>1});const hd=P.aim[0]?d2:[0,P.aim[1]];hitFoes(P.x+hd[0]*HB_FWD,P.y-P.z-44+hd[1]*HB_FWD,hd,C,false);}}
       if(P.queued&&P.combo<3&&P.t>=Math.round(T*C.cancel)){P.queued=false;P.combo++;begin();return world();}}
     if(P.t>=T){if(P.st==='death'){P.t=T;if(++P.deadT>120){P.dead=false;P.hp=HP_MAX;P.deadT=0;P.inv=HERO_INV;start('idle','idle_'+art());}return world();}P.queued=false;start('idle','idle_'+art());}
@@ -162,7 +172,7 @@ function world(){
   foes.forEach(foeStep);for(const e of foes){e.x=Math.max(X0+20,Math.min(X1-20,e.x));e.y=Math.max(Y0,Math.min(Y1,e.y));}
   for(const p of pops)p.t++;pops=pops.filter(p=>p.t<40);
   for(const f of CTR)f.t++;for(let i=CTR.length-1;i>=0;i--)if(CTR[i].t>=(CTR[i].big?16:12))CTR.splice(i,1);
-  for(const b of BEAMS)b.t++;for(let i=BEAMS.length-1;i>=0;i--)if(BEAMS[i].t>=beamLife(BEAMS[i]))BEAMS.splice(i,1);
+  for(const b of BEAMS){b.t++;beamHits(b);}for(let i=BEAMS.length-1;i>=0;i--)if(BEAMS[i].t>=beamLife(BEAMS[i]))BEAMS.splice(i,1);
   for(const s of SPARKS){s.t++;s.x+=s.vx;s.y+=s.vy;s.vx*=.9;s.vy*=.9;}for(let i=SPARKS.length-1;i>=0;i--)if(SPARKS[i].t>14)SPARKS.splice(i,1);
   for(const w of WAVES)w.t++;for(let i=WAVES.length-1;i>=0;i--)if(WAVES[i].t>=16)WAVES.splice(i,1);
 }
@@ -179,14 +189,21 @@ function trailC(tx,ty,f){const age=f.t,heavy=f.heavy,big=f.big,life=heavy?20:big
 // hit 3 laser, pixel-art style: drawn unrotated into a small canvas (stepped palette bands, jittering energy edge, pulses running
 // forward), then blitted rotated with nearest-neighbour so diagonals stay stair-stepped like the sprites. Timeline (24 ticks):
 // 0-3 the head races out, 3-12 full beam, 12-24 the tail breaks off from the tip and the beam thins out forward, leaving dust.
-const beamLife=b=>24;const BOFF=document.createElement('canvas'),bg=BOFF.getContext('2d');const DUST=[],BURST=[];
+const beamLife=b=>24;
+function bolt(g,x0,y0,x1,y1,col){g.fillStyle=col;const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))||1;for(let i=0;i<=n;i++)g.fillRect(24+Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}   // 1px pixel line in the beam canvas (24 = PAD)
+const BOFF=document.createElement('canvas'),bg=BOFF.getContext('2d');const DUST=[],BURST=[];
 const hash=(x,y)=>{const h=Math.sin(x*12.9898+y*78.233)*43758.5453;return h-Math.floor(h);};
 function drawBeam(b,ox,oy){const t=b.t,L=b.len,life=24,[dx,dy]=b.dir,nx=-dy,ny=dx;
-  const head=L*Math.min(1,(t+1)/4),tail=t<12?0:L*Math.pow((t-12)/12,1.3)*.95,k=t<12?1:Math.max(0,1-(t-12)/12),a=t<12?1:k;
+  const G=beamGeo(b),head=G.head,tail=G.tail,k=t<12?1:Math.max(0,1-(t-12)/12),a=t<12?1:k;
   const hw=b.w*(t<3?1.35:1)*Math.sqrt(k),PAD=24,H=48,cy=H/2;BOFF.width=Math.ceil(L)+PAD*2;BOFF.height=H;bg.clearRect(0,0,BOFF.width,H);
   const band=(x,half,col,al)=>{if(half<=0)return;const h=Math.max(1,Math.round(half*2));bg.globalAlpha=al;bg.fillStyle=col;bg.fillRect(PAD+x,Math.round(cy-h/2),1,h);};
   for(let x=Math.floor(tail);x<head;x++){const j=Math.round((hash(x>>1,t)-.5)*2.4),pulse=((x-t*22)%46+46)%46<7?1:0,end=Math.min(1,(head-x)/10,(x-tail+1)/8);
     band(x,(hw+3+j)*end,'#2a5cff',.55*a);band(x,(hw+1.5+pulse+j*.5)*end,'#46cfff',.85*a);band(x,(hw+.2+pulse)*end,'#c9f7ff',a);band(x,Math.max(.5,hw-1.2)*end,'#ffffff',a);}
+  if(t<20){const seed=(t>>1)*7+b.len,ext=hw+7;bg.globalAlpha=Math.min(1,a*1.2);   // lightning: 3 jagged bolts weaving around the beam, forks off the sides
+    for(let n=0;n<3;n++){let x=Math.floor(tail)+(n*9),y=cy+Math.round((hash(n,seed)-.5)*ext*2);
+      while(x<head-4){const nx2=x+4+Math.floor(hash(x,seed+n)*7),ny2=cy+Math.round((hash(nx2,seed*3+n)-.5)*ext*2);bolt(bg,x,y,nx2,ny2,n?'#9fe8ff':'#ffffff');
+        if(hash(nx2,seed+11)>.86){const fx=nx2+6+Math.floor(hash(nx2,seed)*8),fy=ny2+(ny2<cy?-1:1)*(4+Math.floor(hash(seed,nx2)*7));bolt(bg,nx2,ny2,fx,fy,'#46cfff');}x=nx2;y=ny2;}}
+    bg.globalAlpha=1;}
   if(t<8){const r=Math.round(7-t*.6),hx=PAD+Math.round(head);bg.globalAlpha=1;    // bright head with a pixel cross
     bg.fillStyle='#46cfff';bg.fillRect(hx-r,cy-1,r*2+1,3);bg.fillRect(hx-1,cy-r,3,r*2+1);bg.fillStyle='#ffffff';bg.fillRect(hx-r-4,cy,r*2+9,1);bg.fillRect(hx,cy-r-4,1,r*2+9);bg.fillRect(hx-2,cy-2,5,5);}
   if(t<9){bg.globalAlpha=1-t/9;bg.strokeStyle='#c9f7ff';bg.lineWidth=1;bg.beginPath();bg.ellipse(PAD+2+t,cy,1.5+t*.4,4+t*2.2,0,0,7);bg.stroke();}   // muzzle ring
@@ -226,6 +243,10 @@ function draw(){
     else if(e.k==='spirit'){const fr=Math.floor(e.t/10)%4,s=.62;ctx.translate(sx,sy-8+Math.sin(e.t/14)*3);ctx.scale(s*e.f,s);ctx.drawImage(IMG.spirit,fr*65,0,65,103,-29,-102,65,103);}
     else{const fr=e.st==='charge'?Math.floor(e.t/4)%4:(e.flash?5:4),s=.55,fc=e.st==='charge'?Math.sign(e.v[0])||1:e.f;ctx.translate(sx,sy);ctx.scale(s*(fc>0?-1:1),s);ctx.drawImage(IMG.boar,fr*264,0,264,203,-132,-186,264,203);}
     ctx.restore();
+    if(e.shock>0&&!e.dead){ctx.save();ctx.globalCompositeOperation='lighter';const s2=(e.t>>1)*13;   // electric crackle while stunned
+      for(let n=0;n<2;n++){let x=sx-e.r+Math.round(hash(n,s2)*4),y=sy-e.h*hash(n+5,s2);ctx.fillStyle=n?'#46cfff':'#ffffff';
+        for(let i=0;i<6;i++){const x2=x+Math.round(e.r*2/6),y2=sy-e.h*hash(i+n*7,s2);const m=Math.max(Math.abs(x2-x),Math.abs(y2-y))||1;for(let j=0;j<=m;j++)ctx.fillRect(Math.round(x+(x2-x)*j/m),Math.round(y+(y2-y)*j/m),1,1);x=x2;y=y2;}}
+      ctx.restore();}
     if(!e.dead&&e.hp<e.max){const w=e.heavy?56:32;ctx.fillStyle='#300';ctx.fillRect(sx-w/2,sy-e.h-12,w,3);ctx.fillStyle='#e33';ctx.fillRect(sx-w/2,sy-e.h-12,w*e.hp/e.max,3);}
     if(showHB&&!e.dead){ctx.strokeStyle='rgba(255,80,80,.9)';ctx.beginPath();ctx.arc(sx,sy-e.h/2,e.r,0,7);ctx.stroke();}}
   function drawHero(){const sx=Math.round(P.x-cX),gy=Math.round(P.y-cY),g=groundAt(P.x,P.y),sy=Math.round(P.y-cY-P.z);
@@ -235,7 +256,8 @@ function draw(){
     if(!blink){ctx.save();ctx.translate(sx,sy);if(fl)ctx.scale(-1,1);if(P.white>0){ctx.filter='brightness(0) invert(1)';P.white--;}if(P.st==='dash')ctx.globalAlpha=.85;ctx.drawImage(SH[s],x,y,w,h,-ax,-ay,w,h);ctx.restore();}
     if(showHB){ctx.strokeStyle='rgba(120,200,255,.9)';ctx.beginPath();ctx.ellipse(sx,sy,HERO_R,HERO_R/1.4,0,0,7);ctx.stroke();
       if(P.st==='atk'&&P.combo<3){const C=COMBO[P.combo-1],tr=trailOf(),hd=P.aim[0]?norm(tr.dir):[0,P.aim[1]];hb(sx+hd[0]*HB_FWD,sy-44+hd[1]*HB_FWD,hd,C.r,C.arc,'rgba(255,230,80,.25)');}
-      else if(P.st==='atk'){const C=COMBO[P.combo-1],tr=trailOf(),d=norm(tr.dir),x=tr.x-cX,y=tr.y-cY;ctx.strokeStyle='rgba(255,230,80,.7)';ctx.lineWidth=2*(C.w+6);ctx.lineCap='round';ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+d[0]*C.len,y+d[1]*C.len);ctx.stroke();ctx.globalAlpha=1;}}}
+      }}
+    if(showHB)for(const b of BEAMS){if(b.t>=16)continue;const g=beamGeo(b),[dx,dy]=b.dir,x=b.x-cX,y=b.y-cY;ctx.strokeStyle='rgba(255,230,80,.45)';ctx.lineWidth=2*g.half;ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(x+dx*g.tail,y+dy*g.tail);ctx.lineTo(x+dx*g.head,y+dy*g.head);ctx.stroke();}
   for(const en of ents)en.f();
   for(const w of WAVES){const a=1-w.t/16,r=(w.big?20:10)+w.t*(w.big?10:7);ctx.strokeStyle=`rgba(200,240,255,${.8*a})`;ctx.lineWidth=3*a+1;ctx.beginPath();ctx.ellipse(Math.round(w.x-cX),Math.round(w.y-cY),r,r*.45,0,0,7);ctx.stroke();}
   for(const f of CTR)trailC(f.x-cX,f.y-cY,f);
