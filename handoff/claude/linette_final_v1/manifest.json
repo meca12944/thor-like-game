@@ -1188,7 +1188,7 @@
      3
     ],
     "lunge": 2,
-    "src": "linette_final_v1/attack_src/atk2/right",
+    "src": "linette_skel_v1/atk2_east_face",
     "pick": [
      0,
      1,
@@ -1208,7 +1208,7 @@
      3
     ],
     "lunge": 2,
-    "src": "linette_final_v1/attack_src/atk2/right (mirrored)",
+    "src": "linette_skel_v1/atk2_east_face (mirrored)",
     "pick": [
      0,
      1,
@@ -1318,7 +1318,7 @@
      2
     ],
     "lunge": 8,
-    "src": "linette_final_v1/attack_src/atk3/right",
+    "src": "linette_skel_v1/atk3_east_face",
     "pick": [
      0,
      1,
@@ -1329,11 +1329,11 @@
      6,
      7,
      8,
-     9,
-     10,
-     11,
-     12,
-     13
+     7,
+     6,
+     5,
+     4,
+     0
     ]
    },
    "left": {
@@ -1354,7 +1354,7 @@
      2
     ],
     "lunge": 8,
-    "src": "linette_final_v1/attack_src/atk3/right (mirrored)",
+    "src": "linette_skel_v1/atk3_east_face (mirrored)",
     "pick": [
      0,
      1,
@@ -1365,11 +1365,11 @@
      6,
      7,
      8,
-     9,
-     10,
-     11,
-     12,
-     13
+     7,
+     6,
+     5,
+     4,
+     0
     ]
    },
    "down": {

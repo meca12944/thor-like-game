@@ -324,15 +324,15 @@
  "atk3_right": {
   "scale": 1.0,
   "offset": [
-   2,
-   -6
+   4,
+   -5
   ]
  },
  "atk3_left": {
   "scale": 1.0,
   "offset": [
-   -2,
-   -6
+   -4,
+   -5
   ]
  },
  "atk3_down": {
