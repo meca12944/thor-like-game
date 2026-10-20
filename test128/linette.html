@@ -116,7 +116,7 @@ function draw(){
   const camX=Math.round(P.x-VW/2)+shx,camY=Math.round(P.y-VH*0.55)+shy;
   for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
   const sx=Math.round(P.x-camX),sy0=Math.round(P.y-camY);let sy=sy0;
-  if(P.st==='jump'){const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));sy-=Math.round(Math.sin(u*Math.PI)*(rj?72:30));}   // rjump: push-off 2 frames, airborne arc (~2/3 of her height, like the hero), landing stride 2 frames   // airborne arc in the middle of the clip
+  if(P.st==='jump'){const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));sy-=Math.round(Math.sin(u*Math.PI)*(rj?72:60));}   // rjump: push-off 2 frames, airborne arc (~2/3 of her height, like the hero), landing stride 2 frames   // airborne arc in the middle of the clip
   const drawDummy=D=>{const x=Math.round(D.x-camX),y=Math.round(D.y-camY);ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(x,y,14,4,0,0,7);ctx.fill();
     const w=D.fl>0&&D.fl%2?'#fff':null;ctx.fillStyle=w||'#7a5230';ctx.fillRect(x-3,y-44,6,44);ctx.fillStyle=w||'#a8743f';ctx.fillRect(x-14,y-38,28,6);ctx.beginPath();ctx.arc(x,y-50,9,0,7);ctx.fillStyle=w||'#c9a06a';ctx.fill();
     if(D.fl>0)D.fl--;D.x+=(D.hx-D.x)*0.06;D.y+=(D.hy-D.y)*0.06;
