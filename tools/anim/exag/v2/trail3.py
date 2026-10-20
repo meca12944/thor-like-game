@@ -15,7 +15,7 @@ def tip(im):
         d=np.hypot(xs-px,ys-py);j=d.argmax()
         if best is None or d[j]>best[2]: best=(xs[j],ys[j],d[j])
     return best
-def arc(center,R,a_tip,sgn,span,lead=8,T=None,sq=1.0):
+def arc(center,R,a_tip,sgn,span,lead=40,T=None,sq=1.0):
     # Ys8-like: thin clean half-moon, sharp tail, a hair ahead of the blade tip
     T=T or min(9,0.15*R);cx,cy=center;a0=a_tip-sgn*span;a1=a_tip+sgn*lead;us=[i/48 for i in range(49)]
     ang=lambda u:math.radians(a0+(a1-a0)*u)
