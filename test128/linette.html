@@ -83,7 +83,7 @@ function step(){
     const L=clip(P.clip),T=total(L);
     if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:P.run?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
-    if(P.st==='atk'){const lt=tmeta(P.clip);if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0),H=HIT[P.combo-1];if(P.t>tl-4&&P.t<=tl){P.x+=lt.dir[0]*H.push/4;P.y+=lt.dir[1]*H.push/4;}if(P.t===tl)strike(P.clip,P.combo-1);}   // lunge along the thrust, strike on the lunge frame
+    if(P.st==='atk'){const lt=tmeta(P.clip);if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0),H=HIT[P.combo-1];if(!STILL&&P.t>tl-4&&P.t<=tl){P.x+=lt.dir[0]*H.push/4;P.y+=lt.dir[1]*H.push/4;}if(P.t===tl)strike(P.clip,P.combo-1);}   // lunge along the thrust, strike on the lunge frame
       const lt2=A.thrust[P.clip],tl2=lt2?L.slice(0,lt2.frame+1).reduce((s,e)=>s+e[2],0):T;
       if(P.queued&&P.combo<3&&P.t>=tl2){P.queued=false;P.combo++;start('atk','atk'+P.combo+'_'+atkDir());return;}}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+atkDir());}
@@ -94,18 +94,20 @@ function step(){
 const VERT={down:1,downl:1,up:-1,upl:-1};
 function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return {...m,dir:[d==='left'?-1:1,0]};   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
   const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
+// owner 10-20 "사람은 가만히 있고 특수효과만 나가게": STILL = no lunge step, the thrust trail flies forward like a shot and hits further away
+const STILL=true,FLY=7;
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
 function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2)FLASH=4;
-  const [dx,dy]=m.dir,reach=(m.big?100:74),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
+  const [dx,dy]=m.dir,reach=(m.big?100:74)+(STILL?FLY*10:0),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
   for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
     for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
       if(along>-20&&along<reach+10&&perp<26&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});}}}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
 function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
-  const tx=x+tip[0],ty=y+tip[1],ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
+  const fly=STILL?age*FLY:0,tx=x+tip[0]+dx*fly,ty=y+tip[1]+dy*fly,ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
   if(heavy)lance(cx,cy,dx,dy,nx,ny,back+ahead*.45,ahead*.75,W*1.6,`rgba(60,150,255,${.31*a})`);
   lance(cx,cy,dx,dy,nx,ny,back+ahead*.35,ahead*.65,W,`rgba(90,210,255,${.47*a})`);lance(cx,cy,dx,dy,nx,ny,back*.8+ahead*.3,ahead*.6,W*.45,`rgba(210,250,255,${.86*a})`);
   lance(cx,cy,dx,dy,nx,ny,back*.6+ahead*.25,ahead*.55,Math.max(1.5,W*.18),`rgba(255,255,255,${a})`);
