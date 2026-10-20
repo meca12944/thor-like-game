@@ -13,18 +13,24 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 #knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
 #keys{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.6);color:var(--fg);padding:14px 18px;border-radius:10px;font-size:14px;line-height:1.7;text-align:center;pointer-events:none}
 #keys.off{display:none}
-@media (hover:hover) and (pointer:fine){#stick,.btn{display:none}}
+#skbar{position:absolute;right:calc(12px + env(safe-area-inset-right));bottom:calc(206px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(2,58px);gap:8px;padding:8px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3)}
+#skbar .sk{position:relative;width:58px;height:58px;border-radius:10px;border:2px solid rgba(255,255,255,.6);background:rgba(20,24,34,.85);color:#fff;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:3px;box-sizing:border-box;overflow:hidden}
+#skbar .sk canvas{position:absolute;left:50%;top:5px;transform:translateX(-50%);width:30px;height:30px;image-rendering:pixelated}
+#skbar .sk .cd{position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.65) var(--p,0%),transparent 0);pointer-events:none}
+#skbar .sk .n{position:absolute;left:4px;top:2px;font-size:10px;color:#ffe08a}
+#skbar .sk.ready{border-color:#ffe08a}
+@media (hover:hover) and (pointer:fine){#stick,.btn{display:none}#skbar{right:50%;transform:translateX(50%);bottom:12px;grid-template-columns:repeat(4,58px)}}
 </style>
 
 <canvas id="c"></canvas>
-<a id="back" href="../" style="position:absolute;left:8px;top:calc(26px + env(safe-area-inset-top));color:#ffe08a;font:12px sans-serif;text-decoration:none;z-index:5;text-shadow:0 1px 2px #000">← 타이틀 · 마을 데모</a><div id="hud">이동 WASD/방향키 · 공격 J/Z · 점프 Space/X · 대시 K/Shift · 달리기 L · 스킬 U · 판정 H · 사망 P</div>
-<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>이동 WASD / 방향키<br>공격 J 또는 Z · 점프 Space 또는 X<br>대시 K 또는 Shift · 달리기 L · 스킬 U<br>판정 H · 사망 P</div>
+<a id="back" href="../" style="position:absolute;left:8px;top:calc(26px + env(safe-area-inset-top));color:#ffe08a;font:12px sans-serif;text-decoration:none;z-index:5;text-shadow:0 1px 2px #000">← 타이틀 · 마을 데모</a><div id="hud">이동 WASD/방향키 · 공격 J/Z · 점프 Space/X · 대시 K/Shift · 달리기 L · 스킬 1~4 · 판정 H · 사망 P</div>
+<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>이동 WASD / 방향키<br>공격 J 또는 Z · 점프 Space 또는 X<br>대시 K 또는 Shift · 달리기 L · 스킬 1 2 3 4 (스킬창 터치)<br>판정 H · 사망 P</div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
 <div class="btn" id="bRun" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom))">달리기</div>
 <div class="btn" id="bJump" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom))">점프</div>
-<div class="btn" id="bCast" style="right:calc(100px + env(safe-area-inset-right));bottom:calc(180px + env(safe-area-inset-bottom))">스킬</div>
+<div id="skbar"></div>
 <div class="btn small" id="bHB" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">판정</div>
 <div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
 <script>
@@ -95,6 +101,51 @@ function slashStep(){const S=P.sl;if(!S)return;S.t++;const Y=SLASH[S.n];
     else SHAKE=Math.max(SHAKE,Y.whiff);}
   if(S.q&&S.n<2&&S.t>=Y.cancel){slashStart(S.n+1);return;}
   if(S.t>=Y.end)P.sl=null;}
+// hero_skills4 v1 (owner 2026-10-20: 4 of the 20 skills in game + a touch skill window): cast clip, release on cast frame 6 (tick 30)
+const SKILLS=[{id:'fire',nm:'화염구',cd:90,col:[255,120,30]},{id:'chain',nm:'연쇄번개',cd:120,col:[255,235,100]},{id:'nova',nm:'빙결서클',cd:150,col:[160,225,255]},{id:'meteor',nm:'메테오',cd:240,col:[255,80,40]}];
+const SKCD=[0,0,0,0],SKF=[],REL_T=30;let SKQ=-1;
+function castSkill(i){if(P.dead||(P.st!=='idle'&&P.st!=='move')||P.air||SKCD[i]>0)return;SKQ=i;SKCD[i]=SKILLS[i].cd;P.sl=null;start('cast','cast_'+P.lastH);}
+function skDir(){const v=DV[dirKey()],l=Math.hypot(v[0],v[1]);return[v[0]/l,v[1]/l];}
+function skHit(dmg,kx,ky,big){if(M.dead)return;M.hp-=dmg;M.flash=8;M.kbx=kx;M.kby=ky;pops.push({x:M.x,y:M.y-60,t:0,s:String(dmg)});IMP.push({x:M.x,y:M.y-24,t:0,big});if(M.hp<=0)M.dead=90;window.__sbx.hits++;}
+function skFire(i){const d=skDir(),fl=P.lastH==='left'?-1:1,hx=P.x+fl*34,hy=P.y-P.z-52,id=SKILLS[i].id,md=Math.hypot(M.x-P.x,M.y-P.y);
+  if(id==='fire')SKF.push({k:'fire',x:hx,y:hy,vx:d[0]*6,vy:d[1]*6,t:0});
+  if(id==='chain')SKF.push({k:'chain',x:hx,y:hy,t:0,on:!M.dead&&md<190,tx:P.x+d[0]*130,ty:P.y+d[1]*130-30});
+  if(id==='nova')SKF.push({k:'nova',x:P.x,y:P.y,t:0,done:false});
+  if(id==='meteor'){const on=!M.dead&&md<230;SKF.push({k:'meteor',x:on?M.x:P.x+d[0]*120,y:on?M.y:P.y+d[1]*120,t:0});}}
+function skStep(){for(let i=0;i<4;i++)if(SKCD[i]>0)SKCD[i]--;
+  if(P.st==='cast'&&P.t===REL_T&&SKQ>=0){skFire(SKQ);SKQ=-1;}
+  for(const f of SKF){f.t++;
+    if(f.k==='fire'&&!f.boom){f.x+=f.vx;f.y+=f.vy;if(!M.dead&&Math.hypot(f.x-M.x,(f.y-(M.y-22))*1.3)<26||f.t>55){f.boom=1;f.t=0;if(!M.dead&&Math.hypot(f.x-M.x,f.y-(M.y-22))<50)skHit(2,f.vx*1.2,f.vy*1.2,false);SHAKE=Math.max(SHAKE,2.5);}}
+    if(f.k==='chain'&&f.on&&(f.t===2||f.t===8||f.t===14)){skHit(1,0,0,false);M.frz=Math.max(M.frz||0,8);SHAKE=Math.max(SHAKE,1.5);}
+    if(f.k==='nova'&&!f.done&&!M.dead){const r=10+f.t*6.5;if(Math.hypot(M.x-f.x,(M.y-f.y)*1.6)<r){f.done=true;skHit(1,0,0,false);M.frz=110;}}
+    if(f.k==='meteor'&&f.t===34){SHAKE=Math.max(SHAKE,6);FLASH=4;if(!M.dead&&Math.hypot(M.x-f.x,(M.y-f.y)*1.4)<70)skHit(3,(M.x-f.x)*.15,(M.y-f.y)*.15,true);}}
+  for(let i=SKF.length-1;i>=0;i--){const f=SKF[i],life={fire:f.boom?20:99,chain:22,nova:26,meteor:56}[f.k];if(f.t>=life)SKF.splice(i,1);}}
+function glow(x,y,r,c,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(255,255,255,${a})`);g.addColorStop(.35,`rgba(${c},${a*.9})`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();}
+function zig(x0,y0,x1,y1,w,col,seed){let s=seed;const r=()=>((s=(s*16807)%2147483647)/2147483647-.5);ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x0,y0);for(let i=1;i<7;i++){const t=i/7;ctx.lineTo(x0+(x1-x0)*t+r()*14,y0+(y1-y0)*t+r()*14);}ctx.lineTo(x1,y1);ctx.stroke();}
+function skDraw(camX,camY){
+  if(P.st==='cast'&&P.t<REL_T&&SKQ>=0){const fl=P.lastH==='left'?-1:1,c=SKILLS[SKQ].col.join(',');glow(P.x+fl*34-camX,P.y-P.z-52-camY,4+P.t*.35,c,.9);}
+  for(const f of SKF){const x=f.x-camX,y=f.y-camY,t=f.t;
+    if(f.k==='fire'){if(!f.boom){for(let k=5;k>=0;k--)glow(x-f.vx*k*1.3,y-f.vy*k*1.3,9-k,'255,'+(130-k*14)+',20',.75-k*.1);}
+      else{const a=1-t/20;glow(x,y,10+t*3,'255,110,20',a);ctx.strokeStyle=`rgba(255,200,90,${a})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y+18,10+t*4,(10+t*4)*.35,0,0,7);ctx.stroke();
+        for(let k=0;k<14;k++){const g=k*.45,sp=2+(k%4);ctx.fillStyle=`rgba(255,${180+(k%3)*25},80,${a})`;ctx.fillRect(x+Math.cos(g)*sp*t,y+Math.sin(g)*sp*t*.7+t*t*.04,2,2);}}}
+    if(f.k==='chain'){const a=1-t/22,tx=(f.on?M.x:f.tx)-camX,ty=(f.on?M.y-22:f.ty)-camY;if(t<18){zig(x,y,tx,ty,4,`rgba(120,190,255,${a*.8})`,t*31+7);zig(x,y,tx,ty,1.5,`rgba(255,255,230,${a})`,t*31+7);glow(tx,ty,14,'255,240,140',a);}}
+    if(f.k==='nova'){const r=10+t*6.5,a=t<18?1:1-(t-18)/8;ctx.strokeStyle=`rgba(200,240,255,${a})`;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y,r,r*.36,0,0,7);ctx.stroke();ctx.strokeStyle=`rgba(140,210,255,${a*.6})`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(x,y,r*.85,r*.3,0,0,7);ctx.stroke();
+      for(let k=0;k<16;k++){const g=k*.3927,px=x+Math.cos(g)*r,py=y+Math.sin(g)*r*.36,s=4+(k%2)*2;ctx.fillStyle=`rgba(225,250,255,${a})`;ctx.strokeStyle=`rgba(90,160,230,${a})`;ctx.beginPath();ctx.moveTo(px,py-s*2);ctx.lineTo(px+s*.5,py);ctx.lineTo(px,py+2);ctx.lineTo(px-s*.5,py);ctx.closePath();ctx.fill();ctx.stroke();}}
+    if(f.k==='meteor'){const a=t<40?1:1-(t-40)/16,R=20+Math.min(t,20)*2;ctx.strokeStyle=`rgba(255,120,40,${a})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,R,R*.36,0,0,7);ctx.stroke();ctx.strokeStyle=`rgba(255,200,90,${a*.7})`;ctx.beginPath();ctx.ellipse(x,y,R*.7,R*.25,0,0,7);ctx.stroke();
+      if(t>=18&&t<34){const u=(t-18)/16,mx=x+150*(1-u),my=y-20-240*(1-u);for(let k=7;k>=0;k--)glow(mx+k*9,my-k*13,12-k,'255,'+(110-k*10)+',20',.7-k*.07);glow(mx,my,15,'255,160,40',1);}
+      if(t>=34){const b=t-34,c=1-b/22;glow(x,y-14,16+b*4,'255,90,10',c);ctx.strokeStyle=`rgba(255,210,130,${c})`;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y,18+b*8,(18+b*8)*.36,0,0,7);ctx.stroke();
+        for(let k=0;k<24;k++){const g=k*.262,sp=2+(k%5);ctx.fillStyle=`rgba(255,${170+(k%3)*30},80,${c})`;ctx.fillRect(x+Math.cos(g)*sp*b,y-16+Math.sin(g)*sp*b*.6+b*b*.12,3,3);}}}}
+  if(M.frz>0&&!M.dead){const x=M.x-camX,y=M.y-camY;ctx.fillStyle='rgba(170,225,255,.35)';ctx.beginPath();ctx.ellipse(x,y-20,22,22,0,0,7);ctx.fill();ctx.strokeStyle='rgba(235,250,255,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-18,y);ctx.lineTo(x-12,y-30);ctx.lineTo(x-3,y-18);ctx.lineTo(x+5,y-40);ctx.lineTo(x+18,y);ctx.stroke();}}
+// skill window: 4 slots with a pixel icon, number, name, cooldown sweep; tap / click to cast
+const SKEL=[];{const bar=document.getElementById('skbar');
+ SKILLS.forEach((k,i)=>{const b=document.createElement('div');b.className='sk ready';b.innerHTML=`<canvas width="15" height="15"></canvas><span class="n">${i+1}</span>${k.nm}<div class="cd"></div>`;bar.appendChild(b);
+  const g=b.querySelector('canvas').getContext('2d'),c=`rgb(${k.col})`;g.fillStyle=c;
+  if(k.id==='fire'){g.beginPath();g.arc(8,9,5,0,7);g.fill();g.fillStyle='#fff6c0';g.fillRect(6,7,3,3);g.fillStyle=c;g.fillRect(9,1,2,4);g.fillRect(5,3,2,3);}
+  if(k.id==='chain'){g.fillRect(8,1,3,5);g.fillRect(5,5,6,2);g.fillRect(7,7,3,4);g.fillRect(4,10,4,2);g.fillRect(3,12,2,3);}
+  if(k.id==='nova'){for(let a=0;a<6;a++){const x=7.5+Math.cos(a*1.047)*6,y=7.5+Math.sin(a*1.047)*6;g.fillRect(x-1,y-1,2,2);}g.fillStyle='#fff';g.fillRect(6,6,3,3);}
+  if(k.id==='meteor'){g.beginPath();g.arc(5,10,4,0,7);g.fill();g.fillStyle='rgba(255,180,60,.8)';g.fillRect(8,4,3,3);g.fillRect(11,1,3,3);}
+  b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();castSkill(i);});SKEL.push(b);});}
+function skUI(){for(let i=0;i<4;i++){const p=SKCD[i]/SKILLS[i].cd*100;SKEL[i].querySelector('.cd').style.setProperty('--p',p+'%');SKEL[i].classList.toggle('ready',SKCD[i]===0);}}
 const COMBO=[{hit:5,cancel:12,r:124,arc:150,dmg:1,kb:5},{hit:6,cancel:15,r:100,arc:170,dmg:1,kb:6},{hit:9,cancel:23,r:118,arc:160,dmg:2,kb:10}]; // game H8HB r/2 x1.3 (owner: bigger), H8.combo hit/cancel ticks
 const HB_FWD=22; // sector centre pushed forward from the chest along the swing direction
 const HERO_R=16,HERO_INV=60,HERO_KB=18,HITSTOP=6;
@@ -109,12 +160,12 @@ const K={};let joy={x:0,y:0};
 cv.tabIndex=0;cv.style.outline='none';cv.focus();addEventListener('pointerdown',()=>cv.focus());
 const keysEl=document.getElementById('keys');if(matchMedia('(pointer:coarse)').matches)keysEl.classList.add('off');addEventListener('pointerdown',()=>keysEl.classList.add('off'));
 addEventListener('keydown',e=>{const c=e.code;if(/^Arrow|^Space$/.test(c))e.preventDefault();keysEl.classList.add('off');if(e.repeat||K[c])return;K[c]=1;
- if(c==='KeyJ'||c==='KeyZ')attack();if(c==='KeyK'||c==='ShiftLeft'||c==='ShiftRight')dash();if(c==='KeyL')P.run=!P.run,ui();if(c==='KeyU')cast();
+ if(c==='KeyJ'||c==='KeyZ')attack();if(c==='KeyK'||c==='ShiftLeft'||c==='ShiftRight')dash();if(c==='KeyL')P.run=!P.run,ui();if(c==='KeyU')castSkill(0);if(c==='Digit1')castSkill(0);if(c==='Digit2')castSkill(1);if(c==='Digit3')castSkill(2);if(c==='Digit4')castSkill(3);
  if(c==='Space'||c==='KeyX')jump();if(c==='KeyH')showHB=!showHB,ui();if(c==='KeyP')die();});
 addEventListener('keyup',e=>{K[e.code]=0;});
 addEventListener('blur',()=>{for(const k in K)K[k]=0;});
 function tap(id,f){document.getElementById(id).addEventListener('pointerdown',e=>{e.preventDefault();f();});}
-tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bJump',jump);tap('bHB',()=>{showHB=!showHB;ui();});tap('bDie',die);
+tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bJump',jump);tap('bHB',()=>{showHB=!showHB;ui();});tap('bDie',die);
 function ui(){document.getElementById('bRun').classList.toggle('on',P.run);document.getElementById('bHB').classList.toggle('on',showHB);}
 {const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
@@ -146,7 +197,7 @@ function step(){
   if(stop>0){stop--;return;}
   for(const f of SFX)f.t++;for(let i=SFX.length-1;i>=0;i--)if(SFX[i].t*S_STEP>=S_LIFE)SFX.splice(i,1);
   for(const m of IMP)m.t++;for(let i=IMP.length-1;i>=0;i--)if(IMP[i].t>=10)IMP.splice(i,1);
-  slashStep();
+  slashStep();skStep();
   for(const f of CTR)f.t++;for(let i=CTR.length-1;i>=0;i--)if(CTR[i].t>=(CTR[i].heavy?20:CTR[i].big?16:12))CTR.splice(i,1);
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
   const moving=m>0.2;P.t++;if(P.inv>0)P.inv--;
@@ -177,8 +228,8 @@ function slimeStep(){
   // slime: hops toward the hero, hurts on body contact (not while the hero is up on the block or high in the air)
   M.t++;if(M.flash>0)M.flash--;
   if(M.dead){if(--M.dead<=0){M.hp=M.max;M.x=P.x+(Math.random()<.5?-1:1)*150;M.y=P.y+(Math.random()-.5)*80;}}
-  else{M.x+=M.kbx;M.y+=M.kby;M.kbx*=.8;M.kby*=.8;
-    if(!P.dead&&M.flash===0&&M.cool<60){const dx=P.x-M.x,dy=P.y-M.y,d=Math.hypot(dx,dy)||1;if(d>8){const hop=(M.t%40)<20?.55:.15,nx=M.x+dx/d*hop,ny=M.y+dy/d*hop;if(!groundAt(nx,M.y))M.x=nx;if(!groundAt(M.x,ny))M.y=ny;}}
+  else{M.x+=M.kbx;M.y+=M.kby;M.kbx*=.8;M.kby*=.8;if(M.frz>0)M.frz--;
+    if(!P.dead&&M.flash===0&&M.cool<60&&!(M.frz>0)){const dx=P.x-M.x,dy=P.y-M.y,d=Math.hypot(dx,dy)||1;if(d>8){const hop=(M.t%40)<20?.55:.15,nx=M.x+dx/d*hop,ny=M.y+dy/d*hop;if(!groundAt(nx,M.y))M.x=nx;if(!groundAt(M.x,ny))M.y=ny;}}
     if(M.cool>0)M.cool--;
     if(M.cool===0&&!P.dead&&P.z<20&&Math.hypot(P.x-M.x,(P.y-M.y)*1.4)<HERO_R+20){const hit=P.inv===0;hurt(P.x-M.x,P.y-M.y);const dx=M.x-P.x,dy=M.y-P.y,d=Math.hypot(dx,dy)||1;M.kbx=dx/d*6;M.kby=dy/d*6;M.cool=hit?90:30;}}  // after a touch the slime bounces off and rests
   for(const p of pops)p.t++;pops=pops.filter(p=>p.t<40);
@@ -211,13 +262,13 @@ function draw(){
   for(const en of ents)en.f();
   for(const w of WAVES){const a=1-w.t/16,r=10+w.t*7;ctx.strokeStyle=`rgba(200,240,255,${.8*a})`;ctx.lineWidth=3*a+1;ctx.beginPath();ctx.ellipse(Math.round(w.x-camX),Math.round(w.y-camY),r,r*.45,0,0,7);ctx.stroke();}
   for(const f of CTR)trailC(f.x-camX,f.y-camY,f);
-  for(const f of SFX)slashDraw(f,camX,camY);for(const m of IMP)impDraw(m,camX,camY);
+  for(const f of SFX)slashDraw(f,camX,camY);skDraw(camX,camY);for(const m of IMP)impDraw(m,camX,camY);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
   ctx.font='bold 12px system-ui';ctx.textAlign='center';for(const p of pops){ctx.fillStyle=`rgba(255,240,120,${1-p.t/40})`;ctx.fillText(p.s,Math.round(p.x-camX),Math.round(p.y-camY-p.t*.6));}
   ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='11px system-ui';ctx.fillText('HP '+P.hp,8,VH-8);
 }
 let acc=0,last=performance.now();
-function loop(now){acc+=Math.min(100,now-last);last=now;if(window.__sbx.manual)acc=0;while(acc>=1000/60){step();acc-=1000/60;}draw();requestAnimationFrame(loop);}  // manual = test driver steps it
+function loop(now){acc+=Math.min(100,now-last);last=now;if(window.__sbx.manual)acc=0;while(acc>=1000/60){step();acc-=1000/60;}draw();skUI();requestAnimationFrame(loop);}  // manual = test driver steps it
 const img=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
 fetch('assets/hero_sbx.json').then(r=>r.json()).then(j=>{A=j;return Promise.all([...A.sheets.map(p=>img('assets/'+p)),img('assets/slime.png')]);}).then(ims=>{SL=ims.pop();SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
 window.__sbx={P,M,K,step,draw,attack,dash,jump,BLOCKS,manual:false,hits:0,get showHB(){return showHB},set showHB(v){showHB=v}};
