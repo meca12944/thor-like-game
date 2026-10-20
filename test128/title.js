@@ -43,6 +43,7 @@
   const ITEMS = [
     { id: 'new', label: '새 게임', ok: true },
     { id: 'continue', label: '이어하기', ok: hasSave },
+    { id: 'town', label: '마을 데모 (이전)', ok: true },
     { id: 'settings', label: '설정', ok: true },
   ];
   TS.sel = hasSave ? 1 : 0;
@@ -57,6 +58,8 @@
   function toMenu() { TS.stage = 'menu'; press.hidden = true; ul.hidden = false; draw(); }
   function startGame(choice) {
     TS.choice = choice;
+    if (choice !== 'town') { location.href = 'sandbox/'; return; }   // owner 2026-10-20: entering the game = the hero sandbox (motion standard); old town demo = menu '마을 데모'
+    choice = TS.choice = hasSave ? 'continue' : 'new';
     if (choice === 'new' && hasSave) {   // fresh run without deleting the quick save
       const q = new URLSearchParams(location.search); q.set('nosave', ''); q.set('notitle', '');
       location.search = q.toString().replace(/=(&|$)/g, '$1'); return;
