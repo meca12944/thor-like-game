@@ -56,17 +56,17 @@
   ]
  },
  "walk_down": {
-  "scale": 1.035,
+  "scale": 1.092,
   "offset": [
-   -7,
-   -10
+   -9,
+   -15
   ]
  },
  "walk_downl": {
-  "scale": 1.035,
+  "scale": 1.092,
   "offset": [
-   -1,
-   -10
+   -13,
+   -15
   ]
  },
  "walk_up": {
@@ -100,14 +100,14 @@
  "run_down": {
   "scale": 1.0,
   "offset": [
-   18,
+   -2,
    6
   ]
  },
  "run_downl": {
   "scale": 1.0,
   "offset": [
-   -17,
+   2,
    6
   ]
  },

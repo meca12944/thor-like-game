@@ -37,6 +37,8 @@ SRC['jump']={'right':(f'{SK}/jump_east',None,json.load(open(f'{SK}/jump_east.tic
 SRC['idle']['right']=(f'{SK}/idle_east_facefix',[0,1,2,3,4,5,4,3,2,1],[7]*10)   # owner 10-20: side idle redrawn by PixelLab from the face-fixed frame (visible eye/nose/chin); frames 6-7 swing the needles -> ping-pong 0-5
 SRC['atk2']['right']=(f'{SK}/atk2_east_face',None,CL['atk2_right']['ticks'])   # owner 10-20: atk2/atk3 heads too big + different faces -> redrawn by PixelLab skeleton from the new face (atk2: legs of frames 1-2 pasted from frame 0)
 SRC['atk3']['right']=(f'{SK}/atk3_east_face',list(range(9))+[7,6,5,4,0],CL['atk3_right']['ticks'])
+for _m,_pick in (('idle',None),('walk',[11]+list(range(1,12))),('run',None)):   # owner 10-20: down-diagonal arms like the side clips (skeleton arms from side; walk frame 0 kept the old spread arms -> replaced)
+    SRC[_m]['down']=(f'{SK}/{_m}_south-east_sidearms',_pick,SRC[_m]['down'][2])
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}

@@ -74,7 +74,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/idle_south-east_diag",
+    "src": "linette_skel_v1/idle_south-east_sidearms",
     "pick": [
      0,
      1,
@@ -106,7 +106,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/idle_south-east_diag (mirrored)",
+    "src": "linette_skel_v1/idle_south-east_sidearms (mirrored)",
     "pick": [
      0,
      1,
@@ -268,9 +268,9 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south-east_diag",
+    "src": "linette_skel_v1/walk_south-east_sidearms",
     "pick": [
-     0,
+     11,
      1,
      2,
      3,
@@ -300,9 +300,9 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south-east_diag (mirrored)",
+    "src": "linette_skel_v1/walk_south-east_sidearms (mirrored)",
     "pick": [
-     0,
+     11,
      1,
      2,
      3,
@@ -462,7 +462,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_south-east_diag",
+    "src": "linette_skel_v1/run_south-east_sidearms",
     "pick": [
      0,
      1,
@@ -494,7 +494,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_south-east_diag (mirrored)",
+    "src": "linette_skel_v1/run_south-east_sidearms (mirrored)",
     "pick": [
      0,
      1,
