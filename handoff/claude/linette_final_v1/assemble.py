@@ -22,6 +22,10 @@ SRC={ # motion: {dir: (folder, frame filter or seq spec, ticks)}
 AS=H+'/attack_src'; CL=json.load(open(AS+'/clips.json'))
 for k in [k for k in SRC if k.startswith('_atk_old_')]: del SRC[k]
 for m in ('atk1','atk2','atk3'): SRC[m]={d:(f'{AS}/{m}/{d}',None,CL[f'{m}_{d}']['ticks']) for d in ('right','down','up')}   # down/up = diagonal art; mirrored copies -> downl/upl
+# owner 10-20: north/south views are not used any more (hard to generate, lower quality) -> drop every down/up clip except the attacks,
+# which already use the diagonal art (down = down-right, up = up-right; downl/upl mirrored). Vertical movement faces the last left/right side.
+for m in SRC:
+    if not m.startswith('atk'): SRC[m]={d:v for d,v in SRC[m].items() if d=='right'}
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}

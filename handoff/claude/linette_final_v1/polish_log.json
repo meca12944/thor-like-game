@@ -13,20 +13,6 @@
    -6
   ]
  },
- "idle_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "idle_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
-  ]
- },
  "walk_right": {
   "scale": 1.0,
   "offset": [
@@ -39,20 +25,6 @@
   "offset": [
    -2,
    -2
-  ]
- },
- "walk_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "walk_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
   ]
  },
  "run_right": {
@@ -69,20 +41,6 @@
    -1
   ]
  },
- "run_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "run_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
-  ]
- },
  "dash_right": {
   "scale": 1.065,
   "offset": [
@@ -95,20 +53,6 @@
   "offset": [
    -11,
    -19
-  ]
- },
- "dash_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "dash_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
   ]
  },
  "hurt_right": {
@@ -125,20 +69,6 @@
    -6
   ]
  },
- "hurt_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "hurt_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
-  ]
- },
  "death_right": {
   "scale": 1.0,
   "offset": [
@@ -153,20 +83,6 @@
    -6
   ]
  },
- "death_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "death_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
-  ]
- },
  "cast_right": {
   "scale": 1.0,
   "offset": [
@@ -179,20 +95,6 @@
   "offset": [
    -2,
    -6
-  ]
- },
- "cast_down": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   0
-  ]
- },
- "cast_up": {
-  "scale": 1.0,
-  "offset": [
-   0,
-   3
   ]
  },
  "atk1_right": {
@@ -210,17 +112,17 @@
   ]
  },
  "atk1_down": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   18,
-   3
+   19,
+   5
   ]
  },
  "atk1_downl": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   -8,
-   3
+   -7,
+   5
   ]
  },
  "atk1_up": {
@@ -252,17 +154,17 @@
   ]
  },
  "atk2_down": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   18,
-   3
+   19,
+   5
   ]
  },
  "atk2_downl": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   -8,
-   3
+   -7,
+   5
   ]
  },
  "atk2_up": {
@@ -294,17 +196,17 @@
   ]
  },
  "atk3_down": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   18,
-   3
+   19,
+   5
   ]
  },
  "atk3_downl": {
-  "scale": 0.967,
+  "scale": 0.958,
   "offset": [
-   -8,
-   3
+   -7,
+   5
   ]
  },
  "atk3_up": {

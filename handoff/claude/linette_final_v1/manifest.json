@@ -49,54 +49,6 @@
      6,
      7
     ]
-   },
-   "down": {
-    "ticks": [
-     7,
-     7,
-     7,
-     7,
-     7,
-     7,
-     7,
-     7
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/idle/south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
-    ]
-   },
-   "up": {
-    "ticks": [
-     7,
-     7,
-     7,
-     7,
-     7,
-     7,
-     7,
-     7
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/idle/north",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
-    ]
    }
   },
   "walk": {
@@ -162,54 +114,6 @@
      9,
      10,
      11
-    ]
-   },
-   "down": {
-    "ticks": [
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/walk/south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
-    ]
-   },
-   "up": {
-    "ticks": [
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/walk/north",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
     ]
    }
   },
@@ -277,54 +181,6 @@
      10,
      11
     ]
-   },
-   "down": {
-    "ticks": [
-     5,
-     4,
-     5,
-     4,
-     5,
-     4,
-     5,
-     4
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/run/south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
-    ]
-   },
-   "up": {
-    "ticks": [
-     5,
-     4,
-     5,
-     4,
-     5,
-     4,
-     5,
-     4
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/run/north",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7
-    ]
    }
   },
   "dash": {
@@ -367,46 +223,6 @@
      4,
      5
     ]
-   },
-   "down": {
-    "ticks": [
-     3,
-     3,
-     4,
-     4,
-     3,
-     3
-    ],
-    "lunge": null,
-    "src": "linette_skel_v1/dash_south_v3",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5
-    ]
-   },
-   "up": {
-    "ticks": [
-     3,
-     3,
-     4,
-     4,
-     3,
-     3
-    ],
-    "lunge": null,
-    "src": "linette_skel_v1/dash_north",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5
-    ]
    }
   },
   "hurt": {
@@ -441,46 +257,6 @@
     ],
     "lunge": null,
     "src": "linette_skel_v1/hurt_east (mirrored)",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5
-    ]
-   },
-   "down": {
-    "ticks": [
-     3,
-     4,
-     5,
-     4,
-     3,
-     3
-    ],
-    "lunge": null,
-    "src": "linette_skel_v1/hurt_south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5
-    ]
-   },
-   "up": {
-    "ticks": [
-     3,
-     4,
-     5,
-     4,
-     3,
-     3
-    ],
-    "lunge": null,
-    "src": "linette_skel_v1/hurt_north",
     "pick": [
      0,
      1,
@@ -543,58 +319,6 @@
      7,
      8
     ]
-   },
-   "down": {
-    "ticks": [
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/death/south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8
-    ]
-   },
-   "up": {
-    "ticks": [
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6,
-     6
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/death/north",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8
-    ]
    }
   },
   "cast": {
@@ -638,58 +362,6 @@
     ],
     "lunge": null,
     "src": "linette_moves_v1/cast/east (mirrored)",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8
-    ]
-   },
-   "down": {
-    "ticks": [
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/cast/south",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8
-    ]
-   },
-   "up": {
-    "ticks": [
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5
-    ],
-    "lunge": null,
-    "src": "linette_moves_v1/cast/north",
     "pick": [
      0,
      1,

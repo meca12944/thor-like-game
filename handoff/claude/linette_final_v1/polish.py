@@ -14,7 +14,7 @@ BOB={('walk','down'):(2,1),('walk','up'):(2,1),('run','down'):(3,1),('run','up')
 shutil.rmtree(OUT,ignore_errors=True); log={}
 for m,dd in man['motions'].items():
     for d in dd:
-        fs=sorted(glob.glob(f'{IN}/{m}/{d}/*.png')); t0,b0,c0=body(fs[0]); ti,bi,ci=body(sorted(glob.glob(f'{IN}/idle/{ {"downl":"down","upl":"up"}.get(d,d)}/*.png'))[0])
+        fs=sorted(glob.glob(f'{IN}/{m}/{d}/*.png')); t0,b0,c0=body(fs[0]); ref=sorted(glob.glob(f'{IN}/idle/{d}/*.png')) or sorted(glob.glob(f'{IN}/idle/right/*.png')); ti,bi,ci=body(ref[0])
         sc=1.0
         if m in STAND and abs((bi-ti)/(b0-t0)-1)>0.03: sc=(bi-ti)/(b0-t0)
         if m in SAME_AS:   # continue exactly where atk1's lunge frame was drawn
