@@ -1723,10 +1723,12 @@
      3,
      3,
      3,
+     3,
+     3,
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/rjump_east",
+    "src": "linette_skel_v1/rjump_east_v2",
     "pick": [
      0,
      1,
@@ -1737,7 +1739,9 @@
      6,
      7,
      8,
-     9
+     9,
+     10,
+     11
     ]
    },
    "left": {
@@ -1751,10 +1755,12 @@
      3,
      3,
      3,
+     3,
+     3,
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/rjump_east (mirrored)",
+    "src": "linette_skel_v1/rjump_east_v2 (mirrored)",
     "pick": [
      0,
      1,
@@ -1765,7 +1771,9 @@
      6,
      7,
      8,
-     9
+     9,
+     10,
+     11
     ]
    }
   }
