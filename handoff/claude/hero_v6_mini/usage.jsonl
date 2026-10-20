@@ -8,3 +8,7 @@
 {"t": "2026-10-20 16:44:33", "name": "pixen_nocoat_s12", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 16:45:01", "name": "pixen_nocoat_s11", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 16:45:01", "name": "run_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-20 16:52:33", "name": "pixen_oldprop_s21", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 16:52:34", "name": "pixen_oldprop_s22", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 16:54:33", "name": "pixen_v7_s31", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 16:54:35", "name": "pixen_v7_s32", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
