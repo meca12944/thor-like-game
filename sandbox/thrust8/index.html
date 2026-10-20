@@ -100,7 +100,7 @@ function trailOf(){const vert=!P.aim[0];const th=A.thr['hit'+P.combo+'_'+P.ak];
   if(vert){const v=P.aim[1];return {x:P.x+P.lastH*6,y:P.y-P.z+(v>0?-30:-100),dir:[0,v],th};}
   const dir=P.aim[1]?[P.aim[0]*DIAG[0],P.aim[1]*DIAG[1]]:[P.aim[0],0];   // diagonals: one fixed screen angle for ↘ ↙ ↗ ↖
   return {x:P.x+th.tip[0],y:P.y-P.z+th.tip[1],dir,th};}
-const DIAG=[Math.cos(Math.PI/6),Math.sin(Math.PI/6)];   // 30 deg
+const DIAG=[Math.cos(22*Math.PI/180),Math.sin(22*Math.PI/180)];   // 22 deg = the blades' average slope in the diagonal art
 function spawn(){foes=[
   {k:'slime',x:260,y:60,hp:5},{k:'slime',x:-260,y:-120,hp:5},{k:'slime',x:60,y:260,hp:5},{k:'spirit',x:120,y:-300,hp:6},{k:'boar',x:600,y:40,hp:16}
  ].map(e=>Object.assign(e,{max:e.hp,kbx:0,kby:0,t:Math.random()*60|0,cd:60+Math.random()*80|0,flash:0,dead:0,gone:false,f:-1,st:'idle',
