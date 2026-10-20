@@ -1,9 +1,14 @@
 # 3-hit sword combo, side view (facing east), designed as poses -> per-frame skeletons (no API calls).
 # angles: 0 = straight down, 90 = forward (+x), 180 = up, -90 = back. bone lengths fixed (shins never shortened).
 import json,math,sys
-UA,FA,TH,SH,TO=18,15,22,21,32          # upper arm, forearm, thigh, shin, torso (from estimate-skeleton of the hero)
-GY=180                                   # ankle height (feet on the 189 baseline)
-HX,HY=126,135                            # neutral hip centre
+# usage: design.py <outdir> <east_kp.json>  - bone lengths, head/shoulder/hip offsets and z from estimate-skeleton of the east rotation
+E={k['label']:(k['x']*256,k['y']*256,int(k.get('z_index',0))) for k in json.load(open(sys.argv[2]))['keypoints']}
+d=lambda a,b:math.dist(E[a][:2],E[b][:2])
+UA,FA=d('RIGHT SHOULDER','RIGHT ELBOW'),d('RIGHT ELBOW','RIGHT ARM')
+TH,SH=d('RIGHT HIP','RIGHT KNEE'),d('RIGHT KNEE','RIGHT LEG')
+HX,HY=(E['LEFT HIP'][0]+E['RIGHT HIP'][0])/2,(E['LEFT HIP'][1]+E['RIGHT HIP'][1])/2
+TO=math.dist((HX,HY),E['NECK'][:2])
+GY=(E['LEFT LEG'][1]+E['RIGHT LEG'][1])/2   # ankle height (feet on the 189 baseline)
 def P(a,L): r=math.radians(a); return (L*math.sin(r),L*math.cos(r))
 add=lambda p,q:(p[0]+q[0],p[1]+q[1])
 def leg(hip,fx,bend=1):                  # 2-bone IK, knee bends forward
@@ -14,8 +19,9 @@ def leg(hip,fx,bend=1):                  # 2-bone IK, knee bends forward
 def pose(p):
     hip=(HX+0.4*p.get('dx',0),HY+p.get('dy',0));lean=p.get('lean',0)  # root travel kept at 40%: the game's FEELYS adds the forward lunge
     nk=add(hip,(TO*math.sin(math.radians(lean)),-TO*math.cos(math.radians(lean))))
-    J={'NECK':nk,'NOSE':add(nk,(6+lean*0.1,-15)),'RIGHT EYE':add(nk,(4,-18)),'LEFT EYE':add(nk,(6,-18)),'RIGHT EAR':add(nk,(-3,-18)),'LEFT EAR':add(nk,(-5,-18)),
-       'RIGHT SHOULDER':add(nk,(1,3)),'LEFT SHOULDER':add(nk,(-3,2)),'RIGHT HIP':add(hip,(1,1)),'LEFT HIP':add(hip,(-1,0))}
+    J={'NECK':nk}
+    for l in ('NOSE','LEFT EYE','RIGHT EYE','LEFT EAR','RIGHT EAR','LEFT SHOULDER','RIGHT SHOULDER'): J[l]=add(nk,(E[l][0]-E['NECK'][0],E[l][1]-E['NECK'][1]))
+    for l in ('LEFT HIP','RIGHT HIP'): J[l]=add(hip,(E[l][0]-HX,E[l][1]-HY))
     for s in 'RL':
         S='RIGHT' if s=='R' else 'LEFT';u,f=p[s+'a']
         e=add(J[S+' SHOULDER'],P(u,UA));J[S+' ELBOW']=e;J[S+' ARM']=add(e,P(f,FA))
@@ -23,8 +29,7 @@ def pose(p):
         S='RIGHT' if s=='R' else 'LEFT';k,a=leg(J[S+' HIP'],HX-0.6*p.get('dx',0)+p[s+'f']);J[S+' KNEE']=k;J[S+' LEG']=a
     J['_sw']=p.get('sw',p[ 'Ra'][1])     # sword angle (preview only)
     return J
-Z={'RIGHT':1,'LEFT':-1}
-def kp(J): return [dict(x=v[0]/256,y=v[1]/256,label=l,z_index=(Z.get(l.split()[0],0) if l not in('NECK','NOSE') else 0)) for l,v in J.items() if l[0]!='_']
+def kp(J): return [dict(x=v[0]/256,y=v[1]/256,label=l,z_index=E[l][2]) for l,v in J.items() if l[0]!='_']
 ease=lambda t:t*t*(3-2*t)
 def lerp(A,B,t):
     t=ease(t);O={}
@@ -33,7 +38,7 @@ def lerp(A,B,t):
         O[k]=[x+(y-x)*t for x,y in zip(a,b)] if isinstance(a,list) else a+(b-a)*t
     return O
 # poses (exaggerated ~1.5x a normal swing; feet: Rf/Lf = ankle x offset)
-R=dict(dx=0,dy=0,lean=6,Ra=[40,80],La=[20,40],Rf=8,Lf=-8,sw=110)                       # combat ready, blade forward
+R=dict(dx=0,dy=0,lean=4,Ra=[10,70],La=[20,70],Rf=0,Lf=-10,sw=110)                       # combat ready, blade forward
 H1=[R,
  dict(dx=-4,dy=1,lean=-12,Ra=[195,235],La=[60,30],Rf=6,Lf=-12,sw=250),                # wind-up: blade cocked high behind head
  dict(dx=4,dy=3,lean=4,Ra=[165,140],La=[40,20],Rf=16,Lf=-12,sw=150),                  # step in, arm comes over

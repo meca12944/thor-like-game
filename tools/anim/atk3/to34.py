@@ -5,7 +5,7 @@ import json,sys
 side,kp3,view,out,swap=sys.argv[1:6];swap=swap=='1'   # swap=1: the 3/4 skeleton labels the sword hand LEFT (se_kp does)
 sw=lambda l:l.replace('LEFT','#').replace('RIGHT','LEFT').replace('#','RIGHT') if swap else l
 KK=json.load(open(kp3))['keypoints'];K={k['label']:(k['x']*256,k['y']*256) for k in KK};Z={k['label']:int(k.get('z_index',0)) for k in KK}
-sg=1 if view=='se' else -1;low=1.0 if view=='se' else 0.4
+sg=1 if view=='se' else -1;low=1.0 if view=='se' else float(sys.argv[6]) if len(sys.argv)>6 else 0.4
 T=lambda d,s=1:(0.71*d[0]*s,(d[1]+sg*0.41*d[0])*s)
 sub=lambda a,b:(a[0]-b[0],a[1]-b[1]);add=lambda a,b:(a[0]+b[0],a[1]+b[1])
 mid=lambda F,a,b:((F[a][0]+F[b][0])/2,(F[a][1]+F[b][1])/2)
