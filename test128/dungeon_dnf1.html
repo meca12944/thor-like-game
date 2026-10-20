@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>시험 던전</title>
+<title>던파식 1번</title>
 <style>
 html,body{margin:0;height:100%;background:#0d0f12;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,sans-serif}
 canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
@@ -33,7 +33,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div id="res"><div class="box"><h1 id="rTitle">던전 클리어!</h1><div id="rank">S</div>
 <table id="rTab"></table><div id="cards"></div><button id="again">다시 도전</button></div></div>
 <script>
-// Test dungeon, DNF-style room clears (owner 10-20): room 1-3 -> boss room. Entering a room locks the gate, killing every monster opens it,
+// 던파식 1번 (owner 10-20: saved as the DNF-style template for some dungeons). Test dungeon, DNF-style room clears (owner 10-20): room 1-3 -> boss room. Entering a room locks the gate, killing every monster opens it,
 // the boss kill shows the result screen (time / combo / damage taken -> rank, pick one reward card). Town and field stay top-down.
 // Player = linette.html (same atlas, attacks, trails, hit-stop); monsters reuse test128 art: slime.png (3 frames: green, green squash, blue),
 // champ_boar.png (6 frames: charge 0-3, idle 4, stun 5, faces left natively), dungeon tiles = assets/world/tiles_dungeon.png (16px, drawn x3).
