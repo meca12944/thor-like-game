@@ -26,11 +26,36 @@ def diag(name,v,tk):
     return [(clean(Image.open(f'{d}/{x}')),t) for x,t in zip(fs,T)]
 TK={'idle':6,'walk':4,'run':3,'dash':[2,2,3,3,3,3,4],'death':[5,5,5,6,6,6,8,8,10],'jump':3,'cast':4,'hurt':[8,3,3,4,4,4,4]}
 SIDE={'idle':'idle','walk':'walk','run':'run','dash':'dash','death':'death','jump':'jump','cast':'cast_s1','hurt':'hurtys','hit1':'hit1','hit2':'hit2','hit3':'hit3'}
+sys.path.insert(0,P+'fix');sys.path.insert(0,P+'all');import trail3;from trail import trail
+MAN=json.load(open(P+'all/manifest.json'))
+def diag_attack(h,v):
+    d=P+f'dg/out_{h}_{v}';fs=sorted(x for x in os.listdir(d) if x.endswith('.png'));T=MAN[f'{h}_right'];N=len(T)
+    tk=[i for i in range(N) if trail(Image.open(P+f'all/{h}_right/k{i}.png'),420)[1]];lo,hi=min(tk)-1,max(tk)
+    out=[];k=0;prev=None;sgn=None;on=0
+    for i,t in enumerate(T):
+        for part,tt in ((0,(t+1)//2),(1,t//2)):
+            if part==1 and i==N-1: break
+            im=clean(Image.open(f'{d}/{fs[k]}'));k+=1
+            if tt==0: continue
+            p=trail3.pivot(im);tp=trail3.tip(im);ang=None
+            if tp:
+                import math;ang=math.degrees(math.atan2(tp[1]-p[1],tp[0]-p[0]))
+                if prev is not None:
+                    dl=(ang-prev+540)%360-180
+                    if abs(dl)>4: sgn=1 if dl>0 else -1
+                prev=ang
+            if lo<=i<=hi and ang is not None and sgn:  # thin Ys8-style arc, well ahead of the tip; behind the body for the back view
+                arc=trail3.arc(p,tp[2],ang,sgn,[60,95,110][min(on,2)]);on+=1
+                if v=='ne': arc.alpha_composite(im);im=arc
+                else: im.alpha_composite(arc)
+            out.append((im,tt))
+    return out
 cache={}
 def clip(m,d):
     k=(m,d)
     if k in cache: return cache[k]
     if d in ('right','left'): c=side(SIDE[m])
+    elif m.startswith('hit'): c=diag_attack(m,'se' if d.startswith('down') else 'ne')
     else: c=diag(m,'se' if d.startswith('down') else 'ne',TK[m])
     if d in ('left','downl','upl'): c=[(im.transpose(Image.FLIP_LEFT_RIGHT),t) for im,t in c]
     cache[k]=c;return c
@@ -42,6 +67,8 @@ SCRIPT=[('idle','down',70,0,'대기'),('walk','down',80,0.9,'걷기'),('walk','r
         ('run','up',60,2.2,'달리기'),('run','left',70,2.2,'달리기'),('run','downl',60,2.2,'달리기'),('run','down',60,2.2,'달리기'),
         ('dash','right',None,4.0,'대시'),('dash','up',None,3.0,'대시'),('dash','downl',None,3.0,'대시'),
         ('hit1','right',None,0.4,'1타'),('hit2','right',None,0.4,'2타'),('hit3','right',None,0.6,'3타'),
+        ('hit1','down',None,0.4,'1타'),('hit2','down',None,0.4,'2타'),('hit3','down',None,0.6,'3타'),
+        ('hit1','upl',None,0.4,'1타'),('hit2','upl',None,0.4,'2타'),('hit3','upl',None,0.6,'3타'),
         ('idle','upl',50,0,'대기'),('hurt','down',None,-0.8,'맞기'),('hurt','up',None,0.8,'맞기'),('hurt','right',None,-0.8,'맞기'),
         ('jump','down',None,0,'점프'),('jump','upl',None,0,'점프'),('cast','down',None,0,'시전'),('cast','up',None,0,'시전'),
         ('idle','right',40,0,'대기'),('death','down',None,0,'사망'),('death','down',40,0,'사망')]
