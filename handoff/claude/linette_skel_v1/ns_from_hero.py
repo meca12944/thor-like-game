@@ -14,6 +14,11 @@ for f in fs:
     for k,l in L0.items():
         if k in H and k in base:J[k]=[l['x']+S*(LEGX if ('KNEE' in k or 'LEG' in k) else 1)*(H[k]['x']-base[k]['x']),l['y']+S*(H[k]['y']-base[k]['y']),int(l.get('z_index',0))]   # front/back: feet stay under the body (no crab legs)
         else:J[k]=[l['x'],l['y'],int(l.get('z_index',0))]
+    for s in ('LEFT','RIGHT'):   # legs: the hero's leg shape as drawn (keeps foreshortening = foot lifts in front/back views), scaled to Linette's leg length (owner: "주인공 다리모션 참조")
+        hp,kn,an=s+' HIP',s+' KNEE',s+' LEG'
+        if all(k in H and k in L0 and k in base for k in (hp,kn,an)):
+            r=(L0[an]['y']-L0[hp]['y'])/max(1e-6,base[an]['y']-base[hp]['y'])
+            for k in (kn,an):J[k]=[J[hp][0]+r*(H[k]['x']-H[hp]['x']),J[hp][1]+r*(H[k]['y']-H[hp]['y']),J[k][2]]
     for s in ('LEFT','RIGHT'):
         sh=s+' SHOULDER';dx,dy=J[sh][0]-L0[sh]['x'],J[sh][1]-L0[sh]['y']
         out_=1 if (L0[s+' ARM']['x']>L0[sh]['x']) else -1   # which side this arm hangs on in the still
