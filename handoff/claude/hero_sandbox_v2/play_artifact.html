@@ -1,0 +1,120 @@
+<title>주인공 샌드박스</title>
+<style>
+/* one-screen field toy: canvas fills the frame, touch controls float over it. single dark-field look in every theme */
+:root{--bg:#2c3a26;--fg:#ffffff;--btn:rgba(0,0,0,.35);--btn-line:rgba(255,255,255,.55);--on:rgba(255,200,60,.55);color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,sans-serif}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;left:8px;top:calc(6px + env(safe-area-inset-top));color:var(--fg);font-size:13px;text-shadow:0 1px 2px #000;pointer-events:none;max-width:calc(100% - 140px)}
+.btn{position:absolute;width:64px;height:64px;border-radius:50%;background:var(--btn);border:2px solid var(--btn-line);color:var(--fg);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn.on{background:var(--on)}
+.small{width:48px;height:48px;font-size:11px}
+#stick{position:absolute;left:calc(24px + env(safe-area-inset-left));bottom:calc(24px + env(safe-area-inset-bottom));width:120px;height:120px;border-radius:50%;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.4)}
+#knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
+</style>
+
+<canvas id="c"></canvas>
+<div id="hud">주인공 샌드박스 · 이동 WASD/방향키 · 공격 J · 대시 K · 달리기 L · 스킬 U · 히트박스 H</div>
+<div id="stick"><div id="knob"></div></div>
+<div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
+<div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
+<div class="btn" id="bRun" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom))">달리기</div>
+<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom))">스킬</div>
+<div class="btn small" id="bHB" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">판정</div>
+<div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
+<script>
+// Hero sandbox: atlas = assets/hero_sbx.json (hero8 format, built from the showcase clips). Sides = in-game clips (+fixes),
+// diagonals = 3/4 clips (down/up = ↘/↗, downl/upl = mirrored). Hurt/death/cast use the side clip of the last left/right facing.
+// Attack hit boxes = the game's H8HB sectors (radius per hit, arc 150/170/160 deg) scaled to sprite pixels; one slime mob with a body circle.
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let A,SH=[],SL=null,VW=480,VH=270,SC=1;
+function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/380,h/320)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
+addEventListener('resize',resize);resize();
+const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=TILE.getContext('2d');g.fillStyle='#567c46';g.fillRect(0,0,256,256);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+ for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
+// ---- tuning (sprite pixels, 60 ticks/s) ----
+const COMBO=[{hit:5,cancel:12,r:124,arc:150,dmg:1,kb:5},{hit:6,cancel:15,r:100,arc:170,dmg:1,kb:6},{hit:9,cancel:23,r:118,arc:160,dmg:2,kb:10}]; // game H8HB r/2 x1.3 (owner: bigger), H8.combo hit/cancel ticks
+const HB_FWD=22; // sector centre pushed forward from the chest along the swing direction
+const HERO_R=16,HERO_INV=60,HERO_KB=18,HITSTOP=6;
+const P={x:0,y:0,face:'right',lastH:'right',st:'idle',t:0,clip:null,combo:0,queued:false,run:false,dead:false,inv:0,white:0,kbx:0,kby:0,hitDone:false,hp:10,deadT:0};
+const M={x:120,y:-10,hp:5,max:5,dead:0,flash:0,kbx:0,kby:0,t:0,cool:0};
+let showHB=false,stop=0,pops=[];
+const K={};let joy={x:0,y:0};
+addEventListener('keydown',e=>{if(K[e.code])return;K[e.code]=1;if(e.code==='KeyJ')attack();if(e.code==='KeyK')dash();if(e.code==='KeyL')P.run=!P.run,ui();if(e.code==='KeyU')cast();if(e.code==='KeyH')showHB=!showHB,ui();});
+addEventListener('keyup',e=>{K[e.code]=0;});
+function tap(id,f){document.getElementById(id).addEventListener('pointerdown',e=>{e.preventDefault();f();});}
+tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHB',()=>{showHB=!showHB;ui();});tap('bDie',die);
+function ui(){document.getElementById('bRun').classList.toggle('on',P.run);document.getElementById('bHB').classList.toggle('on',showHB);}
+{const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
+ const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
+ st.addEventListener('pointerdown',e=>{id=e.pointerId;st.setPointerCapture(id);mv(e);});st.addEventListener('pointermove',e=>{if(e.pointerId===id)mv(e);});
+ const up=e=>{if(e.pointerId!==id)return;id=null;kn.style.left=kn.style.top='38px';joy={x:0,y:0};};st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);}
+const clip=n=>A.anims[n];const total=L=>L.reduce((s,e)=>s+e[2],0);
+function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
+// facing key: right/left = side; down/up = ↘/↗ (downl/upl when the last left/right was left)
+function dirKey(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
+const DV={right:[1,0],left:[-1,0],down:[.707,.707],downl:[-.707,.707],up:[.707,-.707],upl:[-.707,-.707]};
+function start(st,name){P.st=st;P.t=0;P.clip=name;P.hitDone=false;}
+function attack(){if(P.dead)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt'||P.st==='cast')return;P.combo=1;start('atk','hit1_'+dirKey());}
+function dash(){if(P.dead||P.st==='atk'||P.st==='dash'||P.st==='hurt')return;start('dash','dash_'+dirKey());}
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;start('cast','cast_'+P.lastH);}
+function hurt(dx,dy){if(P.dead||P.inv>0)return;P.hp=Math.max(0,P.hp-1);const l=Math.hypot(dx,dy)||1;P.kbx=dx/l;P.kby=dy/l;P.inv=HERO_INV;P.white=3;stop=HITSTOP;start('hurt','hurt_'+P.lastH);if(P.hp<=0){P.dead=true;start('death','death_'+P.lastH);}}
+function die(){if(P.dead){P.dead=false;P.hp=10;start('idle','idle_'+dirKey());return;}P.dead=true;start('death','death_'+P.lastH);}
+// sector hit box: centred on the chest, opening along the attack direction
+function inSector(cx,cy,dir,r,arc,px,py,pr){const dx=px-cx,dy=py-cy,d=Math.hypot(dx,dy);if(d>r+pr)return false;if(d<pr)return true;
+  const a=Math.acos(Math.max(-1,Math.min(1,(dx*dir[0]+dy*dir[1])/d)))*180/Math.PI;return a<=arc/2+Math.asin(Math.min(1,pr/d))*180/Math.PI;}
+const chest=()=>[P.x,P.y-44];
+function step(){
+  if(stop>0){stop--;return;}
+  let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
+  const moving=m>0.2;P.t++;if(P.inv>0)P.inv--;
+  if(P.st==='idle'||P.st==='move'){
+    if(moving){if(Math.abs(ix)>=Math.abs(iy)*.8){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.25)P.lastH=ix>0?'right':'left';}
+      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+dirKey();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+    else if(P.st!=='idle'||P.clip!=='idle_'+dirKey())start('idle','idle_'+dirKey());
+  }else{
+    const L=clip(P.clip),T=total(L);
+    if(P.st==='dash'){const v=DV[dirKey()];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
+    if(P.st==='hurt'){const k=Math.max(0,1-P.t/18);P.x+=P.kbx*HERO_KB/9*k;P.y+=P.kby*HERO_KB/9*k;}
+    if(P.st==='atk'){const C=COMBO[P.combo-1],dir=DV[P.clip.split('_')[1]];
+      if(P.t<C.hit){P.x+=dir[0]*.9;P.y+=dir[1]*.9;}   // step into the swing
+      if(!P.hitDone&&P.t>=C.hit){P.hitDone=true;const[c0,c1]=chest(),cx=c0+dir[0]*HB_FWD,cy=c1+dir[1]*HB_FWD;
+        if(!M.dead&&inSector(cx,cy,dir,C.r,C.arc,M.x,M.y-22,20)){M.hp-=C.dmg;M.flash=8;M.kbx=dir[0]*C.kb;M.kby=dir[1]*C.kb;stop=HITSTOP+(P.combo===3?5:0);pops.push({x:M.x,y:M.y-60,t:0,s:String(C.dmg)});if(M.hp<=0){M.dead=90;}window.__sbx.hits++;}}
+      if(P.queued&&P.combo<3&&P.t>=C.cancel){P.queued=false;P.combo++;start('atk','hit'+P.combo+'_'+dirKey());return;}}
+    if(P.t>=T){if(P.st==='death'){P.t=T;if(++P.deadT>120){P.dead=false;P.hp=10;P.deadT=0;P.inv=HERO_INV;start('idle','idle_'+dirKey());}return;}P.queued=false;start('idle','idle_'+dirKey());}
+  }
+  // slime: hops toward the hero, hurts on body contact
+  M.t++;if(M.flash>0)M.flash--;
+  if(M.dead){if(--M.dead<=0){M.hp=M.max;M.x=P.x+(Math.random()<.5?-1:1)*150;M.y=P.y+(Math.random()-.5)*80;}}
+  else{M.x+=M.kbx;M.y+=M.kby;M.kbx*=.8;M.kby*=.8;
+    if(!P.dead&&M.flash===0&&M.cool<60){const dx=P.x-M.x,dy=P.y-M.y,d=Math.hypot(dx,dy)||1;if(d>8){const hop=(M.t%40)<20?.55:.15;M.x+=dx/d*hop;M.y+=dy/d*hop;}}
+    if(M.cool>0)M.cool--;
+    if(M.cool===0&&!P.dead&&Math.hypot(P.x-M.x,(P.y-M.y)*1.4)<HERO_R+20){const hit=P.inv===0;hurt(P.x-M.x,P.y-M.y);const dx=M.x-P.x,dy=M.y-P.y,d=Math.hypot(dx,dy)||1;M.kbx=dx/d*6;M.kby=dy/d*6;M.cool=hit?90:30;}}  // after a touch the slime bounces off and rests
+  for(const p of pops)p.t++;pops=pops.filter(p=>p.t<40);
+}
+function hb(cx,cy,dir,r,arc,col){const a0=Math.atan2(dir[1],dir[0]),h=arc/2*Math.PI/180;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a0-h,a0+h);ctx.closePath();ctx.fill();}
+function draw(){
+  const camX=Math.round(P.x-VW/2),camY=Math.round(P.y-VH*0.55);
+  for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
+  const ents=[{y:P.y,f:drawHero},{y:M.y,f:drawSlime}].sort((a,b)=>a.y-b.y);
+  function drawSlime(){if(M.dead)return;const sx=Math.round(M.x-camX),sy=Math.round(M.y-camY),fr=Math.floor(M.t/10)%3;
+    ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy,18,5,0,0,7);ctx.fill();
+    ctx.save();if(M.flash>0&&M.flash%2)ctx.filter='brightness(3)';ctx.drawImage(SL,fr*86,0,86,78,sx-43*.6,sy-77*.6,86*.6,78*.6);ctx.restore();
+    ctx.fillStyle='#300';ctx.fillRect(sx-16,sy-56,32,3);ctx.fillStyle='#e33';ctx.fillRect(sx-16,sy-56,32*M.hp/M.max,3);
+    if(showHB){ctx.strokeStyle='rgba(255,80,80,.9)';ctx.beginPath();ctx.arc(sx,sy-22,20,0,7);ctx.stroke();}}
+  function drawHero(){const sx=Math.round(P.x-camX),sy=Math.round(P.y-camY);
+    ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy,24,6,0,0,7);ctx.fill();
+    const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
+    const blink=P.inv>0&&P.st!=='hurt'&&!P.dead&&(Math.floor(P.inv/3)%2);
+    if(!blink){if(P.white>0){ctx.save();ctx.filter='brightness(0) invert(1)';ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);ctx.restore();P.white--;}else ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);}
+    if(showHB){ctx.strokeStyle='rgba(120,200,255,.9)';ctx.beginPath();ctx.ellipse(sx,sy,HERO_R,HERO_R/1.4,0,0,7);ctx.stroke();
+      if(P.st==='atk'){const C=COMBO[P.combo-1],dir=DV[P.clip.split('_')[1]];hb(sx+dir[0]*HB_FWD,sy-44+dir[1]*HB_FWD,dir,C.r,C.arc,P.t>=C.hit&&P.t<C.hit+4?'rgba(255,230,80,.45)':'rgba(255,230,80,.15)');}}}
+  for(const en of ents)en.f();
+  ctx.font='bold 12px system-ui';ctx.textAlign='center';for(const p of pops){ctx.fillStyle=`rgba(255,240,120,${1-p.t/40})`;ctx.fillText(p.s,Math.round(p.x-camX),Math.round(p.y-camY-p.t*.6));}
+  ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='11px system-ui';ctx.fillText('HP '+P.hp,8,VH-8);
+}
+let acc=0,last=performance.now();
+function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();acc-=1000/60;}draw();requestAnimationFrame(loop);}
+const img=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
+fetch('assets/hero_sbx.json').then(r=>r.json()).then(j=>{A=j;return Promise.all([...A.sheets.map(p=>img('assets/'+p)),img('assets/slime.png')]);}).then(ims=>{SL=ims.pop();SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
+window.__sbx={P,M,step,attack,dash,hits:0,get showHB(){return showHB},set showHB(v){showHB=v}};
+</script>
