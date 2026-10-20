@@ -62,6 +62,7 @@ function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
 const clip=n=>A.anims[n];
 const total=L=>L.reduce((s,e)=>s+e[2],0);
 function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
+// owner 10-20: moving up/down uses the true front/back walk + run clips (walk_south / walk_north ...); idle and the rest keep the diagonal art
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
@@ -84,7 +85,7 @@ function step(){
     if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir()};else if(a.t>=total(La))P.atk=null;}
   if(P.st==='idle'||P.st==='move'){
     if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+atkDir();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+(P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
     else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
@@ -141,5 +142,5 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=17').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=17';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=18').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=18';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
