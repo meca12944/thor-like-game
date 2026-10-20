@@ -88,7 +88,7 @@ function impDraw(m,camX,camY){const a=m.t,x=m.x-camX,y=m.y-camY,al=1-a/10;if(al<
   if(a<4){const L=(m.big?18:12)*(1-a/5);ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.fillRect(Math.round(x-L),Math.round(y)-1,Math.round(2*L),2);ctx.fillRect(Math.round(x)-1,Math.round(y-L),2,Math.round(2*L));}}
 function slashStart(n){const dk=dirKey(),dv=DV[dk],l=Math.hypot(dv[0],dv[1]),dir=[dv[0]/l,dv[1]/l],Y=SLASH[n];P.sl={n,t:0,q:false,dir,done:false};}
 function slashStep(){const S=P.sl;if(!S)return;S.t++;const Y=SLASH[S.n];
-  if(S.t===Y.hit&&!S.done){S.done=true;const[dx,dy]=S.dir;SFX.push({n:S.n,rx:dx*Y.fwd,ry:-Y.y,dir:S.dir,t:0,seed:(S.t*7919+S.n*104729+(P.x|0))%2147483646+1});
+  if(S.t===Y.hit&&!S.done){S.done=true;const[dx,dy]=S.dir;SFX.push({n:S.n,rx:dx*Y.fwd,ry:Math.abs(dx)<.1?-44+dy*(Y.fwd+20):-Y.y,dir:S.dir,t:0,seed:(S.t*7919+S.n*104729+(P.x|0))%2147483646+1});
     const C=COMBO[S.n],cx=P.x+dx*HB_FWD,cy=P.y-44+dy*HB_FWD;
     if(!M.dead&&P.z-groundAt(M.x,M.y)<40&&inSector(cx,cy,S.dir,C.r,C.arc+(dx&&dy?30:0),M.x,M.y-22,20)){M.hp-=C.dmg;M.flash=8;M.kbx=dx*C.kb;M.kby=dy*C.kb;stop=Y.stop;SHAKE=Math.max(SHAKE,Y.shake);if(S.n===2)FLASH=4;
       IMP.push({x:M.x,y:M.y-24,t:0,big:S.n===2});pops.push({x:M.x,y:M.y-60,t:0,s:String(C.dmg)});if(M.hp<=0)M.dead=90;window.__sbx.hits++;}
@@ -120,11 +120,15 @@ function ui(){document.getElementById('bRun').classList.toggle('on',P.run);docum
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
  st.addEventListener('pointerdown',e=>{id=e.pointerId;st.setPointerCapture(id);mv(e);});st.addEventListener('pointermove',e=>{if(e.pointerId===id)mv(e);});
  const up=e=>{if(e.pointerId!==id)return;id=null;kn.style.left=kn.style.top='38px';joy={x:0,y:0};};st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);}
-const clip=n=>A.anims[n];const total=L=>L.reduce((s,e)=>s+e[2],0);
+// _s/_n (true front/back) exist for idle/walk/run only; other states use the diagonal art
+const clip=n=>A.anims[n]||A.anims[n.replace(/_s$/,P.lastH==='left'?'_downl':'_down').replace(/_n$/,P.lastH==='left'?'_upl':'_up')];
+const total=L=>L.reduce((s,e)=>s+e[2],0);
 function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
 // facing key: right/left = side; down/up = ↘/↗ (downl/upl when the last left/right was left)
-function dirKey(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
-const DV={right:[1,0],left:[-1,0],down:[.707,.707],downl:[-.707,.707],up:[.707,-.707],upl:[-.707,-.707]};
+function dirKey(){return P.face==='right'||P.face==='left'||P.face==='s'||P.face==='n'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
+const DV={right:[1,0],left:[-1,0],s:[0,1],n:[0,-1],down:[.707,.707],downl:[-.707,.707],up:[.707,-.707],upl:[-.707,-.707]};
+// 8 sectors: one key = right/left/front(s)/back(n), two keys = diagonal (down/up art, mirrored by lastH)
+function faceFrom(ix,iy){const k=((Math.round(Math.atan2(iy,ix)/(Math.PI/4))%8)+8)%8;P.face=['right','down','s','down','left','up','n','up'][k];if(k===0||k===1||k===7)P.lastH='right';else if(k>=3&&k<=5)P.lastH='left';}
 function start(st,name){P.st=st;P.t=0;P.clip=name;P.hitDone=false;}
 function attack(){if(P.dead||P.st==='dash'||P.st==='hurt'||P.st==='cast'||P.st==='death')return;   // hero_slash_a: usable standing, walking, running, jumping
   const S=P.sl;if(!S){slashStart(0);return;}if(S.n<2&&S.t>=SLASH[S.n].cancel){slashStart(S.n+1);return;}S.q=true;}
@@ -149,9 +153,9 @@ function step(){
   // vertical: jumping / falling / standing on a block
   if(P.air){P.vz-=P.jr?RGRAV:GRAV;P.z+=P.vz;const g=groundAt(P.x,P.y);if(P.z<=g&&P.vz<=0){P.z=g;P.vz=0;P.air=false;P.jr=false;P.jv=0;if(P.st==='jump')start('idle','idle_'+dirKey());}}
   else{const g=groundAt(P.x,P.y);if(g<P.z-1){P.air=true;P.vz=0;P.jv=P.jv||JUMP_V;if(P.st==='idle'||P.st==='move')start('jump','jump_'+dirKey()),P.t=JUMP_T;}else P.z=g;}
-  if(P.st==='jump'){if(moving){if(Math.abs(ix)>=Math.abs(iy)*.8){P.face=ix>0?'right':'left';P.lastH=P.face;}const js=P.jr?RJUMP_SP:1.3;moveHero(ix*js,iy*js);}return slimeStep();}
+  if(P.st==='jump'){if(moving){faceFrom(ix,iy);const js=P.jr?RJUMP_SP:1.3;moveHero(ix*js,iy*js);}return slimeStep();}
   if(P.st==='idle'||P.st==='move'){
-    if(moving){if(Math.abs(ix)>=Math.abs(iy)*.8){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.25)P.lastH=ix>0?'right':'left';}
+    if(moving){faceFrom(ix,iy);
       const sp=P.run?2.2:1.0;moveHero(ix*sp,iy*sp);const n=(P.run?'run_':'walk_')+dirKey();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
     else if(P.st!=='idle'||P.clip!=='idle_'+dirKey())start('idle','idle_'+dirKey());
   }else{
