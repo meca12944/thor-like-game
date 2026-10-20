@@ -14,19 +14,32 @@ sys.path.insert(0,'fix');from trail2 import crescent,stages
 from oneblade import fix as oneblade
 def body_box(im):
     a=np.array(im)[...,3]>0;ys,xs=np.nonzero(a);return xs.min(),ys.min(),xs.max(),ys.max()
+sys.path.insert(0,'fix');import trail3
+SPAN=[60,100,115,115,115,115]
 def retrail(n,seq,src):
     h,dr=n.split('_');out=[]
     tk=[i for i in range(len(man[f'{h}_down'])) if trail(L(f'all/{h}_{"down" if dr=="up" else dr}/k{i}.png'),420)[1]]
-    st=dict(zip(tk,stages(len(tk))))
+    if not tk: return seq
+    lo,hi=min(tk)-1,max(tk);st=dict(zip(tk,stages(len(tk))))
+    prev=None;sgn=None;on=0;cur=None
     for (im,t),k in zip(seq,src):
+        if k is not None: cur=k
         if dr=='right': im=oneblade(im)[0]
         a=np.array(im);old,c=trail(im,420)
-        if c: a[np.array(old)[...,3]>0]=0  # wipe whatever trail PixelLab drew
+        if c: a[np.array(old)[...,3]>0]=0
         body=Image.fromarray(a,'RGBA')
-        if k in st:
-            cr=crescent(dr,h,body_box(body),*st[k])
-            if dr=='up': cr.alpha_composite(body);body=cr
-            else: body.alpha_composite(cr)
+        if dr=='up':
+            if k in st: cr=crescent(dr,h,body_box(body),*st[k]);cr.alpha_composite(body);body=cr
+        else:
+            p=trail3.pivot(body);tp=trail3.tip(body)
+            ang=math.degrees(math.atan2(tp[1]-p[1],tp[0]-p[0])) if tp else None
+            if ang is not None and prev is not None:
+                dlt=(ang-prev+540)%360-180
+                if abs(dlt)>4: sgn=1 if dlt>0 else -1
+            if cur is not None and lo<=cur<=hi+1 and ang is not None and sgn:
+                span=SPAN[min(on,len(SPAN)-1)] if cur<=hi else 60;on+=1
+                body.alpha_composite(trail3.arc(p,tp[2],ang,sgn,span,T=18 if h=='hit3' else 13))
+            if ang is not None: prev=ang
         out.append((body,t))
     return out
 def up_attack(h):
