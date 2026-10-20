@@ -94,14 +94,14 @@ function step(){
 const VERT={down:1,downl:1,up:-1,upl:-1};
 function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return {...m,dir:[d==='left'?-1:1,0]};   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
   const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
-// owner 10-20 "사람은 가만히 있고 특수효과만 나가게": STILL = no lunge step, the thrust trail flies forward like a shot and hits further away
+// owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게": STILL = no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
 const STILL=true,FLY=7;
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
-function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2)FLASH=4;
+function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;
   const [dx,dy]=m.dir,reach=(m.big?100:74)+(STILL?FLY*10:0),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
-  for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
+  for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
     for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
       if(along>-20&&along<reach+10&&perp<26&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});}}}}
 // thrust trail (port of fx.py)
@@ -112,7 +112,7 @@ function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;i
   lance(cx,cy,dx,dy,nx,ny,back+ahead*.35,ahead*.65,W,`rgba(90,210,255,${.47*a})`);lance(cx,cy,dx,dy,nx,ny,back*.8+ahead*.3,ahead*.6,W*.45,`rgba(210,250,255,${.86*a})`);
   lance(cx,cy,dx,dy,nx,ny,back*.6+ahead*.25,ahead*.55,Math.max(1.5,W*.18),`rgba(255,255,255,${a})`);
   ctx.strokeStyle=`rgba(200,245,255,${.67*a})`;ctx.lineWidth=1;for(const[o,l]of(big?[[.9,.6],[-.9,.5],[1.6,.35],[-1.6,.3]]:[[.9,.55],[-.9,.45]])){const sx=cx+nx*o*W-dx*back*.6,sy=cy+ny*o*W-dy*back*.6,L=(back+ahead)*l;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+dx*L,sy+dy*L);ctx.stroke();}
-  if(age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
+  if(!STILL&&age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
 function draw(){
   const shx=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0,shy=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0;SHAKE=SHAKE>0.3?SHAKE*0.82:0;
   const camX=Math.round(P.x-VW/2)+shx,camY=Math.round(P.y-VH*0.55)+shy;
