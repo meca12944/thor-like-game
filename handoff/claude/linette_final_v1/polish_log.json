@@ -362,5 +362,47 @@
    8,
    -2
   ]
+ },
+ "jump_right": {
+  "scale": 1.0,
+  "offset": [
+   2,
+   -6
+  ]
+ },
+ "jump_left": {
+  "scale": 1.0,
+  "offset": [
+   -2,
+   -6
+  ]
+ },
+ "jump_down": {
+  "scale": 1.0,
+  "offset": [
+   14,
+   -3
+  ]
+ },
+ "jump_downl": {
+  "scale": 1.0,
+  "offset": [
+   -13,
+   -3
+  ]
+ },
+ "jump_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "jump_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
+  ]
  }
 }

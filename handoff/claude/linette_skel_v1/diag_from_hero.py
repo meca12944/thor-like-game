@@ -2,13 +2,14 @@
 # Linette keypoints(t) = Linette diagonal still + s * (hero(t) - hero idle frame 0), s = 117/124. For run the arms come from Linette's own
 # side run (hands at the waist, arms back) so she keeps her running style. usage: diag_from_hero.py <motion> <down|up>
 import json,sys,os,glob,subprocess
-m,d=sys.argv[1],sys.argv[2]; H='/tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag'; C=os.path.dirname(os.path.abspath(__file__))
-dd={'down':'south-east','up':'north-east'}[d]; S=117/124
+m,d=sys.argv[1],sys.argv[2]   # d: down | up | right (side)
+H='/tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag'; C=os.path.dirname(os.path.abspath(__file__))
+dd={'down':'south-east','up':'north-east','right':'east'}[d]; S=117/124
 def est(png):
     out=png.replace('.png','.kp.json')
     if not os.path.exists(out): subprocess.run([sys.executable,C+'/estimate.py',png,out],check=True,capture_output=True)
     return {p['label']:p for p in json.load(open(out))['keypoints']}
-base=est(f'{H}/idle_{d}/000.png'); L0={p['label']:p for p in json.load(open(f'{C}/start_still_{dd}_kp.json'))['keypoints']}
+base=est(f'{H}/idle_{d}/000.png'); L0={p['label']:p for p in json.load(open(f'{C}/'+('start_idle_east_kp.json' if d=='right' else f'start_still_{dd}_kp.json')))['keypoints']}
 frames=sorted(glob.glob(f'{H}/{m}_{d}/[0-9]*.png')); seq=[]
 side=json.load(open(f'{C}/kp_run_east_back.json')) if m=='run' else None; side0={p['label']:p for p in side[0]} if side else None
 ARM=('LEFT ELBOW','RIGHT ELBOW','LEFT ARM','RIGHT ARM')
