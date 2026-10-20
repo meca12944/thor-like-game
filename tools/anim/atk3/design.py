@@ -1,8 +1,8 @@
 # 3-hit sword combo, side view (facing east), designed as poses -> per-frame skeletons (no API calls).
 # angles: 0 = straight down, 90 = forward (+x), 180 = up, -90 = back. bone lengths fixed (shins never shortened).
-import json,math,sys
+import json,math,sys,os
 # usage: design.py <outdir> <east_kp.json>  - bone lengths, head/shoulder/hip offsets and z from estimate-skeleton of the east rotation
-E={k['label']:(k['x']*256,k['y']*256,int(k.get('z_index',0))) for k in json.load(open(sys.argv[2]))['keypoints']}
+E={k['label']:(k['x']*256,k['y']*256,int(k.get('z_index',0))) for k in json.load(open(os.environ.get('EAST_KP') or sys.argv[2]))['keypoints']}
 d=lambda a,b:math.dist(E[a][:2],E[b][:2])
 UA,FA=d('RIGHT SHOULDER','RIGHT ELBOW'),d('RIGHT ELBOW','RIGHT ARM')
 TH,SH=d('RIGHT HIP','RIGHT KNEE'),d('RIGHT KNEE','RIGHT LEG')
@@ -57,15 +57,22 @@ H3=[H2[-1],
  dict(dx=36,dy=12,lean=34,Ra=[90,70],La=[86,66],Rf=52,Lf=14,sw=80),                   # cleave impact
  dict(dx=38,dy=14,lean=38,Ra=[55,40],La=[52,38],Rf=52,Lf=14,sw=40),                   # blade buried low front
  dict(dx=38,dy=14,lean=38,Ra=[54,39],La=[51,37],Rf=52,Lf=14,sw=38)]
-# frames per segment: wind-up slow, swing fast, hold long (<=20 skeletons per hit)
-SEG={'h1':[5,3,2,2,2],'h2':[4,3,2,2,2],'h3':[5,3,2,2,2]}   # PixelLab takes at most 15 skeletons per job
-OUT={}
-for n,K in (('h1',H1),('h2',H2),('h3',H3)):
+def build(K,seg):
     fr=[]
-    for i,c in enumerate(SEG[n]):
+    for i,c in enumerate(seg):
         if i==0: fr.append(K[0])
         for j in range(c): fr.append(lerp(K[i],K[i+1],(j+1)/c))
-    OUT[n]=[pose(f) for f in fr]
-json.dump({n:[kp(J) for J in L] for n,L in OUT.items()},open(sys.argv[1]+'/side_kp.json','w'))
-json.dump({n:[{'hand':J['RIGHT ARM'],'sw':J['_sw']} for J in L] for n,L in OUT.items()},open(sys.argv[1]+'/side_sword.json','w'))
-print({n:len(L) for n,L in OUT.items()})
+    return [pose(f) for f in fr]
+if __name__=='__main__':
+    # frames per segment: wind-up slow, swing fast, hold long (<=20 skeletons per hit)
+    SEG={'h1':[5,3,2,2,2],'h2':[4,3,2,2,2],'h3':[5,3,2,2,2]}   # PixelLab takes at most 15 skeletons per job
+    OUT={}
+    for n,K in (('h1',H1),('h2',H2),('h3',H3)):
+        fr=[]
+        for i,c in enumerate(SEG[n]):
+            if i==0: fr.append(K[0])
+            for j in range(c): fr.append(lerp(K[i],K[i+1],(j+1)/c))
+        OUT[n]=[pose(f) for f in fr]
+    json.dump({n:[kp(J) for J in L] for n,L in OUT.items()},open(sys.argv[1]+'/side_kp.json','w'))
+    json.dump({n:[{'hand':J['RIGHT ARM'],'sw':J['_sw']} for J in L] for n,L in OUT.items()},open(sys.argv[1]+'/side_sword.json','w'))
+    print({n:len(L) for n,L in OUT.items()})
