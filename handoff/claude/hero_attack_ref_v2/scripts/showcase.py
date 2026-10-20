@@ -85,8 +85,8 @@ cache={}
 def clip(m,d):
     k=(m,d)
     if k in cache: return cache[k]
-    if m.startswith('hit'): c=new_attack(m,'east' if d in ('right','left') else 'se' if d.startswith('down') else 'ne')
-    elif d in ('right','left'): c=side(SIDE[m])
+    if d in ('right','left'): c=side(SIDE[m])  # side = the in-game clips as they are (owner: keep the original side attacks)
+    elif m.startswith('hit'): c=new_attack(m,'se' if d.startswith('down') else 'ne')
     else: c=diag(m,'se' if d.startswith('down') else 'ne',TK[m])
     if d in ('left','downl','upl'): c=[(im.transpose(Image.FLIP_LEFT_RIGHT),t) for im,t in c]
     cache[k]=c;return c
