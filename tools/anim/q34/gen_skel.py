@@ -17,7 +17,7 @@ def req(m,p,b=None):
 F=json.load(open(fkp));F=F['keypoints'] if isinstance(F,dict) else F
 F=[{k:v for k,v in p.items() if k in('x','y','label','z_index')} for p in F]
 for p in F:p['z_index']=int(p.get('z_index',0))
-body={'description':'young swordsman with long straight black hair, dark navy coat with gold trim, cape with red lining, gold pauldron on one shoulder, longsword in the right hand',
+body={'description':os.environ.get('DESC','young swordsman with long straight black hair, dark navy coat with gold trim, cape with red lining, gold pauldron on one shoulder, longsword in the right hand'),
       'action':os.environ.get('ACTION','run'),'direction':dr,'view':'low top-down','first_frame':{'type':'base64','base64':base64.b64encode(open(first,'rb').read()).decode(),'format':'png'},
       'first_frame_keypoints':F,'keypoints':json.load(open(kp)),'template_id':'mannequin','seed':int(seed),'no_background':True}
 st,r=req('POST','/animate-with-skeleton-v3',body)

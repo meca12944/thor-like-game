@@ -1,0 +1,254 @@
+{
+"hit1_right": {
+"frame": 6,
+"tick": 9,
+"tip": [
+116.0,
+-77.0
+],
+"dir": [
+1.0,
+0.0
+],
+"big": false,
+"heavy": false
+},
+"hit1_left": {
+"frame": 6,
+"tick": 9,
+"tip": [
+-117.0,
+-77.0
+],
+"dir": [
+-1.0,
+-0.0
+],
+"big": false,
+"heavy": false
+},
+"hit2_right": {
+"frame": 6,
+"tick": 10,
+"tip": [
+121.0,
+-80.0
+],
+"dir": [
+1.0,
+-0.004
+],
+"big": true,
+"heavy": false
+},
+"hit2_left": {
+"frame": 6,
+"tick": 10,
+"tip": [
+-122.0,
+-80.0
+],
+"dir": [
+-1.0,
+-0.004
+],
+"big": true,
+"heavy": false
+},
+"hit3_right": {
+"frame": 7,
+"tick": 14,
+"tip": [
+127.0,
+-68.0
+],
+"dir": [
+1.0,
+0.0
+],
+"big": true,
+"heavy": true
+},
+"hit3_left": {
+"frame": 7,
+"tick": 14,
+"tip": [
+-128.0,
+-68.0
+],
+"dir": [
+-1.0,
+-0.0
+],
+"big": true,
+"heavy": true
+},
+"hit1_down": {
+"frame": 6,
+"tick": 9,
+"tip": [
+104.0,
+-70.0
+],
+"dir": [
+0.912,
+0.41
+],
+"big": false,
+"heavy": false
+},
+"hit1_downl": {
+"frame": 6,
+"tick": 9,
+"tip": [
+-105.0,
+-70.0
+],
+"dir": [
+-0.912,
+0.41
+],
+"big": false,
+"heavy": false
+},
+"hit2_down": {
+"frame": 6,
+"tick": 10,
+"tip": [
+91.0,
+-84.0
+],
+"dir": [
+0.912,
+0.41
+],
+"big": true,
+"heavy": false
+},
+"hit2_downl": {
+"frame": 6,
+"tick": 10,
+"tip": [
+-92.0,
+-84.0
+],
+"dir": [
+-0.912,
+0.41
+],
+"big": true,
+"heavy": false
+},
+"hit3_down": {
+"frame": 7,
+"tick": 14,
+"tip": [
+115.0,
+-47.0
+],
+"dir": [
+0.998,
+0.063
+],
+"big": true,
+"heavy": true
+},
+"hit3_downl": {
+"frame": 7,
+"tick": 14,
+"tip": [
+-116.0,
+-47.0
+],
+"dir": [
+-0.998,
+0.063
+],
+"big": true,
+"heavy": true
+},
+"hit1_up": {
+"frame": 6,
+"tick": 9,
+"tip": [
+101.0,
+-114.0
+],
+"dir": [
+0.941,
+-0.337
+],
+"big": false,
+"heavy": false
+},
+"hit1_upl": {
+"frame": 6,
+"tick": 9,
+"tip": [
+-102.0,
+-114.0
+],
+"dir": [
+-0.941,
+-0.337
+],
+"big": false,
+"heavy": false
+},
+"hit2_up": {
+"frame": 6,
+"tick": 10,
+"tip": [
+102.0,
+-130.0
+],
+"dir": [
+0.899,
+-0.438
+],
+"big": true,
+"heavy": false
+},
+"hit2_upl": {
+"frame": 6,
+"tick": 10,
+"tip": [
+-103.0,
+-130.0
+],
+"dir": [
+-0.899,
+-0.438
+],
+"big": true,
+"heavy": false
+},
+"hit3_up": {
+"frame": 7,
+"tick": 14,
+"tip": [
+102.0,
+-134.0
+],
+"dir": [
+0.892,
+-0.451
+],
+"big": true,
+"heavy": true
+},
+"hit3_upl": {
+"frame": 7,
+"tick": 14,
+"tip": [
+-103.0,
+-134.0
+],
+"dir": [
+-0.892,
+-0.451
+],
+"big": true,
+"heavy": true
+}
+}

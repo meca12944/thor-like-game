@@ -5,6 +5,7 @@ import json,sys,os,shutil,subprocess,numpy as np
 from PIL import Image,ImageDraw,ImageFont
 D,out=sys.argv[1:3];CL=json.load(open(D+'/clips.json'))
 HIT={'hit1':5,'hit2':6,'hit3':9}                                  # strike tick (game H8.combo)
+if os.path.exists(D+'/hit.json'): HIT=json.load(open(D+'/hit.json'))   # per-set strike ticks
 HINT={'right':(1,0),'left':(-1,0),'down':(1,.45),'downl':(-1,.45),'up':(1,-.45),'upl':(-1,-.45)}
 def strike_frame(T,tick):
     c=0
