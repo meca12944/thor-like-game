@@ -13,31 +13,47 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 #knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
 </style></head><body>
 <canvas id="c"></canvas>
-<div id="hud">리네트 테스트 · 이동 WASD/방향키 · 공격 J · 대시 K · 달리기 L · 스킬 U</div>
+<div id="hud">리네트 테스트 · 이동 WASD/방향키 · 공격 J · 대시 K · 달리기 L · 스킬 U · 점프 Space</div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
 <div class="btn" id="bRun" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom))">달리기</div>
-<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom))">스킬</div>
+<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom));font-size:12px">스킬</div>
+<div class="btn" id="bJump" style="right:calc(196px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">점프</div>
 <div class="btn small" id="bHurt" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">피격</div>
 <div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
 <script>
 // Linette sandbox: atlas = assets/anim/linette8.json (hero8 format: cells [x,y,w,h,ax,ay], anims "<motion>_<dir>" = [[sheet,cell,ticks]]),
-// left = right mirrored; no north/south views (owner 10-20): walking up/down keeps the last left/right side, attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
+// left = right mirrored; no north/south views (owner 10-20): idle/walk/run/dash/skill/attacks facing up/down use the diagonal clips (hurt/death keep the last side), attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
 // Thrust trails are drawn in code from A.thrust (tip/dir at the lunge frame), like the hero's engine-drawn trails.
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let A,SH=[],VW=480,VH=270,SC=1;
 function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/360,h/300)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
+// hero's magic circle + PixelLab fire ring (same assets/rules as test128 index CASTFIRE): the fire runs once around the circle from the front,
+// revealing the circle where it has passed, then burns out in 4 frames. S1 cyan / S2 red / S3 gold, cycling on each skill press.
+let FX=null,FIRE=null;
+const CIRC=[[[115,143,115,46,57,24],[463,143,115,46,57,24]],[[345,49,115,46,57,24],[693,49,115,46,57,24]],[[230,96,115,46,57,24],[578,96,115,46,57,24]]]; // [full, faded] per skill
+const FC=[0,85,170].flatMap(y=>[0,124,248,372,496].map(x=>[x,y,123,84,60,63])),RING=[-1,-2.5,57,22.5],A0=Math.PI/2,LAP0=2,LAPEND=26,POST=[4,12,22,34];
+function blitC(img,c,x,y){ctx.drawImage(img,c[0],c[1],c[2],c[3],x-c[4],y-c[5],c[2],c[3]);}
+function castFx(front,sx,sy){
+  if(!FX||P.skill==null)return;const casting=P.st==='cast',t=P.t,cx=sx+RING[0],cy=sy+RING[1],rx=RING[2],ry=RING[3];
+  if(!casting&&!P.cf)return;
+  const p=casting?(t-LAP0)/(LAPEND-LAP0):2,clipHalf=()=>{ctx.beginPath();ctx.rect(cx-rx-30,front?cy:cy-ry*3-60,rx*2+60,ry*3+60);ctx.clip();},
+        sector=sw=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.ellipse(cx,cy,rx+12,ry+12,0,A0,A0+sw);ctx.closePath();ctx.clip();};
+  if(!front&&casting){ctx.save();if(p<1){if(p<=0){ctx.restore();}else{sector(p*Math.PI*2);blitC(FX,CIRC[P.skill][0],sx,sy);ctx.restore();}}else{const T=total(clip(P.clip));blitC(FX,CIRC[P.skill][t>T-10?1:0],sx,sy);ctx.restore();}}
+  if(casting&&p>0&&p<1){ctx.save();clipHalf();sector(p*Math.PI*2);blitC(FIRE,FC[P.skill*5],sx,sy);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35;blitC(FIRE,FC[P.skill*5],sx,sy);ctx.restore();}
+  else if(p>=1){if(!P.cf)P.cf={t0:P.gt};const k=POST.findIndex(v=>P.gt-P.cf.t0<v);if(k<0){if(!casting)P.cf=null;return;}ctx.save();clipHalf();blitC(FIRE,FC[P.skill*5+1+k],sx,sy);ctx.restore();}
+}
 // grass field (pre-rendered tile)
 const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=TILE.getContext('2d');g.fillStyle='#567c46';g.fillRect(0,0,256,256);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
 const P={x:0,y:0,face:'right',lastH:'right',st:'idle',t:0,clip:null,combo:0,queued:false,run:false,dashT:0,dead:false};
 const K={};let joy={x:0,y:0};
-addEventListener('keydown',e=>{K[e.code]=1;if(e.code==='KeyJ')attack();if(e.code==='KeyK')dash();if(e.code==='KeyL')P.run=!P.run,ui();if(e.code==='KeyU')cast();});
+addEventListener('keydown',e=>{K[e.code]=1;if(e.code==='KeyJ')attack();if(e.code==='KeyK')dash();if(e.code==='KeyL')P.run=!P.run,ui();if(e.code==='KeyU')cast();if(e.code==='Space')jump();});
 addEventListener('keyup',e=>{K[e.code]=0;});
 function tap(id,f){const b=document.getElementById(id);b.addEventListener('pointerdown',e=>{e.preventDefault();f();});}
-tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHurt',hurt);tap('bDie',die);
+tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHurt',hurt);tap('bJump',jump);tap('bDie',die);
 function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
 {const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
@@ -49,8 +65,9 @@ function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])retur
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt')return;P.combo=1;start('atk','atk1_'+atkDir());}
-function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+P.lastH);}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;start('cast','cast_'+P.lastH);}
+function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+atkDir());}
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
+function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;start('jump','jump_'+atkDir());}   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;start('death','death_'+P.lastH);}
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
@@ -59,15 +76,16 @@ function step(){
   const moving=m>0.2;P.t++;
   if(P.st==='idle'||P.st==='move'){
     if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+P.lastH;if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
-    else if(P.st!=='idle'||P.clip!=='idle_'+P.lastH)start('idle','idle_'+P.lastH);
+      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+atkDir();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+    else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
+    if(P.st==='jump'){P.x+=ix*(P.run?1.6:0.9);P.y+=iy*(P.run?1.6:0.9);}
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
     if(P.st==='atk'){const lt=A.thrust[P.clip];if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0);if(P.t>tl-3&&P.t<=tl){P.x+=lt.dir[0]*1.6;P.y+=lt.dir[1]*1.6;}}   // small lunge along the thrust
       const lt2=A.thrust[P.clip],tl2=lt2?L.slice(0,lt2.frame+1).reduce((s,e)=>s+e[2],0):T;
       if(P.queued&&P.combo<3&&P.t>=tl2){P.queued=false;P.combo++;start('atk','atk'+P.combo+'_'+atkDir());return;}}
-    if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+P.lastH);}
+    if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+atkDir());}
   }
 }
 // thrust trail (port of fx.py)
@@ -82,13 +100,16 @@ function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;i
 function draw(){
   const camX=Math.round(P.x-VW/2),camY=Math.round(P.y-VH*0.55);
   for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
-  const sx=Math.round(P.x-camX),sy=Math.round(P.y-camY);
-  ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy,24,6,0,0,7);ctx.fill();
+  const sx=Math.round(P.x-camX),sy0=Math.round(P.y-camY);let sy=sy0;
+  if(P.st==='jump'){const T=total(clip(P.clip)),u=Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));sy-=Math.round(Math.sin(u*Math.PI)*30);}   // airborne arc in the middle of the clip
+  ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
+  castFx(false,sx,sy);
   const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
+  castFx(true,sx,sy);
   const m=A.thrust[P.clip];if(P.st==='atk'&&m){const tl=L.slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
 }
 let acc=0,last=performance.now();
-function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=2').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=2';})));}).then(ims=>{SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
+function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
+fetch('assets/anim/linette8.json?v=8').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=8';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
