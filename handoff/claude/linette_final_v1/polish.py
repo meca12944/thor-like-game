@@ -7,7 +7,9 @@ from PIL import Image
 from measure import body
 H=os.path.dirname(os.path.abspath(__file__)); IN=H+'/frames'; OUT=H+'/frames_polished'
 man=json.load(open(H+'/manifest.json'))
-STAND={'idle','walk','dash','hurt','death','cast','atk1','atk2','atk3'}   # clips whose frame 0 is a standing pose (run starts mid-stride)
+STAND={'idle','walk','dash','hurt','death','cast','atk1','atk3'}   # atk2 starts in the atk1 lunge -> takes atk1's offset/scale (SAME_AS)
+SAME_AS={'atk2':'atk1'}
+kept={}   # clips whose frame 0 is a standing pose (run starts mid-stride)
 BOB={('walk','down'):(2,1),('walk','up'):(2,1),('run','down'):(3,1),('run','up'):(3,1)}   # (bob px, sway px): two steps per clip
 shutil.rmtree(OUT,ignore_errors=True); log={}
 for m,dd in man['motions'].items():
@@ -15,6 +17,9 @@ for m,dd in man['motions'].items():
         fs=sorted(glob.glob(f'{IN}/{m}/{d}/*.png')); t0,b0,c0=body(fs[0]); ti,bi,ci=body(sorted(glob.glob(f'{IN}/idle/{d}/*.png'))[0])
         sc=1.0
         if m in STAND and abs((bi-ti)/(b0-t0)-1)>0.03: sc=(bi-ti)/(b0-t0)
+        if m in SAME_AS and d in ('right','left'):   # continue exactly where atk1's lunge frame was drawn
+            sc,c0,b0=kept[(SAME_AS[m],d)]
+        kept[(m,d)]=(sc,c0,b0)
         os.makedirs(f'{OUT}/{m}/{d}',exist_ok=True); n=len(fs)
         for i,f in enumerate(fs):
             im=Image.open(f).convert('RGBA')

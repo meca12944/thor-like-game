@@ -210,17 +210,17 @@
   ]
  },
  "atk1_down": {
-  "scale": 0.967,
+  "scale": 1.0,
   "offset": [
-   18,
-   3
+   0,
+   0
   ]
  },
  "atk1_up": {
   "scale": 1.0,
   "offset": [
-   -7,
-   -2
+   0,
+   3
   ]
  },
  "atk2_right": {
@@ -238,17 +238,17 @@
   ]
  },
  "atk2_down": {
-  "scale": 0.967,
+  "scale": 1.0,
   "offset": [
-   18,
-   3
+   1,
+   0
   ]
  },
  "atk2_up": {
   "scale": 1.0,
   "offset": [
-   -7,
-   -2
+   0,
+   3
   ]
  },
  "atk3_right": {
@@ -266,17 +266,17 @@
   ]
  },
  "atk3_down": {
-  "scale": 0.967,
+  "scale": 1.0,
   "offset": [
-   18,
-   3
+   0,
+   0
   ]
  },
  "atk3_up": {
   "scale": 1.0,
   "offset": [
-   -7,
-   -2
+   0,
+   3
   ]
  }
 }

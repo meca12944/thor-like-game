@@ -6,7 +6,7 @@ F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',16)
 man=json.load(open(H+'/manifest.json'))['motions']
 M=[('idle','대기'),('walk','걷기'),('run','달리기'),('dash','대시'),('hurt','맞기'),('death','사망'),('cast','시전'),('atk1','1타'),('atk2','2타'),('atk3','3타')]
 D=[('down','아래'),('up','위'),('left','왼쪽'),('right','오른쪽')]
-fr={(m,d):[Image.open(f).convert('RGBA').crop((38,40,218,200)) for f in sorted(glob.glob(f'{H}/frames/{m}/{d}/*.png'))] for m,_ in M for d,_ in D}
+fr={(m,d):[Image.open(f).convert('RGBA').crop((38,40,218,200)) for f in sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))] for m,_ in M for d,_ in D}
 def seq(m,d):
     s=[];[s.extend([i]*t) for i,t in enumerate(man[m][d]['ticks'])]
     if m in('death','hurt','dash','cast') or m.startswith('atk'): s+= [len(man[m][d]['ticks'])-1]*20 if m=='death' else [s[-1]]*8

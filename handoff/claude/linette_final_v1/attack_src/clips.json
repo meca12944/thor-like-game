@@ -1,0 +1,231 @@
+{
+ "atk1_right": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   10,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk1/east/000.png",
+   "linette_thrust_v1/atk1/east/001.png",
+   "linette_thrust_v1/atk1/east/002.png",
+   "linette_thrust_v1/atk1/east/003.png",
+   "linette_thrust_v1/atk1/east/004.png",
+   "linette_thrust_v1/atk1/east/005.png",
+   "linette_thrust_v1/atk1/east/006.png",
+   "linette_thrust_v1/atk1/east/007.png",
+   "linette_thrust_v1/atk1/east/008.png",
+   "linette_thrust_v1/atk1/east/007.png",
+   "linette_thrust_v1/atk1/east/006.png",
+   "linette_thrust_v1/atk1/east/005.png",
+   "linette_thrust_v1/atk1/east/004.png",
+   "linette_thrust_v1/atk1/east/000.png"
+  ]
+ },
+ "atk2_right": {
+  "ticks": [
+   1,
+   2,
+   12,
+   3,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_skel_v1/swap_east/000.png",
+   "linette_skel_v1/swap_east/001.png",
+   "linette_skel_v1/swap_east/002.png",
+   "linette_skel_v1/atk2chain_east/004.png",
+   "linette_skel_v1/atk2chain_east/005.png",
+   "linette_skel_v1/atk2chain_east/006.png"
+  ]
+ },
+ "atk3_right": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   18,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk3/east/000.png",
+   "linette_thrust_v1/atk3/east/001.png",
+   "linette_thrust_v1/atk3/east/002.png",
+   "linette_thrust_v1/atk3/east/003.png",
+   "linette_thrust_v1/atk3/east/004.png",
+   "linette_thrust_v1/atk3/east/005.png",
+   "linette_thrust_v1/atk3/east/006.png",
+   "linette_thrust_v1/atk3/east/007.png",
+   "linette_thrust_v1/atk3/east/008.png",
+   "linette_thrust_v1/atk3/east/007.png",
+   "linette_thrust_v1/atk3/east/006.png",
+   "linette_thrust_v1/atk3/east/005.png",
+   "linette_thrust_v1/atk3/east/004.png",
+   "linette_thrust_v1/atk3/east/000.png"
+  ]
+ },
+ "atk1_down": {
+  "ticks": [
+   3,
+   4,
+   12,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_thrust_v1/atk1fb/south/000.png",
+   "linette_thrust_v1/atk1fb/south/003.png",
+   "linette_thrust_v1/atk1fb/south/008.png",
+   "linette_thrust_v1/atk1fb/south/003.png",
+   "linette_thrust_v1/atk1fb/south/000.png"
+  ]
+ },
+ "atk3_down": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   18,
+   3,
+   3
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk3fb/south/000.png",
+   "linette_thrust_v1/atk3fb/south/001.png",
+   "linette_thrust_v1/atk3fb/south/002.png",
+   "linette_thrust_v1/atk3fb/south/003.png",
+   "linette_thrust_v1/atk3fb/south/004.png",
+   "linette_thrust_v1/atk3fb/south/005.png",
+   "linette_thrust_v1/atk3fb/south/006.png",
+   "linette_thrust_v1/atk3fb/south/007.png",
+   "linette_thrust_v1/atk3fb/south/008.png",
+   "linette_thrust_v1/atk3fb/south/004.png",
+   "linette_thrust_v1/atk3fb/south/000.png"
+  ]
+ },
+ "atk1_up": {
+  "ticks": [
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   1,
+   12,
+   3,
+   3
+  ],
+  "lunge": 7,
+  "src": [
+   "linette_thrust_v1/atk1fb/north/000.png",
+   "linette_thrust_v1/atk1fb/north/001.png",
+   "linette_thrust_v1/atk1fb/north/002.png",
+   "linette_thrust_v1/atk1fb/north/003.png",
+   "linette_thrust_v1/atk1fb/north/004.png",
+   "linette_thrust_v1/atk1fb/north/005.png",
+   "linette_thrust_v1/atk1fb/north/007.png",
+   "linette_thrust_v1/atk1fb/north/008.png",
+   "linette_thrust_v1/atk1fb/north/005.png",
+   "linette_thrust_v1/atk1fb/north/000.png"
+  ]
+ },
+ "atk3_up": {
+  "ticks": [
+   3,
+   3,
+   4,
+   1,
+   18,
+   3,
+   3
+  ],
+  "lunge": 4,
+  "src": [
+   "linette_thrust_v1/atk3fb/north/000.png",
+   "linette_thrust_v1/atk3fb/north/001.png",
+   "linette_thrust_v1/atk3fb/north/002.png",
+   "linette_thrust_v1/atk3fb/north/007.png",
+   "linette_thrust_v1/atk3fb/north/008.png",
+   "linette_thrust_v1/atk3fb/north/002.png",
+   "linette_thrust_v1/atk3fb/north/000.png"
+  ]
+ },
+ "atk2_down": {
+  "ticks": [
+   3,
+   4,
+   12,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_thrust_v1/atk1fb/south/000.png",
+   "linette_thrust_v1/atk1fb/south/003.png",
+   "linette_thrust_v1/atk1fb/south/008.png",
+   "linette_thrust_v1/atk1fb/south/003.png",
+   "linette_thrust_v1/atk1fb/south/000.png",
+   "(mirrored)"
+  ]
+ },
+ "atk2_up": {
+  "ticks": [
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   1,
+   12,
+   3,
+   3
+  ],
+  "lunge": 7,
+  "src": [
+   "linette_thrust_v1/atk1fb/north/000.png",
+   "linette_thrust_v1/atk1fb/north/001.png",
+   "linette_thrust_v1/atk1fb/north/002.png",
+   "linette_thrust_v1/atk1fb/north/003.png",
+   "linette_thrust_v1/atk1fb/north/004.png",
+   "linette_thrust_v1/atk1fb/north/005.png",
+   "linette_thrust_v1/atk1fb/north/007.png",
+   "linette_thrust_v1/atk1fb/north/008.png",
+   "linette_thrust_v1/atk1fb/north/005.png",
+   "linette_thrust_v1/atk1fb/north/000.png",
+   "(mirrored)"
+  ]
+ }
+}

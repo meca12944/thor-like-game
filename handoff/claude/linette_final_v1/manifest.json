@@ -13,6 +13,7 @@
      7,
      7
     ],
+    "lunge": null,
     "src": "linette_moves_v1/idle/east",
     "pick": [
      0,
@@ -36,6 +37,7 @@
      7,
      7
     ],
+    "lunge": null,
     "src": "linette_moves_v1/idle/east (mirrored)",
     "pick": [
      0,
@@ -59,6 +61,7 @@
      7,
      7
     ],
+    "lunge": null,
     "src": "linette_moves_v1/idle/south",
     "pick": [
      0,
@@ -82,6 +85,7 @@
      7,
      7
     ],
+    "lunge": null,
     "src": "linette_moves_v1/idle/north",
     "pick": [
      0,
@@ -111,6 +115,7 @@
      4,
      4
     ],
+    "lunge": null,
     "src": "linette_skel_v1/walk_east",
     "pick": [
      0,
@@ -142,6 +147,7 @@
      4,
      4
     ],
+    "lunge": null,
     "src": "linette_skel_v1/walk_east (mirrored)",
     "pick": [
      0,
@@ -169,6 +175,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/walk/south",
     "pick": [
      0,
@@ -192,6 +199,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/walk/north",
     "pick": [
      0,
@@ -221,6 +229,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/run_east_B4",
     "pick": [
      0,
@@ -252,6 +261,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/run_east_B4 (mirrored)",
     "pick": [
      0,
@@ -279,6 +289,7 @@
      5,
      4
     ],
+    "lunge": null,
     "src": "linette_moves_v1/run/south",
     "pick": [
      0,
@@ -302,6 +313,7 @@
      5,
      4
     ],
+    "lunge": null,
     "src": "linette_moves_v1/run/north",
     "pick": [
      0,
@@ -325,6 +337,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/dash_east",
     "pick": [
      0,
@@ -344,6 +357,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/dash_east (mirrored)",
     "pick": [
      0,
@@ -363,6 +377,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/dash_south_v3",
     "pick": [
      0,
@@ -382,6 +397,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/dash_north",
     "pick": [
      0,
@@ -403,6 +419,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/hurt_east",
     "pick": [
      0,
@@ -422,6 +439,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/hurt_east (mirrored)",
     "pick": [
      0,
@@ -441,6 +459,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/hurt_south",
     "pick": [
      0,
@@ -460,6 +479,7 @@
      3,
      3
     ],
+    "lunge": null,
     "src": "linette_skel_v1/hurt_north",
     "pick": [
      0,
@@ -484,6 +504,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/death/east",
     "pick": [
      0,
@@ -509,6 +530,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/death/east (mirrored)",
     "pick": [
      0,
@@ -534,6 +556,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/death/south",
     "pick": [
      0,
@@ -559,6 +582,7 @@
      6,
      6
     ],
+    "lunge": null,
     "src": "linette_moves_v1/death/north",
     "pick": [
      0,
@@ -586,6 +610,7 @@
      5,
      5
     ],
+    "lunge": null,
     "src": "linette_moves_v1/cast/east",
     "pick": [
      0,
@@ -611,6 +636,7 @@
      5,
      5
     ],
+    "lunge": null,
     "src": "linette_moves_v1/cast/east (mirrored)",
     "pick": [
      0,
@@ -636,6 +662,7 @@
      5,
      5
     ],
+    "lunge": null,
     "src": "linette_moves_v1/cast/south",
     "pick": [
      0,
@@ -661,6 +688,7 @@
      5,
      5
     ],
+    "lunge": null,
     "src": "linette_moves_v1/cast/north",
     "pick": [
      0,
@@ -693,7 +721,8 @@
      2,
      2
     ],
-    "src": "linette_thrust_v1/atk1/east",
+    "lunge": 8,
+    "src": "linette_final_v1/attack_src/atk1/right",
     "pick": [
      0,
      1,
@@ -704,11 +733,11 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9,
+     10,
+     11,
+     12,
+     13
     ]
    },
    "left": {
@@ -728,7 +757,8 @@
      2,
      2
     ],
-    "src": "linette_thrust_v1/atk1/east (mirrored)",
+    "lunge": 8,
+    "src": "linette_final_v1/attack_src/atk1/right (mirrored)",
     "pick": [
      0,
      1,
@@ -739,66 +769,46 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9,
+     10,
+     11,
+     12,
+     13
     ]
    },
    "down": {
     "ticks": [
-     2,
-     1,
-     1,
-     2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     3,
+     4,
+     12,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk1/south-east",
+    "lunge": 2,
+    "src": "linette_final_v1/attack_src/atk1/down",
     "pick": [
      0,
      1,
      2,
      3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     7,
-     6,
-     5,
-     4,
-     0
+     4
     ]
    },
    "up": {
     "ticks": [
      2,
+     2,
+     2,
+     2,
+     2,
+     2,
      1,
-     1,
-     2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     12,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk1/north-east",
+    "lunge": 7,
+    "src": "linette_final_v1/attack_src/atk1/up",
     "pick": [
      0,
      1,
@@ -809,138 +819,84 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9
     ]
    }
   },
   "atk2": {
    "right": {
     "ticks": [
-     2,
-     1,
      1,
      2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     12,
+     3,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk2/east",
+    "lunge": 2,
+    "src": "linette_final_v1/attack_src/atk2/right",
     "pick": [
      0,
      1,
      2,
      3,
      4,
-     5,
-     6,
-     7,
-     8,
-     7,
-     6,
-     5,
-     4,
-     0
+     5
     ]
    },
    "left": {
     "ticks": [
-     2,
-     1,
      1,
      2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     12,
+     3,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk2/east (mirrored)",
+    "lunge": 2,
+    "src": "linette_final_v1/attack_src/atk2/right (mirrored)",
     "pick": [
      0,
      1,
      2,
      3,
      4,
-     5,
-     6,
-     7,
-     8,
-     7,
-     6,
-     5,
-     4,
-     0
+     5
     ]
    },
    "down": {
     "ticks": [
-     2,
-     1,
-     1,
-     2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     3,
+     4,
+     12,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk2/south-east",
+    "lunge": 2,
+    "src": "linette_final_v1/attack_src/atk2/down",
     "pick": [
      0,
      1,
      2,
      3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     7,
-     6,
-     5,
-     4,
-     0
+     4
     ]
    },
    "up": {
     "ticks": [
      2,
+     2,
+     2,
+     2,
+     2,
+     2,
      1,
-     1,
-     2,
-     2,
-     2,
-     2,
-     1,
-     10,
-     2,
-     2,
-     2,
-     2,
-     2
+     12,
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk2/north-east",
+    "lunge": 7,
+    "src": "linette_final_v1/attack_src/atk2/up",
     "pick": [
      0,
      1,
@@ -951,11 +907,7 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9
     ]
    }
   },
@@ -977,7 +929,8 @@
      2,
      2
     ],
-    "src": "linette_thrust_v1/atk3/east",
+    "lunge": 8,
+    "src": "linette_final_v1/attack_src/atk3/right",
     "pick": [
      0,
      1,
@@ -988,11 +941,11 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9,
+     10,
+     11,
+     12,
+     13
     ]
    },
    "left": {
@@ -1012,7 +965,8 @@
      2,
      2
     ],
-    "src": "linette_thrust_v1/atk3/east (mirrored)",
+    "lunge": 8,
+    "src": "linette_final_v1/attack_src/atk3/right (mirrored)",
     "pick": [
      0,
      1,
@@ -1023,11 +977,11 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9,
+     10,
+     11,
+     12,
+     13
     ]
    },
    "down": {
@@ -1041,13 +995,11 @@
      2,
      1,
      18,
-     2,
-     2,
-     2,
-     2,
-     2
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk3/south-east",
+    "lunge": 8,
+    "src": "linette_final_v1/attack_src/atk3/down",
     "pick": [
      0,
      1,
@@ -1058,31 +1010,22 @@
      6,
      7,
      8,
-     7,
-     6,
-     5,
-     4,
-     0
+     9,
+     10
     ]
    },
    "up": {
     "ticks": [
-     2,
-     1,
-     1,
-     2,
-     2,
-     2,
-     2,
+     3,
+     3,
+     4,
      1,
      18,
-     2,
-     2,
-     2,
-     2,
-     2
+     3,
+     3
     ],
-    "src": "linette_thrust_v1/atk3/north-east",
+    "lunge": 4,
+    "src": "linette_final_v1/attack_src/atk3/up",
     "pick": [
      0,
      1,
@@ -1090,14 +1033,7 @@
      3,
      4,
      5,
-     6,
-     7,
-     8,
-     7,
-     6,
-     5,
-     4,
-     0
+     6
     ]
    }
   }

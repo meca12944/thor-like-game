@@ -4,15 +4,26 @@ import json,glob,os
 import numpy as np
 from PIL import Image
 H=os.path.dirname(os.path.abspath(__file__)); A=json.load(open(H+'/atlas/linette8.json'))
-FACE={'right':(1,0),'left':(-1,0),'down':(1,0.35),'up':(1,-0.45)}   # down/up use the diagonal thrust art (down-right / up-right)
+def binary_opening(m,_k=None):   # 3x3 opening with numpy (erode then dilate)
+    P=np.pad(m,1); er=np.ones_like(m)
+    for dy in (0,1,2):
+        for dx in (0,1,2): er&=P[dy:dy+m.shape[0],dx:dx+m.shape[1]]
+    P=np.pad(er,1); di=np.zeros_like(m)
+    for dy in (0,1,2):
+        for dx in (0,1,2): di|=P[dy:dy+m.shape[0],dx:dx+m.shape[1]]
+    return di
+FACE={'right':(1,0),'left':(-1,0),'down':(0,1),'up':(0,-1)}   # down/up = true front/back thrusts (v2)
+MAN=json.load(open(H+'/manifest.json'))['motions']
 LUNGE=8                                                          # frame index of the full extension in every atk clip
 out={}
 for m in ('atk1','atk2','atk3'):
     for d,f in FACE.items():
-        im=np.asarray(Image.open(sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))[LUNGE]))[...,3]>40
-        ys,xs=np.nonzero(im); fv=np.array(f)/np.hypot(*f); proj=xs*fv[0]+ys*fv[1]; i=proj.argmax(); tip=np.array([xs[i],ys[i]],float)
-        near=np.hypot(xs-tip[0],ys-tip[1])<34; P=np.stack([xs[near],ys[near]],1).astype(float); P-=P.mean(0)
+        LUNGE=MAN[m][d]['lunge']; im=np.asarray(Image.open(sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))[LUNGE]))[...,3]>40
+        thin=im & ~binary_opening(im) if d in ('down','up') else im   # front/back: the needle tip sits by the feet -> look at thin (1-2 px) pixels only
+        ys,xs=np.nonzero(thin); fv=np.array(f)/np.hypot(*f); proj=xs*fv[0]+ys*fv[1]; i=proj.argmax(); tip=np.array([xs[i],ys[i]],float)
+        ay,ax_=np.nonzero(im); near=np.hypot(ax_-tip[0],ay-tip[1])<34; P=np.stack([ax_[near],ay[near]],1).astype(float); P-=P.mean(0)
         v=np.linalg.svd(P,full_matrices=False)[2][0]; v=v if v@fv>0 else -v
+        if d in ('down','up'): v=fv                                  # front/back: drive the trail straight down / up the screen
         rec={'frame':LUNGE,'tip':[round(float(tip[0])-128,1),round(float(tip[1])-189,1)],'dir':[round(float(v[0]),3),round(float(v[1]),3)],'big':m=='atk3'}
         if m=='atk3':   # both needles: second tip = farthest point off the first needle's line (>=4px away), near the front
             perp=np.abs((xs-tip[0])*v[1]-(ys-tip[1])*v[0]); cand=(perp>=4)&(proj>proj.max()-40)
