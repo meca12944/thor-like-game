@@ -526,13 +526,16 @@
       if (h.owner && h.owner.dead && h.t < h.warn) { S.hazards.splice(i, 1); continue; }
       const live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
       if (live && h.dmg && !h.hit && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
+      if (live && h.zone && inHaz(h, hero.x, hero.y - 4)) hero.slowT = Math.max(hero.slowT, .15);
       if (h.t >= h.warn && !h.fired) { h.fired = true; if (h.onEnd) h.onEnd(h); hazardFx(h); }
       if (h.linger && h.t >= h.warn + (h.act || 0) && h.t < h.warn + h.act + h.linger && !h.hit && Math.hypot(hero.x - h.x, (hero.y - h.y) * 1.15) < h.r * .8) { if (hurt(1, h)) h.hit = true; }
       if (h.t > h.warn + (h.act || 0) + (h.linger || 0) + .25) { S.hazards.splice(i, 1); if (h === S.ult) S.ult = null; }
     }
     for (let i = S.shots.length - 1; i >= 0; i--) { const s = S.shots[i]; s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt;
-      if (Math.hypot(hero.x - s.x, hero.y - 8 - s.y) < s.r + 5 && hurt(s.dmg, s)) { S.shots.splice(i, 1); continue; }
-      if (s.t > s.life || solidAt(s.x, s.y + 6)) { addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
+      if (s.ret && !s.back && s.t > s.life / 2) { s.back = true; s.vx = -s.vx; s.vy = -s.vy; } // boomerang (felt puppet blades)
+      if (Math.hypot(hero.x - s.x, hero.y - 8 - s.y) < s.r + 5 && hurt(s.dmg, s)) { if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); S.shots.splice(i, 1); continue; }
+      if (s.t > s.life || solidAt(s.x, s.y + 6)) { if (s.zone) hazard({ shape: 'circle', x: s.x, y: s.y + 6, r: 12, warn: 0, act: 2, dmg: 0, kind: 'web', zone: true }); // slowing web patch
+        addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
       if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
@@ -612,7 +615,7 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
-      drawHeroHi(k); drawHiRes(k, ox, oy);
+      drawFeltHi(k, mm => mm.y <= hero.y); drawHeroHi(k); drawFeltHi(k, mm => mm.y > hero.y); drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
       if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
@@ -789,6 +792,7 @@
     const sc = (m.scale || 1) * (m.spawnT > 0 ? Math.max(0, 1 - m.spawnT * 1.8) : 1); if (sc <= 0) return;
     const hover = D.hover ? D.hover + Math.sin(S.t * 6 + m.x) * 2 : 0;
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(m.x, m.y, (m.r + 2) * sc, (m.r * .45 + 1) * sc, 0, 0, TAU); g.fill();
+    if (D.felt) return; // body: drawFeltHi (hi-res pass)
     const sx = m.shake ? (Math.random() - .5) * 2 : 0;
     const mode = m.flash > 0 ? 'white' : (m.tint === 'rage' ? 'rage' : null);
     let sy = 1; if (m.squash) sy = 1 - m.squash * .3; if (m.st === 'pC') sy = .86;
@@ -797,11 +801,41 @@
     if (m.rolling) { g.save(); g.translate(m.x, m.y - 16); g.rotate(S.t * 18); g.fillStyle = '#4a5a34'; g.beginPath(); g.arc(0, 0, 16, 0, TAU); g.fill(); g.strokeStyle = '#1c2410'; g.lineWidth = 1; g.stroke(); g.fillStyle = '#5cff8a'; for (let i = 0; i < 5; i++) { g.rotate(TAU / 5); g.fillRect(9, -2, 7, 4); } g.restore(); return; }
     drawSpr(g, name, m.x + sx, m.y - (m.hz || 0) - hover, { flip: m.face > 0, scale: sc, sy, mode, rot: m.lean ? m.lean * .9 * (m.face > 0 ? 1 : -1) : 0 });
   }
+  // ---- chapter-1 Felt mobs: PixelLab strips (256px cells, foot at y 250, art faces right) drawn in the hi-res pass, y-split around the hero
+  const FELTIMG = {}; function feltImg(src) { if (!FELTIMG[src]) { const im = new Image(); im.src = src + '.png'; FELTIMG[src] = im; } return FELTIMG[src]; }
+  function feltFrame(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
+    if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
+      if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
+      t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; }
+    return m.moving ? Math.floor(S.t * 60 / a.ticks[0] + m.home[0]) % a.n : 0; }
+  function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
+    for (const mm of S.mobs) { if (mm.dead || !mm.D.felt || !pick(mm)) continue; const A = mm.D.anim, name = mm.anim || 'walk', im = feltImg(A.src + '_' + name); if (!im.complete || !im.naturalWidth) continue;
+      const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
+      const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sy = idle ? 1 + .02 * Math.sin(S.t * 4 + mm.home[0]) : 1, sz = A.F * k * sc, [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
+      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      if (mm.flash > 0) ctx.filter = 'brightness(3)';
+      ctx.drawImage(im, f * 256, 0, 256, 256, -sz / 2, -sz * 250 / 256, sz, sz); ctx.restore(); } }
+  const FELT_SHOT = { // code-drawn projectiles (rotated to the flight direction; +x = forward)
+    needle(g) { g.fillStyle = '#1e1e24'; g.fillRect(-5, -1, 10, 2); g.fillStyle = '#dfe2ea'; g.fillRect(-4, 0, 8, 1); g.fillStyle = '#9a9aa6'; g.fillRect(-9, 0, 3, 1); },
+    threadball(g, s) { g.fillStyle = '#28262a'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.fillStyle = '#c8c6be'; g.beginPath(); g.arc(0, 0, 3, 0, TAU); g.fill();
+      g.strokeStyle = '#7a7672'; g.lineWidth = 1; g.beginPath(); g.arc(0, 0, 2, s.t * 9, s.t * 9 + 2); g.stroke(); g.strokeStyle = '#bebab2'; g.beginPath(); g.moveTo(-4, 0);
+      for (let i = 1; i < 6; i++) g.lineTo(-4 - i * 2, Math.sin(s.t * 14 + i) * 1.5); g.stroke(); },
+    blade(g, s) { g.rotate(s.t * 18); g.fillStyle = '#3a1c10'; g.fillRect(-6, -2, 12, 4); g.fillRect(-2, -6, 4, 12); g.fillStyle = '#b05c30'; g.fillRect(-5, -1, 10, 2); g.fillRect(-1, -5, 2, 10); g.fillStyle = '#ecc890'; g.fillRect(-1, -1, 2, 2); },
+    pin(g) { g.fillStyle = '#1e1e24'; g.fillRect(-4, -1, 8, 2); g.fillStyle = '#d6dae0'; g.fillRect(-3, 0, 7, 1); g.fillStyle = '#c81e28'; g.fillRect(-6, -1, 3, 3); },
+    web(g, s) { g.fillStyle = 'rgba(235,235,240,.75)'; g.beginPath(); g.arc(0, 0, 4.5, 0, TAU); g.fill(); g.strokeStyle = '#8c8c98'; g.lineWidth = 1;
+      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 + s.t * 2; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * 4.5, Math.sin(a) * 4.5); g.stroke(); } },
+    venom(g) { g.fillStyle = '#14281a'; g.fillRect(-5, -1, 9, 2); g.fillStyle = '#96e65a'; g.fillRect(-4, 0, 8, 1); g.fillStyle = '#64c83c'; g.fillRect(-8, 0, 1, 1); g.fillRect(-11, 0, 1, 1); },
+    orb(g, s) { const r = 4 + Math.sin(s.t * 18) * .6; g.fillStyle = 'rgba(120,40,170,.35)'; g.beginPath(); g.arc(0, 0, r + 2.5, 0, TAU); g.fill();
+      g.fillStyle = '#9640d2'; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fill(); g.fillStyle = '#e6beff'; g.fillRect(-1, -2, 2, 2); },
+    stone(g, s) { g.rotate(s.t * 14); g.fillStyle = '#28261f'; g.beginPath(); g.moveTo(-4, -3); g.lineTo(5, 0); g.lineTo(-3, 4); g.closePath(); g.fill();
+      g.fillStyle = '#827e78'; g.beginPath(); g.moveTo(-3, -2); g.lineTo(4, 0); g.lineTo(-2, 3); g.closePath(); g.fill(); g.fillStyle = '#a05ac8'; g.fillRect(-1, 0, 2, 1); },
+  };
   function drawShot(g, s) { g.save(); g.translate(s.x, s.y); g.rotate(Math.atan2(s.vy, s.vx));
-    if (s.kind === 'shard') { g.fillStyle = '#8affb0'; g.beginPath(); g.moveTo(6, 0); g.lineTo(-4, -3); g.lineTo(-4, 3); g.fill(); g.fillStyle = '#e8fff0'; g.fillRect(-1, -1, 5, 2); }
+    if (FELT_SHOT[s.kind]) FELT_SHOT[s.kind](g, s);
+    else if (s.kind === 'shard') { g.fillStyle = '#8affb0'; g.beginPath(); g.moveTo(6, 0); g.lineTo(-4, -3); g.lineTo(-4, 3); g.fill(); g.fillStyle = '#e8fff0'; g.fillRect(-1, -1, 5, 2); }
     else { g.fillStyle = '#ffe070'; g.fillRect(-4, -1, 8, 2); g.fillStyle = '#3a2a10'; g.fillRect(3, -1, 2, 2); }
     g.restore(); }
-  function hazColor(h) { return ({ poison: [170, 80, 255], root: [120, 220, 80], crystal: [90, 255, 160], cage: [90, 255, 160], summon: [255, 220, 60], acorn: [255, 160, 60] })[h.kind] || [255, 60, 50]; }
+  function hazColor(h) { return ({ web: [225, 225, 240], poison: [170, 80, 255], root: [120, 220, 80], crystal: [90, 255, 160], cage: [90, 255, 160], summon: [255, 220, 60], acorn: [255, 160, 60] })[h.kind] || [255, 60, 50]; }
   function drawHazard(g, h, top) {
     if (h.shape === 'all') return;
     const [r, gg, b] = hazColor(h), warnP = Math.min(1, h.t / (h.warn || 1e-3)), live = h.t >= h.warn && h.t < h.warn + (h.act || 0);

@@ -1,0 +1,98 @@
+[
+{
+"id": "c1_01_silmamul",
+"name": "실마물 (Thread Crawler)",
+"w": 287,
+"h": 260,
+"foot": 236,
+"n": 12,
+"ticks": [
+6,
+3,
+3,
+2,
+3,
+3,
+3,
+3,
+2,
+3,
+4,
+6
+],
+"hit": 4,
+"pose": true
+},
+{
+"id": "c1_02_thread_puppet",
+"name": "실 꼭두각시 (Thread Puppet)",
+"w": 276,
+"h": 258,
+"foot": 234,
+"n": 12,
+"ticks": [
+6,
+3,
+3,
+2,
+3,
+3,
+3,
+3,
+2,
+3,
+4,
+6
+],
+"hit": 4,
+"pose": true
+},
+{
+"id": "c1_03_needle_spider",
+"name": "바늘 거미 (Needle Spiderling)",
+"w": 272,
+"h": 246,
+"foot": 222,
+"n": 12,
+"ticks": [
+6,
+3,
+3,
+2,
+3,
+3,
+3,
+3,
+2,
+3,
+4,
+6
+],
+"hit": 4,
+"pose": true
+},
+{
+"id": "c1_04_unrotting_hound",
+"name": "썩지 않는 들개 (Unrotting Hound)",
+"w": 281,
+"h": 201,
+"foot": 177,
+"n": 12,
+"ticks": [
+6,
+3,
+3,
+2,
+3,
+3,
+3,
+3,
+2,
+3,
+4,
+6
+],
+"hit": 4,
+"pose": true
+}
+]
