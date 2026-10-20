@@ -209,6 +209,34 @@
    -6
   ]
  },
+ "atk1_down": {
+  "scale": 0.967,
+  "offset": [
+   18,
+   3
+  ]
+ },
+ "atk1_downl": {
+  "scale": 0.967,
+  "offset": [
+   -8,
+   3
+  ]
+ },
+ "atk1_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "atk1_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
+  ]
+ },
  "atk2_right": {
   "scale": 1.0,
   "offset": [
@@ -223,6 +251,34 @@
    -6
   ]
  },
+ "atk2_down": {
+  "scale": 0.967,
+  "offset": [
+   18,
+   3
+  ]
+ },
+ "atk2_downl": {
+  "scale": 0.967,
+  "offset": [
+   -8,
+   3
+  ]
+ },
+ "atk2_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "atk2_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
+  ]
+ },
  "atk3_right": {
   "scale": 1.0,
   "offset": [
@@ -235,6 +291,34 @@
   "offset": [
    -2,
    -6
+  ]
+ },
+ "atk3_down": {
+  "scale": 0.967,
+  "offset": [
+   18,
+   3
+  ]
+ },
+ "atk3_downl": {
+  "scale": 0.967,
+  "offset": [
+   -8,
+   3
+  ]
+ },
+ "atk3_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "atk3_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
   ]
  }
 }

@@ -21,14 +21,14 @@ SRC={ # motion: {dir: (folder, frame filter or seq spec, ticks)}
 }
 AS=H+'/attack_src'; CL=json.load(open(AS+'/clips.json'))
 for k in [k for k in SRC if k.startswith('_atk_old_')]: del SRC[k]
-for m in ('atk1','atk2','atk3'): SRC[m]={d:(f'{AS}/{m}/{d}',None,CL[f'{m}_{d}']['ticks']) for d in ('right',)}   # owner 10-20: down/up attacks removed (side only; left = mirrored)
+for m in ('atk1','atk2','atk3'): SRC[m]={d:(f'{AS}/{m}/{d}',None,CL[f'{m}_{d}']['ticks']) for d in ('right','down','up')}   # down/up = diagonal art; mirrored copies -> downl/upl
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
     for d,(src,sel,ticks) in dd.items():
         fs=frames(src); sel=sel if sel is not None else list(range(len(fs)))
         assert len(sel)==len(ticks),(m,d,len(sel),len(ticks),len(fs))
-        for dn,flip in ((d,False),)+((('left',True),) if d=='right' else ()):
+        for dn,flip in ((d,False),)+((('left',True),) if d=='right' else (('downl',True),) if (d=='down' and m.startswith('atk')) else (('upl',True),) if (d=='up' and m.startswith('atk')) else ()):
             out=f'{H}/frames/{m}/{dn}'; shutil.rmtree(out,ignore_errors=True); os.makedirs(out)
             for i,k in enumerate(sel):
                 im=Image.open(fs[k]).convert('RGBA'); im=ImageOps.mirror(im) if flip else im; im.save(f'{out}/{i:03d}.png')
