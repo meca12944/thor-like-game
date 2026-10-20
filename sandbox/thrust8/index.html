@@ -25,7 +25,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div id="hud">이동 WASD/방향키 · 공격 J/Z · 대시 K/Shift · 달리기 L · 점프 Space/X · 스킬 U · 판정 H · 사망 P</div>
 <div id="aim">찌르기 방향: →</div>
 <button class="pc" id="pReset" type="button">적 다시 놓기</button>
-<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>방향키를 누른 채 공격 = 그 방향으로 찌르기 (8방향), 찌를 때마다 검기 레이저<br>↑ / ↓ 만 누르면 몸은 대각선 그대로, 검기만 위 / 아래로<br>두 키(↗ ↘ ↙ ↖) = 대각선 찌르기 · ← → = 옆 찌르기<br>대시 K · 달리기 L · 점프 Space · 스킬 U</div>
+<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>방향키를 누른 채 공격 = 그 방향으로 찌르기 (8방향), 3타는 얇은 검기 레이저<br>↑ / ↓ 만 누르면 몸은 대각선 그대로, 검기만 위 / 아래로<br>두 키(↗ ↘ ↙ ↖) = 대각선 찌르기 · ← → = 옆 찌르기<br>대시 K · 달리기 L · 점프 Space · 스킬 U</div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(40px + env(safe-area-inset-bottom,0px));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px))">대시</div>
@@ -49,14 +49,14 @@ const X0=-700,X1=1100,Y0=-420,Y1=420;
 // thrust combo: strike tick from the atlas (thr), cancel after the hold; long narrow hit box along the aim
 // skill-speed thrusts: attack clips play at ATK_SPEED (wind-up frames squeezed hardest), each strike fires a laser beam of length L
 const ATK_SPEED=0.5;
-const COMBO=[{cancel:.62,len:230,w:4,dmg:1,kb:6},{cancel:.62,len:270,w:5,dmg:1,kb:7},{cancel:1,len:380,w:8,dmg:2,kb:12}];  // cancel = share of the clip
+const COMBO=[{cancel:.62,r:150,arc:70,dmg:1,kb:6},{cancel:.62,r:155,arc:70,dmg:1,kb:7},{cancel:1,len:380,w:3,dmg:2,kb:12}];  // hits 1-2: lance trail + sector, hit 3: thin laser  // cancel = share of the clip
 const CHIT=[{push:10,stop:3,shake:1.5},{push:14,stop:4,shake:2.5},{push:24,stop:8,shake:5}];
 const HB_FWD=22,HERO_R=16,HERO_INV=60,HERO_KB=18,HITSTOP=6,HP_MAX=10;
 const JUMP_H=84,JUMP_T=15,JUMP_V=2*JUMP_H/JUMP_T,GRAV=JUMP_V/JUMP_T;
 const BLOCKS=[{x:200,y:-160,w:96,d:44,h:36}];
 function groundAt(x,y){let g=0;for(const b of BLOCKS)if(x>b.x-6&&x<b.x+b.w+6&&y>b.y-3&&y<b.y+b.d+3)g=Math.max(g,b.h);return g;}
 const P={x:0,y:0,face:'right',lastH:1,aim:[1,0],st:'idle',t:0,clip:null,combo:0,queued:false,run:false,dead:false,inv:0,white:0,kbx:0,kby:0,hitDone:false,hp:HP_MAX,deadT:0,z:0,vz:0,air:false,jv:0};
-let foes=[],showHB=false,stop=0,pops=[],SHAKE=0,FLASH=0,camX=0,camY=0;const WAVES=[],BEAMS=[],SPARKS=[];
+let foes=[],showHB=false,stop=0,pops=[],SHAKE=0,FLASH=0,camX=0,camY=0;const WAVES=[],BEAMS=[],SPARKS=[],CTR=[];
 const SFX={};['swing_light','swing_heavy','hit_light','hit_heavy','kill'].forEach(n=>{try{SFX[n]=new Audio('sfx/'+n+'.ogg')}catch(e){}});
 let audioOn=false;const snd=n=>{if(!audioOn||!SFX[n])return;try{const a=SFX[n].cloneNode();a.volume=.45;a.play().catch(()=>{})}catch(e){}};
 const K={};let joy={x:0,y:0};
@@ -149,8 +149,9 @@ function step(){
     if(P.st==='atk'){const C=COMBO[P.combo-1],H=CHIT[P.combo-1],tr=trailOf(),hit=tr.th.fast,v=norm(P.aim);
       if(P.t<hit-4)moveHero(v[0]*.6,v[1]*.6);if(P.t>=hit-4&&P.t<hit)moveHero(v[0]*H.push/4,v[1]*H.push/4);   // lunge along the aim
       if(!P.hitDone&&P.t>=hit){P.hitDone=true;const t2=trailOf();stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);
-        const d2=norm(t2.dir);BEAMS.push({x:t2.x,y:t2.y,dir:d2,t:0,n:P.combo,len:C.len,w:C.w});if(P.combo===3){FLASH=4;WAVES.push({x:t2.x+d2[0]*C.len,y:t2.y+d2[1]*C.len,t:0});}
-        hitBeam(t2.x,t2.y,d2,C,P.combo===3);}
+        const d2=norm(t2.dir);
+        if(P.combo===3){BEAMS.push({x:t2.x,y:t2.y,dir:d2,t:0,n:3,len:C.len,w:C.w});FLASH=4;WAVES.push({x:t2.x+d2[0]*C.len,y:t2.y+d2[1]*C.len,t:0});hitBeam(t2.x,t2.y,d2,C,true);}
+        else{CTR.push({x:t2.x,y:t2.y,dir:t2.dir,t:0,heavy:false,big:P.combo>1});const hd=P.aim[0]?d2:[0,P.aim[1]];hitFoes(P.x+hd[0]*HB_FWD,P.y-P.z-44+hd[1]*HB_FWD,hd,C,false);}}
       if(P.queued&&P.combo<3&&P.t>=Math.round(T*C.cancel)){P.queued=false;P.combo++;begin();return world();}}
     if(P.t>=T){if(P.st==='death'){P.t=T;if(++P.deadT>120){P.dead=false;P.hp=HP_MAX;P.deadT=0;P.inv=HERO_INV;start('idle','idle_'+art());}return world();}P.queued=false;start('idle','idle_'+art());}
   }
@@ -160,6 +161,7 @@ function moveHero(dx,dy){if(groundAt(P.x+dx,P.y)<=P.z+2)P.x+=dx;if(groundAt(P.x,
 function world(){
   foes.forEach(foeStep);for(const e of foes){e.x=Math.max(X0+20,Math.min(X1-20,e.x));e.y=Math.max(Y0,Math.min(Y1,e.y));}
   for(const p of pops)p.t++;pops=pops.filter(p=>p.t<40);
+  for(const f of CTR)f.t++;for(let i=CTR.length-1;i>=0;i--)if(CTR[i].t>=(CTR[i].big?16:12))CTR.splice(i,1);
   for(const b of BEAMS)b.t++;for(let i=BEAMS.length-1;i>=0;i--)if(BEAMS[i].t>=beamLife(BEAMS[i]))BEAMS.splice(i,1);
   for(const s of SPARKS){s.t++;s.x+=s.vx;s.y+=s.vy;s.vx*=.9;s.vy*=.9;}for(let i=SPARKS.length-1;i>=0;i--)if(SPARKS[i].t>14)SPARKS.splice(i,1);
   for(const w of WAVES)w.t++;for(let i=WAVES.length-1;i>=0;i--)if(WAVES[i].t>=16)WAVES.splice(i,1);
@@ -211,9 +213,11 @@ function draw(){
     const [s,c,,fl]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];const blink=P.inv>0&&P.st!=='hurt'&&!P.dead&&(Math.floor(P.inv/3)%2);
     if(!blink){ctx.save();ctx.translate(sx,sy);if(fl)ctx.scale(-1,1);if(P.white>0){ctx.filter='brightness(0) invert(1)';P.white--;}if(P.st==='dash')ctx.globalAlpha=.85;ctx.drawImage(SH[s],x,y,w,h,-ax,-ay,w,h);ctx.restore();}
     if(showHB){ctx.strokeStyle='rgba(120,200,255,.9)';ctx.beginPath();ctx.ellipse(sx,sy,HERO_R,HERO_R/1.4,0,0,7);ctx.stroke();
-      if(P.st==='atk'){const C=COMBO[P.combo-1],tr=trailOf(),d=norm(tr.dir),x=tr.x-cX,y=tr.y-cY;ctx.strokeStyle='rgba(255,230,80,.7)';ctx.lineWidth=2*(C.w+6);ctx.lineCap='round';ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+d[0]*C.len,y+d[1]*C.len);ctx.stroke();ctx.globalAlpha=1;}}}
+      if(P.st==='atk'&&P.combo<3){const C=COMBO[P.combo-1],tr=trailOf(),hd=P.aim[0]?norm(tr.dir):[0,P.aim[1]];hb(sx+hd[0]*HB_FWD,sy-44+hd[1]*HB_FWD,hd,C.r,C.arc,'rgba(255,230,80,.25)');}
+      else if(P.st==='atk'){const C=COMBO[P.combo-1],tr=trailOf(),d=norm(tr.dir),x=tr.x-cX,y=tr.y-cY;ctx.strokeStyle='rgba(255,230,80,.7)';ctx.lineWidth=2*(C.w+6);ctx.lineCap='round';ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+d[0]*C.len,y+d[1]*C.len);ctx.stroke();ctx.globalAlpha=1;}}}
   for(const en of ents)en.f();
   for(const w of WAVES){const a=1-w.t/16,r=(w.big?20:10)+w.t*(w.big?10:7);ctx.strokeStyle=`rgba(200,240,255,${.8*a})`;ctx.lineWidth=3*a+1;ctx.beginPath();ctx.ellipse(Math.round(w.x-cX),Math.round(w.y-cY),r,r*.45,0,0,7);ctx.stroke();}
+  for(const f of CTR)trailC(f.x-cX,f.y-cY,f);
   for(const b of BEAMS)drawBeam(b,cX,cY);
   ctx.fillStyle='#dff6ff';for(const s of SPARKS){ctx.globalAlpha=1-s.t/14;ctx.fillRect(Math.round(s.x-cX),Math.round(s.y-cY),2,2);}ctx.globalAlpha=1;
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
