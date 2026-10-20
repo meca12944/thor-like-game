@@ -73,6 +73,7 @@ function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.d
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
 function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
+  if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
   const moving=m>0.2;P.t++;
   if(P.st==='idle'||P.st==='move'){
     if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
@@ -82,12 +83,25 @@ function step(){
     const L=clip(P.clip),T=total(L);
     if(P.st==='jump'){P.x+=ix*(P.run?1.6:0.9);P.y+=iy*(P.run?1.6:0.9);}
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
-    if(P.st==='atk'){const lt=A.thrust[P.clip];if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0);if(P.t>tl-3&&P.t<=tl){P.x+=lt.dir[0]*1.6;P.y+=lt.dir[1]*1.6;}}   // small lunge along the thrust
+    if(P.st==='atk'){const lt=tmeta(P.clip);if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0),H=HIT[P.combo-1];if(P.t>tl-4&&P.t<=tl){P.x+=lt.dir[0]*H.push/4;P.y+=lt.dir[1]*H.push/4;}if(P.t===tl)strike(P.clip,P.combo-1);}   // lunge along the thrust, strike on the lunge frame
       const lt2=A.thrust[P.clip],tl2=lt2?L.slice(0,lt2.frame+1).reduce((s,e)=>s+e[2],0):T;
       if(P.queued&&P.combo<3&&P.t>=tl2){P.queued=false;P.combo++;start('atk','atk'+P.combo+'_'+atkDir());return;}}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+atkDir());}
   }
 }
+// hit feel (owner 10-20 "1번"): up/down attacks drive the trail straight up/down the screen (the art is diagonal), lunge along the input,
+// hit-stop + screen shake on the strike, shockwave + flash on the 3rd hit, training dummies that react.
+const VERT={down:1,downl:1,up:-1,upl:-1};
+function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return m;
+  const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
+const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
+const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
+let SHAKE=0,FLASH=0,WAVES=[];
+function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2)FLASH=4;
+  const [dx,dy]=m.dir,reach=(m.big?100:74),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
+  for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
+    for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
+      if(along>-20&&along<reach+10&&perp<26&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});}}}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
 function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
@@ -98,16 +112,25 @@ function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;i
   ctx.strokeStyle=`rgba(200,245,255,${.67*a})`;ctx.lineWidth=1;for(const[o,l]of(big?[[.9,.6],[-.9,.5],[1.6,.35],[-1.6,.3]]:[[.9,.55],[-.9,.45]])){const sx=cx+nx*o*W-dx*back*.6,sy=cy+ny*o*W-dy*back*.6,L=(back+ahead)*l;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+dx*L,sy+dy*L);ctx.stroke();}
   if(age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
 function draw(){
-  const camX=Math.round(P.x-VW/2),camY=Math.round(P.y-VH*0.55);
+  const shx=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0,shy=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0;SHAKE=SHAKE>0.3?SHAKE*0.82:0;
+  const camX=Math.round(P.x-VW/2)+shx,camY=Math.round(P.y-VH*0.55)+shy;
   for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
   const sx=Math.round(P.x-camX),sy0=Math.round(P.y-camY);let sy=sy0;
   if(P.st==='jump'){const T=total(clip(P.clip)),u=Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));sy-=Math.round(Math.sin(u*Math.PI)*30);}   // airborne arc in the middle of the clip
+  const drawDummy=D=>{const x=Math.round(D.x-camX),y=Math.round(D.y-camY);ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(x,y,14,4,0,0,7);ctx.fill();
+    const w=D.fl>0&&D.fl%2?'#fff':null;ctx.fillStyle=w||'#7a5230';ctx.fillRect(x-3,y-44,6,44);ctx.fillStyle=w||'#a8743f';ctx.fillRect(x-14,y-38,28,6);ctx.beginPath();ctx.arc(x,y-50,9,0,7);ctx.fillStyle=w||'#c9a06a';ctx.fill();
+    if(D.fl>0)D.fl--;D.x+=(D.hx-D.x)*0.06;D.y+=(D.hy-D.y)*0.06;
+    for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
+  for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
   castFx(false,sx,sy);
   const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
   castFx(true,sx,sy);
-  const m=A.thrust[P.clip];if(P.st==='atk'&&m){const tl=L.slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
+  for(const D of DUM)if(D.y>P.y)drawDummy(D);
+  for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
+  if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
+  const m=tmeta(P.clip);if(P.st==='atk'&&m){const tl=L.slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
