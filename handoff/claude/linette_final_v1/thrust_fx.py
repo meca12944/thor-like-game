@@ -13,6 +13,11 @@ for m in ('atk1','atk2','atk3'):
         ys,xs=np.nonzero(im); fv=np.array(f)/np.hypot(*f); proj=xs*fv[0]+ys*fv[1]; i=proj.argmax(); tip=np.array([xs[i],ys[i]],float)
         near=np.hypot(xs-tip[0],ys-tip[1])<34; P=np.stack([xs[near],ys[near]],1).astype(float); P-=P.mean(0)
         v=np.linalg.svd(P,full_matrices=False)[2][0]; v=v if v@fv>0 else -v
-        out[f'{m}_{d}']={'frame':LUNGE,'tip':[round(tip[0]-128,1),round(tip[1]-189,1)],'dir':[round(v[0],3),round(v[1],3)],'big':m=='atk3'}
+        rec={'frame':LUNGE,'tip':[round(float(tip[0])-128,1),round(float(tip[1])-189,1)],'dir':[round(float(v[0]),3),round(float(v[1]),3)],'big':m=='atk3'}
+        if m=='atk3':   # both needles: second tip = farthest point off the first needle's line (>=4px away), near the front
+            perp=np.abs((xs-tip[0])*v[1]-(ys-tip[1])*v[0]); cand=(perp>=4)&(proj>proj.max()-40)
+            if cand.any():
+                j=np.flatnonzero(cand)[proj[cand].argmax()]; rec['tip2']=[round(float(xs[j])-128,1),round(float(ys[j])-189,1)]
+        out[f'{m}_{d}']=rec
 A['thrust']=out; A['_doc']+=' thrust[<atk>_<dir>] = needle tip (relative to root) and direction at the full-lunge frame; the engine draws the trail.'
 json.dump(A,open(H+'/atlas/linette8.json','w'),separators=(',',':')); print(json.dumps(out)[:600])

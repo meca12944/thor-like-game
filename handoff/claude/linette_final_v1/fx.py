@@ -5,13 +5,18 @@ from PIL import Image,ImageDraw
 def lance(g,cx,cy,dx,dy,nx,ny,back,ahead,w,col):
     g.polygon([(cx-dx*back,cy-dy*back),(cx+nx*w/2,cy+ny*w/2),(cx+dx*ahead,cy+dy*ahead),(cx-nx*w/2,cy-ny*w/2)],fill=col)
 def draw_thrust(base,x,y,meta,age):
-    big=meta['big']; life=16 if big else 12
+    if meta.get('tip2'):   # finisher: two heavy lances, one per needle
+        _one(base,x,y,{**meta,'heavy':True},age); _one(base,x,y,{**meta,'tip':meta['tip2'],'heavy':True},age); return
+    _one(base,x,y,meta,age)
+def _one(base,x,y,meta,age):
+    big=meta['big']; heavy=meta.get('heavy'); life=20 if heavy else (16 if big else 12)
     if age<0 or age>=life: return
     grow=min(1,(age+1)/2); a=1-age/life; dx,dy=meta['dir']; nx,ny=-dy,dx
     tx,ty=x+meta['tip'][0],y+meta['tip'][1]
-    ahead=(70 if big else 52)*grow; back=(34 if big else 26); W=(12 if big else 9)
+    ahead=(92 if heavy else 70 if big else 52)*grow; back=(40 if heavy else 34 if big else 26); W=(16 if heavy else 12 if big else 9)
     cx,cy=tx+dx*ahead*0.35,ty+dy*ahead*0.35
     lay=Image.new('RGBA',base.size); g=ImageDraw.Draw(lay)
+    if heavy: lance(g,cx,cy,dx,dy,nx,ny,back+ahead*0.45,ahead*0.75,W*1.6,(60,150,255,int(80*a)))   # heavy outer glow
     lance(g,cx,cy,dx,dy,nx,ny,back+ahead*0.35,ahead*0.65,W,(90,210,255,int(120*a)))
     lance(g,cx,cy,dx,dy,nx,ny,back*0.8+ahead*0.3,ahead*0.6,W*0.45,(210,250,255,int(220*a)))
     lance(g,cx,cy,dx,dy,nx,ny,back*0.6+ahead*0.25,ahead*0.55,max(1.5,W*0.18),(255,255,255,int(255*a)))
