@@ -67,22 +67,50 @@ def frames_diag(v):
             c=Image.new('RGBA',(512,512));c.paste(im,(128,128));im=c
         out.append((im,t))
     return out
+def guard_side(a):
+    """gold crossguard = small gold blob farthest to the right (side view, facing right)"""
+    r,g,b=[a[...,i].astype(int) for i in range(3)];gold=(a[...,3]>0)&(r>150)&(g>80)&(b<110)&(r>g)
+    lab,n=ndimage.label(gold,structure=np.ones((3,3)));best=None
+    for i in range(1,n+1):
+        ys,xs=np.nonzero(lab==i)
+        if 3<=len(xs)<=60 and (best is None or xs.mean()>best[0]):best=(xs.mean(),ys.mean(),xs.max())
+    return best
+def side_blade_len():
+    # visible blade length in the side hit1 thrust (same sword, horizontal): longest light run right of its guard
+    e=A['anims']['hit1_right'][4];x,y,w,h,ax,ay=A['cells'][e[0]][e[1]];a=np.array(Image.open(G+A['sheets'][e[0]]).convert('RGBA').crop((x,y,x+w,y+h)))
+    gx,gy,gr=guard_side(a);row=light(a)[int(round(gy))-2:int(round(gy))+3].any(0);xs=np.nonzero(row[int(gr)+1:])[0]
+    run=0
+    for v in xs:
+        if v-run>3:break
+        run=v
+    return run
 def frames_side():
-    out=[]
-    for i,e in enumerate(A['anims']['hit3_right']):
-        x,y,w,h,ax,ay=A['cells'][e[0]][e[1]];sh=Image.open(G+A['sheets'][e[0]]).convert('RGBA');im=Image.new('RGBA',(256,256));im.paste(sh.crop((x,y,x+w,y+h)),(128-ax,189-ay))
+    out=[];BL=58;print('side blade length',BL)   # measured on the in-game frames (guard -> tip ~55-58 px)
+    SA=json.load(open(SRC+'/hero_sbx.json'))   # original (white-crescent) side frames = the sandbox atlas hit3_right
+    for i,e in enumerate(SA['anims']['hit3_right']):
+        x,y,w,h,ax,ay=SA['cells'][e[0]][e[1]];sh=Image.open(SRC+'/'+SA['sheets'][e[0]]).convert('RGBA');im=Image.new('RGBA',(256,256));im.paste(sh.crop((x,y,x+w,y+h)),(128-ax,189-ay))
         tr,cn=trail(im,150,2)
         if cn and i>=4:
-            a=np.array(im);m=np.array(tr)[...,3]>0;a[m]=0;body=a[...,3]>0;holes=ndimage.binary_fill_holes(body)&~body
+            a=np.array(im);m=np.array(tr)[...,3]>0;gd=guard_side(a)
+            corr=np.zeros(m.shape,bool)
+            if gd:  # keep the blade: band along the guard row out to the blade length
+                gx,gy,gr=gd;y0=int(round(gy));corr[y0-2:y0+3,int(gr)+1:int(gr)+1+BL+2]=True
+            m&=~corr;cres=np.zeros_like(a);cres[m]=a[m];a[m]=0
+            body=a[...,3]>0;holes=ndimage.binary_fill_holes(body)&~body
             if holes.any():
                 idx=ndimage.distance_transform_edt(~body,return_distances=False,return_indices=True);a[holes]=a[idx[0][holes],idx[1][holes]]
-            im,k,tp=place(Image.fromarray(a),tr,(1,0));print('side',i,'tip',tp,'push',k)
+            # left-over white speed lines (outside the blade band) -> same sky blue, in place
+            r_,g_,b_=[a[...,k].astype(int) for k in range(3)];wl=(a[...,3]>0)&(np.minimum(np.minimum(r_,g_),b_)>195)&~corr
+            body_core=ndimage.binary_erosion(a[...,3]>0,iterations=3);wl&=~body_core
+            if wl.any():
+                t=np.array(tint(Image.fromarray(np.where(wl[...,None],a,0).astype(np.uint8))));a[wl]=t[wl]
+            im,k,tp=place(Image.fromarray(a),Image.fromarray(cres),(1,0));print('side',i,'tip',tp,'push',k)
         else:
             c=Image.new('RGBA',(512,512));c.paste(im,(128,128));im=c
         out.append((im,e[2]))
     return out
 if __name__=='__main__':
-    src=sys.argv[1];d=json.load(open(src+'/hero_sbx.json'))
+    src=sys.argv[1];SRC=src;d=json.load(open(src+'/hero_sbx.json'))
     if 'hero_sbx_h3s.webp' in d['sheets']:
         i=d['sheets'].index('hero_sbx_h3s.webp');d['sheets'].pop(i);d['cells'].pop(i)
     for k in [k for k in d['anims'] if k.startswith('hit3s_')]:del d['anims'][k]
