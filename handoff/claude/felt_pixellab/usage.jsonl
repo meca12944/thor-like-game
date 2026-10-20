@@ -62,3 +62,9 @@
 {"t": "2026-10-20 15:23:09", "name": "p_bench_s202", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 15:24:14", "name": "bld_atelier2_s202", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 15:24:17", "name": "bld_atelier2_s101", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:34:43", "name": "plaza:pz_statue_s402", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:34:45", "name": "plaza:pz_fountain_s402", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:34:55", "name": "plaza:pz_fountain_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:35:04", "name": "plaza:pz_statue_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:35:07", "name": "plaza:pz_stall_a_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 15:35:20", "name": "plaza:pz_stall_a_s402", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
