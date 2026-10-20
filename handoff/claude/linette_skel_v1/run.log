@@ -257,3 +257,12 @@
 2026-10-20 11:25:44 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/009.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-20 11:28:51 animate rjump_east east seed 73 usage {"type": "generations", "generations": 3.0}
 2026-10-20 11:44:36 animate rjump_east_v2 east seed 73 usage {"type": "generations", "generations": 3.0}
+2026-10-20 12:20:45 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/000.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:20:49 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/001.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:20:51 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/002.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:20:55 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/003.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:20:57 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/004.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:20:59 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/005.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:21:03 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/006.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:21:05 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/idle_before/right/007.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 12:25:57 animate idle_east_facefix east seed 73 usage {"type": "generations", "generations": 3.0}

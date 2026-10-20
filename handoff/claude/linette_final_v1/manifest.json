@@ -11,10 +11,12 @@
      7,
      7,
      7,
+     7,
+     7,
      7
     ],
     "lunge": null,
-    "src": "linette_moves_v1/idle/east",
+    "src": "linette_skel_v1/idle_east_facefix",
     "pick": [
      0,
      1,
@@ -22,8 +24,10 @@
      3,
      4,
      5,
-     6,
-     7
+     4,
+     3,
+     2,
+     1
     ]
    },
    "left": {
@@ -35,10 +39,12 @@
      7,
      7,
      7,
+     7,
+     7,
      7
     ],
     "lunge": null,
-    "src": "linette_moves_v1/idle/east (mirrored)",
+    "src": "linette_skel_v1/idle_east_facefix (mirrored)",
     "pick": [
      0,
      1,
@@ -46,8 +52,10 @@
      3,
      4,
      5,
-     6,
-     7
+     4,
+     3,
+     2,
+     1
     ]
    },
    "down": {

@@ -34,6 +34,7 @@ for _m in ('idle','walk','run','dash'):   # owner 10-20: diagonal idle/walk/run/
 SRC['jump']={'right':(f'{SK}/jump_east',None,json.load(open(f'{SK}/jump_east.ticks.json'))),   # owner 10-20: jump from the hero's jump (skeleton), side + diagonal
              'down':(f'{SK}/jump_south-east_diag',None,json.load(open(f'{SK}/jump_south-east_diag.ticks.json'))),
              'up':(f'{SK}/jump_north-east_diag',None,json.load(open(f'{SK}/jump_north-east_diag.ticks.json')))}
+SRC['idle']['right']=(f'{SK}/idle_east_facefix',[0,1,2,3,4,5,4,3,2,1],[7]*10)   # owner 10-20: side idle redrawn by PixelLab from the face-fixed frame (visible eye/nose/chin); frames 6-7 swing the needles -> ping-pong 0-5
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}

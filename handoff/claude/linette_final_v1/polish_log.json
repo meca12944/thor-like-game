@@ -2,15 +2,15 @@
  "idle_right": {
   "scale": 1.0,
   "offset": [
-   2,
-   -6
+   0,
+   0
   ]
  },
  "idle_left": {
   "scale": 1.0,
   "offset": [
-   -2,
-   -6
+   0,
+   0
   ]
  },
  "idle_down": {
