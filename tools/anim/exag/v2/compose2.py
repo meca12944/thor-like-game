@@ -10,17 +10,17 @@ def gen_seq(d,T,loop):  # interleaved key/mid frames from one job dir, ticks spl
             m=L(f'{d}/{g[k]}');k+=1;fr+=[(e,(t+1)//2)]+([(m,t//2)] if t//2 else []);src+=[i]+([None] if t//2 else [])
         else: fr.append((e,t));src.append(i)
     return fr,src
+sys.path.insert(0,'fix');from uptrail import crescent,stages,body_center
 def up_attack(h):
-    fr,src=gen_seq({'hit1':'fix/hit1_up2','hit2':'fix/hit2_up2','hit3':'fix/hit3_up3'}[h],man[f'{h}_up'],False);out=[]
+    fr,src=gen_seq(f'fix/{h}_up4',man[f'{h}_up'],False);out=[]
+    tk=[i for i in range(len(man[f'{h}_down'])) if trail(L(f'all/{h}_down/k{i}.png'),420)[1]]
+    st=dict(zip(tk,stages(len(tk))))
     for (im,t),k in zip(fr,src):
         a=np.array(im);old,c=trail(im,420)
         if c: a[np.array(old)[...,3]>0]=0
         body=Image.fromarray(a,'RGBA')
-        if k is not None:
-            tr,c=trail(L(f'all/{h}_down/k{k}.png'),420)
-            if c:  # down crescent seen from behind: mirror, flip to the far (upper) side, drawn behind the body
-                tr=tr.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.FLIP_TOP_BOTTOM).transform((256,256),Image.AFFINE,(1,0,0,0,1,256-2*128))
-                base=Image.new('RGBA',(256,256));base.alpha_composite(tr);base.alpha_composite(body);body=base
+        if k in st:  # crescent only on the far side of the body, behind it
+            base=crescent(h,body_center(body),*st[k]);base.alpha_composite(body);body=base
         out.append((body,t))
     return out
 PUSH={'right':(-1,0),'left':(1,0),'down':(0,-1),'up':(0,1)}
