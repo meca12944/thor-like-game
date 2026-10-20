@@ -1,0 +1,378 @@
+[
+{
+"id": "a1_06_forest_slime",
+"name": "숲 슬라임 (Forest Slime)",
+"kind": "blob",
+"w": 163,
+"h": 169,
+"n": 8
+},
+{
+"id": "a1_07_acorn_squirrel",
+"name": "도토리 다람쥐 (Acorn Squirrel)",
+"kind": "breathe",
+"w": 159,
+"h": 180,
+"n": 8
+},
+{
+"id": "a1_08_spirit_sprout",
+"name": "나무 정령 새싹 (Tree Spirit Sprout)",
+"kind": "sway",
+"w": 140,
+"h": 196,
+"n": 8
+},
+{
+"id": "a2_06_glow_worm",
+"name": "반딧불 지렁이 (Glow Worm)",
+"kind": "breathe",
+"w": 179,
+"h": 175,
+"n": 8
+},
+{
+"id": "a2_07_cave_mole",
+"name": "동굴 두더지 (Cave Mole)",
+"kind": "breathe",
+"w": 189,
+"h": 181,
+"n": 8
+},
+{
+"id": "a2_08_crystal_slime",
+"name": "수정 슬라임 (Crystal Slime)",
+"kind": "blob",
+"w": 167,
+"h": 167,
+"n": 8
+},
+{
+"id": "a3_03_sand_viper",
+"name": "모래 독사 (Sand Viper)",
+"kind": "breathe",
+"w": 179,
+"h": 216,
+"n": 8
+},
+{
+"id": "a3_04_bald_vulture",
+"name": "대머리 독수리 (Bald Vulture)",
+"kind": "breathe",
+"w": 191,
+"h": 187,
+"n": 8
+},
+{
+"id": "a3_05_desert_bandit",
+"name": "사막 도적 (Desert Bandit)",
+"kind": "breathe",
+"w": 177,
+"h": 224,
+"n": 8
+},
+{
+"id": "a3_06_sand_spirit",
+"name": "모래 정령 (Sand Spirit)",
+"kind": "float",
+"w": 203,
+"h": 225,
+"n": 8
+},
+{
+"id": "a3_07_camel_tortoise",
+"name": "낙타 거북 (Camel Tortoise)",
+"kind": "breathe",
+"w": 215,
+"h": 204,
+"n": 8
+},
+{
+"id": "a3_08_antlion",
+"name": "개미귀신 (Antlion)",
+"kind": "breathe",
+"w": 209,
+"h": 222,
+"n": 8
+},
+{
+"id": "a4_02_scarab_swarm",
+"name": "스카라베 떼 (Scarab Swarm)",
+"kind": "breathe",
+"w": 194,
+"h": 172,
+"n": 8
+},
+{
+"id": "a4_03_anubis_guard",
+"name": "아누비스 경비병 (Anubis Guard)",
+"kind": "breathe",
+"w": 147,
+"h": 268,
+"n": 8
+},
+{
+"id": "a4_04_cursed_jar",
+"name": "저주 항아리 (Cursed Jar)",
+"kind": "still",
+"w": 173,
+"h": 210,
+"n": 8
+},
+{
+"id": "a4_05_serpent_statue",
+"name": "뱀 머리 석상 (Serpent-Head Statue)",
+"kind": "still",
+"w": 188,
+"h": 257,
+"n": 8
+},
+{
+"id": "a4_06_ghost_cat",
+"name": "고양이 망령 (Ghost Cat)",
+"kind": "float",
+"w": 150,
+"h": 218,
+"n": 8
+},
+{
+"id": "a4_07_slab_golem",
+"name": "함정 석판 골렘 (Trap Slab Golem)",
+"kind": "still",
+"w": 189,
+"h": 247,
+"n": 8
+},
+{
+"id": "a4_08_sand_skeleton_archer",
+"name": "모래 해골 궁수 (Sand Skeleton Archer)",
+"kind": "breathe",
+"w": 191,
+"h": 210,
+"n": 8
+},
+{
+"id": "a5_02_jellyfish",
+"name": "해파리 (Jellyfish)",
+"kind": "float",
+"w": 160,
+"h": 202,
+"n": 8
+},
+{
+"id": "a5_03_spiny_puffer",
+"name": "가시 복어 (Spiny Puffer)",
+"kind": "blob",
+"w": 172,
+"h": 163,
+"n": 8
+},
+{
+"id": "a5_04_shark_trooper",
+"name": "상어 돌격병 (Shark Trooper)",
+"kind": "breathe",
+"w": 204,
+"h": 226,
+"n": 8
+},
+{
+"id": "a5_05_octopus_inker",
+"name": "문어 먹물병 (Octopus Inker)",
+"kind": "breathe",
+"w": 185,
+"h": 215,
+"n": 8
+},
+{
+"id": "a5_06_electric_eel",
+"name": "전기 뱀장어 (Electric Eel)",
+"kind": "breathe",
+"w": 179,
+"h": 167,
+"n": 8
+},
+{
+"id": "a5_07_anglerfish",
+"name": "아귀 (Anglerfish)",
+"kind": "breathe",
+"w": 197,
+"h": 175,
+"n": 8
+},
+{
+"id": "a5_08_hermit_crab",
+"name": "소라게 (Hermit Crab)",
+"kind": "breathe",
+"w": 180,
+"h": 174,
+"n": 8
+},
+{
+"id": "a6_02_seagull",
+"name": "갈매기 (Seagull)",
+"kind": "breathe",
+"w": 173,
+"h": 166,
+"n": 8
+},
+{
+"id": "a6_03_pirate_skeleton",
+"name": "해적 해골 (Pirate Skeleton)",
+"kind": "breathe",
+"w": 189,
+"h": 225,
+"n": 8
+},
+{
+"id": "a6_04_barnacle_golem",
+"name": "따개비 골렘 (Barnacle Golem)",
+"kind": "still",
+"w": 209,
+"h": 233,
+"n": 8
+},
+{
+"id": "a6_05_turtle_shieldbearer",
+"name": "바다 거북 방패병 (Sea Turtle Shieldbearer)",
+"kind": "breathe",
+"w": 188,
+"h": 214,
+"n": 8
+},
+{
+"id": "a6_06_wave_spirit",
+"name": "파도 정령 (Wave Spirit)",
+"kind": "float",
+"w": 179,
+"h": 190,
+"n": 8
+},
+{
+"id": "a6_07_starfish",
+"name": "불가사리 (Starfish)",
+"kind": "breathe",
+"w": 159,
+"h": 153,
+"n": 8
+},
+{
+"id": "a6_08_pirate_parrot",
+"name": "해적 앵무새 (Pirate Parrot)",
+"kind": "breathe",
+"w": 165,
+"h": 183,
+"n": 8
+},
+{
+"id": "a7_07_flame_hound",
+"name": "화염 사냥개 (Flame Hound)",
+"kind": "breathe",
+"w": 193,
+"h": 193,
+"n": 8
+},
+{
+"id": "a7_08_obsidian_archer",
+"name": "흑요석 궁수 (Obsidian Archer)",
+"kind": "breathe",
+"w": 180,
+"h": 219,
+"n": 8
+},
+{
+"id": "a8_06_thundercloud_bird",
+"name": "뇌운 새 (Thundercloud Bird)",
+"kind": "float",
+"w": 201,
+"h": 212,
+"n": 8
+},
+{
+"id": "a8_07_ice_turtle",
+"name": "얼음 거북 (Ice Turtle)",
+"kind": "breathe",
+"w": 193,
+"h": 172,
+"n": 8
+},
+{
+"id": "a8_08_storm_gargoyle",
+"name": "폭풍 가고일 (Storm Gargoyle)",
+"kind": "breathe",
+"w": 206,
+"h": 228,
+"n": 8
+},
+{
+"id": "a9_05_shadow_assassin",
+"name": "그림자 암살자 (Shadow Assassin)",
+"kind": "breathe",
+"w": 199,
+"h": 211,
+"n": 8
+},
+{
+"id": "a9_06_void_eye",
+"name": "공허 눈알 (Void Eye)",
+"kind": "float",
+"w": 165,
+"h": 205,
+"n": 8
+},
+{
+"id": "a9_07_gargoyle_statue",
+"name": "가고일 석상 (Gargoyle Statue)",
+"kind": "still",
+"w": 177,
+"h": 273,
+"n": 8
+},
+{
+"id": "a9_08_cursed_doll",
+"name": "저주 인형 (Cursed Doll)",
+"kind": "breathe",
+"w": 177,
+"h": 231,
+"n": 8
+},
+{
+"id": "field_mushroom",
+"name": "독버섯 (Poison Mushroom)",
+"kind": "sway",
+"w": 240,
+"h": 297,
+"n": 8
+},
+{
+"id": "field_horned_rabbit",
+"name": "뿔토끼 (Horned Rabbit)",
+"kind": "breathe",
+"w": 224,
+"h": 338,
+"n": 8
+},
+{
+"id": "field_wasp",
+"name": "말벌 (Wasp)",
+"kind": "float",
+"w": 306,
+"h": 300,
+"n": 8
+},
+{
+"id": "field_boar",
+"name": "멧돼지 (Boar)",
+"kind": "breathe",
+"w": 226,
+"h": 213,
+"n": 8
+},
+{
+"id": "field_scarecrow",
+"name": "호박 허수아비 (Pumpkin Scarecrow)",
+"kind": "breathe",
+"w": 267,
+"h": 366,
+"n": 8
+}
+]
