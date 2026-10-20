@@ -92,9 +92,9 @@ function step(){
 // hit feel (owner 10-20 "1번"): up/down attacks drive the trail straight up/down the screen (the art is diagonal), lunge along the input,
 // hit-stop + screen shake on the strike, shockwave + flash on the 3rd hit, training dummies that react.
 const VERT={down:1,downl:1,up:-1,upl:-1};
-function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return {...m,dir:[d==='left'?-1:1,0]};   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
+function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return STILL?{...m,dir:[d==='left'?-1:1,0],tip:[m.tip[0]*0.4,m.tip[1]],tip2:m.tip2?[m.tip2[0]*0.4,m.tip2[1]]:null}:{...m,dir:[d==='left'?-1:1,0]};   // STILL: trail starts at the body front   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
   const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
-// owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게": STILL = no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
+// owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게" + "동작 모션 없이": STILL = no attack pose (stays in idle), no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
 const STILL=true,FLY=7;
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
@@ -113,7 +113,7 @@ function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;i
   lance(cx,cy,dx,dy,nx,ny,back*.6+ahead*.25,ahead*.55,Math.max(1.5,W*.18),`rgba(255,255,255,${a})`);
   ctx.strokeStyle=`rgba(200,245,255,${.67*a})`;ctx.lineWidth=1;for(const[o,l]of(big?[[.9,.6],[-.9,.5],[1.6,.35],[-1.6,.3]]:[[.9,.55],[-.9,.45]])){const sx=cx+nx*o*W-dx*back*.6,sy=cy+ny*o*W-dy*back*.6,L=(back+ahead)*l;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+dx*L,sy+dy*L);ctx.stroke();}
   if(!STILL&&age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
-function draw(){
+function draw(){   // STILL: during attacks she keeps the idle pose (no attack frames drawn)
   const shx=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0,shy=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0;SHAKE=SHAKE>0.3?SHAKE*0.82:0;
   const camX=Math.round(P.x-VW/2)+shx,camY=Math.round(P.y-VH*0.55)+shy;
   for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
@@ -126,13 +126,13 @@ function draw(){
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
   castFx(false,sx,sy);
-  const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
+  const still=STILL&&P.st==='atk',L=still?clip('idle_'+atkDir()):clip(P.clip);const e=frameAt(L,still?P.gt:P.t,still||P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
   castFx(true,sx,sy);
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
-  const m=tmeta(P.clip);if(P.st==='atk'&&m){const tl=L.slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
+  const m=tmeta(P.clip);if(P.st==='atk'&&m){const tl=clip(P.clip).slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
