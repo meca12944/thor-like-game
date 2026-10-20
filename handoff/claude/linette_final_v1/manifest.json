@@ -204,7 +204,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_east",
+    "src": "linette_skel_v1/walk_east_face",
     "pick": [
      0,
      1,
@@ -236,7 +236,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_east (mirrored)",
+    "src": "linette_skel_v1/walk_east_face (mirrored)",
     "pick": [
      0,
      1,
@@ -268,9 +268,9 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south-east_sidearms",
+    "src": "linette_skel_v1/walk_south-east_face",
     "pick": [
-     11,
+     0,
      1,
      2,
      3,
@@ -300,9 +300,9 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south-east_sidearms (mirrored)",
+    "src": "linette_skel_v1/walk_south-east_face (mirrored)",
     "pick": [
-     11,
+     0,
      1,
      2,
      3,

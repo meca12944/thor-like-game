@@ -39,6 +39,8 @@ SRC['atk2']['right']=(f'{SK}/atk2_east_face',None,CL['atk2_right']['ticks'])   #
 SRC['atk3']['right']=(f'{SK}/atk3_east_face',list(range(9))+[7,6,5,4,0],CL['atk3_right']['ticks'])
 for _m,_pick in (('idle',None),('walk',[11]+list(range(1,12))),('run',None)):   # owner 10-20: down-diagonal arms like the side clips (skeleton arms from side; walk frame 0 kept the old spread arms -> replaced)
     SRC[_m]['down']=(f'{SK}/{_m}_south-east_sidearms',_pick,SRC[_m]['down'][2])
+SRC['walk']['right']=(f'{SK}/walk_east_face',None,[4]*12)   # owner 10-20 "걸을때 얼굴 이상": walks redrawn by PixelLab skeleton from the new face (side from the new idle, diagonal from the new diagonal idle)
+SRC['walk']['down']=(f'{SK}/walk_south-east_face',None,SRC['walk']['down'][2])
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}

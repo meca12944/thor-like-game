@@ -44,29 +44,29 @@
  "walk_right": {
   "scale": 1.0,
   "offset": [
-   2,
-   -2
+   0,
+   -1
   ]
  },
  "walk_left": {
   "scale": 1.0,
   "offset": [
-   -2,
-   -2
+   0,
+   -1
   ]
  },
  "walk_down": {
-  "scale": 1.092,
+  "scale": 1.044,
   "offset": [
-   -9,
-   -15
+   -8,
+   -11
   ]
  },
  "walk_downl": {
-  "scale": 1.092,
+  "scale": 1.044,
   "offset": [
-   -13,
-   -15
+   -2,
+   -11
   ]
  },
  "walk_up": {
