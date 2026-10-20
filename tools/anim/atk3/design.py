@@ -58,7 +58,7 @@ H3=[H2[-1],
  dict(dx=38,dy=14,lean=38,Ra=[55,40],La=[52,38],Rf=52,Lf=14,sw=40),                   # blade buried low front
  dict(dx=38,dy=14,lean=38,Ra=[54,39],La=[51,37],Rf=52,Lf=14,sw=38)]
 # frames per segment: wind-up slow, swing fast, hold long (<=20 skeletons per hit)
-SEG={'h1':[5,3,2,2,2],'h2':[4,3,2,2,2],'h3':[5,3,2,2,3]}
+SEG={'h1':[5,3,2,2,2],'h2':[4,3,2,2,2],'h3':[5,3,2,2,2]}   # PixelLab takes at most 15 skeletons per job
 OUT={}
 for n,K in (('h1',H1),('h2',H2),('h3',H3)):
     fr=[]
