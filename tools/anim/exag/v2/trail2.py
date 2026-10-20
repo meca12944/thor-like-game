@@ -4,7 +4,7 @@ from PIL import Image,ImageDraw
 # (start deg, end deg, radius, thickness, y squash) ; image angles: 0 = +x, 90 = down
 SW={'right':{'hit1':(-75,70,58,14,0.85),'hit2':(70,-75,58,14,0.85),'hit3':(-105,105,72,20,0.85)},
     'down': {'hit1':(25,155,58,14,0.62),'hit2':(155,25,58,14,0.62),'hit3':(10,170,72,20,0.62)},
-    'up':   {'hit1':(335,205,58,14,0.62),'hit2':(205,335,58,14,0.62),'hit3':(190,350,72,20,0.62)}}
+    'up':   {'hit1':(335,205,58,22,0.62),'hit2':(205,335,58,22,0.62),'hit3':(190,350,72,28,0.62)}}
 OFF={'right':(14,44),'down':(0,48),'up':(0,38)}
 def crescent(dr,h,box,u0,u1):
     a0,a1,R,T,sq=SW[dr][h];x0,y0,x1,y1=box;cx=(x0+x1)/2+OFF[dr][0];cy=y0+OFF[dr][1]

@@ -28,18 +28,21 @@ def retrail(n,seq,src):
         a=np.array(im);old,c=trail(im,420)
         if c: a[np.array(old)[...,3]>0]=0
         body=Image.fromarray(a,'RGBA')
+        p=trail3.pivot(body);tp=trail3.tip(body)
+        ang=math.degrees(math.atan2(tp[1]-p[1],tp[0]-p[0])) if tp else None
+        if ang is not None and prev is not None:
+            dlt=(ang-prev+540)%360-180
+            if abs(dlt)>4: sgn=1 if dlt>0 else -1
         if dr=='up':
-            if k in st: cr=crescent(dr,h,body_box(body),*st[k]);cr.alpha_composite(body);body=cr
-        else:
-            p=trail3.pivot(body);tp=trail3.tip(body)
-            ang=math.degrees(math.atan2(tp[1]-p[1],tp[0]-p[0])) if tp else None
-            if ang is not None and prev is not None:
-                dlt=(ang-prev+540)%360-180
-                if abs(dlt)>4: sgn=1 if dlt>0 else -1
-            if cur is not None and lo<=cur<=hi+1 and ang is not None and sgn:
-                span=SPAN[min(on,len(SPAN)-1)] if cur<=hi else 60;on+=1
-                body.alpha_composite(trail3.arc(p,tp[2],ang,sgn,span,T=18 if h=='hit3' else 13))
-            if ang is not None: prev=ang
+            if k in st:
+                if ang is not None and sgn and ang<0:  # blade visible on the far side: follow its tip, behind the body
+                    cr=trail3.arc(p,tp[2],ang,sgn,SPAN[min(on,len(SPAN)-1)],sq=0.75);on+=1
+                else: cr=crescent(dr,h,body_box(body),*st[k])
+                cr.alpha_composite(body);body=cr
+        elif cur is not None and lo<=cur<=hi+1 and ang is not None and sgn:
+            span=SPAN[min(on,len(SPAN)-1)] if cur<=hi else 60;on+=1
+            body.alpha_composite(trail3.arc(p,tp[2],ang,sgn,span))
+        if ang is not None: prev=ang
         out.append((body,t))
     return out
 def up_attack(h):

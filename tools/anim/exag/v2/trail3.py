@@ -15,10 +15,11 @@ def tip(im):
         d=np.hypot(xs-px,ys-py);j=d.argmax()
         if best is None or d[j]>best[2]: best=(xs[j],ys[j],d[j])
     return best
-def arc(center,R,a_tip,sgn,span,lead=12,T=13):
+def arc(center,R,a_tip,sgn,span,lead=35,T=None,sq=1.0):
+    T=T or 0.34*R
     cx,cy=center;a0=a_tip-sgn*span;a1=a_tip+sgn*lead;us=[i/40 for i in range(41)]
-    ang=lambda u:math.radians(a0+(a1-a0)*u);th=lambda u:T*math.sin(math.pi*u)**0.7
+    ang=lambda u:math.radians(a0+(a1-a0)*u);th=lambda u:T*math.sin(math.pi*u)**0.55  # fat moon crescent, tapered tips
     im=Image.new('RGBA',(256,256));d=ImageDraw.Draw(im)
-    outer=[(cx+(R+3)*math.cos(ang(u)),cy+(R+3)*math.sin(ang(u))) for u in us]
-    inner=[(cx+(R+3-th(u))*math.cos(ang(u)),cy+(R+3-th(u))*math.sin(ang(u))) for u in reversed(us)]
+    outer=[(cx+(R+6)*math.cos(ang(u)),cy+(R+6)*sq*math.sin(ang(u))) for u in us]
+    inner=[(cx+(R+6-th(u))*math.cos(ang(u)),cy+(R+6-th(u))*sq*math.sin(ang(u))) for u in reversed(us)]
     d.polygon(outer+inner,fill=(238,238,252,255),outline=(196,196,232,255));return im
