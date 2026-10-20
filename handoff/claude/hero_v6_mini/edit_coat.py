@@ -8,7 +8,7 @@ DESC = ('Shorten the long navy coat into a waist-length fitted jacket that ends 
         'Below the belt show black fitted trousers, steel knee guards and the same brown knee boots. Keep everything else exactly the same: '
         'face, messy short black hair, gold pauldrons, gold trim on the jacket, belts and pouch, gloves, the sword in the right hand, pose, size and position.')
 body = {'method': 'edit_with_text', 'description': DESC, 'image_size': {'width': 256, 'height': 256}, 'no_background': True, 'seed': 77,
-        'edit_images': [{'type': 'base64', 'base64': pl.b64(os.path.join(SRC, f'{d}.png')), 'format': 'png'} for d in DIRS]}
+        'edit_images': [{'image': {'type': 'base64', 'base64': pl.b64(os.path.join(SRC, f'{d}.png')), 'format': 'png'}, 'width': 256, 'height': 256} for d in DIRS]}
 r = pl.submit('/edit-images-v2', body); print({k: (str(v)[:300]) for k, v in r.items() if k != 'last_response'})
 if not r.get('background_job_id'): sys.exit(1)
 j = pl.wait(r['background_job_id'], every=6); rec = pl.log('edit_nocoat_' + '+'.join(DIRS), '/edit-images-v2', j); print(rec)

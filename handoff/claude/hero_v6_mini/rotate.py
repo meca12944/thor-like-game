@@ -2,12 +2,12 @@
 import os, sys, json, base64
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import pl
 D = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(D, 'rot'); os.makedirs(OUT, exist_ok=True)
-DESC = ('young adult swordsman, messy short black hair, tired dark eyes, high-collared dark navy long coat with thin gold embroidery, '
+DESC = ('young adult swordsman, messy short black hair, tired dark eyes, high-collared dark navy waist-length fitted jacket with thin gold trim ending at the hips, no coat tails, '
         'gold ornate pauldrons on both shoulders, brown leather belts and a pouch, black fingerless gloves and bracers, black trousers, '
         'steel knee guards, brown leather knee boots, a long steel sword held lowered in the right hand. Same character, same colours and '
         'same proportions as the reference in every direction.')
 seed = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-body = {'description': DESC, 'reference_image': {'type': 'base64', 'base64': pl.b64(os.path.join(D, 'ref', 'south_ref_256.png')), 'format': 'png'},
+body = {'description': DESC, 'reference_image': {'type': 'base64', 'base64': pl.b64(os.path.join(D, 'ref', os.environ.get('HERO_REF', 'south_ref_256.png'))), 'format': 'png'},
         'n_directions': 8, 'view': 'low top-down', 'seed': seed, 'no_background': True, 'name': 'hero_v6'}
 r = pl.submit('/create-character-v3', body); print({k: v for k, v in r.items() if k != 'last_response'})
 j = pl.wait(r['background_job_id'], every=6); rec = pl.log(f'rotate_s{seed}', '/create-character-v3', j); print(rec)

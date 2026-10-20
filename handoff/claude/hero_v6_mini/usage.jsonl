@@ -5,3 +5,6 @@
 {"t": "2026-10-20 16:29:16", "name": "px_south", "endpoint": "/image-to-pixelart-pro", "status": "completed", "usage": {"type": "generations", "generations": 20.0}, "n": 20.0}
 {"t": "2026-10-20 16:33:08", "name": "rotate_s1", "endpoint": "/create-character-v3", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
 {"t": "2026-10-20 16:39:41", "name": "rotate_s2", "endpoint": "/create-character-v3", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-20 16:44:33", "name": "pixen_nocoat_s12", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 16:45:01", "name": "pixen_nocoat_s11", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-20 16:45:01", "name": "run_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
