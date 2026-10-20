@@ -18,7 +18,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
 <div class="btn" id="bRun" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom))">달리기</div>
-<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom))">스킬</div>
+<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom));font-size:12px">스킬</div>
 <div class="btn small" id="bHurt" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">피격</div>
 <div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
 <script>
@@ -29,6 +29,21 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let A,SH=[],VW=480,VH=270,SC=1;
 function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/360,h/300)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
+// hero's magic circle + PixelLab fire ring (same assets/rules as test128 index CASTFIRE): the fire runs once around the circle from the front,
+// revealing the circle where it has passed, then burns out in 4 frames. S1 cyan / S2 red / S3 gold, cycling on each skill press.
+let FX=null,FIRE=null;
+const CIRC=[[[115,143,115,46,57,24],[463,143,115,46,57,24]],[[345,49,115,46,57,24],[693,49,115,46,57,24]],[[230,96,115,46,57,24],[578,96,115,46,57,24]]]; // [full, faded] per skill
+const FC=[0,85,170].flatMap(y=>[0,124,248,372,496].map(x=>[x,y,123,84,60,63])),RING=[-1,-2.5,57,22.5],A0=Math.PI/2,LAP0=2,LAPEND=26,POST=[4,12,22,34];
+function blitC(img,c,x,y){ctx.drawImage(img,c[0],c[1],c[2],c[3],x-c[4],y-c[5],c[2],c[3]);}
+function castFx(front,sx,sy){
+  if(!FX||P.skill==null)return;const casting=P.st==='cast',t=P.t,cx=sx+RING[0],cy=sy+RING[1],rx=RING[2],ry=RING[3];
+  if(!casting&&!P.cf)return;
+  const p=casting?(t-LAP0)/(LAPEND-LAP0):2,clipHalf=()=>{ctx.beginPath();ctx.rect(cx-rx-30,front?cy:cy-ry*3-60,rx*2+60,ry*3+60);ctx.clip();},
+        sector=sw=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.ellipse(cx,cy,rx+12,ry+12,0,A0,A0+sw);ctx.closePath();ctx.clip();};
+  if(!front&&casting){ctx.save();if(p<1){if(p<=0){ctx.restore();}else{sector(p*Math.PI*2);blitC(FX,CIRC[P.skill][0],sx,sy);ctx.restore();}}else{const T=total(clip(P.clip));blitC(FX,CIRC[P.skill][t>T-10?1:0],sx,sy);ctx.restore();}}
+  if(casting&&p>0&&p<1){ctx.save();clipHalf();sector(p*Math.PI*2);blitC(FIRE,FC[P.skill*5],sx,sy);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35;blitC(FIRE,FC[P.skill*5],sx,sy);ctx.restore();}
+  else if(p>=1){if(!P.cf)P.cf={t0:P.gt};const k=POST.findIndex(v=>P.gt-P.cf.t0<v);if(k<0){if(!casting)P.cf=null;return;}ctx.save();clipHalf();blitC(FIRE,FC[P.skill*5+1+k],sx,sy);ctx.restore();}
+}
 // grass field (pre-rendered tile)
 const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=TILE.getContext('2d');g.fillStyle='#567c46';g.fillRect(0,0,256,256);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
@@ -50,7 +65,7 @@ function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt')return;P.combo=1;start('atk','atk1_'+atkDir());}
 function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+P.lastH);}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;start('cast','cast_'+P.lastH);}
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+P.lastH);}
 function hurt(){if(P.dead)return;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;start('death','death_'+P.lastH);}
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
@@ -84,11 +99,13 @@ function draw(){
   for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
   const sx=Math.round(P.x-camX),sy=Math.round(P.y-camY);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy,24,6,0,0,7);ctx.fill();
+  castFx(false,sx,sy);
   const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
+  castFx(true,sx,sy);
   const m=A.thrust[P.clip];if(P.st==='atk'&&m){const tl=L.slice(0,m.frame).reduce((a,e)=>a+e[2],0),age=P.t-tl;if(m.tip2){trailOne(sx,sy,m,m.tip,age,true);trailOne(sx,sy,m,m.tip2,age,true);}else trailOne(sx,sy,m,m.tip,age,false);}
 }
 let acc=0,last=performance.now();
-function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=3').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=3';})));}).then(ims=>{SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
+function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
+fetch('assets/anim/linette8.json?v=3').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=3';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
