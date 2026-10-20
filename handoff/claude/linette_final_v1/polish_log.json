@@ -13,6 +13,34 @@
    -6
   ]
  },
+ "idle_down": {
+  "scale": 1.0,
+  "offset": [
+   14,
+   -3
+  ]
+ },
+ "idle_downl": {
+  "scale": 1.0,
+  "offset": [
+   -13,
+   -3
+  ]
+ },
+ "idle_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "idle_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
+  ]
+ },
  "walk_right": {
   "scale": 1.0,
   "offset": [
@@ -25,6 +53,34 @@
   "offset": [
    -2,
    -2
+  ]
+ },
+ "walk_down": {
+  "scale": 1.035,
+  "offset": [
+   -7,
+   -10
+  ]
+ },
+ "walk_downl": {
+  "scale": 1.035,
+  "offset": [
+   -1,
+   -10
+  ]
+ },
+ "walk_up": {
+  "scale": 1.084,
+  "offset": [
+   13,
+   -13
+  ]
+ },
+ "walk_upl": {
+  "scale": 1.084,
+  "offset": [
+   -34,
+   -13
   ]
  },
  "run_right": {
@@ -41,6 +97,34 @@
    0
   ]
  },
+ "run_down": {
+  "scale": 1.0,
+  "offset": [
+   18,
+   6
+  ]
+ },
+ "run_downl": {
+  "scale": 1.0,
+  "offset": [
+   -17,
+   6
+  ]
+ },
+ "run_up": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   5
+  ]
+ },
+ "run_upl": {
+  "scale": 1.0,
+  "offset": [
+   -6,
+   5
+  ]
+ },
  "dash_right": {
   "scale": 1.065,
   "offset": [
@@ -53,6 +137,34 @@
   "offset": [
    -11,
    -19
+  ]
+ },
+ "dash_down": {
+  "scale": 1.0,
+  "offset": [
+   14,
+   -3
+  ]
+ },
+ "dash_downl": {
+  "scale": 1.0,
+  "offset": [
+   -13,
+   -3
+  ]
+ },
+ "dash_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "dash_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
   ]
  },
  "hurt_right": {
@@ -98,17 +210,17 @@
   ]
  },
  "cast_down": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   19,
-   5
+   14,
+   -3
   ]
  },
  "cast_downl": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   -7,
-   5
+   -13,
+   -3
   ]
  },
  "cast_up": {
@@ -140,17 +252,17 @@
   ]
  },
  "atk1_down": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   19,
-   5
+   14,
+   -3
   ]
  },
  "atk1_downl": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   -7,
-   5
+   -13,
+   -3
   ]
  },
  "atk1_up": {
@@ -182,17 +294,17 @@
   ]
  },
  "atk2_down": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   19,
-   5
+   14,
+   -3
   ]
  },
  "atk2_downl": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   -7,
-   5
+   -13,
+   -3
   ]
  },
  "atk2_up": {
@@ -224,17 +336,17 @@
   ]
  },
  "atk3_down": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   19,
-   5
+   14,
+   -3
   ]
  },
  "atk3_downl": {
-  "scale": 0.958,
+  "scale": 1.0,
   "offset": [
-   -7,
-   5
+   -13,
+   -3
   ]
  },
  "atk3_up": {
