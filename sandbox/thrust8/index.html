@@ -22,10 +22,10 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 </style>
 
 <canvas id="c"></canvas>
-<div id="hud">이동 WASD/방향키 · 공격 J/Z · 대시 K/Shift · 달리기 L · 점프 Space/X · 스킬 U · 판정 H · 사망 P</div>
+<div id="hud">이동 WASD/방향키 · 공격 J/Z · ↑↓ 공격 방식 M · 대시 K/Shift · 달리기 L · 점프 Space/X · 스킬 U · 판정 H · 사망 P</div>
 <div id="aim">찌르기 방향: →</div>
 <button class="pc" id="pReset" type="button">적 다시 놓기</button>
-<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>방향키를 누른 채 공격 = 그 방향으로 찌르기 (8방향), 3타는 얇은 검기 레이저<br>↑ / ↓ 만 누르면 몸은 대각선 그대로, 검기만 위 / 아래로<br>두 키(↗ ↘ ↙ ↖) = 대각선 찌르기 · ← → = 옆 찌르기<br>대시 K · 달리기 L · 점프 Space · 스킬 U</div>
+<div id="keys"><b>화면 한 번 클릭 → 키보드 조작</b><br>방향키를 누른 채 공격 = 그 방향으로 찌르기 (8방향), 3타는 얇은 검기 레이저<br>↑ / ↓ 만 누르면 몸은 대각선 그대로, 검기만 위 / 아래로<br>두 키(↗ ↘ ↙ ↖) = 대각선 찌르기 · ← → = 옆 찌르기<br>M = ↑ / ↓ 공격 방식 바꾸기 (대각선 그림 / C 정면 찌르기 / D 정면 베기)<br>대시 K · 달리기 L · 점프 Space · 스킬 U</div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(40px + env(safe-area-inset-bottom,0px));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px))">대시</div>
@@ -33,6 +33,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div class="btn" id="bJump" style="right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px))">점프</div>
 <div class="btn" id="bCast" style="right:calc(100px + env(safe-area-inset-right,0px));bottom:calc(180px + env(safe-area-inset-bottom,0px))">스킬</div>
 <div class="btn small" id="bHB" style="right:calc(16px + env(safe-area-inset-right,0px));top:calc(40px + env(safe-area-inset-top,0px))">판정</div>
+<div class="btn small" id="bUD" style="right:calc(128px + env(safe-area-inset-right,0px));top:calc(40px + env(safe-area-inset-top,0px))">대각</div>
 <div class="btn small" id="bReset" style="right:calc(72px + env(safe-area-inset-right,0px));top:calc(40px + env(safe-area-inset-top,0px))">적</div>
 <script>
 // Hero sandbox, all-thrust 3-hit (handoff/claude/hero_thrust3_v1) with Linette-style 8-direction trails.
@@ -64,13 +65,13 @@ cv.tabIndex=0;cv.style.outline='none';cv.focus();addEventListener('pointerdown',
 const keysEl=document.getElementById('keys');if(matchMedia('(pointer:coarse)').matches)keysEl.classList.add('off');addEventListener('pointerdown',()=>keysEl.classList.add('off'));
 addEventListener('keydown',e=>{const c=e.code;if(/^Arrow|^Space$/.test(c))e.preventDefault();keysEl.classList.add('off');audioOn=true;if(e.repeat||K[c])return;K[c]=1;
  if(c==='KeyJ'||c==='KeyZ')attack();if(c==='KeyK'||c==='ShiftLeft'||c==='ShiftRight')dash();if(c==='KeyL')P.run=!P.run,ui();if(c==='KeyU')cast();
- if(c==='Space'||c==='KeyX')jump();if(c==='KeyH')showHB=!showHB,ui();if(c==='KeyP')die();});
+ if(c==='Space'||c==='KeyX')jump();if(c==='KeyH')showHB=!showHB,ui();if(c==='KeyP')die();if(c==='KeyM'){UDMODE=(UDMODE+1)%3;ui();}});
 addEventListener('keyup',e=>{K[e.code]=0;});addEventListener('blur',()=>{for(const k in K)K[k]=0;});
 function tap(id,f){document.getElementById(id).addEventListener('pointerdown',e=>{e.preventDefault();f();});}
-tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bJump',jump);tap('bHB',()=>{showHB=!showHB;ui();});tap('bReset',spawn);
+tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bJump',jump);tap('bHB',()=>{showHB=!showHB;ui();});tap('bReset',spawn);tap('bUD',()=>{UDMODE=(UDMODE+1)%3;ui();});
 document.getElementById('pReset').addEventListener('click',()=>{spawn();cv.focus()});
 const ARROW={'1,0':'→','-1,0':'←','0,1':'↓','0,-1':'↑','1,1':'↘','-1,1':'↙','1,-1':'↗','-1,-1':'↖'};
-function ui(){document.getElementById('bRun').classList.toggle('on',P.run);document.getElementById('bHB').classList.toggle('on',showHB);document.getElementById('aim').textContent='찌르기 방향: '+ARROW[P.aim.join(',')];}
+function ui(){document.getElementById('bRun').classList.toggle('on',P.run);document.getElementById('bHB').classList.toggle('on',showHB);document.getElementById('aim').textContent='찌르기 방향: '+ARROW[P.aim.join(',')]+'  ·  ↑↓ 공격(M): '+UDNAME[UDMODE];const ub=document.getElementById('bUD');if(ub)ub.textContent=['대각','C','D'][UDMODE];}
 {const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
  st.addEventListener('pointerdown',e=>{id=e.pointerId;st.setPointerCapture(id);mv(e);});st.addEventListener('pointermove',e=>{if(e.pointerId===id)mv(e);});
@@ -85,21 +86,24 @@ function artOf(v){if(!v[1])return v[0]>0?'right':'left';const l=(v[0]?v[0]:P.las
 const art=()=>artOf(P.aim);
 function start(st,name){P.st=st;P.t=0;P.clip=name;P.hitDone=false;}
 function attack(){if(P.dead||P.air)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt'||P.st==='cast')return;P.combo=1;begin();}
-function begin(){const[ix,iy]=input(),s=snap8(ix,iy);if(s){P.aim=s;if(s[0])P.lastH=s[0];}ui();P.ak=art();start('atk','thit'+P.combo+'_'+P.ak);snd(P.combo===3?'swing_heavy':'swing_light');}
+function begin(){const[ix,iy]=input(),s=snap8(ix,iy);if(s){P.aim=s;if(s[0])P.lastH=s[0];}ui();P.ak=art();P.udk=UDMODE&&!P.aim[0]?(UDMODE===1?'chit':'dhit')+P.combo+'_'+(P.aim[1]>0?'down':'up'):null;start('atk',P.udk||('thit'+P.combo+'_'+P.ak));snd(P.combo===3?'swing_heavy':'swing_light');}
 function jump(){if(P.dead||P.air||(P.st!=='idle'&&P.st!=='move'))return;P.jv=JUMP_V;P.vz=P.jv;P.air=true;start('jump','jump_'+art());}
 function dash(){if(P.dead||P.air||P.st==='atk'||P.st==='dash'||P.st==='hurt')return;const[ix,iy]=input(),s=snap8(ix,iy);if(s){P.aim=s;if(s[0])P.lastH=s[0];}start('dash','dash_'+art());}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;start('cast','cast_'+(P.lastH>0?'right':'left'));P.castHit=false;}
 const sideKey=()=>P.lastH>0?'right':'left';
 function hurt(dx,dy,dmg){if(P.dead||P.inv>0||P.st==='dash')return;P.hp=Math.max(0,P.hp-(dmg||1));const l=Math.hypot(dx,dy)||1;P.kbx=dx/l;P.kby=dy/l;P.inv=HERO_INV;P.white=3;stop=HITSTOP;start('hurt','hurt_'+sideKey());snd('hit_light');if(P.hp<=0){P.dead=true;start('death','death_'+sideKey());}}
-function die(){if(P.dead){P.dead=false;P.hp=HP_MAX;start('idle','idle_'+art());return;}P.dead=true;start('death','death_'+sideKey());}
+function die(){if(P.dead){P.dead=false;P.hp=HP_MAX;start('idle',idleName());return;}P.dead=true;start('death','death_'+sideKey());}
 function inSector(cx,cy,dir,r,arc,px,py,pr){const dx=px-cx,dy=py-cy,d=Math.hypot(dx,dy);if(d>r+pr)return false;if(d<pr)return true;
   const a=Math.acos(Math.max(-1,Math.min(1,(dx*dir[0]+dy*dir[1])/d)))*180/Math.PI;return a<=arc/2+Math.asin(Math.min(1,pr/d))*180/Math.PI;}
 const norm=v=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l]};
 // trail origin + direction for the current aim: pure up/down = straight up/down from the body; otherwise the blade tip/dir of the art
-function trailOf(){const vert=!P.aim[0];const th=A.thr['hit'+P.combo+'_'+P.ak];
+function trailOf(){const vert=!P.aim[0];if(P.udk){const th=A.udth[P.udk],v=P.aim[1];return {x:P.x+(v>0?10:-10),y:P.y-P.z+(v>0?-40:-80),dir:[0,v],th};}
+  const th=A.thr['hit'+P.combo+'_'+P.ak];
   if(vert){const v=P.aim[1];return {x:P.x+P.lastH*6,y:P.y-P.z+(v>0?-30:-100),dir:[0,v],th};}
   const dir=P.aim[1]?[P.aim[0]*DIAG[0],P.aim[1]*DIAG[1]]:[P.aim[0],0];   // diagonals: one fixed screen angle for ↘ ↙ ↗ ↖
   return {x:P.x+th.tip[0],y:P.y-P.z+th.tip[1],dir,th};}
+let UDMODE=0;const UDNAME=['대각선 그림','C 정면 찌르기','D 정면 베기'];   // M: how pure ↑ / ↓ attacks are drawn
+const idleName=()=>UDMODE&&!P.aim[0]?'fidle_'+(P.aim[1]>0?'down':'up'):'idle_'+art();
 const DIAG=[Math.cos(22*Math.PI/180),Math.sin(22*Math.PI/180)];   // 22 deg = the blades' average slope in the diagonal art
 function spawn(){foes=[
   {k:'slime',x:260,y:60,hp:5},{k:'slime',x:-260,y:-120,hp:5},{k:'slime',x:60,y:260,hp:5},{k:'spirit',x:120,y:-300,hp:6},{k:'boar',x:600,y:40,hp:16}
@@ -145,12 +149,12 @@ function foeStep(e){
 function step(){
   if(stop>0){stop--;return;}
   const[ix,iy,m]=input();const moving=m>0.2;P.t++;if(P.inv>0)P.inv--;
-  if(P.air){P.vz-=GRAV;P.z+=P.vz;const g=groundAt(P.x,P.y);if(P.z<=g&&P.vz<=0){P.z=g;P.vz=0;P.air=false;if(P.st==='jump')start('idle','idle_'+art());}}
+  if(P.air){P.vz-=GRAV;P.z+=P.vz;const g=groundAt(P.x,P.y);if(P.z<=g&&P.vz<=0){P.z=g;P.vz=0;P.air=false;if(P.st==='jump')start('idle',idleName());}}
   else{const g=groundAt(P.x,P.y);if(g<P.z-1){P.air=true;P.vz=0;if(P.st==='idle'||P.st==='move')start('jump','jump_'+art()),P.t=JUMP_T;}else P.z=g;}
   if(P.st==='jump'){if(moving){const s=snap8(ix,iy);if(s){P.aim=s;if(s[0])P.lastH=s[0];}moveHero(ix*1.3,iy*1.3);}return world();}
   if(P.st==='idle'||P.st==='move'){
     if(moving){const s=snap8(ix,iy);if(s){P.aim=s;if(s[0])P.lastH=s[0];}const sp=P.run?2.2:1.0;moveHero(ix*sp,iy*sp);const n=(P.run?'run_':'walk_')+art();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}ui();}
-    else if(P.st!=='idle'||P.clip!=='idle_'+art())start('idle','idle_'+art());
+    else if(P.st!=='idle'||P.clip!==idleName())start('idle',idleName());
   }else{
     const L=clip(P.clip),T=total(L);
     if(P.st==='dash'){const k=1-P.t/T,v=norm(P.aim);moveHero(v[0]*5*k,v[1]*5*k);}
@@ -163,7 +167,7 @@ function step(){
         if(P.combo===3){BEAMS.push({x:t2.x,y:t2.y,dir:d2,t:0,n:3,len:C.len,w:C.w,C,hit:new Set()});FLASH=4;WAVES.push({x:t2.x+d2[0]*C.len,y:t2.y+d2[1]*C.len,t:0});beamHits(BEAMS[BEAMS.length-1]);}
         else{CTR.push({x:t2.x,y:t2.y,dir:t2.dir,t:0,heavy:false,big:P.combo>1});const hd=P.aim[0]?d2:[0,P.aim[1]];hitFoes(P.x+hd[0]*HB_FWD,P.y-P.z-44+hd[1]*HB_FWD,hd,C,false);}}
       if(P.queued&&P.combo<3&&P.t>=Math.round(T*C.cancel)){P.queued=false;P.combo++;begin();return world();}}
-    if(P.t>=T){if(P.st==='death'){P.t=T;if(++P.deadT>120){P.dead=false;P.hp=HP_MAX;P.deadT=0;P.inv=HERO_INV;start('idle','idle_'+art());}return world();}P.queued=false;start('idle','idle_'+art());}
+    if(P.t>=T){if(P.st==='death'){P.t=T;if(++P.deadT>120){P.dead=false;P.hp=HP_MAX;P.deadT=0;P.inv=HERO_INV;start('idle',idleName());}return world();}P.queued=false;start('idle',idleName());}
   }
   world();
 }
@@ -274,7 +278,10 @@ function loop(now){acc+=Math.min(100,now-last);last=now;if(window.__sbx.manual)a
 function speedUp(){for(const k in A.anims){if(!k.startsWith('thit'))continue;const L=A.anims[k],key=k.slice(1),th=A.thr[key];let c=0,fi=L.length-1;
   for(let i=0;i<L.length;i++){if(c+L[i][2]>th.tick){fi=i;break;}c+=L[i][2];}
   const N=L.map((e,i)=>{const t=e[2]*(i<fi?ATK_SPEED*.8:ATK_SPEED*1.1);return [e[0],e[1],Math.max(1,Math.round(t)),...e.slice(3)];});
-  A.anims[k]=N;th.fast=N.slice(0,fi).reduce((s,e)=>s+e[2],0);}}
+  A.anims[k]=N;th.fast=N.slice(0,fi).reduce((s,e)=>s+e[2],0);}
+  A.udth={};for(const k in A.udthr||{}){const L=A.anims[k],tick=A.udthr[k];let c=0,fi=L.length-1;for(let i=0;i<L.length;i++){if(c+L[i][2]>tick){fi=i;break;}c+=L[i][2];}
+    const N=L.map((e,i)=>[e[0],e[1],Math.max(1,Math.round(e[2]*(i<fi?ATK_SPEED*.8:ATK_SPEED*1.1))),...e.slice(3)]);A.anims[k]=N;A.udth[k]={fast:N.slice(0,fi).reduce((s,e)=>s+e[2],0)};}
+  for(const d of ['down','up'])if(A.anims['chit1_'+d])A.anims['fidle_'+d]=[[...A.anims['chit1_'+d][0].slice(0,2),60]];}
 const img=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
 fetch('assets/hero_sbx.json').then(r=>r.json()).then(j=>{A=j;speedUp();return Promise.all([...A.sheets.map(p=>img('assets/'+p)),img('assets/slime.png'),img('assets/spirit.png'),img('assets/champ_boar.png')]);})
  .then(ims=>{IMG.boar=ims.pop();IMG.spirit=ims.pop();IMG.slime=ims.pop();SH=ims;spawn();ui();start('idle','idle_right');requestAnimationFrame(loop);});
