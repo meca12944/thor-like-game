@@ -294,3 +294,9 @@
 2026-10-20 14:34:39 estimate walk_face_src/first_se.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-20 14:40:07 animate walk_south-east_face south-east seed 71 usage {"type": "generations", "generations": 3.0}
 2026-10-20 14:40:46 animate walk_east_face east seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-20 15:12:46 estimate up_src/first_idle.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 15:12:48 estimate up_src/first_run.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 15:19:11 animate idle_north-east_sidearms north-east seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-20 15:19:23 estimate up_src/first_walk.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 15:19:35 animate run_north-east_sidearms north-east seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-20 15:25:57 animate walk_north-east_sidearms north-east seed 71 usage {"type": "generations", "generations": 3.0}

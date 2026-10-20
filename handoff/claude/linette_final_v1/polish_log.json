@@ -70,17 +70,17 @@
   ]
  },
  "walk_up": {
-  "scale": 1.084,
+  "scale": 1.074,
   "offset": [
-   13,
-   -13
+   16,
+   -12
   ]
  },
  "walk_upl": {
-  "scale": 1.084,
+  "scale": 1.074,
   "offset": [
    -34,
-   -13
+   -12
   ]
  },
  "run_right": {
@@ -114,15 +114,15 @@
  "run_up": {
   "scale": 1.0,
   "offset": [
-   8,
-   5
+   13,
+   6
   ]
  },
  "run_upl": {
   "scale": 1.0,
   "offset": [
-   -6,
-   5
+   -12,
+   6
   ]
  },
  "dash_right": {

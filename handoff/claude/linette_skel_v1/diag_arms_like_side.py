@@ -1,9 +1,9 @@
 # Owner 10-20 "밑으로 대각선 양 방향 팔위치 좌우랑 틀리다": down-diagonal clips get the SIDE clip's arms.
-# legs/torso/head = the current diagonal skeleton (kp_<m>_south-east_fromhero.json); each arm = diagonal shoulder + side (elbow/hand - shoulder) offset
+# legs/torso/head = the current diagonal skeleton (kp_<m>_<DIAG>_fromhero.json, DIAG env = south-east | north-east); each arm = diagonal shoulder + side (elbow/hand - shoulder) offset
 # of the same frame phase, arms drawn behind the body like the side view. usage: diag_arms_like_side.py <motion> <side_kp.json> <out.json> [sx=1.0]
 import json,sys,os
 C=os.path.dirname(os.path.abspath(__file__));m,side,out=sys.argv[1],sys.argv[2],sys.argv[3];SX=float(sys.argv[4]) if len(sys.argv)>4 else 1.0
-D=json.load(open(f'{C}/kp_{m}_south-east_fromhero.json'));Sd=json.load(open(side if os.path.isabs(side) else f'{C}/{side}'))
+DD=os.environ.get('DIAG','south-east');D=json.load(open(f'{C}/kp_{m}_{DD}_fromhero.json'));Sd=json.load(open(side if os.path.isabs(side) else f'{C}/{side}'))
 if isinstance(Sd,dict):Sd=[Sd['keypoints']]
 if isinstance(Sd[0],dict):Sd=[Sd]
 seq=[]
