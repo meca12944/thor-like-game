@@ -8,14 +8,14 @@ def arm_set(f,s,sh,ua,fa,lu,lf,side=1):
     for p in f:
         if p['label']==s+' ELBOW': p['x'],p['y']=e[0]/256,e[1]/256
         if p['label']==s+' ARM': p['x'],p['y']=w[0]/256,w[1]/256
-mode=sys.argv[1]; V1='--v1' in sys.argv
+mode=sys.argv[1]; V1='--v1' in sys.argv; V2='--v2' in sys.argv   # default v3 (owner): hands at the waist like before, forearms level and pointing back so both needles trail behind
 if mode=='side':
     F=json.load(open(sys.argv[2])); n=len(F)
     for i,f in enumerate(F):
         P={p['label']:p for p in f}; ph=math.sin(2*math.pi*i/n)
         for s,off in (('RIGHT',0),('LEFT',8)):
             sh=P[s+' SHOULDER']; lu=lf=14
-            arm_set(f,s,sh,(-62 if V1 else -100)-off+4*ph,(-78 if V1 else -104)-off+5*ph,lu,lf)        # negative angle = behind (facing +x); v2: arms straight back (owner: needle no longer pokes forward)
+            arm_set(f,s,sh,(-62 if V1 else -100 if V2 else -50)-off+4*ph,(-78 if V1 else -104 if V2 else -100)-off+5*ph,lu,lf)        # negative angle = behind (facing +x); v2: arms straight back (owner: needle no longer pokes forward)
     json.dump(F,open(sys.argv[3],'w'))
 else:
     pre,n,out=sys.argv[2],int(sys.argv[3]),sys.argv[4]; F=[]

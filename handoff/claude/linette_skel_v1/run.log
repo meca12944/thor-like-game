@@ -107,3 +107,5 @@
 2026-10-20 04:10:51 estimate ../linette_moves_v1/death/east/007.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-20 04:11:01 estimate ../linette_moves_v1/death/east/008.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
 2026-10-20 04:48:01 animate run_east_back2 east seed 23 usage {"type": "generations", "generations": 3.0}
+2026-10-20 04:56:02 animate run_east_back3 east seed 23 usage {"type": "generations", "generations": 3.0}
+2026-10-20 05:04:04 animate run_east_back4 east seed 24 usage {"type": "generations", "generations": 3.0}
