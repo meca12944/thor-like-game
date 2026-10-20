@@ -107,7 +107,7 @@ function spawn(){foes=[
 function hitBeam(x,y,d,C,heavy){let any=false;
   for(const e of foes){if(e.dead||e.gone||P.z>=30)continue;const px=e.x-x,py=e.y-e.h/2-y,u=Math.max(0,Math.min(C.len,px*d[0]+py*d[1])),qx=px-d[0]*u,qy=py-d[1]*u;
     if(Math.hypot(qx,qy)<e.r+C.w+6){any=true;e.hp-=C.dmg;e.flash=8;const kb=C.kb*(e.heavy?.35:1);e.kbx=d[0]*kb;e.kby=d[1]*kb;if(e.st==='wind'||e.st==='lunge')e.st='idle',e.cd=50;
-      pops.push({x:e.x,y:e.y-e.h-14,t:0,s:String(C.dmg),big:heavy});for(let i=0;i<6;i++)SPARKS.push({x:e.x,y:e.y-e.h/2,vx:(Math.random()-.5)*4+d[0]*2,vy:(Math.random()-.5)*4+d[1]*2,t:0});if(e.hp<=0){e.dead=60;snd('kill');}}}
+      pops.push({x:e.x,y:e.y-e.h-14,t:0,s:String(C.dmg),big:heavy});for(let i=0;i<6;i++)SPARKS.push({x:e.x,y:e.y-e.h/2,vx:(Math.random()-.5)*4+d[0]*2,vy:(Math.random()-.5)*4+d[1]*2,t:0});BURST.push({x:e.x,y:e.y-e.h/2,t:0});if(e.hp<=0){e.dead=60;snd('kill');}}}
   if(any)snd(heavy?'hit_heavy':'hit_light');return any;}
 function hitFoes(cx,cy,dir,C,heavy){let any=false;
   for(const e of foes){if(e.dead||e.gone||P.z>=30)continue;
@@ -176,17 +176,38 @@ function trailC(tx,ty,f){const age=f.t,heavy=f.heavy,big=f.big,life=heavy?20:big
   ctx.strokeStyle=`rgba(200,245,255,${.67*a})`;ctx.lineWidth=1;for(const[o,l]of(big?[[.9,.6],[-.9,.5],[1.6,.35],[-1.6,.3]]:[[.9,.55],[-.9,.45]])){const sx=cx+nx*o*W-dx*back*.6,sy=cy+ny*o*W-dy*back*.6,L=(back+ahead)*l;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+dx*L,sy+dy*L);ctx.stroke();}
   if(age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
 // laser beam: shoots out of the blade tip to full length in 3 ticks, white core + cyan glow, bright head, then thins and fades
-const beamLife=b=>b.n===3?22:b.n===2?16:14;
-function drawBeam(b,ox,oy){const life=beamLife(b),a=1-b.t/life,grow=Math.min(1,(b.t+1)/3),L=b.len*grow,[dx,dy]=b.dir,x0=b.x-ox,y0=b.y-oy,x1=x0+dx*L,y1=y0+dy*L;
-  const W=b.w*(b.t<3?1.25:Math.sqrt(a));ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
-  const line=(w,col,s0)=>{ctx.strokeStyle=col;ctx.lineWidth=Math.max(1,w);ctx.beginPath();ctx.moveTo(x0+dx*L*s0,y0+dy*L*s0);ctx.lineTo(x1,y1);ctx.stroke();};
-  line(W*2.2,`rgba(40,120,255,${.28*a})`,0);line(W*1.3,`rgba(70,200,255,${.55*a})`,0);line(W*.6,`rgba(220,250,255,${.95*a})`,0);line(Math.max(1,W*.22),`rgba(255,255,255,${a})`,.02);
-  const nx=-dy,ny=dx;ctx.lineWidth=1;ctx.strokeStyle=`rgba(190,240,255,${.6*a})`;   // speed lines riding the beam
-  for(const[o,s0,s1]of[[W*1.6,.15,.7],[-W*1.6,.3,.85],[W*2.6,.45,.95],[-W*2.4,.05,.5]]){ctx.beginPath();ctx.moveTo(x0+dx*L*s0+nx*o,y0+dy*L*s0+ny*o);ctx.lineTo(x0+dx*L*s1+nx*o,y0+dy*L*s1+ny*o);ctx.stroke();}
-  if(b.t<6){const r=(b.n===3?12:8)*(1-b.t/6)+3;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(x1-r,y1-.5,2*r,1.5);ctx.fillRect(x1-.5,y1-r,1.5,2*r);
-    ctx.fillStyle=`rgba(160,230,255,${.6*a})`;ctx.beginPath();ctx.arc(x1,y1,r*.6,0,7);ctx.fill();}
-  if(b.t<4){ctx.fillStyle=`rgba(255,255,255,${.9*(1-b.t/4)})`;ctx.beginPath();ctx.arc(x0,y0,W*.6,0,7);ctx.fill();}   // muzzle flash at the tip
+// hit 3 laser, pixel-art style: drawn unrotated into a small canvas (stepped palette bands, jittering energy edge, pulses running
+// forward), then blitted rotated with nearest-neighbour so diagonals stay stair-stepped like the sprites. Timeline (24 ticks):
+// 0-3 the head races out, 3-12 full beam, 12-24 the tail breaks off from the tip and the beam thins out forward, leaving dust.
+const beamLife=b=>24;const BOFF=document.createElement('canvas'),bg=BOFF.getContext('2d');const DUST=[],BURST=[];
+const hash=(x,y)=>{const h=Math.sin(x*12.9898+y*78.233)*43758.5453;return h-Math.floor(h);};
+function drawBeam(b,ox,oy){const t=b.t,L=b.len,life=24,[dx,dy]=b.dir,nx=-dy,ny=dx;
+  const head=L*Math.min(1,(t+1)/4),tail=t<12?0:L*Math.pow((t-12)/12,1.3)*.95,k=t<12?1:Math.max(0,1-(t-12)/12),a=t<12?1:k;
+  const hw=b.w*(t<3?1.35:1)*Math.sqrt(k),PAD=24,H=48,cy=H/2;BOFF.width=Math.ceil(L)+PAD*2;BOFF.height=H;bg.clearRect(0,0,BOFF.width,H);
+  const band=(x,half,col,al)=>{if(half<=0)return;const h=Math.max(1,Math.round(half*2));bg.globalAlpha=al;bg.fillStyle=col;bg.fillRect(PAD+x,Math.round(cy-h/2),1,h);};
+  for(let x=Math.floor(tail);x<head;x++){const j=Math.round((hash(x>>1,t)-.5)*2.4),pulse=((x-t*22)%46+46)%46<7?1:0,end=Math.min(1,(head-x)/10,(x-tail+1)/8);
+    band(x,(hw+3+j)*end,'#2a5cff',.55*a);band(x,(hw+1.5+pulse+j*.5)*end,'#46cfff',.85*a);band(x,(hw+.2+pulse)*end,'#c9f7ff',a);band(x,Math.max(.5,hw-1.2)*end,'#ffffff',a);}
+  if(t<8){const r=Math.round(7-t*.6),hx=PAD+Math.round(head);bg.globalAlpha=1;    // bright head with a pixel cross
+    bg.fillStyle='#46cfff';bg.fillRect(hx-r,cy-1,r*2+1,3);bg.fillRect(hx-1,cy-r,3,r*2+1);bg.fillStyle='#ffffff';bg.fillRect(hx-r-4,cy,r*2+9,1);bg.fillRect(hx,cy-r-4,1,r*2+9);bg.fillRect(hx-2,cy-2,5,5);}
+  if(t<9){bg.globalAlpha=1-t/9;bg.strokeStyle='#c9f7ff';bg.lineWidth=1;bg.beginPath();bg.ellipse(PAD+2+t,cy,1.5+t*.4,4+t*2.2,0,0,7);bg.stroke();}   // muzzle ring
+  bg.globalAlpha=1;const x0=b.x-ox,y0=b.y-oy,ang=Math.atan2(dy,dx);
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.globalCompositeOperation='lighter';ctx.translate(Math.round(x0),Math.round(y0));ctx.rotate(ang);
+  if(t<10){ctx.globalAlpha=.22*(1-t/10);ctx.drawImage(BOFF,-PAD,-H,BOFF.width,H*2);}   // short bloom: the same beam stretched wide
+  ctx.globalAlpha=1;ctx.drawImage(BOFF,-PAD,-cy);ctx.restore();
+  if(t>=12&&!b.dusted){b.dusted=1;for(let i=0;i<26;i++){const u=Math.random()*L,o=(Math.random()-.5)*b.w*3;DUST.push({x:b.x+dx*u+nx*o,y:b.y+dy*u+ny*o,vx:nx*(Math.random()-.5)*1.2+dx*.6,vy:ny*(Math.random()-.5)*1.2+dy*.6-.15,t:0,l:14+Math.random()*12|0});}}
+}
+function drawFxBits(ox,oy){ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const d of DUST){d.t++;d.x+=d.vx;d.y+=d.vy;d.vx*=.93;d.vy*=.93;ctx.globalAlpha=1-d.t/d.l;ctx.fillStyle=d.t<d.l*.4?'#ffffff':'#46cfff';ctx.fillRect(Math.round(d.x-ox),Math.round(d.y-oy),1,1);}
+  for(let i=DUST.length-1;i>=0;i--)if(DUST[i].t>=DUST[i].l)DUST.splice(i,1);
+  for(const q of BURST){q.t++;const a=1-q.t/10,r=3+q.t*2,x=Math.round(q.x-ox),y=Math.round(q.y-oy);ctx.globalAlpha=a;ctx.fillStyle='#ffffff';
+    ctx.fillRect(x-r,y,2*r+1,1);ctx.fillRect(x,y-r,1,2*r+1);ctx.fillStyle='#46cfff';const d2=Math.round(r*.6);for(const[sx,sy]of[[1,1],[1,-1],[-1,1],[-1,-1]])ctx.fillRect(x+sx*d2,y+sy*d2,2,2);}
+  for(let i=BURST.length-1;i>=0;i--)if(BURST[i].t>=10)BURST.splice(i,1);
   ctx.restore();}
+// charge: light gathers on the blade tip for the last 8 ticks before the 3rd strike
+function drawCharge(cX,cY){if(P.st!=='atk'||P.combo!==3)return;const tr=trailOf(),k=tr.th.fast-P.t;if(k<=0||k>8)return;
+  const x=Math.round(tr.x-cX),y=Math.round(tr.y-cY),r=Math.round(2+(8-k)*.7);ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ffffff';
+  ctx.fillRect(x-r,y,2*r+1,1);ctx.fillRect(x,y-r,1,2*r+1);ctx.fillStyle='#46cfff';ctx.fillRect(x-1,y-1,3,3);
+  for(let i=0;i<4;i++){const an=i*Math.PI/2+P.t*.4,d=k*3;ctx.fillRect(Math.round(x+Math.cos(an)*d),Math.round(y+Math.sin(an)*d),1,1);}ctx.restore();}
 function hb(cx,cy,dir,r,arc,col){const a0=Math.atan2(dir[1],dir[0]),h=arc/2*Math.PI/180;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a0-h,a0+h);ctx.closePath();ctx.fill();}
 function draw(){
   const shx=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0,shy=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0;SHAKE=SHAKE>0.3?SHAKE*0.82:0;
@@ -219,6 +240,7 @@ function draw(){
   for(const w of WAVES){const a=1-w.t/16,r=(w.big?20:10)+w.t*(w.big?10:7);ctx.strokeStyle=`rgba(200,240,255,${.8*a})`;ctx.lineWidth=3*a+1;ctx.beginPath();ctx.ellipse(Math.round(w.x-cX),Math.round(w.y-cY),r,r*.45,0,0,7);ctx.stroke();}
   for(const f of CTR)trailC(f.x-cX,f.y-cY,f);
   for(const b of BEAMS)drawBeam(b,cX,cY);
+  drawFxBits(cX,cY);drawCharge(cX,cY);
   ctx.fillStyle='#dff6ff';for(const s of SPARKS){ctx.globalAlpha=1-s.t/14;ctx.fillRect(Math.round(s.x-cX),Math.round(s.y-cY),2,2);}ctx.globalAlpha=1;
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
   ctx.textAlign='center';for(const p of pops){ctx.font=(p.big?'bold 14px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,240,120,${1-p.t/40})`;ctx.fillText(p.s,Math.round(p.x-cX),Math.round(p.y-cY-p.t*.6));}
