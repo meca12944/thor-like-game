@@ -86,8 +86,8 @@ const isDiag=k=>k!=='right'&&k!=='left';const NM=4;
 // V = small hit-3 crescent (hit3s_* clips, crescent x0.7 about the chest), G = afterimages behind hits 1-2 (owner 2026-10-20 tests)
 let SMALLC=true,GHOST=false,TICK=0;const GH=[];  // owner 2026-10-20 세팅: hit 3 = thin sky-blue trail by default
 function atkClip(n,dk){return 'hit'+(n===3&&SMALLC?'3s':n)+'_'+(ATKMODE===2&&isDiag(dk)?(dk.endsWith('l')?'left':'right'):dk);}
-// two keys (e.g. down+right) = diagonal: face up/down with that horizontal side -> the ↘↗↙↖ clips and diagonal hit box (owner 2026-10-20)
-function faceFrom(ix,iy){if(Math.abs(ix)>.35&&Math.abs(iy)>.35){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)*.8){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.25)P.lastH=ix>0?'right':'left';}}
+// facing from input; two keys (down+right) = side again (owner 2026-10-20: the diagonal attack art turns the face). Combo hits re-aim on each press.
+function faceFrom(ix,iy){if(Math.abs(ix)>=Math.abs(iy)*.8){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.25)P.lastH=ix>0?'right':'left';}}
 function aimNow(){if(Math.hypot(P.ix||0,P.iy||0)>.2)faceFrom(P.ix,P.iy);}
 function attack(){aimNow();if(P.dead||P.air)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt'||P.st==='cast')return;P.combo=1;P.ad=dirKey();start('atk',atkClip(1,P.ad));}
 function jump(){if(P.dead||P.air||(P.st!=='idle'&&P.st!=='move'))return;P.jr=P.run&&P.st==='move';P.jv=P.jr?RJUMP_V:JUMP_V;P.vz=P.jv;P.air=true;const dk=dirKey();start('jump',(P.jr&&(dk==='right'||dk==='left')?'rjump_':'jump_')+dk);}
