@@ -13,6 +13,7 @@ ASSETS = [
  ('bld_inn',     (160, 160), B + 'two-story timber inn and tavern with a small balcony, warm lit windows, hanging tankard sign, barrels by the door'),
  ('bld_chapel',  (160, 176), B + 'old ruined stone chapel with a square bell tower, part of the roof collapsed, candle light inside the arched door'),
  ('bld_atelier', (160, 144), B + 'ruined royal tailor workshop of carved pale stone with a broken gilded arch, colorful cloth draped over the cracked walls, a dress mannequin by the door'),
+ ('bld_atelier2', (160, 144), B + 'whole small workshop building with cracked pale carved stone walls and a roof partly collapsed and patched with colorful cloth drapes, broken gilded arch over the front door, dress mannequin and fabric bolts beside the door'),
  ('bld_stall',   (112, 96), 'merchant wooden cart stall with a red tiled canopy, goods and bottles on display, a wooden wheel'),
  ('bld_shack1',  (96, 96), B + 'poor ramshackle plank shack with a patched sagging roof and a crooked chimney'),
  ('bld_shack2',  (96, 96), B + 'tiny refugee hovel built from scavenged boards and stones, cloth roof patch'),
