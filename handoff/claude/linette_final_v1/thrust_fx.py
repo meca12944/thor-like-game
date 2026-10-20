@@ -18,6 +18,7 @@ LUNGE=8                                                          # frame index o
 out={}
 for m in ('atk1','atk2','atk3'):
     for d,f in FACE.items():
+        if d not in MAN[m]: continue
         LUNGE=MAN[m][d]['lunge']; im=np.asarray(Image.open(sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))[LUNGE]))[...,3]>40
         thin=im & ~binary_opening(im) if d in ('down','up') else im   # front/back: the needle tip sits by the feet -> look at thin (1-2 px) pixels only
         ys,xs=np.nonzero(thin); fv=np.array(f)/np.hypot(*f); proj=xs*fv[0]+ys*fv[1]; i=proj.argmax(); tip=np.array([xs[i],ys[i]],float)

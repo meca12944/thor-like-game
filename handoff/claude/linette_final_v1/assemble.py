@@ -21,7 +21,7 @@ SRC={ # motion: {dir: (folder, frame filter or seq spec, ticks)}
 }
 AS=H+'/attack_src'; CL=json.load(open(AS+'/clips.json'))
 for k in [k for k in SRC if k.startswith('_atk_old_')]: del SRC[k]
-for m in ('atk1','atk2','atk3'): SRC[m]={d:(f'{AS}/{m}/{d}',None,CL[f'{m}_{d}']['ticks']) for d in ('right','down','up')}
+for m in ('atk1','atk2','atk3'): SRC[m]={d:(f'{AS}/{m}/{d}',None,CL[f'{m}_{d}']['ticks']) for d in ('right',)}   # owner 10-20: down/up attacks removed (side only; left = mirrored)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}

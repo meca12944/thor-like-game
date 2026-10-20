@@ -775,52 +775,6 @@
      12,
      13
     ]
-   },
-   "down": {
-    "ticks": [
-     3,
-     4,
-     12,
-     3,
-     3
-    ],
-    "lunge": 2,
-    "src": "linette_final_v1/attack_src/atk1/down",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4
-    ]
-   },
-   "up": {
-    "ticks": [
-     2,
-     2,
-     2,
-     2,
-     2,
-     2,
-     1,
-     12,
-     3,
-     3
-    ],
-    "lunge": 7,
-    "src": "linette_final_v1/attack_src/atk1/up",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     9
-    ]
    }
   },
   "atk2": {
@@ -862,52 +816,6 @@
      3,
      4,
      5
-    ]
-   },
-   "down": {
-    "ticks": [
-     3,
-     4,
-     12,
-     3,
-     3
-    ],
-    "lunge": 2,
-    "src": "linette_final_v1/attack_src/atk2/down",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4
-    ]
-   },
-   "up": {
-    "ticks": [
-     2,
-     2,
-     2,
-     2,
-     2,
-     2,
-     1,
-     12,
-     3,
-     3
-    ],
-    "lunge": 7,
-    "src": "linette_final_v1/attack_src/atk2/up",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     9
     ]
    }
   },
@@ -982,58 +890,6 @@
      11,
      12,
      13
-    ]
-   },
-   "down": {
-    "ticks": [
-     2,
-     1,
-     1,
-     2,
-     2,
-     2,
-     2,
-     1,
-     18,
-     3,
-     3
-    ],
-    "lunge": 8,
-    "src": "linette_final_v1/attack_src/atk3/down",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     9,
-     10
-    ]
-   },
-   "up": {
-    "ticks": [
-     3,
-     3,
-     4,
-     1,
-     18,
-     3,
-     3
-    ],
-    "lunge": 4,
-    "src": "linette_final_v1/attack_src/atk3/up",
-    "pick": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6
     ]
    }
   }

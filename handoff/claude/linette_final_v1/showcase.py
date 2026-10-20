@@ -20,7 +20,7 @@ SCRIPT=[('idle','down',60,0,'대기'),('walk','down',70,0.9,'걷기'),('walk','r
         ('dash','right',None,4.0,'대시'),('atk1','right',None,0.4,'1타'),('atk2','right',None,0.4,'2타'),('atk3','right',None,0.6,'3타'),
         ('idle','right',30,0,'대기'),('hurt','right',None,-0.8,'맞기'),('run','up',60,2.2,'달리기'),('walk','left',90,0.9,'걷기'),
         ('run','left',70,2.2,'달리기'),('atk1','left',None,0.4,'1타'),('atk2','left',None,0.4,'2타'),('atk3','left',None,0.6,'3타'),
-        ('run','down',50,2.2,'달리기'),('cast','down',None,0,'시전'),('atk1','down',None,0.4,'1타'),('atk2','down',None,0.4,'2타'),('atk3','down',None,0.6,'3타'),('run','up',40,2.2,'달리기'),('atk1','up',None,0.4,'1타'),('atk2','up',None,0.4,'2타'),('atk3','up',None,0.6,'3타'),
+        ('run','down',50,2.2,'달리기'),('cast','down',None,0,'시전'),
         ('death','down',None,0,'사망'),('death','down',40,0,'사망')]
 x,y=120.0,200.0; k=0
 for m,d,ticks,sp,lab in SCRIPT:

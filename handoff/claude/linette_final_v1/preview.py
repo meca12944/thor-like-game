@@ -6,7 +6,7 @@ F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',16)
 man=json.load(open(H+'/manifest.json'))['motions']
 M=[('idle','대기'),('walk','걷기'),('run','달리기'),('dash','대시'),('hurt','맞기'),('death','사망'),('cast','시전'),('atk1','1타'),('atk2','2타'),('atk3','3타')]
 D=[('down','아래'),('up','위'),('left','왼쪽'),('right','오른쪽')]
-fr={(m,d):[Image.open(f).convert('RGBA').crop((38,40,218,200)) for f in sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))] for m,_ in M for d,_ in D}
+fr={(m,d):[Image.open(f).convert('RGBA').crop((38,40,218,200)) for f in sorted(glob.glob(f'{H}/frames_polished/{m}/{d}/*.png'))] for m,_ in M for d,_ in D if d in man[m]}
 def seq(m,d):
     s=[];[s.extend([i]*t) for i,t in enumerate(man[m][d]['ticks'])]
     if m in('death','hurt','dash','cast') or m.startswith('atk'): s+= [len(man[m][d]['ticks'])-1]*20 if m=='death' else [s[-1]]*8
@@ -20,6 +20,7 @@ for t in range(600):
         for r,(m,mk) in enumerate(M[p*5:p*5+5]):
             g.text((x0+4,TH+r*CH+70),mk,font=F,fill='black')
             for j,(d,_) in enumerate(D):
+                if d not in man[m]: continue   # attacks: side only
                 q=seq(m,d); im.alpha_composite(fr[(m,d)][q[t%len(q)]],(x0+LW+j*CW,TH+r*CH))
     im.convert('RGB').resize((W*3//2//2*2,Hh*3//2//2*2),Image.NEAREST).save(f'{T}/f_{t:04d}.png')
 subprocess.run(['ffmpeg','-y','-loglevel','error','-framerate','60','-i',f'{T}/f_%04d.png','-c:v','libx264','-pix_fmt','yuv420p','-crf','22',H+'/linette_all_motions_v1.mp4'],check=True)
