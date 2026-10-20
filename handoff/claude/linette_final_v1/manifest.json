@@ -1710,6 +1710,64 @@
      14
     ]
    }
+  },
+  "rjump": {
+   "right": {
+    "ticks": [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/rjump_east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   },
+   "left": {
+    "ticks": [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ],
+    "lunge": null,
+    "src": "linette_skel_v1/rjump_east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   }
   }
  }
 }

@@ -245,3 +245,14 @@
 2026-10-20 09:22:19 animate jump_east east seed 73 usage {"type": "generations", "generations": 3.0}
 2026-10-20 09:24:14 animate jump_south-east_diag south-east seed 73 usage {"type": "generations", "generations": 4.0}
 2026-10-20 09:24:33 animate jump_north-east_diag north-east seed 73 usage {"type": "generations", "generations": 4.0}
+2026-10-20 11:25:08 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/000.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:11 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/001.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:17 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/002.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:23 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/003.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:26 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/004.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:29 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/005.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:36 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/006.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:38 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/007.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:41 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/008.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:25:44 estimate /tmp/claude-0/-home-user-thor-like-game/a29f4f91-dc28-5c8c-bba3-8521caf6b08f/scratchpad/herodiag/rjump_right/009.png usage {"type": "generations", "generations": 0.1} keys ['usage', 'keypoints']
+2026-10-20 11:28:51 animate rjump_east east seed 73 usage {"type": "generations", "generations": 3.0}

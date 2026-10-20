@@ -404,5 +404,19 @@
    8,
    -2
   ]
+ },
+ "rjump_right": {
+  "scale": 1.0,
+  "offset": [
+   -9,
+   -2
+  ]
+ },
+ "rjump_left": {
+  "scale": 1.0,
+  "offset": [
+   10,
+   -2
+  ]
  }
 }
