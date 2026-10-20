@@ -43,7 +43,9 @@ MOT={ # name: (frames, action)  -- frame counts follow the hero set (256 canvas 
  'atk2':(8,"Attack 2 of 3: a quick straight thrust with the left-hand needle, the other needle pulled back, brief hold, then pull back to the stance."),
  'atk3':(8,"Attack 3 of 3, the finisher: a big lunging double thrust with both needles together, long step forward with full extension, hold the final pose, then recover."),
 }
-FACE={'south':" TRUE FRONT VIEW every frame: she faces the camera, chest and face toward the viewer; forward movement and attacks go DOWN the screen toward the camera; she never turns sideways or away.",
+FACE={'south-east':" Three-quarter FRONT view facing down-right every frame; she never turns away or sideways.",
+ 'north-east':" Three-quarter BACK view facing up-right every frame, face mostly hidden; arms and needles stay visible. She never turns around.",
+ 'south':" TRUE FRONT VIEW every frame: she faces the camera, chest and face toward the viewer; forward movement and attacks go DOWN the screen toward the camera; she never turns sideways or away.",
  'north':" TRUE BACK VIEW every frame: seen from directly behind, back of the head and ponytail visible, face never shown; forward movement and attacks go UP the screen; arms and needles stay visible beside the body. She never turns around.",
  'east':" STRICT SIDE VIEW every frame: facing RIGHT in profile, chest never turns toward the camera; everything moves toward the RIGHT. She never turns around.",
  'west':" STRICT SIDE VIEW every frame: facing LEFT in profile, chest never turns toward the camera; everything moves toward the LEFT. She never turns around."}

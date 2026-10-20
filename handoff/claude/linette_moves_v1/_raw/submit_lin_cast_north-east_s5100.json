@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Skill cast: she crosses both needles in front of her chest, gathers, then flings both arms forward as if releasing threads, holds the pose, then returns to the stance. Three-quarter BACK view facing up-right every frame, face mostly hidden; arms and needles stay visible. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 8,
+  "directions": [
+   "north-east"
+  ],
+  "animation_name": "lin_cast_north-east_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "8f58afc8-1ee7-4ca6-96ef-98eb8e00c454"
+  ],
+  "directions": [
+   "north-east"
+  ],
+  "animation_group_id": "acefc9f3-bae4-4478-b432-3c4356f740cb",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}

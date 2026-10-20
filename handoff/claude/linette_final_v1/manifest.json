@@ -373,6 +373,110 @@
      7,
      8
     ]
+   },
+   "down": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_moves_v1/cast/south-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "downl": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_moves_v1/cast/south-east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "up": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_moves_v1/cast/north-east",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "upl": {
+    "ticks": [
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5,
+     5
+    ],
+    "lunge": null,
+    "src": "linette_moves_v1/cast/north-east (mirrored)",
+    "pick": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ]
    }
   },
   "atk1": {

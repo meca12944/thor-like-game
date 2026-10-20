@@ -97,6 +97,34 @@
    -6
   ]
  },
+ "cast_down": {
+  "scale": 0.958,
+  "offset": [
+   19,
+   5
+  ]
+ },
+ "cast_downl": {
+  "scale": 0.958,
+  "offset": [
+   -7,
+   5
+  ]
+ },
+ "cast_up": {
+  "scale": 1.0,
+  "offset": [
+   -7,
+   -2
+  ]
+ },
+ "cast_upl": {
+  "scale": 1.0,
+  "offset": [
+   8,
+   -2
+  ]
+ },
  "atk1_right": {
   "scale": 1.0,
   "offset": [

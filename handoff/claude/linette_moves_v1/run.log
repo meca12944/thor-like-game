@@ -82,3 +82,9 @@
 [13:49:48] done lin_atk3_north_s5100 {'type': 'generations', 'generations': 8.0}
 [13:50:20] done lin_atk3_west_s5100 {'type': 'generations', 'generations': 8.0}
 [13:50:20] spent total from job records: 288.0
+[03:48:25] jobs=2 est=16 spent_so_far=288.0 cap=360
+[03:48:28] submitted lin_cast_south-east_s5100
+[03:48:28] submitted lin_cast_north-east_s5100
+[03:50:55] done lin_cast_north-east_s5100 {'type': 'generations', 'generations': 8.0}
+[03:51:05] done lin_cast_south-east_s5100 {'type': 'generations', 'generations': 8.0}
+[03:51:05] spent total from job records: 304.0
