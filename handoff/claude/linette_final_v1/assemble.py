@@ -10,7 +10,7 @@ def atk(hold): return ('seq',list(range(8))+[8,7,6,5,4,0],ATK+[hold,2,2,2,2,2])
 SRC={ # motion: {dir: (folder, frame filter or seq spec, ticks)}
  'idle':{'right':(V1+'/idle/east',list(range(8)),[7]*8),'down':(V1+'/idle/south',list(range(8)),[7]*8),'up':(V1+'/idle/north',list(range(8)),[7]*8)},
  'walk':{'right':(SK+'/walk_east',None,[4]*12),'down':(V1+'/walk/south',list(range(8)),[6]*8),'up':(V1+'/walk/north',list(range(8)),[6]*8)},
- 'run':{'right':(SK+'/run_east_B4',None,[3]*12),'down':(V1+'/run/south',list(range(8)),[5,4]*4),'up':(V1+'/run/north',list(range(8)),[5,4]*4)},
+ 'run':{'right':(SK+'/run_east_back',None,[3]*12),'down':(V1+'/run/south',list(range(8)),[5,4]*4),'up':(V1+'/run/north',list(range(8)),[5,4]*4)},
  'dash':{'right':(SK+'/dash_east',None,[3,3,4,4,3,3]),'down':(SK+'/dash_south_v3',None,[3,3,4,4,3,3]),'up':(SK+'/dash_north',None,[3,3,4,4,3,3])},
  'hurt':{'right':(SK+'/hurt_east',None,[3,4,5,4,3,3]),'down':(SK+'/hurt_south',None,[3,4,5,4,3,3]),'up':(SK+'/hurt_north',None,[3,4,5,4,3,3])},  # front/back dash+hurt redone with skeleton (v1 text frames had splayed crab legs)
  'death':{'right':(V1+'/death/east',None,[6]*9),'down':(V1+'/death/south',None,[6]*9),'up':(V1+'/death/north',None,[6]*9)},

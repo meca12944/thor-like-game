@@ -31,14 +31,14 @@
   "scale": 1.0,
   "offset": [
    4,
-   -1
+   0
   ]
  },
  "run_left": {
   "scale": 1.0,
   "offset": [
-   -3,
-   -1
+   -4,
+   0
   ]
  },
  "dash_right": {

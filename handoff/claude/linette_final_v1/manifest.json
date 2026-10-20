@@ -134,7 +134,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_east_B4",
+    "src": "linette_skel_v1/run_east_back",
     "pick": [
      0,
      1,
@@ -166,7 +166,7 @@
      3
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_east_B4 (mirrored)",
+    "src": "linette_skel_v1/run_east_back (mirrored)",
     "pick": [
      0,
      1,
