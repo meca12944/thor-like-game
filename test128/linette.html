@@ -23,7 +23,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
 <script>
 // Linette sandbox: atlas = assets/anim/linette8.json (hero8 format: cells [x,y,w,h,ax,ay], anims "<motion>_<dir>" = [[sheet,cell,ticks]]),
-// left = right mirrored; no north/south views (owner 10-20): walking up/down keeps the last left/right side, attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
+// left = right mirrored; no north/south views (owner 10-20): idle/walk/run/dash/skill/attacks facing up/down use the diagonal clips (hurt/death keep the last side), attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
 // Thrust trails are drawn in code from A.thrust (tip/dir at the lunge frame), like the hero's engine-drawn trails.
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let A,SH=[],VW=480,VH=270,SC=1;
@@ -64,7 +64,7 @@ function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])retur
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead)return;if(P.st==='atk'){P.queued=true;return;}if(P.st==='dash'||P.st==='hurt')return;P.combo=1;start('atk','atk1_'+atkDir());}
-function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+P.lastH);}
+function dash(){if(P.dead||P.st==='atk'||P.st==='dash')return;start('dash','dash_'+atkDir());}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function hurt(){if(P.dead)return;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;start('death','death_'+P.lastH);}
@@ -74,15 +74,15 @@ function step(){
   const moving=m>0.2;P.t++;
   if(P.st==='idle'||P.st==='move'){
     if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+P.lastH;if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
-    else if(P.st!=='idle'||P.clip!=='idle_'+P.lastH)start('idle','idle_'+P.lastH);
+      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+atkDir();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+    else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
     if(P.st==='atk'){const lt=A.thrust[P.clip];if(lt){const tl=L.slice(0,lt.frame).reduce((s,e)=>s+e[2],0);if(P.t>tl-3&&P.t<=tl){P.x+=lt.dir[0]*1.6;P.y+=lt.dir[1]*1.6;}}   // small lunge along the thrust
       const lt2=A.thrust[P.clip],tl2=lt2?L.slice(0,lt2.frame+1).reduce((s,e)=>s+e[2],0):T;
       if(P.queued&&P.combo<3&&P.t>=tl2){P.queued=false;P.combo++;start('atk','atk'+P.combo+'_'+atkDir());return;}}
-    if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+P.lastH);}
+    if(P.t>=T){if(P.st==='death'){P.t=T;return;}P.queued=false;start('idle','idle_'+atkDir());}
   }
 }
 // thrust trail (port of fx.py)
@@ -107,5 +107,5 @@ function draw(){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=6').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=6';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=7').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=7';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
