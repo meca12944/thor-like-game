@@ -13,3 +13,5 @@
 {"t": "2026-10-20 16:54:33", "name": "pixen_v7_s31", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 16:54:35", "name": "pixen_v7_s32", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 16:58:33", "name": "rotate_s3", "endpoint": "/create-character-v3", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 00:02:30", "name": "pixen_v7knee_s42", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-21 00:02:38", "name": "pixen_v7knee_s41", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}

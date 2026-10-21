@@ -5,9 +5,9 @@ import os, sys, json, time, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import pl
 D = os.path.dirname(os.path.abspath(__file__)); P = json.load(open(os.path.join(D, 'plan.json')))
 CID = json.load(open(os.path.join(D, 'rot', 'pick.json')))['character_id']
-COMMON = ('Same character as the rotation: messy short black hair, dark navy coat with gold trim, gold pauldrons on both shoulders, '
-          'long sword in the right hand. Face, outfit and proportions identical every frame. Coat tails stay short and close to the legs, '
-          'they do not flap. Bold outlines, no flickering pixels. NO glow, sparks, dust or effects. Keep facing the same direction the whole time.')
+COMMON = ('Same character as the rotation: messy spiky dark hair, navy hip-length jacket with gold trim, ornate gold pauldrons, brown bracers, gold knee guards, '
+          'long sword in the right hand. Face, outfit and proportions identical every frame. No cape and no coat tails, '
+          'nothing flaps. Bold outlines, no flickering pixels. NO glow, sparks, dust or effects. Keep facing the same direction the whole time.')
 SIDE = ' STRICT SIDE VIEW every frame, the chest never turns toward the camera.'
 BACK = ' BACK VIEW every frame, the face is never shown, sword and arms stay visible.'
 name = sys.argv[1]; spec = P['phaseA'].get(name) or P['phaseB'][name]
