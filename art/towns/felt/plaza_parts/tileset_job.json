@@ -1,0 +1,37 @@
+{
+ "usage": {
+  "type": "generations",
+  "generations": 4.0
+ },
+ "id": "546748d1-0533-4fe9-b94d-e77b30d0c9f1",
+ "status": "completed",
+ "created_at": "2026-10-21T12:22:06.966970+00:00",
+ "last_response": {
+  "seed": 1278761260,
+  "type": "done",
+  "usage": {
+   "seconds": 31.22296380996704
+  },
+  "action": "tiles",
+  "status": "completed",
+  "progress": 1.3694444444444445,
+  "tileset_id": "4568832f-3213-486f-aa22-0ce235640e76",
+  "frame_index": 0,
+  "request_type": "tileset",
+  "tileset_name": "dry grass with small dirt patches ↗ worn grey cobblestone village plaza with cracked",
+  "billing_usage": {
+   "usd": 0.0,
+   "type": "generations",
+   "generations": 4
+  },
+  "generation_id": "5201e396-b444-4028-82d2-e6b4a6b23cc4",
+  "queue_position": 0,
+  "billing_charged": true,
+  "saved_to_database": true,
+  "tileset_description": "dry grass with small dirt patches → worn grey cobblestone village plaza with cracked stones",
+  "generation_started_at": "2026-10-21T12:22:07.396949+00:00",
+  "estimated_wait_seconds": 0,
+  "original_image_n_colors": 221,
+  "quantized_image_n_colors": 45
+ }
+}
