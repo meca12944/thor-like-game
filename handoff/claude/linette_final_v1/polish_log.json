@@ -56,31 +56,31 @@
   ]
  },
  "walk_down": {
-  "scale": 1.044,
+  "scale": 1.0,
   "offset": [
-   -8,
-   -11
+   -20,
+   -6
   ]
  },
  "walk_downl": {
-  "scale": 1.044,
+  "scale": 1.0,
   "offset": [
-   -2,
-   -11
+   21,
+   -6
   ]
  },
  "walk_up": {
-  "scale": 1.074,
+  "scale": 1.0,
   "offset": [
-   16,
-   -12
+   2,
+   -2
   ]
  },
  "walk_upl": {
-  "scale": 1.074,
+  "scale": 1.0,
   "offset": [
-   -34,
-   -12
+   -2,
+   -2
   ]
  },
  "walk_south": {
@@ -114,29 +114,29 @@
  "run_down": {
   "scale": 1.0,
   "offset": [
-   -2,
-   6
+   -24,
+   -3
   ]
  },
  "run_downl": {
   "scale": 1.0,
   "offset": [
-   2,
-   6
+   26,
+   -3
   ]
  },
  "run_up": {
   "scale": 1.0,
   "offset": [
-   13,
-   6
+   -25,
+   1
   ]
  },
  "run_upl": {
   "scale": 1.0,
   "offset": [
-   -12,
-   6
+   26,
+   1
   ]
  },
  "run_south": {

@@ -57,3 +57,19 @@
 [2026-10-21 01:57:40] tween tw_srun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
 [2026-10-21 02:04:53] tween tw_nrun_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
 [2026-10-21 02:04:58] tween tw_nrun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:47:46] edit dg_ner_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:03] edit dg_ser_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:03] edit dg_ser_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:04] edit dg_se_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:12] edit dg_ne_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:13] edit dg_se_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:15] edit dg_ne_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:56] edit dg_ner_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:51:00] tween tw_ne_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:08] tween tw_ner_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:10] tween tw_ser_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:25] tween tw_se_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:34] tween tw_ser_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:43] tween tw_se_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:44] tween tw_ner_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:52:25] tween tw_ne_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
