@@ -29,7 +29,7 @@
     "up",
     "n"
    ],
-   "action": "breathing idle, standing still holding the sword lowered in the right hand"
+   "action": "calm breathing idle standing still, only the chest and shoulders rise and fall slightly, feet planted, the sword held lowered in the right hand pointing down, no other movement"
   },
   "walk": {
    "frames": 8,
@@ -41,7 +41,7 @@
     "up",
     "n"
    ],
-   "action": "walking at a steady pace, sword held low in the right hand"
+   "action": "walking at a steady natural pace, legs alternating, arms swinging gently opposite the legs, the sword held low in the right hand pointing down and back, it never rises"
   },
   "run": {
    "frames": 8,

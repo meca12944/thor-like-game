@@ -8,6 +8,7 @@ import sys, os, glob, json
 import numpy as np
 from PIL import Image
 SRC, OUT = sys.argv[1], sys.argv[2]; SP = float(sys.argv[3]) if len(sys.argv) > 3 else 2.2; GY = 189
+MODE = sys.argv[4] if len(sys.argv) > 4 else 'foot'   # foot = retime by planted-foot travel (side view); fixed:N = N ticks each; idle:N = torso locked to the median, N ticks
 os.makedirs(OUT, exist_ok=True)
 F = [np.array(Image.open(f).convert('RGBA')) for f in sorted(glob.glob(os.path.join(SRC, '*.png')))]; N = len(F)
 
@@ -22,7 +23,7 @@ def torso_x(a):
 dy = [GY - bottom(a) for a in F]
 X = [torso_x(a) for a in F]
 if any(v is None for v in X): X = [128.0] * N
-tgt = [float(np.mean([X[(i + j) % N] for j in range(-2, 3)])) for i in range(N)]
+tgt = [float(np.median(X))] * N if MODE.startswith('idle') else [float(np.mean([X[(i + j) % N] for j in range(-2, 3)])) for i in range(N)]
 dx = [int(round(tgt[i] - X[i])) for i in range(N)]
 G = []
 for i, a in enumerate(F):
@@ -43,6 +44,7 @@ for i in range(N):
     moves = [x - y for x in a for y in b if 0 <= x - y <= 30]
     t = round(min(moves, key=lambda m: abs(m - SP * 4)) / SP) if moves else 4   # no planted match (foot swap / flight) -> 4 ticks
     ticks.append(int(min(8, max(2, t))))
+if MODE != 'foot': ticks = [int(MODE.split(':')[1])] * N
 for i, im in enumerate(G): im.save(os.path.join(OUT, f'{i:03d}.png'))
 json.dump({'ticks': ticks, 'dx': dx, 'dy': dy, 'cycle_ticks': sum(ticks), 'speed': SP}, open(os.path.join(OUT, 'timing.json'), 'w'))
 print('dy', dy, 'dx', dx, 'ticks', ticks, 'cycle', sum(ticks))

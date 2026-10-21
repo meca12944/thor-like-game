@@ -16,7 +16,7 @@ def one(motion, pair):
     if os.path.isdir(out) and os.listdir(out): return motion, pair, 'skip'
     a, b = (('R', 'L') if pair == 'RL' else ('L', 'R'))
     img = lambda k: {'type': 'base64', 'base64': pl.b64(os.path.join(O, f'key_{motion}_{k}.png')), 'format': 'png'}
-    r = pl.submit('/animate-with-text-v3', {'first_frame': img(a), 'last_frame': img(b), 'action': ACT[motion], 'frame_count': 4, 'seed': 7, 'no_background': True})
+    r = pl.submit('/animate-with-text-v3', {'first_frame': img(a), 'last_frame': img(b), 'action': ACT[motion], 'frame_count': 4, 'seed': int(os.environ.get('TW_SEED', 7)), 'no_background': True})
     jid = r.get('background_job_id') or (r.get('background_job_ids') or [None])[0]
     if not jid: return motion, pair, 'submit failed ' + str(r)[:200]
     open(os.path.join(O, f'jobid_tw_{motion}_{pair}.txt'), 'w').write(jid)
