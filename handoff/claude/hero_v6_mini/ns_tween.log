@@ -1,2 +1,7 @@
 walk_south RL completed 4.0 5
 walk_south LR completed 4.0 5
+walk_north RL completed 4.0 5
+walk_north LR completed 4.0 5
+run_south RL completed 4.0 5
+run_south LR completed 4.0 5
+TOTAL hero_v6 usage 198.0
