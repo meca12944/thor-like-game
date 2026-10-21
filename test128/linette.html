@@ -13,7 +13,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 #knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
 </style></head><body>
 <canvas id="c"></canvas>
-<div id="hud">리네트 테스트 · 이동 WASD/방향키 · 공격 J · 대시 K · 달리기 L · 스킬 U · 점프 Space</div>
+<div id="hud">리네트 테스트 · 이동 방향키/WASD · 달리기 Shift(누르는 동안) 또는 L(켜기/끄기) · 공격 J/Z · 대시 K/X · 스킬 U/C · 점프 Space · 피격 H · 사망 G<br><span id="kbhint">PC: 화면을 한 번 클릭하면 키보드로 조작돼요</span></div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
@@ -50,10 +50,20 @@ const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=
  for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
 const P={x:0,y:0,face:'right',lastH:'right',st:'idle',t:0,clip:null,atk:null,run:false,dashT:0,dead:false};
 const K={};let joy={x:0,y:0};
-addEventListener('keydown',e=>{K[e.code]=1;if(e.code==='KeyJ')attack();if(e.code==='KeyK')dash();if(e.code==='KeyL')P.run=!P.run,ui();if(e.code==='KeyU')cast();if(e.code==='Space')jump();});
+// keyboard (owner 10-21 "조작 키보드로 할수있게"): arrows/WASD move, Shift held = run (L toggles), J/Z attack (held = combo), K/X dash, U/C skill, Space jump, H hurt, G death.
+// Keys never scroll the page; holding a key does not re-toggle; the touch pad hides while the keyboard is used and comes back on touch.
+const GAME_KEYS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','KeyJ','KeyZ','KeyK','KeyX','KeyL','KeyU','KeyC','KeyH','KeyG','ShiftLeft','ShiftRight'];
+function touchUI(on){for(const el of document.querySelectorAll('.btn,#stick'))el.style.display=on?'':'none';const h=document.getElementById('kbhint');if(h)h.style.display=on?'':'none';}
+addEventListener('keydown',e=>{if(GAME_KEYS.includes(e.code))e.preventDefault();if(!K.__kb){K.__kb=1;touchUI(false);}
+  const c=e.code;if(c==='KeyJ'||c==='KeyZ'){attack();}if(e.repeat){K[c]=1;return;}K[c]=1;
+  if(c==='KeyK'||c==='KeyX')dash();if(c==='KeyL'){P.run=!P.run;ui();}if(c==='KeyU'||c==='KeyC')cast();if(c==='Space')jump();if(c==='KeyH')hurt();if(c==='KeyG')die();});
 addEventListener('keyup',e=>{K[e.code]=0;});
+addEventListener('blur',()=>{for(const k in K)if(k!=='__kb')K[k]=0;});   // focus lost -> no stuck keys
+addEventListener('touchstart',()=>{if(K.__kb){K.__kb=0;touchUI(true);}},{passive:true});
+addEventListener('pointerdown',()=>{window.focus();},{capture:true});
 function tap(id,f){const b=document.getElementById(id);b.addEventListener('pointerdown',e=>{e.preventDefault();f();});}
 tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHurt',hurt);tap('bJump',jump);tap('bDie',die);
+const runHeld=()=>P.run||K.ShiftLeft||K.ShiftRight;   // L toggle or Shift held
 function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
 {const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
@@ -70,7 +80,7 @@ function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir()};}
 function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
-function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=P.run&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
 let TR=[];   // flying thrust trails (world space)
@@ -85,11 +95,11 @@ function step(){
     if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir()};else if(a.t>=total(La))P.atk=null;}
   if(P.st==='idle'||P.st==='move'){
     if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+(P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
     else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:P.run?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:runHeld()?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}start('idle','idle_'+atkDir());}
   }
