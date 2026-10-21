@@ -12,7 +12,7 @@ SIDE = ' STRICT SIDE VIEW every frame, the chest never turns toward the camera.'
 BACK = ' BACK VIEW every frame, the face is never shown, sword and arms stay visible.'
 name = sys.argv[1]; spec = P['phaseA'].get(name) or P['phaseB'][name]
 dirs = sys.argv[2:] or [P['dirs'][d] for d in spec['dirs']]
-seed = {'idle': 601, 'walk': 602, 'run': 603}.get(name, 610)
+seed = int(os.environ.get('ANIM_SEED') or {'idle': 601, 'walk': 602, 'run': 603}.get(name, 610))
 jobs = {}; gid = None
 for d in dirs:
     extra = SIDE if d == 'east' else BACK if d == 'north' else ''
