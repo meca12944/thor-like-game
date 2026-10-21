@@ -78,3 +78,11 @@ for m in ('idle','walk','run'):
             im=Image.open(f);c=Image.new('RGBA',(256,256));c.paste(im,(dx,0),im);c.save(f)
         log[f'{m}_{d}_center']={'scale':1.0,'dx':dx}
 json.dump(log,open(H+'/polish_log.json','w'),indent=1); print(json.dumps({k:v for k,v in log.items() if v['scale']!=1.0}))
+# owner 10-21 "리네트 몸이 마법진 밖으로 나간다": the throw cast steps forward -> every cast frame is centred on its own skirt (x=128),
+# so her body stays in the middle of the magic circle the whole cast (feet slide a little, the lunge still reads in the legs)
+for d in os.listdir(f'{OUT}/cast'):
+    for f in sorted(glob.glob(f'{OUT}/cast/{d}/*.png')):
+        c0=skirt_cx(f)
+        if c0 is None:continue
+        dx=round(128-c0)
+        if dx:im=Image.open(f);c=Image.new('RGBA',(256,256));c.paste(im,(dx,0),im);c.save(f)
