@@ -73,3 +73,13 @@
 - 크기는 **전체 키로 맞추지 않는다**(웅크린 달리기가 커진다). 머리(파란 리본 위) → 치마 아랫단(빨강 최하단) 길이로 모든 서기·걷기·달리기를 옆 서기와 같게(polish.py).
 - 위치는 발이 아니라 **몸(치마 가운데)** 기준으로 클립마다 한 번만 x 이동 → 방향 바꿀 때 옆으로 튀지 않는다.
 - 확인: `linette_final_v1/circle_check.py frames_polished out.png` — 모든 클립을 같은 원 안에 그려서 크기·튀어나온 곳을 본다.
+
+## 8. 최종 확정본 (2026-10-21 사장님 "이거 좋다")
+- **8방향 걷기·달리기 전부 같은 방식**: 방향마다 핵심 자세 1장(팔 흔들기 포함) + `tween.py key key … 8`로 한 주기 8장(`cycle8.py`). 좌우·정면·뒷면·대각선 모두.
+  - 핵심 자세 프롬프트에 팔: 걷기 `arms swing naturally opposite to the legs (one arm forward, the other back), each hand holding its thin silver needle`,
+    달리기 `arms pump energetically opposite to the legs (one arm forward with the elbow bent, the other back)` + 정면은 `neither hand is raised above the chest`.
+  - 뒷모습은 `the red bikini top and its thin back strap are clearly visible across her back` (안 쓰면 위로 뛸 때 브라가 사라짐).
+  - 대각선 뒷모습 주기는 `STRICT three-quarter BACK view … her face is never visible, she never turns to a side view` (안 쓰면 옆모습으로 돌아감).
+- **크기**: 머리→치마 길이로 옆 서기와 같게, **위치**: 치마 가운데 기준(7절). 확인은 `circle_check.py`.
+- **크기 바꿀 때는 무조건 `pxscale.py`** (부드럽게 줄인 뒤 원래 색으로 맞춤). 가장 가까운 픽셀 복사(NEAREST)는 도트 줄이 겹치거나 빠져 "도트가 부드럽지 않다".
+- 비용 감각: 동작 1개(한 방향) ≈ 18 (핵심 자세 10 + 한 주기 8). 리네트 8방향 걷기·달리기 + 수정까지 이번 이틀 약 550.
