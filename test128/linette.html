@@ -73,11 +73,14 @@ const clip=n=>A.anims[n];
 const total=L=>L.reduce((s,e)=>s+e[2],0);
 function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
 // owner 10-20: moving up/down uses the true front/back walk + run clips (walk_south / walk_north ...); idle and the rest keep the diagonal art
+// diagonal attacks: facing diagonally (last move had both axes) -> the stab flies at 45deg on screen (slightly flattened for the top-down view)
+function dir8(){if(!P.diag||P.face!=='down'&&P.face!=='up')return null;const sx=P.lastH==='left'?-1:1,sy=P.face==='down'?1:-1;return [sx*0.78,sy*0.62];}
+function diagMeta(m,d){if(!d)return m;const nx=-d[1],ny=d[0],tp=[d[0]*26,-62+d[1]*14];return {...m,dir:d,tip:m.tip2?[tp[0]+nx*6,tp[1]+ny*6]:tp,tip2:m.tip2?[tp[0]-nx*6,tp[1]-ny*6]:null};}
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
-function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir()};}
+function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
@@ -92,11 +95,12 @@ function step(){
   const moving=m>0.2;P.t++;
   if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
   if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
-    if(lt&&t0<tl&&a.t>=tl){TR.push({x:P.x,y:P.y-jz(),m:lt,t0:P.gt});strike(a.clip,a.n-1);}
-    if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir()};else if(a.t>=total(La))P.atk=null;}
+    if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt});strike(a.clip,a.n-1,mm);}
+    if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
   if(P.st==='idle'||P.st==='move'){
-    if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+    if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
+      if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
+      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
     else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
@@ -115,7 +119,7 @@ const STILL=true,FLY=7,ATK_SPEED=2;   // ATK_SPEED: attack clock per tick (owner
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
-function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
+function strike(n,hi,mo){const m=mo||tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
   const [dx,dy]=m.dir,reach=(m.big?100:74)+(STILL?FLY*10:0),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
   for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
     for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
