@@ -30,6 +30,21 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let A,SH=[],VW=480,VH=270,SC=1;
 function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/360,h/300)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
+// hero's magic circle + PixelLab fire ring (same assets/rules as test128 index CASTFIRE): the fire runs once around the circle from the front,
+// revealing the circle where it has passed, then burns out in 4 frames. S1 cyan / S2 red / S3 gold, cycling on each skill press.
+let FX=null,FIRE=null;
+const CIRC=[[[115,143,115,46,57,24],[463,143,115,46,57,24]],[[345,49,115,46,57,24],[693,49,115,46,57,24]],[[230,96,115,46,57,24],[578,96,115,46,57,24]]]; // [full, faded] per skill
+const FC=[0,85,170].flatMap(y=>[0,124,248,372,496].map(x=>[x,y,123,84,60,63])),RING=[-1,-2.5,57,22.5],A0=Math.PI/2,LAP0=2,LAPEND=26,POST=[4,12,22,34];
+function blitC(img,c,x,y){ctx.drawImage(img,c[0],c[1],c[2],c[3],x-c[4],y-c[5],c[2],c[3]);}
+function castFx(front,sx,sy){
+  if(!FX||P.skill==null)return;const casting=P.st==='cast',t=P.t,cx=sx+RING[0],cy=sy+RING[1],rx=RING[2],ry=RING[3];
+  if(!casting&&!P.cf)return;
+  const p=casting?(t-LAP0)/(LAPEND-LAP0):2,clipHalf=()=>{ctx.beginPath();ctx.rect(cx-rx-30,front?cy:cy-ry*3-60,rx*2+60,ry*3+60);ctx.clip();},
+        sector=sw=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.ellipse(cx,cy,rx+12,ry+12,0,A0,A0+sw);ctx.closePath();ctx.clip();};
+  if(!front&&casting){ctx.save();if(p<1){if(p<=0){ctx.restore();}else{sector(p*Math.PI*2);blitC(FX,CIRC[P.skill][0],sx,sy);ctx.restore();}}else{const T=total(clip(P.clip));blitC(FX,CIRC[P.skill][t>T-10?1:0],sx,sy);ctx.restore();}}
+  if(casting&&p>0&&p<1){ctx.save();clipHalf();sector(p*Math.PI*2);blitC(FIRE,FC[P.skill*5],sx,sy);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35;blitC(FIRE,FC[P.skill*5],sx,sy);ctx.restore();}
+  else if(p>=1){if(!P.cf)P.cf={t0:P.gt};const k=POST.findIndex(v=>P.gt-P.cf.t0<v);if(k<0){if(!casting)P.cf=null;return;}ctx.save();clipHalf();blitC(FIRE,FC[P.skill*5+1+k],sx,sy);ctx.restore();}
+}
 // grass field (pre-rendered tile)
 const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=TILE.getContext('2d');g.fillStyle='#567c46';g.fillRect(0,0,256,256);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
@@ -70,7 +85,7 @@ function start(st,name){P.st=st;P.t=0;P.clip=name;}
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
@@ -147,10 +162,10 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
     for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
-  sewFx(false,camX,camY);
+  castFx(false,sx,sy);sewFx(false,camX,camY);
   const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
-  sewFx(true,camX,camY);
+  castFx(true,sx,sy);sewFx(true,camX,camY);
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
@@ -212,5 +227,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=34').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=34';})));}).then(ims=>{SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=34').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=34';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
