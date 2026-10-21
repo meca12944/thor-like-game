@@ -248,7 +248,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_se_keys",
+    "src": "linette_ns_keys_v1/a_se_walk8",
     "pick": [
      0,
      1,
@@ -272,7 +272,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_se_keys (mirrored)",
+    "src": "linette_ns_keys_v1/a_se_walk8 (mirrored)",
     "pick": [
      0,
      1,
@@ -296,7 +296,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_ne_keys",
+    "src": "linette_ns_keys_v1/a_ne_walk8",
     "pick": [
      0,
      1,
@@ -320,7 +320,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_ne_keys (mirrored)",
+    "src": "linette_ns_keys_v1/a_ne_walk8 (mirrored)",
     "pick": [
      0,
      1,
@@ -344,7 +344,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_south_keys",
+    "src": "linette_ns_keys_v1/a_s_walk8",
     "pick": [
      0,
      1,
@@ -368,7 +368,7 @@
      6
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/walk_north_keys",
+    "src": "linette_ns_keys_v1/a_n_walk8",
     "pick": [
      0,
      1,
@@ -442,7 +442,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_se_keys8",
+    "src": "linette_ns_keys_v1/a_se_run8",
     "pick": [
      0,
      1,
@@ -466,7 +466,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_se_keys8 (mirrored)",
+    "src": "linette_ns_keys_v1/a_se_run8 (mirrored)",
     "pick": [
      0,
      1,
@@ -490,7 +490,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_ne_keys8",
+    "src": "linette_ns_keys_v1/a_ne_run8",
     "pick": [
      0,
      1,
@@ -514,7 +514,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_ne_keys8 (mirrored)",
+    "src": "linette_ns_keys_v1/a_ne_run8 (mirrored)",
     "pick": [
      0,
      1,
@@ -538,7 +538,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_south_keys",
+    "src": "linette_ns_keys_v1/a_s_run8",
     "pick": [
      0,
      1,
@@ -562,7 +562,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_ns_keys_v1/run_north_keys",
+    "src": "linette_ns_keys_v1/a_n_run8",
     "pick": [
      0,
      1,
