@@ -18,3 +18,4 @@
 {"t": "2026-10-21 00:07:53", "name": "rotate_s4", "endpoint": "/create-character-v3", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
 {"t": "2026-10-21 00:12:22", "name": "run_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
 {"t": "2026-10-21 01:47:07", "name": "run_east_v7b", "endpoint": "/characters/animations", "status": "completed", "usage": {"note": "job id not logged (script stalled); v3 8 frames = 8 like the other runs"}, "n": 8.0}
+{"t": "2026-10-21 01:53:21", "name": "run_east_seam", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 4.0}, "n": 4.0}
