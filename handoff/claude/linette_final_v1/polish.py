@@ -36,16 +36,22 @@ for m,dd in man['motions'].items():
         log[f'{m}_{d}']={'scale':round(sc,3),'offset':[round(128-c0*sc),round(189-b0*sc)]}
 # front/back runs (hero skeleton, foreshortened legs): snap every frame's lowest pixel to the ground line, then a 2px run bob,
 # so she neither floats nor sinks (owner 10-20 "다리가 왜이래")
-# owner 10-21 "캐릭 크기가 방향별로 틀려지네": every walk / run clip scaled about the feet so its median height = one target for all 8 directions
-SIZE_TARGET={'walk':117,'run':116,'idle':117}
-for m,tgt in SIZE_TARGET.items():
+# owner 10-21 "캐릭 크기가 방향별로 틀려지네" / "뛸때 좌우 크기가 훨씬 커": size = head-to-skirt length (blue ribbon top -> lowest red skirt pixel),
+# which legs and crouching do not change (full height made crouched runs look too big). Every idle / walk / run clip is scaled about the feet
+# so its median head-to-skirt = the side idle's.
+def upper(f):
+    a=np.array(Image.open(f).convert('RGBA')).astype(int);al=a[:,:,3]>0
+    by=np.where(al&(a[:,:,2]>a[:,:,0]+40)&(a[:,:,2]>120))[0];ry=np.where(al&(a[:,:,0]>150)&(a[:,:,1]<70)&(a[:,:,2]<80))[0]
+    return ry.max()-by.min() if len(by) and len(ry) else None
+_r=[upper(f) for f in sorted(glob.glob(f'{OUT}/idle/right/*.png'))];UTGT=sorted(v for v in _r if v)[len(_r)//2]
+for m in ('idle','walk','run'):
     for d in os.listdir(f'{OUT}/{m}'):
-        fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));hs=sorted((lambda b:b[3]-b[1])(Image.open(f).getbbox()) for f in fs);med=hs[len(hs)//2];sc=tgt/med
+        fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));us=sorted(v for v in (upper(f) for f in fs) if v);med=us[len(us)//2];sc=UTGT/med
         if abs(sc-1)<0.015:continue
         for f in fs:
             im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=im.resize((round(256*sc),round(256*sc)),Image.NEAREST)
             c=Image.new('RGBA',(256,256));c.paste(im2,(round(cx-cx*sc),round(fy-fy*sc)),im2);c.save(f)
-        log[f'{m}_{d}_size']={'median':med,'scale':round(sc,3)}
+        log[f'{m}_{d}_size']={'upper_median':int(med),'target':int(UTGT),'scale':round(sc,3)}
 for m,d in (('run','south'),('run','north'),('run','down'),('run','downl'),('run','up'),('run','upl'),('run','right'),('run','left')):   # key-pose runs: keep the drawn ground, but cap the airborne lift at 4px (more reads as hopping)
     fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));n=len(fs)
     for i,f in enumerate(fs):
@@ -56,4 +62,18 @@ for m,d in (('walk','down'),('walk','downl'),('walk','up'),('walk','upl'),('walk
     for i,f in enumerate(fs):
         im=Image.open(f);b=im.getbbox();dy=190-b[3]-(1 if i%4==2 else 0)
         c=Image.new('RGBA',(256,256));c.paste(im,(0,dy),im);c.save(f)
+# circle check (owner 10-21): centre every idle / walk / run clip on her body, not her feet - per clip one constant x shift so the median
+# skirt centre sits at x=128 (wide first-frame stances had pushed some clips sideways, so she jumped left/right when turning)
+def skirt_cx(f):
+    a=np.array(Image.open(f).convert('RGBA')).astype(int);al=a[:,:,3]>0;xs=np.where((al&(a[:,:,0]>150)&(a[:,:,1]<70)&(a[:,:,2]<80)).any(axis=0))[0]
+    return (xs.min()+xs.max())/2 if len(xs) else None
+for m in ('idle','walk','run'):
+    for d in os.listdir(f'{OUT}/{m}'):
+        fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));cs=sorted(v for v in (skirt_cx(f) for f in fs) if v is not None)
+        if not cs:continue
+        dx=round(128-cs[len(cs)//2])
+        if dx==0:continue
+        for f in fs:
+            im=Image.open(f);c=Image.new('RGBA',(256,256));c.paste(im,(dx,0),im);c.save(f)
+        log[f'{m}_{d}_center']={'scale':1.0,'dx':dx}
 json.dump(log,open(H+'/polish_log.json','w'),indent=1); print(json.dumps({k:v for k,v in log.items() if v['scale']!=1.0}))
