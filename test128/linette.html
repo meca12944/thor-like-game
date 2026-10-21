@@ -13,7 +13,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 #knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
 </style></head><body>
 <canvas id="c"></canvas>
-<div id="hud">리네트 테스트 · 이동 WASD/방향키 · 공격 J · 대시 K · 달리기 L · 스킬 U · 점프 Space</div>
+<div id="hud">리네트 테스트 · 이동 방향키/WASD · 달리기 Shift(누르는 동안) 또는 L(켜기/끄기) · 공격 J/Z · 대시 방향키 두 번 또는 K/X · 스킬 U/C · 점프 Space · 피격 H · 사망 G<br><span id="kbhint">PC: 화면을 한 번 클릭하면 키보드로 조작돼요</span></div>
 <div id="stick"><div id="knob"></div></div>
 <div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
 <div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
@@ -50,10 +50,23 @@ const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=
  for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
 const P={x:0,y:0,face:'right',lastH:'right',st:'idle',t:0,clip:null,atk:null,run:false,dashT:0,dead:false};
 const K={};let joy={x:0,y:0};
-addEventListener('keydown',e=>{K[e.code]=1;if(e.code==='KeyJ')attack();if(e.code==='KeyK')dash();if(e.code==='KeyL')P.run=!P.run,ui();if(e.code==='KeyU')cast();if(e.code==='Space')jump();});
+// keyboard (owner 10-21 "조작 키보드로 할수있게"): arrows/WASD move, Shift held = run (L toggles), J/Z attack (held = combo), K/X dash, U/C skill, Space jump, H hurt, G death.
+// Keys never scroll the page; holding a key does not re-toggle; the touch pad hides while the keyboard is used and comes back on touch.
+// double-tap a direction key = dash (owner 10-21 "앞으로 2번 하면 대쉬")
+const GAME_KEYS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','KeyJ','KeyZ','KeyK','KeyX','KeyL','KeyU','KeyC','KeyH','KeyG','ShiftLeft','ShiftRight'];
+function touchUI(on){for(const el of document.querySelectorAll('.btn,#stick'))el.style.display=on?'':'none';const h=document.getElementById('kbhint');if(h)h.style.display=on?'':'none';}
+addEventListener('keydown',e=>{if(GAME_KEYS.includes(e.code))e.preventDefault();if(!K.__kb){K.__kb=1;touchUI(false);}
+  const c=e.code;if(c==='KeyJ'||c==='KeyZ'){attack();}if(e.repeat){K[c]=1;return;}K[c]=1;
+  const DT={ArrowRight:'right',KeyD:'right',ArrowLeft:'left',KeyA:'left',ArrowDown:'down',KeyS:'down',ArrowUp:'up',KeyW:'up'}[c];   // double-tap a direction = dash that way
+  if(DT){const now=performance.now();if(K.__tapDir===DT&&now-K.__tapT<260){K.__tapT=0;if(DT==='left'||DT==='right'){P.face=DT;P.lastH=DT;}else P.face=DT;P.diag=false;dash();}else{K.__tapDir=DT;K.__tapT=now;}}
+  if(c==='KeyK'||c==='KeyX')dash();if(c==='KeyL'){P.run=!P.run;ui();}if(c==='KeyU'||c==='KeyC')cast();if(c==='Space')jump();if(c==='KeyH')hurt();if(c==='KeyG')die();});
 addEventListener('keyup',e=>{K[e.code]=0;});
+addEventListener('blur',()=>{for(const k in K)if(k!=='__kb')K[k]=0;});   // focus lost -> no stuck keys
+addEventListener('touchstart',()=>{if(K.__kb){K.__kb=0;touchUI(true);}},{passive:true});
+addEventListener('pointerdown',()=>{window.focus();},{capture:true});
 function tap(id,f){const b=document.getElementById(id);b.addEventListener('pointerdown',e=>{e.preventDefault();f();});}
 tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHurt',hurt);tap('bJump',jump);tap('bDie',die);
+const runHeld=()=>P.run||K.ShiftLeft||K.ShiftRight;   // L toggle or Shift held
 function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
 {const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
  const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
@@ -62,14 +75,18 @@ function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
 const clip=n=>A.anims[n];
 const total=L=>L.reduce((s,e)=>s+e[2],0);
 function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
+// owner 10-20: moving up/down uses the true front/back walk + run clips (walk_south / walk_north ...); idle and the rest keep the diagonal art
+// diagonal attacks: facing diagonally (last move had both axes) -> the stab flies at 45deg on screen (slightly flattened for the top-down view)
+function dir8(){if(!P.diag||P.face!=='down'&&P.face!=='up')return null;const sx=P.lastH==='left'?-1:1,sy=P.face==='down'?1:-1;return [sx*0.78,sy*0.62];}
+function diagMeta(m,d){if(!d)return m;const nx=-d[1],ny=d[0],tp=[d[0]*26,-62+d[1]*14];return {...m,dir:d,tip:m.tip2?[tp[0]+nx*6,tp[1]+ny*6]:tp,tip2:m.tip2?[tp[0]-nx*6,tp[1]-ny*6]:null};}
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
 function start(st,name){P.st=st;P.t=0;P.clip=name;}
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
-function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir()};}
+function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
-function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=P.run&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
 let TR=[];   // flying thrust trails (world space)
@@ -79,16 +96,18 @@ function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
   if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
   const moving=m>0.2;P.t++;
-  if(P.atk){const a=P.atk;a.t++;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
-    if(lt&&a.t===tl){TR.push({x:P.x,y:P.y-jz(),m:lt,t0:P.gt});strike(a.clip,a.n-1);}
-    if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir()};else if(a.t>=total(La))P.atk=null;}
+  if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
+  if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
+    if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt});strike(a.clip,a.n-1,mm);}
+    if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
   if(P.st==='idle'||P.st==='move'){
-    if(moving){if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const sp=P.run?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(P.run?'run_':'walk_')+atkDir();if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+    if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
+      if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
+      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
     else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:P.run?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:runHeld()?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
     if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}start('idle','idle_'+atkDir());}
   }
@@ -99,11 +118,11 @@ const VERT={down:1,downl:1,up:-1,upl:-1};
 function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return STILL?{...m,dir:[d==='left'?-1:1,0],tip:[m.tip[0]*0.4,m.tip[1]],tip2:m.tip2?[m.tip2[0]*0.4,m.tip2[1]]:null}:{...m,dir:[d==='left'?-1:1,0]};   // STILL: trail starts at the body front   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
   const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
 // owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게" + "동작 모션 없이": STILL = no attack pose (stays in idle), no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
-const STILL=true,FLY=7;
+const STILL=true,FLY=7,ATK_SPEED=2;   // ATK_SPEED: attack clock per tick (owner 10-21 "공속 빠르게" -> 2x)
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
-function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
+function strike(n,hi,mo){const m=mo||tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
   const [dx,dy]=m.dir,reach=(m.big?100:74)+(STILL?FLY*10:0),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
   for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
     for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
@@ -111,7 +130,19 @@ function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];let any=fals
   if(any){P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
-function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
+// owner 10-21 "좀더 앞으로 찌르는 듯한 검흔": a stab streak - a sharp spear-point head shoots forward fast (ease-out), the tail stays at the
+// needle tip for a moment and then snaps forward after the head, so it reads as one straight piercing line; thin speed lines beside it.
+function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=heavy?135:105,W=heavy?9:6;
+  const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3))+age*1.5,k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
+  const ox=x+tip[0],oy=y+tip[1],P=d=>[ox+dx*d,oy+dy*d];
+  const blade=(w,tailW,col,headLen)=>{const t=P(Tl),h=P(H),hb=P(Math.max(Tl,H-headLen));ctx.fillStyle=col;ctx.beginPath();
+    ctx.moveTo(t[0]+nx*tailW/2,t[1]+ny*tailW/2);ctx.lineTo(hb[0]+nx*w/2,hb[1]+ny*w/2);ctx.lineTo(h[0],h[1]);ctx.lineTo(hb[0]-nx*w/2,hb[1]-ny*w/2);ctx.lineTo(t[0]-nx*tailW/2,t[1]-ny*tailW/2);ctx.closePath();ctx.fill();};
+  if(heavy)blade(W*2.2,0,`rgba(60,150,255,${.28*a})`,26);
+  blade(W*1.4,0,`rgba(90,210,255,${.5*a})`,22);blade(W*0.7,0,`rgba(215,250,255,${.9*a})`,18);blade(Math.max(1.5,W*0.28),0,`rgba(255,255,255,${a})`,14);
+  ctx.strokeStyle=`rgba(200,245,255,${.6*a})`;ctx.lineWidth=1;
+  for(const[o,f]of(heavy?[[1.3,.55],[-1.3,.45],[2.1,.3],[-2.1,.35]]:[[1.2,.5],[-1.2,.4]])){const s0=Tl+(H-Tl)*0.1,s1=Tl+(H-Tl)*(0.1+f),p0=P(s0),p1=P(s1);ctx.beginPath();ctx.moveTo(p0[0]+nx*o*W,p0[1]+ny*o*W);ctx.lineTo(p1[0]+nx*o*W,p1[1]+ny*o*W);ctx.stroke();}
+  if(age<3){const h=P(H+2),r=heavy?6:4;ctx.fillStyle=`rgba(255,255,255,${1-age/3})`;ctx.fillRect(h[0]-r,h[1],2*r,1);ctx.fillRect(h[0],h[1]-r,1,2*r);}}
+function trailOne(x,y,m,tip,age,heavy){if(STILL)return stabOne(x,y,m,tip,age,heavy);const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
   const fly=STILL?age*FLY:0,tx=x+tip[0]+dx*fly,ty=y+tip[1]+dy*fly,ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
   if(heavy)lance(cx,cy,dx,dy,nx,ny,back+ahead*.45,ahead*.75,W*1.6,`rgba(60,150,255,${.31*a})`);
   lance(cx,cy,dx,dy,nx,ny,back+ahead*.35,ahead*.65,W,`rgba(90,210,255,${.47*a})`);lance(cx,cy,dx,dy,nx,ny,back*.8+ahead*.3,ahead*.6,W*.45,`rgba(210,250,255,${.86*a})`);
@@ -141,5 +172,5 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=17').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=17';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=34').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=34';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
