@@ -19,3 +19,9 @@
 {"t": "2026-10-21 00:12:22", "name": "run_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
 {"t": "2026-10-21 01:47:07", "name": "run_east_v7b", "endpoint": "/characters/animations", "status": "completed", "usage": {"note": "job id not logged (script stalled); v3 8 frames = 8 like the other runs"}, "n": 8.0}
 {"t": "2026-10-21 01:53:21", "name": "run_east_seam", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 4.0}, "n": 4.0}
+{"t": "2026-10-21 10:31:42", "name": "key_walk_north_R", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:31:43", "name": "key_run_south_R", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:31:49", "name": "key_walk_south_R", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:31:55", "name": "key_run_north_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:31:56", "name": "key_run_south_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:31:58", "name": "key_run_north_R", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
