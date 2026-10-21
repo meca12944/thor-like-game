@@ -1,1 +1,3 @@
 {'background_job_ids': "['c6647c8a-baf4-4262-b095-417ca8e8bcb9']", 'directions': "['east']", 'animation_group_id': 'c08bbe85-367e-4a1f-810f-e08c28ad0b05', 'status': 'processing', 'enhanced_prompt': 'None', 'enhance_usage': 'None'}
+{'t': '2026-10-21 11:09:28', 'name': 'walk_east_seam', 'endpoint': '/characters/animations', 'status': 'completed', 'usage': {'type': 'generations', 'generations': 4.0}, 'n': 4.0}
+saved 5

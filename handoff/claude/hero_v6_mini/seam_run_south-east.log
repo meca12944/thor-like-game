@@ -1,1 +1,3 @@
 {'background_job_ids': "['0ac7d2b1-7b52-4fb5-b035-c803bb97b222']", 'directions': "['south-east']", 'animation_group_id': 'a825813e-c4c0-4a46-b711-9598716d2e87', 'status': 'processing', 'enhanced_prompt': 'None', 'enhance_usage': 'None'}
+{'t': '2026-10-21 11:08:27', 'name': 'run_south-east_seam', 'endpoint': '/characters/animations', 'status': 'completed', 'usage': {'type': 'generations', 'generations': 4.0}, 'n': 4.0}
+saved 5
