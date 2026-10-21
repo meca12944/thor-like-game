@@ -59,7 +59,7 @@ def images(j):
     lr = j.get('last_response') or {}
     out = []
     for im in (lr.get('images') or []) + ([lr['image']] if lr.get('image') else []):
-        if isinstance(im, dict) and im.get('base64'): out.append(base64.b64decode(im['base64']))
+        if isinstance(im, dict) and im.get('base64'): out.append(base64.b64decode(im['base64'].split(',')[-1]))
         elif isinstance(im, str) and len(im) > 100: out.append(base64.b64decode(im.split(',')[-1]))
     return out
 
