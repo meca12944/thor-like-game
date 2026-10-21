@@ -85,7 +85,7 @@ function start(st,name){P.st=st;P.t=0;P.clip=name;}
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;document.getElementById('bCast').textContent='스킬 S'+(P.skill+1);start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
+function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
@@ -100,6 +100,7 @@ function step(){
   if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
     if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt});strike(a.clip,a.n-1,mm);}
     if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
+  skillStep();
   if(P.st==='idle'||P.st==='move'){
     if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
       if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
@@ -161,14 +162,68 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
     for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
-  castFx(false,sx,sy);
+  castFx(false,sx,sy);sewFx(false,camX,camY);
   const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
-  castFx(true,sx,sy);
+  castFx(true,sx,sy);sewFx(true,camX,camY);
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
   for(const T of TR){const age=P.gt-T.t0,x=Math.round(T.x-camX),y=Math.round(T.y-camY);if(T.m.tip2){trailOne(x,y,T.m,T.m.tip,age,true);trailOne(x,y,T.m,T.m.tip2,age,true);}else trailOne(x,y,T.m,T.m.tip,age,false);}TR=TR.filter(T=>P.gt-T.t0<20);
+}
+// owner 10-21 "리네트 스킬 만들어보자" -> 재봉사 실/바늘, 3 skills cycling on each press (cast pose = her two needle-rapiers spreading):
+// S1 바늘비: a fan of needles with red thread tails flies forward and pierces. S2 실 묶기: one needle on a red thread shoots out,
+// wraps the first dummy it hits in thread loops and yanks it back. S3 재봉진: a needle sews a running-stitch circle around her
+// (starts at the front, one lap) and then the stitches flash gold and 12 needles burst outward. All drawn in code as pixel lines.
+const SKN=['S1 바늘비','S2 실 묶기','S3 재봉진'];
+const NC={tip:'#ffffff',body:'#dfe6ee',shade:'#8d98a6',th:'#d8283a',thl:'#ff6a78',gold:'#ffd25a'};
+let NDL=[],ROPE=null,STITCH=null;
+function skDir(){const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);return [d[0]/m,d[1]/m];}
+function pline(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);ctx.fillStyle=col;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;
+  for(let i=0;i<400;i++){ctx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+function needle(x,y,dx,dy,len,a){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a*.35;ctx.strokeStyle='#bfe8ff';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x-dx*len*.5,y-dy*len*.5);ctx.lineTo(x+dx*len*.6,y+dy*len*.6);ctx.stroke();ctx.restore();ctx.globalAlpha=a;const tx=x+dx*len*.5,ty=y+dy*len*.5,bx=x-dx*len*.5,by=y-dy*len*.5;
+  pline(bx-dy,by+dx,tx-dy,ty+dx,NC.shade);pline(bx,by,tx,ty,NC.body);pline(bx+dy,by-dx,tx+dy,ty-dx,NC.body);pline(tx-dx*2,ty-dy*2,tx,ty,NC.tip);ctx.fillStyle=NC.shade;ctx.fillRect(Math.round(bx),Math.round(by),1,1);ctx.globalAlpha=1;}
+function thread(pts,a,col){ctx.globalAlpha=a;for(let i=1;i<pts.length;i++){pline(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],col||NC.th);pline(pts[i-1][0],pts[i-1][1]+1,pts[i][0],pts[i][1]+1,col||NC.th);}ctx.globalAlpha=1;}
+function hitD(D,dmg,push,dx,dy,big){if(D.fl>=6)return false;D.fl=10;D.x+=dx*push;D.y+=dy*push;D.pops.push({v:dmg,a:0,big});return true;}
+const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-64&&y<D.y+6;   // dummy body box (post + head), so chest-high needles hit
+function hand(){const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*16,P.y-jz()-62+d[1]*6];}
+function skillStep(){
+  if(P.st==='cast'&&P.sk){const k=P.skill,t=P.t,S=P.sk,[dx,dy]=S.d;
+    if(k===0&&t>=22&&S.fired<7&&t%1===0){const i=S.fired++,o=[0,-1,1,-2,2,-3,3][i]*0.13,ca=Math.cos(o),sa=Math.sin(o),vx=dx*ca-dy*sa,vy=dx*sa+dy*ca,[hx,hy]=hand();
+      NDL.push({x:hx,y:hy,vx:vx*7.5,vy:vy*7.5,age:0,life:30,hit:new Set(),tail:[],dmg:9});}
+    if(k===1&&t===20&&!S.fired){S.fired=1;const [hx,hy]=hand();ROPE={x:hx,y:hy,dx,dy,age:0,ph:'fly',dist:0,D:null};}
+    if(k===2&&t===2&&!S.fired){S.fired=1;STITCH={age:0,x:P.x,y:P.y,a0:Math.atan2(dy,dx)};}
+  }
+  for(const n of NDL){n.age++;n.tail.unshift([n.x,n.y]);if(n.tail.length>7)n.tail.pop();n.x+=n.vx;n.y+=n.vy;
+    for(const D of DUM){if(n.hit.has(D))continue;if(inD(D,n.x,n.y,14)){n.hit.add(D);const m=Math.hypot(n.vx,n.vy);if(hitD(D,n.dmg,n.big?6:3,n.vx/m,n.vy/m,n.big)){P.stop=Math.max(P.stop||0,n.big?4:1);SHAKE=Math.max(SHAKE,n.big?2.5:1);}}}}
+  NDL=NDL.filter(n=>n.age<n.life);
+  if(ROPE){const R=ROPE;R.age++;
+    if(R.ph==='fly'){R.dist+=11;R.x+=R.dx*11;R.y+=R.dy*11;for(const D of DUM)if(inD(D,R.x,R.y,16)){R.D=D;R.ph='wrap';R.t0=R.age;hitD(D,16,0,R.dx,R.dy,false);P.stop=3;SHAKE=Math.max(SHAKE,1.5);break;}if(R.ph==='fly'&&R.dist>210){R.ph='back';}}
+    else if(R.ph==='wrap'){const D=R.D;R.x=D.x;R.y=D.y-34;if(R.age-R.t0>=16){R.ph='yank';R.t0=R.age;const [hx,hy]=hand(),vx=hx-D.x,vy=(hy+30)-D.y,m=Math.hypot(vx,vy)||1;hitD(D,34,Math.min(70,m-34),vx/m,vy/m,true);P.stop=8;SHAKE=Math.max(SHAKE,4);}}
+    else if(R.ph==='yank'){const D=R.D;R.x=D.x;R.y=D.y-34;if(R.age-R.t0>=22)ROPE=null;}
+    else if(R.ph==='back'){const [hx,hy]=hand(),vx=hx-R.x,vy=hy-R.y,m=Math.hypot(vx,vy);if(m<14)ROPE=null;else{R.x+=vx/m*14;R.y+=vy/m*14;}}}
+  if(STITCH){const S=STITCH;S.age++;S.x=P.x;S.y=P.y;
+    if(S.age===30){const R0=[74,30];for(let i=0;i<12;i++){const a=S.a0+i*Math.PI/6,cx=Math.cos(a),cy=Math.sin(a),m=Math.hypot(cx,cy*0.5);
+      NDL.push({x:S.x+cx*R0[0],y:S.y-6+cy*R0[1],vx:cx/m*8,vy:cy*0.5/m*8,age:0,life:22,hit:new Set(),tail:[],dmg:28,big:true});}SHAKE=Math.max(SHAKE,3);}
+    if(S.age>44)STITCH=null;}
+}
+// one stitch lap: front (angle a0 = facing) round once; stitches = short dashes on the ellipse, back half drawn behind her
+function sewFx(front,camX,camY){
+  if(STITCH){const S=STITCH,cx=S.x-camX,cy=S.y-6-camY,rx=74,ry=30,p=Math.min(1,(S.age-2)/24),N=28,flash=S.age>=30;
+    const fade=S.age>34?1-(S.age-34)/10:1;
+    for(let i=0;i<N*p;i++){const a0=S.a0+i/N*Math.PI*2,a1=a0+0.6/N*Math.PI*2,y0=Math.sin(a0);if(front!==(y0>=0))continue;
+      const col=flash?(S.age<33?'#ffffff':NC.gold):(i%2?NC.th:NC.thl);ctx.globalAlpha=fade;pline(cx+Math.cos(a0)*rx,cy+y0*ry,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry,col);pline(cx+Math.cos(a0)*rx,cy+y0*ry+1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry+1,col);
+      if(flash&&S.age<38){ctx.globalAlpha=fade*.45;pline(cx+Math.cos(a0)*rx,cy+y0*ry-1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry-1,NC.gold);}ctx.globalAlpha=1;}
+    if(!flash&&p<1&&p>0){const a=S.a0+p*Math.PI*2,y=Math.sin(a);if(front===(y>=0)){const nx=cx+Math.cos(a)*rx,ny=cy+y*ry,tx=-Math.sin(a),ty=Math.cos(a)*ry/rx,m=Math.hypot(tx,ty);needle(nx,ny-2,tx/m,ty/m,15,1);}}}
+  if(!front)return;
+  for(const n of NDL){const a=n.age>n.life-6?(n.life-n.age)/6:1,m=Math.hypot(n.vx,n.vy),x=n.x-camX,y=n.y-camY;
+    if(n.tail.length>1)thread([[x,y],...n.tail.map(q=>[q[0]-camX+(Math.random()<.5?0:1),q[1]-camY])],a*.85,n.big?NC.gold:NC.th);
+    needle(x,y,n.vx/m,n.vy/m,n.big?18:15,a);}
+  if(ROPE){const R=ROPE,[hx,hy]=hand(),x0=hx-camX,y0=hy-camY,x1=R.x-camX,y1=R.y-camY,sag=R.ph==='fly'||R.ph==='back'?8:R.ph==='wrap'?3:0,pts=[];
+    for(let i=0;i<=10;i++){const u=i/10;pts.push([x0+(x1-x0)*u,y0+(y1-y0)*u+Math.sin(u*Math.PI)*sag]);}thread(pts,1,NC.th);thread(pts.map(q=>[q[0],q[1]-1]),.5,NC.thl);
+    if(R.ph==='fly'||R.ph==='back')needle(x1,y1,R.dx,R.dy,16,1);
+    if(R.D&&(R.ph==='wrap'||R.ph==='yank')){const D=R.D,dx=D.x-camX,dy=D.y-camY,n=R.ph==='wrap'?Math.min(4,1+(R.age-R.t0)/4):4,a=R.ph==='yank'?Math.max(0,1-(R.age-R.t0-10)/12):1;
+      for(let i=0;i<n;i++){const yy=dy-14-i*9,rx=12-i*0.5,ry=3.5;ctx.globalAlpha=a;for(let j=0;j<16;j++){const a0=j/16*Math.PI*2,a1=(j+1)/16*Math.PI*2;pline(dx+Math.cos(a0)*rx,yy+Math.sin(a0)*ry,dx+Math.cos(a1)*rx,yy+Math.sin(a1)*ry,j%2?NC.th:NC.thl);}ctx.globalAlpha=1;}}}
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
