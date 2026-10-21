@@ -185,8 +185,10 @@ function needle(x,y,dx,dy,len,a){ctx.save();ctx.globalCompositeOperation='lighte
   pline(bx-dy,by+dx,tx-dy,ty+dx,NC.shade);pline(bx,by,tx,ty,NC.body);pline(bx+dy,by-dx,tx+dy,ty-dx,NC.body);pline(tx-dx*2,ty-dy*2,tx,ty,NC.tip);ctx.fillStyle=NC.shade;ctx.fillRect(Math.round(bx),Math.round(by),1,1);ctx.globalAlpha=1;}
 function thread(pts,a,col){ctx.globalAlpha=a;for(let i=1;i<pts.length;i++){pline(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],col||NC.th);pline(pts[i-1][0],pts[i-1][1]+1,pts[i][0],pts[i][1]+1,col||NC.th);}ctx.globalAlpha=1;}
 function hitD(D,dmg,push,dx,dy,big){if(D.fl>=6)return false;D.fl=10;D.x+=dx*push;D.y+=dy*push;D.pops.push({v:dmg,a:0,big});return true;}
-const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-64&&y<D.y+6;   // dummy body box (post + head), so chest-high needles hit
-function hand(){const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*34,P.y-jz()-66+d[1]*8];}   // throwing hand (cast key: front arm straight out at chest height)
+const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-100&&y<D.y+6;   // dummy body box (post + head + room above), so needles thrown from her raised hand still hit
+// owner 10-21 "몇몇 동작에서 손에 실이 안나온다": the thread starts at the needle in her hand = measured tip of the current cast frame (A.casttip)
+function tipNow(){const n=P.clip,T=A.casttip&&A.casttip[n];if(P.st!=='cast'||!T)return null;const L=clip(n);let t=P.t;for(let i=0;i<L.length;i++){if(t<L[i][2])return T[i];t-=L[i][2];}return T[T.length-1];}
+function hand(){const tp=tipNow();if(tp){P.lastTip=tp;P.lastTipClip=P.clip;}const q=tp||(P.lastTip&&P.sk?P.lastTip:null);if(q)return [P.x+q[0],P.y-jz()+q[1]];const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*34,P.y-jz()-66+d[1]*8];}
 function skillStep(){
   if(P.st==='cast'&&P.sk){const k=P.skill,t=P.t,S=P.sk,[dx,dy]=S.d;
     if(k===0&&t>=22&&S.fired<7&&t%1===0){const i=S.fired++,o=[0,-1,1,-2,2,-3,3][i]*0.13,ca=Math.cos(o),sa=Math.sin(o),vx=dx*ca-dy*sa,vy=dx*sa+dy*ca,[hx,hy]=hand();
@@ -216,6 +218,10 @@ function sewFx(front,camX,camY){
       if(flash&&S.age<38){ctx.globalAlpha=fade*.45;pline(cx+Math.cos(a0)*rx,cy+y0*ry-1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry-1,NC.gold);}ctx.globalAlpha=1;}
     if(!flash&&p<1&&p>0){const a=S.a0+p*Math.PI*2,y=Math.sin(a);if(front===(y>=0)){const nx=cx+Math.cos(a)*rx,ny=cy+y*ry,tx=-Math.sin(a),ty=Math.cos(a)*ry/rx,m=Math.hypot(tx,ty);needle(nx,ny-2,tx/m,ty/m,15,1);}}}
   if(!front)return;
+  if(P.st==='cast'&&P.sk){const [hx,hy]=hand(),x=hx-camX,y=hy-camY,t=P.t;
+    if(t<20){for(let i=0;i<3;i++){const a0=t*0.5+i*2.1;thread([[x,y],[x+Math.cos(a0)*6,y+Math.sin(a0)*3-2],[x+Math.cos(a0+1.2)*7,y+Math.sin(a0+1.2)*3.5-2]],.9,i%2?NC.thl:NC.th);}}   // winding: little thread loops spinning on the needle
+    else if(P.skill===0){for(const n of NDL)if(!n.big&&n.age<10)thread([[x,y],[n.x-camX,n.y-camY]],1-n.age/10,NC.th);}
+    else if(P.skill===2&&STITCH&&STITCH.age<30){const S=STITCH,p=Math.min(1,(S.age-2)/24),a=S.a0+p*Math.PI*2;thread([[x,y],[S.x-camX+Math.cos(a)*74,S.y-6-camY+Math.sin(a)*30]],.8,NC.th);}}
   for(const n of NDL){const a=n.age>n.life-6?(n.life-n.age)/6:1,m=Math.hypot(n.vx,n.vy),x=n.x-camX,y=n.y-camY;
     if(n.tail.length>1)thread([[x,y],...n.tail.map(q=>[q[0]-camX+(Math.random()<.5?0:1),q[1]-camY])],a*.85,n.big?NC.gold:NC.th);
     needle(x,y,n.vx/m,n.vy/m,n.big?18:15,a);}
@@ -227,5 +233,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=35').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=35';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=36').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=36';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
