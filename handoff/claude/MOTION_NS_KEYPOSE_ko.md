@@ -59,3 +59,12 @@
 - [ ] 장마다 키가 같나 (cycle_ns 출력 h 값), 얼굴·디자인이 원본과 같나
 - [ ] 달리기 공중 높이 4px 이하, 걷기는 땅에서 안 뜨나
 - [ ] 크레딧은 잔액 앞뒤로 확인, 다른 방 사용분과 구분해서 보고
+
+## 6. 대각선(3/4) 추가 교훈 (2026-10-21)
+- 대각선도 같은 방식으로 된다(↘/↗ 원본에서 "the leg nearer to the viewer / the far leg"로 2장, 좌우 단어 대신 near/far).
+- **함정**: 대각선 **달리기**는 near/far 두 장이 사실상 같은 자세로 나오는 경우가 있다 → 반 주기마다 다리가 한 바퀴씩 돌아 교차 장이 이상해진다(사장님 "다리교차 프레임 이상").
+  확인법: 두 핵심 자세를 나란히 놓고 **뒤로 간 다리가 서로 반대인지** 본다. 같으면 →
+  `tween.py key.png key.png tw8_<d> 8 "one complete natural human running cycle … ends back in this exact starting pose; legs alternate cleanly, one crossing per step …"` (8) 한 번으로
+  한 주기 8장을 받고 `cycle8.py`로 키를 맞춘다. 이쪽이 더 싸다(8 vs 8+사이장).
+- 대각선 걷기는 아래로 걸을 때 몇 장이 7px 뜬다 → polish에서 걷기는 발을 땅선에 붙임(1px 출렁임). 달리기는 4px 이상 뜨지 않게, 땅 아래로 묻히지 않게.
+- 리네트 대각선: 핵심 자세 8장 80 + 사이 장 32 + 달리기 한 주기 2회 16 = 128.
