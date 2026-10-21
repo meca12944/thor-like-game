@@ -10,6 +10,8 @@ ACT = {
  'walk_north': 'natural human walk away from the viewer, back view the whole time: the back leg swings forward past the standing leg, knee bends as it passes, body rises slightly at the passing moment, gentle opposite arm swing, sword pointing down, no effects',
  'run_south': 'natural human run toward the viewer, front view the whole time: the pushing leg swings through and its knee drives up while the other leg comes down and pushes off, brief moment with both feet off the ground, arms at his sides, sword held low pointing down, no effects',
  'run_north': 'natural human run away from the viewer, back view the whole time: the kicked-up heel swings through and that knee drives forward while the other leg pushes off and its heel kicks up showing the sole, arms at his sides, sword held low pointing down, no effects',
+ 'walk_se': 'natural human walk toward the bottom-right, three-quarter view the whole time at the same angle: the back leg swings forward past the standing leg, knee bends as it passes, body rises slightly at the passing moment, arms swing opposite to the legs, sword held low pointing down, no effects',
+ 'run_se': 'natural human run toward the bottom-right, three-quarter view the whole time at the same angle: the pushing leg swings through and its knee drives up while the other leg comes down and pushes off, brief moment with both feet off the ground, elbows bent, arms swinging opposite to the legs, sword held low pointing down, no effects',
 }
 def one(motion, pair):
     out = os.path.join(O, f'tw_{motion}_{pair}'); 

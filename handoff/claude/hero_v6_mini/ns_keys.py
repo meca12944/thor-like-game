@@ -11,6 +11,8 @@ P = {
  'walk_north': "Natural human walking pose walking AWAY from the viewer, back view, seen from behind, we see his back and the back of his head, mid-stride contact: his {A} leg (on the {a} side of the image) steps forward away from the viewer, heel touching the ground, that foot slightly higher in the image; his {B} leg is behind him nearer the viewer, knee slightly bent, heel lifted so we see the sole of the boot. Feet about hip width apart, not crossed. Hips level, slight natural arm swing, the sword pointing down.",
  'run_south': "Natural human RUNNING pose toward the viewer, front view facing the viewer, face visible: his {A} knee ({a} side of the image) drives up and forward toward the viewer, thigh raised, foot off the ground under the knee; his {B} leg pushes off behind, nearly straight, only the toes touching the ground. Torso leaning slightly forward, both arms at his sides slightly pulled back, the sword held low pointing down. Not crossed, human proportions.",
  'run_north': "Natural human RUNNING pose running AWAY from the viewer, back view, seen from behind: his {A} knee ({a} side of the image) drives up and forward away from the viewer; his {B} leg behind him nearer the viewer is bent with the heel kicked up high so we see the sole of the boot. Torso leaning slightly forward, both arms at his sides slightly pulled back, the sword held low pointing down. Not crossed, human proportions.",
+ 'walk_se': "Natural human walking pose, three-quarter view facing toward the bottom-right of the image the whole time, exactly the same angle as the input, mid-stride contact: his {A} leg steps forward with the heel touching the ground, that foot further toward the bottom-right; his {B} leg is behind him, knee slightly bent, standing on the toes. Not crossed, hips level, torso upright, slight natural arm swing opposite to the legs, the sword held low in his right hand pointing down.",
+ 'run_se': "Natural human RUNNING pose, three-quarter view facing toward the bottom-right of the image, exactly the same angle as the input: his {A} knee drives up and forward, thigh raised, foot off the ground under the knee; his {B} leg pushes off behind him, nearly straight, only the toes touching the ground. Torso leaning slightly forward, both elbows bent, arms swinging opposite to the legs, the sword held low in his right hand pointing down. Not crossed, human proportions.",
 }
 def side(motion, leg):   # his RIGHT leg = image left on the front view, image right on the back view
     front = motion.endswith('south')
@@ -20,7 +22,7 @@ def one(motion, key):
     if os.path.exists(out): return motion, key, 'skip'
     A, B = ('RIGHT', 'LEFT') if key == 'R' else ('LEFT', 'RIGHT')
     desc = P[motion].format(A=A, B=B, a=side(motion, A)) + TAIL
-    src = os.path.join(D, 'rot', 's4', 'south.png' if motion.endswith('south') else 'north.png')
+    src = os.path.join(D, 'rot', 's4', 'south-east.png' if motion.endswith('_se') else 'south.png' if motion.endswith('south') else 'north.png')
     body = {'method': 'edit_with_text', 'edit_images': [{'image': {'type': 'base64', 'base64': pl.b64(src), 'format': 'png'}, 'width': 256, 'height': 256}],
             'image_size': {'width': 256, 'height': 256}, 'description': desc, 'seed': 7, 'no_background': True}
     r = pl.submit('/edit-images-v2', body)
