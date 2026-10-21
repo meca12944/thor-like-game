@@ -25,3 +25,5 @@
 {"t": "2026-10-21 10:31:55", "name": "key_run_north_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
 {"t": "2026-10-21 10:31:56", "name": "key_run_south_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
 {"t": "2026-10-21 10:31:58", "name": "key_run_north_R", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:32:02", "name": "key_walk_north_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
+{"t": "2026-10-21 10:32:02", "name": "key_walk_south_L", "endpoint": "/edit-images-v2", "status": "completed", "usage": {"type": "generations", "generations": 10.0}, "n": 10.0}
