@@ -61,6 +61,12 @@ for _m in ('walk','run'):
 SRC['run']['south']=(f'{KN}/b_s_run8',None,[4]*8)   # 10-21 "아래 뛸때 한쪽팔 고정": front run redrawn with both arms swinging
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
+# owner 10-21 "실 감고 던지기": new cast = X-cross the rapiers at the chest, twirl (winding thread), step and throw (PixelLab key pose + in-betweens, linette_cast_v1);
+# the throw key lands at tick 20 (skills fire at 20-22), held, then back to idle; 45 ticks like before so the magic circle timing is unchanged.
+CV=B+'/linette_cast_v1';_back=[2,3,3,3,4,3,2,12,4,4,5]
+SRC['cast']={'right':(CV+'/cast_e_seq',[0,1,2,3,4,6,7,8,7,1,0],_back),
+             'down':(CV+'/tw_se',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5]),
+             'up':(CV+'/tw_ne',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5])}
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}

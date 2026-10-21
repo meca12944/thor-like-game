@@ -226,15 +226,15 @@
  "cast_right": {
   "scale": 1.0,
   "offset": [
-   2,
-   -6
+   0,
+   0
   ]
  },
  "cast_left": {
   "scale": 1.0,
   "offset": [
-   -2,
-   -6
+   0,
+   0
   ]
  },
  "cast_down": {
