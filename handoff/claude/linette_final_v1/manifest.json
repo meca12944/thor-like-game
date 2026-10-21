@@ -392,16 +392,16 @@
      5
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south_ns",
+    "src": "linette_thrust_v1/walk_front_pl/south",
     "pick": [
-     0,
      1,
      2,
      3,
      4,
      5,
      6,
-     7
+     7,
+     8
     ]
    },
    "north": {

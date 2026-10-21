@@ -43,6 +43,7 @@ SRC['walk']['right']=(f'{SK}/walk_east_face',None,[4]*12)   # owner 10-20 "걸�
 SRC['walk']['down']=(f'{SK}/walk_south-east_face',None,SRC['walk']['down'][2])
 for _m,_t in (('walk',[5]*8),('run',[4]*8)):   # owner 10-20: true front/back (south/north) walk + run from the hero's front/back motions (skeleton); dirs 'south'/'north', no mirror
     SRC[_m]['south']=(f'{SK}/{_m}_south_ns',None,_t);SRC[_m]['north']=(f'{SK}/{_m}_north_ns',None,_t)
+SRC['walk']['south']=(f'{TH}/walk_front_pl/south',list(range(1,9)),[5]*8)   # owner 10-21 "이상하다 픽셀랩에 고쳐라": front walk = PixelLab's own text walk (characters/animations v3), frame 0 (start pose) dropped
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
