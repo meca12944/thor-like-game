@@ -58,6 +58,7 @@ SRC['walk']['right']=(f'{KN}/walk_e_keys8',None,[6]*8);SRC['run']['right']=(f'{K
 # back views keep the bikini back strap visible. Sizes are evened out in polish.py (SIZE_TARGET).
 for _m in ('walk','run'):
     for _d,_k in (('south','s'),('north','n'),('down','se'),('up','ne')):SRC[_m][_d]=(f'{KN}/a_{_k}_{_m}8',None,[6]*8 if _m=='walk' else [4]*8)
+SRC['run']['south']=(f'{KN}/b_s_run8',None,[4]*8)   # 10-21 "아래 뛸때 한쪽팔 고정": front run redrawn with both arms swinging
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}

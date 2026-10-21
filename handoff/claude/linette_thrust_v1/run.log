@@ -97,3 +97,5 @@
 [2026-10-21 11:51:34] tween tw8_a_se_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
 [2026-10-21 11:55:09] tween tw8_a_ne_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
 [2026-10-21 11:55:13] tween tw8_a_ne_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 12:08:55] edit b_s_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 12:11:09] tween tw8_b_s_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}

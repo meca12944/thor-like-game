@@ -142,8 +142,8 @@
  "run_south": {
   "scale": 1.0,
   "offset": [
-   -2,
-   -8
+   -6,
+   -3
   ]
  },
  "run_north": {
@@ -468,9 +468,9 @@
   "scale": 0.985
  },
  "walk_south_size": {
-  "upper_median": 63,
+  "upper_median": 62,
   "target": 65,
-  "scale": 1.032
+  "scale": 1.048
  },
  "walk_downl_size": {
   "upper_median": 69,
@@ -501,11 +501,6 @@
   "upper_median": 69,
   "target": 65,
   "scale": 0.942
- },
- "run_south_size": {
-  "upper_median": 67,
-  "target": 65,
-  "scale": 0.97
  },
  "run_downl_size": {
   "upper_median": 69,
@@ -557,7 +552,7 @@
  },
  "walk_north_center": {
   "scale": 1.0,
-  "dx": -2
+  "dx": -1
  },
  "walk_up_center": {
   "scale": 1.0,
@@ -569,7 +564,11 @@
  },
  "walk_downl_center": {
   "scale": 1.0,
-  "dx": -1
+  "dx": -2
+ },
+ "walk_down_center": {
+  "scale": 1.0,
+  "dx": 1
  },
  "walk_left_center": {
   "scale": 1.0,
@@ -585,15 +584,15 @@
  },
  "run_north_center": {
   "scale": 1.0,
-  "dx": 7
+  "dx": 8
  },
  "run_up_center": {
   "scale": 1.0,
-  "dx": 20
+  "dx": 22
  },
  "run_south_center": {
   "scale": 1.0,
-  "dx": -4
+  "dx": 4
  },
  "run_downl_center": {
   "scale": 1.0,

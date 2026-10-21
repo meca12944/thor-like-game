@@ -5,6 +5,7 @@ import glob,json,os,shutil,math
 import numpy as np
 from PIL import Image
 from measure import body
+from pxscale import pxscale
 H=os.path.dirname(os.path.abspath(__file__)); IN=H+'/frames'; OUT=H+'/frames_polished'
 man=json.load(open(H+'/manifest.json'))
 STAND={'idle','walk','dash','hurt','death','cast','atk1','atk3','jump'}   # atk2 starts in the atk1 lunge -> takes atk1's offset/scale (SAME_AS)
@@ -24,7 +25,7 @@ for m,dd in man['motions'].items():
         for i,f in enumerate(fs):
             im=Image.open(f).convert('RGBA')
             if sc!=1.0:   # scale about frame-0 feet, nearest to keep pixels
-                im=im.resize((round(256*sc),round(256*sc)),Image.NEAREST); fx,fy=c0*sc,b0*sc
+                im=pxscale(im,sc); fx,fy=c0*sc,b0*sc
             else: fx,fy=c0,b0
             dx,dy=128-fx,189-fy
             if (m,d) in BOB:
@@ -49,7 +50,7 @@ for m in ('idle','walk','run'):
         fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));us=sorted(v for v in (upper(f) for f in fs) if v);med=us[len(us)//2];sc=UTGT/med
         if abs(sc-1)<0.015:continue
         for f in fs:
-            im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=im.resize((round(256*sc),round(256*sc)),Image.NEAREST)
+            im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=pxscale(im,sc)
             c=Image.new('RGBA',(256,256));c.paste(im2,(round(cx-cx*sc),round(fy-fy*sc)),im2);c.save(f)
         log[f'{m}_{d}_size']={'upper_median':int(med),'target':int(UTGT),'scale':round(sc,3)}
 for m,d in (('run','south'),('run','north'),('run','down'),('run','downl'),('run','up'),('run','upl'),('run','right'),('run','left')):   # key-pose runs: keep the drawn ground, but cap the airborne lift at 4px (more reads as hopping)
