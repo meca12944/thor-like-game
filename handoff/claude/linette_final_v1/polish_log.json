@@ -44,15 +44,15 @@
  "walk_right": {
   "scale": 1.0,
   "offset": [
-   0,
-   -1
+   -7,
+   -5
   ]
  },
  "walk_left": {
   "scale": 1.0,
   "offset": [
-   0,
-   -1
+   8,
+   -5
   ]
  },
  "walk_down": {
@@ -100,15 +100,15 @@
  "run_right": {
   "scale": 1.0,
   "offset": [
-   4,
-   0
+   20,
+   -4
   ]
  },
  "run_left": {
   "scale": 1.0,
   "offset": [
-   -4,
-   0
+   -18,
+   -4
   ]
  },
  "run_down": {
