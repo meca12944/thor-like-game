@@ -86,15 +86,15 @@
  "walk_south": {
   "scale": 0.935,
   "offset": [
-   1,
-   12
+   12,
+   6
   ]
  },
  "walk_north": {
-  "scale": 0.927,
+  "scale": 0.958,
   "offset": [
-   2,
-   16
+   10,
+   5
   ]
  },
  "run_right": {
@@ -142,15 +142,15 @@
  "run_south": {
   "scale": 1.0,
   "offset": [
-   -7,
+   -1,
    -1
   ]
  },
  "run_north": {
   "scale": 1.0,
   "offset": [
-   2,
-   4
+   4,
+   -8
   ]
  },
  "dash_right": {

@@ -36,9 +36,9 @@ for m,dd in man['motions'].items():
         log[f'{m}_{d}']={'scale':round(sc,3),'offset':[round(128-c0*sc),round(189-b0*sc)]}
 # front/back runs (hero skeleton, foreshortened legs): snap every frame's lowest pixel to the ground line, then a 2px run bob,
 # so she neither floats nor sinks (owner 10-20 "다리가 왜이래")
-for m,d in (('run','south'),('run','north'),('walk','south'),('walk','north')):
+for m,d in (('run','south'),('run','north')):   # key-pose runs: keep the drawn ground, but cap the airborne lift at 4px (more reads as hopping)
     fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));n=len(fs)
     for i,f in enumerate(fs):
-        im=Image.open(f);b=im.getbbox();dy=190-b[3]-round(2*abs(math.sin(2*math.pi*i/n)))
+        im=Image.open(f);b=im.getbbox();dy=max(0,186-b[3])
         c=Image.new('RGBA',(256,256));c.paste(im,(0,dy),im);c.save(f)
 json.dump(log,open(H+'/polish_log.json','w'),indent=1); print(json.dumps({k:v for k,v in log.items() if v['scale']!=1.0}))

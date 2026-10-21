@@ -40,3 +40,20 @@
 [2026-10-20 01:08:11] anim atk1fb north completed usage {'type': 'generations', 'generations': 8.0}
 [2026-10-20 01:13:04] anim atk1fb south completed usage {'type': 'generations', 'generations': 8.0}
 [2026-10-21 00:07:16] anim walk_front_pl south completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 01:32:32] edit ns_south_Lfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:32:48] edit ns_south_Rfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:41:04] tween tw_south_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:41:26] tween tw_south_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:44:29] edit ns_north_Lfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:51] edit ns_srun_L completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:51] edit ns_srun_R completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:55] edit ns_north_Rfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:47:15] edit ns_srun_R2 completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:51:32] tween tw_north_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:51:34] tween tw_north_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:53:24] edit ns_nrun_R completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:53:38] edit ns_nrun_L completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:57:20] tween tw_srun_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:57:40] tween tw_srun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 02:04:53] tween tw_nrun_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 02:04:58] tween tw_nrun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}

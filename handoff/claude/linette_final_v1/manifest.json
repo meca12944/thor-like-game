@@ -382,17 +382,17 @@
    },
    "south": {
     "ticks": [
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_south_ns",
+    "src": "linette_ns_keys_v1/walk_south_keys",
     "pick": [
      0,
      1,
@@ -406,17 +406,17 @@
    },
    "north": {
     "ticks": [
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5,
-     5
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6,
+     6
     ],
     "lunge": null,
-    "src": "linette_skel_v1/walk_north_ns",
+    "src": "linette_ns_keys_v1/walk_north_keys",
     "pick": [
      0,
      1,
@@ -634,7 +634,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_south_ns",
+    "src": "linette_ns_keys_v1/run_south_keys",
     "pick": [
      0,
      1,
@@ -658,7 +658,7 @@
      4
     ],
     "lunge": null,
-    "src": "linette_skel_v1/run_north_ns",
+    "src": "linette_ns_keys_v1/run_north_keys",
     "pick": [
      0,
      1,

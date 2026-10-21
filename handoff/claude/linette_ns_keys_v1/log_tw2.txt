@@ -1,0 +1,1 @@
+[2026-10-21 01:41:04] tween tw_south_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
