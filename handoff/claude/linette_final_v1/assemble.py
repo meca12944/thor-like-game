@@ -51,7 +51,7 @@ for _m in ('idle','walk','run'):   # owner 10-21 "대각선 이상": up-diagonal
     SRC[_m]['up']=(f'{SK}/{_m}_north-east_sidearms',None,SRC[_m]['up'][2])
 # owner 10-21 "해야지": diagonal walk + run also by the key-pose method (near/far leg keys + in-betweens), left = mirrored
 SRC['walk']['down']=(f'{KN}/walk_se_keys',None,[6]*8);SRC['walk']['up']=(f'{KN}/walk_ne_keys',None,[6]*8)
-SRC['run']['down']=(f'{KN}/run_se_keys',None,[4]*8);SRC['run']['up']=(f'{KN}/run_ne_keys',None,[4]*8)
+SRC['run']['down']=(f'{KN}/run_se_keys8',None,[4]*8);SRC['run']['up']=(f'{KN}/run_ne_keys8',None,[4]*8)   # 10-21 "다리교차 이상": one full 8-frame cycle key->same key (cycle8.py)
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}

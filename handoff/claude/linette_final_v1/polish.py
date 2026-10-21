@@ -39,7 +39,7 @@ for m,dd in man['motions'].items():
 for m,d in (('run','south'),('run','north'),('run','down'),('run','downl'),('run','up'),('run','upl')):   # key-pose runs: keep the drawn ground, but cap the airborne lift at 4px (more reads as hopping)
     fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));n=len(fs)
     for i,f in enumerate(fs):
-        im=Image.open(f);b=im.getbbox();dy=max(0,186-b[3])
+        im=Image.open(f);b=im.getbbox();dy=max(0,186-b[3]) if b[3]<186 else min(0,190-b[3])   # no more than 4px up, never below the ground
         c=Image.new('RGBA',(256,256));c.paste(im,(0,dy),im);c.save(f)
 for m,d in (('walk','down'),('walk','downl'),('walk','up'),('walk','upl')):   # key-pose diagonal walks: a walk never leaves the ground -> lowest pixel on the ground line (1px bob)
     fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));n=len(fs)

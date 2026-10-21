@@ -73,3 +73,5 @@
 [2026-10-21 10:51:43] tween tw_se_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
 [2026-10-21 10:51:44] tween tw_ner_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
 [2026-10-21 10:52:25] tween tw_ne_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 11:25:25] tween tw8_ser completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:25:35] tween tw8_ner completed frames 9 usage {'type': 'generations', 'generations': 8.0}
