@@ -349,3 +349,6 @@
 2026-10-20 16:45:20 animate walk_south_ns south seed 71 usage {"type": "generations", "generations": 3.0}
 2026-10-20 16:58:39 animate walk_south_ns south seed 71 usage {"type": "generations", "generations": 3.0}
 2026-10-21 00:31:43 animate walk_south_ns south seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-21 00:44:09 animate run_south_ns south seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-21 00:44:39 animate walk_north_ns north seed 71 usage {"type": "generations", "generations": 3.0}
+2026-10-21 00:47:05 animate run_north_ns north seed 71 usage {"type": "generations", "generations": 3.0}

@@ -35,6 +35,14 @@ for f in F:
     dh=hc-hip0
     for p in L0:
         if p not in J:J[p]=L0[p]+dh
+    if os.environ.get('RUNARMS'):   # Linette's run: both arms pulled back, hands behind the hips
+        for s in ('LEFT','RIGHT'):
+            sh=J[s+' SHOULDER'];o=1 if L0[s+' ARM'][0]>L0[s+' SHOULDER'][0] else -1
+            J[s+' ELBOW']=sh+np.array([o*5,19]);J[s+' ARM']=sh+np.array([o*7,36])
+    if os.environ.get('UNDERHIPS'):   # feet/knees straight under each hip (no crossing), keep the mocap lift/depth in y
+        for s in ('LEFT','RIGHT'):
+            o=1 if L0[s+' HIP'][0]>hip0[0] else -1
+            J[s+' KNEE'][0]=J[s+' HIP'][0]+o*1;J[s+' LEG'][0]=J[s+' HIP'][0]+o*1.5
     g=GROUND-max(J['LEFT LEG'][1],J['RIGHT LEG'][1])   # the lower foot stays on the ground
     for p in J:J[p]=J[p]+np.array([0,g])
     # nearer leg drawn in front

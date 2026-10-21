@@ -41,7 +41,7 @@ for _m,_pick in (('idle',None),('walk',[11]+list(range(1,12))),('run',None)):   
     SRC[_m]['down']=(f'{SK}/{_m}_south-east_sidearms',_pick,SRC[_m]['down'][2])
 SRC['walk']['right']=(f'{SK}/walk_east_face',None,[4]*12)   # owner 10-20 "걸을때 얼굴 이상": walks redrawn by PixelLab skeleton from the new face (side from the new idle, diagonal from the new diagonal idle)
 SRC['walk']['down']=(f'{SK}/walk_south-east_face',None,SRC['walk']['down'][2])
-for _m,_t in (('walk',[5]*8),('run',[4]*8)):   # owner 10-20: true front/back (south/north) walk + run from the hero's front/back motions (skeleton); dirs 'south'/'north', no mirror
+for _m,_t in (('walk',[5]*8),('run',[4]*8)):   # 10-21: runs + back walk = CMU mocap (09_01 run / 07_01 walk) seen front/back with depth tilt, legs alternate under the hips (mocap_ns.py)   # owner 10-20: true front/back (south/north) walk + run from the hero's front/back motions (skeleton); dirs 'south'/'north', no mirror
     SRC[_m]['south']=(f'{SK}/{_m}_south_ns',None,_t);SRC[_m]['north']=(f'{SK}/{_m}_north_ns',None,_t)
 # owner 10-21: front walk = CMU walk skeleton seen from the front with a strong depth tilt (legs visibly swing forward/back), feet under the hips (walk_south_ns v7)
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
