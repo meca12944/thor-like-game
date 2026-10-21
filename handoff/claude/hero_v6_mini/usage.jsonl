@@ -42,3 +42,14 @@
 {"t": "2026-10-21 10:38:16", "name": "pixen_hair_s61", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-21 10:38:27", "name": "pixen_hair_s64", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-21 10:38:41", "name": "pixen_hair_s63", "endpoint": "/edit-image-pixen", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-21 10:47:20", "name": "tw_run_north_RL", "endpoint": "/animate-with-text-v3", "status": "completed", "usage": {"type": "generations", "generations": 4.0}, "n": 4.0}
+{"t": "2026-10-21 10:47:38", "name": "idle_south", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:47:49", "name": "run_south-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:48:09", "name": "walk_south-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:48:27", "name": "run_north-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:06", "name": "walk_north-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:11", "name": "idle_south-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:19", "name": "walk_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:24", "name": "idle_east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:37", "name": "idle_north-east", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
+{"t": "2026-10-21 10:49:49", "name": "idle_north", "endpoint": "/characters/animations", "status": "completed", "usage": {"type": "generations", "generations": 8.0}, "n": 8.0}
