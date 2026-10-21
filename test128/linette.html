@@ -123,7 +123,19 @@ function strike(n,hi){const m=tmeta(n);if(!m)return;const H=HIT[hi];let any=fals
   if(any){P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
-function trailOne(x,y,m,tip,age,heavy){const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
+// owner 10-21 "좀더 앞으로 찌르는 듯한 검흔": a stab streak - a sharp spear-point head shoots forward fast (ease-out), the tail stays at the
+// needle tip for a moment and then snaps forward after the head, so it reads as one straight piercing line; thin speed lines beside it.
+function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=heavy?135:105,W=heavy?9:6;
+  const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3))+age*1.5,k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
+  const ox=x+tip[0],oy=y+tip[1],P=d=>[ox+dx*d,oy+dy*d];
+  const blade=(w,tailW,col,headLen)=>{const t=P(Tl),h=P(H),hb=P(Math.max(Tl,H-headLen));ctx.fillStyle=col;ctx.beginPath();
+    ctx.moveTo(t[0]+nx*tailW/2,t[1]+ny*tailW/2);ctx.lineTo(hb[0]+nx*w/2,hb[1]+ny*w/2);ctx.lineTo(h[0],h[1]);ctx.lineTo(hb[0]-nx*w/2,hb[1]-ny*w/2);ctx.lineTo(t[0]-nx*tailW/2,t[1]-ny*tailW/2);ctx.closePath();ctx.fill();};
+  if(heavy)blade(W*2.2,0,`rgba(60,150,255,${.28*a})`,26);
+  blade(W*1.4,0,`rgba(90,210,255,${.5*a})`,22);blade(W*0.7,0,`rgba(215,250,255,${.9*a})`,18);blade(Math.max(1.5,W*0.28),0,`rgba(255,255,255,${a})`,14);
+  ctx.strokeStyle=`rgba(200,245,255,${.6*a})`;ctx.lineWidth=1;
+  for(const[o,f]of(heavy?[[1.3,.55],[-1.3,.45],[2.1,.3],[-2.1,.35]]:[[1.2,.5],[-1.2,.4]])){const s0=Tl+(H-Tl)*0.1,s1=Tl+(H-Tl)*(0.1+f),p0=P(s0),p1=P(s1);ctx.beginPath();ctx.moveTo(p0[0]+nx*o*W,p0[1]+ny*o*W);ctx.lineTo(p1[0]+nx*o*W,p1[1]+ny*o*W);ctx.stroke();}
+  if(age<3){const h=P(H+2),r=heavy?6:4;ctx.fillStyle=`rgba(255,255,255,${1-age/3})`;ctx.fillRect(h[0]-r,h[1],2*r,1);ctx.fillRect(h[0],h[1]-r,1,2*r);}}
+function trailOne(x,y,m,tip,age,heavy){if(STILL)return stabOne(x,y,m,tip,age,heavy);const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
   const fly=STILL?age*FLY:0,tx=x+tip[0]+dx*fly,ty=y+tip[1]+dy*fly,ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
   if(heavy)lance(cx,cy,dx,dy,nx,ny,back+ahead*.45,ahead*.75,W*1.6,`rgba(60,150,255,${.31*a})`);
   lance(cx,cy,dx,dy,nx,ny,back+ahead*.35,ahead*.65,W,`rgba(90,210,255,${.47*a})`);lance(cx,cy,dx,dy,nx,ny,back*.8+ahead*.3,ahead*.6,W*.45,`rgba(210,250,255,${.86*a})`);
