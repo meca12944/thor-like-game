@@ -3,9 +3,7 @@ python3 make_sheet.py -> hero_v6_all_sheet.png, hero_v6_all_motions.mp4 (each cl
 import os, glob, json, subprocess, tempfile
 from PIL import Image, ImageDraw
 DIRS = ['s', 'se', 'e', 'ne', 'n']
-SRC = {'idle': {'s': 'anim/idle/south_pp', 'se': 'anim/idle/south-east_pp', 'e': 'anim/idle/east_pp', 'ne': 'anim/idle/north-east_pp', 'n': 'anim/idle/north_pp'},
-       'walk': {'s': 'ns/final_walk_south', 'se': 'anim/walk/south-east_final', 'e': 'anim/walk/east_final', 'ne': 'anim/walk/north-east_final', 'n': 'ns/final_walk_north'},
-       'run': {'s': 'ns/final_run_south', 'se': 'anim/run/south-east_final', 'e': 'anim/run/east_final', 'ne': 'anim/run/north-east_final', 'n': 'ns/final_run_north'}}
+from make_sheet_src import SRC
 CW = 160; BG = (60, 70, 60, 255)
 def clip(d):
     fs = sorted(glob.glob(d + '/*.png')); t = json.load(open(d + '/timing.json')) if os.path.exists(d + '/timing.json') else {}
