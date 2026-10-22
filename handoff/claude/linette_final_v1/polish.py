@@ -86,3 +86,26 @@ for d in os.listdir(f'{OUT}/cast'):
         if c0 is None:continue
         dx=round(128-c0)
         if dx:im=Image.open(f);c=Image.new('RGBA',(256,256));c.paste(im,(dx,0),im);c.save(f)
+# owner 10-22 "좌우측 얼굴이 너무 도트가 튄다": the side walk/run faces differ a little on every frame (scattered dark dots, eye moving) -> stamp the
+# approved side idle face (eye -> chin, the front of the head) onto every side walk/run frame at the spot found by matching the head, so the face
+# is the same clean drawing in idle / walk / run and does not flicker. Left = done on the mirrored frame.
+def _rib(a):
+    b=(a[:,:,3]>0)&(a[:,:,2]>a[:,:,0]+40)&(a[:,:,2]>120);ys,xs=np.nonzero(b);t=ys.min();return t,int(np.median(xs[ys<t+8]))
+_I=np.array(Image.open(f'{OUT}/idle/right/000.png').convert('RGBA'));_Ii=_I.astype(int);_t0,_x0=_rib(_Ii);_W=_Ii[_t0+6:_t0+32,_x0-2:_x0+24]
+_FY0,_FY1,_FX0,_FX1=_t0+13,_t0+29,_x0+6,_x0+23   # face patch (eye, nose, mouth, chin) in the idle frame
+def _stamp(A):
+    a=A.astype(int);t,x=_rib(a);best=None
+    for dy in range(-6,7):
+        for dx in range(-6,7):
+            y1,x1=_t0+6+(t-_t0)+dy,_x0-2+(x-_x0)+dx;R=a[y1:y1+_W.shape[0],x1:x1+_W.shape[1]]
+            if R.shape!=_W.shape:continue
+            sc=np.abs(R[:,:,:3]*(R[:,:,3:]>0)-_W[:,:,:3]*(_W[:,:,3:]>0)).mean()+30*np.abs((R[:,:,3]>0).astype(int)-(_W[:,:,3]>0)).mean()
+            if best is None or sc<best[0]:best=(sc,(t-_t0)+dy,(x-_x0)+dx)
+    _,oy,ox=best;P=_I[_FY0:_FY1,_FX0:_FX1];reg=A[_FY0+oy:_FY1+oy,_FX0+ox:_FX1+ox];m=(P[:,:,3]>0)&(reg[:,:,3]>0);reg[m]=P[m];return A
+for m in ('walk','run'):
+    for d in ('right','left'):
+        for f in sorted(glob.glob(f'{OUT}/{m}/{d}/*.png')):
+            A=np.array(Image.open(f).convert('RGBA'))
+            if d=='left':A=np.ascontiguousarray(A[:,::-1]);A=_stamp(A);A=np.ascontiguousarray(A[:,::-1])
+            else:A=_stamp(A)
+            Image.fromarray(A).save(f)
