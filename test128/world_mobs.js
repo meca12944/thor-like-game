@@ -63,6 +63,38 @@
     } }, o);
   }
 
+  // areas 2-9 regulars (room-3 strips, assets/mobs47: idle 8 frames + attack 12 frames, hit frame 4; drawn hi-res by world.js drawS47).
+  // One shared AI per attack style, every hit telegraphed: melee = circle in front / shoot = aim line then shot(s) / charge = aim line then dash /
+  // aoe = ring around itself / drop = circle under the hero. HP / dmg grow by area. h = body height in field px (strip body px x 0.2).
+  const ATK47 = { n: 12, ticks: [6, 3, 3, 2, 3, 3, 3, 3, 2, 3, 4, 6], hit: 4 };
+  const SHOT47 = { beam: { sp: 190, r: 3, life: 1.0 }, arrow: { sp: 150, r: 2, life: 1.3 }, firearrow: { sp: 155, r: 2, life: 1.3 }, spike: { sp: 120, r: 2, life: 1.0 },
+    ink: { sp: 95, r: 4, life: 1.5, slow: 0.8 }, bolt: { sp: 170, r: 3, life: 1.0 }, feather: { sp: 130, r: 2, life: 1.2 }, orb: { sp: 85, r: 5, life: 2.0 } };
+  const HAZ47 = { rock: 'rock', sand: 'web', bolt: 'crystal', poison: 'poison', shock: 'crystal', wave: 'swipe' };
+  function s47(o) {
+    const a = o.area, dmg = Math.round(5 + (a - 1) * 0.6);
+    return Object.assign({ s47: o.id, anim: { attack: ATK47 }, hp: 50 + (a - 1) * 14, r: Math.max(5, Math.round(o.h * .22)), sp: o.fly ? 34 : 26, aff: { weak: [], resist: [] }, mat: 'm_a1_shared', dmg,
+      update(m, W, dt) {
+        const h = W.hero, D = this; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2.2)) - dt; const d = W.dist(m, h);
+        if (m.st === 'dash') { const sp = 210 * dt; W.touch(m, m.r + 4, D.dmg); if (!W.moveCol(m, Math.cos(m.aim) * sp, Math.sin(m.aim) * sp, m.r, m.fly) || m.t > 0.55) { set(m, 'idle'); m.anim = null; W.fx('dust', m.x, m.y); } return; }
+        if (m.st === 'atk') { if (m.at > m.dur) { if (m.next) { const f = m.next; m.next = null; f(); } else { set(m, 'idle'); m.anim = null; } } return; }
+        const x0 = m.x, y0 = m.y, want = D.ai === 'melee' ? 22 : D.ai === 'aoe' ? 16 : D.ai === 'charge' ? 80 : 95;
+        if (D.sp && d < 200) { if (d > want + 8) toward(m, W, dt, D.sp, h.x, h.y); else if (d < want - 24) toward(m, W, dt, -D.sp * .7, h.x, h.y); else m.face = h.x > m.x ? 1 : -1; }
+        else if (D.sp) wander(m, W, dt, D.sp * .5); else m.face = h.x > m.x ? 1 : -1;
+        m.moving = Math.abs(m.x - x0) + Math.abs(m.y - y0) > 1e-3;
+        if (m.cd > 0 || d > (D.ai === 'melee' || D.ai === 'aoe' ? want + 16 : 160)) return;
+        const ranged = D.ai === 'shoot' || D.ai === 'drop'; if (!tok(m, W, ranged)) return;
+        const A = ang(m, h.x, h.y); m.face = Math.cos(A) >= 0 ? 1 : -1; let warn = 0.6;
+        if (D.ai === 'melee') { const reach = 14; warn = W.hazard({ shape: 'circle', x: m.x + Math.cos(A) * reach, y: m.y + Math.sin(A) * reach * .8, r: 15, warn: 0.55, act: 0.05, dmg: D.dmg, kind: 'swipe', owner: m }).warn; m.cd = 1.5 / agg(W); }
+        else if (D.ai === 'aoe') { warn = W.hazard({ shape: 'circle', x: m.x, y: m.y, r: 34, warn: 0.75, act: 0.1, dmg: D.dmg, kind: HAZ47[D.fx] || 'swipe', owner: m }).warn; m.cd = 2.2 / agg(W); }
+        else if (D.ai === 'drop') { warn = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: 16, warn: 0.8, act: 0.05, dmg: D.dmg, kind: HAZ47[D.fx] || 'rock', owner: m }).warn; m.cd = 2.2 / agg(W); }
+        else if (D.ai === 'charge') { m.aim = A; warn = lineTele(W, m, A, 130, 0.55, 14); m.next = () => { set(m, 'dash'); m.anim = 'hold'; }; m.cd = 2.0 / agg(W); }
+        else { const S2 = SHOT47[D.fx] || SHOT47.arrow, dirs = D.pat === 'ring' ? [...Array(8)].map((_, i) => i * Math.PI / 4) : D.pat === 'fan' ? [A - .3, A, A + .3] : [A];
+          for (const b of dirs) warn = lineTele(W, m, b, Math.min(150, S2.sp * 1.2), 0.6, 6);
+          W.after(warn, () => { if (m.dead) return; for (const b of dirs) W.shot(Object.assign({ x: m.x, y: m.y - D.h * .45, a: b, dmg: D.dmg - 1, kind: D.fx, owner: m }, S2)); }); m.cd = 2.0 / agg(W); }
+        startAnim(m, 'attack', ATK47, ATK47.hit, warn); set(m, 'atk'); if (D.ai === 'charge') m.dur = warn;
+      } }, o);
+  }
+
   const def = {
     // ------------------------------------------------ area 1 regulars (WORLD_PLAN.md / MONSTERS.md)
     mushroom: { name: '독버섯', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 50, spr: 'mushroom', h: 20, r: 6, mat: 'm_spore',
@@ -262,7 +294,51 @@
       shots: [{ name: '독기 구체', sp: 80, waves: [0], shot: { kind: 'orb', r: 5, dmg: 5, life: 2.0 } },
         { name: '돌껍질 파편 2파', sp: 120, waves: [0, 0.23], shot: { kind: 'stone', r: 3, dmg: 4, life: 1.3 } }],
       anim: { src: 'assets/mobs_felt/c1_04_unrotting_hound', F: 36, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4 } } }),
+
+    // ------------------------------------------------ areas 2-9 (owner 10-22 "만들어 놓은 몬스터 전부 인게임"): placed in maps/field02..field09
+    a2_06_glow_worm: s47({ name: '반딧불 지렁이', area: 2, h: 30, ai: 'melee' }),
+    a2_07_cave_mole: s47({ name: '동굴 두더지', area: 2, h: 31, ai: 'drop', fx: 'rock' }),
+    a2_08_crystal_slime: s47({ name: '수정 슬라임', area: 2, h: 29, ai: 'shoot', fx: 'beam' }),
+    a3_03_sand_viper: s47({ name: '모래 독사', area: 3, h: 38, ai: 'charge' }),
+    a3_04_bald_vulture: s47({ name: '대머리 독수리', area: 3, h: 33, ai: 'charge', fly: true }),
+    a3_05_desert_bandit: s47({ name: '사막 도적', area: 3, h: 40, ai: 'melee' }),
+    a3_06_sand_spirit: s47({ name: '모래 정령', area: 3, h: 40, ai: 'aoe', fx: 'sand' }),
+    a3_07_camel_tortoise: s47({ name: '낙타 거북', area: 3, h: 36, ai: 'charge' }),
+    a3_08_antlion: s47({ name: '개미귀신', area: 3, h: 40, ai: 'drop', fx: 'sand' }),
+    a4_02_scarab_swarm: s47({ name: '스카라베 떼', area: 4, h: 30, ai: 'charge' }),
+    a4_03_anubis_guard: s47({ name: '아누비스 경비병', area: 4, h: 49, ai: 'melee' }),
+    a4_04_cursed_jar: s47({ name: '저주 항아리', area: 4, h: 37, ai: 'aoe', fx: 'poison' }),
+    a4_05_serpent_statue: s47({ name: '뱀 머리 석상', area: 4, h: 47, ai: 'shoot', fx: 'beam', sp: 0 }),
+    a4_06_ghost_cat: s47({ name: '고양이 망령', area: 4, h: 39, ai: 'melee', fly: true }),
+    a4_07_slab_golem: s47({ name: '함정 석판 골렘', area: 4, h: 45, ai: 'drop', fx: 'rock' }),
+    a4_08_sand_skeleton_archer: s47({ name: '모래 해골 궁수', area: 4, h: 37, ai: 'shoot', fx: 'arrow' }),
+    a5_02_jellyfish: s47({ name: '해파리', area: 5, h: 36, ai: 'aoe', fx: 'shock' }),
+    a5_03_spiny_puffer: s47({ name: '가시 복어', area: 5, h: 28, ai: 'shoot', fx: 'spike', pat: 'ring' }),
+    a5_04_shark_trooper: s47({ name: '상어 돌격병', area: 5, h: 40, ai: 'charge' }),
+    a5_05_octopus_inker: s47({ name: '문어 먹물병', area: 5, h: 38, ai: 'shoot', fx: 'ink', pat: 'fan' }),
+    a5_06_electric_eel: s47({ name: '전기 뱀장어', area: 5, h: 29, ai: 'shoot', fx: 'bolt' }),
+    a5_07_anglerfish: s47({ name: '아귀', area: 5, h: 30, ai: 'melee' }),
+    a5_08_hermit_crab: s47({ name: '소라게', area: 5, h: 30, ai: 'melee' }),
+    a6_02_seagull: s47({ name: '갈매기', area: 6, h: 28, ai: 'charge', fly: true }),
+    a6_03_pirate_skeleton: s47({ name: '해적 해골', area: 6, h: 40, ai: 'melee' }),
+    a6_04_barnacle_golem: s47({ name: '따개비 골렘', area: 6, h: 42, ai: 'melee' }),
+    a6_05_turtle_shieldbearer: s47({ name: '바다 거북 방패병', area: 6, h: 38, ai: 'melee' }),
+    a6_06_wave_spirit: s47({ name: '파도 정령', area: 6, h: 33, ai: 'aoe', fx: 'wave' }),
+    a6_07_starfish: s47({ name: '불가사리', area: 6, h: 26, ai: 'shoot', fx: 'spike', pat: 'ring' }),
+    a6_08_pirate_parrot: s47({ name: '해적 앵무새', area: 6, h: 32, ai: 'shoot', fx: 'feather', pat: 'fan' }),
+    a7_07_flame_hound: s47({ name: '화염 사냥개', area: 7, h: 34, ai: 'charge' }),
+    a7_08_obsidian_archer: s47({ name: '흑요석 궁수', area: 7, h: 39, ai: 'shoot', fx: 'firearrow' }),
+    a8_06_thundercloud_bird: s47({ name: '뇌운 새', area: 8, h: 38, ai: 'drop', fx: 'bolt', fly: true }),
+    a8_07_ice_turtle: s47({ name: '얼음 거북', area: 8, h: 30, ai: 'charge' }),
+    a8_08_storm_gargoyle: s47({ name: '폭풍 가고일', area: 8, h: 41, ai: 'drop', fx: 'bolt' }),
+    a9_05_shadow_assassin: s47({ name: '그림자 암살자', area: 9, h: 37, ai: 'charge' }),
+    a9_06_void_eye: s47({ name: '공허 눈알', area: 9, h: 36, ai: 'shoot', fx: 'beam' }),
+    a9_07_gargoyle_statue: s47({ name: '가고일 석상', area: 9, h: 50, ai: 'melee' }),
+    a9_08_cursed_doll: s47({ name: '저주 인형', area: 9, h: 41, ai: 'shoot', fx: 'orb', pat: 'fan' }),
   };
+  for (const k in def) if (def[k].s47 === undefined && def[k].ai) def[k].s47 = k;
+  // area-1 regulars keep their AI and get the room-3 hi-res strips (body height x1.3)
+  for (const [k, id] of Object.entries({ mushroom: 'field_mushroom', rabbit: 'field_horned_rabbit', wasp: 'field_wasp', boar: 'field_boar', scarecrow: 'field_scarecrow', slime: 'a1_06_forest_slime', squirrel: 'a1_07_acorn_squirrel', sprout: 'a1_08_spirit_sprout' })) { def[k].s47 = id; def[k].h = Math.round(def[k].h * 1.3); }
   for (const k in def) { const D = def[k]; if (!D.felt) continue; // 8-way shots (owner 10-22 "4방향 -> 8방향"), bigger, faster attacks
     D.anim.F *= FELT_SC; D.h = Math.round(D.h * FELT_SC); D.r = Math.round(D.r * 1.2); D.melee.range *= 1.15; D.melee.rad *= 1.15; D.rec = FELT_REC; }
   window.WorldMobs = { def };

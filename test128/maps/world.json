@@ -242,8 +242,8 @@
    "boss": "수정 여왕거미",
    "x": 13.4,
    "y": 33.6,
-   "scene": null,
-   "locked": true,
+   "scene": "field02",
+   "locked": false,
    "bgm": "area02_cave"
   },
   {
@@ -254,8 +254,8 @@
    "boss": "모래 대지렁이",
    "x": 92.0,
    "y": 28.6,
-   "scene": null,
-   "locked": true,
+   "scene": "field03",
+   "locked": false,
    "bgm": "area03_desert"
   },
   {
@@ -266,8 +266,8 @@
    "boss": "황금가면 미라왕",
    "x": 112.0,
    "y": 45.0,
-   "scene": null,
-   "locked": true,
+   "scene": "field04",
+   "locked": false,
    "bgm": "area04_pyramid"
   },
   {
@@ -278,8 +278,8 @@
    "boss": "심해 크라켄 뱀",
    "x": 16.4,
    "y": 59.5,
-   "scene": null,
-   "locked": true,
+   "scene": "field05",
+   "locked": false,
    "bgm": "area05_coral_sea"
   },
   {
@@ -290,8 +290,8 @@
    "boss": "산호 거대게",
    "x": 109.0,
    "y": 56.1,
-   "scene": null,
-   "locked": true,
+   "scene": "field06",
+   "locked": false,
    "bgm": "area06_cliff"
   },
   {
@@ -302,8 +302,8 @@
    "boss": "화염검 흑기사",
    "x": 80.0,
    "y": 7.4,
-   "scene": null,
-   "locked": true,
+   "scene": "field07",
+   "locked": false,
    "bgm": "area07_volcano"
   },
   {
@@ -314,8 +314,8 @@
    "boss": "뇌전 와이번",
    "x": 31.6,
    "y": 12.0,
-   "scene": null,
-   "locked": true,
+   "scene": "field08",
+   "locked": false,
    "bgm": "area08_thunder_tower"
   },
   {
@@ -326,8 +326,8 @@
    "boss": "공허의 대사제",
    "x": 40.9,
    "y": 25.0,
-   "scene": null,
-   "locked": true,
+   "scene": "field09",
+   "locked": false,
    "bgm": "area09_dark_temple"
   },
   {
