@@ -810,10 +810,10 @@
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; }
     return m.moving ? Math.floor(S.t * 60 / a.ticks[0] + m.home[0]) % a.n : 0; }
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
-    for (const mm of S.mobs) { if (mm.dead || !mm.D.felt || !pick(mm)) continue; const A = mm.D.anim, name = mm.anim || 'walk', im = feltImg(A.src + '_' + name); if (!im.complete || !im.naturalWidth) continue;
+    for (const mm of S.mobs) { if (mm.dead || !mm.D.felt || !pick(mm)) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sy = idle ? 1 + .02 * Math.sin(S.t * 4 + mm.home[0]) : 1, sz = A.F * k * sc, [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
-      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       if (mm.flash > 0) ctx.filter = 'brightness(3)';
       ctx.drawImage(im, f * 256, 0, 256, 256, -sz / 2, -sz * 250 / 256, sz, sz); ctx.restore(); } }
   const FELT_SHOT = { // code-drawn projectiles (rotated to the flight direction; +x = forward)
