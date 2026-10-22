@@ -72,6 +72,13 @@ FV=B+'/linette_face_v2';SRC['walk']['right']=(FV+'/walk_e8',None,[6]*8);SRC['run
 # owner 10-22 "주인공 대시 모션 그대로 가지고와": side dash = the hero's side dash (hero8 dash_right: stand, low lunge, hold, recover) on Linette by skeleton,
 # same ticks as the hero (4,4,4,5); diagonal dashes were already the hero's (dash_*_diag, ticks 2,1,3,2,3,3,3)
 SRC['dash']['right']=(SK+'/dash_east_hero',None,[4,4,4,5])
+# owner 10-22 "일반 점프시 다리 모양이 부자연" -> A (re-time, no new art): the wide landing stances were shown while she was in the air.
+# New order: stand -> crouch (anticipation) -> legs-together frame while rising -> slightly opened frame at the peak/fall -> landing stance
+# (only after touching down) -> crouch (absorb) -> stand. Air = ticks 8..32 (linette.html JUMP_AIR), same for all three views.
+_JT=[2,6,14,10,5,4,2]
+SRC['jump']['right']=(SK+'/jump_east',[0,1,2,3,7,1,0],_JT)
+SRC['jump']['down']=(SK+'/jump_south-east_diag',[0,3,4,5,11,3,0],_JT)
+SRC['jump']['up']=(SK+'/jump_north-east_diag',[0,3,4,5,13,3,0],_JT)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
