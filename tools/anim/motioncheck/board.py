@@ -7,7 +7,7 @@ G,O=sys.argv[1:3];os.makedirs(O,exist_ok=True)
 F=lambda n:ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',n)
 def hero_atlas():
     s=open(f'{G}/index.html').read();i=s.index('/*H8*/const H8=');j=s.index('{',i);return json.JSONDecoder().raw_decode(s[j:])[0]
-KO={'idle':'서 있기','walk':'걷기','run':'달리기','dash':'구르기','jump':'점프','rjump':'달리며 점프','hit1':'베기 1','hit2':'베기 2','hit3':'베기 3','atk1':'찌르기 1','atk2':'찌르기 2','atk3':'찌르기 3',
+KO={'idle':'서 있기','walk':'걷기','run':'달리기','dash':'대시','jump':'점프','rjump':'달리며 점프','hit1':'베기 1','hit2':'베기 2','hit3':'베기 3','atk1':'찌르기 1','atk2':'찌르기 2','atk3':'찌르기 3',
     'hurt':'맞기','hurtys':'맞기(크게)','death':'죽기','hold':'힘 모으기','rec1':'베기1 뒤 멈춤','rec2':'베기2 뒤 멈춤','cast':'스킬','cast_s1':'스킬 1','cast_s2':'스킬 2','cast_s3':'스킬 3'}
 AR={'down':'↓ 앞','up':'↑ 뒤','right':'→ 오른쪽','left':'← 왼쪽','downl':'↙ 왼앞','upl':'↖ 왼뒤'}
 def page(A,sheets,motions,dirs,title,out,start,CW=170,CH=200,LW=150,ar=AR):
