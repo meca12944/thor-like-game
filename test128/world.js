@@ -606,7 +606,7 @@
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
   function render() {
-    const dpr = Math.min(devicePixelRatio || 1, 3), CW = Math.round(innerWidth * dpr), CH = Math.round(innerHeight * dpr);
+    const dpr = Math.min(devicePixelRatio || 1, 2), /* owner 10-22 "너무 끊기는데": 3x phones drew 2.25x the pixels */ CW = Math.round(innerWidth * dpr), CH = Math.round(innerHeight * dpr);
     if (cv.width !== CW || cv.height !== CH) { cv.width = CW; cv.height = CH; }
     const k = Math.max(1, Math.floor(Math.min(CW / LW, CH / LH))), ox = Math.floor((CW - LW * k) / 2), oy = Math.floor((CH - LH * k) / 2);
     S.view = { k, ox, oy };
@@ -814,9 +814,9 @@
     for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sy = idle ? 1 + .02 * Math.sin(S.t * 4 + mm.home[0]) : 1, sz = A.F * k * sc, [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
-      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); ctx.scale(1, sy);
       if (mm.flash > 0) ctx.filter = 'brightness(3)';
-      ctx.drawImage(im, f * 256, 0, 256, 256, -sz / 2, -sz * 250 / 256, sz, sz); ctx.restore(); } }
+      blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
   // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
   const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p; return i; }); }).catch(() => {});
@@ -851,6 +851,15 @@
   // ram strips (left-facing art mirrored, field 5) have no attack strip: the idle frame lunges in code. Old area-1 AIs (no startAnim) show the
   // attack strip's strike pose while they wind up / attack.
   let M47 = null; getJSON('assets/mobs47/mobs47.json').then(j => M47 = j).catch(() => {});
+  // pre-scaled strip cache: big strips (150-300px cells) are shrunk once per on-screen size with high-quality smoothing, then blitted 1:1
+  // (resampling every frame per mob was the main per-frame cost on phones). Key = image + scale rounded to 1/40.
+  const SCL = new Map();
+  function scaledStrip(im, s) { if (!im.complete || !im.naturalWidth) return null; const q = Math.round(s * 40) / 40, key = im.src + '|' + q; let c = SCL.get(key); if (c) return c;
+    if (SCL.size > 160) SCL.clear(); c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(im.naturalWidth * q)); c.height = Math.max(1, Math.ceil(im.naturalHeight * q)); c.q = q;
+    const g2 = c.getContext('2d'); g2.imageSmoothingEnabled = true; g2.imageSmoothingQuality = 'high'; g2.drawImage(im, 0, 0, c.width, c.height); SCL.set(key, c); return c; }
+  function blitFrame(im, fi, cw, ch, s, dx, dy) { // draw frame fi (cell cw x ch) of strip im at scale s with its top-left at (dx, dy) in the current transform
+    const c = scaledStrip(im, s); if (!c) return; const q = c.q, k = s / q; ctx.imageSmoothingEnabled = Math.abs(k - 1) > .01;
+    ctx.drawImage(c, Math.round(fi * cw * q), 0, Math.round(cw * q), Math.round(ch * q), dx, dy, cw * s, ch * s); }
   const S47IMG = {}; function s47Img(id, k) { const key = id + '_' + k; if (!S47IMG[key]) { const im = new Image(); im.src = 'assets/mobs47/' + key + '.webp'; S47IMG[key] = im; } return S47IMG[key]; }
   const LUNGE = [0, -6, -10, 14, 24, 26, 24, 20, 14, 8, 3, 0]; // ram: x offset per attack frame (strip px)
   const OLDATK = ['prep', 'throw', 'cast', 'aim', 'charge', 'puff', 'swipe', 'rise', 'jump'];
@@ -866,9 +875,9 @@
     const hop = mm.moving && !D.fly ? Math.abs(Math.sin(S.t * 11 + ph)) * 1.5 : 0, lift = (mm.hz || 0) + (mm.hop || 0) + hop + (D.hover ? D.hover + Math.sin(S.t * 6 + mm.x) * 2 : 0);
     let sy = 1; if (mm.squash) sy = 1 - mm.squash * .3; if (mm.st === 'pC') sy = .86;
     const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y - lift);
-    ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); if (mm.lean) ctx.rotate(mm.lean * .9); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); if (mm.lean) ctx.rotate(mm.lean * .9); ctx.scale(1, sy);
     if (mm.flash > 0) ctx.filter = 'brightness(3)'; else if (mm.tint === 'rage') ctx.filter = 'sepia(1) saturate(4) hue-rotate(-30deg)';
-    ctx.drawImage(im, fi * C.w, 0, C.w, C.h, (-C.w / 2 + dx) * s, -C.foot * s, C.w * s, C.h * s); ctx.restore(); }
+    blitFrame(im, fi, C.w, C.h, s, Math.round((-C.w / 2 + dx) * s), Math.round(-C.foot * s)); ctx.restore(); }
   const FELT_SHOT = { // code-drawn projectiles (rotated to the flight direction; +x = forward)
     needle(g) { g.fillStyle = '#1e1e24'; g.fillRect(-5, -1, 10, 2); g.fillStyle = '#dfe2ea'; g.fillRect(-4, 0, 8, 1); g.fillStyle = '#9a9aa6'; g.fillRect(-9, 0, 3, 1); },
     threadball(g, s) { g.fillStyle = '#28262a'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.fillStyle = '#c8c6be'; g.beginPath(); g.arc(0, 0, 3, 0, TAU); g.fill();

@@ -1532,7 +1532,7 @@ function drawBars(){for(const m of slimes){if(m.dead||m.spawnT>0)continue;const 
 
 // ---------- view ----------
 let scale=1,offX=0,offY=0,camX=0,camY=0,viewW=WW,viewH=WH,dpr=1;
-function resize(){dpr=Math.min(window.devicePixelRatio||1,3);cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);}
+function resize(){dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);}
 addEventListener('resize',resize);resize();
 let pix=1,LW=VIEW.logicalW,LH=VIEW.logicalH,camTX=0,camTY=0,camInit=false,presOX=0,presOY=0,rcx=0,rcy=0;
 const ZOOMQ=new URLSearchParams(location.search).get('zoom'),ZOOM=ZOOMQ?Math.max(1,Math.min(4,+ZOOMQ||1)):'sbx'; // default 'sbx' (owner 2026-10-20): sandbox ratio = 1 hero pixel per screen point; ?zoom=1 old view, ?zoom=2 previous 2x; // camera zoom (owner 2026-10-20: 2x default; ?zoom=1 = old view). Zoomed: whole-pixel upscale only (non-integer nearest upscale shimmered = looked blurry while moving)
