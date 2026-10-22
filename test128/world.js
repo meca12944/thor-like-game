@@ -430,7 +430,7 @@
     if (S.jingleT > 0) S.jingleT -= dt;
     S.shake = Math.max(0, S.shake - dt * 14);
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 2.2) respawnAfterDeath(); queue.length = 0; return; }
-    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
+    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
     updateCam(dt);
   }
@@ -616,7 +616,8 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
-      drawFeltHi(k, mm => mm.y <= hero.y); drawHeroHi(k); drawFeltHi(k, mm => mm.y > hero.y); drawHiRes(k, ox, oy);
+      ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); // hi-res bodies stay inside the view (no spill into the letterbox)
+      drawFeltHi(k, mm => mm.y <= hero.y); drawPetHi(k, false); drawHeroHi(k); drawPetHi(k, true); drawFeltHi(k, mm => mm.y > hero.y); ctx.restore(); drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
       if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
@@ -793,7 +794,7 @@
     const sc = (m.scale || 1) * (m.spawnT > 0 ? Math.max(0, 1 - m.spawnT * 1.8) : 1); if (sc <= 0) return;
     const hover = D.hover ? D.hover + Math.sin(S.t * 6 + m.x) * 2 : 0;
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(m.x, m.y, (m.r + 2) * sc, (m.r * .45 + 1) * sc, 0, 0, TAU); g.fill();
-    if (D.felt) return; // body: drawFeltHi (hi-res pass)
+    if (D.felt || (D.s47 && M47 && M47[D.s47])) return; // body: drawFeltHi / drawS47 (hi-res pass)
     const sx = m.shake ? (Math.random() - .5) * 2 : 0;
     const mode = m.flash > 0 ? 'white' : (m.tint === 'rage' ? 'rage' : null);
     let sy = 1; if (m.squash) sy = 1 - m.squash * .3; if (m.st === 'pC') sy = .86;
@@ -810,12 +811,64 @@
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     return m.moving ? Math.floor(S.t * 60 / a.ticks[0] + m.home[0]) % a.n : 0; }
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
-    for (const mm of S.mobs) { if (mm.dead || !mm.D.felt || !pick(mm)) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
+    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sy = idle ? 1 + .02 * Math.sin(S.t * 4 + mm.home[0]) : 1, sz = A.F * k * sc, [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
       ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       if (mm.flash > 0) ctx.filter = 'brightness(3)';
       ctx.drawImage(im, f * 256, 0, 256, 256, -sz / 2, -sz * 250 / 256, sz, sz); ctx.restore(); } }
+  // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
+  // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
+  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p; return i; }); }).catch(() => {});
+  const PET_MAPS = ['field00'];
+  const petDir = (dx, dy, cur) => Math.abs(dx) > Math.abs(dy) * 1.4 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'down' : 'downl') : (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'up' : 'upl');
+  const petTot = L => L.reduce((a, f) => a + f[2], 0);
+  function stepPet(dt) { const m = M(); if (!PET.A || !PET_MAPS.includes(m.id)) { S.pet = null; return; }
+    let P = S.pet; if (!P || P.map !== m) P = S.pet = { x: hero.x - 14, y: hero.y + 4, dir: 'right', t: 0, cd: 0, n: 0, map: m, moving: false, run: false };
+    P.t += dt; P.cd -= dt; const x0 = P.x, y0 = P.y;
+    if (P.atk) { const a = P.atk, L = PET.A.anims[a.clip + '_' + a.dir]; a.t += dt * 60;
+      if (!a.done && a.t >= a.hitT) { a.done = true; const tg = a.tg; if (tg && !tg.dead && Math.hypot(tg.x - P.x, tg.y - P.y) < 30) hitMob(tg, 6, Math.atan2(tg.y - P.y, tg.x - P.x), false); }
+      if (a.t >= petTot(L)) P.atk = null; P.moving = false; return; }
+    let tg = null, bd = 90; for (const o of S.mobs) { if (o.dead || o.spawnT > 0 || o.noBar || o.D.boss) continue; const d = Math.hypot(o.x - P.x, o.y - P.y); if (d < bd && Math.hypot(o.x - hero.x, o.y - hero.y) < 120) { bd = d; tg = o; } }
+    let gx, gy, sp; if (tg) { gx = tg.x - Math.sign(tg.x - P.x || 1) * 14; gy = tg.y; sp = 95; } else { const fv = FACEV[hero.face] || [1, 0]; gx = hero.x - fv[0] * 18 - 8; gy = hero.y - fv[1] * 12 + 4; sp = 0; }
+    const dx = gx - P.x, dy = gy - P.y, d = Math.hypot(dx, dy);
+    if (!tg && d > 240) { P.x = gx; P.y = gy; }
+    else if (tg && Math.hypot(tg.x - P.x, tg.y - P.y) < 22 && P.cd <= 0) { const clip = P.n++ % 2 ? 'atk2' : 'atk1', dir = petDir(tg.x - P.x, tg.y - P.y, P.dir), th = PET.A.thrust[clip + '_' + dir], L = PET.A.anims[clip + '_' + dir];
+      P.dir = dir; P.atk = { t: 0, clip, dir, tg, hitT: petTot(L.slice(0, th ? th.frame : 4)) }; P.cd = 0.9; P.moving = false; return; }
+    else if (d > (tg ? 3 : 14)) { const v = (sp || (d > 60 ? 130 : 78)) * dt, k = Math.min(1, v / d); moveCol(P, dx * k, dy * k, 4); P.run = sp ? true : d > 60; }
+    const mx = P.x - x0, my = P.y - y0; P.moving = Math.abs(mx) + Math.abs(my) > 1e-3; if (P.moving) P.dir = petDir(mx, my, P.dir); else if (tg) P.dir = petDir(tg.x - P.x, tg.y - P.y, P.dir);
+    if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 46 : 32)) % 1; }
+  function drawPetHi(k, front) { const P = S.pet; if (!P || !PET.A || P.map !== S.map || (P.y > hero.y) !== front) return; const A = PET.A, a = P.atk;
+    const an = a ? a.clip : P.moving ? (P.run ? 'run' : 'walk') : 'idle', L = A.anims[an + '_' + (a ? a.dir : P.dir)] || A.anims[an + '_right']; if (!L) return;
+    let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) e = L[Math.floor((P.gp || 0) * L.length) % L.length]; else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
+    const im = PET.IM[e[0]], c = A.cells[e[0]][e[1]]; if (!im || !im.complete) return; const sc = k * H128FIG / 117, [sx, sy] = W2S(P.x, P.y);
+    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(sx, sy, 6 * k, 2.5 * k, 0, 0, TAU); ctx.fill(); ctx.imageSmoothingEnabled = sc < 1;
+    ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc));
+    const th = a && A.thrust[a.clip + '_' + a.dir]; if (th && a.t >= a.hitT - 4 && a.t < a.hitT + 10) { const q = 1 - Math.max(0, a.t - a.hitT) / 10, tx = sx + th.tip[0] * sc, ty = sy + th.tip[1] * sc; // thrust trail (code)
+      ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round'; for (const [w, col] of [[6, `rgba(150,220,255,${.35 * q})`], [2.5, `rgba(255,255,255,${.9 * q})`]]) { ctx.strokeStyle = col; ctx.lineWidth = w * k / 3; ctx.beginPath(); ctx.moveTo(tx - th.dir[0] * 34 * sc, ty - th.dir[1] * 34 * sc); ctx.lineTo(tx, ty); ctx.stroke(); } }
+    ctx.restore(); }
+  // ---- room-3 strips (assets/mobs47, tools/anim/mobs47/import.py): idle 8 frames (8fps) + attack 12 frames (hit = frame 4), all facing right.
+  // ram strips (left-facing art mirrored, field 5) have no attack strip: the idle frame lunges in code. Old area-1 AIs (no startAnim) show the
+  // attack strip's strike pose while they wind up / attack.
+  let M47 = null; getJSON('assets/mobs47/mobs47.json').then(j => M47 = j).catch(() => {});
+  const S47IMG = {}; function s47Img(id, k) { const key = id + '_' + k; if (!S47IMG[key]) { const im = new Image(); im.src = 'assets/mobs47/' + key + '.webp'; S47IMG[key] = im; } return S47IMG[key]; }
+  const LUNGE = [0, -6, -10, 14, 24, 26, 24, 20, 14, 8, 3, 0]; // ram: x offset per attack frame (strip px)
+  const OLDATK = ['prep', 'throw', 'cast', 'aim', 'charge', 'puff', 'swipe', 'rise', 'jump'];
+  function s47Frame(m) { const a = m.D.anim.attack, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
+    if (m.anim === 'hold') return a.hit; if (t < m.keyT) { for (; i < a.hit; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return a.hit; }
+    t -= m.keyT; for (i = a.hit; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; }
+  function drawS47(mm, k) { const J = M47 && M47[mm.D.s47]; if (!J) return; const D = mm.D;
+    const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) return;
+    let f = -1; if (mm.anim === 'attack' || mm.anim === 'hold') f = s47Frame(mm); else if (!D.anim || !D.anim.attack.n || !D.ai) { if (mm.atk || OLDATK.includes(mm.st)) f = mm.st === 'prep' || mm.st === 'aim' || mm.st === 'rise' ? 2 : 5; }
+    const useAtk = f >= 0 && !J.ram && J.atk, im = s47Img(D.s47, useAtk ? 'atk' : 'idle'); if (!im.complete || !im.naturalWidth) return;
+    const C = useAtk ? J.atk : J.idle, s = D.h / J.body * sc * k, ph = mm.home ? mm.home[0] : 0;
+    const fi = useAtk ? f : Math.floor(S.t * 8 + ph) % J.idle.n, dx = f >= 0 && !useAtk ? LUNGE[f] : 0;
+    const hop = mm.moving && !D.fly ? Math.abs(Math.sin(S.t * 11 + ph)) * 1.5 : 0, lift = (mm.hz || 0) + (mm.hop || 0) + hop + (D.hover ? D.hover + Math.sin(S.t * 6 + mm.x) * 2 : 0);
+    let sy = 1; if (mm.squash) sy = 1 - mm.squash * .3; if (mm.st === 'pC') sy = .86;
+    const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y - lift);
+    ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); if (mm.lean) ctx.rotate(mm.lean * .9); ctx.scale(1, sy); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    if (mm.flash > 0) ctx.filter = 'brightness(3)'; else if (mm.tint === 'rage') ctx.filter = 'sepia(1) saturate(4) hue-rotate(-30deg)';
+    ctx.drawImage(im, fi * C.w, 0, C.w, C.h, (-C.w / 2 + dx) * s, -C.foot * s, C.w * s, C.h * s); ctx.restore(); }
   const FELT_SHOT = { // code-drawn projectiles (rotated to the flight direction; +x = forward)
     needle(g) { g.fillStyle = '#1e1e24'; g.fillRect(-5, -1, 10, 2); g.fillStyle = '#dfe2ea'; g.fillRect(-4, 0, 8, 1); g.fillStyle = '#9a9aa6'; g.fillRect(-9, 0, 3, 1); },
     threadball(g, s) { g.fillStyle = '#28262a'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.fillStyle = '#c8c6be'; g.beginPath(); g.arc(0, 0, 3, 0, TAU); g.fill();
@@ -828,6 +881,13 @@
     venom(g) { g.fillStyle = '#14281a'; g.fillRect(-5, -1, 9, 2); g.fillStyle = '#96e65a'; g.fillRect(-4, 0, 8, 1); g.fillStyle = '#64c83c'; g.fillRect(-8, 0, 1, 1); g.fillRect(-11, 0, 1, 1); },
     orb(g, s) { const r = 4 + Math.sin(s.t * 18) * .6; g.fillStyle = 'rgba(120,40,170,.35)'; g.beginPath(); g.arc(0, 0, r + 2.5, 0, TAU); g.fill();
       g.fillStyle = '#9640d2'; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fill(); g.fillStyle = '#e6beff'; g.fillRect(-1, -2, 2, 2); },
+    beam(g, s) { g.fillStyle = 'rgba(200,120,255,.35)'; g.fillRect(-9, -2, 14, 4); g.fillStyle = '#f0d8ff'; g.fillRect(-8, -1, 13, 2); g.fillStyle = '#fff'; g.fillRect(2, -1, 3, 2); },
+    arrow(g) { g.fillStyle = '#5a4630'; g.fillRect(-6, 0, 10, 1); g.fillStyle = '#d8d8d0'; g.fillRect(4, -1, 2, 3); g.fillStyle = '#e8e0c8'; g.fillRect(-7, -1, 2, 1); g.fillRect(-7, 1, 2, 1); },
+    firearrow(g, s) { g.fillStyle = `rgba(255,${120 + 60 * Math.sin(s.t * 30)},40,.6)`; g.fillRect(-10, -1, 6, 3); g.fillStyle = '#2a1a14'; g.fillRect(-6, 0, 10, 1); g.fillStyle = '#ffb040'; g.fillRect(4, -1, 2, 3); },
+    spike(g) { g.fillStyle = '#3a3010'; g.fillRect(-3, -1, 6, 2); g.fillStyle = '#f0d860'; g.fillRect(-2, 0, 6, 1); },
+    ink(g, s) { const r = 3.5 + Math.sin(s.t * 14) * .5; g.fillStyle = '#1c1028'; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fill(); g.fillStyle = '#4a3060'; g.fillRect(-1, -2, 2, 1); g.fillStyle = 'rgba(28,16,40,.6)'; g.fillRect(-8, -1, 4, 2); },
+    bolt(g, s) { g.strokeStyle = '#fff6a0'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-8, 0); for (let i = 1; i <= 4; i++) g.lineTo(-8 + i * 3, (i % 2 ? -2 : 2) * Math.sin(s.t * 40 + i)); g.stroke(); g.fillStyle = 'rgba(255,240,120,.3)'; g.beginPath(); g.arc(4, 0, 3, 0, TAU); g.fill(); },
+    feather(g) { g.fillStyle = '#c83020'; g.fillRect(-5, -1, 8, 2); g.fillStyle = '#30a040'; g.fillRect(-7, -1, 2, 2); g.fillStyle = '#f0e0a0'; g.fillRect(3, 0, 2, 1); },
     stone(g, s) { g.rotate(s.t * 14); g.fillStyle = '#28261f'; g.beginPath(); g.moveTo(-4, -3); g.lineTo(5, 0); g.lineTo(-3, 4); g.closePath(); g.fill();
       g.fillStyle = '#827e78'; g.beginPath(); g.moveTo(-3, -2); g.lineTo(4, 0); g.lineTo(-2, 3); g.closePath(); g.fill(); g.fillStyle = '#a05ac8'; g.fillRect(-1, 0, 2, 1); },
   };
