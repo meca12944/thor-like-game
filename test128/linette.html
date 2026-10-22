@@ -80,7 +80,7 @@ function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])retur
 function dir8(){if(!P.diag||P.face!=='down'&&P.face!=='up')return null;const sx=P.lastH==='left'?-1:1,sy=P.face==='down'?1:-1;return [sx*0.78,sy*0.62];}
 function diagMeta(m,d){if(!d)return m;const nx=-d[1],ny=d[0],tp=[d[0]*26,-62+d[1]*14];return {...m,dir:d,tip:m.tip2?[tp[0]+nx*6,tp[1]+ny*6]:tp,tip2:m.tip2?[tp[0]-nx*6,tp[1]-ny*6]:null};}
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
-function start(st,name){P.st=st;P.t=0;P.clip=name;}
+function start(st,name){P.st=st;P.t=0;P.clip=name;if(st!=='idle'){P.vx=P.vy=0;P.skid=0;}}   // a new action drops the walk/run velocity (no skid after a dash/jump/cast)
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
@@ -105,6 +105,8 @@ function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill
 function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
+const MV={walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
+let DUST=[];function dust(x,y,n,v){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=Math.random();DUST.push({x:x+(Math.random()-.5)*12,y:y-1,vx:Math.cos(a)*v*r/60,vy:-Math.abs(Math.sin(a))*v*r/120,t:0,life:14+Math.random()*10,c:Math.random()<.5?'#e8dcc0':'#cbb894',s:Math.random()<.5?2:3});}}
 let TR=[];   // flying thrust trails (world space)
 function jz(){if(P.st!=='jump')return 0;const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));return Math.round(Math.sin(u*Math.PI)*(rj?72:60));}   // jump height: rjump = push-off 2 frames, arc, landing 2 frames; standing jump arcs mid-clip
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
@@ -112,6 +114,7 @@ function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
   if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
   const moving=m>0.2;P.t++;
+  for(const d of DUST){d.t++;d.x+=d.vx;d.y+=d.vy;d.vy+=0.02;}DUST=DUST.filter(d=>d.t<d.life);
   for(const g of GH)g.a++;GH=GH.filter(g=>g.a<GH8.life).slice(-GH8.alpha.length);
   if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
   if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
@@ -121,16 +124,23 @@ function step(){
   if(P.st==='idle'||P.st==='move'){
     if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
       if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const running=runHeld(),tg=running?2.2:1.0;P.spd=(P.st==='move'?P.spd||0.5:0.5);P.spd+=(tg-P.spd)*(tg>P.spd?0.12:0.2);if(Math.abs(tg-P.spd)<0.03)P.spd=tg;P.x+=ix*P.spd;P.y+=iy*P.spd;
-      // owner 10-22 "걷다가 뛸때 부드럽게": speed ramps walk 1.0 <-> run 2.2 over ~0.3s; the leg cycle keeps its phase when the clip changes
-      // (walk and run both have the long stride on frames 0 and 4), and the clip plays at the speed she actually moves (no foot sliding while speeding up)
+      // owner 10-22 "비슷한 게임보다 머가 이상한지 -> 전부 다 해라": (1) no foot sliding - the leg cycle advances by the distance she covers (MV.stride px per
+      // clip tick: walk stride ~45px per 24 ticks, run ~65px per 16 ticks), (2) speeds matched to that stride (walk 1.0 -> 2.0, run 2.2 -> 4.0 px/tick),
+      // (3) a walk/run starts on a passing frame (legs together) instead of the widest stride, (6) near-instant start like the hero (accelTicks 2),
+      // (5) hero's run start: 10-tick burst (x2.3/1.9) with a dust kick-up, dust puffs on every run footfall. Stopping = (4) short skid (see the else branch).
+      P.skid=0;const running=runHeld(),wasRun=P.clip&&P.clip.startsWith('run_');if(running&&!(P.st==='move'&&wasRun)){P.runT=10;dust(P.x-ix*10,P.y,8,130);}
+      const tg=(running?MV.run:MV.walk)*(running&&P.runT>0?1+(MV.burst-1)*P.runT/10:1);if(P.runT>0)P.runT--;
+      P.vx=(P.vx||0)+(ix*tg-(P.vx||0))*0.5;P.vy=(P.vy||0)+(iy*tg-(P.vy||0))*0.5;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.spd=sp;
       const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
-      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=0;}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
-      P.mt=(P.mt||0)+Math.min(1.6,P.spd/tg);}
-    else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
+      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
+      const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
+      if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
+    else{if(P.st==='move'){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
+      if(P.skid){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;if(Math.hypot(P.vx,P.vy)<0.2){P.vx=P.vy=0;P.skid=0;}P.x+=P.vx;P.y+=P.vy;}
+      if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());}
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:runHeld()?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
     if(P.st==='dash'&&P.dsh){const d=P.dsh,E=q=>1-Math.pow(1-q,2.6),p0=Math.min(1,(P.t-1)/DSH.burst),p=Math.min(1,P.t/DSH.burst),st=DSH.travel*(E(p)-E(Math.max(0,p0)));P.x+=d.dx*st;P.y+=d.dy*st*.8;
       if((P.t-1)%2===0&&P.t-1<DSH.dur)GH.push({e:frameAt(L,P.t,false),x:P.x,y:P.y-jz(),a:0});}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}start('idle','idle_'+atkDir());}
@@ -185,6 +195,7 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
     for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
+  for(const d of DUST){ctx.globalAlpha=1-d.t/d.life;ctx.fillStyle=d.c;ctx.fillRect(Math.round(d.x-camX),Math.round(d.y-camY),d.s,d.s);}ctx.globalAlpha=1;
   drawDash(camX,camY,true);castFx(false,sx,sy);sewFx(false,camX,camY);
   const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
