@@ -104,7 +104,12 @@ function step(){
   if(P.st==='idle'||P.st==='move'){
     if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
       if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
+      const running=runHeld(),tg=running?2.2:1.0;P.spd=(P.st==='move'?P.spd||0.5:0.5);P.spd+=(tg-P.spd)*(tg>P.spd?0.12:0.2);if(Math.abs(tg-P.spd)<0.03)P.spd=tg;P.x+=ix*P.spd;P.y+=iy*P.spd;
+      // owner 10-22 "걷다가 뛸때 부드럽게": speed ramps walk 1.0 <-> run 2.2 over ~0.3s; the leg cycle keeps its phase when the clip changes
+      // (walk and run both have the long stride on frames 0 and 4), and the clip plays at the speed she actually moves (no foot sliding while speeding up)
+      const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
+      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=0;}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
+      P.mt=(P.mt||0)+Math.min(1.6,P.spd/tg);}
     else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
   }else{
     const L=clip(P.clip),T=total(L);
@@ -163,7 +168,7 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
   castFx(false,sx,sy);sewFx(false,camX,camY);
-  const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
+  const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
   castFx(true,sx,sy);sewFx(true,camX,camY);
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
