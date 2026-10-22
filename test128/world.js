@@ -46,7 +46,7 @@
   function spOf(i) { const C = spW(); return i === 3 ? C.dash : i === 4 ? C.charge.lv1 : C.charge.lv2; }
   function atkTS(i) { const h = spOf(i); return { dur: h.dur / 60, a0: h.a0 / 60, a1: h.a1 / 60 }; }
   function arcW(i) { return i >= 3 ? (spOf(i).arc || 100) : i === 2 ? SWING.arc3 : SWING.arc; }
-  function sfx(k, v, r) { try { const g = window.__game; if (g && g.SFX) g.SFX.play(k, v, r); } catch (e) { } }
+  function sfx(k, v, r) { try { if (window.SFX2 && SFX2.has(k)) return SFX2.play(k, v, r); const g = window.__game; if (g && g.SFX) g.SFX.play(k, v, r); } catch (e) { } } // SFX2 = code-made sounds (sfx_synth.js), else the town's recorded ones
   const FADE = 0.35, CARD = 2.1;
   const Q = new URLSearchParams(location.search);
   const LS = 'thor.world.v1';
@@ -253,7 +253,7 @@
     return names.join(', '); }
 
   // ---------------- hazards / shots: the only things that can hurt the hero ----------------
-  function hazard(h) { h.t = 0; h.hit = false; teleScale(h); S.hazards.push(h); return h; }
+  function hazard(h) { h.t = 0; h.hit = false; teleScale(h); S.hazards.push(h); if (h.warn > 0) sfx('tele', .5, h.dmg ? 1 : 1.3); return h; }
   function inHaz(h, x, y) {
     if (h.shape === 'circle') return Math.hypot(x - h.x, (y - h.y) * 1.15) < h.r + 3;
     if (h.shape === 'ring') { const d = Math.hypot(x - h.x, (y - h.y) * 1.15); return d > h.r0 - 3 && d < h.r + 3; }
@@ -266,9 +266,9 @@
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
-      if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
+      if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); ultAdd('gainHurt', dmg);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); ultAdd('gainHurt', dmg);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
@@ -277,7 +277,7 @@
   }
   function ultAdd(k, n) { const g = window.__game; if (g && g.addUlt && g.ULT_CFG) g.addUlt(g.ULT_CFG[k] * n); } // 필살기 게이지: 피격(1HP당) · 저스트 회피만 (template ULT_CFG)
   function touch(m, r, dmg) { if (Math.hypot(hero.x - m.x, hero.y - m.y) < r + 5) hurt(dmg, m); }
-  function shot(s) { s.t = 0; s.vx = Math.cos(s.a) * s.sp; s.vy = Math.sin(s.a) * s.sp; s.life = s.life || 2; S.shots.push(s); }
+  function shot(s) { sfx('shot', .45); s.t = 0; s.vx = Math.cos(s.a) * s.sp; s.vy = Math.sin(s.a) * s.sp; s.life = s.life || 2; S.shots.push(s); }
   function tempSolid(x, y, r, life, kind) { S.temp.push({ x, y, r, life, kind }); const d = Math.hypot(hero.x - x, hero.y - y); if (d < r + 5) { const a = Math.atan2(hero.y - y, hero.x - x) || 0, need = r + 6 - d; moveCol(hero, Math.cos(a) * need, Math.sin(a) * need, 5);
       if (Math.hypot(hero.x - x, hero.y - y) < r + 5) S.temp.pop(); } } // push out, never through a wall; if there is no room the crystal just doesn't form
   function randomFloor() { const m = M(); for (let i = 0; i < 60; i++) { const x = (2 + Math.random() * (m.w - 4)) * m.T, y = (2 + Math.random() * (m.h - 4)) * m.T; if (!blocked(x, y, 6)) return [x, y]; } return [hero.x, hero.y]; }
@@ -301,7 +301,7 @@
     if (m.dead || m.invuln || m.spawnT > 0) return;
     const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1;
     const AF = melee && window.GameAff ? window.GameAff.of(D) : null; if (AF) dmg *= AF.mul; // weapon damage type vs D.aff (weak x1.5 / resist x0.5)
-    m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m);
+    m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m); sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8);
     if (!D.boss) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
     addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: .6, color: AF && AF.col ? AF.col : '#fff' });
@@ -310,9 +310,9 @@
   }
   function killMob(m) {
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
-    addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion });
+    addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); sfx('mob_die', .8);
     if (D.onDeath) D.onDeath(m, W);
-    if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
+    if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) { sfx('coin', .6); } if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
     if (m.flag) { SAVE.flags[m.flag] = true; save(); }
@@ -337,7 +337,7 @@
 
   // the API handed to mob behaviours (world_mobs.js)
   const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), dist, spawn, count, engage,
-    fx: addFx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
+    fx: addFx, sfx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
 
   // ---------------- scene manager ----------------
   function go(to, spawnName, opt = {}) {
@@ -455,9 +455,9 @@
     if (takePress('potion')) usePotion();
     if (takePress('ult') && !S.ultFx) castUlt();
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
-      hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); }
+      hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     if (takePress('attack') && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.holdT = 0; hero.holdOk = true; hero.charge = null; // running + attack = 돌진베기
-      if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); } }
+      if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); } }
     if (isHeld('attack') && hero.holdOk) hero.holdT += dt; else hero.holdOk = false; // charge (모으기): keep holding attack -> lv1 t1 / lv2 t2, release = charged slash; a hit / dodge cancels
     if (!hero.charge && hero.holdOk && hero.holdT > .14 && !hero.atk && !hero.roll && hero.hp > 0) { hero.charge = { t: hero.holdT, lv: 0, flash: 0 }; hero.run = false; }
     if (hero.charge) { const C = hero.charge, CF = spW().charge; C.t += dt; C.flash = Math.max(0, C.flash - dt); const lv = C.t >= CF.t2 ? 2 : C.t >= CF.t1 ? 1 : 0;
@@ -539,7 +539,7 @@
         addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
-      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
+      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); sfx('heart', .7); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
     const e = S.engaged; let want = m.bgm;
@@ -594,7 +594,7 @@
   function bossDoor(o) { const m = M(); const L = m.links.boss_door; const need = (L.needFlags || []).filter(f => !SAVE.flags[f]);
     if (need.length) { if (!S.msg) msg(L.lockedText + '  (남은 챔피언 ' + need.length + ')', 3); return; }
     go(L.to, L.spawn); }
-  function hazardFx(h) { if (h.kind === 'rock' || h.kind === 'crystal' || h.kind === 'quake') addFx(h.kind === 'rock' ? 'debris' : 'crystal', h.x, h.y, { life: .5 });
+  function hazardFx(h) { if (h.dmg) sfx(h.kind === 'swipe' || h.kind === 'thud' ? 'mob_swing' : h.kind === 'root' || h.kind === 'web' ? 'mob_swing' : 'impact', .7); if (h.kind === 'rock' || h.kind === 'crystal' || h.kind === 'quake') addFx(h.kind === 'rock' ? 'debris' : 'crystal', h.x, h.y, { life: .5 });
     if (h.kind === 'ult') { shake(7); for (let i = 0; i < 30; i++) { const p = randomFloor(); addFx('crystal', p[0], p[1], { life: .7 }); } }
     if (h.kind === 'poison') addFx('cloud', h.x, h.y, { life: (h.act || 0) + (h.linger || 0) + .2, r: h.r }); }
 
@@ -711,7 +711,7 @@
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down');
     const sd = /^(right|left|up|down)$/.test(f8) ? f8 : (f8.includes('right') ? 'right' : 'left'), L8 = H.left && sd === 'left', fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd; // 4-way sprite, diagonals = side; hero v4 has real left frames (else left = mirror)
-    const A = k => H.anims[k + '_' + d], seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
+    const A = k => H.anims[k + '_' + d] || H.anims[k + '_' + (String(h.f8 || '').includes('left') && H.anims[k + '_left'] ? 'left' : 'right')], /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y), m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
@@ -827,7 +827,7 @@
     let P = S.pet; if (!P || P.map !== m) P = S.pet = { x: hero.x - 14, y: hero.y + 4, dir: 'right', t: 0, cd: 0, n: 0, map: m, moving: false, run: false };
     P.t += dt; P.cd -= dt; const x0 = P.x, y0 = P.y;
     if (P.atk) { const a = P.atk, L = PET.A.anims[a.clip + '_' + a.dir]; a.t += dt * 60;
-      if (!a.done && a.t >= a.hitT) { a.done = true; const tg = a.tg; if (tg && !tg.dead && Math.hypot(tg.x - P.x, tg.y - P.y) < 30) hitMob(tg, 6, Math.atan2(tg.y - P.y, tg.x - P.x), false); }
+      if (!a.done && a.t >= a.hitT) { a.done = true; sfx('thrust', .6); const tg = a.tg; if (tg && !tg.dead && Math.hypot(tg.x - P.x, tg.y - P.y) < 30) hitMob(tg, 6, Math.atan2(tg.y - P.y, tg.x - P.x), false); }
       if (a.t >= petTot(L)) P.atk = null; P.moving = false; return; }
     let tg = null, bd = 90; for (const o of S.mobs) { if (o.dead || o.spawnT > 0 || o.noBar || o.D.boss) continue; const d = Math.hypot(o.x - P.x, o.y - P.y); if (d < bd && Math.hypot(o.x - hero.x, o.y - hero.y) < 120) { bd = d; tg = o; } }
     let gx, gy, sp; if (tg) { gx = tg.x - Math.sign(tg.x - P.x || 1) * 14; gy = tg.y; sp = 95; } else { const fv = FACEV[hero.face] || [1, 0]; gx = hero.x - fv[0] * 18 - 8; gy = hero.y - fv[1] * 12 + 4; sp = 0; }
