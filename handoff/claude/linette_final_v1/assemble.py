@@ -79,6 +79,8 @@ _JT=[2,6,14,10,5,4,2]
 SRC['jump']['right']=(SK+'/jump_east',[0,1,2,3,7,1,0],_JT)
 SRC['jump']['down']=(SK+'/jump_south-east_diag',[0,3,4,5,11,3,0],_JT)
 SRC['jump']['up']=(SK+'/jump_north-east_diag',[0,3,4,5,13,3,0],_JT)
+# owner 10-22 "위로 달리기가 완전한 위방향이 아니라 살짝 오른쪽": back run redrawn as a STRICT straight back view (key from the straight back walk + 8-frame key->key cycle, linette_runn_v2)
+SRC['run']['north']=(B+'/linette_runn_v2/run_n8',None,[4]*8)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
