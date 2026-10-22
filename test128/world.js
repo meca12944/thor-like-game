@@ -430,7 +430,7 @@
     if (S.jingleT > 0) S.jingleT -= dt;
     S.shake = Math.max(0, S.shake - dt * 14);
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 2.2) respawnAfterDeath(); queue.length = 0; return; }
-    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
+    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
     updateCam(dt);
   }
@@ -475,10 +475,11 @@
       if (r.t >= RD) { hero.roll = null; hero.rollCd = DG() ? DG().cdTicks / 60 : ROLL.cd; if (r.carry) { hero.run = true; } } }
     else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const H = (h128() || {}).H128 || {}, AT = atkT(a.i), lv = a.i >= 3 ? (a.t < AT.a1 ? (spOf(a.i).lunge || 0) * .3 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : H.v4 ? (a.t < AT.a1 ? (H.lunge || [9, 11, 14])[Math.min(2, a.i)] * 29 / 96 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : 20; // hero v4: per-hit forward advance (town px scaled to field)
       moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
+      if (!SLASH_BODY && !a.gk && a.t >= AT.a0 - 2 / 60) { a.gk = true; gkSpawn(a.i); }
       if (a.t >= AT.a0 && a.t <= AT.a1) { const R = hbR(a.i), cosA = Math.cos(hbA(a.i) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
           const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
-          if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); hitMob(mm, a.i >= 3 ? ATK_DMG[0] * (spOf(a.i).dmgMul || 1) : ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (a.i >= 3) sfx(a.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
+          if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); if (!SLASH_BODY) { S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: a.i >= 2 }); } hitMob(mm, a.i >= 3 ? ATK_DMG[0] * (spOf(a.i).dmgMul || 1) : ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (a.i >= 3) sfx(a.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
       if (a.i === 5 && !a.waved && a.t >= AT.a0) { a.waved = true; spawnHW(Math.atan2(dv[1], dv[0])); shake(1); } // charge lv2: forward sword wave (1px shake only)
       if (a.t >= AT.dur) { hero.atk = null; hero.comboT = a.i >= 3 ? 0 : ATK.chain; if (a.i >= 3) hero.atkCd = spOf(a.i).cool || .2; } }
     else { const g = window.__game, mv = !!(ix || iy);
@@ -714,7 +715,7 @@
     const A = k => H.anims[k + '_' + d] || H.anims[k + '_' + (String(h.f8 || '').includes('left') && H.anims[k + '_left'] ? 'left' : 'right')], /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y), m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
-    else if (h.atk) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
+    else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A('hurt'); e = seq(L, (1 - hero.inv) * 60); }
@@ -735,10 +736,46 @@
   function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, [0, 0, c[2], c[3], c[4], c[5]], x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
   function drawH128Raw(im, c, x, y, k, alpha, fl) { const sc = k * H128FIG / 117, [sx, sy] = W2S(x, y);
     ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; if (fl) { ctx.translate(Math.round(sx), 0); ctx.scale(-1, 1); ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); } else ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
+  // ---- 검기 (owner 10-22 "검 베는 모션은 안쓰려구" / "최종 샌드박스 검기만 나가고 있어"): the attack no longer plays the slash body clips;
+  // the hero keeps the idle/walk pose with a small code-made kick (lean back -> snap forward + squash), and the sword energy arcs of the
+  // 주인공 / 몬스터 샌드박스 (hero_slash_a v1) fly out. Arc art is generated in code (sArc), in atlas px, drawn at the hero's hi-res scale.
+  const SLASH_BODY = false; // true = old slash clips (hit1-3)
+  const GK = [{ R: 52, span: 140, T: 18, rot: 0, y: 78, fwd: 22, v: 4, rev: 0, sq: .5 }, { R: 54, span: 140, T: 18, rot: 35, y: 90, fwd: 22, v: 4, rev: 1, sq: .75 }, { R: 72, span: 170, T: 26, rot: 0, y: 74, fwd: 22, v: 3, rev: 0, sq: 1 }];
+  const GK_LIFE = 13, GK_STEP = .8, sCache = new Map();
+  function sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y) { if (flip) x = -x; const xr = x * ca + y * sa, yr = (-x * sa + y * ca) / sq, r = Math.hypot(xr, yr); let u = (Math.atan2(yr, xr) * 180 / Math.PI + span / 2) / span; if (rev) u = 1 - u;
+    if (u < tail || u > head || u < 0 || u > 1) return null; const k = Math.min(1, Math.max(0, (u - tail) / Math.max(head - tail, 1e-3))), w = T * Math.pow(Math.sin(Math.PI * u), .6) * (.15 + .85 * Math.pow(k, 1.3)); return [k, w, r - R + w * .35]; }
+  function sArc(R, span, T, head, tail, rot, rev, sq, flip) { const key = [R, span, T, head, tail, rot, rev, sq, flip].map(v => Math.round(v * 100)).join('|'); let c2 = sCache.get(key); if (c2) return c2;
+    if (sCache.size > 400) sCache.clear(); const N = Math.ceil(2 * R + 2 * T + 30), c = N / 2; c2 = document.createElement('canvas'); c2.width = c2.height = N; const g = c2.getContext('2d'), id = g.createImageData(N, N), d = id.data, an = rot * Math.PI / 180, ca = Math.cos(an), sa = Math.sin(an);
+    for (let py = 0; py < N; py++) for (let px = 0; px < N; px++) { const x = px - c, y = py - c, i = (py * N + px) * 4; let f = sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y), cr = 0, cg = 0, cb = 0, al = 0;
+      if (f) { const [k, w, dd] = f, ad = Math.abs(dd); if (ad < w / 2 + 6) { cr = 40; cg = 110; cb = 255; al = 40 + 80 * k; } if (ad < w / 2) { cr = 90 + 165 * k * k; cg = 190 + 65 * k; cb = 255; al = 230; } if ((ad < w / 5 && k > .25) || (dd > w / 2 - 1.5 && dd < w / 2 && k > .4)) { cr = cg = cb = 255; al = 255; } }
+      if (al < 230) { const e = sField(R * .78, span * .85, T * .45, head * .95, tail + .1, ca, sa, rev, sq, flip, x, y); if (e && Math.abs(e[2]) < e[1] / 2) { cr = 150; cg = 225; cb = 255; al = Math.max(al, 180 * e[0]); } }
+      if (al) { d[i] = cr; d[i + 1] = cg; d[i + 2] = cb; d[i + 3] = al; } }
+    g.putImageData(id, 0, 0); sCache.set(key, c2); return c2; }
+  function gkSpawn(i) { const v = FACEV[hero.face] || [1, 0], l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n];
+    S.gk = S.gk || []; S.gk.push({ n, dir: [dx, dy], rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
+  function gkTick() { if (S.gk) { for (const f of S.gk) f.t++; S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
+    ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
+    for (const f of S.gk || []) { const a = f.t * GK_STEP, Y = GK[f.n], head = Math.min(1, (a + 1) / 2.5), tail = a < 4 ? 0 : Math.min(1, (a - 4) / 7), [dx, dy] = f.dir, fl = dx < 0;
+      const ox = f.rx + dx * a * Y.v, oy = f.ry + dy * a * Y.v; // rides with the hero and flies forward
+      if (tail < head) { const ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI, T = Y.T * (a < 6 ? 1 : Math.max(.35, 1 - (a - 6) / 7)), q = v => Math.round(v * 4) / 4;
+        const im = sArc(Y.R * (1 + .025 * q(a)), Y.span, T, q(head), q(tail), Y.rot + ang * (fl ? -1 : 1), Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
+      const nx = -dy, ny = dx, big = f.n === 2; let sd = f.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+      const la = Math.max(0, 1 - a / 8); if (la > 0) { ctx.fillStyle = `rgba(200,240,255,${.86 * la})`; for (let i = 0; i < (big ? 7 : 4); i++) { const o = rnd() * 60 - 30, L = 14 + rnd() * 20, b = Y.R * .4 - rnd() * 30 + a * 5; for (let j = 0; j < L; j++) ctx.fillRect(Math.round(ox + dx * (b + j) + nx * o), Math.round(oy + dy * (b + j) + ny * o), 1, 1); } } // speed lines
+      const tx = ox + dx * Y.R * .95, ty = oy + dy * Y.R * .95;
+      if (a <= 3) { const L = (big ? 10 : 7) * (1 - a / 4) + 3, al = 1 - a / 4; ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(Math.round(tx - L), Math.round(ty) - 1, Math.round(2 * L), 2); ctx.fillRect(Math.round(tx), Math.round(ty - L * .6), 1, Math.round(L * 1.2)); ctx.fillStyle = `rgba(220,245,255,${al})`; ctx.beginPath(); ctx.arc(tx, ty, 3, 0, TAU); ctx.fill(); }
+      if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
+    ctx.restore();
+    for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
+      ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
+      if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
+  function gkKick(a) { const AT = atkT(a.i), u = a.t; return u < AT.a0 ? { x: -2 * u / Math.max(AT.a0, 1e-3), sq: 1 } : { x: 4 * Math.exp(-(u - AT.a0) * 14), sq: 1 - .05 * Math.exp(-(u - AT.a0) * 14) }; } // atlas px: lean back, snap forward, squash
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
-    drawH128(h128Cell(), h.x, h.y, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x, h.y, k, .5, 'white');
+    let kx = 0, ky = 0, sq = 1; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.x * f; ky = v[1] * K.x * f * .5; sq = K.sq; }
+    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); ctx.translate(-fx, -fy);
+    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore(); if (!SLASH_BODY) gkDraw(k);
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
