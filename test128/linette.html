@@ -80,15 +80,33 @@ function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])retur
 function dir8(){if(!P.diag||P.face!=='down'&&P.face!=='up')return null;const sx=P.lastH==='left'?-1:1,sy=P.face==='down'?1:-1;return [sx*0.78,sy*0.62];}
 function diagMeta(m,d){if(!d)return m;const nx=-d[1],ny=d[0],tp=[d[0]*26,-62+d[1]*14];return {...m,dir:d,tip:m.tip2?[tp[0]+nx*6,tp[1]+ny*6]:tp,tip2:m.tip2?[tp[0]-nx*6,tp[1]-ny*6]:null};}
 function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
-function start(st,name){P.st=st;P.t=0;P.clip=name;}
+function start(st,name){P.st=st;P.t=0;P.clip=name;if(st!=='idle'){P.vx=P.vy=0;P.skid=0;}}   // a new action drops the walk/run velocity (no skid after a dash/jump/cast)
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
-function dash(){if(P.dead||P.st==='dash')return;start('dash','dash_'+atkDir());}
+// owner 10-22 "대시 모션뒤에 잔상 남기고 대시 길이 더 길게, 주인공이랑 똑같이": the hero's dash v2 (test128 index DODGE + drawDash8/drawGhosts8):
+// burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
+// a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
+const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
+function dash(){if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:'idle_'+atkDir(),lines:null};start('dash','dash_'+atkDir());}
+const TINTC=document.createElement('canvas');
+function blitTint(e,x,y,alpha,col,mix){const [s,c]=e,[cx,cy,w,h,ax,ay]=A.cells[s][c];if(TINTC.width<w)TINTC.width=w;if(TINTC.height<h)TINTC.height=h;const g=TINTC.getContext('2d');
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.clearRect(0,0,TINTC.width,TINTC.height);g.drawImage(SH[s],cx,cy,w,h,0,0,w,h);g.globalCompositeOperation='source-atop';g.globalAlpha=mix;g.fillStyle=col;g.fillRect(0,0,w,h);
+  ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(TINTC,0,0,w,h,Math.round(x-ax),Math.round(y-ay),w,h);ctx.restore();}
+function drawDash(camX,camY,behind){
+  if(behind){for(let i=0;i<GH.length;i++){const g=GH[i],r=GH.length-1-i,a=GH8.alpha[r]*Math.max(0,Math.min(1,(GH8.life-g.a)/(GH8.life-GH8.fadeFrom)));if(a>0)blitTint(g.e,g.x-camX,g.y-camY,a,'#6ed7ff',.75);}
+    const d=P.dsh;if(d&&P.st==='dash'&&P.t<4){const L=clip(d.idle);if(L)blitTint(L[0],d.x0-camX,d.y0-camY,(150/255)*(1-P.t/4),'#dcfaff',.85);}return;}
+  const d=P.dsh;if(!d||P.st!=='dash'||P.t>DSH.burst+2)return;const fade=P.t<=DSH.burst?1:.5;
+  if(!d.lines){let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;d.lines=Array.from({length:9},()=>[rnd()*2-1,10+rnd()*30,45+rnd()*65,rnd()*3|0]);}
+  const px=-d.dy,py=d.dx,k=117/124,cx=P.x-camX,cy=P.y-jz()-camY-40*k,half=40*k;
+  for(const[o,st,ln,ci]of d.lines){const x=cx+o*half*px,y=cy+o*half*py*1.4,s0=st*k,s1=(st+ln)*k;ctx.strokeStyle=['rgba(140,230,255,','rgba(220,250,255,','rgba(90,200,250,'][ci]+(.9*fade)+')';ctx.lineWidth=ci===1?2:1;
+    ctx.beginPath();ctx.moveTo(x-d.dx*s0,y-d.dy*s0*.8);ctx.lineTo(x-d.dx*s1,y-d.dy*s1*.8);ctx.stroke();}}
 function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
 function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
+const MV={walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
+let DUST=[];function dust(x,y,n,v){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=Math.random();DUST.push({x:x+(Math.random()-.5)*12,y:y-1,vx:Math.cos(a)*v*r/60,vy:-Math.abs(Math.sin(a))*v*r/120,t:0,life:14+Math.random()*10,c:Math.random()<.5?'#e8dcc0':'#cbb894',s:Math.random()<.5?2:3});}}
 let TR=[];   // flying thrust trails (world space)
 function jz(){if(P.st!=='jump')return 0;const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-T*0.25)/(T*0.55)));return Math.round(Math.sin(u*Math.PI)*(rj?72:60));}   // jump height: rjump = push-off 2 frames, arc, landing 2 frames; standing jump arcs mid-clip
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
@@ -96,6 +114,8 @@ function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
   if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
   const moving=m>0.2;P.t++;
+  for(const d of DUST){d.t++;d.x+=d.vx;d.y+=d.vy;d.vy+=0.02;}DUST=DUST.filter(d=>d.t<d.life);
+  for(const g of GH)g.a++;GH=GH.filter(g=>g.a<GH8.life).slice(-GH8.alpha.length);
   if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
   if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
     if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt});strike(a.clip,a.n-1,mm);}
@@ -104,12 +124,25 @@ function step(){
   if(P.st==='idle'||P.st==='move'){
     if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
       if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
-      const running=runHeld(),sp=running?2.2:1.0;P.x+=ix*sp;P.y+=iy*sp;const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());if(P.st!=='move'||P.clip!==n){P.st='move';P.clip=n;}}
-    else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());
+      // owner 10-22 "비슷한 게임보다 머가 이상한지 -> 전부 다 해라": (1) no foot sliding - the leg cycle advances by the distance she covers (MV.stride px per
+      // clip tick: walk stride ~45px per 24 ticks, run ~65px per 16 ticks), (2) speeds matched to that stride (walk 1.0 -> 2.0, run 2.2 -> 4.0 px/tick),
+      // (3) a walk/run starts on a passing frame (legs together) instead of the widest stride, (6) near-instant start like the hero (accelTicks 2),
+      // (5) hero's run start: 10-tick burst (x2.3/1.9) with a dust kick-up, dust puffs on every run footfall. Stopping = (4) short skid (see the else branch).
+      P.skid=0;const running=runHeld(),wasRun=P.clip&&P.clip.startsWith('run_');if(running&&!(P.st==='move'&&wasRun)){P.runT=10;dust(P.x-ix*10,P.y,8,130);}
+      const tg=(running?MV.run:MV.walk)*(running&&P.runT>0?1+(MV.burst-1)*P.runT/10:1);if(P.runT>0)P.runT--;
+      P.vx=(P.vx||0)+(ix*tg-(P.vx||0))*0.5;P.vy=(P.vy||0)+(iy*tg-(P.vy||0))*0.5;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.spd=sp;
+      const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
+      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
+      const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
+      if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
+    else{if(P.st==='move'){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
+      if(P.skid){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;if(Math.hypot(P.vx,P.vy)<0.2){P.vx=P.vy=0;P.skid=0;}P.x+=P.vx;P.y+=P.vy;}
+      if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());}
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?3.0:runHeld()?1.6:0.9;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
-    if(P.st==='dash'){const v=DV[P.face];const k=1-P.t/T;P.x+=v[0]*5*k;P.y+=v[1]*5*k;}
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp;}}   // running jump carries forward even without input
+    if(P.st==='dash'&&P.dsh){const d=P.dsh,E=q=>1-Math.pow(1-q,2.6),p0=Math.min(1,(P.t-1)/DSH.burst),p=Math.min(1,P.t/DSH.burst),st=DSH.travel*(E(p)-E(Math.max(0,p0)));P.x+=d.dx*st;P.y+=d.dy*st*.8;
+      if((P.t-1)%2===0&&P.t-1<DSH.dur)GH.push({e:frameAt(L,P.t,false),x:P.x,y:P.y-jz(),a:0});}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}start('idle','idle_'+atkDir());}
   }
 }
@@ -162,10 +195,11 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
     for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
   for(const D of DUM)if(D.y<=P.y)drawDummy(D);
   ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24,6,0,0,7);ctx.fill();
-  castFx(false,sx,sy);sewFx(false,camX,camY);
-  const L=clip(P.clip);const e=frameAt(L,P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
+  for(const d of DUST){ctx.globalAlpha=1-d.t/d.life;ctx.fillStyle=d.c;ctx.fillRect(Math.round(d.x-camX),Math.round(d.y-camY),d.s,d.s);}ctx.globalAlpha=1;
+  drawDash(camX,camY,true);castFx(false,sx,sy);sewFx(false,camX,camY);
+  const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
-  castFx(true,sx,sy);sewFx(true,camX,camY);
+  castFx(true,sx,sy);sewFx(true,camX,camY);   // owner 10-22 "속도선 제거해": no dash speed lines (drawDash(...,false) not called)
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
@@ -185,8 +219,10 @@ function needle(x,y,dx,dy,len,a){ctx.save();ctx.globalCompositeOperation='lighte
   pline(bx-dy,by+dx,tx-dy,ty+dx,NC.shade);pline(bx,by,tx,ty,NC.body);pline(bx+dy,by-dx,tx+dy,ty-dx,NC.body);pline(tx-dx*2,ty-dy*2,tx,ty,NC.tip);ctx.fillStyle=NC.shade;ctx.fillRect(Math.round(bx),Math.round(by),1,1);ctx.globalAlpha=1;}
 function thread(pts,a,col){ctx.globalAlpha=a;for(let i=1;i<pts.length;i++){pline(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],col||NC.th);pline(pts[i-1][0],pts[i-1][1]+1,pts[i][0],pts[i][1]+1,col||NC.th);}ctx.globalAlpha=1;}
 function hitD(D,dmg,push,dx,dy,big){if(D.fl>=6)return false;D.fl=10;D.x+=dx*push;D.y+=dy*push;D.pops.push({v:dmg,a:0,big});return true;}
-const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-64&&y<D.y+6;   // dummy body box (post + head), so chest-high needles hit
-function hand(){const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*16,P.y-jz()-62+d[1]*6];}
+const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-100&&y<D.y+6;   // dummy body box (post + head + room above), so needles thrown from her raised hand still hit
+// owner 10-21 "몇몇 동작에서 손에 실이 안나온다": the thread starts at the needle in her hand = measured tip of the current cast frame (A.casttip)
+function tipNow(){const n=P.clip,T=A.casttip&&A.casttip[n];if(P.st!=='cast'||!T)return null;const L=clip(n);let t=P.t;for(let i=0;i<L.length;i++){if(t<L[i][2])return T[i];t-=L[i][2];}return T[T.length-1];}
+function hand(){const tp=tipNow();if(tp){P.lastTip=tp;P.lastTipClip=P.clip;}const q=tp||(P.lastTip&&P.sk?P.lastTip:null);if(q)return [P.x+q[0],P.y-jz()+q[1]];const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*34,P.y-jz()-66+d[1]*8];}
 function skillStep(){
   if(P.st==='cast'&&P.sk){const k=P.skill,t=P.t,S=P.sk,[dx,dy]=S.d;
     if(k===0&&t>=22&&S.fired<7&&t%1===0){const i=S.fired++,o=[0,-1,1,-2,2,-3,3][i]*0.13,ca=Math.cos(o),sa=Math.sin(o),vx=dx*ca-dy*sa,vy=dx*sa+dy*ca,[hx,hy]=hand();
@@ -216,6 +252,10 @@ function sewFx(front,camX,camY){
       if(flash&&S.age<38){ctx.globalAlpha=fade*.45;pline(cx+Math.cos(a0)*rx,cy+y0*ry-1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry-1,NC.gold);}ctx.globalAlpha=1;}
     if(!flash&&p<1&&p>0){const a=S.a0+p*Math.PI*2,y=Math.sin(a);if(front===(y>=0)){const nx=cx+Math.cos(a)*rx,ny=cy+y*ry,tx=-Math.sin(a),ty=Math.cos(a)*ry/rx,m=Math.hypot(tx,ty);needle(nx,ny-2,tx/m,ty/m,15,1);}}}
   if(!front)return;
+  if(P.st==='cast'&&P.sk){const [hx,hy]=hand(),x=hx-camX,y=hy-camY,t=P.t;
+    if(t<20){for(let i=0;i<3;i++){const a0=t*0.5+i*2.1;thread([[x,y],[x+Math.cos(a0)*6,y+Math.sin(a0)*3-2],[x+Math.cos(a0+1.2)*7,y+Math.sin(a0+1.2)*3.5-2]],.9,i%2?NC.thl:NC.th);}}   // winding: little thread loops spinning on the needle
+    else if(P.skill===0){for(const n of NDL)if(!n.big&&n.age<10)thread([[x,y],[n.x-camX,n.y-camY]],1-n.age/10,NC.th);}
+    else if(P.skill===2&&STITCH&&STITCH.age<30){const S=STITCH,p=Math.min(1,(S.age-2)/24),a=S.a0+p*Math.PI*2;thread([[x,y],[S.x-camX+Math.cos(a)*74,S.y-6-camY+Math.sin(a)*30]],.8,NC.th);}}
   for(const n of NDL){const a=n.age>n.life-6?(n.life-n.age)/6:1,m=Math.hypot(n.vx,n.vy),x=n.x-camX,y=n.y-camY;
     if(n.tail.length>1)thread([[x,y],...n.tail.map(q=>[q[0]-camX+(Math.random()<.5?0:1),q[1]-camY])],a*.85,n.big?NC.gold:NC.th);
     needle(x,y,n.vx/m,n.vy/m,n.big?18:15,a);}
@@ -227,5 +267,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=34').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=34';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=39').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=39';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
 </script></body></html>
