@@ -86,7 +86,7 @@ function start(st,name){P.st=st;P.t=0;P.clip=name;}
 function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 // owner 10-22 "대시 모션뒤에 잔상 남기고 대시 길이 더 길게, 주인공이랑 똑같이": the hero's dash v2 (test128 index DODGE + drawDash8/drawGhosts8):
 // burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
-// a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point, speed lines.
+// a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
 const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
 function dash(){if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:'idle_'+atkDir(),lines:null};start('dash','dash_'+atkDir());}
 const TINTC=document.createElement('canvas');
@@ -188,7 +188,7 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
   drawDash(camX,camY,true);castFx(false,sx,sy);sewFx(false,camX,camY);
   const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
   ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
-  castFx(true,sx,sy);sewFx(true,camX,camY);drawDash(camX,camY,false);
+  castFx(true,sx,sy);sewFx(true,camX,camY);   // owner 10-22 "속도선 제거해": no dash speed lines (drawDash(...,false) not called)
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
