@@ -87,7 +87,7 @@
         if (D.ai === 'melee') { const reach = 14; warn = W.hazard({ shape: 'circle', x: m.x + Math.cos(A) * reach, y: m.y + Math.sin(A) * reach * .8, r: 15, warn: 0.55, act: 0.05, dmg: D.dmg, kind: 'swipe', owner: m }).warn; m.cd = 1.5 / agg(W); }
         else if (D.ai === 'aoe') { warn = W.hazard({ shape: 'circle', x: m.x, y: m.y, r: 34, warn: 0.75, act: 0.1, dmg: D.dmg, kind: HAZ47[D.fx] || 'swipe', owner: m }).warn; m.cd = 2.2 / agg(W); }
         else if (D.ai === 'drop') { warn = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: 16, warn: 0.8, act: 0.05, dmg: D.dmg, kind: HAZ47[D.fx] || 'rock', owner: m }).warn; m.cd = 2.2 / agg(W); }
-        else if (D.ai === 'charge') { m.aim = A; warn = lineTele(W, m, A, 130, 0.55, 14); m.next = () => { set(m, 'dash'); m.anim = 'hold'; }; m.cd = 2.0 / agg(W); }
+        else if (D.ai === 'charge') { m.aim = A; warn = lineTele(W, m, A, 130, 0.55, 14); m.next = () => { set(m, 'dash'); m.anim = 'hold'; if (W.sfx) W.sfx('mob_dash', .7); }; m.cd = 2.0 / agg(W); }
         else { const S2 = SHOT47[D.fx] || SHOT47.arrow, dirs = D.pat === 'ring' ? [...Array(8)].map((_, i) => i * Math.PI / 4) : D.pat === 'fan' ? [A - .3, A, A + .3] : [A];
           for (const b of dirs) warn = lineTele(W, m, b, Math.min(150, S2.sp * 1.2), 0.6, 6);
           W.after(warn, () => { if (m.dead) return; for (const b of dirs) W.shot(Object.assign({ x: m.x, y: m.y - D.h * .45, a: b, dmg: D.dmg - 1, kind: D.fx, owner: m }, S2)); }); m.cd = 2.0 / agg(W); }
