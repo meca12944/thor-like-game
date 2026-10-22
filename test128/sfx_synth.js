@@ -31,6 +31,11 @@
     coin:      [['t', { type: 'square', f0: 988, dur: .07, v: .12 }], ['t', { type: 'square', f0: 1319, dur: .18, v: .12, d: .07 }]],
     heart:     [['t', { type: 'triangle', f0: 660, dur: .1, v: .2 }], ['t', { type: 'triangle', f0: 880, dur: .1, v: .2, d: .08 }], ['t', { type: 'triangle', f0: 1320, dur: .2, v: .2, d: .16 }]],
     thrust:    [['n', { f0: 1800, f1: 4200, dur: .09, v: .22, a: .01 }]],                                                  // Linette's needle
+    // sandbox-only stand-ins for the town's recorded swing / hit sounds (the game keeps the recordings)
+    slash:     [['n', { f0: 1400, f1: 3800, dur: .11, v: .3, a: .015 }]],
+    slash_big: [['n', { f0: 900, f1: 3200, dur: .18, v: .4, a: .02 }], ['t', { type: 'sawtooth', f0: 160, f1: 90, dur: .15, v: .06 }]],
+    hit:       [['n', { f0: 2600, f1: 900, dur: .07, v: .45 }], ['t', { type: 'square', f0: 260, f1: 120, dur: .08, v: .16 }]],
+    hit_big:   [['n', { f0: 2000, f1: 500, dur: .12, v: .55 }], ['t', { type: 'square', f0: 200, f1: 70, dur: .14, v: .22 }], ['n', { f0: 300, f1: 80, dur: .2, v: .3, filter: 'lowpass' }]],
   };
   function voice(ctx, dest, nb, k, vol, rate, t0) { const out = ctx.createGain(); out.gain.value = vol; out.connect(dest); const r = rate * (.95 + Math.random() * .1);
     for (const [kind, o0] of DEF[k]) { const o = Object.assign({}, o0, { out, nb, f0: o0.f0 * r, f1: (o0.f1 || o0.f0) * r }); (kind === 't' ? tone : noise)(ctx, t0 + (o0.d || 0), o); } }
