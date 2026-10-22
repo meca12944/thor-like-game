@@ -1,0 +1,13 @@
+{"tag": "edit_hurt_down_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_hurt_up_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_walk_up_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_walk_down_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_run_down_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_walk_up_key2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_tw_dash_b", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.024758294781049094}}
+{"tag": "anim_tw_dash_a", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.021771733184655508}}
+{"tag": "anim_cyc_walk_down", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.030109896043936407}}
+{"tag": "anim_cyc_run_down", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.0422735629412863}}
+{"tag": "anim_tw_hurt_down", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.02215055610736211}}
+{"tag": "anim_tw_hurt_up", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.022473068124718137}}
+{"tag": "anim_cyc_walk_up", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.030933132880263857}}
