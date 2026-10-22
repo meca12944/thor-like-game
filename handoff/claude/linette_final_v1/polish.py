@@ -63,12 +63,21 @@ for m,d in (('walk','down'),('walk','downl'),('walk','up'),('walk','upl'),('walk
     for i,f in enumerate(fs):
         im=Image.open(f);b=im.getbbox();dy=190-b[3]-(1 if i%4==2 else 0)
         c=Image.new('RGBA',(256,256));c.paste(im,(0,dy),im);c.save(f)
+# owner 10-22 "스킬 쓸 때 몸이 커짐": cast starts and ends standing like idle -> scale each cast clip so its standing frame 0 is as tall as idle frame 0
+# of the same view (head-to-skirt does not work for the back view: the ribbon/strap colours mix)
+for d in os.listdir(f'{OUT}/cast'):
+    fs=sorted(glob.glob(f'{OUT}/cast/{d}/*.png'));ib=Image.open(f'{OUT}/idle/{d}/000.png').getbbox();cb=Image.open(fs[0]).getbbox();sc=(ib[3]-ib[1])/(cb[3]-cb[1])
+    if abs(sc-1)<0.015:continue
+    for f in fs:
+        im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=pxscale(im,sc)
+        c=Image.new('RGBA',(256,256));c.paste(im2,(round(cx-cx*sc),round(fy-fy*sc)),im2);c.save(f)
+    log[f'cast_{d}_size']={'scale':round(sc,3)}
 # circle check (owner 10-21): centre every idle / walk / run clip on her body, not her feet - per clip one constant x shift so the median
 # skirt centre sits at x=128 (wide first-frame stances had pushed some clips sideways, so she jumped left/right when turning)
 def skirt_cx(f):
     a=np.array(Image.open(f).convert('RGBA')).astype(int);al=a[:,:,3]>0;xs=np.where((al&(a[:,:,0]>150)&(a[:,:,1]<70)&(a[:,:,2]<80)).any(axis=0))[0]
     return (xs.min()+xs.max())/2 if len(xs) else None
-for m in ('idle','walk','run'):
+for m in ('idle','walk','run','dash','jump','rjump','hurt'):   # dash/jump/rjump/hurt added 10-22 (diagonal dash/jump popped 14-17px sideways)
     for d in os.listdir(f'{OUT}/{m}'):
         fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));cs=sorted(v for v in (skirt_cx(f) for f in fs) if v is not None)
         if not cs:continue
@@ -109,3 +118,8 @@ for m in ('walk','run'):
             if d=='left':A=np.ascontiguousarray(A[:,::-1]);A=_stamp(A);A=np.ascontiguousarray(A[:,::-1])
             else:A=_stamp(A)
             Image.fromarray(A).save(f)
+# 2) owner 10-22: up-diagonal dash/jump frames sank up to 9-11px under the ground -> no frame of dash/jump/rjump/cast may go below the ground line
+for m in ('dash','jump','rjump','cast'):
+    for f in glob.glob(f'{OUT}/{m}/*/*.png'):
+        im=Image.open(f);b=im.getbbox()
+        if b and b[3]>190:c=Image.new('RGBA',(256,256));c.paste(im,(0,190-b[3]),im);c.save(f)
