@@ -131,7 +131,7 @@ function step(){
   for(const g of GH)g.a++;GH=GH.filter(g=>g.a<GH8.life).slice(-GH8.alpha.length);
   if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
   if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
-    if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt});strike(a.clip,a.n-1,mm);}
+    if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt,hi:a.n-1});strike(a.clip,a.n-1,mm);}
     if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
   skillStep();
   if(P.st==='idle'||P.st==='move'){
@@ -168,22 +168,27 @@ const VERT={down:1,downl:1,up:-1,upl:-1};
 function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return STILL?{...m,dir:[d==='left'?-1:1,0],tip:[m.tip[0]*0.4,m.tip[1]],tip2:m.tip2?[m.tip2[0]*0.4,m.tip2[1]]:null}:{...m,dir:[d==='left'?-1:1,0]};   // STILL: trail starts at the body front   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
   const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
 // owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게" + "동작 모션 없이": STILL = no attack pose (stays in idle), no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
-const STILL=true,FLY=7,ATK_SPEED=2;   // ATK_SPEED: attack clock per tick (owner 10-21 "공속 빠르게" -> 2x)
+const STILL=true,FLY=7,ATK_SPEED=2;
+// owner 10-22 "공격 검흔이 너무 크다, 일반 탑다운 게임 히트박스 크기만큼": reach was 144-170px from the needle tip (~1.5 body lengths) while the streak
+// drew only 105-135px, so hits landed past the visible streak. Now one number for both: 1st/2nd hit 80px, 3rd hit 105px from the needle tip
+// (~1.0 / 1.2 body lengths from her body, like the hero's thrust 118/83 world px and common top-down melee ~1 body length), half-width 18 / 22.
+// The streak head stops exactly at the end of the hit box. ?hb=1 draws the hit boxes for checking.
+const ATKR={len:[80,80,105],half:[18,18,22]},SHOWHB=/[?&]hb=1/.test(location.search);   // ATK_SPEED: attack clock per tick (owner 10-21 "공속 빠르게" -> 2x)
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
 function strike(n,hi,mo){const m=mo||tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
-  const [dx,dy]=m.dir,reach=(m.big?100:74)+(STILL?FLY*10:0),tips=m.tip2?[m.tip,m.tip2]:[m.tip];
+  const [dx,dy]=m.dir,reach=ATKR.len[hi],half=ATKR.half[hi],tips=m.tip2?[m.tip,m.tip2]:[m.tip];
   for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
     for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
-      if(along>-20&&along<reach+10&&perp<26&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});any=true;}}}
+      if(along>-8&&along<reach&&perp<half&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});any=true;}}}
   if(any){P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
 // owner 10-21 "좀더 앞으로 찌르는 듯한 검흔": a stab streak - a sharp spear-point head shoots forward fast (ease-out), the tail stays at the
 // needle tip for a moment and then snaps forward after the head, so it reads as one straight piercing line; thin speed lines beside it.
-function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=heavy?135:105,W=heavy?9:6;
-  const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3))+age*1.5,k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
+function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=ATKR.len[heavy?2:0],W=heavy?9:6;
+  const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3)),k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
   const ox=x+tip[0],oy=y+tip[1],P=d=>[ox+dx*d,oy+dy*d];
   const blade=(w,tailW,col,headLen)=>{const t=P(Tl),h=P(H),hb=P(Math.max(Tl,H-headLen));ctx.fillStyle=col;ctx.beginPath();
     ctx.moveTo(t[0]+nx*tailW/2,t[1]+ny*tailW/2);ctx.lineTo(hb[0]+nx*w/2,hb[1]+ny*w/2);ctx.lineTo(h[0],h[1]);ctx.lineTo(hb[0]-nx*w/2,hb[1]-ny*w/2);ctx.lineTo(t[0]-nx*tailW/2,t[1]-ny*tailW/2);ctx.closePath();ctx.fill();};
@@ -220,6 +225,8 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
   for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
   for(const T of TR){const age=P.gt-T.t0,x=Math.round(T.x-camX),y=Math.round(T.y-camY);if(T.m.tip2){trailOne(x,y,T.m,T.m.tip,age,true);trailOne(x,y,T.m,T.m.tip2,age,true);}else trailOne(x,y,T.m,T.m.tip,age,false);}TR=TR.filter(T=>P.gt-T.t0<20);
+  if(SHOWHB)for(const T of TR){if(P.gt-T.t0>14)continue;const [dx,dy]=T.m.dir,L=ATKR.len[T.hi||0],h=ATKR.half[T.hi||0];ctx.strokeStyle='#ff3040';ctx.lineWidth=1;
+    for(const t of T.m.tip2?[T.m.tip,T.m.tip2]:[T.m.tip]){const ox=T.x+t[0]-camX,oy=T.y+t[1]-camY,c=[[-8,-h],[L,-h],[L,h],[-8,h]].map(([u,v])=>[ox+dx*u-dy*v,oy+dy*u+dx*v]);ctx.beginPath();ctx.moveTo(...c[0]);for(const q of c.slice(1))ctx.lineTo(...q);ctx.closePath();ctx.stroke();}}   // ?hb=1: red = hit box
 }
 // owner 10-21 "리네트 스킬 만들어보자" -> 재봉사 실/바늘, 3 skills cycling on each press (cast pose = her two needle-rapiers spreading):
 // S1 바늘비: a fan of needles with red thread tails flies forward and pierces. S2 실 묶기: one needle on a red thread shoots out,
