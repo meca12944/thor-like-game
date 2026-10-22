@@ -1,12 +1,14 @@
 # Diagonal walk cycle (2번방 final method): one key pose + one same->same 8-frame animate-with-text-v3 cycle (frames 0-7).
 # One scale per clip from frame 0 (body height = the side walk's), pxscale (no nearest-neighbour), x shifted once by frame 0's body
-# centre, every frame's feet on the ground line (y 250). usage: cycle_diag.py <cycle prefix> <side walk strip> <out strip>
+# centre, every frame's feet on the ground line (y 250). usage: cycle_diag.py <cycle prefix> <out strip> <ref strip> [ref strip ...]
+# target body height = mean of the reference strips (side alone for upright mobs; side + front for long, low ones)
 import sys,numpy as np
 from PIL import Image
 from assemble_lib import clean
 from pxscale import pxscale
-pre,side,out=sys.argv[1:4]
-sd=Image.open(side);sh=np.mean([sd.crop((i*256,0,i*256+256,256)).getbbox()[3]-sd.crop((i*256,0,i*256+256,256)).getbbox()[1] for i in range(8)])
+pre,out=sys.argv[1:3]
+def hof(p):sd=Image.open(p);return np.mean([sd.crop((i*256,0,i*256+256,256)).getbbox()[3]-sd.crop((i*256,0,i*256+256,256)).getbbox()[1] for i in range(8)])
+sh=np.mean([hof(p) for p in sys.argv[3:]])
 fr=[clean(Image.open(f'{pre}_{i:02d}.png')) for i in range(8)];b0=fr[0].getbbox();s=sh/(b0[3]-b0[1]);cx0=(b0[0]+b0[2])/2*s
 st=Image.new('RGBA',(256*8,256))
 for i,im in enumerate(fr):
