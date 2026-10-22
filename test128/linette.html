@@ -83,12 +83,12 @@ function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down
 function start(st,name){P.st=st;P.t=0;P.clip=name;if(st!=='idle'){P.vx=P.vy=0;P.skid=0;}}   // a new action drops the walk/run velocity (no skid after a dash/jump/cast)
 // owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
 // P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
-function attack(){if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
+function attack(){snapFace();if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
 // owner 10-22 "대시 모션뒤에 잔상 남기고 대시 길이 더 길게, 주인공이랑 똑같이": the hero's dash v2 (test128 index DODGE + drawDash8/drawGhosts8):
 // burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
 // a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
 const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
-function dash(){if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:'idle_'+atkDir(),lines:null};start('dash','dash_'+atkDir());}
+function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:'idle_'+atkDir(),lines:null};start('dash','dash_'+atkDir());}
 const TINTC=document.createElement('canvas');
 function blitTint(e,x,y,alpha,col,mix){const [s,c]=e,[cx,cy,w,h,ax,ay]=A.cells[s][c];if(TINTC.width<w)TINTC.width=w;if(TINTC.height<h)TINTC.height=h;const g=TINTC.getContext('2d');
   g.globalCompositeOperation='source-over';g.globalAlpha=1;g.clearRect(0,0,TINTC.width,TINTC.height);g.drawImage(SH[s],cx,cy,w,h,0,0,w,h);g.globalCompositeOperation='source-atop';g.globalAlpha=mix;g.fillStyle=col;g.fillRect(0,0,w,h);
@@ -101,8 +101,8 @@ function drawDash(camX,camY,behind){
   const px=-d.dy,py=d.dx,k=117/124,cx=P.x-camX,cy=P.y-jz()-camY-40*k,half=40*k;
   for(const[o,st,ln,ci]of d.lines){const x=cx+o*half*px,y=cy+o*half*py*1.4,s0=st*k,s1=(st+ln)*k;ctx.strokeStyle=['rgba(140,230,255,','rgba(220,250,255,','rgba(90,200,250,'][ci]+(.9*fade)+')';ctx.lineWidth=ci===1?2:1;
     ctx.beginPath();ctx.moveTo(x-d.dx*s0,y-d.dy*s0*.8);ctx.lineTo(x-d.dx*s1,y-d.dy*s1*.8);ctx.stroke();}}
-function cast(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
-function jump(){if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
+function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
 function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
 function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
 const MV={ySc:0.8,walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
@@ -111,6 +111,18 @@ let TR=[];   // flying thrust trails (world space)
 const JUMP_AIR=[8,32];   // owner 10-22 standing jump re-timed: crouch 0-8, air 8-32 (legs-together frames), landing stance + absorb after 32
 function jz(){if(P.st!=='jump')return 0;const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-JUMP_AIR[0])/(JUMP_AIR[1]-JUMP_AIR[0])));return Math.round(Math.sin(u*Math.PI)*(rj?72:60));}   // jump height: rjump = push-off 2 frames, arc, landing 2 frames; standing jump arcs mid-clip
 const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
+// owner 10-22 "방향전환시 좀더 부드럽게": 8 facings 0=right 1=down-right 2=down 3=down-left 4=left 5=up-left 6=up 7=up-right.
+// The shown facing walks one 45-degree step every TURN.step ticks toward the input (a 180-degree turn passes through the front, toward the camera),
+// so right->left reads right, down-right, down, down-left, left. Attacks/dash/skill/jump snap to the input at once (no delay on actions).
+// Letting go of a diagonal (two keys are never released on the same tick) keeps the diagonal instead of flashing the straight direction.
+const TURN={step:3,grace:6};
+function dir8of(ix,iy){const dg=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;if(dg)return ix>0?(iy>0?1:7):(iy>0?3:5);if(Math.abs(ix)>=Math.abs(iy))return ix>0?0:4;return iy>0?2:6;}
+function setF8(i){P.f8=i;P.diag=i%2===1;if(i===0||i===1||i===7)P.lastH='right';else if(i===3||i===4||i===5)P.lastH='left';P.face=i===0?'right':i===4?'left':(i>=1&&i<=3)?'down':'up';}
+function turnStep(t){const now=P.gt||0;if(t!==P.t8){P.t8p=P.t8;P.t8=t;P.t8T=now;}
+  if(P.f8==null){setF8(t);P.turnT=0;return;}if(P.f8===t)return;if((P.turnT=(P.turnT||0)-1)>0)return;P.turnT=TURN.step;
+  const d=((t-P.f8)%8+8)%8,via=k=>[1,2,3].some(j=>(P.f8+k*j+8)%8===2);   // 180-degree turn: the side whose path passes the front (down); up<->down: the side she was facing
+  const dirn=d!==4?(d<4?1:-1):via(1)?1:via(-1)?-1:((P.f8===6)===(P.lastH==='right')?1:-1);setF8((P.f8+dirn+8)%8);}
+function snapFace(){if(P.t8!=null&&P.f8!==P.t8)setF8(P.t8);P.turnT=0;}
 function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
   if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
@@ -123,21 +135,22 @@ function step(){
     if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
   skillStep();
   if(P.st==='idle'||P.st==='move'){
-    if(moving){P.diag=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;   // owner 10-21 "대각선 방향이 왜 없지": diagonal input -> diagonal art + diagonal attacks
-      if(P.diag){P.face=iy>0?'down':'up';P.lastH=ix>0?'right':'left';}else if(Math.abs(ix)>=Math.abs(iy)){P.face=ix>0?'right':'left';P.lastH=P.face;}else{P.face=iy>0?'down':'up';if(Math.abs(ix)>0.3)P.lastH=ix>0?'right':'left';}
+    if(moving){turnStep(dir8of(ix,iy));   // owner 10-22 "방향전환시 좀더 부드럽게": the facing turns through the in-between directions (see turnStep)
       // owner 10-22 "비슷한 게임보다 머가 이상한지 -> 전부 다 해라": (1) no foot sliding - the leg cycle advances by the distance she covers (MV.stride px per
       // clip tick: walk stride ~45px per 24 ticks, run ~65px per 16 ticks), (2) speeds matched to that stride (walk 1.0 -> 2.0, run 2.2 -> 4.0 px/tick),
       // (3) a walk/run starts on a passing frame (legs together) instead of the widest stride, (6) near-instant start like the hero (accelTicks 2),
       // (5) hero's run start: 10-tick burst (x2.3/1.9) with a dust kick-up, dust puffs on every run footfall. Stopping = (4) short skid (see the else branch).
       P.skid=0;const running=runHeld(),wasRun=P.clip&&P.clip.startsWith('run_');if(running&&!(P.st==='move'&&wasRun)){P.runT=10;dust(P.x-ix*10,P.y,8,130);}
       const tg=(running?MV.run:MV.walk)*(running&&P.runT>0?1+(MV.burst-1)*P.runT/10:1);if(P.runT>0)P.runT--;
-      P.vx=(P.vx||0)+(ix*tg-(P.vx||0))*0.5;P.vy=(P.vy||0)+(iy*tg*MV.ySc-(P.vy||0))*0.5;   // (10-22) up/down at 0.8x: depth + less sliding on the front/back walks
+      const ka=((P.vx||0)*ix+(P.vy||0)*iy)<0?0.25:0.5;P.vx=(P.vx||0)+(ix*tg-(P.vx||0))*ka;P.vy=(P.vy||0)+(iy*tg*MV.ySc-(P.vy||0))*ka;   // (10-22) reversing = a short brake before speeding the other way
+         // (10-22) up/down at 0.8x: depth + less sliding on the front/back walks
       P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.spd=sp;
       const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
       if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
       const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
       if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
-    else{if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
+    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(P.gt||0)-P.t8T<TURN.grace){P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
+      if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
       // owner 10-22 "멈출 때 서 있는 자세로 미끄러짐": during the skid she keeps stepping (the walk/run legs advance by the distance, slowing down) and stands once nearly stopped
       if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle','idle_'+atkDir());}}
       else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());}
