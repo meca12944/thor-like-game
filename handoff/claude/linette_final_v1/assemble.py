@@ -67,6 +67,8 @@ CV=B+'/linette_cast_v1';_back=[2,3,3,3,4,3,2,12,4,4,5]
 SRC['cast']={'right':(CV+'/cast_e_seq',[0,1,2,3,4,6,7,8,7,1,0],_back),
              'down':(CV+'/tw_se',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5]),
              'up':(CV+'/tw_ne',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5])}
+# owner 10-22 "가만히 서있는 얼굴과 뛰는 얼굴이 틀리다": side walk + run redrawn from the face-fixed idle (new face) - key pose + one 8-frame key->key cycle (linette_face_v2)
+FV=B+'/linette_face_v2';SRC['walk']['right']=(FV+'/walk_e8',None,[6]*8);SRC['run']['right']=(FV+'/run_e8',None,[4]*8)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
