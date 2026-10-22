@@ -39,7 +39,8 @@
   };
   function voice(ctx, dest, nb, k, vol, rate, t0) { const out = ctx.createGain(); out.gain.value = vol; out.connect(dest); const r = rate * (.95 + Math.random() * .1);
     for (const [kind, o0] of DEF[k]) { const o = Object.assign({}, o0, { out, nb, f0: o0.f0 * r, f1: (o0.f1 || o0.f0) * r }); (kind === 't' ? tone : noise)(ctx, t0 + (o0.d || 0), o); } }
-  function play(k, vol = 1, rate = 1) { if (OFF || !ac || !DEF[k]) return; const now = ac.currentTime; if (last[k] && now - last[k] < .04) return; last[k] = now; if (ac.state === 'suspended') ac.resume();
+  let busy = [];   // voice cap: at most 8 sounds started per 0.15s (a burst of hits / telegraphs used to stack dozens of audio nodes)
+  function play(k, vol = 1, rate = 1) { if (OFF || !ac || !DEF[k]) return; const now = ac.currentTime; if (last[k] && now - last[k] < .04) return; busy = busy.filter(t => now - t < .15); if (busy.length >= 8) return; busy.push(now); last[k] = now; if (ac.state === 'suspended') ac.resume();
     voice(ac, master, noiseBuf, k, vol, rate, now); }
   function render(list, secs) { const sr = 44100, oc = new OfflineAudioContext(1, Math.ceil(sr * secs), sr), m = oc.createGain(); m.gain.value = .45; m.connect(oc.destination); const nb = mkNoise(oc);
     for (const [k, t, v] of list) voice(oc, m, nb, k, v || 1, 1, t); return oc.startRendering().then(b => Array.from(b.getChannelData(0))); }

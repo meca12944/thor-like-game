@@ -82,7 +82,7 @@ for(const o of S47){const a=o.area;Object.assign(o,{s47:true,hp:50+(a-1)*14,dmg:
 const IMG={};for(const m of MOBS)for(const k of(m.s47?['idle',m.J.ram?null:'atk']:['walk','walk_s','walk_n','walk_se','walk_ne','attack','shoot'])){if(!k)continue;const im=new Image();im.src=m.id+'_'+k+'.webp';IMG[m.id+k]=im;}
 const snd=(k,v)=>{if(SND&&window.SFX2)SFX2.play(k,v);};let SND=true;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d'),TAU=Math.PI*2,T60=a=>a.reduce((s,v)=>s+v,0)/60;
-let K=3,VW=300,VH=220;function resize(){const d=devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;K=Math.max(2,Math.min(cv.width/210,cv.height/240));VW=cv.width/K;VH=cv.height/K;}
+let K=3,VW=300,VH=220;function resize(){const d=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;K=Math.max(2,Math.min(cv.width/210,cv.height/240));VW=cv.width/K;VH=cv.height/K;}
 addEventListener('resize',resize);resize();
 // hero: the 주인공 샌드박스 atlas (hero_sbx.json, 8 directions; _s/_n = true front/back). cells [x,y,w,h,ax,ay], anims [sheet,cell,ticks]
 let HA=null,DARK=true;const HSH0=[],HSHD=[];   // original sheets / darker outfit (tools/anim/feltmobs/hero_dark.py)
@@ -338,8 +338,8 @@ function draw(){const g=ctx;g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=
     if(h.shape==='circle'){g.fillStyle=`rgba(224,83,62,${.12+.2*wp})`;g.strokeStyle=`rgba(224,83,62,${.55+.35*pulse})`;g.lineWidth=1;g.beginPath();g.ellipse(h.x,h.y,h.r,h.r/1.15,0,0,TAU);g.fill();g.stroke();g.fillStyle='rgba(224,83,62,.35)';g.beginPath();g.ellipse(h.x,h.y,h.r*wp,h.r*wp/1.15,0,0,TAU);g.fill();}
     else{g.strokeStyle=`rgba(224,83,62,${.35+.35*pulse})`;g.lineWidth=h.w*(.3+.7*wp);g.lineCap='round';g.beginPath();g.moveTo(h.x,h.y-8);g.lineTo(h.x2,h.y2-8);g.stroke();}}
   const m=S.mob,d=S.def,list=[[m.y,()=>{if(m.dead)return;if(d.s47){draw47(g,m,d);return;}const fb=m.anim==='walk'&&m.dir!=='side',nf=m.dir==='s'||m.dir==='n',im=IMG[d.id+(fb?'walk_'+m.dir:m.anim)];g.fillStyle='rgba(0,0,0,.32)';g.beginPath();g.ellipse(m.x,m.y,9*MOB_SC,4*MOB_SC,0,0,TAU);g.fill();if(!im.complete||!im.naturalWidth)return;
-      const f=frameOf(m,d),idle=m.anim==='walk'&&!m.moving,sy=idle?1+.02*Math.sin(S.t*4):1,sz=d.F;g.save();g.translate(m.x,m.y);if(m.face<0&&!(fb&&nf))g.scale(-1,1);g.scale(1,sy);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
-      if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);g.drawImage(im,f*256,0,256,256,-sz/2,-sz*250/256,sz,sz);g.restore();
+      const f=frameOf(m,d),idle=m.anim==='walk'&&!m.moving,sy=idle?1+.02*Math.sin(S.t*4):1,sz=d.F;g.save();g.translate(m.x,m.y);if(m.face<0&&!(fb&&nf))g.scale(-1,1);g.scale(1,sy);
+      if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);blit(g,im,f,256,256,sz/256,-sz/2,-sz*250/256);g.restore();
       if(m.hp<d.hp){const w=20;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-w/2-.5,m.y-d.h-9.5,w+1,3);g.fillStyle='#d8443a';g.fillRect(m.x-w/2,m.y-d.h-9,w*Math.max(0,m.hp)/d.hp,2);}}],[hero.y,drawHero]];
   list.sort((a,b)=>a[0]-b[0]).forEach(o=>o[1]());
   g.save();g.scale(HS,HS);for(const f of SFX)slashDraw(f,0,0);for(const f of IMP)impDraw(f,0,0);skDraw(0,0);g.restore();
@@ -347,11 +347,15 @@ function draw(){const g=ctx;g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=
   g.textAlign='center';g.font='bold 7px "Gowun Dodum",sans-serif';for(const f of S.fx){g.fillStyle=f.col;g.globalAlpha=Math.max(0,1-f.t/.8);g.fillText(f.text,f.x,f.y-f.t*14);g.globalAlpha=1;}
   g.setTransform(1,0,0,1,0,0);if(FLASH>0){g.fillStyle=`rgba(255,255,255,${FLASH*.06})`;g.fillRect(0,0,cv.width,cv.height);}skUI();
   document.getElementById('info').innerHTML=`<b>${d.name}</b> <span style="opacity:.7">${AREA[d.area]}</span> · ${S.auto?'자동 (게임과 같은 AI)':'수동'} · 지금: ${m.st==='idle'?(m.moving?'이동':'대기'):m.st==='melee'?'근접':m.st==='atk'?AIN[d.ai]:'8방향 투사체'} · 몹 HP <b>${Math.max(0,Math.round(m.hp))}</b>/${d.hp} · 처치 <b>${S.kills}</b> · 주인공 HP <b>${hero.hp}</b>/${hero.maxHp}${hero.dead?' (사망 · 곧 부활)':''} · 맞은 횟수 <b>${S.hits}</b>${hero.slow>0?' · <b style="color:#9fd">둔화</b>':''}`;}
+// pre-scaled strip cache (owner 10-22 "너무 끊기는데"): shrink each strip once per on-screen size, then blit 1:1 instead of resampling every frame
+const SCL=new Map();function scaled(im,s){const q=Math.round(s*40)/40,key=im.src+'|'+q;let c=SCL.get(key);if(c)return c;if(SCL.size>60)SCL.clear();c=document.createElement('canvas');c.width=Math.ceil(im.naturalWidth*q);c.height=Math.ceil(im.naturalHeight*q);c.q=q;
+  const x=c.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(im,0,0,c.width,c.height);SCL.set(key,c);return c;}
+function blit(g,im,fi,cw,ch,s,dx,dy){const c=scaled(im,s*K),q=c.q;g.save();g.scale(1/K,1/K);g.imageSmoothingEnabled=false;g.drawImage(c,Math.round(fi*cw*q),0,Math.round(cw*q),Math.round(ch*q),Math.round(dx*K),Math.round(dy*K),Math.round(cw*q),Math.round(ch*q));g.restore();}
 function draw47(g,m,d){const J=d.J;g.fillStyle='rgba(0,0,0,.32)';g.beginPath();g.ellipse(m.x,m.y,d.r+2,(d.r*.45+1),0,0,TAU);g.fill();
   let f=-1;if(m.anim==='attack'||m.anim==='hold')f=m.anim==='hold'?ATK47.hit:frameOf(m,d);const useAtk=f>=0&&!J.ram,im=IMG[d.id+(useAtk?'atk':'idle')];
   if(im&&im.complete&&im.naturalWidth){const C=useAtk?J.atk:J.idle,s=d.h/J.body,fi=useAtk?f:Math.floor(S.t*8)%J.idle.n,dx=f>=0&&!useAtk?LUNGE[f]:0,lift=m.moving&&!d.fly?Math.abs(Math.sin(S.t*11))*1.5:0;
-    g.save();g.translate(m.x,m.y-lift);if(m.face<0)g.scale(-1,1);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);
-    g.drawImage(im,fi*C.w,0,C.w,C.h,(-C.w/2+dx)*s,-C.foot*s,C.w*s,C.h*s);g.restore();}
+    g.save();g.translate(m.x,m.y-lift);if(m.face<0)g.scale(-1,1);if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);
+    blit(g,im,fi,C.w,C.h,s,(-C.w/2+dx)*s,-C.foot*s);g.restore();}
   if(m.hp<d.hp){const w=20;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-w/2-.5,m.y-d.h-9.5,w+1,3);g.fillStyle='#d8443a';g.fillRect(m.x-w/2,m.y-d.h-9,w*Math.max(0,m.hp)/d.hp,2);}}
 function heroAnim(h){const d=h.dir,side=h.face>0?'right':'left',A=HA.anims,dd=d==='s'?(h.face<0?'downl':'down'):d==='n'?(h.face<0?'upl':'up'):d;
   if(h.dead)return 'death_'+side;
