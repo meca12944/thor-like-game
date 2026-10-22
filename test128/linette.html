@@ -166,7 +166,7 @@ function step(){
 // hit-stop + screen shake on the strike, shockwave + flash on the 3rd hit, training dummies that react.
 const VERT={down:1,downl:1,up:-1,upl:-1};
 function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return STILL?{...m,dir:[d==='left'?-1:1,0],tip:[m.tip[0]*0.4,m.tip[1]],tip2:m.tip2?[m.tip2[0]*0.4,m.tip2[1]]:null}:{...m,dir:[d==='left'?-1:1,0]};   // STILL: trail starts at the body front   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
-  const tx=m.tip[0]*0.35,ty=v>0?-34:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
+  const tx=m.tip[0]*0.2,ty=v>0?-20:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
 // owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게" + "동작 모션 없이": STILL = no attack pose (stays in idle), no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
 const STILL=true,FLY=7,ATK_SPEED=2;
 // owner 10-22 "공격 검흔이 너무 크다, 일반 탑다운 게임 히트박스 크기만큼": reach was 144-170px from the needle tip (~1.5 body lengths) while the streak
