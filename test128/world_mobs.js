@@ -38,8 +38,9 @@
   // chapter-1 Felt mobs (strip-animated, see def.c1_*): approach, then melee when close or a 4-way shot pattern (alternating) at range
   const T60 = a => a.reduce((s, v) => s + v, 0) / 60;
   function startAnim(m, name, a, key, warn) { // play strip `name`; frames before `key` stretch so frame `key` lands at `warn` s (the telegraph end)
-    m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)); }
+    m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)) * (m.D.rec || 1); }
   const FELT_SPD = 1.4; // owner 10-22 "걷는속도 빠르게": move x1.4, walk cycle 5 ticks/frame (was 7)
+  const FELT_SC = 1.35, FELT_CD = .6, FELT_REC = .7; // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function felt(o) {
     return Object.assign({ felt: true, update(m, W, dt) {
       const h = W.hero, A = this.anim; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; const d = W.dist(m, h);
@@ -54,11 +55,11 @@
       if (m.cd > 0 || d > 150) return;
       if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
-        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 / agg(W); return; }
+        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD / agg(W); return; }
       if (m.intent === 'shoot' && d > 40 && tok(m, W, true)) { m.intent = null; m.pi = ((m.pi ?? Math.floor(Math.random() * 2)) + 1) % 2; const p = this.shots[m.pi]; m.face = h.x > m.x ? 1 : -1;
-        let tw = 0.6; for (let i = 0; i < 4; i++) tw = lineTele(W, m, i * Math.PI / 2, Math.min(150, p.sp * 1.4), 0.6, 6);
-        startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'shoot'); m.cd = 2.4 / agg(W);
-        for (const w of p.waves) W.after(tw + w, () => { if (m.dead) return; for (let i = 0; i < 4; i++) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a: i * Math.PI / 2, sp: p.sp, owner: m }, p.shot)); }); }
+        let tw = 0.6; for (let i = 0; i < 8; i++) tw = lineTele(W, m, i * Math.PI / 4, Math.min(150, p.sp * 1.4), 0.6, 6);
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'shoot'); m.cd = 2.4 * FELT_CD / agg(W);
+        for (const w of p.waves) W.after(tw + w, () => { if (m.dead) return; for (let i = 0; i < 8; i++) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a: i * Math.PI / 4, sp: p.sp, owner: m }, p.shot)); }); }
     } }, o);
   }
 
@@ -239,7 +240,7 @@
       dmgMul(m) { return m.st === 'stagger' ? 2 : 1; } },
 
     // ------------------------------------------------ chapter 1 펠트 (art/mobs/felt): PixelLab walk / attack / shoot strips, drawn hi-res by world.js drawFeltHi.
-    // 3 patterns each = 1 melee (circle in front; the strip's strike frame lands when the telegraph fills) + 2 four-way shots (right/down/left/up,
+    // 3 patterns each = 1 melee (circle in front; the strip's strike frame lands when the telegraph fills) + 2 eight-way shots (owner 10-22; was right/down/left/up,
     // line telegraphs first). Projectiles are drawn in code (world.js drawShot kinds). Spec + preview: art/mobs/felt/patterns.json, felt_mobs_*.mp4.
     c1_silmamul: felt({ name: '실마물', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 50, h: 26, r: 7, sp: 22,
       melee: { range: 24, rad: 14, dmg: 5 },
@@ -262,5 +263,7 @@
         { name: '돌껍질 파편 2파', sp: 120, waves: [0, 0.23], shot: { kind: 'stone', r: 3, dmg: 4, life: 1.3 } }],
       anim: { src: 'assets/mobs_felt/c1_04_unrotting_hound', F: 36, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4 } } }),
   };
+  for (const k in def) { const D = def[k]; if (!D.felt) continue; // 8-way shots (owner 10-22 "4방향 -> 8방향"), bigger, faster attacks
+    D.anim.F *= FELT_SC; D.h = Math.round(D.h * FELT_SC); D.r = Math.round(D.r * 1.2); D.melee.range *= 1.15; D.melee.rad *= 1.15; D.rec = FELT_REC; }
   window.WorldMobs = { def };
 })();

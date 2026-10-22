@@ -807,7 +807,7 @@
   function feltFrame(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
     if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
-      t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; }
+      t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     return m.moving ? Math.floor(S.t * 60 / a.ticks[0] + m.home[0]) % a.n : 0; }
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
     for (const mm of S.mobs) { if (mm.dead || !mm.D.felt || !pick(mm)) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
