@@ -104,11 +104,9 @@ h = lambda x, y, n=0: (np.sin(x * 127.1 + y * 311.7 + n * 74.7) * 43758.5453) % 
 for ch, ids in PJA.get('field_legend', {}).items():
     ids = [i for i in ids if i in PJ]
     if not ids: continue
-    if ch == 'b':                                                  # bridge planks: one per bridge row, flat under the hero
-        v = part(ids[0])
-        for y in range(H):
-            xs = [x for x in range(W) if M['ground'][y][x] == 'b']
-            if xs: PROPS.append(dict(v, id=f'bridge_{y}', x=(xs[0] + xs[-1] + 1) / 2, y=y + 1, under=1))
+    if ch == 'b':                                                  # bridge: one picture over the whole block of bridge tiles, flat under the hero
+        v = part(ids[0]); bt = [(x, y) for y in range(H) for x in range(W) if M['ground'][y][x] == 'b']
+        if bt: PROPS.append(dict(v, id='bridge', x=(min(x for x, _ in bt) + max(x for x, _ in bt) + 1) / 2, y=max(y for _, y in bt) + 1, under=1))
     elif ch == '"':                                                # reeds: half the tall-grass tiles (art room: all of them is too thick)
         vs = [part(i) for i in ids]
         for y in range(H):

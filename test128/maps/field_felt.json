@@ -411,31 +411,11 @@
   "ground": "assets/world/field_felt_hd/ground.png",
   "props": [
    {
-    "img": "assets/world/field_felt_hd/bridge_wood.png",
-    "ax": 88,
-    "ay": 45,
+    "img": "assets/world/field_felt_hd/bridge_3.png",
+    "ax": 60,
+    "ay": 143,
     "flip": false,
-    "id": "bridge_17",
-    "x": 44.0,
-    "y": 18,
-    "under": 1
-   },
-   {
-    "img": "assets/world/field_felt_hd/bridge_wood.png",
-    "ax": 88,
-    "ay": 45,
-    "flip": false,
-    "id": "bridge_18",
-    "x": 44.0,
-    "y": 19,
-    "under": 1
-   },
-   {
-    "img": "assets/world/field_felt_hd/bridge_wood.png",
-    "ax": 88,
-    "ay": 45,
-    "flip": false,
-    "id": "bridge_19",
+    "id": "bridge",
     "x": 44.0,
     "y": 20,
     "under": 1
