@@ -89,6 +89,18 @@ SRC['idle']['north']=(V1+'/idle/north',[0,1,2,3,4,3,2,1],[8]*8)
 # + idle->key in-betweens, linette_dashns_v1), 17 ticks like the other dashes: stand, drop, lunge (held), back up
 DN=B+'/linette_dashns_v1';_DT=[2,2,3,6,2,2]
 SRC['dash']['south']=(DN+'/tw_s',[0,1,3,4,3,1],_DT);SRC['dash']['north']=(DN+'/tw_n',[0,1,3,4,3,1],_DT)
+# owner 10-23 "다음 고칠점 3": diagonal-down idle jumped at frames 9-11 (needle flips) and at the loop seam (x2.9) -> calm frames 0-8 ping-pong
+SRC['idle']['down']=(SRC['idle']['down'][0],[0,1,2,3,2,1],[10,10,10,10,10,10])   # frames 0-3 only (4 and 9-11 jump)
+# owner 10-23 "추천 순서랑 크레딧 사용해서 전부": straight front/back cast, jump, hurt, death + running jump for both diagonals and front/back
+# (key poses + in-betweens, linette_ns2_v1). Frames where PixelLab painted effects (thread loops, hit bursts) are skipped.
+NS=B+'/linette_ns2_v1'
+for _v,_d in (('s','south'),('n','north')):
+    SRC['cast'][_d]=(f'{NS}/cast_{_v}_seq',None,[2,3,3,3,9,2,12,4,7])        # stand, raise, X (winding held), throw (held from tick 22), back
+    SRC['jump'][_d]=(f'{NS}/tw_jump_{_v}',[0,1,4,3,2,1,0],[2,6,14,10,5,4,2])  # same timing as the other standing jumps (air ticks 8-32)
+    SRC['hurt'][_d]=(f'{NS}/tw_hurt_{_v}',[0,3,4,3,0],[3,5,6,4,4])
+    SRC['death'][_d]=(f'{NS}/tw_death_{_v}',None,[6]*9)
+    SRC['rjump'][_d]=(f'{NS}/rj_{_v}_seq',None,[4]*9)
+SRC['rjump']['down']=(f'{NS}/rj_d_seq',None,[4]*9);SRC['rjump']['up']=(f'{NS}/rj_u_seq',None,[4]*9)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}

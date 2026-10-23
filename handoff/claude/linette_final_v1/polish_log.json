@@ -41,18 +41,32 @@
    -2
   ]
  },
+ "idle_south": {
+  "scale": 1.0,
+  "offset": [
+   0,
+   0
+  ]
+ },
+ "idle_north": {
+  "scale": 1.0,
+  "offset": [
+   0,
+   3
+  ]
+ },
  "walk_right": {
   "scale": 1.0,
   "offset": [
-   -7,
-   -5
+   -10,
+   1
   ]
  },
  "walk_left": {
   "scale": 1.0,
   "offset": [
-   8,
-   -5
+   11,
+   1
   ]
  },
  "walk_down": {
@@ -100,15 +114,15 @@
  "run_right": {
   "scale": 1.0,
   "offset": [
-   20,
-   -4
+   4,
+   2
   ]
  },
  "run_left": {
   "scale": 1.0,
   "offset": [
-   -18,
-   -4
+   -3,
+   2
   ]
  },
  "run_down": {
@@ -149,22 +163,22 @@
  "run_north": {
   "scale": 1.0,
   "offset": [
-   -6,
-   -9
+   2,
+   -7
   ]
  },
  "dash_right": {
-  "scale": 1.065,
+  "scale": 1.0,
   "offset": [
-   -4,
-   -19
+   0,
+   0
   ]
  },
  "dash_left": {
-  "scale": 1.065,
+  "scale": 1.0,
   "offset": [
-   -11,
-   -19
+   0,
+   0
   ]
  },
  "dash_down": {
@@ -195,6 +209,20 @@
    -2
   ]
  },
+ "dash_south": {
+  "scale": 1.0,
+  "offset": [
+   1,
+   1
+  ]
+ },
+ "dash_north": {
+  "scale": 1.0,
+  "offset": [
+   -1,
+   0
+  ]
+ },
  "hurt_right": {
   "scale": 1.0,
   "offset": [
@@ -209,6 +237,20 @@
    -6
   ]
  },
+ "hurt_south": {
+  "scale": 1.0,
+  "offset": [
+   1,
+   1
+  ]
+ },
+ "hurt_north": {
+  "scale": 1.0,
+  "offset": [
+   -1,
+   0
+  ]
+ },
  "death_right": {
   "scale": 1.0,
   "offset": [
@@ -221,6 +263,20 @@
   "offset": [
    -2,
    -6
+  ]
+ },
+ "death_south": {
+  "scale": 1.0,
+  "offset": [
+   1,
+   1
+  ]
+ },
+ "death_north": {
+  "scale": 1.0,
+  "offset": [
+   -1,
+   0
   ]
  },
  "cast_right": {
@@ -263,6 +319,20 @@
   "offset": [
    8,
    -2
+  ]
+ },
+ "cast_south": {
+  "scale": 1.0,
+  "offset": [
+   1,
+   1
+  ]
+ },
+ "cast_north": {
+  "scale": 1.0,
+  "offset": [
+   -1,
+   0
   ]
  },
  "atk1_right": {
@@ -433,6 +503,20 @@
    -2
   ]
  },
+ "jump_south": {
+  "scale": 1.0,
+  "offset": [
+   1,
+   1
+  ]
+ },
+ "jump_north": {
+  "scale": 1.0,
+  "offset": [
+   -1,
+   0
+  ]
+ },
  "rjump_right": {
   "scale": 1.0,
   "offset": [
@@ -447,15 +531,57 @@
    0
   ]
  },
+ "rjump_south": {
+  "scale": 1.0,
+  "offset": [
+   -4,
+   0
+  ]
+ },
+ "rjump_north": {
+  "scale": 1.0,
+  "offset": [
+   4,
+   0
+  ]
+ },
+ "rjump_down": {
+  "scale": 1.0,
+  "offset": [
+   -21,
+   1
+  ]
+ },
+ "rjump_downl": {
+  "scale": 1.0,
+  "offset": [
+   22,
+   1
+  ]
+ },
+ "rjump_up": {
+  "scale": 1.0,
+  "offset": [
+   -21,
+   1
+  ]
+ },
+ "rjump_upl": {
+  "scale": 1.0,
+  "offset": [
+   22,
+   1
+  ]
+ },
  "idle_downl_size": {
-  "upper_median": 69,
+  "upper_median": 68,
   "target": 65,
-  "scale": 0.942
+  "scale": 0.956
  },
  "idle_down_size": {
-  "upper_median": 69,
+  "upper_median": 68,
   "target": 65,
-  "scale": 0.942
+  "scale": 0.956
  },
  "walk_north_size": {
   "upper_median": 63,
@@ -488,14 +614,14 @@
   "scale": 0.985
  },
  "run_right_size": {
-  "upper_median": 64,
+  "upper_median": 68,
   "target": 65,
-  "scale": 1.016
+  "scale": 0.956
  },
  "run_north_size": {
-  "upper_median": 70,
+  "upper_median": 67,
   "target": 65,
-  "scale": 0.929
+  "scale": 0.97
  },
  "run_up_size": {
   "upper_median": 69,
@@ -513,30 +639,50 @@
   "scale": 0.942
  },
  "run_left_size": {
-  "upper_median": 64,
+  "upper_median": 68,
   "target": 65,
-  "scale": 1.016
+  "scale": 0.956
  },
  "run_upl_size": {
   "upper_median": 69,
   "target": 65,
   "scale": 0.942
  },
+ "cast_north_size": {
+  "scale": 0.966
+ },
+ "cast_south_size": {
+  "scale": 0.975
+ },
+ "cast_downl_size": {
+  "scale": 0.959
+ },
+ "cast_down_size": {
+  "scale": 0.959
+ },
  "idle_right_center": {
   "scale": 1.0,
   "dx": -2
+ },
+ "idle_north_center": {
+  "scale": 1.0,
+  "dx": 1
  },
  "idle_up_center": {
   "scale": 1.0,
   "dx": 10
  },
+ "idle_south_center": {
+  "scale": 1.0,
+  "dx": -1
+ },
  "idle_downl_center": {
   "scale": 1.0,
-  "dx": 18
+  "dx": 20
  },
  "idle_down_center": {
   "scale": 1.0,
-  "dx": -19
+  "dx": -20
  },
  "idle_left_center": {
   "scale": 1.0,
@@ -548,7 +694,7 @@
  },
  "walk_right_center": {
   "scale": 1.0,
-  "dx": 4
+  "dx": 5
  },
  "walk_north_center": {
   "scale": 1.0,
@@ -572,7 +718,7 @@
  },
  "walk_left_center": {
   "scale": 1.0,
-  "dx": -4
+  "dx": -5
  },
  "walk_upl_center": {
   "scale": 1.0,
@@ -580,11 +726,11 @@
  },
  "run_right_center": {
   "scale": 1.0,
-  "dx": -32
+  "dx": -23
  },
  "run_north_center": {
   "scale": 1.0,
-  "dx": 8
+  "dx": -3
  },
  "run_up_center": {
   "scale": 1.0,
@@ -604,10 +750,118 @@
  },
  "run_left_center": {
   "scale": 1.0,
-  "dx": 30
+  "dx": 14
  },
  "run_upl_center": {
   "scale": 1.0,
   "dx": -20
+ },
+ "dash_right_center": {
+  "scale": 1.0,
+  "dx": -1
+ },
+ "dash_north_center": {
+  "scale": 1.0,
+  "dx": 4
+ },
+ "dash_up_center": {
+  "scale": 1.0,
+  "dx": 14
+ },
+ "dash_south_center": {
+  "scale": 1.0,
+  "dx": -8
+ },
+ "dash_downl_center": {
+  "scale": 1.0,
+  "dx": 17
+ },
+ "dash_down_center": {
+  "scale": 1.0,
+  "dx": -17
+ },
+ "dash_left_center": {
+  "scale": 1.0,
+  "dx": -1
+ },
+ "dash_upl_center": {
+  "scale": 1.0,
+  "dx": -14
+ },
+ "jump_right_center": {
+  "scale": 1.0,
+  "dx": -4
+ },
+ "jump_up_center": {
+  "scale": 1.0,
+  "dx": 14
+ },
+ "jump_south_center": {
+  "scale": 1.0,
+  "dx": -2
+ },
+ "jump_downl_center": {
+  "scale": 1.0,
+  "dx": 18
+ },
+ "jump_down_center": {
+  "scale": 1.0,
+  "dx": -18
+ },
+ "jump_left_center": {
+  "scale": 1.0,
+  "dx": 6
+ },
+ "jump_upl_center": {
+  "scale": 1.0,
+  "dx": -14
+ },
+ "rjump_right_center": {
+  "scale": 1.0,
+  "dx": -2
+ },
+ "rjump_north_center": {
+  "scale": 1.0,
+  "dx": -6
+ },
+ "rjump_up_center": {
+  "scale": 1.0,
+  "dx": 14
+ },
+ "rjump_south_center": {
+  "scale": 1.0,
+  "dx": 4
+ },
+ "rjump_downl_center": {
+  "scale": 1.0,
+  "dx": -18
+ },
+ "rjump_down_center": {
+  "scale": 1.0,
+  "dx": 18
+ },
+ "rjump_left_center": {
+  "scale": 1.0,
+  "dx": 4
+ },
+ "rjump_upl_center": {
+  "scale": 1.0,
+  "dx": -14
+ },
+ "hurt_right_center": {
+  "scale": 1.0,
+  "dx": 4
+ },
+ "hurt_north_center": {
+  "scale": 1.0,
+  "dx": -12
+ },
+ "hurt_south_center": {
+  "scale": 1.0,
+  "dx": -17
+ },
+ "hurt_left_center": {
+  "scale": 1.0,
+  "dx": -5
  }
 }

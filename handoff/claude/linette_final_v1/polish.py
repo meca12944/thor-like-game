@@ -132,3 +132,39 @@ for d in ('south','north'):
     if abs(sc-1)<0.015:continue
     for f in fi:
         im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=pxscale(im,sc);c=Image.new('RGBA',(256,256));c.paste(im2,(round(cx-cx*sc),round(fy-fy*sc)),im2);c.save(f)
+# owner 10-23 "다음 고칠점 5": the up-diagonal walk was drawn ~9 brighter than the other walks -> scale its colours to the other walks' median brightness
+def _bright(fs):
+    v=[];
+    for f in fs:
+        a=np.array(Image.open(f).convert('RGBA')).astype(float);m=a[:,:,3]>0;v.append(a[:,:,:3][m].mean())
+    return float(np.mean(v))
+for m in ('walk',):
+    B={d:_bright(sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'))) for d in os.listdir(f'{OUT}/{m}')}
+    ref=float(np.median(list(B.values())))
+    for d,b in B.items():
+        if abs(b-ref)<6:continue
+        k=ref/b
+        for f in sorted(glob.glob(f'{OUT}/{m}/{d}/*.png')):
+            a=np.array(Image.open(f).convert('RGBA')).astype(float);a[:,:,:3]=np.clip(a[:,:,:3]*k,0,255);Image.fromarray(a.astype('uint8')).save(f)
+        log[f'{m}_{d}_bright']={'scale':1.0,'k':round(k,3)}
+# owner 10-23 "다음 고칠점 4": the diagonal-down face had blurry eyes -> PixelLab fixed the face on idle_down frame 0 (linette_ns2_v1/k_face_d.png, same position)
+# and that face (eyes, nose, mouth: ribbon top +12..+28 rows, right part of the head) is stamped on every diagonal-down clip at the matched head spot,
+# like the side face stamp. downl = done on the mirrored frame.
+_DFI=np.array(Image.open(os.path.join(os.path.dirname(H),'linette_ns2_v1','k_face_d.png')).convert('RGBA'));_DFa=_DFI.astype(int);_dt,_dx=_rib(_DFa)
+_DW=_DFa[_dt+4:_dt+32,_dx-14:_dx+20];_DY0,_DY1,_DX0,_DX1=_dt+12,_dt+29,_dx-4,_dx+17
+def _stampd(A):
+    a=A.astype(int);t,x=_rib(a);best=None
+    for dy in range(-6,7):
+        for dx in range(-6,7):
+            y1,x1=_dt+4+(t-_dt)+dy,_dx-14+(x-_dx)+dx;R=a[y1:y1+_DW.shape[0],x1:x1+_DW.shape[1]]
+            if R.shape!=_DW.shape:continue
+            sc=np.abs(R[:,:,:3]*(R[:,:,3:]>0)-_DW[:,:,:3]*(_DW[:,:,3:]>0)).mean()+30*np.abs((R[:,:,3]>0).astype(int)-(_DW[:,:,3]>0)).mean()
+            if best is None or sc<best[0]:best=(sc,(t-_dt)+dy,(x-_dx)+dx)
+    _,oy,ox=best;P=_DFI[_DY0:_DY1,_DX0:_DX1];reg=A[_DY0+oy:_DY1+oy,_DX0+ox:_DX1+ox];m=(P[:,:,3]>0)&(reg[:,:,3]>0);reg[m]=P[m];return A
+for m in ('idle','walk','run','dash','cast','jump'):
+    for d in ('down','downl'):
+        for f in sorted(glob.glob(f'{OUT}/{m}/{d}/*.png')):
+            A=np.array(Image.open(f).convert('RGBA'))
+            if d=='downl':A=np.ascontiguousarray(A[:,::-1]);A=_stampd(A);A=np.ascontiguousarray(A[:,::-1])
+            else:A=_stampd(A)
+            Image.fromarray(A).save(f)

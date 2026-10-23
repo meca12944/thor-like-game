@@ -4,7 +4,7 @@
 import json,os,numpy as np
 from PIL import Image
 H=os.path.dirname(os.path.abspath(__file__));A=json.load(open(H+'/atlas/linette8.json'))
-D={'right':(1,0),'left':(-1,0),'down':(0.78,0.62),'downl':(-0.78,0.62),'up':(0.78,-0.62),'upl':(-0.78,-0.62)}
+D={'south':(0,1),'north':(0,-1),'right':(1,0),'left':(-1,0),'down':(0.78,0.62),'downl':(-0.78,0.62),'up':(0.78,-0.62),'upl':(-0.78,-0.62)}
 sh={};A['casttip']={}
 for n,L in A['anims'].items():
     if not n.startswith('cast_'):continue
