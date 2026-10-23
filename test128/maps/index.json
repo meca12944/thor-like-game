@@ -2,7 +2,6 @@
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
  "maps": [
   "field00",
-  "field01",
   "dungeon01_b1",
   "dungeon01_b2",
   "boss01",
@@ -20,8 +19,7 @@
    "name": "1지역 · 시작의 숲",
    "worldNode": "area1",
    "maps": [
-    "field00",
-    "field01"
+    "field00"
    ],
    "town": {
     "label": "시작 마을",
@@ -109,8 +107,8 @@
    "id": "dest_temple",
    "label": "고대 숲 신전 입구",
    "kind": "dungeon",
-   "map": "field01",
-   "x": 46,
+   "map": "field00",
+   "x": 102,
    "y": 4
   },
   {

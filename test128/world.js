@@ -71,6 +71,7 @@
   try { Object.assign(SAVE, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   if (Q.has('worldreset')) SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null };
   for (const k of ['explored', 'waystones', 'landmarks', 'quests']) SAVE[k] = SAVE[k] || {};
+  if (SAVE.fogV !== 'region01') { delete SAVE.explored.field00; delete SAVE.explored.field01; SAVE.fogV = 'region01'; } // 바람길 + 시작의 숲 stitched into one map (owner 10-23)
   const save = () => { try { localStorage.setItem(LS, JSON.stringify(SAVE)); } catch (e) {} };
 
   // ---------------- assets ----------------
@@ -212,7 +213,7 @@
   const held = new Set(), queue = [];
   const PASS = new Set(['KeyB', 'KeyN', 'Minus', 'Equal', 'NumpadSubtract', 'NumpadAdd', 'F12']); // BGM keys keep working
   const DEFKEYS = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], attack: ['KeyJ', 'KeyZ'], dash: ['KeyK', 'KeyX'],
-    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'] };
+    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
   function KM() { const g = window.__game; return (g && g.ctl && g.ctl.KEYMAP) || DEFKEYS; }
   function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
   const isHeld = a => codesOf(a).some(c => held.has(c));
@@ -341,8 +342,11 @@
     fx: addFx, sfx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
 
   // ---------------- scene manager ----------------
+  // 세미 오픈월드 (owner 10-23): field01 (시작의 숲) now lives inside field00 at x+56 (tools/stitch_region01.py); old links keep working
+  const ALIAS = { field01: { to: 'field00', pre: 'f01_' } };
   function go(to, spawnName, opt = {}) {
     if (S.trans) return false;
+    const AL = ALIAS[to]; if (AL) { to = AL.to; spawnName = AL.pre + (spawnName || 'default'); }
     S.trans = { phase: 'out', t: 0, to, spawn: spawnName, card: opt.card, fromTown: S.scene === 'town' };
     if (S.trans.fromTown) { const g = window.__game; S.townPos = { x: g.hero.x, y: g.hero.y - 34 }; g.setManual(true); syncFromTown(); show(true); }
     return true;
@@ -356,6 +360,8 @@
       if (!m.groundC) m.groundC = renderGround(m);
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
+      if (!sp && spawnName && spawnName.startsWith('snap:')) sp = spawnName.slice(5).split(',').map(Number).concat([hero.face]); // death retry: just before the fight
+      if (!sp && spawnName === 'resume' && SAVE.resume && SAVE.resume.map === m.id) sp = [SAVE.resume.x, SAVE.resume.y, SAVE.resume.face || 'down'];
       if (!sp && m.type === 'world') { const n = (m.nodes || []).find(n => n.id === spawnName); if (n) sp = [n.x + .5, n.y + 2.2, 'down']; }
       sp = sp || (m.spawns && m.spawns.default) || [m.w / 2, m.h / 2];
       hero.x = sp[0] * m.T; hero.y = sp[1] * m.T; hero.face = sp[2] || 'down'; hero.safe = [hero.x, hero.y]; hero.atk = hero.roll = null; hero.inv = .5; hero.moving = false;
@@ -369,6 +375,9 @@
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
       updateGate(m, true);
+      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null;
+      if (S.pendingMsg) { msg(S.pendingMsg, 2.2); S.pendingMsg = null; }
+      if (S.pendingHp) { hero.hp = Math.max(1, Math.min(hero.maxHp, S.pendingHp)); S.pendingHp = 0; syncTownHp(); }
       snapCam();
       if (NAV()) NAV().onEnter(m);
     });
@@ -393,11 +402,46 @@
   function returnToTown() {
     const g = window.__game; if (!g) return;
     if (S.townPos) { g.hero.x = S.townPos.x; g.hero.y = S.townPos.y; g.hero.face = 'up'; }
-    syncTownHp(); g.setManual(false); S.scene = 'town'; S.bgm = null; held.clear();
+    syncTownHp(); g.setManual(false); S.scene = 'town'; S.bgm = null; held.clear(); if (SAVE.resume) { SAVE.resume = null; save(); }
   }
   function syncFromTown() { const g = window.__game; if (!g) return; hero.maxHp = g.hero.maxHp || 50; hero.hp = Math.max(1, g.hero.hp ?? hero.maxHp); }
   function syncTownHp() { const g = window.__game; if (g && g.hero) { g.hero.hp = hero.hp; g.hero.maxHp = hero.maxHp; } }
   function die() { S.deadT = 0.01; banner('쓰러졌다…', 2.2); }
+  // ---------------- semi-open world (owner 10-23 「세미 오픈월드 이스8처럼 … 중간세이브」) ----------------
+  // areas: named parts of one seamless map (name card, no fade; first visit = auto-save). save anywhere out of combat (F5),
+  // waystones save + become the respawn point. death: J = retry from just before the fight / T = last waystone.
+  // champion thorn ring: walking up to a champion raises a ring of thorns that holds the hero in until it falls.
+  const LOCK_R = 150, LOCK_SQ = .75;  // ring radius (px, 16px tiles) and its 3/4-view squash
+  function areaAt(m, x, y) { const tx = x / m.T, ty = y / m.T; return (m.areas || []).find(a => tx >= a.x && tx < a.x + a.w && ty >= a.y && ty < a.y + a.h) || null; }
+  function inCombat() { return !!S.lock || !!(S.bossRef && !S.bossRef.dead) || S.mobs.some(mm => !mm.dead && !(mm.spawnT > 0) && Math.hypot(mm.x - hero.x, mm.y - hero.y) < 140); }
+  function saveHere(kind) { const m = M(); if (!m || m.type === 'world' || S.deadT > 0) return false;
+    if (kind === 'manual' && inCombat()) { msg('근처에 적이 있어 저장할 수 없다', 1.4); sfx('locked', .5); return false; }
+    SAVE.resume = { map: m.id, x: +(hero.x / m.T).toFixed(2), y: +(hero.y / m.T).toFixed(2), face: hero.face, hp: hero.hp }; save();
+    const g = window.__game; if (g && g.quickSave) try { g.quickSave(); } catch (e) {} // bag / gold / gear ride along with the town quick save
+    S.saved = { t: 1.8, text: kind === 'auto' ? '자동 저장' : '저장 완료' }; if (kind === 'manual') msg('저장 완료 — 다음에 켜면 여기서 이어한다', 1.6); return true; }
+  function retry(how) { const m = M(), sn = S.snap; S.deadT = 0; S.lock = null; S.snap = null; hero.inv = 1;
+    if (how === 'snap' && sn) { hero.hp = Math.max(sn.hp, Math.ceil(hero.maxHp / 2)); syncTownHp(); S.pendingMsg = '전투 직전으로 돌아왔다'; go(sn.map, 'snap:' + sn.x + ',' + sn.y, { card: false }); return; }
+    hero.hp = hero.maxHp; syncTownHp(); const w = SAVE.lastWay; S.pendingMsg = w ? '마지막 비석에서 다시 시작' : null;
+    if (w) go(w.map, 'ws:' + w.id, { card: false }); else respawnAfterDeath(); }
+  function stepOpen(m, dt) {
+    // champion ring: raise when the hero walks up to a living champion, release when it falls
+    if (!S.lock) { const c = S.mobs.find(mm => !mm.dead && mm.D.champion && !(mm.spawnT > 0) && Math.hypot(mm.x - hero.x, mm.y - hero.y) < 90);
+      if (c && hero.hp > 0) { S.snap = S.snap || { map: m.id, x: +((hero.px ?? hero.x) / m.T).toFixed(2), y: +((hero.py ?? hero.y) / m.T).toFixed(2), hp: hero.hp };
+        S.lock = { x: (c.x + hero.x) / 2, y: (c.y + hero.y) / 2, mob: c, t: 0 }; engage(c); banner(c.D.name + ' — 가시덩굴이 퇴로를 막았다!', 2, true); shake(2); sfx('impact', .7); } }
+    if (S.lock) { const L = S.lock; L.t += dt;
+      if (L.mob.dead) { S.lock = null; msg('가시덩굴이 걷혔다', 1.6); after(1.4, () => { if (!inCombat()) saveHere('auto'); }); }
+      else { const dx = hero.x - L.x, dy = (hero.y - L.y) / LOCK_SQ, d = Math.hypot(dx, dy); if (d > LOCK_R - 6) { const k = (LOCK_R - 6) / d; hero.x = L.x + dx * k; hero.y = L.y + dy * k * LOCK_SQ; } } }
+    // fight snapshot for the retry: hero state at the moment a fight starts; dropped after 2.5s of calm
+    const f = inCombat(); if (f && !S.snap && hero.hp > 0) S.snap = { map: m.id, x: +((hero.px ?? hero.x) / m.T).toFixed(2), y: +((hero.py ?? hero.y) / m.T).toFixed(2), hp: hero.hp };
+    S.calmT = f ? 0 : (S.calmT || 0) + dt; if (S.calmT > 2.5) S.snap = null; if (!f) { hero.px = hero.x; hero.py = hero.y; }
+    // seamless area change: name card only, first visit auto-saves
+    const ar = areaAt(m, hero.x, hero.y); if (ar && ar.id !== S.area) { S.area = ar.id; S.areaCard = { a: ar, t: 2.4 }; sfx('page', .4);
+      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } }
+    if (S.areaCard && (S.areaCard.t -= dt) <= 0) S.areaCard = null; if (S.saved && (S.saved.t -= dt) <= 0) S.saved = null; }
+  function drawLock(g) { const L = S.lock; if (!L) return; const k = Math.min(1, L.t / .35), n = 56;
+    for (let i = 0; i < n; i++) { const a = i / n * TAU, x = L.x + Math.cos(a) * LOCK_R, y = L.y + Math.sin(a) * LOCK_R * LOCK_SQ, h = (7 + (i % 3) * 3 + Math.sin(S.t * 4 + i) * 1) * k;
+      g.fillStyle = i % 2 ? '#3c1a2a' : '#5a2236'; g.beginPath(); g.moveTo(x - 3, y + 1); g.lineTo(x + (i % 2 ? 1 : -1), y - h); g.lineTo(x + 3, y + 1); g.fill();
+      if (i % 4 === 0) { g.fillStyle = '#2a1420'; g.fillRect(Math.round(x) - 4, Math.round(y), 8, 2); } } }
   function respawnAfterDeath() { hero.hp = hero.maxHp; syncTownHp(); S.deadT = 0; const m = M(); go(m.type === 'boss' ? 'dungeon01_b2' : m.id, 'default', { card: false }); }
 
   // ---------------- town exit gate (town coords; maps/world.json "townGate" overrides) ----------------
@@ -430,7 +474,8 @@
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
     if (S.jingleT > 0) S.jingleT -= dt;
     S.shake = Math.max(0, S.shake - dt * 14);
-    if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 2.2) respawnAfterDeath(); queue.length = 0; return; }
+    if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 1.4) { if (takePress('attack') || takePress('interact')) retry(S.snap ? 'snap' : 'way'); else if (queue.includes('KeyT')) retry('way'); } queue.length = 0; return; }
+    if (S.scene !== 'world' && takePress('save')) saveHere('manual');
     if (hero.hp > 0 && S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150)) ultAdd('autoPerSec', dt); // 필살기 게이지: 싸우는 동안 저절로 (몹이 가까이 있을 때만, owner 10-23)
     if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
@@ -493,6 +538,7 @@
       if (hero.moving) { if (!hero.charge) setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
       else if (hero.skidT > 0) { hero.skidT -= dt; const k = hero.skidT / RUN.skidT; moveCol(hero, hero.skidV[0] * HERO_SPEED * 1.2 * k * dt, hero.skidV[1] * HERO_SPEED * 1.2 * k * dt, 5); } } // short skid
     stepHW(dt);
+    stepOpen(m, dt);
     if (!hero.atk) hero.comboT = Math.max(0, hero.comboT - dt);
     // tiles & objects: pits, spikes, exits, stairs, keys, doors, warp
     const cx = Math.floor(hero.x / m.T), cy = Math.floor(hero.y / m.T);
@@ -576,8 +622,8 @@
         if (o.race) { S.dialog = { text: '광차 경주 트랙. 「바퀴」가 접수를 받는다.\n광차 경주 미니게임은 아직 준비 중이다. (stub)', name: o.name }; S.door = o.id; return; }
         if (o.heal) { hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); }
         S.dialog = { text: o.text || ('「' + (o.name || '건물') + '」'), name: o.name }; S.door = o.id; return; }
-      if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20);
-        S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
+      if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; SAVE.lastWay = { map: m.id, id: o.id }; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); saveHere('way');
+        S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 저장 완료 · 쓰러지면 여기서 다시 시작\n지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
       if (o.type === 'chest') { if (SAVE.chests[o.id]) { msg('빈 상자다'); return; } SAVE.chests[o.id] = true; save(); banner('보물상자! ' + giveLoot((o.loot || []).concat([['gold', window.__game && window.__game.goldFor ? window.__game.goldFor('chest', o.area || 1) : 0]])), 2.2); addFx('sparkle', o.x, o.y - 10, { life: .8 }); return; }
       if (o.type === 'heal') { hero.hp = hero.maxHp; syncTownHp(); msg('쉼터에서 쉬었다. 체력 회복!'); addFx('heal', hero.x, hero.y - 20); return; }
       if (o.type === 'lever') { if (o.on) { msg('이미 당긴 레버다'); return; } o.on = true; SAVE.levers[o.key] = true; save(); shake(1); updateGate(m); return; }
@@ -639,6 +685,7 @@
     for (const o of m.objs) drawObjTile(g, m, o);
     if (NAV()) NAV().drawGround(g, cx, cy);                  // guide route breadcrumbs
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
+    drawLock(g);
     const list = [];                                         // y-sorted sprites
     for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => drawSpr(g, d.spr, d.x, d.y + 1) });
     for (const o of m.objs) {
@@ -1046,7 +1093,9 @@
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
       textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
-      textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
+      const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
+      if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }
+      { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
       const b = S.bossRef; if (b && !b.dead) { const w = 260 * u, y = oy + SH - 20 * u; hpBar(b, cxs, y, w, 7 * u);
@@ -1067,7 +1116,9 @@
       textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + 76 * u, 10 * u, '#ffe08a', '#000', 'right'); }
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
-    if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }
+    if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH);
+      if (S.deadT > 1.4) { panel(cxs - 170 * u, oy + SH / 2 - 46 * u, 340 * u, 92 * u); textOut('쓰러졌다', cxs, oy + SH / 2 - 16 * u, 19 * u, '#ffb0a0');
+        textOut(S.snap ? `${keyHint('attack')}  다시 도전 (전투 직전부터)` : `${keyHint('attack')}  마지막 비석에서`, cxs, oy + SH / 2 + 10 * u, 13 * u, '#fff'); textOut('T  마지막 비석에서', cxs, oy + SH / 2 + 30 * u, 13 * u, '#ddd'); } }
     if (m.type !== 'world') drawFieldUlt(k, ox, oy, SW, SH);
   }
   // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬검·해동), same cut-in timing,
@@ -1169,5 +1220,7 @@
   // ?go=world | field00..field09 | dungeon01_b1 ... : start straight in that scene instead of the town (owner 10-22 "실행할수 있게")
   const GO = new URLSearchParams(location.search).get('go');
   if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default'); }, 100); });
+  else if (SAVE.resume && !Q.has('nosave')) ready.then(() => { const R0 = SAVE.resume, t = setInterval(() => { const g = window.__game; if (!g || !g.ready) return; clearInterval(t); // 이어하기: saved in the field -> start there
+    S.pendingHp = R0.hp; S.pendingMsg = '이어하기 — 저장한 곳에서 시작'; go(R0.map, 'resume', { card: false }); }, 100); });
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
 })();

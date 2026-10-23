@@ -1,0 +1,309 @@
+{
+ "id": "field00",
+ "type": "field",
+ "area": 1,
+ "region": "area1",
+ "mapPos": [
+  0,
+  0
+ ],
+ "name": "마을 외곽 — 바람길",
+ "title": {
+  "kicker": "1지역 · AREA 1",
+  "name": "바람길",
+  "sub": "시작 마을 외곽"
+ },
+ "bgm": "area01_forest",
+ "battleBgm": "battle_champion",
+ "tileset": "field",
+ "tile": 16,
+ "w": 56,
+ "h": 36,
+ "legend": {
+  ".": "grass",
+  ",": "grass_tuft",
+  "'": "grass_flowers",
+  "=": "dirt",
+  "~": "water",
+  "b": "bridge_h",
+  ":": "stones",
+  "#": "cliff",
+  "\"": "tallgrass",
+  "_": "sand",
+  "T": {
+   "ground": "grass",
+   "deco": "tree"
+  },
+  "P": {
+   "ground": "grass",
+   "deco": "pine"
+  },
+  "Y": {
+   "ground": "grass",
+   "deco": "tree",
+   "solid": false
+  },
+  "R": {
+   "ground": "grass",
+   "deco": "boulder"
+  },
+  "r": {
+   "ground": "grass",
+   "deco": "rocks"
+  },
+  "u": {
+   "ground": "grass",
+   "deco": "bush"
+  },
+  "s": {
+   "ground": "grass",
+   "deco": "stump"
+  },
+  "m": {
+   "ground": "grass",
+   "deco": "mushrooms",
+   "solid": false
+  },
+  "f": {
+   "ground": "grass",
+   "deco": "fence"
+  },
+  "O": {
+   "ground": "grass",
+   "deco": "pillar"
+  },
+  "c": {
+   "ground": "grass",
+   "deco": "crystal"
+  }
+ },
+ "solid": [
+  "~",
+  "#",
+  "T",
+  "P",
+  "R",
+  "r",
+  "u",
+  "s",
+  "f",
+  "O",
+  "c"
+ ],
+ "spawns": {
+  "default": [
+   27.5,
+   2.5,
+   "down"
+  ],
+  "town": [
+   27.5,
+   2.5,
+   "down"
+  ],
+  "east": [
+   53.5,
+   19.5,
+   "left"
+  ]
+ },
+ "objects": [
+  {
+   "type": "exit",
+   "x": 24,
+   "y": 0,
+   "w": 7,
+   "h": 1,
+   "to": "town",
+   "spawn": "gate",
+   "label": "시작 마을"
+  },
+  {
+   "type": "exit",
+   "x": 55,
+   "y": 17,
+   "w": 1,
+   "h": 5,
+   "to": "field01",
+   "spawn": "west",
+   "label": "시작의 숲"
+  },
+  {
+   "type": "sign",
+   "x": 25,
+   "y": 10,
+   "text": "↑ 시작 마을    ← 바람의 언덕\n→ 시작의 숲 · 고대 숲 신전    ↓ 수정 동굴 (낙석으로 막힘)"
+  },
+  {
+   "type": "sign",
+   "x": 35,
+   "y": 28,
+   "text": "낙석으로 길이 막혀 있다. 수정 동굴(2지역)은 아직 갈 수 없다."
+  },
+  {
+   "type": "waystone",
+   "id": "ws_windhill",
+   "x": 8,
+   "y": 6,
+   "name": "바람의 언덕 비석"
+  },
+  {
+   "type": "chest",
+   "id": "f00_chest_hill",
+   "x": 6,
+   "y": 8,
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "m_hardwood",
+     1
+    ]
+   ]
+  },
+  {
+   "type": "npc",
+   "id": "npc_bori",
+   "x": 30,
+   "y": 8,
+   "sprite": "npc_bard",
+   "name": "나그네 보리",
+   "quests": [
+    "q_forest_chiefs",
+    "q_temple_golem"
+   ],
+   "idle": "바람이 좋은 날이군. 숲 쪽 길은 이 길을 따라 동쪽이야."
+  },
+  {
+   "type": "landmark",
+   "id": "lm_bridge00",
+   "x": 45,
+   "y": 19,
+   "name": "개울 다리"
+  },
+  {
+   "type": "spawn",
+   "mob": "rabbit",
+   "x": 20,
+   "y": 6,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "rabbit",
+   "x": 38,
+   "y": 22,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "mushroom",
+   "x": 15,
+   "y": 18,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "slime",
+   "x": 42,
+   "y": 15,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "slime",
+   "x": 22,
+   "y": 26,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "squirrel",
+   "x": 49,
+   "y": 24,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "mushroom",
+   "x": 8,
+   "y": 22,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "rabbit",
+   "x": 51,
+   "y": 11,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 31,
+   "y": 11,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 33,
+   "y": 18,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 26,
+   "y": 15,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 34,
+   "y": 25,
+   "respawn": 30
+  }
+ ],
+ "ground": [
+  "TTPTTTTTTTTTTTTPTPPTTTPP.'===..TTTTTPTTPTTPTPTTTTTTPTTTT",
+  "TPTTTTTTTTTTPTTTTTTTTTTP..===..TTTTPPTTTTTTPPTPTPTTPPTTP",
+  "TP....,.'.......P..Tffffff===ffffffT..T.........,.....TT",
+  "TT..........'...T.TT......==='....T,PT,'..~~~~~~..,...PT",
+  "TP.,.O=====O.'..P..TT,,..'===....TPTPT.T.~~~~~~~~...T.PT",
+  "TT.'.=======......TTP.,...===.....P..TT..~~~~~~~~'.TTTTT",
+  "TT...=======.....'..'..'.,===,r..'.TTTP.,~~~~~~~~..TTTTT",
+  "PP..,=======..,.,'...,...'===....'..T....~~~~~~~~..T..TT",
+  "PP''.==========.......,...===,.,........'~~~~~~~~..,..PT",
+  "PP...O=====O.,================..........,.~~~~~~.,...,TT",
+  "TP.,.................','..=====,'........,...~~.....,.TT",
+  "TT.....,..,.u..............===='..,',........~~,.....,TT",
+  "PP............u,,......R.,.======........,..~~..\"\"\"\"\".TP",
+  "TP..'TTT,...........T.,,....=====.....u.....~~',\"\"\"\"\".TT",
+  "PP.TTPP..P..,...,..T.T.,...,.======.......,~~.,.\"\"\"\"\".TT",
+  "TT.TTTTTTT....,....,TTT....,,.=======.'....~~...\"\"\"\"\".TT",
+  "PT..TTT.T,T.....'...TP.........========...,~~..,......TP",
+  "TT.TTTTT.T....'.....P,.'.........==========bb===.,.,....",
+  "TT,T,,P.TT,..'...,....'....,.,....=========bb===========",
+  "TT.,PP,T..,.......,,...,......,..,=.=======bb===========",
+  "TT....T,......\"\"\"\"\"\"'...,s'',...'.=...,.'..~~.==========",
+  "TP.,..........\"\"\"\"\"\"...,..,.......=..,..m..~~.....,..',,",
+  "TP.....,......\"\"\"\"\"\",.,.,.,....'..=....,...~~.....R...TT",
+  "TT......,..'.,\"\"\"\"\"\"...,',,.......=.......,~~..,..T...TT",
+  "TT...,...'TPPP..,...,..,....,.....=.\"\"\"\"\"\"..~~..TTTTP.PT",
+  "TP.,,..PTTPTPP'..m........,.r.....='\"\"\"\"\"\"..~~..TT,TTPTT",
+  "TP....'.T.TTPTT...,'..P.,,......'==.\"\"\"\"\"\"..~~...,TTTTTT",
+  "PT....TP.TTPTT..,...T.T.T.,......=,.\"\"\"\"\"\"...~~.T.T.PPTT",
+  "PT.,..,PTPT,PT.,...T..TPTP.....,.=..\"\"\"\"\"\"...~~T.T..PTTT",
+  "TT....TTTTTTP.P....,TTTT.P......R=..,...,....~~TTTTTPPPT",
+  "TP.....T.T.TPPT...TT.PT.TT....rRrRr'...,.....~~.T.T.T.TT",
+  "TP.','TP.TTTTTT.,,.TTPTPTT,....r=r.....TPT...~~.....,.TT",
+  "TT.....T...TPT,.,..TT..TT.,,....=.....,TTTT..~~.......PT",
+  "TT..',...,T.........TPPT..'.....=......TTT...~~.......TT",
+  "PTTPTTPPTPTTTTTTTPTPTTTPTTTTTTTT=TTTTTPPTPTTT~~TTTTPTTPT",
+  "TTTTPTPTPTTTPTTTTTTTPTTTPPTTPTTT=TPPTTTPTTTTT~~PTTTTTTTT"
+ ]
+}

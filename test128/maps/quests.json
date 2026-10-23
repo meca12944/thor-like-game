@@ -6,15 +6,15 @@
    "progress": "돌엄니와 여왕 말벌, 아직이야? 숲은 동쪽 길 끝이야.",
    "done": "해냈구나! 이제 신전의 골렘 방이 열렸을 거야. 이건 감사의 표시야.",
    "need": {"flags": ["champ_boar", "champ_wasp"]},
-   "targets": [{"map": "field01", "x": 49, "y": 26, "label": "돌엄니 (챔피언)", "untilFlag": "champ_boar"},
-               {"map": "field01", "x": 15, "y": 7,  "label": "여왕 말벌 (챔피언)", "untilFlag": "champ_wasp"}],
+   "targets": [{"map": "field00", "x": 105, "y": 26, "label": "돌엄니 (챔피언)", "untilFlag": "champ_boar"},
+               {"map": "field00", "x": 71, "y": 7,  "label": "여왕 말벌 (챔피언)", "untilFlag": "champ_wasp"}],
    "reward": [["potion", 2]]},
   {"id": "q_temple_golem", "title": "고대 숲 신전의 골렘", "giver": "npc_bori", "requires": ["q_forest_chiefs"],
    "offer": "신전 맨 아래에 이끼 수정 골렘이 잠들어 있어. 기둥 뒤에 숨으면 필살기도 피할 수 있다던데…",
    "progress": "골렘은 신전 지하 2층, 봉인된 문 너머에 있어.",
    "done": "골렘을 쓰러뜨렸다고? 대단해! 숲에 다시 바람이 통하겠어.",
    "need": {"flags": ["boss01"]},
-   "targets": [{"map": "field01", "x": 46, "y": 4, "label": "고대 숲 신전 입구", "untilMapVisited": "dungeon01_b1"},
+   "targets": [{"map": "field00", "x": 102, "y": 4, "label": "고대 숲 신전 입구", "untilMapVisited": "dungeon01_b1"},
                {"map": "dungeon01_b2", "x": 38, "y": 13, "label": "골렘의 방"}],
    "reward": [["heart_piece", 1]]}
  ]
