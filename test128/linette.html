@@ -153,7 +153,7 @@ function step(){
       if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
       const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
       if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
-    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(P.gt||0)-P.t8T<TURN.grace){P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
+    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(Math.abs(P.t8-P.t8p)===1||Math.abs(P.t8-P.t8p)===7)&&(P.gt||0)-P.t8T<TURN.grace){/* only when the straight dir is one of that diagonal's two keys */P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
       if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
       // owner 10-22 "멈출 때 서 있는 자세로 미끄러짐": during the skid she keeps stepping (the walk/run legs advance by the distance, slowing down) and stands once nearly stopped
       if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle','idle_'+atkDir());}}
@@ -181,7 +181,8 @@ const STILL=true,FLY=7,ATK_SPEED=2;
 const CMB=[{hit:5,next:15,end:24},{hit:5,next:18,end:26},{hit:8,next:99,end:22}];
 // (2) three different hits: 1 = quick straight stab, 2 = the other hand, 12 degrees off and 6px lower, 3 = finisher: three needles in a fan + a ring at the end,
 // with a short gathering glow at the needle tip before it fires (ticks 0-8)
-function shapeHit(m,hi){if(hi!==1)return {...m,hi};const r=-0.21*(m.dir[0]<0?-1:1),c=Math.cos(r),sn=Math.sin(r),d=[m.dir[0]*c-m.dir[1]*sn,m.dir[0]*sn+m.dir[1]*c],o=[-d[1]*6*(m.dir[0]<0?-1:1),d[0]*6*(m.dir[0]<0?-1:1)];
+function shapeHit(m,hi){if(hi!==1)return {...m,hi};const sg=Math.abs(m.dir[0])>0.01?(m.dir[0]<0?-1:1):(P.lastH==='left'?-1:1)*(m.dir[1]>0?1:-1);   /* straight up/down: the 2nd stab leans toward the side she last faced */
+  const r=-0.21*sg,c=Math.cos(r),sn=Math.sin(r),d=[m.dir[0]*c-m.dir[1]*sn,m.dir[0]*sn+m.dir[1]*c],o=[-d[1]*6*sg,d[0]*6*sg];
   return {...m,hi,dir:d,tip:[m.tip[0]+o[0],m.tip[1]+Math.abs(o[1])+4],tip2:null};}
 // (6) the hero's sound files (assets/sfx); (3) hit sparks at the contact point
 const SFX={};for(const n of ['swing_light','swing_heavy','hit_light','hit_heavy'])try{SFX[n]=new Audio('assets/sfx/'+n+'.ogg');SFX[n].volume=.45;}catch(e){}
