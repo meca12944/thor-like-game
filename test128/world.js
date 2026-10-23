@@ -728,14 +728,18 @@
   const H128FIG = 30; // figure height in field px (tile 16): about the old hero's 28px
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down');
-    const sd = /^(right|left|up|down)$/.test(f8) ? f8 : (f8.includes('right') ? 'right' : 'left'), L8 = H.left && sd === 'left', fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd; // 4-way sprite, diagonals = side; hero v4 has real left frames (else left = mirror)
-    const A = k => H.anims[k + '_' + d] || H.anims[k + '_' + (String(h.f8 || '').includes('left') && H.anims[k + '_left'] ? 'left' : 'right')], /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
+    // same choice as the town (index.html heroCell8, owner 10-23 "합본"): facing up/down -> the front / back art (diagonals too, mirrored when heading left), else the side art
+    if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
+    const fc = /^(right|left|up|down)$/.test(h.face) ? h.face : 'down', vert = !!H.diag && (fc === 'down' || fc === 'up'), hl = vert ? (f8.includes('left') || (!f8.includes('right') && h.hz === 'left')) : fc === 'left';
+    const sd = vert ? (hl ? 'left' : 'right') : fc, L8 = H.left && sd === 'left'; let fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd;
+    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { if (vert && DIAG8.test(k) && H.anims[k + '_' + fc]) { fl = hl; d = fc; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
+    const A = k => pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')], /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y), m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
-    else if (hero.inv > .67 && S.scene !== 'world') { const L = A('hurt'); e = seq(L, (1 - hero.inv) * 60); }
+    else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
     else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
