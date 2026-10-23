@@ -27,7 +27,7 @@
   const ATK_DMG = [10, 10, 14];
   const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
   // 심연의 힘 (주인 10-23, 벌칙 없는 역전 장치 · 가슴 속 사멸의 코어가 새어 나옴): 맞아서 체력이 35% 이하가 되면 8초 동안 공격·검기 x1.8, 45초마다 한 번
-  const LAST_STAND = { hpPct: 0.35, dur: 8, cd: 45, atk: 1.8 };
+  const LAST_STAND = { hpPct: 0.35, dur: 8, cd: 45, atk: 1.8, flag: 'abyss_awake' }; // 중반 해금: 5장 보스 발바도스를 베면 flag (폭주의 기억). 시험용 ?abyss=1
   const DIFF0 = { id: 'normal', enemy_hp: 1, enemy_dmg: 1, telegraph: 1, aggression: 1, tokens: 2, potion_cap: 5, iframe_bonus: 0, ult_cap: 0.9, telegraph_floor: { attack: 0.45, aoe: 0.6, charge_line: 0.45, ult: 2.2 } };
   const DIFF = () => { const g = window.__game; return (g && g.diff) || DIFF0; };
   const iframe = () => ROLL.iframe + (DIFF().iframe_bonus || 0);
@@ -265,7 +265,7 @@
     return false;
   }
   function lastStandOn() { return !!(S.lastStand && S.lastStand.t > 0); }
-  function checkLastStand() { const L = S.lastStand || (S.lastStand = { t: 0, cd: 0 }); if (L.t > 0 || L.cd > 0 || hero.hp <= 0 || hero.hp > hero.maxHp * LAST_STAND.hpPct) return;
+  function checkLastStand() { const L = S.lastStand || (S.lastStand = { t: 0, cd: 0 }); if (!(SAVE.flags[LAST_STAND.flag] || Q.has('abyss')) || L.t > 0 || L.cd > 0 || hero.hp <= 0 || hero.hp > hero.maxHp * LAST_STAND.hpPct) return;
     L.t = LAST_STAND.dur; banner('가슴의 문양이 깨어난다 — 심연의 힘', 2.2); shake(3); addFx('text', hero.x, hero.y - 34, { text: '심연의 힘', life: 1, color: '#c9a0ff' }); }
   function stepLastStand(dt) { const L = S.lastStand; if (!L) return; if (L.t > 0) { L.t -= dt; if (L.t <= 0) L.cd = LAST_STAND.cd; } else if (L.cd > 0) L.cd -= dt; }
   function hurt(dmg, src, raw) {
