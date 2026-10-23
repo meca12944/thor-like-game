@@ -188,6 +188,17 @@
    6
   ]
  },
+ "idle_n": {
+  "frames": 6,
+  "ticks": [
+   8,
+   8,
+   8,
+   8,
+   8,
+   8
+  ]
+ },
  "idle_right": {
   "frames": 4,
   "ticks": [
@@ -322,6 +333,19 @@
    4
   ]
  },
+ "run_n": {
+  "frames": 8,
+  "ticks": [
+   3,
+   3,
+   3,
+   4,
+   3,
+   3,
+   3,
+   4
+  ]
+ },
  "run_right": {
   "frames": 8,
   "ticks": [
@@ -362,6 +386,19 @@
   ]
  },
  "walk_dr": {
+  "frames": 8,
+  "ticks": [
+   3,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4
+  ]
+ },
+ "walk_n": {
   "frames": 8,
   "ticks": [
    3,
