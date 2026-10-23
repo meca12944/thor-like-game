@@ -1397,7 +1397,8 @@ function update(dt){
   if(!a.sfx&&a.t>=a.sfxT){a.sfx=1;SFX.play(s.titleSpin?'spin_dark':(s.fin||s.dur>tk(24))?'swing_heavy':'swing_light',s.fin?1:.7);}
   if(s.titleSpin&&s.waves&&!a.waved&&a.t>=s.a0+tk(4)){a.waved=1;spawnWaves(s.waves);}
   if(s.wave&&!a.waved&&a.t>=s.a0){a.waved=1;spawnWaves(Object.assign({n:1,col:['255,214,110','120,80,10','255,255,255']},s.wave,{dir:Math.atan2(dv[1],dv[0]),dmg:ATK_DMG[0]*(s.wave.dmgMul||1)/DMG_UNIT}));} // charge lv2: forward sword wave
-  if(a.t>=s.a0&&a.t<=s.a1){
+  if(gkSwing(s)&&!a.gk&&a.t>=s.a0-tk(2)){a.gk=1;townGkSpawn(a);}
+  if(!gkSwing(s)&&a.t>=s.a0&&a.t<=s.a1){
    for(const m of slimes){if(m.dead||a.hit.has(m))continue;let hit=false,kx=dv[0],ky=dv[1];
     if(s.kind==='thrust')hit=inBeam(m,hero.x,hero.y-(dv[1]?0:4),dv,s.len,s.half);
     else if(s.titleSpin){hit=inEll(m,hero.x,hero.y-8,s.rad,s.rad*.72);kx=m.x-hero.x;ky=m.y-hero.y;} // 마왕 only: 360 spin
@@ -1606,14 +1607,14 @@ function heroCell8(){const h=hero,sd0=sdir(),vert=!!H8.diag&&(sd0==='down'||sd0=
  const A=k=>pick(H8.v3&&k==='cast'?'cast_'+h8castKey(d).split('_')[0]:k);let e=null,bob=0;
  if(h.deadT>0){const L=A('death');e=h8seq(L,(tk(FEEL.deathTicks)-h.deadT)*60);}
  else if(h.hurtT>0){const L=A(FEELYS&&H8.anims['hurtys_right']?'hurtys':'hurt');e=h8seq(L,(tk(FEEL.hurtTicks)-h.hurtT)*60);}
- else if(h.atk){const s=h.atk.s,i=h.atk.i|0;const nm=(s.special==='dash')?'hit1':(s.fin||s.leap||i>=2||s.special==='c1'||s.special==='c2')?'hit3':i===1?'hit2':'hit1';const L=A(nm);e=h8seq(L,H8.v3&&!s.special?h.atk.t*60:Math.min(.999,h.atk.t/s.dur)*h8tot(L));}
+ else if(h.atk&&!gkSwing(h.atk.s)){const s=h.atk.s,i=h.atk.i|0;const nm=(s.special==='dash')?'hit1':(s.fin||s.leap||i>=2||s.special==='c1'||s.special==='c2')?'hit3':i===1?'hit2':'hit1';const L=A(nm);e=h8seq(L,H8.v3&&!s.special?h.atk.t*60:Math.min(.999,h.atk.t/s.dur)*h8tot(L));}
  else if(h.charge){e=A('hold')[0];}
  else if(h.dash){const L=A('dash');e=h8seq(L,h.dash.t*60);}
  else if(h.jump){const L=(h.jump.run&&!vert&&(d==='right'||d==='left')&&H8.anims['rjump_'+d])?A('rjump'):A('jump');if(L)e=h8seq(L,Math.min(.999,h.jump.t/h.jump.T)*h8tot(L));} // running jump = hero_runjump v1 (CMU 127_25)
  else if(h.sk){if(/dive|sand/.test(h.sk.id||''))return null;h.cfx=d;e=A('cast')[castFrame(h.sk,d)];}
  else if(h.moving||h.skid){const R=h.run||(touchRun&&h.moving),L=A(R?'run':'walk');e=L[Math.floor(((R&&d==='down'?h.gpd:h.gp)||0)*L.length)%L.length];}
  else if(h.castRec){const L=A('cast');e=L[Math.min(L.length-1,h.castRec.f0+Math.floor(h.castRec.t/H8T.castTpf))];}
- else if(h.rec){if(h.rec.n==='rec3'||(vert&&/^rec[12]$/.test(h.rec.n))){const L=A(h.rec.n==='rec3'?'hit3':'hit'+h.rec.n.slice(3));e=L[L.length-1];}else{const L=A(h.rec.n);e=h8seq(L,h.rec.t);}} // diagonal: hold the diagonal hit's last frame
+ else if(h.rec&&!TOWN_GK){if(h.rec.n==='rec3'||(vert&&/^rec[12]$/.test(h.rec.n))){const L=A(h.rec.n==='rec3'?'hit3':'hit'+h.rec.n.slice(3));e=L[L.length-1];}else{const L=A(h.rec.n);e=h8seq(L,h.rec.t);}} // diagonal: hold the diagonal hit's last frame
  else if(h.pose&&H8.anims[h.pose.n+'_'+d]){e=h8seq(A(h.pose.n),h.pose.t);}
  else if(H8.v3){const L=A('idle');e=h8seq(L,(h.idleT||0)%h8tot(L));}
  else{e=A('idle')[0];const q=(h.idleT||0)/60/H8T.breathS;bob=Math.round((1-Math.cos(q*2*Math.PI))/2*H8T.breathPx);} // breathing: upper body rises 0..2 px
@@ -1695,9 +1696,22 @@ function drawCharge(front){const C=hero.charge;if(!C)return;const lv=C.lv,col=lv
 const H8HB={"r": {"right": [190, 148, 174], "down": [222, 163, 204], "up": [223, 196, 205], "left": [190, 148, 174]}, "arc": [150, 170, 160]}; /* owner 10-19: hit1/hit2 reach +20% (was 158/123, 185/136, 186/163) */ // hero v3 hitboxes = combo3_arc trail reach +10% (world px), arcs per hit
 let HBDBG=new URLSearchParams(location.search).get('hitbox')==='1';addEventListener('keydown',e=>{if(e.code==='F2'){HBDBG=!HBDBG;e.preventDefault();}});
 function h8hb(s,i){if(!(H8&&H8.v3)||s.special||s.leap||s.titleSpin||s.kind==='thrust'||i>2)return null;return [H8HB.r[sdir()][i],Math.min(200,H8HB.arc[i]+(atkVert()?30:0))];} // diagonal aim: +30deg arc so a foe straight below/above is still hit
+// ---- 검기 in town (owner 10-23 "마을도 바꿔"): normal swings no longer play the slash body clips; the 검기 arcs of the fields
+// (world.js window.GKART, drawn in atlas px = logical px) fly out to the hit range and hit when their front passes. Thrust / 마왕 spin / leap keep their old logic.
+const TOWN_GK=true,townGk=[];
+const gkSwing=s=>TOWN_GK&&!s.titleSpin&&!s.leap&&s.kind!=='thrust';
+function townGkSpawn(a){const s=a.s,G=window.GKART;if(!G)return;const v=face8V(),l=Math.hypot(v[0],v[1])||1,dx=v[0]/l,dy=v[1]/l,n=Math.min(2,a.i),Y=G.GK[n];
+ const hb=h8hb(s,a.i),reach=hb?hb[0]:swingRange(s),deg=hb?hb[1]:(s.arc||FEEL.arcDeg),sp=Math.max(Y.v,(reach*LSC-Y.fwd-Y.R*(1+.025*G.FLY))/G.FLY);
+ townGk.push({n,i:a.i,s,dir:[dx,dy],v:sp,reach,deg,hit:new Set(),rx:dx*Y.fwd,ry:Math.abs(dx)<.1?-44+dy*(Y.fwd+20):-Y.y+dy*20,t:0,seed:(Math.random()*2147483646|0)+1});}
+function townGkStep(dt){const G=window.GKART;if(!G)return;for(let k=townGk.length-1;k>=0;k--){const f=townGk[k];f.t+=dt*60;const a=f.t*G.STEP;if(a>G.LIFE+3){townGk.splice(k,1);continue;}if(a>G.FLY+1)continue;
+  const Y=G.GK[f.n],front=Math.min(f.reach,(Y.fwd+Y.R*(1+.025*a)+a*f.v)/LSC),s=f.s;
+  for(const m of slimes){if(m.dead||f.hit.has(m))continue;if(!inSector(m,hero.x,hero.y-8,f.dir,front+14*(m.sc||1),f.deg))continue;f.hit.add(m);const fin3=f.i===2&&!s.special&&!f.finFx;if(fin3)f.finFx=1;
+   damageSlime(m,f.dir[0],f.dir[1],(s.dmgMul?ATK_DMG[0]*s.dmgMul:ATK_DMG[Math.min(2,f.i)])*(s.hits||1),s.kb,{stop:tk(s.stop||3),shake:s.shake!==undefined?s.shake:(s.fin?'fin':FEELYS?'hit':0),fin:s.fin?1:0,col:s.trail?s.trail.map(c=>'rgb('+c+')'):undefined,melee:1});if(fin3)finisherImpact(m,f.dir);}}}
+function drawTownGk(){const G=window.GKART;if(!G||!townGk.length)return;const L=1/LSC,lx=Math.round(hero.x*LSC),ly=Math.round((hero.y-(hero.z||0))*LSC);
+ ctx.save();ctx.translate(lx*L,ly*L);ctx.scale(L,L);ctx.imageSmoothingEnabled=false;for(const f of townGk)G.draw(ctx,f);ctx.restore();}
 function drawHitbox(){const a=hero.atk;if(!HBDBG||!a)return;const s=a.s,hb=h8hb(s,a.i)||[swingRange(s),s.arc||FEEL.arcDeg],dv=atkV(),on=a.t>=s.a0&&a.t<=s.a1,b=Math.atan2(dv[1],dv[0]),h=hb[1]*Math.PI/360;
  ctx.save();ctx.translate(hero.x,hero.y-8);ctx.scale(1,.75);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,hb[0],b-h,b+h);ctx.closePath();ctx.fillStyle=on?'rgba(255,40,40,.35)':'rgba(255,255,0,.12)';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=on?'#ff3030':'#ffff00';ctx.stroke();ctx.restore();}
-function drawSlash(){drawHitbox();const a=hero.atk;if(!a)return;const s=a.s;const dv=atkV();
+function drawSlash(){drawHitbox();const a=hero.atk;if(!a)return;const s=a.s;const dv=atkV();if(gkSwing(s))return;
  if(s.leap&&a.t<s.a0-.03)return;if(s.titleSpin){drawSpinRing(a,'front');return;}
  const tr=s.trail||['120,220,255','255,255,255'];
  const tl=s.strike?.4:.2; // hit 3: longer follow-through fade of the big trail
@@ -1811,7 +1825,7 @@ function render0(){computeView();ctx=mctx;mctx.setTransform(1,0,0,1,0,0);mctx.im
  L.push({y:spirit.y+40,f:drawSpirit});for(const n of npcs)if(!n.dead)L.push({y:n.y,f:()=>drawNpc(n)});
  for(const f of fx)if(f.type!=='ring'&&f.type!=='twinkle')L.push({y:f.type==='proj'?f.y+1:f.y,f:()=>drawFx(f)});
  for(const o of LVL.overlayImgs)L.push({y:o.sortY,ov:1,f:()=>ctx.drawImage(IMG['ov_'+o.name],o.x,o.y)});
- L.sort((a,b)=>a.y-b.y||(a.ov?1:0)-(b.ov?1:0));for(const d of L)d.f();
+ L.sort((a,b)=>a.y-b.y||(a.ov?1:0)-(b.ov?1:0));for(const d of L)d.f();drawTownGk(); // 검기 above the mobs
  for(const f of fx)if(f.type==='ring'&&!f.noTint)drawRing(f);
  for(const p of parts){ctx.globalAlpha=Math.max(0,1-p.t/p.life);ctx.fillStyle=p.c;pfill(p.x,p.y,p.s);}ctx.globalAlpha=1;
  drawWaves();if(FEEL.juice)drawSparks();drawUltWorld();
@@ -1841,7 +1855,7 @@ function drawDebug(){ctx.save();ctx.lineWidth=2;ctx.strokeStyle='#f00';ctx.fillS
 
 // ---------- loop ----------
 let last=0,manual=false;
-function step(dt){if(winOpen||ui)return;if(ultFx){updateUlt(dt);updateCam();return;}updateJuice(dt);if(hitStop>0)hitStop-=dt;else{update(dt);updateWaves(dt);}updateCam();}
+function step(dt){if(winOpen||ui)return;if(ultFx){updateUlt(dt);updateCam();return;}updateJuice(dt);if(hitStop>0)hitStop-=dt;else{update(dt);updateWaves(dt);townGkStep(dt);}updateCam();}
 // fixed 60 Hz simulation (accumulator); render every rAF, interpolating positions between the last two ticks on high-refresh screens
 const INTERP=()=>[hero,spirit,...slimes,...npcs];let acc=0,renderAlpha=1,fpsN=0,fpsAcc=0;
 function snapPrev(){for(const e of INTERP()){e._px=e.x;e._py=e.y;}}
