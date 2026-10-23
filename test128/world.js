@@ -62,7 +62,7 @@
   const cv = document.createElement('canvas'); cv.id = 'wc';
   cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:40;display:none;image-rendering:pixelated;background:transparent';
   const ctx = cv.getContext('2d');
-  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
+  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); let EW = LW, EH = LH; // EW x EH = world px on screen (bigger than LW x LH when a town view zooms out, owner 10-23 「마을 카메라 조금 멀리」) // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
   const gateHint = document.createElement('div');
   gateHint.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:35;padding:3px 12px;background:rgba(12,18,44,.7);color:#ffe08a;font:bold 13px sans-serif;border:2px solid #e2c27a;border-radius:3px;pointer-events:none;display:none';
   gateHint.textContent = '▼ 마을 밖으로 (바람길)';
@@ -104,7 +104,7 @@
       for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
       for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
       if (r.hd) (j._hds = j._hds || []).push(Object.assign({}, r.hd, { gx: p.x, gy: p.y }));
-      areas.push({ id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
+      areas.push({ zoom: r.viewZoom, id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
     spawns.default = spawns.default || spawns[ids[0] + ':default'];
     return Object.assign({}, parts[0], j, { type: 'field', w: W, h: H, ground: rows.map(r => r.join('')), legend, solid: [...solid], objects, spawns, chests, areas: j.areas || areas, bg: null, grade: null,
       title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0], hd: null, hds: j._hds || null }); }); }
@@ -149,7 +149,7 @@
         for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
     return c; }
   function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
-      const x = ((Math.abs(h1) * LW + Math.sin(S.t * .6 + i) * 6) % LW + LW) % LW, y = ((Math.abs(h2) * LH + S.t * sp) % (LH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+      const x = ((Math.abs(h1) * EW + Math.sin(S.t * .6 + i) * 6) % EW + EW) % EW, y = ((Math.abs(h2) * EH + S.t * sp) % (EH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
   function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
     const r = ATLAS.sprites.rects[name]; if (!r) return null;
@@ -336,7 +336,7 @@
       ctx.restore(); } }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
-      const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, LW * v.k, LH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
+      const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   function moveCol(e, dx, dy, r, fly) {
     const m = M(); let ok = true;
@@ -796,9 +796,11 @@
 
   // ---------------- camera ----------------
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
-  function camTarget() { const m = M(); return [clampC(hero.x - LW / 2, m.pw - LW), clampC(hero.y - 10 - LH / 2, m.ph - LH)]; }
+  function camTarget() { const m = M(); return [clampC(hero.x - EW / 2, m.pw - EW), clampC(hero.y - 10 - EH / 2, m.ph - EH)]; }
   function snapCam() { if (M()) S.cam = camTarget(); }
-  function updateCam(dt) { if (!M()) return; const [tx, ty] = camTarget(); const k = 1 - Math.pow(.0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
+  function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function updateCam(dt) { if (!M()) return; { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+    const [tx, ty] = camTarget(); const k = 1 - Math.pow(.0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
   function render() {
@@ -813,10 +815,11 @@
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
       const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
-      if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = k * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
-        const vx = Math.round(ox + (zx - ox) * mix + (ox + px * k - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * k - py * kz - oy) * (1 - mix));
-        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); ctx.drawImage(low, vx, vy, (LW + 1) * kz, (LH + 1) * kz); bodies(kz); ctx.restore(); S.view = { k, ox, oy }; S.camF = cf; }
-      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(k); ctx.drawImage(low, ox - Math.round(cf[0] * k), oy - Math.round(cf[1] * k), (LW + 1) * k, (LH + 1) * k); bodies(k); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
+      const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
+      if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
+        const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
+        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); ctx.drawImage(low, vx, vy, (EW + 1) * kz, (EH + 1) * kz); bodies(kz); ctx.restore(); S.view = { k: kv, ox, oy }; S.camF = cf; }
+      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(kv); ctx.drawImage(low, ox - Math.round(cf[0] * kv), oy - Math.round(cf[1] * kv), (EW + 1) * kv, (EH + 1) * kv); bodies(kv); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -831,7 +834,7 @@
     let cx = Math.floor(S.cam[0]), cy = Math.floor(S.cam[1]); S.camF = [S.cam[0] - cx, S.cam[1] - cy];
     if (S.shake > 0) { cx += Math.round((Math.random() - .5) * S.shake * 2); cy += Math.round((Math.random() - .5) * S.shake * 2); }
     S.camI = [cx, cy];
-    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (m.hds) g.clearRect(0, 0, LW + 1, LH + 1); else g.fillRect(0, 0, LW + 1, LH + 1);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (low.width !== EW + 1 || low.height !== EH + 1) { low.width = EW + 1; low.height = EH + 1; } if (m.hds) g.clearRect(0, 0, EW + 1, EH + 1); else g.fillRect(0, 0, EW + 1, EH + 1);
     g.drawImage(m.groundC, -cx, -cy);
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
@@ -840,7 +843,7 @@
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
+    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
@@ -869,8 +872,8 @@
     for (const f of S.fx) drawFx(g, f);
     drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
-      const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, LW + 1, LH + 1);
-      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW + 1, LH + 1); d.globalCompositeOperation = 'destination-out';
+      const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
+      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, EW + 1, EH + 1); d.globalCompositeOperation = 'destination-out';
       const light = (x, y, r) => { const gr = d.createRadialGradient(x - cx, y - cy, 0, x - cx, y - cy, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.6, 'rgba(0,0,0,.7)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - cx - r, y - cy - r, r * 2, r * 2); };
       light(hero.x, hero.y - 10, 100);
       for (const o of m.objs) if (o.type === 'torch') light(o.x, o.y + 8, 50 + Math.sin(S.t * 9 + o.x) * 3);
@@ -881,7 +884,7 @@
     if (S.ult) drawUlt(g, S.ult);
     g.setTransform(1, 0, 0, 1, 0, 0);
   }
-  let _dark = null; function darkLayer() { if (!_dark) { _dark = document.createElement('canvas'); _dark.width = LW + 1; _dark.height = LH + 1; } return _dark; }
+  let _dark = null; function darkLayer() { if (!_dark) _dark = document.createElement('canvas'); if (_dark.width !== EW + 1 || _dark.height !== EH + 1) { _dark.width = EW + 1; _dark.height = EH + 1; } return _dark; }
   let _ultC = null;
   function drawWaystone(g, o) { const on = SAVE.waystones[o.id], p = .5 + .5 * Math.sin(S.t * 3);
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(o.x, o.y + 6, 8, 3, 0, 0, TAU); g.fill();
@@ -1349,7 +1352,7 @@
   // 연구 결과 (handoff/claude/ult_research/CUTIN_ko.md): 심연 초필살기 = hybrid (드물게 쓰니 크게), 일반 필살기 = zoom (자주 쓰니 짧게). 공격/조사 키로 컷인 건너뛰기
   function cutMode(def) { const q = Q.get('cut'); return CUT_T[q] ? q : def; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
-  function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
+  function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + EW + 8 && mm.y > y0 - 8 && mm.y < y0 + EH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
     const cm = cutMode('hybrid'), fx = ['pillar', 'rift', 'trail', 'both'].includes(Q.get('fx')) ? Q.get('fx') : 'rift'; S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fx, seed: Math.random() * 1000, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
@@ -1401,7 +1404,7 @@
   function abLine(g, x0, y0, x1, y1, w, col, a, q) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); for (let i = 0; i <= n; i++) abPx(g, x0 + (x1 - x0) * i / n - w / 2, y0 + (y1 - y0) * i / n - w / 2, w, col, a, q); }
   function abEll(g, cx, cy, rx, ry, col, a, q) { if (rx < .5 || ry < .5) return; for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) { const h = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y / ry) ** 2)));
       if (q >= 2 && a < 1) { for (let x = -h; x < h; x++) abPx(g, cx + x, cy + y, 1, col, a, q); } else { g.globalAlpha = a; g.fillStyle = col; g.fillRect(Math.round(cx - h), Math.round(cy + y), h * 2, 1); } } }
-  function abyssDark(g, f) { const q = fxQ(); if (q < 1 || !f.fx || f.fx === 'pillar') return; const a = Math.min(.62, .62 * f.t / Math.max(.01, f.fz)); g.save(); g.globalAlpha = 1; g.fillStyle = `rgba(10,0,26,${a})`; g.fillRect(S.camI[0] - 4, S.camI[1] - 4, LW + 8, LH + 8); g.restore(); }
+  function abyssDark(g, f) { const q = fxQ(); if (q < 1 || !f.fx || f.fx === 'pillar') return; const a = Math.min(.62, .62 * f.t / Math.max(.01, f.fz)); g.save(); g.globalAlpha = 1; g.fillStyle = `rgba(10,0,26,${a})`; g.fillRect(S.camI[0] - 4, S.camI[1] - 4, EW + 8, EH + 8); g.restore(); }
   function drawAbyssLow(g, f) { const U = f.U, q = fxQ(), P = AB_PAL; let e = f.t - f.fz - f.ci; if (q >= 2) e = Math.floor(e * 12) / 12; const end = U.dur;
     const hx = hero.x, hy = hero.y - 4, cy0 = hero.y - 12; g.save();
     if (q >= 3 && e < 0 && e > -.3) { const k = 1 + e / .3; for (let i = 0; i < 18; i++) { const a = hash(f.seed + i) * TAU, r = (1 - k) * (26 + hash(i + 3) * 22) + 2; abPx(g, hx + Math.cos(a) * r, cy0 + Math.sin(a) * r * .7, i % 4 ? 1 : 2, i % 3 ? P.lit : P.core, 1, q); } } // 힘 모으기: motes implode into the chest
