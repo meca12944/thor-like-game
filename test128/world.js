@@ -28,7 +28,7 @@
   const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
   const DIFF0 = { id: 'normal', enemy_hp: 1, enemy_dmg: 1, telegraph: 1, aggression: 1, tokens: 2, potion_cap: 5, iframe_bonus: 0, ult_cap: 0.9, telegraph_floor: { attack: 0.45, aoe: 0.6, charge_line: 0.45, ult: 2.2 } };
   const DIFF = () => { const g = window.__game; return (g && g.diff) || DIFF0; };
-  const iframe = () => ROLL.iframe + (DIFF().iframe_bonus || 0);
+  const iframe = () => (DG() && DG().iframeTicks ? DG().iframeTicks / 60 : ROLL.iframe) + (DIFF().iframe_bonus || 0); // same invincible window as the town (DODGE.iframeTicks, owner 10-23)
   // telegraph = authored (normal) value x difficulty, never below the difficulty floor (charge lines / ground AoE / attacks / 필살기)
   function teleScale(h) { if (!(h.warn > 0)) return; const d = DIFF(), F = d.telegraph_floor || DIFF0.telegraph_floor;
     const fl = h.kind === 'ult' ? F.ult : h.shape === 'line' ? F.charge_line : (h.dmg ? F.aoe : F.attack); h.warn = Math.max(fl, h.warn * d.telegraph); }
