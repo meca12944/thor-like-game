@@ -1,4 +1,4 @@
-"""잿빛 들판 (field_felt) hd ground = the felt_v4 way (code ground, D=2), so the field matches the town's pixel size and palette.
+"""잿빛 들판 (field_felt) hd ground = the Felt way (tools/hd/build_felt.py: code ground, D=3), so the field matches the town's pixel size and palette.
 Split with the town-art room (10-23): they paint the deco parts (trees, pines, rocks, ...) at D=3; this script paints the ground and adds the
 hd block to maps/field_felt.json (the map stays the other rooms' data: tiles, mobs, objects are untouched, only "hd" is (re)written).
 - tile classes from the legend: grass / tall grass / dirt road / water / bridge / stones / cliff / sand; edges domain-warped so they are organic

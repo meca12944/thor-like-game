@@ -28,7 +28,7 @@
 6. **마을에서만 카메라 조금 멀리 (0.85배)** (넣음, 주인 「다 하고」): 랜드마크 보이는 곳 왕성 16 → 24%, 분수 25 → 33%. 맵 JSON `viewZoom` (붙인 지도에서는 구역별), 들판으로 나가면 부드럽게 1배로 돌아감.
 
 ## 4. 펠트 v4 = 마을배경방 최종 부품 (D=3, 43크레딧)
-- 만드는 법: `python3 test128/tools/hd/build_felt_v4.py <부품 폴더>` (기본 = `handoff/claude/felt_grok_build/final`) → `maps/felt_v4.json` + `maps/ch1_v4.json` + `assets/world/felt_v4/`.
+- 만드는 법: `python3 test128/tools/hd/build_felt.py <부품 폴더>` (기본 = `handoff/claude/felt_grok_build/final`) → `maps/felt.json` + `maps/ch1.json` + `assets/world/felt/` (문·NPC·대사 원본 = `maps/src/felt.json`).
 - 자리 = 그록 발밑 × 0.56 (부품이 그록의 0.7배라 간격도 0.7배). 지도 59×35칸 (남문 밖 이음매 3줄 포함).
 - 0크레딧 손질 (코드): 분수 물 → 어두운 고인 물, 무기점 간판 "o305" 지움, 잡화점 앞에 박힌 사람은 우물 소품으로 가림, 건물 그림의 잘린 네모 테두리 → 찢긴 가장자리.
 - 바닥 = 코드 (마을 32색): 그록 길 모양을 선으로 따라 그린 흙길 + 광장 돌바닥 고리 + 어두운 흙·마른 풀 + 묘지 풀밭.
@@ -36,7 +36,7 @@
 - 2차 부품 (마을배경방 3cfbea2e, 누적 53크레딧): 부서진 왕 석상 분수 · 남문 + 나무 울타리 · 줄등 · 촛대 · 거미 고치 · 불씨 잔해 → `scene_suggest.json` 자리 그대로. 불씨 = 주황 빛, 롬 대장간 굴뚝 + 왕성 = 코드 연기 (맵 hd `smoke`).
 - **마을 시야 0.85배 → 1배로 되돌림** (마을배경방 지적: 소수 배율이면 점 크기가 들쭉날쭉 반짝임). 키 큰 석상 분수 덕에 1배에서도 분수가 보이는 곳 38% (v3 0.85배 33%보다 높음).
 - 숫자 (`town_metrics.py`, 1배): 입구 → 시설 전부 3.5초 안 (v3 5.1초), 랜드마크 보이는 곳 왕성 17% · 예배당 14% · 폐공방 33% · 분수 38%.
-- 시험 주소: `?go=ch1_v4` (펠트 v4 + 잿빛 들판).
+- 게임: 1장 지도 `ch1` = 새 펠트 + 잿빛 들판 (잿빛 들판 바닥·부품 = `tools/hd/build_field_felt_hd.py`).
 
 ## 참고
 - [게임 마을 설계 5요소 (Gamigion)](https://www.gamigion.com/the-5-ingredients-of-game-town-design/)

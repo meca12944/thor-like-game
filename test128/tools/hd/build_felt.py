@@ -1,17 +1,18 @@
 """Felt v4 = the Grok composition built from the town-art room's final D=3 parts (owner 10-23 「그록 그림 대표」 + credits approved).
-Parts: handoff/claude/felt_grok_build/final/ (claude/linette-8dir 8be3cd86) -> copied to assets/world/felt_v4/ (fixed here, 0 credits):
+Parts: handoff/claude/felt_grok_build/final/ (the town-art room) -> copied to assets/world/felt/ (fixed here, 0 credits):
   fountain water darkened (canon = dry cracked fountain), the "o305" text on the weapon-shop sign wiped, the baked-in villager in front of the
   general store hidden behind a well. Places = grok_foot x 0.56 world px (the parts are drawn at 0.7 x Grok size, so the gaps shrink with them).
 Ground = code (palette.json colours): packed-dirt roads traced from the key art as polylines, a cobbled plaza ring, dark earth with dead
   grass, a fenced grave lawn. Solid = each picture's bottom opaque width. Doors / marks / NPCs / clues / waystones / signs follow felt.json
-  (other rooms' data) exactly like v3. Writes maps/felt_v4.json + maps/ch1_v4.json (felt_v4 + field_felt joined at the south exit).
-python3 tools/hd/build_felt_v4.py [parts dir]   (default: the art room's handoff folder)   test: ?go=ch1_v4"""
+  (other rooms' data, now in maps/src/felt.json: edit THAT, then rebuild). Writes maps/felt.json + maps/ch1.json (felt + field_felt joined
+  at the south gate). NPC spots: the near rule (2번방) with the spots tuned for this layout (NEAR below wins over src).
+python3 tools/hd/build_felt.py [parts dir]   (default: the art room's handoff folder)"""
 import os, sys, json, copy, math, random
 import numpy as np
 from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, '..', '..')
 SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_build', 'final')
-OUT = os.path.join(ROOT, 'assets', 'world', 'felt_v4'); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(ROOT, 'assets', 'world', 'felt'); os.makedirs(OUT, exist_ok=True)
 S, T, D, GD = 0.56, 16, 3, 3                      # world px per Grok px, tile, part D, ground D (= parts: one pixel size everywhere)
 PJ = json.load(open(os.path.join(SRC, 'parts.json')))['parts']
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json'))); _top = [x for x, c in enumerate(FF['ground'][0]) if c in ".'=,"]
@@ -44,7 +45,6 @@ def ragged(im, r=14):                               # cut sides (opaque right up
 IM['fountain'] = dry_fountain(IM['fountain'])
 for pid in IM:
     if PJ[pid].get('kind') == 'building' and pid not in ('linette', 'bl_house'): IM[pid] = ragged(IM[pid]); IM['west_a'] = wipe_sign(IM['west_a'])
-for pid, im in IM.items(): im.save(os.path.join(OUT, PJ[pid]['img']), optimize=True)
 
 # ---------- placement ----------
 SC = json.load(open(os.path.join(SRC, 'scene_suggest.json')))['scene']   # the town-art room's entrance scene + district accents (Grok px)
@@ -81,13 +81,17 @@ def place(pid, gx, gy, n=''):
     if pid == 'string_lights':
         for x in (sx0, sx1): solid[int((wy - 1) // T)][x] = True
     big = kind == 'building' and pid != 'fountain'
-    props.append({'id': pid + n, 'role': p.get('role', ''), 'img': f'assets/world/felt_v4/{p["img"]}', 'x': wx / T, 'y': wy / T, 'ax': p['ax'], 'ay': p['ay'],
+    props.append({'id': pid + n, 'role': p.get('role', ''), 'img': f'assets/world/felt/{p["img"]}', 'x': wx / T, 'y': wy / T, 'ax': p['ax'], 'ay': p['ay'],
                   'solid': [sx0, sy0, sx1, sy1], 'fade': 1 if big or pid in ('watchtower', 'mausoleum', 'south_gate', 'string_lights') else 0, 'shadow': 0 if big else 1})
 for pid, p in PJ.items():
     if 'grok_foot' in p: place(pid, *p['grok_foot'])
 ss = PJ['shop_sign']; place('well', ss['grok_foot'][0] - 92 / D / S, ss['grok_foot'][1] + 4, '_shop')   # covers the villager baked into the store art
 for i, (pid, gx, gy) in enumerate(EXTRA): place(pid, gx, gy, f'_{i}')
 P = {q['id']: q for q in props}
+for f in os.listdir(OUT):                                           # the folder holds exactly the pictures this map uses
+    if f != 'ground.png': os.remove(os.path.join(OUT, f))
+for pid, im in IM.items():
+    if any(q['img'].endswith('/' + PJ[pid]['img']) for q in props): im.save(os.path.join(OUT, PJ[pid]['img']), optimize=True)
 
 # ---------- code ground (D=2) ----------
 GW, GH = W * T * GD, H * T * GD
@@ -145,7 +149,7 @@ for i in range(0, len(flat), 1 << 18): idx[i:i + (1 << 18)] = np.argmin(((flat[i
 Image.fromarray(pal[idx].reshape(GH, GW, 3).astype(np.uint8)).save(os.path.join(OUT, 'ground.png'), optimize=True)
 
 # ---------- game objects (doors / NPCs / marks follow the new buildings) ----------
-F = json.load(open(os.path.join(ROOT, 'maps', 'felt.json')))
+F = json.load(open(os.path.join(ROOT, 'maps', 'src', 'felt.json')))   # doors / NPCs / lines / clues = other rooms' data
 def foot(pid, dx=0, dy=0): p = P[pid]; return [int(p['x']) + dx, int(p['y'] - .01) + dy]
 rows = [['#' if solid[y][x] else '.' for x in range(W)] for y in range(H)]
 DOOR = {'f_door_chief': 's_house', 'f_door_smith': 'se_house', 'f_door_herb': 'e_row', 'f_door_inn': 'inn', 'f_door_chapel': 'chapel',
@@ -173,7 +177,7 @@ if not any(o['type'] == 'mark' for o in objs):
 by = {o.get('id'): o for o in objs}
 for o in objs:
     if o['type'] == 'npc':
-        n = o.get('near') or NEAR.get(o['id'])
+        n = NEAR.get(o['id']) or o.get('near')
         if n and n[0] in by: o['near'] = n; r = by[n[0]]; o['x'], o['y'] = min(W - 2, max(1, r['x'] + n[1])), min(H - 2, max(1, r['y'] + n[2]))
 for x in range(EX[0] - 1, EX[0] + 2): rows[H - 1][x] = '.'
 fx_, fy_ = foot('fountain', 0, 1); objs.append({'type': 'waystone', 'id': 'ws_felt_plaza', 'x': fx_, 'y': fy_, 'name': '광장 분수', 'walk': True})
@@ -199,14 +203,14 @@ for i in range(14):
     t = (i / 13) ** .7; x = ax0 + (ax1 - ax0) * t; y = ay0 + (ay1 - ay0) * t; n = 1 + int(t * 3)
     for j in range(n): dx = (j - n / 2) * 1.1; WEBS.append([x + dx, y - 2 - (j % 2), x + dx + 1.2 + t, y - .2, .5 + t, .25 + .5 * t])
 m = {k: F[k] for k in ('type', 'area', 'region', 'title', 'bgm', 'battleBgm', 'tileset', 'tile') if k in F}
-m.update(id='felt_v4', name='펠트', w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
+m.update(id='felt', name='펠트', w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
          spawns={'default': [EX[0] + .5, EX[1] - 1.5, 'up'], 'world': [EX[0] + .5, EX[1] - 1.5, 'up'], 'field': [EX[0] + .5, EX[1] - 1.5, 'up']},
-         hd={'D': GD, 'ground': 'assets/world/felt_v4/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk'},
-         note='GENERATED by tools/hd/build_felt_v4.py from the town-art room parts + felt.json (doors / NPCs / clues)')
-json.dump(m, open(os.path.join(ROOT, 'maps', 'felt_v4.json'), 'w'), ensure_ascii=False, indent=1)
+         hd={'D': GD, 'ground': 'assets/world/felt/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk'},
+         note='GENERATED by tools/hd/build_felt.py from the town-art room parts + maps/src/felt.json (doors / NPCs / clues) - do not hand-edit')
+json.dump(m, open(os.path.join(ROOT, 'maps', 'felt.json'), 'w'), ensure_ascii=False, indent=1)
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json')))
 top = [x for x, c in enumerate(FF['ground'][0]) if c in ".'=,"]; fxo = EX[0] - (top[0] + top[-1]) // 2
-json.dump({'id': 'ch1_v4', 'note': 'test: Felt v4 (town-art room D=3 parts) + 잿빛 들판', 'region': 'ch1', 'area': 1, 'dropExits': ['felt'],
-           'compose': [{'map': 'felt_v4', 'x': 0, 'y': 0}, {'map': 'field_felt', 'x': fxo, 'y': H}]}, open(os.path.join(ROOT, 'maps', 'ch1_v4.json'), 'w'), ensure_ascii=False, indent=1)
-print('ok felt_v4', W, 'x', H, len(props), 'props', len(objs), 'objects; field_felt at x', fxo)
+json.dump({'id': 'ch1', 'note': '1장 = 펠트 + 잿빛 들판 이어 붙인 지도 (세미 오픈월드). GENERATED by tools/hd/build_felt.py (field_felt sits under the south gate); field_felt.json is edited as it is',
+           'compose': [{'map': 'felt', 'x': 0, 'y': 0}, {'map': 'field_felt', 'x': fxo, 'y': H}], 'region': 'ch1', 'area': 1}, open(os.path.join(ROOT, 'maps', 'ch1.json'), 'w'), ensure_ascii=False, indent=1)
+print('ok felt', W, 'x', H, len(props), 'props', len(objs), 'objects; field_felt at x', fxo)
 print('\n'.join(rows[y] if isinstance(rows[y], str) else ''.join(rows[y]) for y in range(H)))
