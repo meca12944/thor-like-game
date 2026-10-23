@@ -632,7 +632,7 @@
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
-    if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
+    if (S.dialog) { stepDialog(dt); queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) S.pause = !S.pause;
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
@@ -788,14 +788,23 @@
     const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20);
     addFx('text', hero.x, hero.y - 32, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
   function feedAdd(name, n, col) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
+  // 대화창 v2 (2번방 10-23, 1장 어두운 톤): pages ('\n\n' or 3 lines), typewriter DLG.cps with a soft blip, skip = show the page, choices [{t, f}] picked with up/down
+  const DLG = { cps: 38, lines: 3 };
+  function dlgPages(d) { if (!d.pages) { const P = []; for (const pg of String(d.text || '…').split(/\n{2,}/)) { const L = pg.split('\n'); for (let i = 0; i < L.length; i += DLG.lines) P.push(L.slice(i, i + DLG.lines).join('\n')); }
+      d.pages = P.length ? P : ['…']; d.pi = 0; d.ch = 0; d.sel = 0; d.t = 0; } return d.pages; }
+  function stepDialog(dt) { const d = S.dialog, P = dlgPages(d), pg = P[d.pi], full = pg.length, last = d.pi === P.length - 1, b4 = Math.floor(d.ch); d.t += dt;
+    d.ch = Math.min(full, d.ch + dt * DLG.cps); const n = Math.floor(d.ch); if (n > b4 && n % 2 === 0 && !/\s/.test(pg[n - 1] || ' ')) sfx('talk', .5, d.pitch || 1);
+    if (last && d.choices && d.ch >= full) { if (takePress('up')) d.sel = (d.sel + d.choices.length - 1) % d.choices.length; if (takePress('down')) d.sel = (d.sel + 1) % d.choices.length; }
+    if (takePress('interact') || takePress('attack')) { if (d.ch < full) d.ch = full; else if (!last) { d.pi++; d.ch = 0; } else { const c = d.choices && d.choices[d.sel]; S.dialog = null; if (c && c.f) c.f(); else if (d.then) d.then(); } }
+    else if (takePress('menu') && !d.choices) S.dialog = null; }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
       if (!((o.tx === fx && o.ty === fy) || Math.hypot(o.x - hero.x, o.y - hero.y) < 15)) continue;
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
       if (o.type === 'npc') { const text = (o.quests && NAV()) ? NAV().talk(o) : (o.idle || '…'); S.talked = o.id;
-        if ((o.shop || o.forge) && text === (o.idle || '…') && openTrade(o)) return; // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
-        S.dialog = { text, name: o.name, por: o.main ? (o.portrait || o.art || o.id) : null }; return; }
+        if ((o.shop || o.forge) && text === (o.idle || '…') && window.__game && (window.__game.openForge || window.__game.openShop)) { S.dialog = { text, name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1, choices: [{ t: o.forge ? '강화·제작' : '물건을 본다', f: () => openTrade(o) }, { t: '그만둔다' }] }; return; } // 대사 먼저, 고르면 가게 // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
+        S.dialog = { text, name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1, por: !o.anim && o.main ? (o.portrait || o.art || o.id) : null }; return; }
       if (o.type === 'clue') { clue(o); return; }
       if (o.type === 'door') { // town B building doors: shops open the shop UI, the inn heals, others show their sign
         const g = window.__game;
@@ -1352,6 +1361,27 @@
   function font(px) { return 'bold ' + Math.max(8, Math.round(px)) + 'px "Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif'; }
   function textOut(t, x, y, px, fill, stroke = '#000', align = 'center') { ctx.font = font(px); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, px / 5); ctx.strokeStyle = stroke; ctx.strokeText(t, x, y); ctx.fillStyle = fill; ctx.fillText(t, x, y); }
   function panel(x, y, w, h) { ctx.fillStyle = 'rgba(12,18,44,.78)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#e2c27a'; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, w - 2, h - 2); ctx.strokeStyle = 'rgba(226,194,122,.4)'; ctx.lineWidth = 1; ctx.strokeRect(x + 5, y + 5, w - 10, h - 10); }
+  function dlgBust(d, x, y, sz) { // portrait = the NPC's own in-game pixel sprite, head + shoulders, nearest-scaled (0 credits, always matches the map)
+    const A = d.anim && npcAnim(d.anim); if (!A) return false; const seq = A.J.anims.idle_down; if (!seq) return false; const t = Math.floor(d.t * 60) % seq.reduce((a, q) => a + q[2], 0); let q = seq[0], acc = 0; for (const e of seq) { acc += e[2]; if (t < acc) { q = e; break; } }
+    const c = A.J.cells[q[0]][q[1]], [cx, cy, cw, ch] = c, top = cy, bh = Math.min(ch, Math.round(cw * 1.0)), bw = Math.min(cw, bh), bx = cx + Math.round((cw - bw) / 2);
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, sz, sz); ctx.clip(); ctx.imageSmoothingEnabled = false; const sc = sz / Math.max(bw, bh) * 1.25; ctx.drawImage(A.im, bx, top, bw, bh, Math.round(x + sz / 2 - bw * sc / 2), Math.round(y + 3 * sz / 100 * 4), Math.round(bw * sc), Math.round(bh * sc)); ctx.restore(); return true; }
+  function drawDialog(ox, oy, SW, SH, u) { const d = S.dialog, P = dlgPages(d), pg = P[d.pi], shown = pg.slice(0, Math.floor(d.ch)), done = d.ch >= pg.length;
+    const g0 = ctx.createLinearGradient(0, oy + SH * .45, 0, oy + SH); g0.addColorStop(0, 'rgba(6,4,10,0)'); g0.addColorStop(1, 'rgba(6,4,10,.55)'); ctx.fillStyle = g0; ctx.fillRect(ox, oy + SH * .45, SW, SH * .55); // dusk under the box
+    const w = Math.min(SW - 40 * u, 560 * u), x = Math.round(ox + (SW - w) / 2), h = 92 * u, y = Math.round(oy + SH - h - 16 * u), sz = 76 * u, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = hasB || hasP;
+    ctx.fillStyle = 'rgba(10,8,14,.92)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(x + u, y + u, w - 2 * u, h - 2 * u); ctx.strokeStyle = 'rgba(150,120,90,.25)'; ctx.lineWidth = u; ctx.strokeRect(x + 5 * u, y + 5 * u, w - 10 * u, h - 10 * u);
+    ctx.fillStyle = '#8a2a2a'; for (let i = 0; i < w - 24 * u; i += 3 * u) if ((i / u | 0) % 7 !== 3) ctx.fillRect(x + 12 * u + i, y + 3 * u + Math.round(Math.sin(i / (14 * u) + d.t * .6) * u), 2 * u, Math.max(1, u)); // 붉은 실 한 가닥 (1장 = 아라크네의 실)
+    for (const [cx, cy] of [[x, y], [x + w, y], [x, y + h], [x + w, y + h]]) { ctx.fillStyle = '#7a6448'; ctx.fillRect(cx - 3 * u, cy - 3 * u, 6 * u, 6 * u); ctx.fillStyle = '#1a1420'; ctx.fillRect(cx - u, cy - u, 2 * u, 2 * u); }
+    let tx = x + 18 * u;
+    if (port) { const px = x + 10 * u, py = y + (h - sz) / 2; ctx.fillStyle = '#16111c'; ctx.fillRect(px, py, sz, sz); if (hasB) dlgBust(d, px, py, sz); else { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, px, py, sz, sz); ctx.imageSmoothingEnabled = false; }
+      ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(px, py, sz, sz); tx = px + sz + 14 * u; }
+    if (d.name) { ctx.font = font(12 * u); const nw = ctx.measureText(d.name).width + (d.role ? ctx.measureText(' · ' + d.role).width * .85 : 0) + 22 * u, ny = y - 14 * u;
+      ctx.fillStyle = 'rgba(10,8,14,.95)'; ctx.fillRect(tx - 10 * u, ny, nw, 18 * u); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(tx - 10 * u, ny, nw, 18 * u);
+      textOut(d.name, tx, ny + 13.5 * u, 12 * u, '#e8d3a8', '#000', 'left'); if (d.role) { ctx.font = font(12 * u); textOut(' · ' + d.role, tx + ctx.measureText(d.name).width, ny + 13.5 * u, 10 * u, '#8f8478', '#000', 'left'); } }
+    shown.split('\n').forEach((l, i) => textOut(l, tx, y + (26 + i * 21) * u, 13 * u, '#ece6dc', '#000', 'left'));
+    if (done && d.pi === P.length - 1 && d.choices) d.choices.forEach((c, i) => { const cy = y - (d.choices.length - i) * 22 * u - 22 * u, on = i === d.sel; ctx.font = font(12 * u); const cw = ctx.measureText(c.t).width + 34 * u, cx = x + w - cw - 8 * u;
+      ctx.fillStyle = on ? 'rgba(60,18,22,.95)' : 'rgba(10,8,14,.9)'; ctx.fillRect(cx, cy, cw, 19 * u); ctx.strokeStyle = on ? '#b04a3a' : '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(cx, cy, cw, 19 * u); textOut((on ? '▶ ' : '   ') + c.t, cx + 9 * u, cy + 14 * u, 12 * u, on ? '#ffe2c8' : '#a99c8c', '#000', 'left'); });
+    if (done && !(d.choices && d.pi === P.length - 1)) { const bob = Math.round(Math.sin(d.t * 6) * 1.5 * u); textOut(d.pi < P.length - 1 ? '▼' : '■', x + w - 16 * u, y + h - 10 * u + bob, 10 * u, '#b04a3a', '#000', 'right'); }
+    if (P.length > 1) textOut((d.pi + 1) + '/' + P.length, x + w - 30 * u, y + h - 10 * u, 9 * u, '#6e6458', '#000', 'right'); }
   function keyHint(a) { const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
     const u = k / 3, m = M(), SW = LW * k, SH = LH * k, cxs = ox + SW / 2;
@@ -1386,17 +1416,12 @@
         ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(Math.round(cxs) - 1, y - 2 * u, 2, 11 * u); }
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
-      textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
+      if (!S.dialog) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
-    if (S.dialog) { const x = ox + 30 * u, y = oy + SH - 108 * u, w = SW - 60 * u; panel(x, y, w, 84 * u);
-      const pi = S.dialog.por && porImg(S.dialog.por), hasP = pi && pi.complete && pi.naturalWidth, tx = x + (hasP ? 96 : 18) * u;
-      if (hasP) { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, x + 10 * u, y - 10 * u, 80 * u, 80 * u); ctx.imageSmoothingEnabled = false; }
-      if (S.dialog.name) textOut(S.dialog.name, tx, y + 16 * u, 12 * u, '#ffe08a', '#000', 'left');
-      S.dialog.text.split('\n').forEach((l, i) => textOut(l, tx, y + ((S.dialog.name ? 38 : 28) + i * 20) * u, 13 * u, '#fff', '#000', 'left'));
-      textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + 76 * u, 10 * u, '#ffe08a', '#000', 'right'); }
+    if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut(Q.has('old') ? 'Esc: 계속   ·   T: 마을로 귀환' : 'Esc: 계속   ·   T: 펠트로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH);
