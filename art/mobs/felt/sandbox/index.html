@@ -50,8 +50,8 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
   <button class="pb on" id="bSkin">복장<small id="nSkin">어둡게 · C</small></button>
 </div><div id="info"></div></div>
 <div id="stick"><div id="knob"></div></div>
-<div id="act"><div id="skbar"></div><button class="pb mid" id="bJump">점프</button><button class="pb mid" id="bRun">달리기</button><button class="pb big" id="roll">구르기</button><button class="pb big" id="bAtk">공격</button></div>
-<div id="keys">이동 WASD / 방향키 · 달리기 L(켜고 끄기) · 구르기 Shift 또는 K · 점프 Space 또는 X<br>공격 J 또는 Z · 스킬 1 2 3 4 · 판정 H · 사망 P<br>몹 패턴 7 8 9 · 자동 R · 몹 바꾸기 Q/E · 소리 M</div>
+<div id="act"><div id="skbar"></div><button class="pb mid" id="bJump">점프</button><button class="pb mid" id="bRun">달리기</button><button class="pb big" id="roll">회피<br>대시</button><button class="pb big" id="bAtk">공격</button></div>
+<div id="keys">이동 WASD / 방향키 · 달리기 L(켜고 끄기) · 회피대시 Shift 또는 K · 점프 Space 또는 X<br>공격 J 또는 Z · 스킬 1 2 3 4 · 판정 H · 사망 P<br>몹 패턴 7 8 9 · 자동 R · 몹 바꾸기 Q/E · 소리 M</div>
 <script src="sfx_synth.js"></script>
 <script>
 // Felt (ch.1) mob sandbox. Mirrors test128 world_mobs.js c1_* (same patterns, speeds, telegraph timing) at game scale (logical px,
@@ -138,7 +138,7 @@ function sArc(R,span,T,head,tail,rot,rev,sq,flip){const key=[R,span,T,head,tail,
     if(al){d[i]=cr;d[i+1]=cg;d[i+2]=cb;d[i+3]=al;}}
   g.putImageData(id,0,0);sCache.set(key,cv2);return cv2;}
 function slashDraw(f,camX,camY){const a=f.t*S_STEP,Y=SLASH[f.n],head=Math.min(1,(a+1)/2.5),tail=a<4?0:Math.min(1,(a-4)/7),[dx,dy]=f.dir,fl=dx<0;
-  const ox=U(hero.x)+f.rx+dx*a*Y.v-camX,oy=U(hero.y)+f.ry+dy*a*Y.v-camY;   // rides with the hero (walk / run / jump) and flies forward
+  const ox=U(hero.x)+f.rx+dx*a*(f.v||Y.v)-camX,oy=U(hero.y)+f.ry+dy*a*(f.v||Y.v)-camY;   // rides with the hero (walk / run / jump) and flies forward
   if(tail<head){const ang=Math.atan2(dy,Math.abs(dx))*180/Math.PI,T=Y.T*(a<6?1:Math.max(.35,1-(a-6)/7)),q=v=>Math.round(v*4)/4;
     const im=sArc(Y.R*(1+.025*q(a)),Y.span,T,q(head),q(tail),Y.rot+ang*(fl?-1:1),Y.rev,Y.sq,fl);ctx.drawImage(im,Math.round(ox-im.width/2),Math.round(oy-im.height/2));}
   const nx=-dy,ny=dx,big=f.n===2;let s=f.seed;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
@@ -158,13 +158,15 @@ function inSector(cx,cy,dir,r,arc,px,py,pr){const dx=px-cx,dy=py-cy,d=Math.hypot
 function mobBody(){const m=S.mob;return[U(m.x),U(m.y-S.def.h*.45),U(S.def.h*.55)];}   // centre + radius, atlas px
 function mobHit(dmg,kx,ky,big){const m=S.mob;if(m.dead)return;m.hp-=dmg;snd(big?'hit_big':'hit',.8);m.flash=.12;m.kx=kx;m.ky=ky;const[bx,by]=mobBody();IMP.push({x:bx,y:by,t:0,big});
   S.fx.push({type:'text',x:m.x,y:m.y-S.def.h-4,text:String(dmg),col:'#fff4d0',t:0});if(m.hp<=0){m.dead=1.4;S.kills++;S.timers=[];m.st='idle';m.dashT=0;snd('mob_die',.8);}}
+function gkHit(f){if(f.hitDone||!f.C)return;const a=f.t*S_STEP;if(a>9){f.hitDone=true;return;}const Y=f.Y,C=f.C,[dx,dy]=f.dir,front=Y.fwd+Y.R*(1+.025*a)+a*f.v-HB_FWD;
+  const cx=f.hx+dx*HB_FWD,cy=f.hy-44+dy*HB_FWD,[bx,by,pr]=mobBody();
+  if(!S.mob.dead&&inSector(cx,cy,f.dir,Math.min(C.r,front),C.arc+(dx&&dy?30:0),bx,by,pr)){f.hitDone=true;mobHit(C.dmg,dx*90,dy*90,f.n===2);SHAKE=Math.max(SHAKE,Y.shake);if(f.n===2)FLASH=4;}}
 function slashStart(n){snd(n===2?'slash_big':'slash',.7);const v=DV[hero.dir]||[hero.face,0],l=Math.hypot(v[0],v[1]);hero.sl={n,t:0,q:false,dir:[v[0]/l,v[1]/l],done:false};}
 function heroAtk(){if(hero.cast||hero.roll||hero.dead||hero.hurtT>0)return;const Sl=hero.sl;if(!Sl){slashStart(0);return;}if(Sl.n<2&&Sl.t>=SLASH[Sl.n].cancel){slashStart(Sl.n+1);return;}Sl.q=true;}
 function slashStep(){const Sl=hero.sl;if(!Sl)return;Sl.t++;const Y=SLASH[Sl.n];
-  if(Sl.t===Y.hit&&!Sl.done){Sl.done=true;const[dx,dy]=Sl.dir;SFX.push({n:Sl.n,rx:dx*Y.fwd,ry:Math.abs(dx)<.1?-44+dy*(Y.fwd+20):-Y.y,dir:Sl.dir,t:0,seed:(Sl.t*7919+Sl.n*104729+(U(hero.x)|0)+99999)%2147483646+1});
-    const C=COMBO[Sl.n],cx=U(hero.x)+dx*HB_FWD,cy=U(hero.y)-44+dy*HB_FWD,[bx,by,pr]=mobBody();
-    if(!S.mob.dead&&inSector(cx,cy,Sl.dir,C.r,C.arc+(dx&&dy?30:0),bx,by,pr)){mobHit(C.dmg,dx*90,dy*90,Sl.n===2);SHAKE=Math.max(SHAKE,Y.shake);if(Sl.n===2)FLASH=4;}
-    else SHAKE=Math.max(SHAKE,Y.whiff);}
+  if(Sl.t===Y.hit&&!Sl.done){Sl.done=true;const[dx,dy]=Sl.dir;SFX.push({get hx(){return U(hero.x)},get hy(){return U(hero.y)},n:Sl.n,rx:dx*Y.fwd,ry:Math.abs(dx)<.1?-44+dy*(Y.fwd+20):-Y.y,dir:Sl.dir,t:0,seed:(Sl.t*7919+Sl.n*104729+(U(hero.x)|0)+99999)%2147483646+1});
+    // owner 10-23 (game PR #80 · town): the 검기 flies out to the hit range and hits when its front passes (was: instant hit up to 2-3x past the drawn arc)
+    const f=SFX[SFX.length-1],C=COMBO[Sl.n];f.v=Math.max(Y.v,(C.r+HB_FWD-Y.fwd-Y.R*(1+.025*8))/8);f.C=C;f.Y=Y;f.hitDone=false;SHAKE=Math.max(SHAKE,Y.whiff);}
   if(Sl.q&&Sl.n<2&&Sl.t>=Y.cancel){slashStart(Sl.n+1);return;}if(Sl.t>=Y.end)hero.sl=null;}
 const SKILLS=[{id:'fire',nm:'화염구',cd:90,col:[255,120,30]},{id:'chain',nm:'연쇄번개',cd:120,col:[255,235,100]},{id:'nova',nm:'빙결서클',cd:150,col:[160,225,255]},{id:'meteor',nm:'메테오',cd:240,col:[255,80,40]}];
 const SKCD=[0,0,0,0],SKF=[],REL_T=30;let SKQ=-1;
@@ -257,7 +259,7 @@ document.getElementById('bSnd').onclick=e=>{e.stopPropagation();sndT();};addEven
 pick(MOBS[0]);setAuto(true);
 addEventListener('pointerdown',()=>document.getElementById('keys').hidden=true);setTimeout(()=>document.getElementById('keys').hidden=true,5000);
 // ---- step
-function step(dt){S.acc+=dt;let run=0;while(S.acc>=1/60){S.acc-=1/60;if(STOP>0){STOP--;continue;}run++;S.tick=(S.tick||0)+1;heroTick();slashStep();skStep();for(const f of SFX)f.t++;for(const f of IMP)f.t++;SHAKE*=.85;if(FLASH>0)FLASH--;}
+function step(dt){S.acc+=dt;let run=0;while(S.acc>=1/60){S.acc-=1/60;if(STOP>0){STOP--;continue;}run++;S.tick=(S.tick||0)+1;heroTick();slashStep();skStep();for(const f of SFX){f.t++;gkHit(f);}for(const f of IMP)f.t++;SHAKE*=.85;if(FLASH>0)FLASH--;}
   dt=run/60;if(!dt)return;S.t+=dt;hero.at+=dt;const m=S.mob,d=S.def;
   for(let i=SFX.length-1;i>=0;i--)if(SFX[i].t*S_STEP>S_LIFE+3)SFX.splice(i,1);for(let i=IMP.length-1;i>=0;i--)if(IMP[i].t>10)IMP.splice(i,1);
   m.flash=Math.max(0,m.flash-dt);m.frz=Math.max(0,m.frz-dt);
@@ -357,6 +359,10 @@ function draw47(g,m,d){const J=d.J;g.fillStyle='rgba(0,0,0,.32)';g.beginPath();g
     g.save();g.translate(m.x,m.y-lift);if(m.face<0)g.scale(-1,1);if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);
     blit(g,im,fi,C.w,C.h,s,(-C.w/2+dx)*s,-C.foot*s);g.restore();}
   if(m.hp<d.hp){const w=20;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-w/2-.5,m.y-d.h-9.5,w+1,3);g.fillStyle='#d8443a';g.fillRect(m.x-w/2,m.y-d.h-9,w*Math.max(0,m.hp)/d.hp,2);}}
+// owner 10-23 "회피대시시 끊김": the afterimage used a CSS colour filter on every ghost every frame (very slow on phones, 50-600 ms frames).
+// Now each frame's cyan ghost is coloured once and kept (same look: game dash tint #6ed7ff).
+const GHC=new Map();function ghostImg(c,q){const key=(DARK?'d':'o')+c[0]+'_'+c[1];let o=GHC.get(key);if(o)return o;const sh=sheetsH()[c[0]];if(!sh||!sh.complete)return null;
+  o=document.createElement('canvas');o.width=q[2];o.height=q[3];const x=o.getContext('2d');x.drawImage(sh,q[0],q[1],q[2],q[3],0,0,q[2],q[3]);x.globalCompositeOperation='source-atop';x.globalAlpha=.75;x.fillStyle='#6ed7ff';x.fillRect(0,0,q[2],q[3]);GHC.set(key,o);return o;}
 function heroAnim(h){const d=h.dir,side=h.face>0?'right':'left',A=HA.anims,dd=d==='s'?(h.face<0?'downl':'down'):d==='n'?(h.face<0?'upl':'up'):d;
   if(h.dead)return 'death_'+side;
   if(h.cast)return 'cast_'+h.cast.side;
@@ -370,8 +376,8 @@ function drawHero(){const g=ctx,h=hero,HSH=sheetsH();if(!HA||!HSH.length||!HSH.e
   for(;k<fr.length-1;k++){t-=fr[k][2];if(t<0)break;}const [sh,ci]=fr[k],c=HA.cells[sh][ci];h.cell=[sh,ci];
   const shd=Math.max(.35,1-h.z/20);g.fillStyle=`rgba(0,0,0,${.32*shd})`;g.beginPath();g.ellipse(h.x,h.y,6*shd,2.6*shd,0,0,TAU);g.fill();
   g.save();g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
-  for(const gh of GH){const q=HA.cells[gh.c[0]][gh.c[1]];g.globalAlpha=.55*(1-gh.t/12);g.filter='brightness(.75) sepia(1) hue-rotate(165deg) saturate(4)';   // afterimage (game roll trail look)
-    g.drawImage(HSH[gh.c[0]],q[0],q[1],q[2],q[3],gh.x-q[4]*HS,gh.y-q[5]*HS,q[2]*HS,q[3]*HS);}
+  for(const gh of GH){const q=HA.cells[gh.c[0]][gh.c[1]],im=ghostImg(gh.c,q);if(!im)continue;g.globalAlpha=.55*(1-gh.t/12);   // afterimage (game dash trail look)
+    g.drawImage(im,gh.x-q[4]*HS,gh.y-q[5]*HS,q[2]*HS,q[3]*HS);}
   g.globalAlpha=1;g.filter=h.white>0?'brightness(0) invert(1)':'none';g.drawImage(HSH[sh],c[0],c[1],c[2],c[3],h.x-c[4]*HS,h.y-h.z-c[5]*HS,c[2]*HS,c[3]*HS);g.restore();
   if(showHB){g.save();g.scale(HS,HS);g.strokeStyle='rgba(120,200,255,.9)';g.lineWidth=1/HS;g.beginPath();g.ellipse(U(h.x),U(h.y),16,16/1.4,0,0,7);g.stroke();
     if(h.sl){const Sl=h.sl,C=COMBO[Sl.n],dv=Sl.dir,on=Sl.t>=SLASH[Sl.n].hit&&Sl.t<SLASH[Sl.n].hit+4;hb(U(h.x)+dv[0]*HB_FWD,U(h.y-h.z)-44+dv[1]*HB_FWD,dv,C.r,C.arc+(dv[0]&&dv[1]?30:0),on?'rgba(255,230,80,.45)':'rgba(255,230,80,.15)');}
