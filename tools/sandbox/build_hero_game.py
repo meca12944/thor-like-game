@@ -11,6 +11,7 @@ SH = [Image.open(f'{G}/assets/' + p).convert('RGBA') for p in H8['sheets']]; AN 
 def src(base, d):  # sandbox direction -> (game clip, mirrored)
     side = {'right': ('right', False), 'left': ('right', True), 's': ('down', False), 'n': ('up', False), 'down': ('down', False), 'downl': ('down', True), 'up': ('up', False), 'upl': ('up', True)}[d]
     k = f'{base}_{side[0]}'
+    if d in ('down', 'downl') and f'{base}_dr' in AN: return (f'{base}_dr', d == 'downl')  # ↘ art, ↙ = mirrored (motion lab 10-23)
     return (k, side[1]) if k in AN else (f'{base}_right', d in ('left', 'downl', 'upl'))
 want = {}
 for base in ('idle', 'walk', 'run', 'dash', 'jump'):
