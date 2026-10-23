@@ -13,6 +13,9 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, '..
 OUT = os.path.join(ROOT, 'assets', 'world', 'field_felt_hd'); os.makedirs(OUT, exist_ok=True)
 MP = os.path.join(ROOT, 'maps', 'field_felt.json'); M = json.load(open(MP))
 PALF = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_layout', 'palette.json')
+PARTS = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_build', 'final')
+# tile deco -> the art room's D=3 parts (parts.json); tiles keep their rules, only the picture changes (world.js buildMap / drawPropsHi)
+DECO = {'bush': ['bush_b'], 'rocks': ['stone_low'], 'fence': ['fence_wood']}
 PAL = json.load(open(PALF)); hx = lambda s: np.array([int(s[i:i + 2], 16) for i in (1, 3, 5)], float)
 W, H, T, GD = M['w'], M['h'], M['tile'], 2
 GW, GH = W * T * GD, H * T * GD
@@ -42,7 +45,8 @@ gv = n1 * .55 + n2 * .3 + n3 * .15
 img[:] = sel([gv < .38, gv < .52, gv < .66], [cols['d2'], cols['g2'], cols['g1'] * .7 + cols['d3'] * .3], cols['g1'] * .85 + cols['r2'] * .15)
 bv = vnoise(1.1, 4); blade = (bv > .8) & (np.roll(bv, 1, 0) <= .8) & (n1 > .4); img[blade] = img[blade] * 1.18   # sparse short blades
 # tall grass: denser, lighter, longer blades
-tg = C == 1; tb = (vnoise(.9, 5) > .6) & tg; img[tg] = cols['g1'] * .9; img[tb] = cols['r3'] * .6 + cols['g1'] * .4; img[tg & (np.roll(tb, 2, 0))] = cols['d3']
+tg = C == 1; sway = np.floor((xx + np.floor(vnoise(4, 5) * 3)) / 2) % 3 == 0          # tall grass: thin vertical stalks in clumps, lit tips
+tb = sway & (vnoise(2.2, 15) > .42) & tg; img[tg] = cols['d3'] * .6 + cols['g1'] * .4; img[tb] = cols['g1']; img[tb & ~np.roll(tb, 2, 0)] = cols['r3'] * .7 + cols['g1'] * .3
 # dirt road
 rd = C == 2; rv = n2 * .7 + n3 * .3; img[rd] = sel([rv[rd] < .35, rv[rd] < .55, rv[rd] < .75], [cols['r1'], cols['r2'], cols['r3']], cols['r4'])
 img[rd & (vnoise(1.2, 6) > .82)] = cols['r5']
@@ -87,6 +91,18 @@ rng = np.random.default_rng(5); WEBS = []
 for _ in range(22):
     a = trees[rng.integers(len(trees))]; b = min((t for t in trees if t != a and 2 <= abs(t[0] - a[0]) <= 5 and abs(t[1] - a[1]) <= 2), key=lambda t: rng.random(), default=None)
     if b: WEBS.append([a[0] + .5, a[1] - .4, b[0] + .5, b[1] - .3, .8 + rng.random() * .6, .35 + rng.random() * .25])
-M['hd'] = {'D': GD, 'ground': 'assets/world/field_felt_hd/ground.png', 'props': [], 'water': WATER, 'webs': WEBS, 'grade': None}
+import shutil
+PJ = json.load(open(os.path.join(PARTS, 'parts.json')))['parts']; ART = {}
+for spr, ids in DECO.items():
+    for i in ids:
+        if i not in PJ: continue
+        p = dict(PJ[i]); im = Image.open(os.path.join(PARTS, p['img']))
+        if spr == 'fence':                                   # one fence tile = a 1-tile (48 art px) slice from the middle of the long fence
+            x0 = p['ax'] - 24; im = im.crop((x0, 0, x0 + 48, im.height)); p['ax'] = 24; p['img'] = 'fence_tile.png'; p['flip'] = False
+        if not p.get('zone', '').startswith('field'):        # town parts reused out here get the field's ash (field parts come ash-painted)
+            a = np.asarray(im.convert('RGBA')).astype(float); a[..., :3] = ash(a[..., :3], .55); im = Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+        im.save(os.path.join(OUT, p['img']))
+        ART.setdefault(spr, []).append({'img': f'assets/world/field_felt_hd/{p["img"]}', 'ax': p['ax'], 'ay': p['ay'], **({'flip': False} if p.get('flip') is False else {})})
+M['hd'] = {'D': GD, 'decoArt': ART, 'ground': 'assets/world/field_felt_hd/ground.png', 'props': [], 'water': WATER, 'webs': WEBS, 'grade': None}
 open(MP, 'w').write(json.dumps(M, ensure_ascii=False, indent=1) + '\n')
 print('ok field_felt hd ground', GW, 'x', GH, len(WATER), 'water runs', len(WEBS), 'threads')

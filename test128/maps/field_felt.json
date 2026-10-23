@@ -306,6 +306,30 @@
  "grade": "ash",
  "hd": {
   "D": 2,
+  "decoArt": {
+   "bush": [
+    {
+     "img": "assets/world/field_felt_hd/bush_b.png",
+     "ax": 46,
+     "ay": 53
+    }
+   ],
+   "rocks": [
+    {
+     "img": "assets/world/field_felt_hd/stone_low.png",
+     "ax": 70,
+     "ay": 43
+    }
+   ],
+   "fence": [
+    {
+     "img": "assets/world/field_felt_hd/fence_tile.png",
+     "ax": 24,
+     "ay": 42,
+     "flip": false
+    }
+   ]
+  },
   "ground": "assets/world/field_felt_hd/ground.png",
   "props": [],
   "water": [

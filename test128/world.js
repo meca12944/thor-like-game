@@ -90,7 +90,7 @@
   // under everything, props (buildings / trees) one by one, y-sorted with the hero (see-through when the hero is behind), light pools on top.
   const HDIMG = {};
   function loadHD(j) { if (!j.hds && j.hd) j.hds = [Object.assign({}, j.hd, { gx: 0, gy: 0 })]; if (!j.hds) return j;
-    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); for (const q of h.props || []) urls.add(q.img); }
+    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); for (const q of h.props || []) urls.add(q.img); for (const k in h.decoArt || {}) for (const v of h.decoArt[k]) urls.add(v.img); }
     return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = u; }))).then(() => j); }
   // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
   // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
@@ -192,6 +192,10 @@
     }
     for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {spr: [{img, ax, ay, flip}]}):
+      for (const d of m.decos) { const vs = A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
+        const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
+        const j = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: j && f(2) < .5, dx: j * Math.round((f(3) - .5) * 5), dy: j * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
     m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
@@ -320,7 +324,14 @@
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy);
       if (q.shadow) { ctx.save(); ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); ctx.restore(); }
-      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(sx - ax * sc), Math.round(sy - ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); } }
+      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(sx - ax * sc), Math.round(sy - ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); }
+    const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
+    for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
+      const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
+      const behind = im.height / e.D > 28 && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; d._a = (d._a ?? 1) + ((behind ? .5 : 1) - (d._a ?? 1)) * .2;
+      const [sx, sy] = W2S(fx, fy); ctx.save(); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
+      ctx.globalAlpha = d._a; ctx.imageSmoothingEnabled = false; ctx.translate(Math.round(sx), Math.round(sy)); if (e.flip) ctx.scale(-1, 1);
+      ctx.drawImage(im, -Math.round(e.v.ax * sc), -Math.round(e.v.ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); } }
   function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
     for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
       if (h.grade === 'dusk') { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ox, oy, gw, gh); ctx.restore(); } // dusk: one grade over ground, props and characters alike
@@ -851,7 +862,7 @@
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
+    for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
