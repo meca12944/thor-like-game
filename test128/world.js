@@ -316,7 +316,7 @@
   }
   function killMob(m) {
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
-    addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion });
+    { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } // 심연: pixel void burst instead of the white puff
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
@@ -760,8 +760,8 @@
     ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; if (fl) { ctx.translate(Math.round(sx), 0); ctx.scale(-1, 1); ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); } else ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
-    if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
-    drawH128(h128Cell(), h.x, h.y, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x, h.y, k, .5, 'white');
+    if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
+    drawH128(h128Cell(), h.x, h.y, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x, h.y, k, .5, 'white');
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
@@ -867,6 +867,7 @@
     g.drawImage(_ultC, 0, 0);
   }
   function drawFx(g, f) { const p = f.t / f.life;
+    if (f.type === 'voidpop') { const q = fxQ(), R = (f.big ? 20 : 10) * (.3 + p); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU + f.x, r = R * (.6 + .4 * hash(i + f.y)); abPx(g, f.x + Math.cos(a) * r, f.y + Math.sin(a) * r * .7, i % 3 ? 1 : 2, i % 2 ? AB_PAL.lit : AB_PAL.void, 1 - p, q); } abEll(g, f.x, f.y, 4 * (1 - p), 3 * (1 - p), AB_PAL.core, 1 - p, q); g.globalAlpha = 1; return; }
     if (f.type === 'scorch') { const q = fxQ(), a = 1 - p; abEll(g, f.x, f.y, 10, 4, AB_PAL.void, a * .9, q); abEll(g, f.x, f.y, 6, 2, AB_PAL.deep, a, q); for (let i = 0; i < 4; i++) { const ph = (p * 2 + i / 4) % 1; abPx(g, f.x + (hash(i + f.x) - .5) * 14, f.y - ph * 18, 1, i % 2 ? AB_PAL.lit : AB_PAL.vio, a * (1 - ph), q); } g.globalAlpha = 1; return; } // 그을린 자국 + 올라가는 불티
     if (f.type === 'spark') { g.fillStyle = `rgba(255,255,220,${1 - p})`; for (let i = 0; i < 4; i++) { const a = i * 1.57 + .7; g.fillRect(f.x + Math.cos(a) * p * 8 - 1, f.y + Math.sin(a) * p * 8 - 1, 2, 2); } }
     if (f.type === 'poof') { g.fillStyle = `rgba(240,240,255,${.8 * (1 - p)})`; const R = (f.big ? 22 : 9) * (0.4 + p); for (let i = 0; i < 6; i++) { const a = i * TAU / 6; g.beginPath(); g.arc(f.x + Math.cos(a) * R, f.y + Math.sin(a) * R * .6, 3 * (1 - p) + 1, 0, TAU); g.fill(); } }
@@ -968,7 +969,7 @@
     if (e >= 0 && !f.boomed) { f.boomed = true; shake(2); try { g.SFX.play('ult_boom', 1); } catch (er) {} } // modest: 2px boom, 1px per hit (world cap 3px + '화면 흔들림' option)
     while (e >= 0 && f.hitI < U.hitT.length && e >= U.hitT[f.hitI]) { f.hitI++; shake(1); const n = U.hitT.length;
       for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, F = U.whole ? U : FULT, tot = D.boss ? mm.maxHp * F.boss : D.champion ? mm.maxHp * F.champ : F.mob, d = Math.max(1, Math.round(tot / n));
-        mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
+        mm.hp -= d; mm.hitT = .3; mm.flash = U.whole && f.fx && f.fx !== 'pillar' && fxQ() >= 3 ? 0 : .12; mm.lagDelay = .35; // the world is frozen during the ult: a flash would stay white the whole time if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
         if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
     if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.whole && f.fx === 'rift' && fxQ() >= 3) for (const mm of f.vic) addFx('scorch', mm.x, mm.y + 2, { life: 1.6 }); if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
   function cutZoom() { const f = S.ultFx; if (!f || (f.cut !== 'zoom' && f.cut !== 'hybrid')) return 1; const c = f.t - f.fz, e = c - f.ci; // push in during the cut, snap back on the boom
