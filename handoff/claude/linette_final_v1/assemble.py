@@ -85,6 +85,10 @@ SRC['run']['north']=(B+'/linette_runn_v2/run_n8',None,[4]*8)
 # front: calm frames 0-2 ping-pong (frames 3-8 flick the ponytail), back: 0-7 ping-pong. Used when she faces straight down/up and at the start.
 SRC['idle']['south']=(V1+'/idle/south',[0,1,2,1],[9]*4)
 SRC['idle']['north']=(V1+'/idle/north',[0,1,2,3,4,3,2,1],[8]*8)
+# owner 10-23 "대시 방향별로 / 리네트 폼대로": straight front/back dash in Linette's own form (key pose: knees bent, feet under her, arms close, leaning in;
+# + idle->key in-betweens, linette_dashns_v1), 17 ticks like the other dashes: stand, drop, lunge (held), back up
+DN=B+'/linette_dashns_v1';_DT=[2,2,3,6,2,2]
+SRC['dash']['south']=(DN+'/tw_s',[0,1,3,4,3,1],_DT);SRC['dash']['north']=(DN+'/tw_n',[0,1,3,4,3,1],_DT)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
