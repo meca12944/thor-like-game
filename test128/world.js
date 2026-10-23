@@ -84,7 +84,14 @@
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
   const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = src; });
   const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
-  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(j => (MAPS[id] = buildMap(j))); }
+  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(loadHD).then(j => (MAPS[id] = buildMap(j))); }
+  // 고해상도 배경 (owner 10-23 「펠트 마을 최고 퀄리티」, 마을배경방과 정한 형식): map JSON "hd" = {D, ground, props[], lights[], grade}.
+  // Drawn at the characters' pixel density (D art px per world px) on the screen canvas, not in the 384x216 low canvas: the ground picture
+  // under everything, props (buildings / trees) one by one, y-sorted with the hero (see-through when the hero is behind), light pools on top.
+  const HDIMG = {};
+  function loadHD(j) { if (!j.hds && j.hd) j.hds = [Object.assign({}, j.hd, { gx: 0, gy: 0 })]; if (!j.hds) return j;
+    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); for (const q of h.props || []) urls.add(q.img); }
+    return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = u; }))).then(() => j); }
   // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
   // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
   // Each part becomes an area {part, name, sub, bgm, grade, bg}: painted backgrounds and colour grades stay per part, the music follows the area.
@@ -96,10 +103,11 @@
       for (const o of r.objects || []) { if (o.type === 'exit' && ids.includes(o.to)) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
       for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
       for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
+      if (r.hd) (j._hds = j._hds || []).push(Object.assign({}, r.hd, { gx: p.x, gy: p.y }));
       areas.push({ id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
     spawns.default = spawns.default || spawns[ids[0] + ':default'];
     return Object.assign({}, parts[0], j, { type: 'field', w: W, h: H, ground: rows.map(r => r.join('')), legend, solid: [...solid], objects, spawns, chests, areas: j.areas || areas, bg: null, grade: null,
-      title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0] }); }); }
+      title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0], hd: null, hds: j._hds || null }); }); }
   function composeGround(m) { const c = renderGround(m), g = c.getContext('2d'), T = m.T; // tiles everywhere, then each part's painting / grade on its own rectangle
     for (const a of m.areas) { const x = a.x * T, y = a.y * T, w = a.w * T, h = a.h * T;
       if (a.bg && BGIMG[a.bg]) { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(BGIMG[a.bg], x, y, w, h); g.imageSmoothingEnabled = false; continue; }
@@ -184,6 +192,7 @@
     }
     for (const o of (j.objects || [])) if (!['spawn', 'champion'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -300,6 +309,27 @@
       npcSelf = o; const nx = o.x + dx / L * v, ny = o.y + dy / L * v; if (!blocked(nx, ny + 6, 4) && Math.hypot(hero.x - nx, hero.y - ny) > 10) { o.x = nx; o.y = ny; } else { o.tgt = null; o.wt = 1; } npcSelf = null; } }
   function npcCell(o) { const A = npcAnim(o.anim); if (!A) return null; const J = A.J, seq = J.anims[(o.tgt ? 'walk_' : 'idle_') + (o.face || 'down')] || J.anims.idle_down; let t = Math.floor((o.at || 0) * 60) % seq.reduce((a, s) => a + s[2], 0);
     for (const s of seq) { if (t < s[2]) return [A.im, J.cells[s[0]][s[1]]]; t -= s[2]; } return null; }
+  // ---- hd map layer (see loadHD) ----
+  function drawHDGround(k) { const m = M(); if (!m || !m.hds) return; ctx.imageSmoothingEnabled = false;
+    for (const h of m.hds) { const im = HDIMG[h.ground]; if (!im) continue; const [sx, sy] = W2S(h.gx * m.T, h.gy * m.T), sc = k / h.D;
+      ctx.drawImage(im, Math.round(sx), Math.round(sy), Math.round(im.width * sc), Math.round(im.height * sc)); } }
+  function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
+    for (const h of m.hds) for (const q of h.props || []) { const im = HDIMG[q.img]; if (!im) continue;
+      const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
+      const sc = k / h.D, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / h.D, wr = wl + im.width / h.D, wt = fy - ay / h.D;
+      const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
+      const [sx, sy] = W2S(fx, fy);
+      if (q.shadow) { ctx.save(); ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); ctx.restore(); }
+      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(sx - ax * sc), Math.round(sy - ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); } }
+  function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
+    for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
+      if (h.grade === 'dusk') { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ox, oy, gw, gh); ctx.restore(); } // dusk: one grade over ground, props and characters alike
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (const [lx, ly, r, col, a] of h.lights || []) { const [sx, sy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R0 = r * k * (1 + .04 * Math.sin(S.t * 7 + lx)), gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, R0);
+        const c = col.replace('#', ''), rr = parseInt(c.slice(0, 2), 16), gg = parseInt(c.slice(2, 4), 16), bb = parseInt(c.slice(4, 6), 16);
+        gr.addColorStop(0, `rgba(${rr},${gg},${bb},${.32 * a})`); gr.addColorStop(.5, `rgba(${rr},${gg},${bb},${.12 * a})`); gr.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        ctx.fillStyle = gr; ctx.save(); ctx.translate(sx, sy); ctx.scale(1, .72); ctx.translate(-sx, -sy); ctx.fillRect(sx - R0, sy - R0, R0 * 2, R0 * 2); ctx.restore(); }
+      ctx.restore(); } }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, LW * v.k, LH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
@@ -435,7 +465,8 @@
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
-      if (!m.groundC) m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+      if (!m.groundC) { m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+        for (const h of m.hds || []) { const im = HDIMG[h.ground]; if (im) m.groundC.getContext('2d').clearRect(h.gx * m.T, h.gy * m.T, im.width / h.D, im.height / h.D); } }
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
       if (!sp && spawnName && spawnName.startsWith('snap:')) sp = spawnName.slice(5).split(',').map(Number).concat([hero.face]); // death retry: just before the fight
@@ -777,11 +808,11 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
+      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = k * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * k - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * k - py * kz - oy) * (1 - mix));
-        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, vx, vy, (LW + 1) * kz, (LH + 1) * kz); S.view = { k: kz, ox: vx, oy: vy }; bodies(kz); ctx.restore(); S.view = { k, ox, oy }; S.camF = cf; }
-      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, ox - Math.round(cf[0] * k), oy - Math.round(cf[1] * k), (LW + 1) * k, (LH + 1) * k); bodies(k); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
+        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); ctx.drawImage(low, vx, vy, (LW + 1) * kz, (LH + 1) * kz); bodies(kz); ctx.restore(); S.view = { k, ox, oy }; S.camF = cf; }
+      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(k); ctx.drawImage(low, ox - Math.round(cf[0] * k), oy - Math.round(cf[1] * k), (LW + 1) * k, (LH + 1) * k); bodies(k); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -796,7 +827,7 @@
     let cx = Math.floor(S.cam[0]), cy = Math.floor(S.cam[1]); S.camF = [S.cam[0] - cx, S.cam[1] - cy];
     if (S.shake > 0) { cx += Math.round((Math.random() - .5) * S.shake * 2); cy += Math.round((Math.random() - .5) * S.shake * 2); }
     S.camI = [cx, cy];
-    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; g.fillRect(0, 0, LW + 1, LH + 1);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (m.hds) g.clearRect(0, 0, LW + 1, LH + 1); else g.fillRect(0, 0, LW + 1, LH + 1);
     g.drawImage(m.groundC, -cx, -cy);
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
