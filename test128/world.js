@@ -998,10 +998,19 @@
     const L0 = big ? 9 : 6, st = (big ? 5 : 1.5) * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
     return { lean: L0 * sp, step: st, sq: 1 + .045 * Math.exp(-t * 30) * Math.cos(t * 40) };
   }
+  // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
+  // 출발하면 앞으로 숙였다 돌아오고, 멈추면 뒤로 버텼다가 살짝 앞으로 넘어갔다 섬. 발은 땅에 그대로(그리기에서 기울이기만). 단위: 머리 높이에서 그림 px
+  const LEAN = { kick: 150, w: 14, z: .4, max: 12 };
+  function h8Lean(h) { const now = S.t, sp = h.moving && !h.roll ? (h.run ? RUN.mul : 1) : 0; let dt = Math.min(.1, Math.max(0, now - (h.lnT ?? now))); h.lnT = now;
+    if (h.lnSp == null) h.lnSp = sp; const dv = sp - h.lnSp; h.lnSp = sp; if (h.roll || S.deadT > 0) { h.lnL = h.lnV = 0; return null; }
+    if (dv) { if (h.moving) h.lnDir = FACEV[h.face] || [1, 0]; h.lnV = (h.lnV || 0) + dv * LEAN.kick; }
+    for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
+    const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail

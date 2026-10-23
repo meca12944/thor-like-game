@@ -29,10 +29,10 @@ with sync_playwright() as p:
         for t in range(ticks):
             r=pg.evaluate("()=>{const W=__world;W.hero.hp=W.hero.maxHp;W.killAll&&W.killAll();W.advance(1/60);const h=W.hero;return [h.x,h.y,h.face,h.f8,!!h.run,!!h.moving,W.cell8()]}")
             log.append({'seg':f'{d}{"run" if run else ""}','x':r[0],'y':r[1],'face':r[2],'f8':r[3],'run':r[4],'mov':r[5],'cell':r[6]})
-            if FR and n%2==0:
+            if FR and n%int(os.environ.get('FRSTEP','2'))==0:
                 p_=pg.evaluate("()=>{const W=__world,S=W.S,v=S.view,h=W.hero,c=document.querySelector('canvas'),r=c.getBoundingClientRect(),q=r.width/c.width;return [r.left+(v.ox+(h.x-S.camI[0])*v.k)*q,r.top+(v.oy+(h.y-S.camI[1])*v.k)*q]}")
                 os.makedirs(FR,exist_ok=True);x0=min(max(0,p_[0]-160),1280-320);y0=min(max(0,p_[1]-200),720-260)
-                pg.screenshot(path=f'{FR}/{n//2:04d}.png',clip={'x':x0,'y':y0,'width':320,'height':260})
+                pg.screenshot(path=f'{FR}/{n//int(os.environ.get("FRSTEP","2")):04d}.png',clip={'x':x0,'y':y0,'width':320,'height':260})
             n+=1
     b.close()
 json.dump({'log':log,'errs':errs},open(OUT,'w'));print('ticks',len(log),'errors',errs[:3])
