@@ -43,7 +43,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 <div class="btn small" id="bHB" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">판정</div>
 <div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
 <script>
-// Hero sandbox: atlas = assets/hero_sbx.json (hero8 format, built from the showcase clips). Sides = in-game clips (+fixes),
+// Hero sandbox: atlas = assets/hero_game.json = the game's hero, built by tools/sandbox/build_hero_game.py (owner 10-23: one hero everywhere; the old showcase atlas hero_sbx.json stays as art source). Sides = in-game clips (+fixes),
 // diagonals = 3/4 clips (down/up = ↘/↗, downl/upl = mirrored). Hurt/death/cast use the side clip of the last left/right facing.
 // Attack hit boxes = the game's H8HB sectors (radius per hit, arc 150/170/160 deg) scaled to sprite pixels; one slime mob with a body circle.
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
@@ -272,7 +272,7 @@ function step(){
     else if(P.st!=='idle'||P.clip!=='idle_'+dirKey())start('idle','idle_'+dirKey());
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='dash'){const v=DV[dirKey()];const k=1-P.t/T;moveHero(v[0]*5*k,v[1]*5*k);}
+    if(P.st==='dash'){const v=DV[dirKey()],E2=q=>1-Math.pow(1-q,2.6),q0=Math.min(1,Math.max(0,P.t-1)/14),q1=Math.min(1,P.t/14),st=150*(E2(q1)-E2(q0));moveHero(v[0]*st,v[1]*st);} // same dash as the game: 150 px (1.21 hero-heights) over a 14-tick burst
     if(P.st==='hurt'){const k=Math.max(0,1-P.t/18);moveHero(P.kbx*HERO_KB/9*k,P.kby*HERO_KB/9*k);}
     if(P.st==='atk'){const sk=P.clip.split('_')[1],side=sk==='right'||sk==='left',N=NCOMBO[P.combo-1],C=side?Object.assign({},COMBO[P.combo-1],{hit:N.hit,cancel:N.cancel}):COMBO[P.combo-1],dir=DV[sk];
       // (old atk-state path, unused since hero_slash_a: attack() no longer enters 'atk')
@@ -331,6 +331,6 @@ function draw(){
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;if(window.__sbx.manual)acc=0;while(acc>=1000/60){step();acc-=1000/60;}draw();skUI();refUI();requestAnimationFrame(loop);}  // manual = test driver steps it
 const img=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
-fetch('assets/hero_sbx.json').then(r=>r.json()).then(j=>{A=j;return Promise.all([...A.sheets.map(p=>img('assets/'+p)),img('assets/slime.png')]);}).then(ims=>{SL=ims.pop();SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/hero_game.json?v='+(Date.parse(document.lastModified)||0).toString(36)).then(r=>r.json()).then(j=>{A=j;return Promise.all([...A.sheets.map(p=>img('assets/'+p+'?v='+(Date.parse(document.lastModified)||0).toString(36))),img('assets/slime.png')]);}).then(ims=>{SL=ims.pop();SH=ims;start('idle','idle_right');requestAnimationFrame(loop);});
 window.__sbx={P,M,K,step,draw,attack,dash,jump,BLOCKS,manual:false,hits:0,get showHB(){return showHB},set showHB(v){showHB=v}};
 </script>
