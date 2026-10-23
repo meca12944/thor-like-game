@@ -60,9 +60,10 @@ def key(a, thr=14):   # 테두리와 이어진 단색 바탕 지우기
     c = a[0, 0, :3].astype(int); flat = np.abs(a[:, :, :3].astype(int) - c).sum(2) < thr
     fl, _ = ndimage.label(flat); e = set(np.unique(np.concatenate([fl[0], fl[-1], fl[:, 0], fl[:, -1]]))) - {0}
     a[:, :, 3] = np.where(np.isin(fl, list(e)), 0, a[:, :, 3]); return a
-SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a', 'bridge_wood', 'dry_reeds', 'pale_mushrooms'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
+SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a', 'bridge_wood', 'dry_reeds', 'pale_mushrooms',
+        'd_loom_a', 'd_stairs_down', 'd_mannequins', 'd_fabric_pile', 'd_boss_loom', 'd_boss_loom3'}   # 던전: 작게 나온 1차·배경 박힌 판 버림   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
 for pid in gen.TEXT:
-    if pid in SKIP: continue
+    if pid in SKIP or not os.path.exists(f'out/{pid}_t.png'): continue
     a = tight(key(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA')))); Image.fromarray(a).save(f'final/{pid}.png')
     parts[pid] = {'img': f'{pid}.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1, 'kind': 'prop'}
 # 분수 = 그록 분수 + 부서진 왕 석상 (3번방 배치 연구: 랜드마크·저장 비석 역할), 물은 마름
@@ -93,6 +94,20 @@ while y < H3 - bot.height:
 b3.alpha_composite(bot, (0, H3 - bot.height)); b3.save('final/bridge_3.png')
 parts['bridge_3'] = {'img': 'bridge_3.png', 'w': 120, 'h': H3, 'ax': 60, 'ay': H3 - 1, 'kind': 'prop', 'zone': 'field', 'flip': False,
                      'note': '세로 3칸 개울 다리 (가로로 건넘), 주인공 아래 깔기'}
+# 제1던전 「아라크네의 폐공방」 부품 (주인 10-23 「제1던전까지 만들어」): 2판 이름 정리 + zone
+for n, new in (('d_loom_a2', 'd_loom_a'), ('d_stairs2', 'd_stair_arch'), ('d_mannequins2', 'd_mannequins'), ('d_fabric_pile2', 'd_fabric_pile'), ('d_boss_loom2', 'd_boss_loom')):
+    if n in parts: parts[new] = parts.pop(n); parts[new]['img'] = new + '.png'; os.replace(f'final/{n}.png', f'final/{new}.png')
+# 보스 베틀: 거미줄 안쪽 갈색 바탕도 지움 (테두리와 안 이어져도 같은 바탕색이면 투명)
+if 'd_boss_loom' in parts:
+    src = np.array(Image.open('out/d_boss_loom2_t.png').convert('RGBA')); c = src[0, 0, :3].astype(int)
+    src[..., 3] = np.where(np.abs(src[..., :3].astype(int) - c).sum(2) < 16, 0, src[..., 3]); a = tight(src)
+    Image.fromarray(a).save('final/d_boss_loom.png'); parts['d_boss_loom'].update(w=a.shape[1], h=a.shape[0], ax=a.shape[1] // 2, ay=a.shape[0] - 1)
+DROLE = {'d_loom_a': '베틀(부서진)', 'd_loom_b': '태피스트리 베틀', 'd_spool_rack': '큰 실패 선반', 'd_mannequins': '마네킹 무리', 'd_mannequin': '마네킹 1',
+         'd_cut_table': '재단대', 'd_fabric_pile': '천 더미', 'd_cocoon_wall': '고치 벽(벽면 판)', 'd_web_sheet': '거미줄 막', 'd_thread_pillar': '실 감긴 기둥',
+         'd_bones': '뼈 더미', 'd_wardrobe': '옷장', 'd_door_arch': '아치 나무문', 'd_stair_arch': '계단 입구 아치', 'd_wall_arch': '아치 벽 조각',
+         'd_chest': '보물상자', 'd_waystone': '비석(순간이동)', 'd_boss_loom': '보스방: 해골 영혼 베틀(큰 장식)'}
+for n, r in DROLE.items():
+    if n in parts: parts[n]['zone'] = 'dungeon1'; parts[n]['role'] = r; parts[n]['flip'] = n in ('d_bones', 'd_fabric_pile', 'd_cocoon_wall')
 FIELD = {'T': ['ash_tree_a', 'ash_tree_b', 'dead_tree'], 'P': ['burnt_pine_a', 'burnt_pine_b'], 'Y': ['ash_tree_b'], 'u': ['bush_b', 'ash_bush'],
          'R': ['boulder'], 'r': ['stone_low'], 's': ['stump'], 'm': ['pale_mushrooms'], 'f': ['fence_tile'], 'O': ['ruin_pillar'],
          'c': ['thread_stake'], 'b': ['bridge_3'], '"': ['dry_reeds'], 'clue:f00_clue_corpse': ['deer_corpse']}
