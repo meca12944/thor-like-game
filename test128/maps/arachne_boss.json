@@ -92,6 +92,7 @@
   "x": 14.5,
   "y": 9,
   "flag": "boss_arachne",
+  "intro": 1.8,
   "reward": [
    [
     "heart_piece",
@@ -170,6 +171,72 @@
     "y": 15.5,
     "ax": 36,
     "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_6",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 11,
+    "y": 11,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_7",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 17.5,
+    "y": 12.5,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_8",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 10,
+    "y": 5.5,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_9",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 18.5,
+    "y": 5.5,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_10",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 5.5,
+    "y": 4.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_11",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 22.5,
+    "y": 4.9,
+    "ax": 41,
+    "ay": 106,
     "D": 3,
     "fade": 0,
     "shadow": 1
