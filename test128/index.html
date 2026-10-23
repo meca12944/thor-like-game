@@ -1871,7 +1871,7 @@ function withInterp(a,fn){if(a>=1||manual){fn();return;}const sv=[];for(const e 
  try{fn();}finally{for(const[e,x,y]of sv){e.x=x;e.y=y;}}}
 function frame(t){let el=(t-last)/1000||0;last=t;if(el>.25)el=.25;fpsN++;fpsAcc+=el;if(fpsAcc>=.5){fpsVal=fpsN/fpsAcc;fpsN=0;fpsAcc=0;}
  pollPad();if(!manual){acc+=el;let n=0;while(acc>=1/60-1e-6&&n<6){snapPrev();step(1/60);acc-=1/60;n++;}if(n>=6)acc=0;renderAlpha=Math.min(1,acc*60+0);if(winOpen||ui)renderAlpha=1;}else renderAlpha=1;
- updateSlotEls();updateKhud();render();requestAnimationFrame(frame);}
+ updateSlotEls();updateKhud();if(!(window.__scene&&window.__scene.active&&window.__scene.scene!=='town'))render();requestAnimationFrame(frame);} /* a field/dungeon map (world.js) covers the town canvas: skip drawing the hidden town (was ~half of every field frame) */
 const jobs=[load('bg','bg_town.jpg')];if(ANIM)jobs.push(load('hero_anim',ANIM.src).then(makeTints));if(H128)jobs.push(load('hero128',H128.src).then(makeTints));if(H8)H8.sheets.forEach((src,i)=>jobs.push(load('h8_'+i,src+'?v='+H8.cells[i].length))); /* cache-bust: the cell count changes whenever frames are added -> new URL (Pages/phone cache sheets for 10 min) */for(const k in SPR)jobs.push(load(k,SPR[k].src));for(const o of LVL.overlayImgs)jobs.push(load('ov_'+o.name,o.src));
 Promise.all(jobs).then(()=>{
  const pose=Q.get('pose');if(pose&&pose.startsWith('attack')){const i=(+pose.slice(6)||1)-1;slimes.forEach(m=>m.t=99);startSwing(i);hero.atk.t=(SWINGS[i].a0+SWINGS[i].a1)/2;hero.atk.hit=new Set(slimes);if(Q.get('face'))hero.face=Q.get('face');hitStop=1e9;shake=0;document.getElementById('hint').style.display='none';}
