@@ -134,6 +134,7 @@ def main():
     for name, tx, by, sol in PROPS:
         im = part(name); stamp(im, tx * T, by * T - im.height, bool(sol))
     objs = [{'type': 'exit', 'x': 27, 'y': H - 1, 'w': 3, 'h': 1, 'to': 'world', 'spawn': 'townA', 'label': '↓ 차가운 대지 · 월드맵'},
+            {'type': 'waystone', 'id': 'ws_arachne', 'x': 48, 'y': 35, 'name': '폐공방 앞 비석'},   # 보스(아라크네) 앞 비석 (주인 10-23 「추천대로」: 지면 바로 앞에서 다시)
             {'type': 'sign', 'x': 31, 'y': 26, 'text': '펠트\n← 무기점 · 잡화점 · 대장간   ↑ 이장 집 · 예배당   → 여관 · 약초 오두막   ↘ 리네트의 공방'}]
     for i, x, y in doors:
         solid[y][x] = True; n, extra = DOORS[i]; objs.append(dict({'type': 'door', 'id': i, 'x': x, 'y': y, 'name': n}, **extra))
