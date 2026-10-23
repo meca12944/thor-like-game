@@ -299,6 +299,7 @@
   { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #jumpb,body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
+      + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
       + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
       + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
       + '#wtb_pot{right:max(40px,env(safe-area-inset-right));bottom:max(232px,calc(env(safe-area-inset-bottom) + 202px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#ffb0c0,#c03050 60%,#5a1020)}'
@@ -312,6 +313,8 @@
     wire(document.getElementById('atk'), 'KeyJ'); // town attack button -> this scene's attack key (hold = charge, same as the key)
     for (const [id, label, code] of [['wtb_ult', '필살기', 'KeyR'], ['wtb_act', '조사', 'KeyL'], ['wtb_pot', '물약', 'KeyE'], ['wtb_menu', '메뉴', 'Escape']]) { const el = document.createElement('div'); el.id = id; el.className = 'wtb'; el.textContent = label; ui.appendChild(el); wire(el, code); } }
 
+  const DLG_CPS = 55; // dialog letters per second (fast enough to read along, never a wait)
+  addEventListener('pointerdown', e => { if (S.dialog && e.target && e.target.tagName === 'CANVAS') S.dlgTap = true; }); // phone: tap the picture to go on
   // ---------------- helpers ----------------
   const M = () => S.map;
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -632,9 +635,16 @@
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
-    if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
+    if (S.dialog) { const d = S.dialog; if (!d.t) sfx('talk'); d.t = (d.t || 0) + dt; // 대화창 (UI_GUIDE 8~10): 글자가 빠르게 흘러나오고, 첫 누름 = 이 쪽 전부 보기, 다음 누름 = 다음 쪽 / 닫기, Esc = 바로 닫기
+      if (takePress('menu')) S.dialog = null;
+      else if (takePress('interact') || takePress('attack') || queue.includes('Space') || queue.includes('Enter') || S.dlgTap) {
+        if (d.t < .12) {} // the press that opened it
+        else if (d.pages && d.t * DLG_CPS < d.pages[d.pg || 0].join('').length) d.t = 99;
+        else if (d.pages && (d.pg || 0) < d.pages.length - 1) { d.pg = (d.pg || 0) + 1; d.t = .12; sfx('page'); }
+        else S.dialog = null; }
+      S.dlgTap = false; queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
-    if (takePress('menu')) S.pause = !S.pause;
+    if (takePress('menu')) { const g = window.__game; if (g && g.ctl && !S.pause) { g.ctl.openUI('menu'); queue.length = 0; return; } S.pause = !S.pause; } // Esc = the shared pause menu (설정 · 귀환 inside)
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
     if (S.freezeT > 0) { S.freezeT -= dt; updateCam(dt); return; } // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
@@ -1349,6 +1359,31 @@
   }
   // display-resolution text: names, HP bars, CHAMPION labels, HUD, dialogs (crisp at any integer scale)
   function W2S(x, y) { const v = S.view, f = S.camF || [0, 0]; return [v.ox + (x - S.camI[0] - Math.round(f[0] * v.k) / v.k) * v.k, v.oy + (y - S.camI[1] - Math.round(f[1] * v.k) / v.k) * v.k]; } // same screen-pixel shift as the ground
+  // 대화창 (UI_GUIDE 8~10): 읽기 쉬운 큰 글자(폰에서도 15px 이상, 글자 크기 설정 반영) · 이름표는 상자 위 탭 · 줄은 상자 폭에 맞춰 접고 3줄씩 쪽 나누기 ·
+  // 글자가 빠르게 흘러나옴 · 다 나오면 ▼가 통통 · 여러 쪽이면 1/2 · 아래 조작 안내줄은 대화 중엔 숨김
+  function drawDialog(d, ox, oy, SW, SH, u) {
+    const g = window.__game, ts = (g && g.textScale) || 1, dpr = ctx.canvas.width / Math.max(1, innerWidth);
+    const fs = Math.round(Math.max(15 * u, 15 * dpr) * ts), lh = Math.round(fs * 1.5), pad = Math.round(fs * .8);
+    const pi = d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, pw = hasP ? Math.round(lh * 3 + pad) : 0;
+    const w = Math.min(SW - 24 * u, fs * 34), x = ox + (SW - w) / 2, h = pad * 2 + lh * 3, y = oy + SH - h - Math.max(10 * u, 8 * dpr), tx = x + pad + pw, tw = w - pad * 2 - pw;
+    ctx.font = font(fs);
+    if (!d.pages || d.fs !== fs) { const lines = []; // wrap each line to the box (Korean: any letter; spaces preferred)
+      for (const para of String(d.text).split('\n')) { let cur = '';
+        for (const ch of para) { if (ctx.measureText(cur + ch).width > tw && cur) { const sp = cur.lastIndexOf(' '); if (sp > cur.length * .5) { lines.push(cur.slice(0, sp)); cur = cur.slice(sp + 1) + ch; } else { lines.push(cur); cur = ch; } } else cur += ch; }
+        lines.push(cur); }
+      d.pages = []; for (let i = 0; i < lines.length; i += 3) d.pages.push(lines.slice(i, i + 3)); d.fs = fs; d.pg = Math.min(d.pg || 0, d.pages.length - 1); }
+    const a = Math.min(1, (d.t || 0) * 8); ctx.globalAlpha = a;
+    panel(x, y + (1 - a) * 8 * u, w, h);
+    if (hasP) { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, x + pad * .6, y + h - pad * .6 - lh * 3 - pad * .4, lh * 3 + pad * .4, lh * 3 + pad * .4); ctx.imageSmoothingEnabled = false; }
+    if (d.name) { const nf = Math.round(fs * .85); ctx.font = font(nf); const nw = ctx.measureText(d.name).width + nf * 1.4, nh = Math.round(nf * 1.7), nx = x + pad * .6 + pw, ny = y - nh * .62;
+      ctx.fillStyle = 'rgba(30,24,10,.95)'; ctx.fillRect(nx, ny, nw, nh); ctx.strokeStyle = '#e2c27a'; ctx.lineWidth = Math.max(1, 1.5 * dpr); ctx.strokeRect(nx + .5, ny + .5, nw - 1, nh - 1);
+      textOut(d.name, nx + nf * .7, ny + nh * .72, nf, '#ffe08a', '#000', 'left'); }
+    const pg = d.pages[d.pg || 0]; let left = Math.floor((d.t || 0) * DLG_CPS);
+    pg.forEach((l, i) => { if (left <= 0) return; textOut(l.slice(0, left), tx, y + pad + lh * i + fs * 1.05, fs, '#fff', '#000', 'left'); left -= l.length; });
+    if (left >= 0) { const bob = Math.abs(Math.sin(S.t * 5)) * 3 * dpr, ax = x + w - pad, ay = y + h - pad * .55 - bob, s = fs * .32;
+      ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.moveTo(ax - s * 2, ay - s * 1.4); ctx.lineTo(ax, ay - s * 1.4); ctx.lineTo(ax - s, ay); ctx.fill();
+      if (d.pages.length > 1) textOut((d.pg || 0) + 1 + '/' + d.pages.length, ax - s * 2.8, y + h - pad * .55, Math.round(fs * .7), '#c9b98a', '#000', 'right'); }
+    ctx.globalAlpha = 1; }
   function font(px) { return 'bold ' + Math.max(8, Math.round(px)) + 'px "Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif'; }
   function textOut(t, x, y, px, fill, stroke = '#000', align = 'center') { ctx.font = font(px); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, px / 5); ctx.strokeStyle = stroke; ctx.strokeText(t, x, y); ctx.fillStyle = fill; ctx.fillText(t, x, y); }
   function panel(x, y, w, h) { ctx.fillStyle = 'rgba(12,18,44,.78)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#e2c27a'; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, w - 2, h - 2); ctx.strokeStyle = 'rgba(226,194,122,.4)'; ctx.lineWidth = 1; ctx.strokeRect(x + 5, y + 5, w - 10, h - 10); }
@@ -1386,17 +1421,13 @@
         ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(Math.round(cxs) - 1, y - 2 * u, 2, 11 * u); }
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
-      textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
+      if (!S.dialog) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
-    if (S.dialog) { const x = ox + 30 * u, y = oy + SH - 108 * u, w = SW - 60 * u; panel(x, y, w, 84 * u);
-      const pi = S.dialog.por && porImg(S.dialog.por), hasP = pi && pi.complete && pi.naturalWidth, tx = x + (hasP ? 96 : 18) * u;
-      if (hasP) { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, x + 10 * u, y - 10 * u, 80 * u, 80 * u); ctx.imageSmoothingEnabled = false; }
-      if (S.dialog.name) textOut(S.dialog.name, tx, y + 16 * u, 12 * u, '#ffe08a', '#000', 'left');
-      S.dialog.text.split('\n').forEach((l, i) => textOut(l, tx, y + ((S.dialog.name ? 38 : 28) + i * 20) * u, 13 * u, '#fff', '#000', 'left'));
-      textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + 76 * u, 10 * u, '#ffe08a', '#000', 'right'); }
+    if (S.dialog) drawDialog(S.dialog, ox, oy, SW, SH, u);
+    { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut(Q.has('old') ? 'Esc: 계속   ·   T: 마을로 귀환' : 'Esc: 계속   ·   T: 펠트로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH);
@@ -1596,6 +1627,7 @@
     flag(id, v = true) { SAVE.flags[id] = v; save(); }, reset() { SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null }; save(); if (NAV()) NAV().reset(); },
     get nav() { return NAV(); },
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
+    home() { S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); },
     hurt, spawn, render, tile: () => [Math.floor(hero.x / S.map.T), Math.floor(hero.y / S.map.T)],
     setHeroTile(x, y, face) { hero.x = (x + .5) * S.map.T; hero.y = (y + .5) * S.map.T; if (face) hero.face = face; snapCam(); },
     interact, LAST_STAND, castAbyss, castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
