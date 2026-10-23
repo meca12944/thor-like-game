@@ -1,5 +1,6 @@
 # 몹 점검 (monster textbook 0부 10): one command measures every felt mob against the attack / movement standard and saves a table image.
 #   python3 test128/tools/mob_check.py [base_url=http://127.0.0.1:8931] [out.png] [kind,kind,...]
+#   works for any mob kind (felt, s47 strips, area-1 mobs). Owner 10-23: run it on EVERY new or changed mob and report the table image.
 #   per mob, in field01 with the hero standing still (no damage):
 #     1 mob, 60 s : attacks, longest run of the same attack, seconds standing still after attacks (the opening)
 #     3 mobs, 20 s: % of walking time facing away from the hero, % of time two of them overlap
@@ -11,7 +12,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
 KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
 SETUP = "()=>{const W=__world;W.setManual(true);(W.map.objects||[]).forEach(o=>{if(o.type==='spawn')o.respawn=1e9});}"
 ONE = """(K)=>{const W=__world,h=W.hero;W.setHeroTile(17,18);W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
-  const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s!==prev){if(['melee','shoot0','shoot1','lunge','leap'].includes(s))seq.push(s);prev=s;}
+  const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.D.ai||'');if(s!==prev){if(!['idle','rest','hop','walk','stagger','stun','dormant','rise','aim'].includes(s))seq.push(s);prev=s;}
    if(m.st==='rest'||(m.st==='lunge'&&m.sub==='rec'))still+=1/60;}
   let run=1,best=1;for(let i=1;i<seq.length;i++){run=seq[i]===seq[i-1]?run+1:1;best=Math.max(best,run);}return {name:m.D.name,attacks:seq.length,longestRepeat:best,openSec:+still.toFixed(1)}}"""
 PACK = """(K)=>{const W=__world,h=W.hero;W.setHeroTile(17,18);W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;
