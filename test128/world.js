@@ -842,7 +842,8 @@
     if (best) setFace(best[0], best[1]); }
   function gkDir() { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null; if (f8 && f8 !== hero.face) { const a = DIR8.indexOf(f8) * Math.PI / 4; return [Math.cos(a), Math.sin(a)]; } return FACEV[hero.face] || [1, 0]; }
   // owner 10-23 "게임을 좀 어렵게 / 검기 판정 줄여": the hit reaches about as far as the drawn arc (was 67 / 49 / 62 px, 150-170°) and only in front
-  const GK_REACH = [40, 38, 46], GK_ARC = [100, 110, 120]; // field px per combo hit 1-3 (specials 3+ keep hbR), degrees
+  // [검기 난이도 연구 10-23] reach x0.8 (≈ the chapter-1 felt mobs' melee reach 34-46px with the body pad) so a hit means stepping into danger, arc x1.3 so aiming stays forgiving
+  const GK_REACH = [32, 30, 37], GK_ARC = [130, 143, 156]; // field px per combo hit 1-3 (specials 3+ keep hbR), degrees
   function gkSpawn(i) { const v = gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = i <= 2 ? GK_REACH[i] : hbR(i);
     const sp = Math.max(Y.v, (reach / GK_K - Y.fwd - Y.R * (1 + .025 * GK_FLY)) / GK_FLY);
     S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
