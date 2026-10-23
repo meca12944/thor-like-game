@@ -195,7 +195,12 @@ const DEBUG=Q.has('debug');
 const cv=document.getElementById('c'),mctx=cv.getContext('2d');let ctx=mctx; // ctx = current target: lctx (logical world pass) or mctx (screen: HUD, bars, text)
 const lc=document.createElement('canvas'),lctx=lc.getContext('2d'); // logical-resolution world buffer (VIEW.logicalW x logicalH), scaled up with nearest-neighbour
 const IMG={};
-function load(n,src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>{IMG[n]=i;res()};i.onerror=()=>rej(new Error('load '+src));i.src='assets/'+src;});}
+// 불러오는 중 화면 (10-23 사장님 "시커먼 화면 나오네", 안드로이드): 처음에 그림 약 20MB를 받는 동안 까만 화면에 버튼만 보였음 -> 진행 막대를 띄우고 다 받으면 지움
+const LD={n:0,d:0};{const el=document.createElement('div');el.id='loadv';el.style.cssText='position:fixed;inset:0;z-index:200;background:#0b0d14;color:#e8d6b0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font:bold 18px sans-serif;pointer-events:none';
+ el.innerHTML='<div>불러오는 중…</div><div style="width:60%;max-width:360px;height:12px;border:2px solid #e8d6b0;border-radius:7px;overflow:hidden"><div id="loadbar" style="height:100%;width:0;background:#ffcf5a;transition:width .2s"></div></div><div id="loadpct" style="font:13px sans-serif;opacity:.8">처음 한 번은 조금 걸려요</div>';document.body.appendChild(el);
+ const t0=performance.now(),iv=setInterval(()=>{const W=window.__world,town=LD.n&&LD.d>=LD.n,ok=town&&(!W||W.ready),p=Math.round(100*(.75*LD.d/Math.max(1,LD.n)+(ok?.25:0)));
+  document.getElementById('loadbar').style.width=p+'%';if(ok||performance.now()-t0>120000){el.remove();clearInterval(iv);}},150);}
+function load(n,src){LD.n++;return new Promise((res,rej)=>{const i=new Image();i.onload=()=>{IMG[n]=i;LD.d++;res()};i.onerror=()=>{LD.d++;rej(new Error('load '+src));};i.src='assets/'+src;});}
 
 // =====================================================================
 //  SKILL DATA — edit freely. cost = blue-gauge segments (gauge has 8),
