@@ -105,7 +105,8 @@
       if (m.intent === 'lunge' && d < 95 && !packBusy && tok(m, W)) { m.intent = null; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1;
         const w = lineTele(W, m, m.aim, 230 * .38, 0.45, m.r * 2 + 8); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'leap' && d < 85 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), L = Math.min(d, 60); m.face = Math.cos(a) >= 0 ? 1 : -1;
-        m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * L; m.ty = m.y + Math.sin(a) * L; // lands on the marked spot (where the hero stood)
+        let aa = a; for (let t = 0; t < 4 && W.mobs && W.mobs.some(o => o !== m && !o.dead && Math.hypot(o.x - (m.x + Math.cos(aa) * L), o.y - (m.y + Math.sin(aa) * L)) < o.r + m.r + 6); t++) aa = a + (t % 2 ? -1 : 1) * .45 * (1 + (t >> 1)); // don't land on a packmate
+        m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(aa) * L; m.ty = m.y + Math.sin(aa) * L; // lands on the marked spot (where the hero stood)
         const z = W.hazard({ shape: 'circle', x: m.tx, y: m.ty, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
         m.warn = z.warn; startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'leap'); m.cd = 1.7 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'shoot' && d > 40 && tok(m, W, true)) { m.intent = null; m.pi = ((m.pi ?? Math.floor(Math.random() * 2)) + 1) % this.shots.length; const p = this.shots[m.pi]; m.face = h.x > m.x ? 1 : -1;
