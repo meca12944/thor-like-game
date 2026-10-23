@@ -1,7 +1,7 @@
 # 몹 점검 (monster textbook 0부 10): one command measures every felt mob against the attack / movement standard and saves a table image.
 #   python3 test128/tools/mob_check.py [base_url=http://127.0.0.1:8931] [out.png] [kind,kind,...]
 #   works for any mob kind (felt, s47 strips, area-1 mobs). Owner 10-23: run it on EVERY new or changed mob and report the table image.
-#   per mob, in field01 with the hero standing still (no damage):
+#   per mob, in the canonical 잿빛 들판 (field_felt -> ch1, open spot 28,17; the old field01 now aliases into 바람길 where Linette kills the test mob) with the hero standing still (no damage):
 #     1 mob, 60 s : attacks, longest run of the same attack, seconds standing still after attacks (the opening)
 #     3 mobs, 20 s: % of walking time facing away from the hero, % of time two of them overlap
 import asyncio, json, sys, subprocess
@@ -11,11 +11,11 @@ BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8931'
 OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
 KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
 SETUP = "()=>{const W=__world;W.setManual(true);(W.map.objects||[]).forEach(o=>{if(o.type==='spawn')o.respawn=1e9});}"
-ONE = """(K)=>{const W=__world,h=W.hero;W.setHeroTile(17,18);W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
+ONE = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
   const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.D.ai||'');if(s!==prev){if(!['idle','rest','hop','walk','stagger','stun','dormant','rise','aim'].includes(s))seq.push(s);prev=s;}
    if(m.st==='rest'||(m.st==='lunge'&&m.sub==='rec'))still+=1/60;}
   let run=1,best=1;for(let i=1;i<seq.length;i++){run=seq[i]===seq[i-1]?run+1:1;best=Math.max(best,run);}return {name:m.D.name,attacks:seq.length,longestRepeat:best,openSec:+still.toFixed(1)}}"""
-PACK = """(K)=>{const W=__world,h=W.hero;W.setHeroTile(17,18);W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;
+PACK = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll();W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;
   const ms=[0,1,2].map(i=>W.spawn(K,h.x+70*Math.cos(i*2.1),h.y+70*Math.sin(i*2.1)));let away=0,mv=0,ov=0,n=0;
   for(let i=0;i<1200;i++){h.hp=999;h.inv=0;W.advance(1/60);n++;
    for(const m of ms){if(m.dead)continue;if(m.moving&&m.st==='idle'){mv++;if((h.x-m.x)*m.face<0)away++;}}
@@ -26,7 +26,7 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); pg = await b.new_page(viewport={'width': 960, 'height': 540}); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(BASE + '/index.html?nosave=1&go=field01'); await pg.wait_for_function('window.__world&&__world.ready&&__world.scene&&__world.scene!="town"&&__world.map', timeout=90000); await pg.wait_for_timeout(2500)
+        await pg.goto(BASE + '/index.html?nosave=1&go=field_felt'); await pg.wait_for_function('window.__world&&__world.ready&&__world.scene&&__world.scene!="town"&&__world.map', timeout=90000); await pg.wait_for_timeout(2500)
         await pg.evaluate(SETUP)
         for k in KINDS:
             r = await pg.evaluate(ONE, k); r.update(await pg.evaluate(PACK, k)); r['kind'] = k; rows.append(r); print(json.dumps(r, ensure_ascii=False))
