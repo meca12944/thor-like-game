@@ -145,6 +145,27 @@
    "text": "거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.\n(보스 「아라크네」 던전은 아직 준비 중)"
   },
   {
+   "type": "mark",
+   "id": "f_mark_fountain",
+   "x": 28,
+   "y": 20,
+   "name": "금 간 분수"
+  },
+  {
+   "type": "mark",
+   "id": "f_mark_stall",
+   "x": 42,
+   "y": 32,
+   "name": "벤의 수레 노점"
+  },
+  {
+   "type": "mark",
+   "id": "f_mark_gate",
+   "x": 27,
+   "y": 36,
+   "name": "남쪽 출구(잿빛 들판)"
+  },
+  {
    "type": "waystone",
    "id": "ws_arachne",
    "x": 48,
@@ -162,13 +183,19 @@
    "idle": "30년 전 그 불길을 아직도 기억하네. 하늘까지 붉었지…… 왕도는 하룻밤 사이에 재가 됐어.",
    "art": "a_chief",
    "anim": "felt_bart",
-   "wander": 2
+   "wander": 1.5,
+   "near": [
+    "f_door_chief",
+    -2,
+    2
+   ],
+   "face0": "down"
   },
   {
    "type": "npc",
    "id": "f_rom",
-   "x": 14,
-   "y": 14,
+   "x": 11,
+   "y": 13,
    "name": "롬",
    "role": "대장장이",
    "main": 0,
@@ -176,13 +203,19 @@
    "art": "a_smith",
    "forge": 1,
    "anim": "felt_rom",
-   "wander": 1
+   "wander": 0.6,
+   "near": [
+    "f_door_smith",
+    -1,
+    1
+   ],
+   "face0": "left"
   },
   {
    "type": "npc",
    "id": "f_sera",
-   "x": 49,
-   "y": 26,
+   "x": 51,
+   "y": 25,
    "name": "세라",
    "role": "약초꾼",
    "main": 0,
@@ -190,13 +223,19 @@
    "art": "a_herb",
    "shop": "f_herb",
    "anim": "felt_sera",
-   "wander": 1.5
+   "wander": 1,
+   "near": [
+    "f_door_herb",
+    0,
+    1
+   ],
+   "face0": "down"
   },
   {
    "type": "npc",
    "id": "f_gas",
-   "x": 6,
-   "y": 14,
+   "x": 26,
+   "y": 32,
    "name": "가스",
    "role": "경비대장",
    "main": 0,
@@ -206,26 +245,38 @@
     "q_felt_corpse"
    ],
    "anim": "felt_gas",
-   "wander": 2
+   "wander": 1,
+   "near": [
+    "f_mark_gate",
+    -1,
+    -4
+   ],
+   "face0": "down"
   },
   {
    "type": "npc",
    "id": "f_martha",
-   "x": 37,
-   "y": 26,
+   "x": 40,
+   "y": 25,
    "name": "마르타",
    "role": "여관 주인",
    "main": 0,
    "idle": "외지인은 안 받아. …하룻밤만이야. 문제 일으키면 바로 내쫓을 거다.",
    "art": "c_innkeeper",
    "anim": "felt_martha",
-   "wander": 1.5
+   "wander": 1,
+   "near": [
+    "f_door_inn",
+    0,
+    1
+   ],
+   "face0": "down"
   },
   {
    "type": "npc",
    "id": "f_toby",
-   "x": 25,
-   "y": 23,
+   "x": 30,
+   "y": 24,
    "name": "토비",
    "role": "아이",
    "main": 0,
@@ -235,25 +286,37 @@
     "q_felt_toby"
    ],
    "anim": "felt_toby",
-   "wander": 3
+   "wander": 2,
+   "near": [
+    "f_mark_fountain",
+    2,
+    4
+   ],
+   "face0": "right"
   },
   {
    "type": "npc",
    "id": "f_oswald",
-   "x": 41,
-   "y": 14,
+   "x": 39,
+   "y": 13,
    "name": "오스왈드",
    "role": "수도사",
    "main": 0,
    "idle": "기도하시오, 이방인. 밤마다 종이 울리면… 저 아래에서 응답이 들려오니.",
    "art": "c_priest",
    "anim": "felt_oswald",
-   "wander": 2
+   "wander": 1.2,
+   "near": [
+    "f_door_chapel",
+    0,
+    1
+   ],
+   "face0": "down"
   },
   {
    "type": "npc",
    "id": "f_ben",
-   "x": 40,
+   "x": 45,
    "y": 35,
    "name": "벤",
    "role": "떠돌이 상인",
@@ -265,20 +328,32 @@
     "q_felt_ledger"
    ],
    "anim": "felt_ben",
-   "wander": 1.2
+   "wander": 0.8,
+   "near": [
+    "f_mark_stall",
+    3,
+    3
+   ],
+   "face0": "left"
   },
   {
    "type": "npc",
    "id": "f_luca",
-   "x": 32,
-   "y": 19,
+   "x": 34.5,
+   "y": 21.5,
    "name": "루카",
    "role": "시인",
    "main": 0,
    "idle": "「불탄 왕도에 실이 내리고……」 아, 또 이런 가사가 나오네. 요즘은 밝은 노래가 안 써져.",
    "art": "a_bard",
    "anim": "felt_luca",
-   "wander": 3
+   "wander": 1.5,
+   "near": [
+    "f_mark_fountain",
+    6.5,
+    1.5
+   ],
+   "face0": "left"
   },
   {
    "type": "npc",
@@ -293,6 +368,11 @@
    "quests": [
     "q_felt_main",
     "q_felt_cape"
+   ],
+   "near": [
+    "f_door_atelier",
+    -3,
+    1
    ]
   },
   {

@@ -190,6 +190,8 @@
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
     }
+    const byId = {}; for (const o of (j.objects || [])) if (o.id) byId[o.id] = o; // NPC spot relative to a building/landmark: near:[id,dx,dy] (owner 10-23, survives a village re-layout)
+    for (const o of (j.objects || [])) if (o.near && byId[o.near[0]]) { const r = byId[o.near[0]]; o.x = r.x + o.near[1]; o.y = r.y + o.near[2]; }
     for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
     for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {legend char or deco name: [{img, ax, ay, flip}]}):
@@ -302,13 +304,13 @@
   // Felt NPC wander: idle 2-5 s, then walk to a random free spot within o.wander tiles of the home spot; stop and face the hero when he comes close
   function stepNpcs(dt) { const m = M();
     for (const o of m.objs) { if (o.type !== 'npc' || !o.wander) continue;
-      if (o.hx === undefined) { o.hx = o.x; o.hy = o.y; o.wt = 1 + Math.random() * 3; o.face = 'down'; o.at = Math.random() * 9; }
+      if (o.hx === undefined) { o.hx = o.x; o.hy = o.y; o.wt = 1 + Math.random() * 3; o.face = o.face0 || 'down'; o.at = Math.random() * 9; }
       o.at += dt; const dh = Math.hypot(hero.x - o.x, hero.y - o.y);
       if (dh < 28 || S.talked === o.id && S.dialog) { o.tgt = null; const dx = hero.x - o.x, dy = hero.y - o.y; o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); continue; }
       if (!o.tgt) { if ((o.wt -= dt) > 0) continue; const R = o.wander * m.T, a = Math.random() * TAU, r = R * (.35 + .65 * Math.random()), tx = o.hx + Math.cos(a) * r, ty = o.hy + Math.sin(a) * r * .7;
         npcSelf = o; const ok = !blocked(tx, ty + 6, 4); npcSelf = null; if (ok) { o.tgt = [tx, ty]; o.at = 0; } else o.wt = .5; continue; }
       const dx = o.tgt[0] - o.x, dy = o.tgt[1] - o.y, L = Math.hypot(dx, dy), v = 18 * dt;
-      if (L < v) { o.tgt = null; o.wt = 2 + Math.random() * 3; o.at = 0; continue; }
+      if (L < v) { o.tgt = null; o.wt = 2 + Math.random() * 3; o.at = 0; if (o.face0) o.face = o.face0; continue; } // back at rest: turn to the spot's own facing (롬 = forge)
       o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
       npcSelf = o; const nx = o.x + dx / L * v, ny = o.y + dy / L * v; if (!blocked(nx, ny + 6, 4) && Math.hypot(hero.x - nx, hero.y - ny) > 10) { o.x = nx; o.y = ny; } else { o.tgt = null; o.wt = 1; } npcSelf = null; } }
   function npcCell(o) { const A = npcAnim(o.anim); if (!A) return null; const J = A.J, seq = J.anims[(o.tgt ? 'walk_' : 'idle_') + (o.face || 'down')] || J.anims.idle_down; let t = Math.floor((o.at || 0) * 60) % seq.reduce((a, s) => a + s[2], 0);
