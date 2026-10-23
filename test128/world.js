@@ -954,7 +954,7 @@
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    const cm = cutMode('hybrid'), fx = ['pillar', 'rift', 'trail', 'both'].includes(Q.get('fx')) ? Q.get('fx') : 'pillar'; S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fx, seed: Math.random() * 1000, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
+    const cm = cutMode('hybrid'), fx = ['pillar', 'rift', 'trail', 'both'].includes(Q.get('fx')) ? Q.get('fx') : 'rift'; S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fx, seed: Math.random() * 1000, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function abyssRest() { S.abyssSpent = false; if (S.lastStand) S.lastStand.cd = 0; } // 쉼터·여관·비석에서 쉬면 다시 쓸 수 있음
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
@@ -1000,11 +1000,11 @@
     const hx = hero.x, hy = hero.y - 4, vic = f.vic.slice().sort((a, b) => Math.hypot(a.x - hx, a.y - hy) - Math.hypot(b.x - hx, b.y - hy)), SP = 300; // cracks: 300 px/s
     g.save(); g.globalAlpha = fade;
     if (f.fx === 'rift' || f.fx === 'both') { // 공허 균열: jagged ground cracks race out from the hero; each enemy is swallowed by a void maw when its crack arrives
-      const targets = vic.map(m => [m.x, m.y]).concat(Array.from({ length: 8 }, (_, i) => { const a = i / 8 * TAU + hash(f.seed + i); return [hx + Math.cos(a) * 600, hy + Math.sin(a) * 380]; }));
-      targets.forEach(([tx, ty], j) => { const L = Math.hypot(tx - hx, ty - hy), reach = Math.min(L, e * SP), segs = Math.max(2, Math.round(L / 14)); let px = hx, py = hy;
+      const targets = vic.map(m => [m.x, m.y]).concat(Array.from({ length: 5 }, (_, i) => { const a = i / 5 * TAU + hash(f.seed + i); return [hx + Math.cos(a) * 600, hy + Math.sin(a) * 380]; }));
+      targets.forEach(([tx, ty], j) => { const L = Math.hypot(tx - hx, ty - hy), reach = Math.min(L, e * SP), segs = Math.max(2, Math.round(L / 14)); let px = hx, py = hy; const age = e - L / SP; g.globalAlpha = fade * (age > .35 ? Math.max(.25, 1 - (age - .35) / .5) : 1);
         for (let k = 1; k <= segs; k++) { const d = L * k / segs; if (d > reach + 14) break; const jit = (hash(f.seed + j * 31 + k) - .5) * 10, nx = (ty - hy) / L, ny = -(tx - hx) / L;
           const qx = hx + (tx - hx) * k / segs + (k < segs ? nx * jit : 0), qy = hy + (ty - hy) * k / segs + (k < segs ? ny * jit * .6 : 0), cut = Math.min(1, Math.max(0, (reach - d + 14) / 14));
-          const ex = px + (qx - px) * cut, ey = py + (qy - py) * cut; pxLine(g, px, py, ex, ey, k < 3 ? 3 : 2, AB_PAL.deep); pxLine(g, px, py, ex, ey, 1, (Math.floor(e * 20) + k) % 3 ? AB_PAL.vio : AB_PAL.lit); px = qx; py = qy; } });
+          const ex = px + (qx - px) * cut, ey = py + (qy - py) * cut; pxLine(g, px, py, ex, ey, k < 3 ? 3 : 2, AB_PAL.deep); pxLine(g, px, py, ex, ey, 1, (Math.floor(e * 20) + k) % 3 ? AB_PAL.vio : AB_PAL.lit); px = qx; py = qy; } }); g.globalAlpha = fade;
       vic.forEach((m, j) => { const at = Math.hypot(m.x - hx, m.y - hy) / SP, q = e - at; if (q < 0) return;
         const open = Math.min(1, q / .25), r = 12 * open * (q > end - at - .5 ? Math.max(0, (end - e) / .5) : 1), pul = U.hitT.some(t => e - t >= 0 && e - t < .08);
         pxEllipse(g, m.x, m.y + 2, r + 2, (r + 2) * .45, pul ? AB_PAL.core : AB_PAL.lit); pxEllipse(g, m.x, m.y + 2, r + 1, (r + 1) * .45, AB_PAL.vio); pxEllipse(g, m.x, m.y + 2, r, r * .45, AB_PAL.void);
@@ -1051,7 +1051,7 @@
       ctx.restore();
       const tx = ox + SW * .62 - (1 - Math.min(1, q / .25)) * SW * .3, fs = Math.round(SH * .085); ctx.globalAlpha = Math.min(1, q / .2) * (1 - out);
       textOut(U.name, tx, by + fs * .25, fs, U.band); textOut((U.label || U.route + ' 필살기') + ' · ' + U.en, tx, by + fs * .25 + SH * .05, Math.round(SH * .026), '#fff'); ctx.globalAlpha = 1; }
-    if (e >= 0 && e < .25) { ctx.fillStyle = `rgba(255,255,255,${.6 * (1 - e / .25)})`; ctx.fillRect(ox, oy, SW, SH); } // softer flash than the town (.9)
+    if (e >= 0 && e < .25) { ctx.fillStyle = U.whole && f.fx && f.fx !== 'pillar' ? `rgba(20,0,48,${.75 * (1 - e / .25)})` : `rgba(255,255,255,${.6 * (1 - e / .25)})`; ctx.fillRect(ox, oy, SW, SH); } // 심연: darkness falls instead of a white flash // softer flash than the town (.9)
     ctx.restore(); }
   function b0() { const b = S.bossRef; return !!(b && !b.dead); }
   function hpBar(e, x, y, w, h) { x = Math.round(x - w / 2); y = Math.round(y); const fr = Math.max(0, e.hp / e.maxHp), lg = Math.max(fr, (e.hpLag ?? e.hp) / e.maxHp);
