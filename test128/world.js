@@ -302,7 +302,8 @@
     const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1;
     const AF = melee && window.GameAff ? window.GameAff.of(D) : null; if (AF) dmg *= AF.mul; // weapon damage type vs D.aff (weak x1.5 / resist x0.5)
     m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m); sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8);
-    if (!D.boss) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
+    const armored = D.felt && (m.st === 'melee' || m.st === 'shoot' || m.st === 'leap' || (m.st === 'lunge' && m.sub !== 'rec')); // felt mobs: no knockback while telegraphing / attacking (the warning stays on the body)
+    if (!D.boss && !armored) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
     addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: .6, color: AF && AF.col ? AF.col : '#fff' });
     if (D.boss || D.champion) engage(m);
@@ -336,7 +337,7 @@
   function jingle() { try { if (window.BGM && BGM.jingle) { BGM.jingle('jingle_victory'); S.jingleT = 3.5; } } catch (e) {} }
 
   // the API handed to mob behaviours (world_mobs.js)
-  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), dist, spawn, count, engage,
+  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get mobs() { return S.mobs; }, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), dist, spawn, count, engage,
     fx: addFx, sfx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
 
   // ---------------- scene manager ----------------
@@ -863,7 +864,7 @@
     if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
-    return m.moving ? Math.floor(S.t * 60 / a.ticks[0] + m.home[0]) % a.n : 0; }
+    if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
     for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;

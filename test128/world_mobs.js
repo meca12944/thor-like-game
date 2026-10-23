@@ -50,6 +50,8 @@
     //   duel = 실 꼭두각시 (scissor 2-hit combo + aimed blade boomerang / pin burst).
     return Object.assign({ felt: true, update(m, W, dt) {
       const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; const d = W.dist(m, h);
+      m.burstT = (m.burstT || 0) - dt; m.burstCd = (m.burstCd || 0) - dt;
+      if (m.hitT > .08 && (m.st === 'idle' || m.st === 'rest')) { m.anim = 'walk'; m.moving = false; return; } // flinch when hit while walking / in the opening (never during a telegraph)
       if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? FELT_STD.restMelee : FELT_STD.restShoot; set(m, 'rest'); m.restT = r; m.anim = 'walk'; } return; }
       if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
@@ -62,13 +64,19 @@
       m.anim = 'walk'; const x0 = m.x, y0 = m.y;
       if (m.cd <= 0 && !m.intent) { const r = Math.random(); m.intent = P === 'lunge' ? (r < 2 / 3 ? 'lunge' : 'shoot') : P === 'skirm' ? (r < .5 ? 'leap' : 'shoot') : P === 'duel' ? (r < .5 ? 'combo' : 'shoot') : (r < 1 / 3 ? 'melee' : 'shoot'); } // each cooldown: pick one move
       const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
-      if (d < 200) { if (d > want + 6) toward(m, W, dt, this.sp * FELT_SPD, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
+      if ((P === 'bind' || P === 'duel') && (m.intent === 'melee' || m.intent === 'combo') && d > this.melee.range + 20 && d < 110 && m.burstCd <= 0) { m.burstT = .3; m.burstCd = 2.5; W.fx('dust', m.x, m.y); } // quick scuttle / step-in before a close attack
+      const spd = this.sp * FELT_SPD * (m.burstT > 0 ? 3 : 1);
+      if (d < 200) { if (d > want + 6) toward(m, W, dt, spd, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
         else if (P === 'lunge') { m.orb = m.orb || (Math.random() < .5 ? 1 : -1); const a = ang(m, h.x, h.y) + m.orb * Math.PI / 2, sp = this.sp * FELT_SPD * .6 * agg(W); // circle the hero like a dog pack
           if (!W.moveCol(m, Math.cos(a) * sp * dt, Math.sin(a) * sp * dt, m.r)) m.orb = -m.orb; m.face = h.x > m.x ? 1 : -1; }
         else m.face = h.x > m.x ? 1 : -1; }
       else wander(m, W, dt, this.sp * FELT_SPD * .5);
-      const vx = m.x - x0, vy = m.y - y0; m.moving = Math.abs(vx) + Math.abs(vy) > 1e-3;
-      if (m.moving) { const k = ((Math.round(Math.atan2(vy, vx) / (Math.PI / 4)) % 8) + 8) % 8; m.wdir = ['side', 'se', 's', 'se', 'side', 'ne', 'n', 'ne'][k]; if (Math.abs(vx) > 1e-4) m.face = vx > 0 ? 1 : -1; } // 8-way walk strips (↙↖ = mirrored ↘↗)
+      if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; // spread out around the hero instead of stacking
+        if (dd < gap) { const push = Math.min(gap - dd, 60 * dt); W.moveCol(m, dx / dd * push, dy / dd * push, m.r); } }
+      const vx = m.x - x0, vy = m.y - y0, mv = Math.hypot(vx, vy); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / (this.sp * FELT_SPD); // walk cycle advances with the distance moved (legs match the ground speed)
+      const engaged = d < 200, fa = engaged ? ang(m, h.x, h.y) : Math.atan2(vy, vx); // engaged: always look at the hero (backpedal / sidestep), else face the way it walks
+      if (engaged || m.moving) { const k = ((Math.round(fa / (Math.PI / 4)) % 8) + 8) % 8; m.wdir = ['side', 'se', 's', 'se', 'side', 'ne', 'n', 'ne'][k]; if (Math.abs(Math.cos(fa)) > 1e-3) m.face = Math.cos(fa) > 0 ? 1 : -1; } // 8-way walk strips (↙↖ = mirrored ↘↗)
+      m.back = engaged && m.moving && vx * Math.cos(fa) + vy * Math.sin(fa) < 0; // walking away from where it looks -> walk strip plays backwards
       if (m.cd > 0 || d > 150) return;
       if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
