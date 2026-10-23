@@ -1,0 +1,22 @@
+{"tag": "edit_key_run_r.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_cyc_run_r", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.026471142497327592}}
+{"tag": "edit_key_walk_u.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_run_d.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_walk_r.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_walk_d.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_run_u.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_walk_d2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_run_d2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_cyc_walk_d", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.024942301273345947}}
+{"tag": "anim_cyc_walk_r", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.029403942849900985}}
+{"tag": "anim_cyc_walk_u", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.029938312093416852}}
+{"tag": "anim_cyc_run_d", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.03345591545767254}}
+{"tag": "anim_cyc_run_u", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.04103898978233337}}
+{"tag": "edit_key_walk_u2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_cyc_walk_u2", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.0323214704990387}}
+{"tag": "edit_key_run_dr.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_key_walk_dr.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_cyc_walk_dr", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.02500840624835756}}
+{"tag": "anim_cyc_run_dr", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.031580315583282045}}
+{"tag": "edit_key_run_dr2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_cyc_run_dr2", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.031463566693994735}}
