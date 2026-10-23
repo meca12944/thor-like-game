@@ -1,0 +1,6 @@
+import threading
+from pl import edit
+T=" Keep the exact same character design, face, colors, long black hair, dark coat with gold trim, gold shoulder armor, red-lined cape, the bare silver sword in the right hand, size, full body, human proportions, no effects, STRICT three-quarter FRONT view facing the lower right the whole time (we see his face and chest turned toward the bottom-right of the image), not a side view, not a straight front view."
+J={'key_walk_dr':"Brisk long-stride walking pose toward the lower right: the leg nearer the viewer steps far forward toward the lower right with the heel touching the ground, the other leg is far behind pushing off from the toes, a wide gap between the feet, not crossed, hips level, torso upright, arms swing opposite to the legs, the sword held low in the right hand."+T,
+   'key_run_dr':"Full-speed sprinting pose toward the lower right, flight phase: the front knee drives high forward toward the lower right, the rear leg is extended far behind pushing off, a long stride, torso leaning forward, arms pump opposite to the legs, the sword in the right hand trailing low, hair and cape streaming back."+T}
+ts=[threading.Thread(target=edit,args=('src_idle_dr.png',k+'.png',p,7)) for k,p in J.items()];[t.start() for t in ts];[t.join() for t in ts]
