@@ -22,7 +22,7 @@ B = [  # canon names = the town-art room's match table (handoff/claude/felt_grok
  ('west_a', '[14] 중고 무기점', 95, 165, 270, 430, 428),
  ('west_b', '[15] 시장 거리', 250, 155, 450, 375, 372),
  ('stall_n', '[15] 시장 노점', 430, 262, 575, 392, 390),
- ('west_edge', '[15] 시장 거리', 0, 180, 115, 440, 438),
+ ('west_edge', '주민 빈집 (또는 경비 초소 본채)', 0, 180, 115, 440, 438),
  ('inn', '[7] 마르타의 여관', 930, 215, 1165, 440, 438),
  ('yard_fence', '[6] 예배당 뒤 묘지', 1170, 300, 1536, 410, 405),
  ('shop_sign', '[13] 잡화점', 285, 425, 525, 600, 598),
@@ -36,7 +36,7 @@ B = [  # canon names = the town-art room's match table (handoff/claude/felt_grok
  ('fountain', '[1] 금 간 분수', 600, 400, 765, 505, 500),
 ]
 # NPCs stand where the match table puts them (picture px, in front of their place); sprites / lines come from felt.json
-NPCAT = {'f_luca': (640, 540), 'f_toby': (735, 545), 'f_linette': (705, 300), 'f_gas': (470, 245), 'f_oswald': (1040, 222), 'f_martha': (1050, 470),
+NPCAT = {'f_luca': (640, 540), 'f_toby': (735, 545), 'f_linette': (705, 300), 'f_gas': (960, 800), 'f_oswald': (1040, 222), 'f_martha': (1050, 470),
          'f_sera': (1270, 675), 'f_ben': (1225, 812), 'f_rom': (930, 760), 'f_bart': (630, 812)}
 solid = [[False] * TW for _ in range(TH)]
 for x in range(TW): solid[0][x] = solid[TH - 1][x] = True
