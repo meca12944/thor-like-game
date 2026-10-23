@@ -1,0 +1,119 @@
+{
+ "_doc": "hero_v6 mini sheet frame plan. Same contract as test128/assets/anim/hero8.json: 256x256 canvas, fixed feet root (128,189), figure height 124, scale 1:1. Left-side directions are mirrors of the right side.",
+ "canvas": 256,
+ "anchor": [
+  128,
+  189
+ ],
+ "figH": 124,
+ "dirs": {
+  "s": "south",
+  "down": "south-east",
+  "right": "east",
+  "up": "north-east",
+  "n": "north"
+ },
+ "mirror": {
+  "left": "right",
+  "downl": "down",
+  "upl": "up"
+ },
+ "phaseA": {
+  "idle": {
+   "frames": 8,
+   "ticks": 7,
+   "dirs": [
+    "s",
+    "down",
+    "right",
+    "up",
+    "n"
+   ],
+   "action": "calm breathing idle standing still, only the chest and shoulders rise and fall slightly, feet planted, the sword held lowered in the right hand pointing down, no other movement"
+  },
+  "walk": {
+   "frames": 8,
+   "ticks": 5,
+   "dirs": [
+    "s",
+    "down",
+    "right",
+    "up",
+    "n"
+   ],
+   "action": "walking at a steady natural pace, legs alternating, arms swinging gently opposite the legs, the sword held low in the right hand pointing down and back, it never rises"
+  },
+  "run": {
+   "frames": 8,
+   "ticks": 4,
+   "dirs": [
+    "s",
+    "down",
+    "right",
+    "up",
+    "n"
+   ],
+   "action": "Fast running cycle, looping: upper body leaning forward, long strides with the knees lifting high, arms swinging opposite the legs, the sword held low in the right hand trailing behind the body pointing down and back, the sword is never raised"
+  }
+ },
+ "phaseB": {
+  "dash": {
+   "frames": 6,
+   "dirs": [
+    "right",
+    "down",
+    "up"
+   ]
+  },
+  "jump": {
+   "frames": 8,
+   "dirs": [
+    "right",
+    "down",
+    "up"
+   ]
+  },
+  "hit1": {
+   "frames": 8,
+   "dirs": [
+    "right",
+    "down",
+    "up"
+   ]
+  },
+  "hit2": {
+   "frames": 8,
+   "dirs": [
+    "right",
+    "down",
+    "up"
+   ]
+  },
+  "hit3": {
+   "frames": 8,
+   "dirs": [
+    "right",
+    "down",
+    "up"
+   ]
+  },
+  "hurt": {
+   "frames": 6,
+   "dirs": [
+    "right"
+   ]
+  },
+  "death": {
+   "frames": 8,
+   "dirs": [
+    "right"
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "dirs": [
+    "right"
+   ]
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "7996a588-e1fd-40c8-add1-d2a0ae4d9ba2"
+  ],
+  "directions": [
+   "north"
+  ],
+  "animation_group_id": "dcd883e8-f1c7-4cdb-af4d-d9133d99dd9e",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 1 of 3: from the stance she draws the RIGHT needle back down by the hip, then lunges AWAY from the viewer and drives the right needle straight UP the screen above her shoulder, ending exactly in the lunge pose of the end frame. BACK VIEW every frame, face never shown; she never turns around. Same character, outfit and size in every frame; no effects, no trails, no sparks.",
+  "frame_count": 8,
+  "directions": [
+   "north"
+  ],
+  "animation_name": "atk1fb",
+  "keep_first_frame": true,
+  "seed": 31
+ }
+}

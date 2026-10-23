@@ -230,8 +230,9 @@ const ULTS={
   band:'#ff3a4a',tint:'60,0,10',col:['255,40,60','120,0,20','255,150,110'],shake:12,dur:1.9},
  chan:{id:'chan',name:'찬검·해동',en:'Radiant Blade: Thaw of Dawn',route:'찬검',dmg:9,hitT:[.3,.55,.8,1.05,1.3],bossMul:.5,superArmor:true,por:'hero',
   band:'#bfe8ff',tint:'10,20,50',col:['255,255,255','150,220,255','255,226,140'],shake:11,dur:1.8}};
-const ULT_CFG={max:100,gainHurt:.5,gainPerfect:8,freeze:.2,cutin:1.05}; // 필살기 게이지 (max 100): 적에게 맞으면 차오르고 (받은 피해 1HP당 +0.5), 저스트 회피에 성공하면 크게 차오름 (+8 = 보통 피격 8HP분의 2배). 공격 적중 · 처치 · 보스 페이즈는 0. freeze/cutin in seconds; the world is frozen and the hero invulnerable for the whole ultimate
-function addUlt(v){if(!ultFx&&v>0)ultG=Math.min(ULT_CFG.max,ultG+v);} // the ONLY way the gauge fills (hurtHero / perfectDodge here, world.js hurt())
+const ULT_CFG={max:100,gainHit:5,gainPerfect:15,autoPerSec:.8,autoRangeTown:300,freeze:.2,cutin:1.05}; // 필살기 게이지 (max 100, owner 10-23): 몹이 가까이 있으면 저절로 1초에 +0.8, 맞을 때마다 +5, 저스트 회피 +15 (팍 차는 연출 ultPop). 공격 적중·처치는 0. freeze/cutin in seconds; the world is frozen and the hero invulnerable for the whole ultimate
+function addUlt(v){if(!ultFx&&v>0){ultG=Math.min(ULT_CFG.max,ultG+v);if(v>=3)ultPop={v:Math.round(v),t0:performance.now()};}} // owner 10-23: fills by itself while fighting (autoPerSec, mobs near) + a burst per hit (gainHit) + a big burst per just-dodge (gainPerfect); bursts flash the bar (ultPop)
+let ultPop=null; // the ONLY way the gauge fills (hurtHero / perfectDodge here, world.js hurt())
 let ultG=Q.get('ult')==='full'?ULT_CFG.max:0,ultFx=null;
 function ultId(){const w=(typeof INV!=='undefined'&&INV&&INV.equip)?INV.equip.weapon:null;if(w&&w.id==='hs_chan')return 'chan';return title==='마왕'?'metsukai':'tenkou';}
 function setTitle(t){if(!TITLES.includes(t))return;title=t;try{localStorage.setItem('townDemo.title',t);}catch(e){}weaponType='';syncWeapon();} // demo only: every skill unlocked, gauge refills ~1 segment / 1.8s
@@ -630,9 +631,9 @@ const SLOT_KO={weapon:'무기',helmet:'투구',armor:'갑옷',offhand:'보조',g
 // 무기 + 보조 + 방어구 5칸(투구·갑옷·장갑·하의·신발) + 장신구 3칸(반지·목걸이·귀걸이). Order keeps the old 4 first (data-eq indices / old saves).
 const EQ_SLOTS=['weapon','helmet','armor','offhand','gloves','legs','boots','ring','necklace','earring'];
 const SLOT_ALIAS={body:'armor',chest:'armor',head:'helmet',shield:'offhand',glove:'gloves',hands:'gloves',pants:'legs',leg:'legs',boot:'boots',feet:'boots',shoes:'boots',accessory:'ring',acc:'ring',amulet:'necklace',neck:'necklace',ear:'earring',earrings:'earring',rings:'ring'};
-const SHOP_TOWN={a_tool:'A',demo:'A',b_smith:'B',b_armor:'B',b_acc:'B',b_alch:'B',b_tool:'B',h_smith:'H',h_tool:'H',h_gem:'H'};
+const SHOP_TOWN={a_tool:'A',demo:'A',f_weapon:'A',f_tool:'A',f_herb:'A',f_ben:'A',b_smith:'B',b_armor:'B',b_acc:'B',b_alch:'B',b_tool:'B',h_smith:'H',h_tool:'H',h_gem:'H'};
 // town B (maps/townB.json doors): each shop shows only its slots of ITEMS.shops.B
-const SHOP_SLOTS={b_smith:['weapon','offhand'],b_armor:['helmet','armor','gloves','legs','boots'],b_acc:['ring','necklace','earring'],b_alch:['consumable','potion'],h_smith:['weapon','offhand'],h_tool:['consumable','potion'],h_gem:['ring','necklace','earring']}; // shop id -> town (ITEMS.shops[town] = new-item stock by town tier, tools/new_items.py)
+const SHOP_SLOTS={f_weapon:['weapon','offhand'],f_tool:['consumable','potion'],b_smith:['weapon','offhand'],b_armor:['helmet','armor','gloves','legs','boots'],b_acc:['ring','necklace','earring'],b_alch:['consumable','potion'],h_smith:['weapon','offhand'],h_tool:['consumable','potion'],h_gem:['ring','necklace','earring']}; // shop id -> town (ITEMS.shops[town] = new-item stock by town tier, tools/new_items.py)
 const HEAL=POTION.heal; // legacy name (now % of max HP)
 const BAG_COLS=8,BAG_ROWS=5,BAG_N=BAG_COLS*BAG_ROWS;
 function newInv(){return{gold:1500,quick:'potion',
@@ -645,7 +646,8 @@ let INV=newInv();
 let invMouse=[-1,-1]; // hover selects only on real mouse movement (Chrome re-fires hover after re-render)
 let invTab=0,invZone='bag',invSel=0,eqSel=0,listSel=0,invNote='';
 let shopAt=null,shopMode='buy',sellPend=null; // shop opens only via a shop NPC (or the demo-only Esc shortcut); sell = '판매' mode
-const SHOP_NAMES={a_tool:'미소의 도구상점 「보따리」',demo:'상점 (데모 바로가기)'};
+const SHOP_NAMES={a_tool:'미소의 도구상점 「보따리」',demo:'상점 (데모 바로가기)',f_herb:'세라의 약초 오두막',f_ben:'벤의 노점',f_weapon:'펠트 중고 무기점',f_tool:'펠트 잡화점'};
+const SHOP_IDS={f_herb:['herb_red','potion','antidote','clear_eye','potion_regen'],f_ben:['feather','torch','spd_s','riceball','m_iron_ingot','m_leather_strap','m_hardwood']}; // Felt: fixed lists (세라 = 회복·독소 해독, 벤 = 떠돌이 잡동사니)
 const INV_TABS=['가방 · 장비','상점','대장간'];
 function stackable(id){const s=IT[id]&&IT[id].s;return s==='consumable'||s==='material'||s==='quest';}
 function invCount(id){return INV.bag.filter(b=>b.id===id).reduce((a,b)=>a+b.n,0);}
@@ -692,7 +694,7 @@ function useEffectItem(id,d,inUI){const say=(t,bad)=>{inUI?invNote=(bad?'⚠ ':'
   else if(e.k==='perm'){INV.perm=INV.perm||{hp:0,mp:0,used:[]};INV.perm.hp+=e.hp;INV.perm.mp+=e.mp;INV.perm.used.push(id);recalcGear();out.push(`최대 HP +${e.hp}`);}}
  invTake(id,1);if(d.cd)itemCd[id]=d.cd;else if(heal)itemCd[id]=POTION.cd;
  say(`${d.n} 사용 (${out.join(' · ')})${d.efTodo?' · 일부 효과 미구현':''} · 남은 ${invCount(id)}`);refreshQuick();return true;}
-function shopList(){const t=SHOP_TOWN[shopAt]||shopAt||'A';const L=(t==='A'?ITEMS.shopA:[]).concat((ITEMS.shops&&ITEMS.shops[t])||[]);const f=SHOP_SLOTS[shopAt];return f?L.filter(id=>{const d=ITEMS.items[id];return d&&(f.includes(d.s)||(f.includes('potion')&&d.t==='potion'));}):L;}
+function shopList(){if(SHOP_IDS[shopAt])return SHOP_IDS[shopAt].filter(id=>ITEMS.items[id]);const t=SHOP_TOWN[shopAt]||shopAt||'A';const L=(t==='A'?ITEMS.shopA:[]).concat((ITEMS.shops&&ITEMS.shops[t])||[]);const f=SHOP_SLOTS[shopAt];return f?L.filter(id=>{const d=ITEMS.items[id];return d&&(f.includes(d.s)||(f.includes('potion')&&d.t==='potion'));}):L;}
 // old saves: equipment had 4 slots. Unknown/renamed slot keys are mapped (SLOT_ALIAS) or the item goes back to the bag; unknown item ids are dropped (kept in INV.lost).
 function migrateInv(src){const inv=Object.assign(newInv(),src),eq={},back=[],lost=[];for(const s of EQ_SLOTS)eq[s]=null;
  for(const[k,e]of Object.entries((src&&src.equip)||{})){if(!e||!e.id)continue;const d=IT[e.id];if(!d){lost.push(e.id);continue;}
@@ -743,7 +745,7 @@ function tipHTML(it,extra=''){if(!it)return `<div class="tip none">칸을 고르
   <div class="tk">${kind}${d.t?` · 티어 ${d.t}`:''} · <span style="color:${R[0]}">${R[1]}</span>${starCount(it.id)?` <span class="rst">${'★'.repeat(starCount(it.id))}</span>`:''}${it.n>1?` · ×${it.n}`:''}</div></div></div>${st}${fx}${d.src?`<div class="src">${esc(d.src)}</div>`:''}${price}${extra}</div>`;}
 function invSelected(){if(invTab===0||(invTab===1&&shopMode==='sell'))return invZone==='equip'?INV.equip[EQ_SLOTS[eqSel]]:INV.bag[invSel];
  if(invTab===1){const id=shopList()[listSel];return id&&{id,n:1,plus:0};}
- const r=forgeRows()[listSel];return r&&(r.kind==='enh'?INV.equip.weapon:{id:r.item,n:1,plus:0});}
+ const r=forgeRows()[listSel];return r&&(r.kind==='enh'||r.kind==='enhmax'?INV.equip.weapon:{id:r.item,n:1,plus:0});}
 function forgeRows(){const w=INV.equip.weapon,rows=[];
  if(w){const e=ITEMS.enh.find(x=>x.l===w.plus+1);if(e&&w.plus<3)rows.push({kind:'enh',e});else rows.push({kind:'enhmax'});}
  for(const r of ITEMS.recA)rows.push(Object.assign({kind:'rec'},r));return rows;}
@@ -1067,7 +1069,7 @@ function damageSlime(m,dx,dy,dmg,kb,o={}){if(m.dead)return;if(!o.melee)dmg*=DMG_
   if(m.kind==='boar'){m.respawn=9;shakeAdd('fin');}}}
 function hurtHero(dx,dy,dmg=5){if(hero.deadT>0||ultFx)return;hpGhostT=.45;if(cmb.n)comboEnd();dmg=Math.max(1,Math.round(dmg*DIFF().enemy_dmg*gearDefMul()*(1-buffV('dr')/100)));
  if(hero.barrier&&hero.barrier.hp>0){const B=hero.barrier;B.hp=Math.max(0,B.hp-dmg);hero.inv=Math.max(hero.inv,.6);B.flash=.2; // coral barrier absorbs the hit (no damage, no flinch)
-  burst(hero.x,hero.y-50,10,['#ffd0e0','#ff7a9a','#fff'],200,0);if(B.hp<=0){hero.barrier=null;spawnRing(hero.x,hero.y-40,10,110,.3,'255,120,170',6,.7);burst(hero.x,hero.y-50,26,['#ff7a9a','#ffd0e0','#fff'],320,200,5);msg('산호 결계가 깨졌다');}return;}addUlt(ULT_CFG.gainHurt*dmg);hero.hp=Math.max(0,hero.hp-dmg);hero.inv=1;hero.redT=tk(FEEL.flashTicks*2);
+  burst(hero.x,hero.y-50,10,['#ffd0e0','#ff7a9a','#fff'],200,0);if(B.hp<=0){hero.barrier=null;spawnRing(hero.x,hero.y-40,10,110,.3,'255,120,170',6,.7);burst(hero.x,hero.y-50,26,['#ff7a9a','#ffd0e0','#fff'],320,200,5);msg('산호 결계가 깨졌다');}return;}addUlt(ULT_CFG.gainHit);hero.hp=Math.max(0,hero.hp-dmg);hero.inv=1;hero.redT=tk(FEEL.flashTicks*2);
  const sa=!!(hero.sk&&SK[hero.sk.id]&&SK[hero.sk.id].superArmor!==false)||!!hero.barrier; // skill cast = super armor: damage only, no flinch / knockback / cancel
  if(!sa){const l=Math.hypot(dx,dy)||1;setFace(-dx,-dy);hero.kx=dx/l*FEEL.heroKb;hero.ky=dy/l*FEEL.heroKb*.8;hero.atk=null;hero.jump=null;hero.z=0;hero.combo=0;hero.hurtT=tk(FEEL.hurtTicks);hero.vx=hero.vy=0;}
  shakeAdd('hurt');hitStop=Math.max(hitStop,tk(FEELYS?6:3));if(FEELYS&&!sa)hero.whiteT=3; // feel=ys: white flash on the impact frame
@@ -1184,7 +1186,7 @@ function drawUltScreen(){const f=ultFx;if(!f)return;const U=f.U,W=cv.width,H=cv.
  mctx.restore();}
 function drawLvUp(){if(!(lvFx>0))return;const W=cv.width,H=cv.height,q=Math.min(1,(2-lvFx)/.2),a=Math.min(1,lvFx/.5);ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
  outlined('LEVEL UP!',W/2,H*.3,Math.round(H*.07*(1.4-.4*q)),'#ffe08a');outlined('Lv '+lvl+'  ·  HP · MP 회복',W/2,H*.3+H*.05,Math.round(H*.028),'#fff');ctx.restore();}
-function drawUltBar(){if(!window.HUD)return;const H=cv.height,hu=Math.max(.75,H/600);HUD.drawUlt(mctx,{cx:cv.width/2,y:H-84*hu,u:hu,v:ultG/ULT_CFG.max,name:ULTS[ultId()].name,key:keyLabel('ult',1)});} // modern thin gauge, 'READY (R)' glow when full
+function drawUltBar(){if(!window.HUD)return;const H=cv.height,hu=Math.max(.75,H/600);HUD.drawUlt(mctx,{cx:cv.width/2,y:H-84*hu,u:hu,v:ultG/ULT_CFG.max,name:ULTS[ultId()].name,key:keyLabel('ult',1),pop:ultPop});} // modern thin gauge, 'READY (R)' glow when full
 function burst(x,y,n,cols,sp=200,g=300,s=4,life=.5){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=sp*(.3+Math.random()*.7);parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.6-sp*.3,g,t:0,life:life*(.6+Math.random()*.6),c:cols[i%cols.length],s});}}
 // hitbox helpers (ground plane, y squashed for the 3/4 view)
 function inEll(m,cx,cy,rx,ry){const dx=(m.x-cx)/rx,dy=(m.y-cy)/ry;return dx*dx+dy*dy<1;}
@@ -1472,7 +1474,8 @@ function update(dt){
    if(hero.dash){if(!hero.dash.perfect&&hero.dash.t<=tk(FEEL.perfectTicks)){hero.dash.perfect=true;perfectDodge();}} // every contact/charge is avoidable by rolling
    else hurtHero(dx,dy,m.kind==='boar'?9:5);}}
  }
- for(const n of npcs)updateNpc(n,dt);}
+ for(const n of npcs)updateNpc(n,dt);
+ if(hero.hp>0&&slimes.some(m=>!m.dead&&Math.hypot(m.x-hero.x,m.y-hero.y)<ULT_CFG.autoRangeTown))addUlt(ULT_CFG.autoPerSec*dt);} // 필살기 게이지: 싸우는 동안 저절로
  updateFx(dt);
  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt;if(p.t>p.life)parts.splice(i,1);}
 
@@ -1875,7 +1878,7 @@ Promise.all(jobs).then(()=>{
  updateSlotEls(true);applySaved();hero.hp=hero.maxHp;{const[x,y]=boarSpot();boar.x=x;boar.y=y;}if(loadQuick())msg('빠른 저장을 불러왔다');refreshHints(); // champion spawns at a random valid spot on (re)load
  if(DEBUG){const b=document.createElement('div');b.id='dreset';b.textContent='잠수 아이템 리셋';b.style.cssText='position:fixed;right:20px;top:64px;pointer-events:auto;padding:4px 10px;background:#5a1010;color:#fff;font:bold 13px monospace;border:3px solid #e8d6b0;cursor:pointer';
   b.onclick=()=>{resetDive();b.textContent='리셋됨 ✓';setTimeout(()=>b.textContent='잠수 아이템 리셋',1200);};document.getElementById('ui').appendChild(b);}
- window.__game={get heroGhosts(){return hero.gh},heroPose:(n)=>{const L=H8&&(H8.anims[n+'_down']||H8.anims[n+'_right']);if(!L)return false;hero.pose={n,t:0,max:h8tot(L)+30};return true;},get H8HB(){return H8HB},get HBDBG(){return HBDBG},set HBDBG(v){HBDBG=v},H128,H8,moveCol:(o,dx,dy,r)=>moveCol(o,dx,dy,r),H8img:i=>IMG['h8_'+i],h8tinted:(im,c,t)=>h8tinted(im,c,t),heroCell8:()=>H8&&heroCell8(),face8:()=>face8(),get IMG(){return IMG},hurtHeroForTest:(x,y,d)=>hurtHero(x,y,d),get H128img(){return IMG.hero128},get H128tint(){return HERO_TINT.h128},openShop,shopList,DODGE,dodgeDist,get dodgePhase(){if(!hero.dash)return null;const p=hero.dash.t/tk(FEEL.dashTicks),F=DODGE.frames.town||[];const f=F.find(f=>p<=f.until);return f&&f.phase;},ECON,goldFor,addGold,get goldEarned(){return goldEarned},gearAtkMul,heroDmgType,affOf,townMobDef,get DNUM(){return DNUM},CC,canAct,skillCancelOk,get skBuf(){return skBuf},startSwingForTest:i=>startSwing(i),SP_I,spCfg,dirTap,toggleAlwaysRun,get stick(){return stick},get alwaysRun(){return alwaysRun||touchRun},get touchRun(){return touchRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,expNext,ultId,get ultG(){return ultG},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
+ window.__game={get heroGhosts(){return hero.gh},heroPose:(n)=>{const L=H8&&(H8.anims[n+'_down']||H8.anims[n+'_right']);if(!L)return false;hero.pose={n,t:0,max:h8tot(L)+30};return true;},get H8HB(){return H8HB},get HBDBG(){return HBDBG},set HBDBG(v){HBDBG=v},H128,H8,moveCol:(o,dx,dy,r)=>moveCol(o,dx,dy,r),H8img:i=>IMG['h8_'+i],h8tinted:(im,c,t)=>h8tinted(im,c,t),heroCell8:()=>H8&&heroCell8(),face8:()=>face8(),get IMG(){return IMG},hurtHeroForTest:(x,y,d)=>hurtHero(x,y,d),get H128img(){return IMG.hero128},get H128tint(){return HERO_TINT.h128},openShop,openForge:()=>{invTab=2;listSel=0;openUI('inv');},shopList,DODGE,dodgeDist,get dodgePhase(){if(!hero.dash)return null;const p=hero.dash.t/tk(FEEL.dashTicks),F=DODGE.frames.town||[];const f=F.find(f=>p<=f.until);return f&&f.phase;},ECON,goldFor,addGold,get goldEarned(){return goldEarned},gearAtkMul,heroDmgType,affOf,townMobDef,get DNUM(){return DNUM},CC,canAct,skillCancelOk,get skBuf(){return skBuf},startSwingForTest:i=>startSwing(i),SP_I,spCfg,dirTap,toggleAlwaysRun,get stick(){return stick},get alwaysRun(){return alwaysRun||touchRun},get touchRun(){return touchRun},swingRange,inSector,ANIM,FEEL,VIEW,CS,heroCell,heroAnimName,syncWeapon,buildSwings,get weaponType(){return weaponType},get slowT(){return slowT},get fps(){return fpsVal},setShowFps(v){showFps=v},get pix(){return pix},hero,slimes,boar,npcs,spawnNpc,NPC_BOUNCE,reloadMap,damageSlime,hurtHero,spirit,ULTS,ULT_CFG,castUlt,addUlt,expNext,ultId,get ultG(){return ultG},get ultPop(){return ultPop},set ultG(v){ultG=v},get ultFx(){return ultFx},get title(){return title},DIFFS,get diff(){return DIFF()},get diffI(){return diffI},setDifficulty,ATK_DMG,POTION,get potionCd(){return potionCd},set potionCd(v){potionCd=v},potionTotal,shakeAdd,shakeScale,shakeNow,get shakeOpt(){return shakeOpt},set shakeOpt(v){shakeOpt=v},SHAKE_OPTS,get lvl(){return lvl},set lvl(v){lvl=v},get exp(){return exp},gainExp,mpMax,get mp(){return gauge*mpMax()},get barrier(){return hero.barrier},AREA,BOAR_ZONE,cmb,COMBO_CFG,setTitle,TITLES,WAVES,SFX,SWINGS,SKILLS,SK,fx,parts,cool,slots,press:()=>{atkPressed=true;},keys,blocked,useSkill,toggleWin,skHeld,DIVE,resetDive,get uw(){return uw},get coins(){return coins},get diveTaken(){return diveTaken},get popup(){return popup},
   get gauge(){return gauge},set gauge(v){gauge=v},get timeStop(){return timeStop},get winOpen(){return winOpen},
   setManual(v){manual=v},get ui(){return ui},get potions(){return invCount('potion')},set potions(v){invSet('potion',v)},get INV(){return INV},get uiAlpha(){return uiAlpha},get shopAt(){return shopAt},get shopMode(){return shopMode},get sellPend(){return sellPend},get shopNpc(){return shopNpc},openShop,dropNote,RARITY_STARS,EQ_SLOTS,gearStats,recalcGear,migrateInv,shopList,useConsumable,get buffs(){return BUFFS},get itemCd(){return itemCd},invTake,renderInv,get eqSel(){return eqSel},starCount,IT,setUiAlpha,stepUiAlpha,invAdd,invCount,get invSel(){return invSel},get invTab(){return invTab},get invZone(){return invZone},get invNote(){return invNote},get target(){return target},get areaMode(){return areaMode},set areaMode(v){areaMode=v},castArea,get areaCd(){return areaCd},set areaCd(v){areaCd=v},get areaCd(){return areaCd},get dlg(){return dlg},get msg(){return msgBox&&msgBox.text},
   ctl:{ACTIONS,get KEYMAP(){return KEYMAP},defaultKeys,keyName,keyLabel,conflictOf,allConflicts,setAreaMode,openUI,closeUI,get rebind(){return rebind},get optNote(){return optNote}},advance(sec,dt=1/60){for(let t=0;t<sec-1e-9;t+=dt)step(dt);},render,ready:true};

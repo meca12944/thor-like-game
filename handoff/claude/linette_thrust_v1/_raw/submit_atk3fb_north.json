@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "b5e8e288-bc1d-422c-aad8-e920e35d5e6e"
+  ],
+  "directions": [
+   "north"
+  ],
+  "animation_group_id": "8fbed29d-802b-4e6a-8074-5265fac03ac0",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 3 of 3, the finisher: she coils with both needles low, then drops into a deep lunge AWAY from the viewer and drives BOTH needles together straight UP above her head, ending exactly in the pose of the end frame. BACK VIEW every frame, face never shown; she never turns around. Same character, outfit and size in every frame; no effects, no trails, no sparks.",
+  "frame_count": 8,
+  "directions": [
+   "north"
+  ],
+  "animation_name": "atk3fb",
+  "keep_first_frame": true,
+  "seed": 33
+ }
+}

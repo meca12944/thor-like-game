@@ -1,0 +1,3 @@
+{'usage': None, 'background_job_id': '8fa26bd0-2669-4579-bfab-c42f94a794c6', 'character_id': '518e6150-3c8a-4d7a-a376-359ba4aa1e91', 'status': 'processing', 'enhanced_prompt': None, 'enhance_usage': None}
+{'t': '2026-10-20 16:58:33', 'name': 'rotate_s3', 'endpoint': '/create-character-v3', 'status': 'completed', 'usage': {'type': 'generations', 'generations': 8.0}, 'n': 8.0}
+saved ['job.json']

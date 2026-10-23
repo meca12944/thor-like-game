@@ -5,3 +5,5 @@
 - 2~9지역 39종: 공통 AI(world_mobs.js s47) — 근접/사격/돌진/주변 장판/발밑 낙하, 전부 예고 후 공격. 지역별 들판 field02~09 새로 만듦(tools/gen_region_fields.py), 월드맵 2~9지역 열림.
 - 리네트: 바람길(field00)에서 주인공 따라다니며 근처 몹 찌르기(world.js stepPet/drawPetHi).
 - 테스트: test128/tools/test_place_all.py (에러 0).
+
+> 몹 만드는 순서·공격 기준표·몹별 기록은 **`handoff/claude/MONSTER_TEXTBOOK_ko.md`(몬스터 교본)** 에 모은다 (사장님 10-23). 이 파일은 4번방 작업 일지만.

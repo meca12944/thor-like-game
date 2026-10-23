@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Idle breathing loop: she stands relaxed in a light ready stance, needles held low at her sides, chest rises and falls gently, ponytail sways slightly. Loops seamlessly. STRICT SIDE VIEW every frame: facing RIGHT in profile, chest never turns toward the camera; everything moves toward the RIGHT. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 8,
+  "directions": [
+   "east"
+  ],
+  "animation_name": "lin_idle_east_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "2d6a2935-ad2a-4481-b1fc-73a00c28e1cc"
+  ],
+  "directions": [
+   "east"
+  ],
+  "animation_group_id": "dde420a8-131b-44d2-a630-c0198ae2be1d",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}

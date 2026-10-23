@@ -51,13 +51,13 @@
    "id": "townA",
    "kind": "town",
    "town": "A",
-   "name": "시작 마을",
-   "sub": "분수 마을",
+   "name": "펠트",
+   "sub": "1장 · 불탄 왕도 외곽의 빈민가",
    "x": 63.1,
    "y": 39.4,
-   "scene": "town",
+   "scene": "felt",
    "locked": false,
-   "bgm": "town_a_fountain",
+   "bgm": "town_ruin",
    "connects": {
     "areas": [
      1

@@ -1,0 +1,80 @@
+[13:29:23] jobs=39 est=280 spent_so_far=8.0 cap=350
+[13:29:28] submitted lin_idle_west_s5100
+[13:29:29] submitted lin_walk_south_s5100
+[13:29:29] submitted lin_walk_north_s5100
+[13:29:31] submitted lin_walk_east_s5100
+[13:29:31] submitted lin_idle_north_s5100
+[13:29:39] submitted lin_idle_east_s5100
+[13:31:55] done lin_walk_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:31:57] submitted lin_walk_west_s5100
+[13:32:47] done lin_idle_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:32:52] submitted lin_run_south_s5100
+[13:32:52] done lin_walk_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:32:57] submitted lin_run_north_s5100
+[13:33:24] done lin_idle_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:33:26] submitted lin_run_east_s5100
+[13:33:30] done lin_idle_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:33:34] done lin_walk_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:33:54] submitted lin_run_west_s5100
+[13:33:55] submitted lin_dash_south_s5100
+[13:35:04] done lin_run_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:35:07] submitted lin_dash_north_s5100
+[13:35:16] done lin_run_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:35:26] done lin_walk_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:35:28] submitted lin_dash_west_s5100
+[13:35:33] submitted lin_dash_east_s5100
+[13:36:32] done lin_dash_south_s5100 {'type': 'generations', 'generations': 4.0}
+[13:36:36] submitted lin_hurt_south_s5100
+[13:37:02] done lin_dash_north_s5100 {'type': 'generations', 'generations': 4.0}
+[13:37:04] submitted lin_hurt_north_s5100
+[13:37:09] done lin_dash_west_s5100 {'type': 'generations', 'generations': 4.0}
+[13:37:11] submitted lin_hurt_east_s5100
+[13:37:35] done lin_run_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:37:38] submitted lin_hurt_west_s5100
+[13:37:42] done lin_run_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:37:45] submitted lin_death_south_s5100
+[13:39:29] done lin_dash_east_s5100 {'type': 'generations', 'generations': 4.0}
+[13:39:32] done lin_hurt_east_s5100 {'type': 'generations', 'generations': 4.0}
+[13:39:38] done lin_hurt_south_s5100 {'type': 'generations', 'generations': 4.0}
+[13:39:39] submitted lin_death_north_s5100
+[13:39:41] submitted lin_death_east_s5100
+[13:39:47] done lin_hurt_west_s5100 {'type': 'generations', 'generations': 4.0}
+[13:39:47] submitted lin_death_west_s5100
+[13:39:50] submitted lin_cast_south_s5100
+[13:39:57] done lin_hurt_north_s5100 {'type': 'generations', 'generations': 4.0}
+[13:40:00] submitted lin_cast_north_s5100
+[13:40:51] done lin_death_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:40:54] submitted lin_cast_east_s5100
+[13:42:27] done lin_cast_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:42:32] done lin_death_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:42:36] done lin_death_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:42:36] submitted lin_cast_west_s5100
+[13:42:55] submitted lin_atk1_north_s5100
+[13:43:12] done lin_cast_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:43:19] done lin_death_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:43:24] submitted lin_atk1_south_s5100
+[13:43:27] submitted lin_atk1_west_s5100
+[13:43:32] submitted lin_atk1_east_s5100
+[13:43:49] done lin_cast_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:43:55] submitted lin_atk2_south_s5100
+[13:44:48] done lin_cast_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:45:03] submitted lin_atk2_north_s5100
+[13:45:35] done lin_atk1_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:45:38] submitted lin_atk2_east_s5100
+[13:46:35] done lin_atk1_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:46:39] submitted lin_atk2_west_s5100
+[13:46:40] done lin_atk1_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:46:43] submitted lin_atk3_south_s5100
+[13:46:52] done lin_atk2_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:46:54] submitted lin_atk3_north_s5100
+[13:46:54] done lin_atk1_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:46:57] submitted lin_atk3_east_s5100
+[13:47:33] done lin_atk2_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:47:36] submitted lin_atk3_west_s5100
+[13:48:22] done lin_atk2_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:48:32] done lin_atk3_south_s5100 {'type': 'generations', 'generations': 8.0}
+[13:48:55] done lin_atk2_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:49:15] done lin_atk3_east_s5100 {'type': 'generations', 'generations': 8.0}
+[13:49:48] done lin_atk3_north_s5100 {'type': 'generations', 'generations': 8.0}
+[13:50:20] done lin_atk3_west_s5100 {'type': 'generations', 'generations': 8.0}
+[13:50:20] spent total from job records: 288.0

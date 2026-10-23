@@ -36,7 +36,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
 
-<canvas id="c"></canvas>
+<canvas id="c" tabindex="0" style="outline:none"></canvas><div id="kbHint" style="position:absolute;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(14,12,16,.78);border:1px solid rgba(242,236,224,.38);border-radius:10px;padding:8px 14px;font-size:14px;pointer-events:none">화면을 한 번 누르면 방향키로 조작돼요</div>
 <div id="top"><select id="mobs" class="chip" aria-label="몬스터 고르기"></select>
 <div id="pads">
   <button class="pb" id="pAuto">자동<small>몹 AI · R</small></button>
@@ -47,7 +47,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
   <button class="pb" id="bHB">판정<small>H</small></button>
   <button class="pb" id="bDie">사망<small>P</small></button>
   <button class="pb on" id="bSnd">소리<small id="nSnd">켜짐 · M</small></button>
-  <button class="pb on" id="bSkin">복장<small id="nSkin">어둡게 · C</small></button>
+  <button class="pb" id="bSkin" hidden>복장<small id="nSkin">C</small></button>
 </div><div id="info"></div></div>
 <div id="stick"><div id="knob"></div></div>
 <div id="act"><div id="skbar"></div><button class="pb mid" id="bJump">점프</button><button class="pb mid" id="bRun">달리기</button><button class="pb big" id="roll">회피<br>대시</button><button class="pb big" id="bAtk">공격</button></div>
@@ -84,9 +84,9 @@ const snd=(k,v)=>{if(SND&&window.SFX2)SFX2.play(k,v);};let SND=true;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d'),TAU=Math.PI*2,T60=a=>a.reduce((s,v)=>s+v,0)/60;
 let K=3,VW=300,VH=220;function resize(){const d=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;K=Math.max(2,Math.min(cv.width/210,cv.height/240));VW=cv.width/K;VH=cv.height/K;}
 addEventListener('resize',resize);resize();
-// hero: the 주인공 샌드박스 atlas (hero_sbx.json, 8 directions; _s/_n = true front/back). cells [x,y,w,h,ax,ay], anims [sheet,cell,ticks]
-let HA=null,DARK=true;const HSH0=[],HSHD=[];   // original sheets / darker outfit (tools/anim/feltmobs/hero_dark.py)
-fetch('hero_sbx.json').then(r=>r.json()).then(a=>{HA=a;a.sheets.forEach((f,i)=>{const im=new Image();im.src=f;HSH0[i]=im;const dk=new Image();dk.src=f.replace('.webp','_dk.webp');HSHD[i]=dk;});}).catch(()=>{});
+// hero: the GAME hero (hero_game.json, built from test128/index.html by tools/sandbox/build_hero_game.py — rebuild whenever the hero changes; owner 10-23 "항상 최신 주인공"). cells [x,y,w,h,ax,ay], anims [sheet,cell,ticks]
+let HA=null,DARK=false;const HSH0=[],HSHD=[];   // original sheets / darker outfit (tools/anim/feltmobs/hero_dark.py)
+fetch('hero_game.json').then(r=>r.json()).then(a=>{HA=a;a.sheets.forEach((f,i)=>{const im=new Image();im.src=f;HSH0[i]=im;HSHD[i]=im;});}).catch(()=>{});
 const sheetsH=()=>DARK?HSHD:HSH0;
 const HS=28/124;   // atlas px -> logical px (game hero ~28 tall)
 // ---- state (logical px; origin = arena centre)
@@ -258,6 +258,9 @@ function sndT(){SND=!SND;document.getElementById('bSnd').classList.toggle('on',S
 document.getElementById('bSnd').onclick=e=>{e.stopPropagation();sndT();};addEventListener('keydown',e=>{if(e.code==='KeyM'&&!e.repeat)sndT();});
 pick(MOBS[0]);setAuto(true);
 addEventListener('pointerdown',()=>document.getElementById('keys').hidden=true);setTimeout(()=>document.getElementById('keys').hidden=true,5000);
+// keyboard focus (owner 10-23 "키보드 조작이 안된다 / 방향키로 조작해야지"): the page sits in a frame, so grab focus on load and on every tap; the hint hides once a key arrives
+const kbFocus=()=>{try{window.focus();cv.focus({preventScroll:true});}catch(e){}};kbFocus();addEventListener('load',kbFocus);addEventListener('pointerdown',kbFocus,true);addEventListener('mouseenter',kbFocus);
+addEventListener('keydown',()=>{const h=document.getElementById('kbHint');if(h)h.hidden=true;},true);if(matchMedia('(hover:none)').matches)document.getElementById('kbHint').hidden=true;
 // ---- step
 function step(dt){S.acc+=dt;let run=0;while(S.acc>=1/60){S.acc-=1/60;if(STOP>0){STOP--;continue;}run++;S.tick=(S.tick||0)+1;heroTick();slashStep();skStep();for(const f of SFX){f.t++;gkHit(f);}for(const f of IMP)f.t++;SHAKE*=.85;if(FLASH>0)FLASH--;}
   dt=run/60;if(!dt)return;S.t+=dt;hero.at+=dt;const m=S.mob,d=S.def;

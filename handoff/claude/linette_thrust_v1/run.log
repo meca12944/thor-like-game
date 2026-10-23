@@ -1,0 +1,101 @@
+[2026-10-19 14:05:12] state submit lunge 200 {'usage': None, 'background_job_id': '396a0109-b6ac-4544-b51c-2913d783a89d', 'character_id': '0b059a7b-0656-414f-b6f3-e4d6f8eecbce', 'status': 'queued'}
+[2026-10-19 14:09:32] state lunge completed usage {'type': 'generations', 'generations': 25.0} keys ['character_id', 'storage_urls', 'billing_usage'] cid 0b059a7b-0656-414f-b6f3-e4d6f8eecbce
+[2026-10-19 14:13:41] anim atk1 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:16:48] run_all: spent 33.0 need 138 cap 170
+[2026-10-19 14:16:48] BUDGET STOP
+[2026-10-19 14:17:21] run_all: spent 33.0 need 138 cap 175
+[2026-10-19 14:17:26] state submit atk3 200 {'usage': None, 'background_job_id': 'daaf4f33-3041-43cd-9595-34343092e884', 'character_id': 'f5e73433-1415-4113-8ee3-52dedabc00e3', 'status': 'queued'}
+[2026-10-19 14:17:59] state submit atk2 200 {'usage': None, 'background_job_id': '9fbe2fa9-e13d-47c7-9bce-5aa335ab5664', 'character_id': '59e5863c-0ac9-411f-af95-5594b6956238', 'status': 'queued'}
+[2026-10-19 14:18:10] state atk2 failed usage {'type': 'usd', 'usd': 0.0} keys ['type', 'error', 'status', 'progress', 'character_id', 'edit_description', 'source_character_id', 'generation_started_at'] cid 59e5863c-0ac9-411f-af95-5594b6956238
+[2026-10-19 14:20:36] state atk3 completed usage {'type': 'generations', 'generations': 25.0} keys ['character_id', 'storage_urls', 'billing_usage'] cid f5e73433-1415-4113-8ee3-52dedabc00e3
+[2026-10-19 14:23:30] anim atk1 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:23:59] anim atk3 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:24:49] anim atk1 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:26:33] anim atk3 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:27:01] anim atk3 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:27:07] anim atk3 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:27:26] anim atk1 completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:27:30] run_all spent total from job records: 66.0
+2026-10-19 14:27:57 note: anim job records before this line were saved per motion name only (overwritten); true spend so far = lunge 25 + atk3 state 25 + 8 anims x 8 = 114 (atk2 state failed, not billed)
+[2026-10-19 14:27:58] run_all: spent 66.0 need 57 cap 175
+[2026-10-19 14:27:59] state submit atk2 200 {'usage': None, 'background_job_id': '08730482-ff09-4644-96c1-066ea38cb0d0', 'character_id': '4acc942f-fbba-4b16-a0e6-c6723ff4c8b2', 'status': 'queued'}
+[2026-10-19 14:33:40] state atk2 completed usage {'type': 'generations', 'generations': 25.0} keys ['character_id', 'storage_urls', 'billing_usage'] cid 4acc942f-fbba-4b16-a0e6-c6723ff4c8b2
+[2026-10-19 14:36:42] anim atk2 west completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:37:17] anim atk2 south-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:37:23] anim atk2 east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:38:00] anim atk2 north-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-19 14:38:07] run_all spent total from job records: 123.0
+2026-10-19 14:38:42 thrust set complete. spent total (states 75 + anims 12x8=96) = 171 / cap 175
+[2026-10-20 00:14:46] edit atk2 left east completed usage {'type': 'generations', 'generations': 10.0} keys ['seed', 'type', 'action', 'images', 'progress', 'billing_usage', 'generation_id', 'queue_position', 'usage_cost_usd', 'billing_charged', 'generation_mode', 'quantized_images', 'generation_started_at', 'estimated_wait_seconds', 'original_image_n_colors', 'quantized_image_n_colors']
+[2026-10-20 00:33:56] anim atk2L north-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 00:33:59] anim atk2L south-east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 00:35:04] anim atk2L east completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 01:03:17] edit fb_atk3_south completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-20 01:03:27] edit fb_atk1_south completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-20 01:03:36] edit fb_atk1_north completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-20 01:03:40] edit fb_atk3_north completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-20 01:06:39] anim atk3fb north completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 01:06:39] anim atk1fb south completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 01:06:49] anim atk3fb south completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 01:08:11] anim atk1fb north completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-20 01:13:04] anim atk1fb south completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 00:07:16] anim walk_front_pl south completed usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 01:32:32] edit ns_south_Lfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:32:48] edit ns_south_Rfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:41:04] tween tw_south_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:41:26] tween tw_south_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:44:29] edit ns_north_Lfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:51] edit ns_srun_L completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:51] edit ns_srun_R completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:44:55] edit ns_north_Rfwd completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:47:15] edit ns_srun_R2 completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:51:32] tween tw_north_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:51:34] tween tw_north_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:53:24] edit ns_nrun_R completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:53:38] edit ns_nrun_L completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 01:57:20] tween tw_srun_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 01:57:40] tween tw_srun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 02:04:53] tween tw_nrun_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 02:04:58] tween tw_nrun_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:47:46] edit dg_ner_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:03] edit dg_ser_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:03] edit dg_ser_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:04] edit dg_se_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:12] edit dg_ne_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:13] edit dg_se_far completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:15] edit dg_ne_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:48:56] edit dg_ner_near completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 10:51:00] tween tw_ne_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:08] tween tw_ner_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:10] tween tw_ser_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:25] tween tw_se_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:34] tween tw_ser_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:43] tween tw_se_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:51:44] tween tw_ner_LR completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 10:52:25] tween tw_ne_RL completed frames 5 usage {'type': 'generations', 'generations': 4.0}
+[2026-10-21 11:25:25] tween tw8_ser completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:25:35] tween tw8_ner completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:37:20] edit side_walk completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:37:34] edit side_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:40:47] tween tw8_ew completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:40:57] tween tw8_er completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:46:51] edit a_s_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:00] edit a_n_walk completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:01] edit a_se_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:08] edit a_ne_walk completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:08] edit a_se_walk completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:09] edit a_n_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:09] edit a_s_walk completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:47:09] edit a_ne_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 11:49:22] tween tw8_a_n_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:49:45] tween tw8_a_ne_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:49:59] tween tw8_a_ne_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:50:14] tween tw8_a_s_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:50:26] tween tw8_a_s_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:50:43] tween tw8_a_n_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:51:00] tween tw8_a_se_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:51:34] tween tw8_a_se_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:55:09] tween tw8_a_ne_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 11:55:13] tween tw8_a_ne_walk completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-21 12:08:55] edit b_s_run completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-21 12:11:09] tween tw8_b_s_run completed frames 9 usage {'type': 'generations', 'generations': 8.0}
