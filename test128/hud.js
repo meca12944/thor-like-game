@@ -73,6 +73,9 @@
     gauge(c, x, y, w, h, s, full ? ['#ffb83a', '#fff1b8', '255,220,140'] : ['#b8741c', '#ffbf47', '255,190,90'], { full, glowA: full ? .6 + .4 * br : 1 });
     if (full) txt(c, o.key ? `READY (${o.key})` : 'READY', o.cx, y - 5 * u, 11 * u, `rgb(255,${226 + Math.round(20 * br)},${150 + Math.round(60 * br)})`, 'center', 700);
     else { txt(c, '필살기', x, y - 5 * u, 8.5 * u, 'rgba(255,225,170,.85)', 'left', 700); txt(c, `${Math.floor(o.v * 100)}%`, x + w, y - 5 * u, 9 * u, 'rgba(255,236,200,.9)', 'right', 600); }
+    if (o.pop) { const age = (performance.now() - o.pop.t0) / 1000; if (age < .8) { const k = 1 - age / .8; // burst: white flash on the bar + rising '+N'
+        c.save(); c.globalAlpha = k * .8; c.shadowColor = '#fff'; c.shadowBlur = 12 * u; rr(c, x - 2, y - 2, w + 4, h + 4, h); c.fillStyle = '#fff6d8'; c.fill(); c.restore();
+        txt(c, `+${o.pop.v}`, x + w + 14 * u, y - 4 * u - age * 14 * u, (11 + 5 * k) * u, `rgba(255,236,160,${k})`, 'left', 800); } }
     const sub = full && !o.key ? o.fieldNote : o.name; if (sub) txt(c, sub, o.cx, y + h + 6 * u, 7.5 * u, full ? 'rgba(255,236,190,.9)' : 'rgba(220,210,190,.6)', 'center', 500);
     c.restore();
   }
