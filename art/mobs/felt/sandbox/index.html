@@ -50,8 +50,8 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
   <button class="pb on" id="bSkin">복장<small id="nSkin">어둡게 · C</small></button>
 </div><div id="info"></div></div>
 <div id="stick"><div id="knob"></div></div>
-<div id="act"><div id="skbar"></div><button class="pb mid" id="bJump">점프</button><button class="pb mid" id="bRun">달리기</button><button class="pb big" id="roll">구르기</button><button class="pb big" id="bAtk">공격</button></div>
-<div id="keys">이동 WASD / 방향키 · 달리기 L(켜고 끄기) · 구르기 Shift 또는 K · 점프 Space 또는 X<br>공격 J 또는 Z · 스킬 1 2 3 4 · 판정 H · 사망 P<br>몹 패턴 7 8 9 · 자동 R · 몹 바꾸기 Q/E · 소리 M</div>
+<div id="act"><div id="skbar"></div><button class="pb mid" id="bJump">점프</button><button class="pb mid" id="bRun">달리기</button><button class="pb big" id="roll">회피<br>대시</button><button class="pb big" id="bAtk">공격</button></div>
+<div id="keys">이동 WASD / 방향키 · 달리기 L(켜고 끄기) · 회피대시 Shift 또는 K · 점프 Space 또는 X<br>공격 J 또는 Z · 스킬 1 2 3 4 · 판정 H · 사망 P<br>몹 패턴 7 8 9 · 자동 R · 몹 바꾸기 Q/E · 소리 M</div>
 <script src="sfx_synth.js"></script>
 <script>
 // Felt (ch.1) mob sandbox. Mirrors test128 world_mobs.js c1_* (same patterns, speeds, telegraph timing) at game scale (logical px,
@@ -359,6 +359,10 @@ function draw47(g,m,d){const J=d.J;g.fillStyle='rgba(0,0,0,.32)';g.beginPath();g
     g.save();g.translate(m.x,m.y-lift);if(m.face<0)g.scale(-1,1);if(m.flash>0)g.filter='brightness(3)';if(m.spawn>0)g.globalAlpha=Math.max(0,1-m.spawn*2);
     blit(g,im,fi,C.w,C.h,s,(-C.w/2+dx)*s,-C.foot*s);g.restore();}
   if(m.hp<d.hp){const w=20;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-w/2-.5,m.y-d.h-9.5,w+1,3);g.fillStyle='#d8443a';g.fillRect(m.x-w/2,m.y-d.h-9,w*Math.max(0,m.hp)/d.hp,2);}}
+// owner 10-23 "회피대시시 끊김": the afterimage used a CSS colour filter on every ghost every frame (very slow on phones, 50-600 ms frames).
+// Now each frame's cyan ghost is coloured once and kept (same look: game dash tint #6ed7ff).
+const GHC=new Map();function ghostImg(c,q){const key=(DARK?'d':'o')+c[0]+'_'+c[1];let o=GHC.get(key);if(o)return o;const sh=sheetsH()[c[0]];if(!sh||!sh.complete)return null;
+  o=document.createElement('canvas');o.width=q[2];o.height=q[3];const x=o.getContext('2d');x.drawImage(sh,q[0],q[1],q[2],q[3],0,0,q[2],q[3]);x.globalCompositeOperation='source-atop';x.globalAlpha=.75;x.fillStyle='#6ed7ff';x.fillRect(0,0,q[2],q[3]);GHC.set(key,o);return o;}
 function heroAnim(h){const d=h.dir,side=h.face>0?'right':'left',A=HA.anims,dd=d==='s'?(h.face<0?'downl':'down'):d==='n'?(h.face<0?'upl':'up'):d;
   if(h.dead)return 'death_'+side;
   if(h.cast)return 'cast_'+h.cast.side;
@@ -372,8 +376,8 @@ function drawHero(){const g=ctx,h=hero,HSH=sheetsH();if(!HA||!HSH.length||!HSH.e
   for(;k<fr.length-1;k++){t-=fr[k][2];if(t<0)break;}const [sh,ci]=fr[k],c=HA.cells[sh][ci];h.cell=[sh,ci];
   const shd=Math.max(.35,1-h.z/20);g.fillStyle=`rgba(0,0,0,${.32*shd})`;g.beginPath();g.ellipse(h.x,h.y,6*shd,2.6*shd,0,0,TAU);g.fill();
   g.save();g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
-  for(const gh of GH){const q=HA.cells[gh.c[0]][gh.c[1]];g.globalAlpha=.55*(1-gh.t/12);g.filter='brightness(.75) sepia(1) hue-rotate(165deg) saturate(4)';   // afterimage (game roll trail look)
-    g.drawImage(HSH[gh.c[0]],q[0],q[1],q[2],q[3],gh.x-q[4]*HS,gh.y-q[5]*HS,q[2]*HS,q[3]*HS);}
+  for(const gh of GH){const q=HA.cells[gh.c[0]][gh.c[1]],im=ghostImg(gh.c,q);if(!im)continue;g.globalAlpha=.55*(1-gh.t/12);   // afterimage (game dash trail look)
+    g.drawImage(im,gh.x-q[4]*HS,gh.y-q[5]*HS,q[2]*HS,q[3]*HS);}
   g.globalAlpha=1;g.filter=h.white>0?'brightness(0) invert(1)':'none';g.drawImage(HSH[sh],c[0],c[1],c[2],c[3],h.x-c[4]*HS,h.y-h.z-c[5]*HS,c[2]*HS,c[3]*HS);g.restore();
   if(showHB){g.save();g.scale(HS,HS);g.strokeStyle='rgba(120,200,255,.9)';g.lineWidth=1/HS;g.beginPath();g.ellipse(U(h.x),U(h.y),16,16/1.4,0,0,7);g.stroke();
     if(h.sl){const Sl=h.sl,C=COMBO[Sl.n],dv=Sl.dir,on=Sl.t>=SLASH[Sl.n].hit&&Sl.t<SLASH[Sl.n].hit+4;hb(U(h.x)+dv[0]*HB_FWD,U(h.y-h.z)-44+dv[1]*HB_FWD,dv,C.r,C.arc+(dv[0]&&dv[1]?30:0),on?'rgba(255,230,80,.45)':'rgba(255,230,80,.15)');}
