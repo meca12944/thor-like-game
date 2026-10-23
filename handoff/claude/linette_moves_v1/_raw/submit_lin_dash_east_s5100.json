@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Quick dash: a short crouch, then she bursts forward low and fast with both needles held back, then lands and stops. STRICT SIDE VIEW every frame: facing RIGHT in profile, chest never turns toward the camera; everything moves toward the RIGHT. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 4,
+  "directions": [
+   "east"
+  ],
+  "animation_name": "lin_dash_east_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "3c41cc03-45ac-426d-b341-2247c2c4bfb4"
+  ],
+  "directions": [
+   "east"
+  ],
+  "animation_group_id": "f674651a-b5aa-42a0-9ad8-5e9d9eccf431",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}

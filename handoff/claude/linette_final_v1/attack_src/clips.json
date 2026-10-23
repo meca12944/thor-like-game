@@ -1,0 +1,269 @@
+{
+ "atk1_right": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   10,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk1/east/000.png",
+   "linette_thrust_v1/atk1/east/001.png",
+   "linette_thrust_v1/atk1/east/002.png",
+   "linette_thrust_v1/atk1/east/003.png",
+   "linette_thrust_v1/atk1/east/004.png",
+   "linette_thrust_v1/atk1/east/005.png",
+   "linette_thrust_v1/atk1/east/006.png",
+   "linette_thrust_v1/atk1/east/007.png",
+   "linette_thrust_v1/atk1/east/008.png",
+   "linette_thrust_v1/atk1/east/007.png",
+   "linette_thrust_v1/atk1/east/006.png",
+   "linette_thrust_v1/atk1/east/005.png",
+   "linette_thrust_v1/atk1/east/004.png",
+   "linette_thrust_v1/atk1/east/000.png"
+  ]
+ },
+ "atk2_right": {
+  "ticks": [
+   1,
+   2,
+   12,
+   3,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_skel_v1/swap_east/000.png",
+   "linette_skel_v1/swap_east/001.png",
+   "linette_skel_v1/swap_east/002.png",
+   "linette_skel_v1/atk2chain_east/004.png",
+   "linette_skel_v1/atk2chain_east/005.png",
+   "linette_skel_v1/atk2chain_east/006.png"
+  ]
+ },
+ "atk3_right": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   18,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk3/east/000.png",
+   "linette_thrust_v1/atk3/east/001.png",
+   "linette_thrust_v1/atk3/east/002.png",
+   "linette_thrust_v1/atk3/east/003.png",
+   "linette_thrust_v1/atk3/east/004.png",
+   "linette_thrust_v1/atk3/east/005.png",
+   "linette_thrust_v1/atk3/east/006.png",
+   "linette_thrust_v1/atk3/east/007.png",
+   "linette_thrust_v1/atk3/east/008.png",
+   "linette_thrust_v1/atk3/east/007.png",
+   "linette_thrust_v1/atk3/east/006.png",
+   "linette_thrust_v1/atk3/east/005.png",
+   "linette_thrust_v1/atk3/east/004.png",
+   "linette_thrust_v1/atk3/east/000.png"
+  ]
+ },
+ "atk1_down": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   10,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk1/south-east/000.png",
+   "linette_thrust_v1/atk1/south-east/001.png",
+   "linette_thrust_v1/atk1/south-east/002.png",
+   "linette_thrust_v1/atk1/south-east/003.png",
+   "linette_thrust_v1/atk1/south-east/004.png",
+   "linette_thrust_v1/atk1/south-east/005.png",
+   "linette_thrust_v1/atk1/south-east/006.png",
+   "linette_thrust_v1/atk1/south-east/007.png",
+   "linette_thrust_v1/atk1/south-east/008.png",
+   "linette_thrust_v1/atk1/south-east/007.png",
+   "linette_thrust_v1/atk1/south-east/006.png",
+   "linette_thrust_v1/atk1/south-east/005.png",
+   "linette_thrust_v1/atk1/south-east/004.png",
+   "linette_thrust_v1/atk1/south-east/000.png"
+  ]
+ },
+ "atk2_down": {
+  "ticks": [
+   1,
+   2,
+   12,
+   3,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_skel_v1/swap_south-east/000.png",
+   "linette_skel_v1/swap_south-east/001.png",
+   "linette_skel_v1/swap_south-east/002.png",
+   "linette_skel_v1/atk2chain_south-east/004.png",
+   "linette_skel_v1/atk2chain_south-east/005.png",
+   "linette_skel_v1/atk2chain_south-east/006.png"
+  ]
+ },
+ "atk3_down": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   18,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk3/south-east/000.png",
+   "linette_thrust_v1/atk3/south-east/001.png",
+   "linette_thrust_v1/atk3/south-east/002.png",
+   "linette_thrust_v1/atk3/south-east/003.png",
+   "linette_thrust_v1/atk3/south-east/004.png",
+   "linette_thrust_v1/atk3/south-east/005.png",
+   "linette_thrust_v1/atk3/south-east/006.png",
+   "linette_thrust_v1/atk3/south-east/007.png",
+   "linette_thrust_v1/atk3/south-east/008.png",
+   "linette_thrust_v1/atk3/south-east/007.png",
+   "linette_thrust_v1/atk3/south-east/006.png",
+   "linette_thrust_v1/atk3/south-east/005.png",
+   "linette_thrust_v1/atk3/south-east/004.png",
+   "linette_thrust_v1/atk3/south-east/000.png"
+  ]
+ },
+ "atk1_up": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   10,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk1/north-east/000.png",
+   "linette_thrust_v1/atk1/north-east/001.png",
+   "linette_thrust_v1/atk1/north-east/002.png",
+   "linette_thrust_v1/atk1/north-east/003.png",
+   "linette_thrust_v1/atk1/north-east/004.png",
+   "linette_thrust_v1/atk1/north-east/005.png",
+   "linette_thrust_v1/atk1/north-east/006.png",
+   "linette_thrust_v1/atk1/north-east/007.png",
+   "linette_thrust_v1/atk1/north-east/008.png",
+   "linette_thrust_v1/atk1/north-east/007.png",
+   "linette_thrust_v1/atk1/north-east/006.png",
+   "linette_thrust_v1/atk1/north-east/005.png",
+   "linette_thrust_v1/atk1/north-east/004.png",
+   "linette_thrust_v1/atk1/north-east/000.png"
+  ]
+ },
+ "atk2_up": {
+  "ticks": [
+   1,
+   2,
+   12,
+   3,
+   3,
+   3
+  ],
+  "lunge": 2,
+  "src": [
+   "linette_skel_v1/swap_north-east/000.png",
+   "linette_skel_v1/swap_north-east/001.png",
+   "linette_skel_v1/swap_north-east/002.png",
+   "linette_skel_v1/atk2chain_north-east/004.png",
+   "linette_skel_v1/atk2chain_north-east/005.png",
+   "linette_skel_v1/atk2chain_north-east/006.png"
+  ]
+ },
+ "atk3_up": {
+  "ticks": [
+   2,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   1,
+   18,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "lunge": 8,
+  "src": [
+   "linette_thrust_v1/atk3/north-east/000.png",
+   "linette_thrust_v1/atk3/north-east/001.png",
+   "linette_thrust_v1/atk3/north-east/002.png",
+   "linette_thrust_v1/atk3/north-east/003.png",
+   "linette_thrust_v1/atk3/north-east/004.png",
+   "linette_thrust_v1/atk3/north-east/005.png",
+   "linette_thrust_v1/atk3/north-east/006.png",
+   "linette_thrust_v1/atk3/north-east/007.png",
+   "linette_thrust_v1/atk3/north-east/008.png",
+   "linette_thrust_v1/atk3/north-east/007.png",
+   "linette_thrust_v1/atk3/north-east/006.png",
+   "linette_thrust_v1/atk3/north-east/005.png",
+   "linette_thrust_v1/atk3/north-east/004.png",
+   "linette_thrust_v1/atk3/north-east/000.png"
+  ]
+ }
+}

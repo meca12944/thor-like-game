@@ -1,0 +1,3 @@
+{'background_job_ids': "['a8954094-0d87-4b9d-95fb-967d05fdefc5']", 'directions': "['south-east']", 'animation_group_id': 'a9d7e347-f9b8-4d69-bea6-a934e2868a03', 'status': 'processing', 'enhanced_prompt': 'None', 'enhance_usage': 'None'}
+{'t': '2026-10-21 11:10:01', 'name': 'walk_south-east_seam', 'endpoint': '/characters/animations', 'status': 'completed', 'usage': {'type': 'generations', 'generations': 4.0}, 'n': 4.0}
+saved 5

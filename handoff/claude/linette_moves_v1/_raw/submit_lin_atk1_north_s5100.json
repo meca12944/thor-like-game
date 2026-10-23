@@ -1,0 +1,27 @@
+{
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 1 of 3: a quick straight thrust with the right-hand needle, stepping forward with full arm extension, brief hold, then pull back to the stance. TRUE BACK VIEW every frame: seen from directly behind, back of the head and ponytail visible, face never shown; forward movement and attacks go UP the screen; arms and needles stay visible beside the body. She never turns around. Same character in every frame exactly as the reference image: petite adult woman, pale blonde long ponytail with a blue ribbon, red bikini top, red pleated mini skirt, brown belt with a purple pouch, brown gloves, brown thigh-high boots with silver knee guards, a long thin silver sewing needle held in EACH hand like a rapier. Same face, same proportions and same size as the reference; feet stay on the same ground line. Bold outline, clean pixels. No effects, no trails, no glow on the body.",
+  "frame_count": 8,
+  "directions": [
+   "north"
+  ],
+  "animation_name": "lin_atk1_north_s5100",
+  "keep_first_frame": true,
+  "seed": 5100
+ },
+ "http_status": 200,
+ "body": {
+  "background_job_ids": [
+   "b4637ebf-75db-4ceb-af1b-561dec53eda8"
+  ],
+  "directions": [
+   "north"
+  ],
+  "animation_group_id": "362f253b-555d-4306-8c23-0508a4bc8533",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ }
+}

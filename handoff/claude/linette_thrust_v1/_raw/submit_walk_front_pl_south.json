@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "08fff957-128c-4e4e-8283-6b2b6314c61b"
+  ],
+  "directions": [
+   "south"
+  ],
+  "animation_group_id": "5c742e95-01e2-4909-b7ee-9c561a84f79c",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "walking toward the viewer at a calm pace, front view facing the viewer the whole time, legs straight and parallel under the hips, feet a little apart, one foot steps forward at a time, arms relaxed at the sides holding the needles pointing down, no effects",
+  "frame_count": 8,
+  "directions": [
+   "south"
+  ],
+  "animation_name": "walk_front_pl",
+  "keep_first_frame": true,
+  "seed": 21
+ }
+}

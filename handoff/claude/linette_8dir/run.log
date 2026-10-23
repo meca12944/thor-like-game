@@ -1,0 +1,15 @@
+2026-10-19 13:03:08 request create-character-v3 n_directions=8 seed 1 cap 40
+2026-10-19 13:03:09 job 31baf966-3547-479e-8ad8-dddc5eaed411 character 7e26e0f3-b375-4384-b955-3304cacebff3
+2026-10-19 13:10:21 status completed usage {"type": "generations", "generations": 8.0} saved 0 images to out_s1 keys ['status', 'character_id', 'storage_urls', 'billing_usage', 'character_name', 'directions_type', 'generation_mode', 'directions_count', 'character_description']
+2026-10-19 13:11:13 downloaded 8 direction PNGs from storage_urls (free re-fetch). spent total from job records: 8 / cap 40
+2026-10-19 13:14:14 resize south (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:14:14 resize spent 1.0 cap 20
+2026-10-19 13:15:19 resize south-west (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:16:08 resize west (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:17:18 resize north-west (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:17:58 resize north (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:19:03 resize north-east (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:20:08 resize east (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:20:46 resize south-east (92, 136)->98x144 usage {"type": "generations", "generations": 1.0} keys ['usage']
+2026-10-19 13:20:46 resize spent 7.0 cap 20
+2026-10-19 13:21:13 resize_v1: 8 dirs scaled 117->124 (PixelLab /resize, 8 gen). spent total from job records: 16 (create 8 + resize 8)

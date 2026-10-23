@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "619a9a67-5b4a-4cda-b1c1-d8ca1da95163"
+  ],
+  "directions": [
+   "north-east"
+  ],
+  "animation_group_id": "7fb4f59e-10f2-4caf-891d-674fc36ef013",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 2 of 3: a quick fencing lunge with the LEFT-hand needle. She pulls the left needle back, then steps forward and thrusts the left needle straight ahead, ending exactly in the lunge pose of the end frame. Three-quarter BACK view facing up-right every frame, face mostly hidden; the thrust goes up-right. Arms and needles stay visible. She never turns around. Same character, outfit and size in every frame; no effects, no trails.",
+  "frame_count": 8,
+  "directions": [
+   "north-east"
+  ],
+  "animation_name": "atk2",
+  "keep_first_frame": true,
+  "seed": 12
+ }
+}

@@ -1,0 +1,1 @@
+[2026-10-21 11:25:35] tween tw8_ner completed frames 9 usage {'type': 'generations', 'generations': 8.0}
