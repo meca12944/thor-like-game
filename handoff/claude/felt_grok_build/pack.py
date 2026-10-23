@@ -93,7 +93,7 @@ for ch, ids in FIELD.items():
 parts['cocoons'] = parts.pop('cocoons2'); parts['cocoons']['img'] = 'cocoons.png'; os.replace('final/cocoons2.png', 'final/cocoons.png')
 ZONE = {'south_gate': '남 입구 문', 'fence_wood': '남 입구 나무 울타리', 'anvil': '남(대장간) 모루', 'woodpile': '남(대장간) 장작',
         'string_lights': '서 시장 줄등', 'candelabra': '북동 예배당 촛대', 'tombs': '북동 묘비', 'fence_iron': '북동 묘지 쇠울타리',
-        'cocoons': '동 거미줄 구역 고치', 'bush_b': '남문 바깥 이음매 덤불', 'dead_tree': '남문 바깥 이음매 마른 나무', 'stone_low': '남문 바깥 이음매 돌무더기', 'ember_rubble': '북 왕성 불씨 잔해', 'rubble': '북 왕성 잔해'}
+        'cocoons': '동 거미줄 구역 고치', 'bush_b': 'field·남문 이음매 덤불', 'dead_tree': 'field·남문 이음매 마른 나무', 'stone_low': 'field·남문 이음매 돌무더기', 'ember_rubble': '북 왕성 불씨 잔해', 'rubble': '북 왕성 잔해'}
 for k, z in ZONE.items(): parts[k]['zone'] = z
 parts['watchtower'].update(role='[4] 경비 초소 감시탑', grok_foot=[455, 200], kind='building')
 parts['mausoleum'].update(role='[6] 예배당 뒤 묘지 납골당', grok_foot=[1385, 215])

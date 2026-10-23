@@ -433,7 +433,7 @@
    "field_legend": [
     "u"
    ],
-   "zone": "남문 바깥 이음매 덤불",
+   "zone": "field·남문 이음매 덤불",
    "flip": true
   },
   "dead_tree": {
@@ -446,7 +446,7 @@
    "field_legend": [
     "T"
    ],
-   "zone": "남문 바깥 이음매 마른 나무",
+   "zone": "field·남문 이음매 마른 나무",
    "flip": true
   },
   "stone_low": {
@@ -459,7 +459,7 @@
    "field_legend": [
     "r"
    ],
-   "zone": "남문 바깥 이음매 돌무더기",
+   "zone": "field·남문 이음매 돌무더기",
    "flip": true
   },
   "ash_tree_a": {
