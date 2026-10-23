@@ -27,5 +27,7 @@ description: 「필멸자」 test128에 몬스터를 추가하거나 기존 몹�
 - 지역 들판 2~9는 `python3 test128/tools/gen_region_fields.py` 가 `a{지역}_*` 몹을 자동 배치 (다시 돌리면 맵 재생성).
 
 ## 4. 확인
+- **무조건** `python3 test128/tools/mob_check.py http://127.0.0.1:<port> <표.png> <몹id>` (고치기 전·후) → 표 그림을 주인에게 보내고 빨간 칸은 고치거나 이유 보고 (주인 10-23).
+- `test128/lab.html`에 그 몹 버튼 한 줄 추가 (`data-arena="<몹id>"`).
 - `node -e "new Function(require('fs').readFileSync('test128/world_mobs.js','utf8'))"` 문법 확인.
 - ingame-test 스킬로 녹화 → MP4 를 주인에게 보내고 짧은 한국어로 보고.

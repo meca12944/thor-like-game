@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>몹 시험장</title>
+<style>
+  :root { --bg: #15171d; --card: #20242d; --line: #2f3542; --fg: #eef0f4; --sub: #9aa3b2; --acc: #ffcf5a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.sub { color: var(--sub); margin: 0 0 18px; font-size: 14px; }
+  h2 { font-size: 15px; color: var(--sub); margin: 22px 0 8px; font-weight: 600; }
+  a.btn { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 8px 0; color: var(--fg); text-decoration: none; }
+  a.btn b { display: block; font-size: 16px; }
+  a.btn span { color: var(--sub); font-size: 13px; }
+  a.btn:active { border-color: var(--acc); }
+  .opts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .opts label { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 14px; }
+  .opts input { margin-right: 6px; }
+  .keys { color: var(--sub); font-size: 13px; background: var(--card); border-radius: 12px; padding: 10px 14px; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <h1>몹 시험장</h1>
+  <p class="sub">버튼을 누르면 실제 게임에서 그 몹 무리와 바로 싸워요. 다 잡으면 1.5초 뒤 다시 나와요.</p>
+
+  <div class="opts">
+    <label><input type="checkbox" id="tough" checked>안 죽기</label>
+    <label><input type="checkbox" id="ult">큰 스킬 가득</label>
+  </div>
+
+  <h2>무리</h2>
+  <a class="btn" data-arena="c1_silmamul,c1_unrotting_hound*2"><b>묶고 돌진</b><span>실마물 + 들개 2 — 실에 끌려가면 들개가 달려와요</span></a>
+  <a class="btn" data-arena="c1_needle_spider,c1_thread_puppet,c1_silmamul"><b>장판 + 베기</b><span>바늘 거미 + 실 꼭두각시 + 실마물</span></a>
+  <a class="btn" data-arena="c1_unrotting_hound*3"><b>들개 무리</b><span>들개 3 — 한 마리씩 차례로 돌진</span></a>
+  <a class="btn" data-arena="c1_silmamul,c1_thread_puppet,c1_needle_spider,c1_unrotting_hound"><b>4종 한꺼번에</b><span>가장 어려워요</span></a>
+
+  <h2>한 마리씩</h2>
+  <a class="btn" data-arena="c1_silmamul"><b>실마물</b><span>묶기 — 실 3갈래, 발밑 함정, 할퀴기</span></a>
+  <a class="btn" data-arena="c1_thread_puppet"><b>실 꼭두각시</b><span>연속 베기 — 가위 2연속, 돌아오는 날</span></a>
+  <a class="btn" data-arena="c1_needle_spider"><b>바늘 거미</b><span>뛰어들기 — 표시된 자리로 폴짝, 거미줄</span></a>
+  <a class="btn" data-arena="c1_unrotting_hound"><b>썩지 않는 들개</b><span>돌진 — 빗나가면 한 번 더</span></a>
+
+  <h2>그대로</h2>
+  <a class="btn" href="index.html?go=field00"><b>바람길 들판</b><span>게임 그대로의 배치 (리네트 동행)</span></a>
+
+  <h2>조작</h2>
+  <div class="keys">이동 방향키·WASD · 공격 J/Z (누르고 있으면 연타) · 회피대시 Shift/K/X · 큰 스킬 R<br>공격이 맞기 직전에 회피대시 = 저스트 회피 (슬로모션 + 게이지 +15)<br>폰은 화면 터치 패드</div>
+</main>
+<script>
+  const build = a => { let u = 'index.html?go=field01&at=17,18&arena=' + encodeURIComponent(a).replace(/%2C/g, ',').replace(/%2A/g, '*');
+    if (document.getElementById('tough').checked) u += '&tough=1'; if (document.getElementById('ult').checked) u += '&ult=full'; return u; };
+  const sync = () => document.querySelectorAll('a[data-arena]').forEach(el => el.href = build(el.dataset.arena));
+  document.querySelectorAll('input').forEach(i => i.addEventListener('change', sync)); sync();
+</script>
+</body>
+</html>
