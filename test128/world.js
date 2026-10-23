@@ -26,6 +26,11 @@
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
   const ATK_DMG = [10, 10, 14];
   const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
+  // 마모 (주인 10-23): 장비 마모 = 싸울수록 쌓임 -> 공격·방어·검기 약해짐, 롬이 수리 / 육체 마모 = 필드에 오래 있을수록 최대 체력 상한이 깎임, 여관에서 쉬면 회복
+  // 배수진 = 장비 마모가 한계(100)에 닿은 채 체력이 바닥나면 잠깐 남은 힘을 쥐어짜 화력 폭발 (끝나면 육체 마모 +10)
+  const WEAR = { perHit: 0.3, perHurt: 1.5, bodyPerSec: 0.05, bodyPerHurt: 0.5, bodyCutMax: 0.4,
+    tiers: [{ at: 80, name: '망가짐', atk: 0.75, taken: 1.25, skill: 0.6 }, { at: 50, name: '닳음', atk: 0.9, taken: 1.1, skill: 0.85 }],
+    lastStand: { hpPct: 0.35, dur: 8, cd: 45, atk: 1.8, skill: 1.8, body: 10 }, repairPerPt: 1.5 };
   const DIFF0 = { id: 'normal', enemy_hp: 1, enemy_dmg: 1, telegraph: 1, aggression: 1, tokens: 2, potion_cap: 5, iframe_bonus: 0, ult_cap: 0.9, telegraph_floor: { attack: 0.45, aoe: 0.6, charge_line: 0.45, ult: 2.2 } };
   const DIFF = () => { const g = window.__game; return (g && g.diff) || DIFF0; };
   const iframe = () => ROLL.iframe + (DIFF().iframe_bonus || 0);
@@ -262,16 +267,32 @@
     if (h.shape === 'all') return !ultSafe(h, x, y);
     return false;
   }
+  function wearSt() { return (SAVE.wear = SAVE.wear || { gear: 0, body: 0 }); }
+  function gearTier() { const w = wearSt().gear; return WEAR.tiers.find(t => w >= t.at) || null; }
+  function hpCap() { return Math.max(1, Math.round(hero.maxHp * (1 - WEAR.bodyCutMax * Math.min(100, wearSt().body) / 100))); }
+  function lastStandOn() { return S.lastStand && S.lastStand.t > 0; }
+  function wearAdd(gear, body) { const w = wearSt(), was = gearTier(); w.gear = Math.min(100, w.gear + gear); w.body = Math.min(100, w.body + body);
+    const now = gearTier(); if (now && now !== was) msg('장비가 ' + now.name + ' — 롬에게 수리받자', 2.6);
+    if (hero.hp > hpCap()) { hero.hp = hpCap(); syncTownHp(); } }
+  function wearAtk(skill) { if (lastStandOn()) return skill ? WEAR.lastStand.skill : WEAR.lastStand.atk; const t = gearTier(); return t ? (skill ? t.skill : t.atk) : 1; }
+  function checkLastStand() { const L = S.lastStand || (S.lastStand = { t: 0, cd: 0 }); if (L.t > 0 || L.cd > 0 || wearSt().gear < 100 || hero.hp <= 0 || hero.hp > hpCap() * WEAR.lastStand.hpPct) return;
+    L.t = WEAR.lastStand.dur; banner('배수진 — 부서진 몸과 검에서 마지막 힘을 쥐어짠다!', 2.2); shake(3); addFx('text', hero.x, hero.y - 34, { text: '배수진!', life: 1, color: '#ff7050' }); }
+  function stepWear(dt) { const L = S.lastStand; if (L) { if (L.t > 0) { L.t -= dt; if (L.t <= 0) { L.cd = WEAR.lastStand.cd; wearAdd(0, WEAR.lastStand.body); msg('배수진이 끝났다… 몸이 더 무거워졌다', 2.4); } } else if (L.cd > 0) L.cd -= dt; }
+    const m = M(); if (m && m.type !== 'town' && m.type !== 'world') { const w = wearSt(); w.body = Math.min(100, w.body + WEAR.bodyPerSec * dt); if (hero.hp > hpCap()) hero.hp = hpCap(); } }
+  function repairGear() { const g = window.__game, w = wearSt(); if (w.gear < 1 || !g || !g.INV) return '';
+    const cost = Math.ceil(w.gear * WEAR.repairPerPt), pay = Math.min(cost, g.INV.gold); if (pay <= 0) return '수리비가 없다. (' + cost + 'G 필요)';
+    const pts = pay >= cost ? w.gear : pay / WEAR.repairPerPt; g.INV.gold -= pay; w.gear = Math.max(0, w.gear - pts); save();
+    return '롬: …괴물 칼이라도 날은 세워 줘야지. (수리 -' + pay + 'G' + (w.gear >= 1 ? ', 돈이 모자라 일부만' : '') + ')'; }
   function hurt(dmg, src, raw) {
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 구르기 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
       if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); ultAdd('gainHurt', dmg);
+    if (!raw) { const t = lastStandOn() ? null : gearTier(); dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg * (t ? t.taken : 1))); } hero.hp = Math.max(0, hero.hp - dmg); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); ultAdd('gainHurt', dmg);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
-    syncTownHp();
+    wearAdd(WEAR.perHurt, WEAR.bodyPerHurt); syncTownHp(); checkLastStand();
     if (hero.hp <= 0) die();
     return true;
   }
@@ -299,7 +320,7 @@
   function engage(m) { S.engaged = m; }
   function hitMob(m, dmg, dir, melee) {
     if (m.dead || m.invuln || m.spawnT > 0) return;
-    const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1;
+    const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1; dmg *= wearAtk(!melee); wearAdd(WEAR.perHit, 0); // melee = 칼, else 검기 (skill)
     const AF = melee && window.GameAff ? window.GameAff.of(D) : null; if (AF) dmg *= AF.mul; // weapon damage type vs D.aff (weak x1.5 / resist x0.5)
     m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m);
     if (!D.boss) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
@@ -397,7 +418,7 @@
   function syncFromTown() { const g = window.__game; if (!g) return; hero.maxHp = g.hero.maxHp || 50; hero.hp = Math.max(1, g.hero.hp ?? hero.maxHp); }
   function syncTownHp() { const g = window.__game; if (g && g.hero) { g.hero.hp = hero.hp; g.hero.maxHp = hero.maxHp; } }
   function die() { S.deadT = 0.01; banner('쓰러졌다…', 2.2); }
-  function respawnAfterDeath() { hero.hp = hero.maxHp; syncTownHp(); S.deadT = 0; const m = M(); go(m.type === 'boss' ? 'dungeon01_b2' : m.id, 'default', { card: false }); }
+  function respawnAfterDeath() { hero.hp = hpCap(); syncTownHp(); S.deadT = 0; const m = M(); go(m.type === 'boss' ? 'dungeon01_b2' : m.id, 'default', { card: false }); }
 
   // ---------------- town exit gate (town coords; maps/world.json "townGate" overrides) ----------------
   function townGate() { const m = MAPS.world; return Object.assign({ x0: 560, x1: 800, y: 690, hintY: 640, to: 'field00', spawn: 'town' }, (m && m.townGate) || {}); }
@@ -449,7 +470,7 @@
     }
   }
   function stepMap(dt) {
-    const m = M();
+    const m = M(); stepWear(dt);
     hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt); hero.atkCd = Math.max(0, (hero.atkCd || 0) - dt);
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
@@ -535,7 +556,7 @@
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
-      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
+      if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hpCap(), hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
     const e = S.engaged; let want = m.bgm;
@@ -549,9 +570,9 @@
   const spikeUp = o => spikePhase(o) > 2.0;
   const spikeWarn = o => spikePhase(o) > 1.5 && spikePhase(o) <= 2.0;
   const trapAt = (cx, cy) => M().objs.some(o => (o.type === 'spikes' || o.type === 'pit') && Math.abs(o.tx - cx) <= 1 && Math.abs(o.ty - cy) <= 1);
-  function usePotion() { const g = window.__game; const n = g ? g.potions : 0; if (!n) { msg('물약이 없다'); return; } if (hero.hp >= hero.maxHp) { msg('체력이 가득하다'); return; }
+  function usePotion() { const g = window.__game; const n = g ? g.potions : 0; if (!n) { msg('물약이 없다'); return; } if (hero.hp >= hpCap()) { msg('체력이 가득하다'); return; }
     if (g.potionCd > 0) { msg('물약 재사용 대기 ' + g.potionCd.toFixed(1) + '초'); return; }
-    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
+    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hpCap(), hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -570,12 +591,12 @@
           const lucky = Math.random() < 1 / 8; if (lucky) g.addGold(40);
           S.wish = (S.wish || 0) + 1; S.dialog = { text: '동전을 던졌다… (-10G)\n' + F[Math.floor(Math.random() * F.length)] + (lucky ? '\n우물이 반짝이며 40G를 돌려주었다!' : ''), name: o.name }; S.door = o.id; return; }
         if (o.race) { S.dialog = { text: '광차 경주 트랙. 「바퀴」가 접수를 받는다.\n광차 경주 미니게임은 아직 준비 중이다. (stub)', name: o.name }; S.door = o.id; return; }
-        if (o.heal) { hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); }
+        if (o.heal) { const w = wearSt(), b = Math.round(w.body); w.body = 0; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); if (b >= 1) { S.dialog = { text: (o.text || o.name) + '\n푹 쉬었다. 깎였던 최대 체력이 돌아왔다. (육체 마모 ' + b + '% → 0%)', name: o.name }; S.door = o.id; return; } }
         S.dialog = { text: o.text || ('「' + (o.name || '건물') + '」'), name: o.name }; S.door = o.id; return; }
-      if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; save(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20);
+      if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; save(); hero.hp = hpCap(); syncTownHp(); addFx('heal', hero.x, hero.y - 20);
         S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
       if (o.type === 'chest') { if (SAVE.chests[o.id]) { msg('빈 상자다'); return; } SAVE.chests[o.id] = true; save(); banner('보물상자! ' + giveLoot((o.loot || []).concat([['gold', window.__game && window.__game.goldFor ? window.__game.goldFor('chest', o.area || 1) : 0]])), 2.2); addFx('sparkle', o.x, o.y - 10, { life: .8 }); return; }
-      if (o.type === 'heal') { hero.hp = hero.maxHp; syncTownHp(); msg('쉼터에서 쉬었다. 체력 회복!'); addFx('heal', hero.x, hero.y - 20); return; }
+      if (o.type === 'heal') { hero.hp = hpCap(); syncTownHp(); msg('쉼터에서 쉬었다. 체력 회복!'); addFx('heal', hero.x, hero.y - 20); return; }
       if (o.type === 'lever') { if (o.on) { msg('이미 당긴 레버다'); return; } o.on = true; SAVE.levers[o.key] = true; save(); shake(1); updateGate(m); return; }
       if (o.type === 'door_locked') { tryDoor(o); return; }
       if (o.type === 'boss_door') { bossDoor(o); return; }
@@ -584,7 +605,7 @@
     for (const o of m.objs) if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.hypot(o.x - hero.x, o.y - hero.y) < 22) { SAVE.chests[o.id] = true; save(); banner('풀숲에서 찾았다! ' + giveLoot(o.loot || []), 2.2); return; }
   }
   function openTrade(o) { const g = window.__game; if (!g) return false;
-    if (o.forge && g.openForge) { S.dialog = null; g.openForge(); return true; }
+    if (o.forge && g.openForge) { const r = repairGear(); if (r && !S.repaired) { S.repaired = o.id; S.dialog = { text: r + '\n(한 번 더 말을 걸면 대장간)', name: o.name }; return true; } S.repaired = null; S.dialog = null; g.openForge(); return true; }
     if (o.shop && g.openShop) { S.dialog = null; g.openShop(o.shop); return true; } return false; }
   function questOn(id) { return SAVE.quests[id] === 'active'; }
   function clueReady(o) { return !SAVE.flags[o.flag] && (!o.needQuest || questOn(o.needQuest)) && (o.needFlags || []).every(f => SAVE.flags[f]); }
@@ -899,9 +920,10 @@
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
-      if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
+      if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hpCap(), mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R' }); }
       textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
+      { const w = wearSt(), t = gearTier(), L = lastStandOn(); textOut(L ? `배수진 ${S.lastStand.t.toFixed(1)}초` : `장비 마모 ${Math.round(w.gear)}%` + (t ? ' (' + t.name + ')' : '') + ` · 육체 마모 ${Math.round(w.body)}%` + (w.body >= 1 ? ` (최대 체력 -${Math.round(WEAR.bodyCutMax * w.body)}%)` : ''), ox + 12 * u, hb + 14 * u, 10 * u, L ? '#ff7050' : t ? (t.at >= 80 ? '#ff9a8a' : '#ffd27a') : '#cfe8ff', '#000', 'left'); }
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
@@ -1020,7 +1042,7 @@
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
     hurt, spawn, render, tile: () => [Math.floor(hero.x / S.map.T), Math.floor(hero.y / S.map.T)],
     setHeroTile(x, y, face) { hero.x = (x + .5) * S.map.T; hero.y = (y + .5) * S.map.T; if (face) hero.face = face; snapCam(); },
-    interact, castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
+    interact, WEAR, wearSt, hpCap, castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
   };
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
   if (Q.get('start')) ready.then(() => { const id = Q.get('start'), t0 = Date.now(); const tryGo = () => { const g = window.__game; if (g && g.ready && go(id, 'default', { card: false })) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
