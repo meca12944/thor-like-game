@@ -12,7 +12,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, '..', '..')
 SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_build', 'final')
 OUT = os.path.join(ROOT, 'assets', 'world', 'felt_v4'); os.makedirs(OUT, exist_ok=True)
-S, T, D, GD = 0.56, 16, 3, 2                      # world px per Grok px, tile, part D, ground D
+S, T, D, GD = 0.56, 16, 3, 3                      # world px per Grok px, tile, part D, ground D (= parts: one pixel size everywhere)
 PJ = json.load(open(os.path.join(SRC, 'parts.json')))['parts']
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json'))); _top = [x for x, c in enumerate(FF['ground'][0]) if c in ".'=,"]
 W, H = max(54, int(860 * S // T) - (_top[0] + _top[-1]) // 2 + FF['w']), 35                                     # 1536 x 864 Grok px x 0.56 = 860 x 484 world px (+ 2 rows below the south stalls + 3 rows of seam outside the south gate)
@@ -138,7 +138,8 @@ edge = np.minimum.reduce([wxp, wyp, W * T - wxp, H * T - wyp]); img *= np.clip(.
 img[wyp < 175 * S] *= .7
 # snap to the town palette (base24 + accents)
 pal = np.array([hx(c) for c in (PAL['base24'] + PAL['accent8'] if PAL else [v for v in ('#201810',)])])
-flat = img.reshape(-1, 3); idx = np.argmin(((flat[:, None, :] - pal[None]) ** 2).sum(2), 1)
+flat = img.reshape(-1, 3); idx = np.empty(len(flat), int)
+for i in range(0, len(flat), 1 << 18): idx[i:i + (1 << 18)] = np.argmin(((flat[i:i + (1 << 18), None, :] - pal[None]) ** 2).sum(2), 1)
 Image.fromarray(pal[idx].reshape(GH, GW, 3).astype(np.uint8)).save(os.path.join(OUT, 'ground.png'), optimize=True)
 
 # ---------- game objects (doors / NPCs / marks follow the new buildings) ----------

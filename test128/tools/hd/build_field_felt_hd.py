@@ -14,10 +14,10 @@ OUT = os.path.join(ROOT, 'assets', 'world', 'field_felt_hd'); os.makedirs(OUT, e
 MP = os.path.join(ROOT, 'maps', 'field_felt.json'); M = json.load(open(MP))
 PALF = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_layout', 'palette.json')
 PARTS = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, '..', 'handoff', 'claude', 'felt_grok_build', 'final')
-# tile deco -> the art room's D=3 parts (parts.json); tiles keep their rules, only the picture changes (world.js buildMap / drawPropsHi)
-DECO = {'bush': ['bush_b'], 'rocks': ['stone_low'], 'fence': ['fence_wood']}
+# tile deco -> the art room's D=3 parts (parts.json "field_legend": legend char -> part ids); tiles keep their rules, only the picture changes
+# (world.js buildMap / drawPropsHi). Not decos: b (bridge planks under the hero), " (reeds on half the tall-grass tiles), clue:<id> (a prop on it)
 PAL = json.load(open(PALF)); hx = lambda s: np.array([int(s[i:i + 2], 16) for i in (1, 3, 5)], float)
-W, H, T, GD = M['w'], M['h'], M['tile'], 2
+W, H, T, GD = M['w'], M['h'], M['tile'], 3                       # ground D = the parts' D (one pixel size)
 GW, GH = W * T * GD, H * T * GD
 yy, xx = np.mgrid[0:GH, 0:GW].astype(float); wxp, wyp = xx / GD, yy / GD
 def vnoise(scale, seed):
@@ -92,17 +92,31 @@ for _ in range(22):
     a = trees[rng.integers(len(trees))]; b = min((t for t in trees if t != a and 2 <= abs(t[0] - a[0]) <= 5 and abs(t[1] - a[1]) <= 2), key=lambda t: rng.random(), default=None)
     if b: WEBS.append([a[0] + .5, a[1] - .4, b[0] + .5, b[1] - .3, .8 + rng.random() * .6, .35 + rng.random() * .25])
 import shutil
-PJ = json.load(open(os.path.join(PARTS, 'parts.json')))['parts']; ART = {}
-for spr, ids in DECO.items():
-    for i in ids:
-        if i not in PJ: continue
-        p = dict(PJ[i]); im = Image.open(os.path.join(PARTS, p['img']))
-        if spr == 'fence':                                   # one fence tile = a 1-tile (48 art px) slice from the middle of the long fence
-            x0 = p['ax'] - 24; im = im.crop((x0, 0, x0 + 48, im.height)); p['ax'] = 24; p['img'] = 'fence_tile.png'; p['flip'] = False
-        if not p.get('zone', '').startswith('field'):        # town parts reused out here get the field's ash (field parts come ash-painted)
-            a = np.asarray(im.convert('RGBA')).astype(float); a[..., :3] = ash(a[..., :3], .55); im = Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
-        im.save(os.path.join(OUT, p['img']))
-        ART.setdefault(spr, []).append({'img': f'assets/world/field_felt_hd/{p["img"]}', 'ax': p['ax'], 'ay': p['ay'], **({'flip': False} if p.get('flip') is False else {})})
-M['hd'] = {'D': GD, 'decoArt': ART, 'ground': 'assets/world/field_felt_hd/ground.png', 'props': [], 'water': WATER, 'webs': WEBS, 'grade': None}
-open(MP, 'w').write(json.dumps(M, ensure_ascii=False, indent=1) + '\n')
+PJA = json.load(open(os.path.join(PARTS, 'parts.json'))); PJ = PJA['parts']; ART, PROPS = {}, []
+def part(i):                                                    # copy one part (town parts reused out here get the field's ash)
+    p = dict(PJ[i]); im = Image.open(os.path.join(PARTS, p['img'])).convert('RGBA')
+    if not p.get('zone', '').startswith('field'):
+        a = np.asarray(im).astype(float); a[..., :3] = ash(a[..., :3], .55); im = Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+    im.save(os.path.join(OUT, p['img'])); return {'img': f'assets/world/field_felt_hd/{p["img"]}', 'ax': p['ax'], 'ay': p['ay'], **({'flip': False} if p.get('flip') is False else {})}
+h = lambda x, y, n=0: (np.sin(x * 127.1 + y * 311.7 + n * 74.7) * 43758.5453) % 1
+for ch, ids in PJA.get('field_legend', {}).items():
+    ids = [i for i in ids if i in PJ]
+    if not ids: continue
+    if ch == 'b':                                                  # bridge planks: one per bridge row, flat under the hero
+        v = part(ids[0])
+        for y in range(H):
+            xs = [x for x in range(W) if M['ground'][y][x] == 'b']
+            if xs: PROPS.append(dict(v, id=f'bridge_{y}', x=(xs[0] + xs[-1] + 1) / 2, y=y + 1, under=1))
+    elif ch == '"':                                                # reeds: half the tall-grass tiles (art room: all of them is too thick)
+        vs = [part(i) for i in ids]
+        for y in range(H):
+            for x in range(W):
+                if M['ground'][y][x] == '"' and h(x, y) < .5:
+                    v = vs[int(h(x, y, 1) * len(vs))]; PROPS.append(dict(v, id=f'reed_{x}_{y}', x=float(x + .5 + (h(x, y, 2) - .5) * .4), y=float(y + 1 - h(x, y, 3) * .3), flip=bool(v.get('flip', True) and h(x, y, 4) < .5), shadow=0))
+    elif ch.startswith('clue:'):                                   # a picture on a clue spot (굳은 사슴 사체)
+        o = next((o for o in M['objects'] if o.get('id') == ch[5:]), None)
+        if o: PROPS.append(dict(part(ids[0]), id=ch[5:], x=o['x'] + .5, y=o['y'] + .9, shadow=1))
+    else: ART[ch] = [part(i) for i in ids]
+M['hd'] = {'D': GD, 'decoArt': ART, 'ground': 'assets/world/field_felt_hd/ground.png', 'props': PROPS, 'water': WATER, 'webs': WEBS, 'grade': None}
+txt = json.dumps(M, ensure_ascii=False, indent=1) + '\n'; open(MP, 'w').write(txt)   # serialise first: a failure never truncates the map
 print('ok field_felt hd ground', GW, 'x', GH, len(WATER), 'water runs', len(WEBS), 'threads')

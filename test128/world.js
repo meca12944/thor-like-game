@@ -192,10 +192,10 @@
     }
     for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
-    for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {spr: [{img, ax, ay, flip}]}):
-      for (const d of m.decos) { const vs = A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
+    for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {legend char or deco name: [{img, ax, ay, flip}]}):
+      for (const d of m.decos) { const vs = A[(j.ground[d.ty] || '')[d.tx]] || A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
         const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
-        const j = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: j && f(2) < .5, dx: j * Math.round((f(3) - .5) * 5), dy: j * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
+        const jt = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: jt && f(2) < .5, dx: jt * Math.round((f(3) - .5) * 5), dy: jt * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
     m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
@@ -316,15 +316,17 @@
   // ---- hd map layer (see loadHD) ----
   function drawHDGround(k) { const m = M(); if (!m || !m.hds) return; ctx.imageSmoothingEnabled = false;
     for (const h of m.hds) { const im = HDIMG[h.ground]; if (!im) continue; const [sx, sy] = W2S(h.gx * m.T, h.gy * m.T), sc = k / h.D;
-      ctx.drawImage(im, Math.round(sx), Math.round(sy), Math.round(im.width * sc), Math.round(im.height * sc)); } }
+      ctx.drawImage(im, Math.round(sx), Math.round(sy), Math.round(im.width * sc), Math.round(im.height * sc));
+      for (const q of h.props || []) { if (!q.under) continue; const pi = HDIMG[q.img]; if (!pi) continue; const Dq = q.D || h.D, s2 = k / Dq, [px, py] = W2S((h.gx + q.x) * m.T, (h.gy + q.y) * m.T); // under: walked on (bridge planks)
+        ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
-    for (const h of m.hds) for (const q of h.props || []) { const im = HDIMG[q.img]; if (!im) continue;
+    for (const h of m.hds) for (const q of h.props || []) { const im = HDIMG[q.img]; if (!im || q.under) continue;
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
       const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy);
       if (q.shadow) { ctx.save(); ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); ctx.restore(); }
-      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(sx - ax * sc), Math.round(sy - ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); }
+      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.translate(Math.round(sx), Math.round(sy)); if (q.flip) ctx.scale(-1, 1); ctx.drawImage(im, -Math.round(ax * sc), -Math.round(ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); }
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
       const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
