@@ -22,6 +22,7 @@
   const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => (window.__game && window.__game.DODGE) || null; // dodge dash config (ANIM.dodge); ROLL kept as fallback
   const EASE = { outCubic: p => 1 - (1 - p) ** 3, outQuad: p => 1 - (1 - p) ** 2, linear: p => p };
   const BUILD_V = (Date.parse(document.lastModified) || 0).toString(36); // deploy stamp (see index.html): new deploy -> new asset URLs
+  const V = u => (window.__v ? __v(u) : u); // 지도·그림 주소에 배포 시각 붙이기 (index.html __v)
   function fieldDash(D) { return D.travel ? D.travel * 1.5 / 124 * H128FIG : D.tiles * 16 * .68; } // town: travel (=150 logical px / LSC 1.5) for a 124 px figure -> same ratio for the 30 px field figure (36 px, 1.21 hero-heights)
   function rollDur() { const D = DG(); return D ? D.durTicks / 60 : ROLL.dur; }
   // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
@@ -82,8 +83,8 @@
 
   // ---------------- assets ----------------
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
-  const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = src; });
-  const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
+  const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = V(src); });
+  const getJSON = u => fetch(window.__v ? __v(u) : u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
   function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(loadHD).then(j => (MAPS[id] = buildMap(j))); }
   // 고해상도 배경 (owner 10-23 「펠트 마을 최고 퀄리티」, 마을배경방과 정한 형식): map JSON "hd" = {D, ground, props[], lights[], grade}.
   // Drawn at the characters' pixel density (D art px per world px) on the screen canvas, not in the 384x216 low canvas: the ground picture
@@ -91,7 +92,7 @@
   const HDIMG = {};
   function loadHD(j) { if (!j.hds && j.hd) j.hds = [Object.assign({}, j.hd, { gx: 0, gy: 0 })]; if (!j.hds) return j;
     const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); for (const q of h.props || []) urls.add(q.img); for (const k in h.decoArt || {}) for (const v of h.decoArt[k]) urls.add(v.img); }
-    return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = u; }))).then(() => j); }
+    return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = V(u); }))).then(() => j); }
   // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
   // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
   // Each part becomes an area {part, name, sub, bgm, grade, bg}: painted backgrounds and colour grades stay per part, the music follows the area.
@@ -119,14 +120,14 @@
   const gradeAt = (m, x, y) => { const a = m && m.compose ? areaOf(m, x, y) : null; return a ? a.grade : m && m.grade; };
   // painted-background maps (town B): j.bg = image drawn over the whole map instead of tiles; ground rows only carry collision
   const BGIMG = {};
-  function loadBg(j) { return new Promise(res => { const im = new Image(); im.onload = () => { BGIMG[j.bg] = im; res(j); }; im.onerror = () => res(j); im.src = j.bg; }); }
+  function loadBg(j) { return new Promise(res => { const im = new Image(); im.onload = () => { BGIMG[j.bg] = im; res(j); }; im.onerror = () => res(j); im.src = V(j.bg); }); }
   const NPCIMG = {};
-  function npcImg(id) { if (!NPCIMG[id]) { const im = new Image(); im.src = 'assets/npcs/' + id + '.png'; NPCIMG[id] = im; } return NPCIMG[id]; }
+  function npcImg(id) { if (!NPCIMG[id]) { const im = new Image(); im.src = V('assets/npcs/' + id + '.png'); NPCIMG[id] = im; } return NPCIMG[id]; }
   // Felt NPCs (owner 10-23): 4-way walk/idle atlas assets/npcs/felt/<anim>.json (hero atlas format, figure ~118 px = hero scale), drawn hi-res like the hero
   const NPCA = {};
-  function npcAnim(id) { if (NPCA[id] === undefined) { NPCA[id] = null; getJSON('assets/npcs/felt/' + id + '.json').then(j => { const im = new Image(); im.onload = () => { NPCA[id] = { J: j, im }; }; im.src = 'assets/npcs/felt/' + j.sheets[0]; }).catch(() => {}); } return NPCA[id]; }
+  function npcAnim(id) { if (NPCA[id] === undefined) { NPCA[id] = null; getJSON('assets/npcs/felt/' + id + '.json').then(j => { const im = new Image(); im.onload = () => { NPCA[id] = { J: j, im }; }; im.src = V('assets/npcs/felt/' + j.sheets[0]); }).catch(() => {}); } return NPCA[id]; }
   const PORIMG = {};
-  function porImg(id) { if (!PORIMG[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORIMG[id] = im; } return PORIMG[id]; }
+  function porImg(id) { if (!PORIMG[id]) { const im = new Image(); im.src = V('assets/portraits/' + id + '.png'); PORIMG[id] = im; } return PORIMG[id]; }
   const ready = getJSON('assets/world/world_atlas.json').then(a => { ATLAS = a;
     return Promise.all([loadImg('field', 'assets/' + a.sheets.field.src), loadImg('dungeon', 'assets/' + a.sheets.dungeon.src), loadImg('spr', 'assets/' + a.sprites.src),
       getJSON('maps/tilesets.json').then(t => TILESETS = t)]); }).then(() => loadMap('world'));
@@ -1157,7 +1158,7 @@
     drawSpr(g, name, m.x + sx, m.y - (m.hz || 0) - hover, { flip: m.face > 0, scale: sc, sy, mode, rot: m.lean ? m.lean * .9 * (m.face > 0 ? 1 : -1) : 0 });
   }
   // ---- chapter-1 Felt mobs: PixelLab strips (256px cells, foot at y 250, art faces right) drawn in the hi-res pass, y-split around the hero
-  const FELTIMG = {}; function feltImg(src) { if (!FELTIMG[src]) { const im = new Image(); im.src = src + '.png'; FELTIMG[src] = im; } return FELTIMG[src]; }
+  const FELTIMG = {}; function feltImg(src) { if (!FELTIMG[src]) { const im = new Image(); im.src = V(src + '.png'); FELTIMG[src] = im; } return FELTIMG[src]; }
   function feltFrame(m) { const a = m.D.anim[m.anim || 'walk'], i = feltFrame0(m); return a && a.map ? a.map[i] : i; } // optional frame remap per strip
   function feltFrame0(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
     if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
@@ -1181,7 +1182,7 @@
       blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
   // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
-  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json?v=' + BUILD_V).then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p + '?v=' + BUILD_V; return i; }); }).catch(() => {});
+  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p + '?v=' + BUILD_V; return i; }); }).catch(() => {});
   const PET_MAPS = ['field00'];
   const petDir = (dx, dy, cur) => Math.abs(dx) > Math.abs(dy) * 1.4 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'down' : 'downl') : (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'up' : 'upl');
   const petTot = L => L.reduce((a, f) => a + f[2], 0);
@@ -1222,7 +1223,7 @@
   function blitFrame(im, fi, cw, ch, s, dx, dy) { // draw frame fi (cell cw x ch) of strip im at scale s with its top-left at (dx, dy) in the current transform
     const c = scaledStrip(im, s); if (!c) return; const q = c.q, k = s / q; ctx.imageSmoothingEnabled = Math.abs(k - 1) > .01;
     ctx.drawImage(c, Math.round(fi * cw * q), 0, Math.round(cw * q), Math.round(ch * q), dx, dy, cw * s, ch * s); }
-  const S47IMG = {}; function s47Img(id, k) { const key = id + '_' + k; if (!S47IMG[key]) { const im = new Image(); im.src = 'assets/mobs47/' + key + '.webp'; S47IMG[key] = im; } return S47IMG[key]; }
+  const S47IMG = {}; function s47Img(id, k) { const key = id + '_' + k; if (!S47IMG[key]) { const im = new Image(); im.src = V('assets/mobs47/' + key + '.webp'); S47IMG[key] = im; } return S47IMG[key]; }
   const LUNGE = [0, -6, -10, 14, 24, 26, 24, 20, 14, 8, 3, 0]; // ram: x offset per attack frame (strip px)
   const OLDATK = ['prep', 'throw', 'cast', 'aim', 'charge', 'puff', 'swipe', 'rise', 'jump'];
   function s47Frame(m) { const a = m.D.anim.attack, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
@@ -1405,7 +1406,7 @@
   const CUT_T = { band: [.2, 1.05], zoom: [.08, .72], eye: [.08, .62], hybrid: [.08, .8] };
   // 연구 결과 (handoff/claude/ult_research/CUTIN_ko.md): 심연 초필살기 = hybrid (드물게 쓰니 크게), 일반 필살기 = zoom (자주 쓰니 짧게). 공격/조사 키로 컷인 건너뛰기
   function cutMode(def) { const q = Q.get('cut'); return CUT_T[q] ? q : def; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
-  const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
+  const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = V('assets/portraits/' + id + '.png'); PORI[id] = im; } return PORI[id]; }
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + EW + 8 && mm.y > y0 - 8 && mm.y < y0 + EH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
