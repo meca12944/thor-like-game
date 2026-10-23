@@ -101,10 +101,10 @@ function drawDash(camX,camY,behind){
   const px=-d.dy,py=d.dx,k=117/124,cx=P.x-camX,cy=P.y-jz()-camY-40*k,half=40*k;
   for(const[o,st,ln,ci]of d.lines){const x=cx+o*half*px,y=cy+o*half*py*1.4,s0=st*k,s1=(st+ln)*k;ctx.strokeStyle=['rgba(140,230,255,','rgba(220,250,255,','rgba(90,200,250,'][ci]+(.9*fade)+')';ctx.lineWidth=ci===1?2:1;
     ctx.beginPath();ctx.moveTo(x-d.dx*s0,y-d.dy*s0*.8);ctx.lineTo(x-d.dx*s1,y-d.dy*s1*.8);ctx.stroke();}}
-function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
-function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
-function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
-function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
+function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast',vName('cast'));}   // straight down/up -> front/back cast (10-23), else side/diagonal
+function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&A.anims[rjName()];start('jump',rj?rjName():vName('jump'));}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function hurt(){if(P.dead)return;P.atk=null;start('hurt',P.f8===2&&A.anims.hurt_south?'hurt_south':P.f8===6&&A.anims.hurt_north?'hurt_north':'hurt_'+P.lastH);}
+function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death',P.f8===2&&A.anims.death_south?'death_south':P.f8===6&&A.anims.death_north?'death_north':'death_'+P.lastH);}
 const MV={ySc:0.8,walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
 let DUST=[];function dust(x,y,n,v){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=Math.random();DUST.push({x:x+(Math.random()-.5)*12,y:y-1,vx:Math.cos(a)*v*r/60,vy:-Math.abs(Math.sin(a))*v*r/120,t:0,life:14+Math.random()*10,c:Math.random()<.5?'#e8dcc0':'#cbb894',s:Math.random()<.5?2:3});}}
 let TR=[];   // flying thrust trails (world space)
@@ -124,6 +124,11 @@ function turnStep(t){const now=P.gt||0;if(t!==P.t8){P.t8p=P.t8;P.t8=t;P.t8T=now;
   const dirn=d!==4?(d<4?1:-1):via(1)?1:via(-1)?-1:((P.f8===6)===(P.lastH==='right')?1:-1);setF8((P.f8+dirn+8)%8);}
 // owner 10-23 "기본 서있는 자세가 정면이 아니고 대각선": facing straight down/up -> the straight front/back idle (idle_south / idle_north), diagonals and sides keep theirs; she starts facing the front
 function idleName(){return P.f8===2&&A.anims.idle_south?'idle_south':P.f8===6&&A.anims.idle_north?'idle_north':'idle_'+atkDir();}
+// owner 10-23 "다음 고칠점 1·2": straight down/up use the front/back clip when it exists (cast, jump, hurt, death), and the running jump exists for
+// every facing (side, both diagonals, front, back) - it carries her along the facing direction
+const F8V=[[1,0],[.71,.71],[0,1],[-.71,.71],[-1,0],[-.71,-.71],[0,-1],[.71,-.71]];
+function vName(m){return P.f8===2&&A.anims[m+'_south']?m+'_south':P.f8===6&&A.anims[m+'_north']?m+'_north':m+'_'+atkDir();}
+function rjName(){return P.f8===2?'rjump_south':P.f8===6?'rjump_north':P.diag?'rjump_'+atkDir():'rjump_'+P.face;}
 function snapFace(){if(P.t8!=null&&P.f8!==P.t8)setF8(P.t8);P.turnT=0;}
 function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
@@ -162,7 +167,7 @@ function step(){
       else if(P.st!=='idle'||P.clip!==idleName())start('idle',idleName());}
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp*MV.ySc;}}   // running jump carries forward even without input
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=F8V[P.f8??0];P.x+=v[0]*sp+ix*0.3;P.y+=v[1]*sp*MV.ySc+iy*0.3;}else{P.x+=ix*sp;P.y+=iy*sp*MV.ySc;}}   // running jump carries forward even without input
     if(P.st==='dash'&&P.dsh){const d=P.dsh,E=q=>1-Math.pow(1-q,2.6),p0=Math.min(1,(P.t-1)/DSH.burst),p=Math.min(1,P.t/DSH.burst),st=DSH.travel*(E(p)-E(Math.max(0,p0)));P.x+=d.dx*st;P.y+=d.dy*st*.8;
       if((P.t-1)%2===0&&P.t-1<DSH.dur)GH.push({e:frameAt(L,P.t,false),x:P.x,y:P.y-jz(),a:0});}
     if(P.t>=T){if(P.st==='death'){P.t=T;return;}if(P.st==='jump')dust(P.x,P.y,8,110);start('idle',idleName());}
