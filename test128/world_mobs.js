@@ -40,25 +40,29 @@
   function startAnim(m, name, a, key, warn) { // play strip `name`; frames before `key` stretch so frame `key` lands at `warn` s (the telegraph end)
     m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)) * (m.D.rec || 1); }
   const FELT_SPD = 1.4; // owner 10-22 "걷는속도 빠르게": move x1.4, walk cycle 5 ticks/frame (was 7)
+  // 몹 공격 기준 (owner 10-23 "펠트 몹으로 기준을 잡자"; handoff/claude/MOBS_ROOM4_ko.md 기준표): seconds the mob stands still after each attack = the opening to slash
+  const FELT_STD = { restMelee: .55, restShoot: .35, restLunge: .8, restLeap: .7, backOff: 40 };
   const FELT_SC = 1.35, FELT_CD = .6, FELT_REC = .7; // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function felt(o) {
     // style (owner 10-23 "공격 패턴도 타게임이랑 분석해"): each felt mob gets one role instead of the shared melee + 8-way burst.
     //   base = old shared pattern / bind = 실마물 (aimed thread that binds + thread trap under the hero) /
-    //   skirm = 바늘 거미 (pounce onto a marked spot + aimed spit) / lunge = 들개 (crouch -> straight dash bite -> 0.8s opening, circles the hero).
+    //   skirm = 바늘 거미 (pounce onto a marked spot + aimed spit) / lunge = 들개 (crouch -> straight dash bite -> 0.8s opening, circles the hero) /
+    //   duel = 실 꼭두각시 (scissor 2-hit combo + aimed blade boomerang / pin burst).
     return Object.assign({ felt: true, update(m, W, dt) {
       const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; const d = W.dist(m, h);
-      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { set(m, 'idle'); m.anim = 'walk'; } return; }
+      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? FELT_STD.restMelee : FELT_STD.restShoot; set(m, 'rest'); m.restT = r; m.anim = 'walk'; } return; }
+      if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
         if (m.sub === 'aim') { if (m.t > m.warn) { m.sub = 'go'; m.t = 0; m.bit = false; } return; }
         if (m.sub === 'go') { if (!m.bit && Math.hypot(h.x - m.x, h.y - m.y) < m.r + 9) { m.bit = true; W.touch(m, m.r + 4, this.melee.dmg); }
           const sp = 230 * dt; if (!W.moveCol(m, Math.cos(m.aim) * sp, Math.sin(m.aim) * sp, m.r) || m.t > .38) { m.sub = 'rec'; m.t = 0; W.fx('dust', m.x, m.y); } return; }
-        if (m.t > .8) { set(m, 'idle'); m.anim = 'walk'; } return; } // recovery = the punish window
+        if (m.t > FELT_STD.restLunge) { set(m, 'idle'); m.sub = null; m.anim = 'walk'; } return; } // recovery = the punish window
       if (m.st === 'leap') { if (m.t < m.warn) { const k = Math.min(1, m.t / m.warn), e = k * k * (3 - 2 * k), nx = m.sx + (m.tx - m.sx) * e, ny = m.sy + (m.ty - m.sy) * e; W.moveCol(m, nx - m.x, ny - m.y, m.r); }
-        else if (m.t > m.warn + .45) { set(m, 'idle'); m.anim = 'walk'; } return; }
+        else if (m.t > m.warn + FELT_STD.restLeap) { set(m, 'idle'); m.anim = 'walk'; } return; }
       m.anim = 'walk'; const x0 = m.x, y0 = m.y;
-      if (m.cd <= 0 && !m.intent) { const r = Math.random(); m.intent = P === 'lunge' ? (r < 2 / 3 ? 'lunge' : 'shoot') : P === 'skirm' ? (r < .5 ? 'leap' : 'shoot') : (r < 1 / 3 ? 'melee' : 'shoot'); } // each cooldown: pick one move
-      const want = m.intent === 'melee' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
-      if (d < 200) { if (d > want + 6) toward(m, W, dt, this.sp * FELT_SPD, h.x, h.y); else if (d < want - 14) toward(m, W, dt, -this.sp * FELT_SPD * .7, h.x, h.y);
+      if (m.cd <= 0 && !m.intent) { const r = Math.random(); m.intent = P === 'lunge' ? (r < 2 / 3 ? 'lunge' : 'shoot') : P === 'skirm' ? (r < .5 ? 'leap' : 'shoot') : P === 'duel' ? (r < .5 ? 'combo' : 'shoot') : (r < 1 / 3 ? 'melee' : 'shoot'); } // each cooldown: pick one move
+      const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
+      if (d < 200) { if (d > want + 6) toward(m, W, dt, this.sp * FELT_SPD, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
         else if (P === 'lunge') { m.orb = m.orb || (Math.random() < .5 ? 1 : -1); const a = ang(m, h.x, h.y) + m.orb * Math.PI / 2, sp = this.sp * FELT_SPD * .6 * agg(W); // circle the hero like a dog pack
           if (!W.moveCol(m, Math.cos(a) * sp * dt, Math.sin(a) * sp * dt, m.r)) m.orb = -m.orb; m.face = h.x > m.x ? 1 : -1; }
         else m.face = h.x > m.x ? 1 : -1; }
@@ -69,6 +73,10 @@
       if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD / agg(W); return; }
+      if (m.intent === 'combo' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), r1 = this.melee.range * .6, r2 = this.melee.range * 1.25; m.face = Math.cos(a) >= 0 ? 1 : -1; // scissor 2-hit: snip, then a longer snip 0.3s later
+        const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * r1, y: m.y + Math.sin(a) * r1 * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
+        W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * r2, y: m.y + Math.sin(a) * r2 * .8, r: this.melee.rad, warn: z.warn + 0.3, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
+        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + 0.3); set(m, 'melee'); m.cd = 1.9 * FELT_CD / agg(W); return; }
       if (m.intent === 'lunge' && d < 95 && tok(m, W)) { m.intent = null; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1;
         const w = lineTele(W, m, m.aim, 230 * .38, 0.45, m.r * 2 + 8); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD / agg(W); return; }
       if (m.intent === 'leap' && d < 85 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), L = Math.min(d, 60); m.face = Math.cos(a) >= 0 ? 1 : -1;
@@ -301,10 +309,10 @@
       shots: [{ name: '실타래 3갈래', sp: 80, waves: [0], spread: [-.35, 0, .35], shot: { kind: 'threadball', r: 4, dmg: 4, life: 2.0, slow: 1.0 } }, // aimed at the hero; hit = bound (slowed) 1s
         { name: '실 함정', trap: { r: 16, dmg: 4, slow: 1.0 } }], // circle under the hero, 0.8s warning
       anim: { src: 'assets/mobs_felt/c1_01_silmamul', F: 36, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 7, ticks: [5,  5,  10,  5,  5,  5,  5], release: 2 } } }),
-    c1_thread_puppet: felt({ name: '실 꼭두각시', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 55, h: 30, r: 6, sp: 20,
+    c1_thread_puppet: felt({ name: '실 꼭두각시', style: 'duel', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 55, h: 30, r: 6, sp: 20,
       melee: { range: 26, rad: 15, dmg: 6 },
-      shots: [{ name: '가위날 투척', sp: 105, waves: [0], shot: { kind: 'blade', r: 4, dmg: 5, life: 1.6, ret: true } }, // flies out, comes back
-        { name: '시침핀 3연사', sp: 135, waves: [0, 0.13, 0.27], shot: { kind: 'pin', r: 2, dmg: 3, life: 1.2 } }],
+      shots: [{ name: '가위날 투척', sp: 105, waves: [0], spread: [0], shot: { kind: 'blade', r: 4, dmg: 5, life: 1.6, ret: true } }, // aimed; flies out, comes back
+        { name: '시침핀 3연사', sp: 135, waves: [0, 0.13, 0.27], spread: [0], shot: { kind: 'pin', r: 2, dmg: 3, life: 1.2 } }], // aimed burst
       anim: { src: 'assets/mobs_felt/c1_02_thread_puppet', F: 40, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 11, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  3,  8,  4], hit: 8 }, shoot: { n: 12, ticks: [5,  5,  5,  5,  5,  10,  5,  5,  5,  5,  5,  5], release: 5 } } }),
     c1_needle_spider: felt({ name: '바늘 거미', style: 'skirm', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 45, h: 22, r: 7, sp: 30,
       melee: { range: 20, rad: 12, dmg: 5 },
