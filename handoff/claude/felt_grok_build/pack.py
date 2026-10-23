@@ -107,6 +107,17 @@ for pid, src, gf in [('bl_house', 'house_v2', [70, 860]),
     im = to_pal(Image.open(f'../felt_hd/cut/{src}.png').convert('RGBA')); im.save(f'final/{pid}.png')
     parts[pid] = {'img': f'{pid}.png', 'w': im.width, 'h': im.height, 'ax': im.width // 2, 'ay': im.height - 1,
                   'kind': 'building' if gf else 'prop', **({'grok_foot': gf, 'role': ROLE[pid]} if gf else {})}
+# 나무 발밑 기준점 = 줄기 아래 (숲 띠 앞뒤 순서용): 그림 아래 30~12% 높이에서 불투명 점의 가운데 x, 맨 아래 줄 - 뿌리 퍼짐
+TREES = ('ash_tree_a', 'ash_tree_b', 'dead_tree', 'burnt_pine_a', 'burnt_pine_b')
+for n in TREES:
+    a = np.array(Image.open('final/' + parts[n]['img']).convert('RGBA'))[..., 3] > 0; h = a.shape[0]
+    band = a[int(h * .70):int(h * .88)]; xs = np.nonzero(band)[1]
+    rows = np.nonzero(a.any(1))[0]; bottom = rows.max()
+    # 줄기: 가장 좁은 줄 근처 (가운데 값)
+    parts[n]['ax'] = int(np.median(xs)); parts[n]['ay'] = int(bottom - max(2, h * .03))
+# 좌우 뒤집어도 되는 것 (빛이 왼쪽 위라 건물·글자·간판·문은 안 뒤집음)
+FLIP_OK = set(TREES) | {'bush_b', 'ash_bush', 'dry_reeds', 'pale_mushrooms', 'stump', 'stone_low', 'rubble', 'woodpile', 'boulder', 'tombs', 'cocoons', 'deer_corpse'}
+for n, p in parts.items(): p['flip'] = n in FLIP_OK
 json.dump({'_doc': 'Felt (그록 대표 그림 배치) 부품. D=3 (월드 1px = 그림 3px), view low top-down, 빛 왼쪽 위, 마을 32색. '
                    '투명 PNG 크기 그대로 쓰기. ax/ay = 발밑 기준점. grok_foot × 0.8 = 3번방 구도 판 월드 px 자리. '
                    '건물은 그록 크기의 0.7배 이하로 그렸으니 충돌 칸(solid)은 그림 아래쪽 폭에 맞춰 다시 잡기.',

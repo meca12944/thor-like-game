@@ -61,7 +61,8 @@
     470
    ],
    "role": "[7] 마르타의 여관",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "se_house": {
    "img": "se_house.png",
@@ -74,7 +75,8 @@
     730
    ],
    "role": "[11] 롬의 대장간",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "s_house": {
    "img": "s_house.png",
@@ -87,7 +89,8 @@
     825
    ],
    "role": "[12] 이장 바르트의 집",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "shop_sign": {
    "img": "shop_sign.png",
@@ -100,7 +103,8 @@
     690
    ],
    "role": "[13] 잡화점",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "castle_l": {
    "img": "castle_l.png",
@@ -113,7 +117,8 @@
     230
    ],
    "role": "[2] 불탄 왕성 왼쪽",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "e_row": {
    "img": "e_row.png",
@@ -126,7 +131,8 @@
     620
    ],
    "role": "[8] 세라의 약초 오두막",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "chapel": {
    "img": "chapel.png",
@@ -139,7 +145,8 @@
     198
    ],
    "role": "[5] 예배당 종탑",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "west_a": {
    "img": "west_a.png",
@@ -152,7 +159,8 @@
     460
    ],
    "role": "[14] 중고 무기점",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "west_b": {
    "img": "west_b.png",
@@ -165,7 +173,8 @@
     410
    ],
    "role": "[15] 시장 거리 집",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "stall_n": {
    "img": "stall_n.png",
@@ -178,7 +187,8 @@
     400
    ],
    "role": "[15] 시장 노점",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "sw_house": {
    "img": "sw_house.png",
@@ -191,7 +201,8 @@
     834
    ],
    "role": "[16] 주민 빈집",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "west_edge": {
    "img": "west_edge.png",
@@ -204,7 +215,8 @@
     440
    ],
    "role": "경비 초소 본채(맨 왼쪽)",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "web_arch": {
    "img": "web_arch.png",
@@ -217,7 +229,8 @@
     705
    ],
    "role": "[9] 아라크네의 폐공방",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "red_stall": {
    "img": "red_stall.png",
@@ -230,7 +243,8 @@
     834
    ],
    "role": "[10] 벤의 노점",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "castle_r": {
    "img": "castle_r.png",
@@ -243,7 +257,8 @@
     230
    ],
    "role": "[2] 불탄 왕성 오른쪽",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "watchtower": {
    "img": "watchtower.png",
@@ -256,7 +271,8 @@
    "grok_foot": [
     455,
     200
-   ]
+   ],
+   "flip": false
   },
   "mausoleum": {
    "img": "mausoleum.png",
@@ -269,7 +285,8 @@
    "grok_foot": [
     1385,
     215
-   ]
+   ],
+   "flip": false
   },
   "tombs": {
    "img": "tombs.png",
@@ -278,7 +295,8 @@
    "ax": 70,
    "ay": 112,
    "kind": "prop",
-   "zone": "북동 묘비"
+   "zone": "북동 묘비",
+   "flip": true
   },
   "fence_iron": {
    "img": "fence_iron.png",
@@ -287,7 +305,8 @@
    "ax": 50,
    "ay": 56,
    "kind": "prop",
-   "zone": "북동 묘지 쇠울타리"
+   "zone": "북동 묘지 쇠울타리",
+   "flip": false
   },
   "barrels": {
    "img": "barrels.png",
@@ -295,7 +314,8 @@
    "h": 57,
    "ax": 22,
    "ay": 56,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "bench": {
    "img": "bench.png",
@@ -303,7 +323,8 @@
    "h": 36,
    "ax": 36,
    "ay": 35,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "woodpile": {
    "img": "woodpile.png",
@@ -312,7 +333,8 @@
    "ax": 27,
    "ay": 52,
    "kind": "prop",
-   "zone": "남(대장간) 장작"
+   "zone": "남(대장간) 장작",
+   "flip": true
   },
   "anvil": {
    "img": "anvil.png",
@@ -321,7 +343,8 @@
    "ax": 24,
    "ay": 34,
    "kind": "prop",
-   "zone": "남(대장간) 모루"
+   "zone": "남(대장간) 모루",
+   "flip": false
   },
   "well": {
    "img": "well.png",
@@ -329,7 +352,8 @@
    "h": 93,
    "ax": 37,
    "ay": 92,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "herb_rack": {
    "img": "herb_rack.png",
@@ -337,7 +361,8 @@
    "h": 90,
    "ax": 44,
    "ay": 89,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "rubble": {
    "img": "rubble.png",
@@ -346,7 +371,8 @@
    "ax": 27,
    "ay": 32,
    "kind": "prop",
-   "zone": "북 왕성 잔해"
+   "zone": "북 왕성 잔해",
+   "flip": true
   },
   "sign_post": {
    "img": "sign_post.png",
@@ -354,7 +380,8 @@
    "h": 90,
    "ax": 28,
    "ay": 89,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "south_gate": {
    "img": "south_gate.png",
@@ -363,7 +390,8 @@
    "ax": 160,
    "ay": 211,
    "kind": "prop",
-   "zone": "남 입구 문"
+   "zone": "남 입구 문",
+   "flip": false
   },
   "fence_wood": {
    "img": "fence_wood.png",
@@ -375,7 +403,8 @@
    "field_legend": [
     "f"
    ],
-   "zone": "남 입구 나무 울타리"
+   "zone": "남 입구 나무 울타리",
+   "flip": false
   },
   "string_lights": {
    "img": "string_lights.png",
@@ -384,7 +413,8 @@
    "ax": 100,
    "ay": 121,
    "kind": "prop",
-   "zone": "서 시장 줄등"
+   "zone": "서 시장 줄등",
+   "flip": false
   },
   "candelabra": {
    "img": "candelabra.png",
@@ -393,7 +423,8 @@
    "ax": 15,
    "ay": 113,
    "kind": "prop",
-   "zone": "북동 예배당 촛대"
+   "zone": "북동 예배당 촛대",
+   "flip": false
   },
   "bush_b": {
    "img": "bush_b.png",
@@ -405,19 +436,21 @@
    "field_legend": [
     "u"
    ],
-   "zone": "남문 바깥 이음매 덤불"
+   "zone": "남문 바깥 이음매 덤불",
+   "flip": true
   },
   "dead_tree": {
    "img": "dead_tree.png",
    "w": 128,
    "h": 182,
    "ax": 64,
-   "ay": 181,
+   "ay": 175,
    "kind": "prop",
    "field_legend": [
     "T"
    ],
-   "zone": "남문 바깥 이음매 마른 나무"
+   "zone": "남문 바깥 이음매 마른 나무",
+   "flip": true
   },
   "stone_low": {
    "img": "stone_low.png",
@@ -429,56 +462,61 @@
    "field_legend": [
     "r"
    ],
-   "zone": "남문 바깥 이음매 돌무더기"
+   "zone": "남문 바깥 이음매 돌무더기",
+   "flip": true
   },
   "ash_tree_a": {
    "img": "ash_tree_a.png",
    "w": 144,
    "h": 188,
-   "ax": 72,
-   "ay": 187,
+   "ax": 66,
+   "ay": 181,
    "kind": "prop",
    "field_legend": [
     "T"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "ash_tree_b": {
    "img": "ash_tree_b.png",
    "w": 138,
    "h": 171,
-   "ax": 69,
-   "ay": 170,
+   "ax": 66,
+   "ay": 164,
    "kind": "prop",
    "field_legend": [
     "T",
     "Y"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "burnt_pine_a": {
    "img": "burnt_pine_a.png",
    "w": 57,
    "h": 199,
-   "ax": 28,
-   "ay": 198,
+   "ax": 29,
+   "ay": 192,
    "kind": "prop",
    "field_legend": [
     "P"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "burnt_pine_b": {
    "img": "burnt_pine_b.png",
    "w": 99,
    "h": 208,
-   "ax": 49,
-   "ay": 207,
+   "ax": 47,
+   "ay": 200,
    "kind": "prop",
    "field_legend": [
     "P"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "ash_bush": {
    "img": "ash_bush.png",
@@ -490,7 +528,8 @@
    "field_legend": [
     "u"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "boulder": {
    "img": "boulder.png",
@@ -502,7 +541,8 @@
    "field_legend": [
     "R"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "stump": {
    "img": "stump.png",
@@ -514,7 +554,8 @@
    "field_legend": [
     "s"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "ruin_pillar": {
    "img": "ruin_pillar.png",
@@ -526,7 +567,8 @@
    "field_legend": [
     "O"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": false
   },
   "thread_stake": {
    "img": "thread_stake.png",
@@ -538,7 +580,8 @@
    "field_legend": [
     "c"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": false
   },
   "deer_corpse": {
    "img": "deer_corpse.png",
@@ -550,7 +593,8 @@
    "field_legend": [
     "clue:f00_clue_corpse"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "ember_rubble": {
    "img": "ember_rubble.png",
@@ -559,7 +603,8 @@
    "ax": 58,
    "ay": 63,
    "kind": "prop",
-   "zone": "북 왕성 불씨 잔해"
+   "zone": "북 왕성 불씨 잔해",
+   "flip": false
   },
   "fountain": {
    "img": "fountain.png",
@@ -572,7 +617,8 @@
     530
    ],
    "role": "[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "bridge_wood": {
    "img": "bridge_wood.png",
@@ -584,7 +630,8 @@
    "field_legend": [
     "b"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": false
   },
   "dry_reeds": {
    "img": "dry_reeds.png",
@@ -596,7 +643,8 @@
    "field_legend": [
     "\""
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "pale_mushrooms": {
    "img": "pale_mushrooms.png",
@@ -608,7 +656,8 @@
    "field_legend": [
     "m"
    ],
-   "zone": "field"
+   "zone": "field",
+   "flip": true
   },
   "cocoons": {
    "img": "cocoons.png",
@@ -617,7 +666,8 @@
    "ax": 42,
    "ay": 93,
    "kind": "prop",
-   "zone": "동 거미줄 구역 고치"
+   "zone": "동 거미줄 구역 고치",
+   "flip": true
   },
   "linette": {
    "img": "linette.png",
@@ -630,7 +680,8 @@
     305
    ],
    "role": "[3] 리네트의 공방 (왕실 의상실 폐허)",
-   "kind": "building"
+   "kind": "building",
+   "flip": false
   },
   "bl_house": {
    "img": "bl_house.png",
@@ -643,7 +694,8 @@
     70,
     860
    ],
-   "role": "주민 집 (felt_hd house_v2)"
+   "role": "주민 집 (felt_hd house_v2)",
+   "flip": false
   },
   "lamp": {
    "img": "lamp.png",
@@ -651,7 +703,8 @@
    "h": 80,
    "ax": 14,
    "ay": 79,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "brazier": {
    "img": "brazier.png",
@@ -659,7 +712,8 @@
    "h": 63,
    "ax": 20,
    "ay": 62,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "cart": {
    "img": "cart.png",
@@ -667,7 +721,8 @@
    "h": 75,
    "ax": 41,
    "ay": 74,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   },
   "crates": {
    "img": "crates.png",
@@ -675,7 +730,8 @@
    "h": 60,
    "ax": 40,
    "ay": 59,
-   "kind": "prop"
+   "kind": "prop",
+   "flip": false
   }
  }
 }
