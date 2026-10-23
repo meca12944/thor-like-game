@@ -98,3 +98,17 @@
 {"t": "2026-10-20 15:39:17", "name": "plaza:dc_leaves_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 15:39:18", "name": "plaza:dc_ash_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-20 15:39:27", "name": "plaza:dc_moss_s301", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:42:52", "name": "hd_atelier", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:43:33", "name": "hd_chapel", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:43:56", "name": "hd_burned", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:44:03", "name": "hd_fountain", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 12:44:55", "name": "hd_lamp", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:45:28", "name": "hd_crates", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:46:30", "name": "hd_cart", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:46:36", "name": "hd_deadtree", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 12:47:30", "name": "hd_brazier", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:47:46", "name": "hd_fountain", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 12:47:52", "name": "hd_deadtree", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 12:49:29", "name": "hd_atelier_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:50:22", "name": "hd_burned_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 12:51:14", "name": "hd_house_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
