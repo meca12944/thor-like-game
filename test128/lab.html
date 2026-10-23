@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>몹 시험장</title>
+<title>필멸자 샌드박스</title>
 <style>
   :root { --bg: #15171d; --card: #20242d; --line: #2f3542; --fg: #eef0f4; --sub: #9aa3b2; --acc: #ffcf5a; }
   * { box-sizing: border-box; }
@@ -19,18 +19,24 @@
   .opts { display: flex; gap: 10px; flex-wrap: wrap; }
   .opts label { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 14px; }
   .opts input { margin-right: 6px; }
+  .pick { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .pick select { background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: inherit; }
+  .pick .go { grid-column: 1 / 3; margin: 0; text-align: center; }
   .keys { color: var(--sub); font-size: 13px; background: var(--card); border-radius: 12px; padding: 10px 14px; border: 1px solid var(--line); }
 </style>
 </head>
 <body>
 <main>
-  <h1>몹 시험장</h1>
-  <p class="sub">버튼을 누르면 실제 게임에서 그 몹 무리와 바로 싸워요. 다 잡으면 1.5초 뒤 다시 나와요.</p>
+  <h1>필멸자 샌드박스</h1>
+  <p class="sub">게임 안의 샌드박스예요. 주인공·몹·효과 모두 지금 게임 그대로(항상 최신). 고른 몹과 바로 싸우고, 다 잡으면 1.5초 뒤 다시 나와요.</p>
 
   <div class="opts">
     <label><input type="checkbox" id="tough" checked>안 죽기</label>
     <label><input type="checkbox" id="ult">큰 스킬 가득</label>
   </div>
+
+  <h2>아무 몹이나 (전체 목록)</h2>
+  <div class="pick"><select id="mob"></select><select id="cnt"><option value="1">1마리</option><option value="2">2마리</option><option value="3">3마리</option></select><a class="btn go" id="goMob"><b>싸우기</b></a></div>
 
   <h2>무리</h2>
   <a class="btn" data-arena="c1_silmamul,c1_unrotting_hound*2"><b>묶고 돌진</b><span>실마물 + 들개 2 — 실에 끌려가면 들개가 달려와요</span></a>
@@ -50,11 +56,20 @@
   <h2>조작</h2>
   <div class="keys">이동 방향키·WASD · 공격 J/Z (누르고 있으면 연타) · 회피대시 Shift/K/X · 큰 스킬 R<br>공격이 맞기 직전에 회피대시 = 저스트 회피 (슬로모션 + 게이지 +15)<br>폰은 화면 터치 패드</div>
 </main>
+<script src="world_mobs.js"></script>
 <script>
   const build = a => { let u = 'index.html?go=field01&at=17,18&arena=' + encodeURIComponent(a).replace(/%2C/g, ',').replace(/%2A/g, '*');
     if (document.getElementById('tough').checked) u += '&tough=1'; if (document.getElementById('ult').checked) u += '&ult=full'; return u; };
   const sync = () => document.querySelectorAll('a[data-arena]').forEach(el => el.href = build(el.dataset.arena));
-  document.querySelectorAll('input').forEach(i => i.addEventListener('change', sync)); sync();
+  // every mob in the game, read from the game's own world_mobs.js (always the latest list / behaviour)
+  const AREA = ['1장 펠트', '1지역 시작의 숲', '2지역 수정 동굴', '3지역 모래 사막', '4지역 피라미드', '5지역 산호 바다', '6지역 해안 절벽', '7지역 화산 성채', '8지역 설산 뇌전 탑', '9지역 어둠 신전'];
+  const sel = document.getElementById('mob'), cnt = document.getElementById('cnt'), go = document.getElementById('goMob');
+  const D = (window.WorldMobs && WorldMobs.def) || {}, groups = {};
+  for (const [id, d] of Object.entries(D)) { if (d.boss || d.summoned) continue; const g = id.startsWith('c1_') ? 0 : d.champion ? 1 : (d.area || 1); (groups[g] = groups[g] || []).push([id, (d.champion ? '챔피언 ' : '') + (d.name || id)]); }
+  for (const g of Object.keys(groups).sort((a, b) => a - b)) { const og = document.createElement('optgroup'); og.label = AREA[g] || g + '지역'; for (const [id, nm] of groups[g]) { const o = document.createElement('option'); o.value = id; o.textContent = nm; og.appendChild(o); } sel.appendChild(og); }
+  const syncMob = () => { go.href = build(sel.value + (cnt.value > 1 ? '*' + cnt.value : '')); };
+  sel.onchange = cnt.onchange = syncMob;
+  document.querySelectorAll('input').forEach(i => i.addEventListener('change', () => { sync(); syncMob(); })); sync(); syncMob();
 </script>
 </body>
 </html>
