@@ -1,6 +1,6 @@
 # 펠트 부품 (그록 대표 그림 배치용) — 2026-10-23
 
-사장님 크레딧 승인(약 80) 뒤 만든 것. 이번에 쓴 크레딧 **57** (126 → 183, `../felt_pixellab/usage.jsonl`).
+사장님 크레딧 승인(약 80) 뒤 만든 것. 이번에 쓴 크레딧 **73** (126 → 199, `../felt_pixellab/usage.jsonl`).
 
 ## 게임에 쓸 것 → `final/`
 - 34개 투명 PNG, **D=3** (월드 1px = 그림 3px, 주인공과 같은 점 크기), view low top-down, 마을 32색(`../felt_grok_layout/palette_32.png`)
@@ -36,3 +36,8 @@
 
 ## 3차 — 남문 바깥 이음매 소품 4크레딧
 `bush_b`(마른 덤불·풀), `dead_tree`, `stone_low`. bush_a 는 집 모양으로 나와 버림.
+
+## 4차 — 잿빛 들판(field_felt) D=3 부품 16크레딧 (13 + 다시 3)
+parts.json `field_legend`: 들판 지도 장식 칸 → 부품 (T 잿빛 나무 2+마른 나무 / P 불탄 소나무 2 / u 덤불 2 / R 바위 / r 돌무더기 / s 그루터기 / m 창백한 버섯 / f 나무 울타리 / O 무너진 기둥 / c 실 감긴 말뚝 / b 나무 다리 / " 마른 갈대 / 사슴 사체 단서).
+무료 손질: 소나무 청록 잎 → 잿빛 올리브, 잿빛 나무·덤불 초록 40% 빼기. 미리보기 `field_preview.png` (`python3 field_preview.py <field_felt.json>`, 바닥은 임시).
+버린 판: 다리·갈대·버섯 1차(너무 작거나 계단 모양).

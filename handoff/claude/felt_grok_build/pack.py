@@ -60,7 +60,7 @@ def key(a, thr=14):   # 테두리와 이어진 단색 바탕 지우기
     c = a[0, 0, :3].astype(int); flat = np.abs(a[:, :, :3].astype(int) - c).sum(2) < thr
     fl, _ = ndimage.label(flat); e = set(np.unique(np.concatenate([fl[0], fl[-1], fl[:, 0], fl[:, -1]]))) - {0}
     a[:, :, 3] = np.where(np.isin(fl, list(e)), 0, a[:, :, 3]); return a
-SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
+SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a', 'bridge_wood', 'dry_reeds', 'pale_mushrooms'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
 for pid in gen.TEXT:
     if pid in SKIP: continue
     a = tight(key(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA')))); Image.fromarray(a).save(f'final/{pid}.png')
@@ -69,6 +69,22 @@ for pid in gen.TEXT:
 a = tight(key(np.array(Image.open('out/fountain_king_i.png').convert('RGBA')))); Image.fromarray(a).save('final/fountain.png')
 parts['fountain'] = {'img': 'fountain.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1,
                      'grok_foot': [692, 530], 'role': '[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)', 'kind': 'building'}
+for n in ('bridge_wood', 'dry_reeds', 'pale_mushrooms'):   # 2판으로 바꿔 이름 정리
+    parts[n] = parts.pop(n + '2'); parts[n]['img'] = n + '.png'; os.replace(f'final/{n}2.png', f'final/{n}.png')
+if 'pale_mushrooms2' in parts: parts['pale_mushrooms'] = parts.pop('pale_mushrooms2')
+for n in ('burnt_pine_a', 'burnt_pine_b'):   # 청록 잎 → 잿빛 올리브 (무료 색 바꾸기)
+    a = np.array(Image.open(f'final/{n}.png').convert('RGBA')).astype(int); r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    teal = (b > r + 8) & (a[..., 3] > 0); L = (r + g + b) / 3
+    a[teal, 0] = (L[teal] * 1.02).astype(int); a[teal, 1] = (L[teal] * 1.06).astype(int); a[teal, 2] = (L[teal] * .86).astype(int)
+    Image.fromarray(a.clip(0, 255).astype(np.uint8)).save(f'final/{n}.png')
+for n in ('ash_tree_a', 'ash_tree_b', 'ash_bush'):   # 잿빛 들판: 잎 초록을 40% 빼기 (무료)
+    a = np.array(Image.open(f'final/{n}.png').convert('RGBA')).astype(float); L = a[..., :3].mean(2, keepdims=True)
+    a[..., :3] = a[..., :3] * .6 + L * .4; Image.fromarray(a.clip(0, 255).astype(np.uint8)).save(f'final/{n}.png')
+FIELD = {'T': ['ash_tree_a', 'ash_tree_b', 'dead_tree'], 'P': ['burnt_pine_a', 'burnt_pine_b'], 'Y': ['ash_tree_b'], 'u': ['bush_b', 'ash_bush'],
+         'R': ['boulder'], 'r': ['stone_low'], 's': ['stump'], 'm': ['pale_mushrooms'], 'f': ['fence_wood'], 'O': ['ruin_pillar'],
+         'c': ['thread_stake'], 'b': ['bridge_wood'], '"': ['dry_reeds'], 'clue:f00_clue_corpse': ['deer_corpse']}
+for ch, ids in FIELD.items():
+    for i in ids: parts[i].setdefault('field_legend', []).append(ch); parts[i]['zone'] = parts[i].get('zone') or 'field'
 parts['cocoons'] = parts.pop('cocoons2'); parts['cocoons']['img'] = 'cocoons.png'; os.replace('final/cocoons2.png', 'final/cocoons.png')
 ZONE = {'south_gate': '남 입구 문', 'fence_wood': '남 입구 나무 울타리', 'anvil': '남(대장간) 모루', 'woodpile': '남(대장간) 장작',
         'string_lights': '서 시장 줄등', 'candelabra': '북동 예배당 촛대', 'tombs': '북동 묘비', 'fence_iron': '북동 묘지 쇠울타리',
@@ -94,7 +110,7 @@ for pid, src, gf in [('bl_house', 'house_v2', [70, 860]),
 json.dump({'_doc': 'Felt (그록 대표 그림 배치) 부품. D=3 (월드 1px = 그림 3px), view low top-down, 빛 왼쪽 위, 마을 32색. '
                    '투명 PNG 크기 그대로 쓰기. ax/ay = 발밑 기준점. grok_foot × 0.8 = 3번방 구도 판 월드 px 자리. '
                    '건물은 그록 크기의 0.7배 이하로 그렸으니 충돌 칸(solid)은 그림 아래쪽 폭에 맞춰 다시 잡기.',
-           'D': 3, 'parts': parts}, open('final/parts.json', 'w'), ensure_ascii=False, indent=1)
+           'D': 3, 'field_legend': FIELD, 'parts': parts}, open('final/parts.json', 'w'), ensure_ascii=False, indent=1)
 # 확인 그림
 items = list(parts.items()); cols = 7; cw, ch = 300, 330
 o = Image.new('RGBA', (cols * cw, ((len(items) + cols - 1) // cols) * ch), (58, 52, 44, 255)); d = ImageDraw.Draw(o)

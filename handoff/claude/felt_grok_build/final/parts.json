@@ -1,6 +1,54 @@
 {
  "_doc": "Felt (그록 대표 그림 배치) 부품. D=3 (월드 1px = 그림 3px), view low top-down, 빛 왼쪽 위, 마을 32색. 투명 PNG 크기 그대로 쓰기. ax/ay = 발밑 기준점. grok_foot × 0.8 = 3번방 구도 판 월드 px 자리. 건물은 그록 크기의 0.7배 이하로 그렸으니 충돌 칸(solid)은 그림 아래쪽 폭에 맞춰 다시 잡기.",
  "D": 3,
+ "field_legend": {
+  "T": [
+   "ash_tree_a",
+   "ash_tree_b",
+   "dead_tree"
+  ],
+  "P": [
+   "burnt_pine_a",
+   "burnt_pine_b"
+  ],
+  "Y": [
+   "ash_tree_b"
+  ],
+  "u": [
+   "bush_b",
+   "ash_bush"
+  ],
+  "R": [
+   "boulder"
+  ],
+  "r": [
+   "stone_low"
+  ],
+  "s": [
+   "stump"
+  ],
+  "m": [
+   "pale_mushrooms"
+  ],
+  "f": [
+   "fence_wood"
+  ],
+  "O": [
+   "ruin_pillar"
+  ],
+  "c": [
+   "thread_stake"
+  ],
+  "b": [
+   "bridge_wood"
+  ],
+  "\"": [
+   "dry_reeds"
+  ],
+  "clue:f00_clue_corpse": [
+   "deer_corpse"
+  ]
+ },
  "parts": {
   "inn": {
    "img": "inn.png",
@@ -324,6 +372,9 @@
    "ax": 95,
    "ay": 42,
    "kind": "prop",
+   "field_legend": [
+    "f"
+   ],
    "zone": "남 입구 나무 울타리"
   },
   "string_lights": {
@@ -351,6 +402,9 @@
    "ax": 46,
    "ay": 53,
    "kind": "prop",
+   "field_legend": [
+    "u"
+   ],
    "zone": "남문 바깥 이음매 덤불"
   },
   "dead_tree": {
@@ -360,6 +414,9 @@
    "ax": 64,
    "ay": 181,
    "kind": "prop",
+   "field_legend": [
+    "T"
+   ],
    "zone": "남문 바깥 이음매 마른 나무"
   },
   "stone_low": {
@@ -369,7 +426,131 @@
    "ax": 70,
    "ay": 43,
    "kind": "prop",
+   "field_legend": [
+    "r"
+   ],
    "zone": "남문 바깥 이음매 돌무더기"
+  },
+  "ash_tree_a": {
+   "img": "ash_tree_a.png",
+   "w": 144,
+   "h": 188,
+   "ax": 72,
+   "ay": 187,
+   "kind": "prop",
+   "field_legend": [
+    "T"
+   ],
+   "zone": "field"
+  },
+  "ash_tree_b": {
+   "img": "ash_tree_b.png",
+   "w": 138,
+   "h": 171,
+   "ax": 69,
+   "ay": 170,
+   "kind": "prop",
+   "field_legend": [
+    "T",
+    "Y"
+   ],
+   "zone": "field"
+  },
+  "burnt_pine_a": {
+   "img": "burnt_pine_a.png",
+   "w": 57,
+   "h": 199,
+   "ax": 28,
+   "ay": 198,
+   "kind": "prop",
+   "field_legend": [
+    "P"
+   ],
+   "zone": "field"
+  },
+  "burnt_pine_b": {
+   "img": "burnt_pine_b.png",
+   "w": 99,
+   "h": 208,
+   "ax": 49,
+   "ay": 207,
+   "kind": "prop",
+   "field_legend": [
+    "P"
+   ],
+   "zone": "field"
+  },
+  "ash_bush": {
+   "img": "ash_bush.png",
+   "w": 90,
+   "h": 55,
+   "ax": 45,
+   "ay": 54,
+   "kind": "prop",
+   "field_legend": [
+    "u"
+   ],
+   "zone": "field"
+  },
+  "boulder": {
+   "img": "boulder.png",
+   "w": 82,
+   "h": 88,
+   "ax": 41,
+   "ay": 87,
+   "kind": "prop",
+   "field_legend": [
+    "R"
+   ],
+   "zone": "field"
+  },
+  "stump": {
+   "img": "stump.png",
+   "w": 51,
+   "h": 47,
+   "ax": 25,
+   "ay": 46,
+   "kind": "prop",
+   "field_legend": [
+    "s"
+   ],
+   "zone": "field"
+  },
+  "ruin_pillar": {
+   "img": "ruin_pillar.png",
+   "w": 77,
+   "h": 144,
+   "ax": 38,
+   "ay": 143,
+   "kind": "prop",
+   "field_legend": [
+    "O"
+   ],
+   "zone": "field"
+  },
+  "thread_stake": {
+   "img": "thread_stake.png",
+   "w": 16,
+   "h": 117,
+   "ax": 8,
+   "ay": 116,
+   "kind": "prop",
+   "field_legend": [
+    "c"
+   ],
+   "zone": "field"
+  },
+  "deer_corpse": {
+   "img": "deer_corpse.png",
+   "w": 87,
+   "h": 63,
+   "ax": 43,
+   "ay": 62,
+   "kind": "prop",
+   "field_legend": [
+    "clue:f00_clue_corpse"
+   ],
+   "zone": "field"
   },
   "ember_rubble": {
    "img": "ember_rubble.png",
@@ -392,6 +573,42 @@
    ],
    "role": "[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)",
    "kind": "building"
+  },
+  "bridge_wood": {
+   "img": "bridge_wood.png",
+   "w": 177,
+   "h": 46,
+   "ax": 88,
+   "ay": 45,
+   "kind": "prop",
+   "field_legend": [
+    "b"
+   ],
+   "zone": "field"
+  },
+  "dry_reeds": {
+   "img": "dry_reeds.png",
+   "w": 74,
+   "h": 75,
+   "ax": 37,
+   "ay": 74,
+   "kind": "prop",
+   "field_legend": [
+    "\""
+   ],
+   "zone": "field"
+  },
+  "pale_mushrooms": {
+   "img": "pale_mushrooms.png",
+   "w": 64,
+   "h": 56,
+   "ax": 32,
+   "ay": 55,
+   "kind": "prop",
+   "field_legend": [
+    "m"
+   ],
+   "zone": "field"
   },
   "cocoons": {
    "img": "cocoons.png",
