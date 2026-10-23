@@ -324,6 +324,10 @@
   function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
     for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
       if (h.grade === 'dusk') { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ox, oy, gw, gh); ctx.restore(); } // dusk: one grade over ground, props and characters alike
+      if (h.webs) { ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag, al] of h.webs) { // 거미줄 실 (breadcrumbs toward the Arachne gate), swaying a little
+        const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
+        ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
+        ctx.restore(); }
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const [lx, ly, r, col, a] of h.lights || []) { const [sx, sy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R0 = r * k * (1 + .04 * Math.sin(S.t * 7 + lx)), gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, R0);
         const c = col.replace('#', ''), rr = parseInt(c.slice(0, 2), 16), gg = parseInt(c.slice(2, 4), 16), bb = parseInt(c.slice(4, 6), 16);
