@@ -266,9 +266,10 @@
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 회피대시 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
-      if (just) { hero.roll.just = true; ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
+      if (just) { const ow = src && (src.owner || (src.D ? src : null)); if (ow && ow.D && ow.D.felt) { ow.dazeT = .6; addFx('text', ow.x, ow.y - (ow.D.h || 20) - 8, { text: '?', life: .6, color: '#cfe6ff' }); } // the attacker is caught off guard
+        hero.roll.just = true; S.slowmo = .3; addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(2); ultAdd('gainHit', 1);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = .07; ultAdd('gainHit', 1);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp();
@@ -277,7 +278,7 @@
   }
   function ultAdd(k, n) { const g = window.__game; if (g && g.addUlt && g.ULT_CFG) g.addUlt(g.ULT_CFG[k] * n); } // 필살기 게이지: 싸우는 동안 저절로 · 피격 1번마다 · 저스트 회피 (template ULT_CFG)
   function touch(m, r, dmg) { if (Math.hypot(hero.x - m.x, hero.y - m.y) < r + 5) hurt(dmg, m); }
-  function shot(s) { sfx('shot', .45); s.t = 0; s.vx = Math.cos(s.a) * s.sp; s.vy = Math.sin(s.a) * s.sp; s.life = s.life || 2; S.shots.push(s); }
+  function shot(s) { sfx('shot', .45); if (s.owner && s.owner.D && s.owner.D.felt) addFx('muzzle', s.x, s.y, { life: .15, a: s.a }); s.t = 0; s.vx = Math.cos(s.a) * s.sp; s.vy = Math.sin(s.a) * s.sp; s.life = s.life || 2; S.shots.push(s); }
   function tempSolid(x, y, r, life, kind) { S.temp.push({ x, y, r, life, kind }); const d = Math.hypot(hero.x - x, hero.y - y); if (d < r + 5) { const a = Math.atan2(hero.y - y, hero.x - x) || 0, need = r + 6 - d; moveCol(hero, Math.cos(a) * need, Math.sin(a) * need, 5);
       if (Math.hypot(hero.x - x, hero.y - y) < r + 5) S.temp.pop(); } } // push out, never through a wall; if there is no room the crystal just doesn't form
   function randomFloor() { const m = M(); for (let i = 0; i < 60; i++) { const x = (2 + Math.random() * (m.w - 4)) * m.T, y = (2 + Math.random() * (m.h - 4)) * m.T; if (!blocked(x, y, 6)) return [x, y]; } return [hero.x, hero.y]; }
@@ -425,6 +426,8 @@
     if (takePress('menu')) S.pause = !S.pause;
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; go('town', null, { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { stepUlt(dt); queue.length = 0; updateCam(dt); return; } // 필살기: world frozen (timers, mobs, hazards, shots)
+    if (S.freezeT > 0) { S.freezeT -= dt; updateCam(dt); return; } // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
+    if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
     if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -537,7 +540,8 @@
     }
     for (let i = S.shots.length - 1; i >= 0; i--) { const s = S.shots[i]; s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt;
       if (s.ret && !s.back && s.t > s.life / 2) { s.back = true; s.vx = -s.vx; s.vy = -s.vy; } // boomerang (felt puppet blades)
-      if (Math.hypot(hero.x - s.x, hero.y - 8 - s.y) < s.r + 5 && hurt(s.dmg, s)) { if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); S.shots.splice(i, 1); continue; }
+      if (Math.hypot(hero.x - s.x, hero.y - 8 - s.y) < s.r + 5 && hurt(s.dmg, s)) { if (s.pull && s.owner && !s.owner.dead) { const a = Math.atan2(s.owner.y - hero.y, s.owner.x - hero.x); moveCol(hero, Math.cos(a) * s.pull, Math.sin(a) * s.pull, 5); s.owner.intent = 'melee'; s.owner.cd = Math.min(s.owner.cd || 0, .15); } // thread yank -> follow-up claw
+        if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); S.shots.splice(i, 1); continue; }
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { if (s.zone) hazard({ shape: 'circle', x: s.x, y: s.y + 6, r: 12, warn: 0, act: 2, dmg: 0, kind: 'web', zone: true }); // slowing web patch
         addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
@@ -597,7 +601,7 @@
   function bossDoor(o) { const m = M(); const L = m.links.boss_door; const need = (L.needFlags || []).filter(f => !SAVE.flags[f]);
     if (need.length) { if (!S.msg) msg(L.lockedText + '  (남은 챔피언 ' + need.length + ')', 3); return; }
     go(L.to, L.spawn); }
-  function hazardFx(h) { if (h.dmg) sfx(h.kind === 'swipe' || h.kind === 'thud' ? 'mob_swing' : h.kind === 'root' || h.kind === 'web' ? 'mob_swing' : 'impact', .7); if (h.kind === 'rock' || h.kind === 'crystal' || h.kind === 'quake') addFx(h.kind === 'rock' ? 'debris' : 'crystal', h.x, h.y, { life: .5 });
+  function hazardFx(h) { if (h.dmg && h.kind === 'swipe' && h.owner && h.owner.D && h.owner.D.felt) addFx('claw', h.x, h.y - 6, { life: .22, a: Math.atan2(h.y - h.owner.y, h.x - h.owner.x), r: h.r }); // claw marks at the strike if (h.dmg) sfx(h.kind === 'swipe' || h.kind === 'thud' ? 'mob_swing' : h.kind === 'root' || h.kind === 'web' ? 'mob_swing' : 'impact', .7); if (h.kind === 'rock' || h.kind === 'crystal' || h.kind === 'quake') addFx(h.kind === 'rock' ? 'debris' : 'crystal', h.x, h.y, { life: .5 });
     if (h.kind === 'ult') { shake(7); for (let i = 0; i < 30; i++) { const p = randomFloor(); addFx('crystal', p[0], p[1], { life: .7 }); } }
     if (h.kind === 'poison') addFx('cloud', h.x, h.y, { life: (h.act || 0) + (h.linger || 0) + .2, r: h.r }); }
 
@@ -868,8 +872,16 @@
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
     for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
-      const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sy = idle ? 1 + .02 * Math.sin(S.t * 4 + mm.home[0]) : 1, sz = A.F * k * sc, [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
-      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); ctx.scale(1, sy);
+      const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
+      // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
+      const atkA = name === 'attack' || name === 'shoot', tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
+      if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
+      if (mm.hitT > .18) { bx *= 1.12; by *= .88; }
+      if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
+      if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
+      const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
+      if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry
+      ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); if (rot) ctx.rotate(rot); ctx.scale(bx, by);
       if (mm.flash > 0) ctx.filter = 'brightness(3)';
       blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
@@ -1006,6 +1018,14 @@
     if (f.type === 'heal') { g.fillStyle = `rgba(120,255,140,${1 - p})`; g.fillRect(f.x - 1, f.y - p * 14 - 3, 2, 6); g.fillRect(f.x - 3, f.y - p * 14 - 1, 6, 2); }
     if (f.type === 'stars') { g.fillStyle = '#ffe060'; for (let i = 0; i < 3; i++) { const a = S.t * 6 + i * 2.1; g.fillRect(f.x + Math.cos(a) * 6, f.y + Math.sin(a) * 2, 2, 2); } }
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
+    if (f.type === 'fluff') { const n = f.n || 12; for (let i = 0; i < n; i++) { const a = i * 2.39996 + (f.x % 7), sp = 10 + (i * 37 % 13), x = f.x + Math.cos(a) * sp * p * 1.6, y = f.y + Math.sin(a) * sp * p * .9 - Math.sin(Math.min(1, p * 1.6) * Math.PI) * 10 + p * p * 8; // felt fluff + thread bits
+        g.globalAlpha = Math.max(0, 1 - p * p); g.fillStyle = i % 3 === 0 ? '#f2ede2' : (f.col || '#b0a890'); if (i % 4 === 1) g.fillRect(x, y, 4, 1); else g.fillRect(x - 1, y - 1, 3, 3); } g.globalAlpha = 1; }
+    if (f.type === 'claw') { g.save(); g.translate(f.x, f.y); g.rotate(f.a + Math.PI / 2); const R = (f.r || 12) * 1.1, L = Math.min(1, p * 3); g.globalAlpha = Math.max(0, 1 - p); g.lineWidth = 2; // 3 curved scratches sweeping across the strike circle
+        for (let i = -1; i <= 1; i++) { g.strokeStyle = i ? '#ff6a50' : '#fff4e8'; g.beginPath(); g.arc(i * 5, R * .9, R, -Math.PI / 2 - .9, -Math.PI / 2 - .9 + 1.8 * L); g.stroke(); } g.restore(); g.globalAlpha = 1; }
+    if (f.type === 'bite') { const c = Math.min(1, p * 4), o = (1 - c) * 7; g.globalAlpha = Math.max(0, 1 - p); g.strokeStyle = '#fff'; g.lineWidth = 2; // jaws snapping shut
+      g.beginPath(); g.arc(f.x, f.y - o, 7, Math.PI * .15, Math.PI * .85); g.stroke(); g.beginPath(); g.arc(f.x, f.y + o, 7, Math.PI * 1.15, Math.PI * 1.85); g.stroke(); g.globalAlpha = 1; }
+    if (f.type === 'muzzle') { g.fillStyle = `rgba(255,240,210,${1 - p})`; for (let i = -1; i <= 1; i++) { const a = f.a + i * .5, d = 3 + p * 7; g.fillRect(f.x + Math.cos(a) * d - 1, f.y + Math.sin(a) * d - 1, 2, 2); } }
+    if (f.type === 'justring') { g.strokeStyle = `rgba(150,235,255,${1 - p})`; g.lineWidth = 2; g.beginPath(); g.ellipse(f.x, f.y, 6 + p * 26, (6 + p * 26) * .7, 0, 0, TAU); g.stroke(); }
     if (f.type === 'cloud') { g.fillStyle = `rgba(160,80,220,${.3 * (1 - p)})`; g.beginPath(); g.ellipse(f.x, f.y - 4, f.r || 20, (f.r || 20) * .6, 0, 0, TAU); g.fill(); }
   }
   function drawWorldNodes(g, m) {

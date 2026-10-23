@@ -249,22 +249,29 @@
   {
    "type": "spawn",
    "mob": "c1_thread_puppet",
-   "x": 33,
-   "y": 18,
+   "x": 34,
+   "y": 22,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "c1_needle_spider",
-   "x": 26,
-   "y": 15,
+   "x": 31,
+   "y": 21,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "c1_unrotting_hound",
-   "x": 34,
-   "y": 25,
+   "x": 33,
+   "y": 12,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 30,
+   "y": 13,
    "respawn": 30
   }
  ],
