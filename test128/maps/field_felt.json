@@ -303,5 +303,833 @@
   "PTTPTTPPTPTTTTTTTPTPTTTPTTTTTTTT=TTTTTPPTPTTT~~TTTTPTTPT",
   "TTTTPTPTPTTTPTTTTTTTPTTTPPTTPTTT=TPPTTTPTTTTT~~PTTTTTTTT"
  ],
- "grade": "ash"
+ "grade": "ash",
+ "hd": {
+  "D": 3,
+  "decoArt": {
+   "T": [
+    {
+     "img": "assets/world/field_felt_hd/ash_tree_a.png",
+     "ax": 66,
+     "ay": 181
+    },
+    {
+     "img": "assets/world/field_felt_hd/ash_tree_b.png",
+     "ax": 66,
+     "ay": 164
+    },
+    {
+     "img": "assets/world/field_felt_hd/dead_tree.png",
+     "ax": 64,
+     "ay": 175
+    }
+   ],
+   "P": [
+    {
+     "img": "assets/world/field_felt_hd/burnt_pine_a.png",
+     "ax": 29,
+     "ay": 192
+    },
+    {
+     "img": "assets/world/field_felt_hd/burnt_pine_b.png",
+     "ax": 47,
+     "ay": 200
+    }
+   ],
+   "Y": [
+    {
+     "img": "assets/world/field_felt_hd/ash_tree_b.png",
+     "ax": 66,
+     "ay": 164
+    }
+   ],
+   "u": [
+    {
+     "img": "assets/world/field_felt_hd/bush_b.png",
+     "ax": 46,
+     "ay": 53
+    },
+    {
+     "img": "assets/world/field_felt_hd/ash_bush.png",
+     "ax": 45,
+     "ay": 54
+    }
+   ],
+   "R": [
+    {
+     "img": "assets/world/field_felt_hd/boulder.png",
+     "ax": 41,
+     "ay": 87
+    }
+   ],
+   "r": [
+    {
+     "img": "assets/world/field_felt_hd/stone_low.png",
+     "ax": 70,
+     "ay": 43
+    }
+   ],
+   "s": [
+    {
+     "img": "assets/world/field_felt_hd/stump.png",
+     "ax": 25,
+     "ay": 46
+    }
+   ],
+   "m": [
+    {
+     "img": "assets/world/field_felt_hd/pale_mushrooms.png",
+     "ax": 32,
+     "ay": 55
+    }
+   ],
+   "f": [
+    {
+     "img": "assets/world/field_felt_hd/fence_tile.png",
+     "ax": 24,
+     "ay": 42,
+     "flip": false
+    }
+   ],
+   "O": [
+    {
+     "img": "assets/world/field_felt_hd/ruin_pillar.png",
+     "ax": 38,
+     "ay": 143,
+     "flip": false
+    }
+   ],
+   "c": [
+    {
+     "img": "assets/world/field_felt_hd/thread_stake.png",
+     "ax": 8,
+     "ay": 116,
+     "flip": false
+    }
+   ]
+  },
+  "ground": "assets/world/field_felt_hd/ground.png",
+  "props": [
+   {
+    "img": "assets/world/field_felt_hd/bridge_3.png",
+    "ax": 60,
+    "ay": 143,
+    "flip": false,
+    "id": "bridge",
+    "x": 44.0,
+    "y": 20,
+    "under": 1
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_49_12",
+    "x": 49.62129037775158,
+    "y": 12.732575934761552,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_50_12",
+    "x": 50.484096443965065,
+    "y": 12.973690754327617,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_51_12",
+    "x": 51.30781108218362,
+    "y": 12.733208647710125,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_51_13",
+    "x": 51.48850817478378,
+    "y": 13.969739730028232,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_52_13",
+    "x": 52.570133436325705,
+    "y": 13.923993633894133,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_48_14",
+    "x": 48.58733478612267,
+    "y": 14.740040524163486,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_51_14",
+    "x": 51.50312875315721,
+    "y": 14.941495066966308,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_49_15",
+    "x": 49.45664634630229,
+    "y": 15.908082271615388,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_52_15",
+    "x": 52.434977950589385,
+    "y": 15.815613758769178,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_17_20",
+    "x": 17.485643396383967,
+    "y": 20.84744688159044,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_14_21",
+    "x": 14.623015749661135,
+    "y": 21.713291053887225,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_15_21",
+    "x": 15.359305624275475,
+    "y": 21.859987426931184,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_18_21",
+    "x": 18.483706114636153,
+    "y": 21.967697796579888,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_19_21",
+    "x": 19.392025199576164,
+    "y": 21.97134371720822,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_18_22",
+    "x": 18.472820439597125,
+    "y": 22.74138434836277,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_19_22",
+    "x": 19.47598869029116,
+    "y": 22.93920293272822,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_14_23",
+    "x": 14.394037687188392,
+    "y": 23.931842366822092,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_16_23",
+    "x": 16.347476264655416,
+    "y": 23.829560661630968,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_18_23",
+    "x": 18.606214187599836,
+    "y": 23.978590425526637,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_19_23",
+    "x": 19.659934328273813,
+    "y": 23.98724653777713,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_36_24",
+    "x": 36.49138771251455,
+    "y": 24.842449470140593,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_39_24",
+    "x": 39.54614275600179,
+    "y": 24.960280529080773,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_40_24",
+    "x": 40.497868858208314,
+    "y": 24.749697764544543,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_36_25",
+    "x": 36.344154466476176,
+    "y": 25.830723265420964,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_37_25",
+    "x": 37.64772948006066,
+    "y": 25.76630253849362,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_38_25",
+    "x": 38.624624465909434,
+    "y": 25.915725526337702,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_40_25",
+    "x": 40.39103297589463,
+    "y": 25.838388158444832,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_41_25",
+    "x": 41.64472128643829,
+    "y": 25.75868436646051,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_36_26",
+    "x": 36.41792322089604,
+    "y": 26.977883147540705,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_37_26",
+    "x": 37.34508648006086,
+    "y": 26.852158577223783,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_38_26",
+    "x": 38.418995881610314,
+    "y": 26.75255063339937,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_39_26",
+    "x": 39.520355282171295,
+    "y": 26.976386706344783,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_40_26",
+    "x": 40.426241562012,
+    "y": 26.873053077149233,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_36_27",
+    "x": 36.30902849271079,
+    "y": 27.926363682257215,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_38_27",
+    "x": 38.49746828143107,
+    "y": 27.850713467997412,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_40_27",
+    "x": 40.494466449893665,
+    "y": 27.947651033505828,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_36_28",
+    "x": 36.41652703543586,
+    "y": 28.814144777204273,
+    "flip": false,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_37_28",
+    "x": 37.61779608979123,
+    "y": 28.863999997610517,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_39_28",
+    "x": 39.49731575213373,
+    "y": 28.873019148502863,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_40_28",
+    "x": 40.31251387445445,
+    "y": 28.830692374322826,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/dry_reeds.png",
+    "ax": 37,
+    "ay": 74,
+    "id": "reed_41_28",
+    "x": 41.50069050897146,
+    "y": 28.951957082390074,
+    "flip": true,
+    "shadow": 0
+   },
+   {
+    "img": "assets/world/field_felt_hd/deer_corpse.png",
+    "ax": 43,
+    "ay": 62,
+    "id": "f00_clue_corpse",
+    "x": 12.5,
+    "y": 21.9,
+    "shadow": 1
+   }
+  ],
+  "water": [
+   [
+    3,
+    42,
+    47
+   ],
+   [
+    4,
+    41,
+    48
+   ],
+   [
+    5,
+    41,
+    48
+   ],
+   [
+    6,
+    41,
+    48
+   ],
+   [
+    7,
+    41,
+    48
+   ],
+   [
+    8,
+    41,
+    48
+   ],
+   [
+    9,
+    42,
+    47
+   ],
+   [
+    10,
+    45,
+    46
+   ],
+   [
+    11,
+    45,
+    46
+   ],
+   [
+    12,
+    44,
+    45
+   ],
+   [
+    13,
+    44,
+    45
+   ],
+   [
+    14,
+    43,
+    44
+   ],
+   [
+    15,
+    43,
+    44
+   ],
+   [
+    16,
+    43,
+    44
+   ],
+   [
+    20,
+    43,
+    44
+   ],
+   [
+    21,
+    43,
+    44
+   ],
+   [
+    22,
+    43,
+    44
+   ],
+   [
+    23,
+    43,
+    44
+   ],
+   [
+    24,
+    44,
+    45
+   ],
+   [
+    25,
+    44,
+    45
+   ],
+   [
+    26,
+    44,
+    45
+   ],
+   [
+    27,
+    45,
+    46
+   ],
+   [
+    28,
+    45,
+    46
+   ],
+   [
+    29,
+    45,
+    46
+   ],
+   [
+    30,
+    45,
+    46
+   ],
+   [
+    31,
+    45,
+    46
+   ],
+   [
+    32,
+    45,
+    46
+   ],
+   [
+    33,
+    45,
+    46
+   ],
+   [
+    34,
+    45,
+    46
+   ],
+   [
+    35,
+    45,
+    46
+   ]
+  ],
+  "webs": [
+   [
+    52.5,
+    26.6,
+    55.5,
+    25.7,
+    1.3277907040009533,
+    0.36605360932804776
+   ],
+   [
+    51.5,
+    28.6,
+    54.5,
+    27.7,
+    1.279927715632972,
+    0.4767670347308478
+   ],
+   [
+    49.5,
+    23.6,
+    54.5,
+    22.7,
+    1.210523127430759,
+    0.4659560900208418
+   ],
+   [
+    13.5,
+    31.6,
+    11.5,
+    29.7,
+    1.034275348278633,
+    0.5494834715242553
+   ],
+   [
+    18.5,
+    29.6,
+    21.5,
+    30.7,
+    1.3933166153714116,
+    0.3969187350586297
+   ],
+   [
+    1.5,
+    16.6,
+    6.5,
+    14.7,
+    0.8343551580294493,
+    0.35068630160205944
+   ],
+   [
+    10.5,
+    28.6,
+    13.5,
+    29.7,
+    1.1605684216401781,
+    0.5715187903575882
+   ],
+   [
+    55.5,
+    8.6,
+    51.5,
+    6.7,
+    1.0198428793438294,
+    0.4541854332861922
+   ],
+   [
+    19.5,
+    13.6,
+    22.5,
+    14.7,
+    1.004980405984502,
+    0.5560004496607107
+   ],
+   [
+    55.5,
+    26.6,
+    50.5,
+    28.7,
+    1.2377471744766348,
+    0.4811851522008241
+   ],
+   [
+    9.5,
+    29.6,
+    6.5,
+    30.7,
+    1.1294186246663136,
+    0.4632910695846501
+   ],
+   [
+    51.5,
+    24.6,
+    54.5,
+    25.7,
+    1.3342863258186866,
+    0.4105635205141091
+   ],
+   [
+    3.5,
+    14.6,
+    8.5,
+    15.7,
+    0.8150650035937985,
+    0.38897977678069384
+   ],
+   [
+    52.5,
+    25.6,
+    54.5,
+    24.7,
+    1.24471673616747,
+    0.5283319794778717
+   ],
+   [
+    52.5,
+    24.6,
+    54.5,
+    23.7,
+    0.8833653800977778,
+    0.5457896463119914
+   ],
+   [
+    22.5,
+    14.6,
+    20.5,
+    15.7,
+    0.9497458078021181,
+    0.4357072327091183
+   ],
+   [
+    55.5,
+    28.6,
+    53.5,
+    26.7,
+    0.8421386052976643,
+    0.3894342084560175
+   ]
+  ],
+  "grade": null
+ }
 }
