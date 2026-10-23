@@ -184,19 +184,6 @@
    "role": "[10] 벤의 노점",
    "kind": "building"
   },
-  "fountain": {
-   "img": "fountain.png",
-   "w": 294,
-   "h": 210,
-   "ax": 147,
-   "ay": 209,
-   "grok_foot": [
-    692,
-    530
-   ],
-   "role": "[1] 분수",
-   "kind": "building"
-  },
   "castle_r": {
    "img": "castle_r.png",
    "w": 342,
@@ -242,7 +229,8 @@
    "h": 113,
    "ax": 70,
    "ay": 112,
-   "kind": "prop"
+   "kind": "prop",
+   "zone": "북동 묘비"
   },
   "fence_iron": {
    "img": "fence_iron.png",
@@ -250,7 +238,8 @@
    "h": 57,
    "ax": 50,
    "ay": 56,
-   "kind": "prop"
+   "kind": "prop",
+   "zone": "북동 묘지 쇠울타리"
   },
   "barrels": {
    "img": "barrels.png",
@@ -274,7 +263,8 @@
    "h": 53,
    "ax": 27,
    "ay": 52,
-   "kind": "prop"
+   "kind": "prop",
+   "zone": "남(대장간) 장작"
   },
   "anvil": {
    "img": "anvil.png",
@@ -282,7 +272,8 @@
    "h": 35,
    "ax": 24,
    "ay": 34,
-   "kind": "prop"
+   "kind": "prop",
+   "zone": "남(대장간) 모루"
   },
   "well": {
    "img": "well.png",
@@ -306,7 +297,8 @@
    "h": 33,
    "ax": 27,
    "ay": 32,
-   "kind": "prop"
+   "kind": "prop",
+   "zone": "북 왕성 잔해"
   },
   "sign_post": {
    "img": "sign_post.png",
@@ -315,6 +307,73 @@
    "ax": 28,
    "ay": 89,
    "kind": "prop"
+  },
+  "south_gate": {
+   "img": "south_gate.png",
+   "w": 320,
+   "h": 212,
+   "ax": 160,
+   "ay": 211,
+   "kind": "prop",
+   "zone": "남 입구 문"
+  },
+  "fence_wood": {
+   "img": "fence_wood.png",
+   "w": 191,
+   "h": 43,
+   "ax": 95,
+   "ay": 42,
+   "kind": "prop",
+   "zone": "남 입구 나무 울타리"
+  },
+  "string_lights": {
+   "img": "string_lights.png",
+   "w": 201,
+   "h": 122,
+   "ax": 100,
+   "ay": 121,
+   "kind": "prop",
+   "zone": "서 시장 줄등"
+  },
+  "candelabra": {
+   "img": "candelabra.png",
+   "w": 31,
+   "h": 114,
+   "ax": 15,
+   "ay": 113,
+   "kind": "prop",
+   "zone": "북동 예배당 촛대"
+  },
+  "ember_rubble": {
+   "img": "ember_rubble.png",
+   "w": 116,
+   "h": 64,
+   "ax": 58,
+   "ay": 63,
+   "kind": "prop",
+   "zone": "북 왕성 불씨 잔해"
+  },
+  "fountain": {
+   "img": "fountain.png",
+   "w": 292,
+   "h": 311,
+   "ax": 146,
+   "ay": 310,
+   "grok_foot": [
+    692,
+    530
+   ],
+   "role": "[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)",
+   "kind": "building"
+  },
+  "cocoons": {
+   "img": "cocoons.png",
+   "w": 84,
+   "h": 94,
+   "ax": 42,
+   "ay": 93,
+   "kind": "prop",
+   "zone": "동 거미줄 구역 고치"
   },
   "linette": {
    "img": "linette.png",

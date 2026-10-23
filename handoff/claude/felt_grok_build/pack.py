@@ -43,6 +43,7 @@ def to_pal(im):
 parts = {}
 def tight(a):
     ys, xs = np.nonzero(a[:, :, 3]); return a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+PICK.pop('fountain')
 for pid, v in PICK.items():
     a = np.array(Image.open(f'out/{pid}_{v}.png').convert('RGBA'))
     keep = np.array(gen.mask_of(pid)) > 127
@@ -54,9 +55,25 @@ for pid, v in PICK.items():
     P = POLY[pid]; by = max(p[1] for p in P); bx = [p[0] for p in P if p[1] >= by - 3]
     parts[pid] = {'img': f'{pid}.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1,
                   'grok_foot': [round(sum(bx) / len(bx)), by], 'role': ROLE[pid], 'kind': 'building'}
+from scipy import ndimage
+def key(a, thr=14):   # 테두리와 이어진 단색 바탕 지우기
+    c = a[0, 0, :3].astype(int); flat = np.abs(a[:, :, :3].astype(int) - c).sum(2) < thr
+    fl, _ = ndimage.label(flat); e = set(np.unique(np.concatenate([fl[0], fl[-1], fl[:, 0], fl[:, -1]]))) - {0}
+    a[:, :, 3] = np.where(np.isin(fl, list(e)), 0, a[:, :, 3]); return a
+SKIP = {'fountain_king', 'fountain_king2', 'cocoons'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
 for pid in gen.TEXT:
-    a = tight(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA'))); Image.fromarray(a).save(f'final/{pid}.png')
+    if pid in SKIP: continue
+    a = tight(key(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA')))); Image.fromarray(a).save(f'final/{pid}.png')
     parts[pid] = {'img': f'{pid}.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1, 'kind': 'prop'}
+# 분수 = 그록 분수 + 부서진 왕 석상 (3번방 배치 연구: 랜드마크·저장 비석 역할), 물은 마름
+a = tight(key(np.array(Image.open('out/fountain_king_i.png').convert('RGBA')))); Image.fromarray(a).save('final/fountain.png')
+parts['fountain'] = {'img': 'fountain.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1,
+                     'grok_foot': [692, 530], 'role': '[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)', 'kind': 'building'}
+parts['cocoons'] = parts.pop('cocoons2'); parts['cocoons']['img'] = 'cocoons.png'; os.replace('final/cocoons2.png', 'final/cocoons.png')
+ZONE = {'south_gate': '남 입구 문', 'fence_wood': '남 입구 나무 울타리', 'anvil': '남(대장간) 모루', 'woodpile': '남(대장간) 장작',
+        'string_lights': '서 시장 줄등', 'candelabra': '북동 예배당 촛대', 'tombs': '북동 묘비', 'fence_iron': '북동 묘지 쇠울타리',
+        'cocoons': '동 거미줄 구역 고치', 'ember_rubble': '북 왕성 불씨 잔해', 'rubble': '북 왕성 잔해'}
+for k, z in ZONE.items(): parts[k]['zone'] = z
 parts['watchtower'].update(role='[4] 경비 초소 감시탑', grok_foot=[455, 200], kind='building')
 parts['mausoleum'].update(role='[6] 예배당 뒤 묘지 납골당', grok_foot=[1385, 215])
 # 리네트 공방: atelier_v2 를 init 으로 마을 색 다시 그림 (out/linette_r.png)

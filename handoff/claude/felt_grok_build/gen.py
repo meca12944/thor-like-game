@@ -81,14 +81,26 @@ TEXT = {  # id: (크기, 설명) — init 없이 글자+색만, 투명 배경
  'herb_rack':  ((96, 96),   "wooden drying rack with bundles of hanging herbs, seen from slightly above, 16-bit JRPG"),
  'rubble':     ((128, 80),  "pile of broken burned stone rubble and charred beams, seen from slightly above, 16-bit JRPG"),
  'sign_post':  ((64, 96),   "wooden signpost with two arrow boards, seen from slightly above, 16-bit JRPG"),
+ # 3번방 배치 연구(TOWN_LAYOUT_ko.md) 부탁분: 랜드마크·구역 소품
+ 'fountain_king':  ((320, 320), "tall broken stone fountain in a town square, cracked dry round basin with no water, on top a weathered stone statue of a crowned king holding a sword, the statue's arm broken off, rubble at the base, seen from slightly above, 16-bit JRPG"),
+ 'fountain_king2': ((320, 320), "tall ruined town square fountain, dry cracked tiered stone basin, a headless statue of a king with a long cloak and a sword standing on a high pedestal, moss and rubble, seen from slightly above, 16-bit JRPG", 21),
+ 'south_gate':     ((320, 240), "village entrance gate of rough wooden palisade, two tall log posts with a crossbeam and a hanging wooden sign, open gate doors, short palisade wall on each side, seen from slightly above, 16-bit JRPG"),
+ 'fence_wood':     ((192, 96),  "straight section of a rough wooden palisade fence of sharpened logs, seen from slightly above, 16-bit JRPG"),
+ 'string_lights':  ((256, 128), "string of small hanging paper lanterns on a sagging rope between two wooden poles, seen from slightly above, 16-bit JRPG"),
+ 'candelabra':     ((64, 128),  "tall iron standing candelabra with melted candles and wax drips, seen from slightly above, 16-bit JRPG"),
+ 'cocoons':        ((128, 160), "cluster of three human-sized white silk spider cocoons hanging from a broken beam, thick webs, seen from slightly above, 16-bit JRPG"),
+ 'cocoons2':       ((128, 128), "three large white silk cocoons wrapped tightly in spider web, lying in a heap on the ground with web strands, seen from slightly above, 16-bit JRPG", 3),
+ 'ember_rubble':   ((160, 96),  "pile of charred burned stone rubble and black beams with a few glowing orange embers, thin smoke, seen from slightly above, 16-bit JRPG", None, 'palette_32.png'),
 }
 
 def gen_text(pid, var='t'):
     out = os.path.join(H, 'out', f'{pid}_{var}.png')
     if os.path.exists(out): print(pid, 'skip'); return
-    (w, h), desc = TEXT[pid]
+    (w, h), desc, *rest = TEXT[pid]
+    seed = (rest[0] if rest and rest[0] else 7)
+    pal = {'type': 'base64', 'base64': pl.b64(os.path.join(H, '..', 'felt_grok_layout', rest[1])), 'format': 'png'} if len(rest) > 1 else PAL
     body = {'description': desc + ', ' + STYLE, 'image_size': {'width': w, 'height': h}, 'view': 'low top-down',
-            'color_image': PAL, 'detail': 'high detail', 'shading': 'detailed shading', 'outline': 'selective outline', 'seed': 7}
+            'color_image': pal, 'detail': 'high detail', 'shading': 'detailed shading', 'outline': 'selective outline', 'seed': seed}
     r = pl.submit('/map-objects', body)
     if '_http' in r: print(pid, r); return
     j = pl.wait(r['background_job_id'], every=5); pl.log(f'grok_{pid}_{var}', '/map-objects', j); ims = pl.images(j)
