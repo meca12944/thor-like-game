@@ -26,7 +26,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelate
 // Linette sandbox: atlas = assets/anim/linette8.json (hero8 format: cells [x,y,w,h,ax,ay], anims "<motion>_<dir>" = [[sheet,cell,ticks]]),
 // left = right mirrored; no north/south views (owner 10-20): idle/walk/run/dash/skill/attacks facing up/down use the diagonal clips (hurt/death keep the last side), attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
 // Thrust trails are drawn in code from A.thrust (tip/dir at the lunge frame), like the hero's engine-drawn trails.
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const cv=document.getElementById('c');let ctx=cv.getContext('2d');   // let: the stab streaks are drawn into the pixel canvas (pxBegin/pxEnd) by swapping ctx
 let A,SH=[],VW=480,VH=270,SC=1;
 function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/360,h/300)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
@@ -130,9 +130,13 @@ function step(){
   for(const d of DUST){d.t++;d.x+=d.vx;d.y+=d.vy;d.vy+=0.02;}DUST=DUST.filter(d=>d.t<d.life);
   for(const g of GH)g.a++;GH=GH.filter(g=>g.a<GH8.life).slice(-GH8.alpha.length);
   if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
-  if(P.atk){const a=P.atk,t0=a.t;a.t+=ATK_SPEED;const La=clip(a.clip),lt=tmeta(a.clip),sum=k=>La.slice(0,k).reduce((s,e)=>s+e[2],0),tl=lt?sum(lt.frame):0,tl2=lt?sum(lt.frame+1):total(La);
-    if(lt&&t0<tl&&a.t>=tl){const mm=diagMeta(lt,a.d8);TR.push({x:P.x,y:P.y-jz(),m:mm,t0:P.gt,hi:a.n-1});strike(a.clip,a.n-1,mm);}
-    if(a.q&&a.n<3&&a.t>=tl2)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=total(La))P.atk=null;}
+  if(P.atk){const a=P.atk,C=CMB[a.n-1];a.t++;   // owner 10-22 "검흔 문제점 전부": combo rhythm like the hero (hits at 5 / 20 / 41 ticks = 0.08 / 0.33 / 0.68 s)
+    if(a.t===C.hit){const lt=tmeta(a.clip);if(lt){const mm=shapeHit(diagMeta(lt,a.d8),a.n-1);TR.push({x:P.x,y:P.y-jz(),gy:P.y,m:mm,t0:P.gt,hi:a.n-1});strike(a.clip,a.n-1,mm);
+      P.nudge={t:4,d:mm.dir};sfx(a.n===3?'swing_heavy':'swing_light');}}
+    if(a.q&&a.n<3&&a.t>=C.next)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=C.end)P.atk=null;}
+  if(P.nudge&&--P.nudge.t<=0)P.nudge=null;
+  for(const T of TR)if(P.gt-T.t0<7){T.x=P.x;T.y=P.y-jz();T.gy=P.y;}   // (4) the streak rides with her while it shoots out (no lagging behind when she runs)
+  for(const k of SPK)k.t++;SPK=SPK.filter(k=>k.t<12);
   skillStep();
   if(P.st==='idle'||P.st==='move'){
     if(moving){turnStep(dir8of(ix,iy));   // owner 10-22 "방향전환시 좀더 부드럽게": the facing turns through the in-between directions (see turnStep)
@@ -149,7 +153,7 @@ function step(){
       if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
       const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
       if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
-    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(P.gt||0)-P.t8T<TURN.grace){P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
+    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(Math.abs(P.t8-P.t8p)===1||Math.abs(P.t8-P.t8p)===7)&&(P.gt||0)-P.t8T<TURN.grace){/* only when the straight dir is one of that diagonal's two keys */P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
       if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
       // owner 10-22 "멈출 때 서 있는 자세로 미끄러짐": during the skid she keeps stepping (the walk/run legs advance by the distance, slowing down) and stands once nearly stopped
       if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle','idle_'+atkDir());}}
@@ -173,29 +177,51 @@ const STILL=true,FLY=7,ATK_SPEED=2;
 // drew only 105-135px, so hits landed past the visible streak. Now one number for both: 1st/2nd hit 80px, 3rd hit 105px from the needle tip
 // (~1.0 / 1.2 body lengths from her body, like the hero's thrust 118/83 world px and common top-down melee ~1 body length), half-width 18 / 22.
 // The streak head stops exactly at the end of the hit box. ?hb=1 draws the hit boxes for checking.
+// (1) rhythm: hit = tick of the strike, next = earliest tick the queued next hit starts, end = combo over (hero 14/18/27-tick swings, hits at 5/20/41)
+const CMB=[{hit:5,next:15,end:24},{hit:5,next:18,end:26},{hit:8,next:99,end:22}];
+// (2) three different hits: 1 = quick straight stab, 2 = the other hand (same straight direction, a little lower), 3 = finisher: three needles in a fan + a ring at the end,
+// with a short gathering glow at the needle tip before it fires (ticks 0-8)
+function shapeHit(m,hi){if(hi!==1)return {...m,hi};   /* owner 10-23 "한개 검흔이 대각선으로 발현": no tilt - the 2nd stab goes the same straight way, from the other hand (5px lower / 4px back) */
+  const o=Math.abs(m.dir[0])>0.01?[-m.dir[0]*4,5]:[(P.lastH==='left'?-1:1)*6,-m.dir[1]*4];return {...m,hi,tip:[m.tip[0]+o[0],m.tip[1]+o[1]],tip2:null};}
+// (6) the hero's sound files (assets/sfx); (3) hit sparks at the contact point
+const SFX={};for(const n of ['swing_light','swing_heavy','hit_light','hit_heavy'])try{SFX[n]=new Audio('assets/sfx/'+n+'.ogg');SFX[n].volume=.45;}catch(e){}
+function sfx(n){const a=SFX[n];if(!a)return;try{const c=a.cloneNode();c.volume=a.volume;c.play().catch(()=>{});}catch(e){}}
+let SPK=[];
 const ATKR={len:[80,80,105],half:[18,18,22]},SHOWHB=/[?&]hb=1/.test(location.search);   // ATK_SPEED: attack clock per tick (owner 10-21 "공속 빠르게" -> 2x)
 const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
 const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
 let SHAKE=0,FLASH=0,WAVES=[];
 function strike(n,hi,mo){const m=mo||tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
   const [dx,dy]=m.dir,reach=ATKR.len[hi],half=ATKR.half[hi],tips=m.tip2?[m.tip,m.tip2]:[m.tip];
-  for(const t of tips){const ox=P.x+t[0],oy=P.y+t[1];if(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
-    for(const D of DUM){const rx=D.x-ox,ry=(D.y-28)-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
-      if(along>-8&&along<reach&&perp<half&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});any=true;}}}
-  if(any){P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
+  for(const t of tips){const ox=P.x+t[0],oy=P.y+dy*12;   // (10-22) hits are judged on the GROUND (feet line), like every top-down game: the streak is drawn at chest height, the dummy is where its feet areif(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
+    for(const D of DUM){const rx=D.x-ox,ry=D.y-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
+      if(along>-8&&along<reach&&perp<half&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});any=true;SPK.push({x:D.x,y:D.y-34,t:0,big:hi===2,d:[dx,dy],p:Array.from({length:hi===2?8:5},()=>[Math.random()*2-1,Math.random()*.8+.4])});}}}
+  if(any){sfx(hi===2?'hit_heavy':'hit_light');P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
 // thrust trail (port of fx.py)
 function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
 // owner 10-21 "좀더 앞으로 찌르는 듯한 검흔": a stab streak - a sharp spear-point head shoots forward fast (ease-out), the tail stays at the
 // needle tip for a moment and then snaps forward after the head, so it reads as one straight piercing line; thin speed lines beside it.
+// owner 10-23 "더 괜찮은 검흔" -> 1) dot-art streaks: the stabs and rings are drawn into their own canvas, then every pixel is snapped to a 4-colour
+// palette (white / pale pink / red / dark red) with hard edges, faint parts become a checkerboard dither - same look as the pixel sprites, no smooth blur.
+// 3) a 1-2 frame white flash at the needle tip when a stab fires (stabOne).
+const PXC=document.createElement('canvas'),PXX=PXC.getContext('2d');let PXREAL=null;
+const PXPAL=[[255,255,255],[255,214,222],[255,84,108],[176,26,56]];
+function pxBegin(){if(PXC.width!==VW||PXC.height!==VH){PXC.width=VW;PXC.height=VH;}PXX.clearRect(0,0,VW,VH);PXREAL=ctx;ctx=PXX;}
+function pxEnd(){ctx=PXREAL;if(!TR.length&&!WAVES.length)return;const im=PXX.getImageData(0,0,VW,VH),d=im.data;
+  for(let i=0;i<d.length;i+=4){const a=d[i+3];if(!a)continue;const px=(i>>2)%VW,py=((i>>2)/VW)|0;
+    if(a<40||(a<110&&(px+py)&1)){d[i+3]=0;continue;}   // faint edge: gone or checkerboard dither
+    const r=d[i],g=d[i+1],l=(r+2*g)/3,c=PXPAL[l>225?0:l>165?1:l>100?2:3];d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255;}
+  PXX.putImageData(im,0,0);ctx.drawImage(PXC,0,0);}
 function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=ATKR.len[heavy?2:0],W=heavy?9:6;
   const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3)),k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
   const ox=x+tip[0],oy=y+tip[1],P=d=>[ox+dx*d,oy+dy*d];
   const blade=(w,tailW,col,headLen)=>{const t=P(Tl),h=P(H),hb=P(Math.max(Tl,H-headLen));ctx.fillStyle=col;ctx.beginPath();
     ctx.moveTo(t[0]+nx*tailW/2,t[1]+ny*tailW/2);ctx.lineTo(hb[0]+nx*w/2,hb[1]+ny*w/2);ctx.lineTo(h[0],h[1]);ctx.lineTo(hb[0]-nx*w/2,hb[1]-ny*w/2);ctx.lineTo(t[0]-nx*tailW/2,t[1]-ny*tailW/2);ctx.closePath();ctx.fill();};
-  if(heavy)blade(W*2.2,0,`rgba(60,150,255,${.28*a})`,26);
-  blade(W*1.4,0,`rgba(90,210,255,${.5*a})`,22);blade(W*0.7,0,`rgba(215,250,255,${.9*a})`,18);blade(Math.max(1.5,W*0.28),0,`rgba(255,255,255,${a})`,14);
-  ctx.strokeStyle=`rgba(200,245,255,${.6*a})`;ctx.lineWidth=1;
+  if(heavy)blade(W*2.2,0,`rgba(200,30,60,${.30*a})`,26);
+  blade(W*1.4,0,`rgba(255,85,110,${.5*a})`,22);blade(W*0.7,0,`rgba(255,232,236,${.92*a})`,18);blade(Math.max(1.5,W*0.28),0,`rgba(255,255,255,${a})`,14);
+  ctx.strokeStyle=`rgba(255,170,185,${.6*a})`;ctx.lineWidth=1;
   for(const[o,f]of(heavy?[[1.3,.55],[-1.3,.45],[2.1,.3],[-2.1,.35]]:[[1.2,.5],[-1.2,.4]])){const s0=Tl+(H-Tl)*0.1,s1=Tl+(H-Tl)*(0.1+f),p0=P(s0),p1=P(s1);ctx.beginPath();ctx.moveTo(p0[0]+nx*o*W,p0[1]+ny*o*W);ctx.lineTo(p1[0]+nx*o*W,p1[1]+ny*o*W);ctx.stroke();}
+  if(age<2){const r=heavy?5:3;ctx.fillStyle='#ffffff';ctx.beginPath();ctx.moveTo(ox-r*2,oy);ctx.lineTo(ox,oy-r);ctx.lineTo(ox+r*2,oy);ctx.lineTo(ox,oy+r);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,214,222,.9)';ctx.fillRect(ox-r*3,oy,r*6,1);ctx.fillRect(ox,oy-r*2,1,r*4);}   // 3) fire flash at the needle tip
   if(age<3){const h=P(H+2),r=heavy?6:4;ctx.fillStyle=`rgba(255,255,255,${1-age/3})`;ctx.fillRect(h[0]-r,h[1],2*r,1);ctx.fillRect(h[0],h[1]-r,1,2*r);}}
 function trailOne(x,y,m,tip,age,heavy){if(STILL)return stabOne(x,y,m,tip,age,heavy);const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
   const fly=STILL?age*FLY:0,tx=x+tip[0]+dx*fly,ty=y+tip[1]+dy*fly,ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
@@ -219,14 +245,22 @@ function draw(){   // STILL: during attacks she keeps the idle pose (no attack f
   for(const d of DUST){ctx.globalAlpha=1-d.t/d.life;ctx.fillStyle=d.c;ctx.fillRect(Math.round(d.x-camX),Math.round(d.y-camY),d.s,d.s);}ctx.globalAlpha=1;
   drawDash(camX,camY,true);castFx(false,sx,sy);sewFx(false,camX,camY);
   const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
-  ctx.drawImage(SH[s],x,y,w,h,sx-ax,sy-ay,w,h);
+  const nu=P.nudge?Math.min(2,P.nudge.t*.6):0,nx=P.nudge?Math.round(P.nudge.d[0]*nu):0,ny=P.nudge?Math.round(P.nudge.d[1]*nu*.6):0;ctx.drawImage(SH[s],x,y,w,h,sx-ax+nx,sy-ay+ny,w,h);   // (7) 1-2px 'flinch' toward the stab, no attack pose
   castFx(true,sx,sy);sewFx(true,camX,camY);   // owner 10-22 "속도선 제거해": no dash speed lines (drawDash(...,false) not called)
   for(const D of DUM)if(D.y>P.y)drawDummy(D);
-  for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
+  pxBegin();
+  for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=W.red?`rgba(255,110,130,${1-W.a/16})`:`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
+  for(const T of TR){const age=P.gt-T.t0,x=Math.round(T.x-camX),y=Math.round(T.y-camY);if(T.hi===2){const c=[(T.m.tip[0]+(T.m.tip2||T.m.tip)[0])/2,(T.m.tip[1]+(T.m.tip2||T.m.tip)[1])/2];for(const r of [-0.13,0.13]){const cs=Math.cos(r),sn=Math.sin(r),d=T.m.dir;trailOne(x,y,{...T.m,dir:[d[0]*cs-d[1]*sn,d[0]*sn+d[1]*cs]},c,age-1,false);}trailOne(x,y,T.m,c,age,true);
+    if(age>=6&&!T.w){T.w=1;WAVES.push({x:T.x+c[0]+T.m.dir[0]*ATKR.len[2],y:T.y+c[1]+T.m.dir[1]*ATKR.len[2],a:0,red:1});}}else trailOne(x,y,T.m,T.m.tip,age,false);}TR=TR.filter(T=>P.gt-T.t0<20);
+  pxEnd();
   if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
-  for(const T of TR){const age=P.gt-T.t0,x=Math.round(T.x-camX),y=Math.round(T.y-camY);if(T.m.tip2){trailOne(x,y,T.m,T.m.tip,age,true);trailOne(x,y,T.m,T.m.tip2,age,true);}else trailOne(x,y,T.m,T.m.tip,age,false);}TR=TR.filter(T=>P.gt-T.t0<20);
+  for(const k of SPK){const x=k.x-camX,y=k.y-camY,q=k.t/12,a=1-q,r=(k.big?14:9)*Math.min(1,k.t/3+.3);ctx.fillStyle=`rgba(255,255,255,${a})`;   // (3) hit spark: 4-point star + flying bits
+    ctx.fillRect(Math.round(x-r),Math.round(y),Math.round(2*r),1);ctx.fillRect(Math.round(x),Math.round(y-r),1,Math.round(2*r));ctx.fillStyle=`rgba(255,80,100,${a*.8})`;ctx.fillRect(Math.round(x-r*.6),Math.round(y-r*.6),2,2);ctx.fillRect(Math.round(x+r*.6),Math.round(y+r*.6),2,2);
+    for(const[u,v]of k.p){const dd=k.t*3*v;ctx.fillStyle=u>0?`rgba(230,235,245,${a})`:`rgba(255,90,110,${a})`;ctx.fillRect(Math.round(x+k.d[0]*dd+(-k.d[1])*u*dd*.8),Math.round(y+k.d[1]*dd+k.d[0]*u*dd*.8),2,2);}}
+  if(P.atk&&P.atk.n===3&&P.atk.t<CMB[2].hit){const lt=tmeta(P.atk.clip);if(lt){const m=diagMeta(lt,P.atk.d8),c=m.tip2?[(m.tip[0]+m.tip2[0])/2,(m.tip[1]+m.tip2[1])/2]:m.tip,g=P.atk.t/CMB[2].hit,x=P.x+c[0]-camX,y=P.y-jz()+c[1]-camY;   // finisher gathering glow
+    ctx.fillStyle=`rgba(255,90,110,${.35*g})`;ctx.beginPath();ctx.arc(x,y,3+6*g,0,7);ctx.fill();ctx.fillStyle=`rgba(255,240,245,${.9*g})`;ctx.fillRect(Math.round(x-1),Math.round(y-1),3,3);}}
   if(SHOWHB)for(const T of TR){if(P.gt-T.t0>14)continue;const [dx,dy]=T.m.dir,L=ATKR.len[T.hi||0],h=ATKR.half[T.hi||0];ctx.strokeStyle='#ff3040';ctx.lineWidth=1;
-    for(const t of T.m.tip2?[T.m.tip,T.m.tip2]:[T.m.tip]){const ox=T.x+t[0]-camX,oy=T.y+t[1]-camY,c=[[-8,-h],[L,-h],[L,h],[-8,h]].map(([u,v])=>[ox+dx*u-dy*v,oy+dy*u+dx*v]);ctx.beginPath();ctx.moveTo(...c[0]);for(const q of c.slice(1))ctx.lineTo(...q);ctx.closePath();ctx.stroke();}}   // ?hb=1: red = hit box
+    for(const t of T.m.tip2?[T.m.tip,T.m.tip2]:[T.m.tip]){const ox=T.x+t[0]-camX,oy=(T.gy??T.y)+dy*12-camY,c=[[-8,-h],[L,-h],[L,h],[-8,h]].map(([u,v])=>[ox+dx*u-dy*v,oy+dy*u+dx*v]);ctx.beginPath();ctx.moveTo(...c[0]);for(const q of c.slice(1))ctx.lineTo(...q);ctx.closePath();ctx.stroke();}}   // ?hb=1: red = hit box
 }
 // owner 10-21 "리네트 스킬 만들어보자" -> 재봉사 실/바늘, 3 skills cycling on each press (cast pose = her two needle-rapiers spreading):
 // S1 바늘비: a fan of needles with red thread tails flies forward and pierces. S2 실 묶기: one needle on a red thread shoots out,
