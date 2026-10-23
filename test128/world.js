@@ -299,7 +299,7 @@
         hero.roll.just = true; S.slowmo = .3; addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
     if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = .07; ultAdd('gainHit', 1);
-    if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
+    if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); if (!hero.atk) setFace(-Math.cos(a), -Math.sin(a)); hero.kb = { x: Math.cos(a) * 3.3, y: Math.sin(a) * 3.3, n: 0 }; } // turn to the attacker (the recoil pose leans away from it) and slide ~8px over 7 ticks instead of a 1-tick teleport (motion lab 10-23)
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp(); checkLastStand();
     if (hero.hp <= 0) die();
@@ -458,6 +458,7 @@
   function step(dt) {
     S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
+    if (hero.kb) { const K = hero.kb; moveCol(hero, K.x, K.y, 5); K.x *= .6; K.y *= .6; if (++K.n >= 7) hero.kb = null; } // hit knockback slide (see hurt)
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
@@ -868,12 +869,19 @@
     for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
       if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
-  function gkKick(a) { const AT = atkT(a.i), u = a.t; return u < AT.a0 ? { x: -2 * u / Math.max(AT.a0, 1e-3), sq: 1 } : { x: 4 * Math.exp(-(u - AT.a0) * 14), sq: 1 - .05 * Math.exp(-(u - AT.a0) * 14) }; } // atlas px: lean back, snap forward, squash
+  function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
+    // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
+    const AT = atkT(a.i), u = a.t, big = a.i === 2;
+    if (u < AT.a0) { const q = u / Math.max(AT.a0, 1e-3), e = q * q * (3 - 2 * q); return { lean: -3 * e, step: 0, sq: 1 - .04 * e }; }
+    const t = u - AT.a0, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), sp = Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
+    const L0 = big ? 9 : 6, st = (big ? 5 : 1.5) * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
+    return { lean: L0 * sp, step: st, sq: 1 + .045 * Math.exp(-t * 30) * Math.cos(t * 40) };
+  }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
-    let kx = 0, ky = 0, sq = 1; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.x * f; ky = v[1] * K.x * f * .5; sq = K.sq; }
-    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); ctx.translate(-fx, -fy);
+    let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
@@ -964,7 +972,7 @@
       blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
   // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
-  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p; return i; }); }).catch(() => {});
+  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json?v=47').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p; return i; }); }).catch(() => {});
   const PET_MAPS = ['field00'];
   const petDir = (dx, dy, cur) => Math.abs(dx) > Math.abs(dy) * 1.4 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'down' : 'downl') : (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'up' : 'upl');
   const petTot = L => L.reduce((a, f) => a + f[2], 0);
@@ -982,10 +990,10 @@
       P.dir = dir; P.atk = { t: 0, clip, dir, tg, hitT: petTot(L.slice(0, th ? th.frame : 4)) }; P.cd = 0.9; P.moving = false; return; }
     else if (d > (tg ? 3 : 14)) { const v = (sp || (d > 60 ? 130 : 78)) * dt, k = Math.min(1, v / d); moveCol(P, dx * k, dy * k, 4); P.run = sp ? true : d > 60; }
     const mx = P.x - x0, my = P.y - y0; P.moving = Math.abs(mx) + Math.abs(my) > 1e-3; if (P.moving) P.dir = petDir(mx, my, P.dir); else if (tg) P.dir = petDir(tg.x - P.x, tg.y - P.y, P.dir);
-    if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 46 : 32)) % 1; }
+    if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 32.8 : 23.4)) % 1; } // one cycle per field px = Linette's drawn stride (walk 1.9 / run 4.0 art px per tick x clip ticks x 30/117): feet stay planted (motion lab 10-23; was 46/32 = ~1.4x foot slide)
   function drawPetHi(k, front) { const P = S.pet; if (!P || !PET.A || P.map !== S.map || (P.y > hero.y) !== front) return; const A = PET.A, a = P.atk;
     const an = a ? a.clip : P.moving ? (P.run ? 'run' : 'walk') : 'idle', L = A.anims[an + '_' + (a ? a.dir : P.dir)] || A.anims[an + '_right']; if (!L) return;
-    let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) e = L[Math.floor((P.gp || 0) * L.length) % L.length]; else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
+    let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) { let t = ((P.gp || 0) % 1) * petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } /* walk/run frames have their own ticks (longer where the foot travels further) */ else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
     const im = PET.IM[e[0]], c = A.cells[e[0]][e[1]]; if (!im || !im.complete) return; const sc = k * H128FIG / 117, [sx, sy] = W2S(P.x, P.y);
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(sx, sy, 6 * k, 2.5 * k, 0, 0, TAU); ctx.fill(); ctx.imageSmoothingEnabled = sc < 1;
     ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc));

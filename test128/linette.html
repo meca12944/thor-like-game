@@ -157,8 +157,8 @@ function step(){
          // (10-22) up/down at 0.8x: depth + less sliding on the front/back walks
       P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.spd=sp;
       const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
-      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=MV.startFrame[running?1:0]*clip(n)[0][2];}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
-      const f0=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=Math.floor((P.mt%total(clip(n)))/clip(n)[0][2]);
+      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=total(clip(n).slice(0,MV.startFrame[running?1:0]));}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
+      const fi=t=>clip(n).indexOf(frameAt(clip(n),t,true));const f0=fi(P.mt||0);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=fi(P.mt);
       if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
     else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(Math.abs(P.t8-P.t8p)===1||Math.abs(P.t8-P.t8p)===7)&&(P.gt||0)-P.t8T<TURN.grace){/* only when the straight dir is one of that diagonal's two keys */P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
       if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
@@ -331,5 +331,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=45').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=45';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=47').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=45';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
 </script></body></html>
