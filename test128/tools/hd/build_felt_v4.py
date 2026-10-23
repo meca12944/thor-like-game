@@ -22,7 +22,7 @@ rnd = random.Random(7)
 # ---------- parts (copy + 0-credit fixes) ----------
 def load(pid): return Image.open(os.path.join(SRC, PJ[pid]['img'])).convert('RGBA')
 IM = {pid: load(pid) for pid in PJ}
-def dry_fountain(im):                              # blue water -> dark still water / cracked basin (colours from palette base24 + accent #2f4a52)
+def dry_fountain(im):   # (unused since the art room's statue fountain is dry)                               # blue water -> dark still water / cracked basin (colours from palette base24 + accent #2f4a52)
     a = np.asarray(im).astype(float); r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
     blue = (b > r + 18) & (b > g - 4) & (al > 0); L = (.3 * r + .59 * g + .11 * b) / 255
     dark = np.array([23, 17, 12.]); teal = np.array([47, 74, 82.]); mud = np.array([62, 54, 46.])
@@ -47,13 +47,12 @@ for pid in IM:
 for pid, im in IM.items(): im.save(os.path.join(OUT, PJ[pid]['img']), optimize=True)
 
 # ---------- placement ----------
-EXTRA = [  # props with no Grok spot: (part, Grok x, y) - district accents from TOWN_LAYOUT_ko.md 3)
- ('tombs', 1300, 292), ('tombs', 1450, 305), ('fence_iron', 1215, 335), ('fence_iron', 1300, 340),          # NE chapel yard
- ('lamp', 600, 452), ('lamp', 785, 452), ('lamp', 600, 575), ('lamp', 790, 575), ('lamp', 300, 470), ('lamp', 175, 560),  # plaza + W market
- ('bench', 742, 585), ('crates', 575, 405), ('barrels', 395, 425), ('cart', 850, 430),                    # plaza / market
- ('barrels', 965, 478), ('herb_rack', 1175, 668), ('rubble', 1385, 725), ('rubble', 1500, 640),            # inn / herbs / web quarter
- ('anvil', 900, 760), ('woodpile', 1025, 745), ('sign_post', 815, 705), ('brazier', 1000, 812),          # S entrance (forge, Gas' brazier)
- ('rubble', 545, 255), ('rubble', 880, 262), ('crates', 1105, 850)]
+SC = json.load(open(os.path.join(SRC, 'scene_suggest.json')))['scene']   # the town-art room's entrance scene + district accents (Grok px)
+EXTRA = [tuple(e) for e in SC] + [  # + mine (Grok px): plaza lamps / bench, market, inn, herbs, web quarter, castle rubble
+ ('tombs', 1450, 305), ('fence_iron', 1215, 335), ('fence_iron', 1300, 340), ('candelabra', 1000, 215), ('cocoons', 1500, 640),
+ ('lamp', 600, 452), ('lamp', 785, 452), ('lamp', 600, 575), ('lamp', 790, 575), ('lamp', 175, 560),
+ ('bench', 742, 585), ('crates', 575, 405), ('barrels', 395, 425), ('cart', 850, 430),
+ ('barrels', 965, 478), ('herb_rack', 1175, 668), ('rubble', 1385, 725), ('rubble', 545, 255), ('rubble', 880, 262), ('crates', 1105, 850)]
 props, solid = [], [[False] * W for _ in range(H)]
 for x in range(W): solid[0][x] = solid[H - 1][x] = True
 for y in range(H): solid[y][0] = solid[y][W - 1] = True
@@ -66,14 +65,18 @@ def place(pid, gx, gy, n=''):
     x0, x1 = wx + (c0 - p['ax']) / D, wx + (c1 - p['ax']) / D; inset = (x1 - x0) * (.1 if kind == 'building' else .2)
     depth = min(p['h'] / D * .32, 44) if kind == 'building' else min(p['h'] / D * .3, 10)
     if pid in ('castle_l', 'castle_r'): depth = 60
-    if pid == 'fountain': depth = p['h'] / D * .55
+    if pid == 'fountain': depth = p['w'] / D * .36                 # basin only (the king statue stands tall above it)
     sx0, sx1, sy1, sy0 = int((x0 + inset) // T), int((x1 - inset) // T), int((wy - 3) // T), int((wy - depth) // T)
-    if pid in ('lamp', 'sign_post', 'brazier'): sx0 = sx1 = int(wx // T); sy0 = sy1 = int((wy - 1) // T)
+    if pid in ('lamp', 'sign_post', 'brazier', 'candelabra'): sx0 = sx1 = int(wx // T); sy0 = sy1 = int((wy - 1) // T)
+    if pid == 'string_lights': sx0, sx1 = int((wx - 30) // T), int((wx + 30) // T); sy0 = sy1 = -9              # walk under the lanterns (posts only)
+    if pid == 'south_gate': sy0 = sy1 = int((wy - 3) // T); sx0, sx1 = int((wx - 53) // T), int((wx + 53) // T)  # posts + side fences; the opening is cut below
     for y in range(max(0, sy0), min(H, sy1 + 1)):
-        for x in range(max(0, sx0), min(W, sx1 + 1)): solid[y][x] = True
+        for x in range(max(0, sx0), min(W, sx1 + 1)): solid[y][x] = not (pid == 'south_gate' and abs((x + .5) * T - wx) < 24)
+    if pid == 'string_lights':
+        for x in (sx0, sx1): solid[int((wy - 1) // T)][x] = True
     big = kind == 'building' and pid != 'fountain'
     props.append({'id': pid + n, 'role': p.get('role', ''), 'img': f'assets/world/felt_v4/{p["img"]}', 'x': wx / T, 'y': wy / T, 'ax': p['ax'], 'ay': p['ay'],
-                  'solid': [sx0, sy0, sx1, sy1], 'fade': 1 if big or pid in ('watchtower', 'mausoleum') else 0, 'shadow': 0 if big else 1})
+                  'solid': [sx0, sy0, sx1, sy1], 'fade': 1 if big or pid in ('watchtower', 'mausoleum', 'south_gate', 'string_lights') else 0, 'shadow': 0 if big else 1})
 for pid, p in PJ.items():
     if 'grok_foot' in p: place(pid, *p['grok_foot'])
 ss = PJ['shop_sign']; place('well', ss['grok_foot'][0] - 92 / D / S, ss['grok_foot'][1] + 4, '_shop')   # covers the villager baked into the store art
@@ -112,7 +115,7 @@ def sel(conds, cs, other): return np.select([c[..., None] for c in conds], cs, o
 # earth: dark dirt mottled, dead grass tufts
 e = n1 * .6 + n2 * .3 + n3 * .1; img[:] = sel([e < .35, e < .5, e < .65], [cols['d1'], cols['d2'], cols['d3']], cols['d4'])
 tuft = (vnoise(1.5, 9) > .7) & (vnoise(10, 10) > .62); img[tuft] = cols['g1'] * .6 + cols['d2'] * .4
-img[yard] = np.where((n3[yard] > .5)[:, None], cols['g1'] * .75, cols['g1'] * .45 + cols['d2'] * .55)
+img[yard] = np.where((n3[yard] > .45)[:, None], cols['g1'], np.where((n2[yard] > .5)[:, None], cols['g1'] * .8 + cols['d3'] * .2, cols['d3']))
 # roads: packed dirt, darker rim, ruts and pebbles
 road = dr < 0; rim = (dr >= 0) & (dr < 3)
 rv = n2 * .7 + n3 * .3; img[road] = sel([rv[road] < .35, rv[road] < .55, rv[road] < .75], [cols['r1'], cols['r2'], cols['r3']], cols['r4'])
@@ -170,12 +173,18 @@ for o in objs:
     if o['type'] in ('npc', 'waystone', 'clue', 'sign'): rows[int(o['y'])][int(o['x'])] = '.'
 # district lights (TOWN_LAYOUT 3) and threads toward the Arachne gate (4)
 def lp(pid, dx, dy, r, col, a): x, y = P[pid]['x'] + dx, P[pid]['y'] + dy; return [x, y, r, col, a]
-LIGHTS = [lp('brazier_21', 0, -.6, 60, '#ff8a3a', 1), lp('se_house', -1, -2, 56, '#ff7a2a', 1), lp('s_house', 0, -1, 40, '#ffb060', .6),
+LIGHTS = [lp(next(q['id'] for q in props if q['id'].startswith('brazier')), 0, -.6, 60, '#ff8a3a', 1), lp('se_house', -1, -2, 56, '#ff7a2a', 1), lp('s_house', 0, -1, 40, '#ffb060', .6),
  lp('west_a', 0, -1, 44, '#ffc070', .8), lp('west_b', 0, -1, 44, '#ffc070', .8), lp('stall_n', 0, -1, 40, '#ffcc80', .7), lp('shop_sign', 0, -1, 40, '#ffc070', .6),
  lp('castle_l', 0, -1, 50, '#ff5a2a', .7), lp('castle_r', 0, -1, 50, '#ff5a2a', .7), lp('linette', 0, 0, 44, '#ffd0a0', .6),
  lp('chapel', 0, 0, 44, '#b080ff', .8), lp('mausoleum', -2, 0, 50, '#9a70e0', .6), lp('inn', 0, -1, 50, '#ffb060', .8),
  lp('e_row', 0, -1, 44, '#cfe0d8', .5), lp('web_arch', 0, -1, 56, '#c8d8ff', .7), lp('red_stall', 0, -1, 36, '#ffb070', .6), lp('fountain', 0, -1, 50, '#9fd8ff', .35)]
 LIGHTS += [[q['x'], q['y'] - 1.4, 26, '#ffc070', .7] for q in props if q['id'].startswith('lamp_')]
+LIGHTS += [[q['x'], q['y'] - .5, 22, '#ff6a2a', .9] for q in props if q['id'].startswith('ember_rubble')]           # 불씨 잔해 (art room)
+LIGHTS += [[q['x'], q['y'] - 2.2, 22, '#c090ff', .7] for q in props if q['id'].startswith('candelabra')]
+LIGHTS += [[q['x'], q['y'] - 2.2, 40, '#ffc880', .7] for q in props if q['id'].startswith('string_lights')]
+# smoke (code, not baked): Rom's forge chimney (art room: se_house picture x~120, y~20) + the burned castle
+se = P['se_house']; SMOKE = [[se['x'] + (120 - se['ax']) / D / T, se['y'] - (se['ay'] - 20) / D / T, 1]]
+for c in ('castle_l', 'castle_r'): q = P[c]; SMOKE.append([q['x'] + .5, q['y'] - 5, 1.6])
 ax0, ay0 = P['fountain']['x'] + 3, P['fountain']['y'] - 1; ax1, ay1 = P['web_arch']['x'] - 2, P['web_arch']['y'] - 1.5; WEBS = []
 for i in range(14):
     t = (i / 13) ** .7; x = ax0 + (ax1 - ax0) * t; y = ay0 + (ay1 - ay0) * t; n = 1 + int(t * 3)
@@ -183,8 +192,8 @@ for i in range(14):
 m = {k: F[k] for k in ('type', 'area', 'region', 'title', 'bgm', 'battleBgm', 'tileset', 'tile') if k in F}
 m.update(id='felt_v4', name='펠트', w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
          spawns={'default': [EX[0] + .5, EX[1] - 1.5, 'up'], 'world': [EX[0] + .5, EX[1] - 1.5, 'up'], 'field': [EX[0] + .5, EX[1] - 1.5, 'up']},
-         hd={'D': GD, 'ground': 'assets/world/felt_v4/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'grade': 'dusk'},
-         viewZoom=0.85, note='GENERATED by tools/hd/build_felt_v4.py from the town-art room parts + felt.json (doors / NPCs / clues)')
+         hd={'D': GD, 'ground': 'assets/world/felt_v4/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk'},
+         note='GENERATED by tools/hd/build_felt_v4.py from the town-art room parts + felt.json (doors / NPCs / clues)')
 json.dump(m, open(os.path.join(ROOT, 'maps', 'felt_v4.json'), 'w'), ensure_ascii=False, indent=1)
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json')))
 top = [x for x, c in enumerate(FF['ground'][0]) if c in ".'=,"]; fxo = EX[0] - (top[0] + top[-1]) // 2

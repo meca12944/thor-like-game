@@ -328,6 +328,9 @@
         const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
         ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
         ctx.restore(); }
+      for (const [x0, y0, sz] of h.smoke || []) for (let i = 0; i < 9; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade
+        const ph = (S.t * .16 + i / 9 + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz, [sx, sy] = W2S(wx, wy);
+        ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const [lx, ly, r, col, a] of h.lights || []) { const [sx, sy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R0 = r * k * (1 + .04 * Math.sin(S.t * 7 + lx)), gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, R0);
         const c = col.replace('#', ''), rr = parseInt(c.slice(0, 2), 16), gg = parseInt(c.slice(2, 4), 16), bb = parseInt(c.slice(4, 6), 16);
