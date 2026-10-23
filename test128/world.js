@@ -984,8 +984,9 @@
     ctx.save(); ctx.fillStyle = 'rgba(4,2,10,.92)'; ctx.fillRect(ox, by - bh / 2, SW, bh); const lw = Math.max(2, SH * .006); ctx.fillStyle = U.band; ctx.fillRect(ox, by - bh / 2, SW, lw); ctx.fillRect(ox, by + bh / 2 - lw, SW, lw);
     ctx.beginPath(); ctx.rect(ox, by - bh / 2 + lw, SW, bh - lw * 2); ctx.clip();
     const G = h128(), c = G && h128Cell(); let im = null; if (c) im = c.h8 !== undefined ? G.H8img(c.h8) : G.H128img;
-    if (im && c) { const faceH = c[3] * .3, sc = SH * .2 * 1.5 / faceH, w = c[2] * sc, sx = ox + SW * (.62 - q * .14) - w / 2; ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(im, c[0], c[1] + c[3] * .1, c[2], faceH, sx, by - faceH * sc / 2, w, faceH * sc); }
+    if (im && c) { const FIG = 117, fy0 = c[1] + c[5] - FIG * 1.02, faceH = FIG * .36, faceW = FIG * .62, fx0 = c[0] + c[4] - faceW / 2; // head of the figure: top 36% above the feet anchor
+      const sc = SH * .2 * 1.25 / faceH, sx = ox + SW * (.64 - q * .12) - faceW * sc / 2; ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(im, fx0, fy0, faceW, faceH, sx, by - faceH * sc * .45, faceW * sc, faceH * sc); }
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = `rgba(${U.col[1]},.25)`; ctx.fillRect(ox, by - bh / 2, SW, bh); ctx.restore();
     const fs = Math.round(SH * .06); ctx.globalAlpha = inn * (1 - out); textOut(U.name, ox + SW * .27, by + fs * .3, fs, U.band); ctx.globalAlpha = 1; }
   function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - f.fz - f.ci, c = f.t - f.fz;
