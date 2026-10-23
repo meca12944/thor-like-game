@@ -3,7 +3,6 @@
  "maps": [
   "field00",
   "dungeon01_b1",
-  "dungeon01_b2",
   "boss01",
   "field02",
   "field03",
@@ -33,7 +32,6 @@
    "worldNode": "area1",
    "maps": [
     "dungeon01_b1",
-    "dungeon01_b2",
     "boss01"
    ]
   },
@@ -115,8 +113,8 @@
    "id": "dest_boss",
    "label": "골렘의 방",
    "kind": "boss",
-   "map": "dungeon01_b2",
-   "x": 38,
+   "map": "dungeon01_b1",
+   "x": 84,
    "y": 13
   }
  ],

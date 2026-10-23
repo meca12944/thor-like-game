@@ -15,7 +15,7 @@
    "done": "골렘을 쓰러뜨렸다고? 대단해! 숲에 다시 바람이 통하겠어.",
    "need": {"flags": ["boss01"]},
    "targets": [{"map": "field00", "x": 102, "y": 4, "label": "고대 숲 신전 입구", "untilMapVisited": "dungeon01_b1"},
-               {"map": "dungeon01_b2", "x": 38, "y": 13, "label": "골렘의 방"}],
+               {"map": "dungeon01_b1", "x": 84, "y": 13, "label": "골렘의 방"}],
    "reward": [["heart_piece", 1]]}
  ]
 }

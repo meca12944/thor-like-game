@@ -72,7 +72,7 @@
   try { Object.assign(SAVE, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   if (Q.has('worldreset')) SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null };
   for (const k of ['explored', 'waystones', 'landmarks', 'quests']) SAVE[k] = SAVE[k] || {};
-  if (SAVE.fogV !== 'region01') { delete SAVE.explored.field00; delete SAVE.explored.field01; SAVE.fogV = 'region01'; } // 바람길 + 시작의 숲 stitched into one map (owner 10-23)
+  if (SAVE.fogV !== 'temple01') { for (const k of ['field00', 'field01', 'dungeon01_b1', 'dungeon01_b2']) delete SAVE.explored[k]; SAVE.fogV = 'temple01'; } // 바람길 + 시작의 숲 stitched into one map (owner 10-23)
   const save = () => { try { localStorage.setItem(LS, JSON.stringify(SAVE)); } catch (e) {} };
 
   // ---------------- assets ----------------
@@ -345,7 +345,7 @@
 
   // ---------------- scene manager ----------------
   // 세미 오픈월드 (owner 10-23): field01 (시작의 숲) now lives inside field00 at x+56 (tools/stitch_region01.py); old links keep working
-  const ALIAS = { field01: { to: 'field00', pre: 'f01_' } };
+  const ALIAS = { field01: { to: 'field00', pre: 'f01_' }, dungeon01_b2: { to: 'dungeon01_b1', pre: 'b2_' } }; // + 신전 B2 at x+46 (tools/stitch_temple01.py)
   function go(to, spawnName, opt = {}) {
     if (S.trans) return false;
     const AL = ALIAS[to]; if (AL) { to = AL.to; spawnName = AL.pre + (spawnName || 'default'); }
