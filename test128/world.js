@@ -328,6 +328,11 @@
         const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
         ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
         ctx.restore(); }
+      if (h.water) { ctx.save(); ctx.fillStyle = 'rgba(170,184,196,.22)'; const v = S.view, ph = S.t * 5; // 잔물결 (code): short pale dashes drifting along each water run [y, x0, x1]
+        for (const [y, x0, x1] of h.water) { const [, sy] = W2S(0, (h.gy + y) * T); if (sy < v.oy - T * k || sy > v.oy + (EH + 2) * k) continue;
+          for (let x = x0; x <= x1; x++) for (let j = 0; j < 2; j++) { const hsh = Math.sin((x * 12.9 + y * 78.2 + j * 37.7)) * 43758.5, f = hsh - Math.floor(hsh), u = (f * T + ph * (1 + f)) % T, a = Math.sin(S.t * 1.7 + f * 6.3);
+            if (a < .2) continue; const [sx, sy2] = W2S((h.gx + x) * T + u, (h.gy + y) * T + 3 + j * 8 + f * 3); ctx.fillRect(Math.round(sx), Math.round(sy2), Math.round((2 + 3 * a) * k), Math.max(1, Math.round(k * .5))); } }
+        ctx.restore(); }
       for (const [x0, y0, sz] of h.smoke || []) for (let i = 0; i < 9; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade
         const ph = (S.t * .16 + i / 9 + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz, [sx, sy] = W2S(wx, wy);
         ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
