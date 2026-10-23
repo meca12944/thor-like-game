@@ -678,7 +678,7 @@
     list.push({ y: hero.y, f: () => drawHeroSprite(g, 1) });
     for (const f of S.fx) if (f.type === 'heart') list.push({ y: f.y, f: () => drawHeartPick(g, f) });
     list.sort((a, b) => a.y - b.y).forEach(o => o.f());
-    if (S.ultFx && S.ultFx.U.whole && S.ultFx.fx && S.ultFx.fx !== 'pillar') drawAbyssLow(g, S.ultFx); // pixel effect in the world canvas (same pixels as the map)
+    if (S.ultFx && S.ultFx.U.whole && S.ultFx.fx && S.ultFx.fx !== 'pillar') { abyssDark(g, S.ultFx); drawAbyssLow(g, S.ultFx); } // pixel effect in the world canvas (same pixels as the map)
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
@@ -867,6 +867,7 @@
     g.drawImage(_ultC, 0, 0);
   }
   function drawFx(g, f) { const p = f.t / f.life;
+    if (f.type === 'scorch') { const q = fxQ(), a = 1 - p; abEll(g, f.x, f.y, 10, 4, AB_PAL.void, a * .9, q); abEll(g, f.x, f.y, 6, 2, AB_PAL.deep, a, q); for (let i = 0; i < 4; i++) { const ph = (p * 2 + i / 4) % 1; abPx(g, f.x + (hash(i + f.x) - .5) * 14, f.y - ph * 18, 1, i % 2 ? AB_PAL.lit : AB_PAL.vio, a * (1 - ph), q); } g.globalAlpha = 1; return; } // 그을린 자국 + 올라가는 불티
     if (f.type === 'spark') { g.fillStyle = `rgba(255,255,220,${1 - p})`; for (let i = 0; i < 4; i++) { const a = i * 1.57 + .7; g.fillRect(f.x + Math.cos(a) * p * 8 - 1, f.y + Math.sin(a) * p * 8 - 1, 2, 2); } }
     if (f.type === 'poof') { g.fillStyle = `rgba(240,240,255,${.8 * (1 - p)})`; const R = (f.big ? 22 : 9) * (0.4 + p); for (let i = 0; i < 6; i++) { const a = i * TAU / 6; g.beginPath(); g.arc(f.x + Math.cos(a) * R, f.y + Math.sin(a) * R * .6, 3 * (1 - p) + 1, 0, TAU); g.fill(); } }
     if (f.type === 'dust') { g.fillStyle = `rgba(200,180,140,${.6 * (1 - p)})`; for (let i = 0; i < 3; i++) { g.beginPath(); g.arc(f.x + (i - 1) * 5 * (1 + p), f.y - p * 4, 2 + p * 2, 0, TAU); g.fill(); } }
@@ -969,7 +970,7 @@
       for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, F = U.whole ? U : FULT, tot = D.boss ? mm.maxHp * F.boss : D.champion ? mm.maxHp * F.champ : F.mob, d = Math.max(1, Math.round(tot / n));
         mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
         if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
-    if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
+    if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.whole && f.fx === 'rift' && fxQ() >= 3) for (const mm of f.vic) addFx('scorch', mm.x, mm.y + 2, { life: 1.6 }); if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
   function cutZoom() { const f = S.ultFx; if (!f || (f.cut !== 'zoom' && f.cut !== 'hybrid')) return 1; const c = f.t - f.fz, e = c - f.ci; // push in during the cut, snap back on the boom
     if (c < 0) return 1; if (e < 0) { const q = Math.min(1, c / (f.ci * .85)); return 1 + .75 * (q * q * (3 - 2 * q)); } return e < .12 ? 1 + .75 * (1 - e / .12) : 1; }
   function drawCutZoom(f, U, q, u, ox, oy, SW, SH) { const [hx, hy] = W2S(hero.x, hero.y - 14), k = S.view.k; // spotlight on the hero, chest emblem lights up, name in the world
@@ -993,38 +994,49 @@
     const fs = Math.round(SH * .06); ctx.globalAlpha = inn * (1 - out); textOut(U.name, ox + SW * .27, by + fs * .3, fs, U.band); ctx.globalAlpha = 1; }
   // 심연 초필살기 도트 이펙트 실험 (?fx=pillar|rift|trail|both): 맵과 같은 저해상도 캔버스에 fillRect만으로 (그라데이션·부드러운 선 없음)
   const AB_PAL = { void: '#0b0614', deep: '#2a0f4a', vio: '#6b2bd6', lit: '#b98cff', core: '#efe2ff' };
-  function pxLine(g, x0, y0, x1, y1, w, col) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); g.fillStyle = col; for (let i = 0; i <= n; i++) g.fillRect(Math.round(x0 + (x1 - x0) * i / n - w / 2), Math.round(y0 + (y1 - y0) * i / n - w / 2), w, w); }
-  function pxEllipse(g, cx, cy, rx, ry, col) { if (rx < .5 || ry < .5) return; g.fillStyle = col; for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) { const h = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y / ry) ** 2))); g.fillRect(Math.round(cx - h), Math.round(cy + y), h * 2, 1); } }
   function hash(n) { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); }
-  function drawAbyssLow(g, f) { const U = f.U, e = f.t - f.fz - f.ci, end = U.dur; if (e < 0) return; const fade = e > end - .4 ? Math.max(0, (end - e) / .4) : 1;
-    const hx = hero.x, hy = hero.y - 4, vic = f.vic.slice().sort((a, b) => Math.hypot(a.x - hx, a.y - hy) - Math.hypot(b.x - hx, b.y - hy)), SP = 300; // cracks: 300 px/s
-    g.save(); g.globalAlpha = fade;
-    if (f.fx === 'rift' || f.fx === 'both') { // 공허 균열: jagged ground cracks race out from the hero; each enemy is swallowed by a void maw when its crack arrives
+  // 퀄리티 단계 실험 (?fxq=0..3, 누적): 1 = 맵만 어둡게 하고 이펙트는 그 위에 밝게(빛나는 금) · 2 = 12fps로 끊어 움직이고 사라질 때 디더링(도트답게) · 3 = 힘 모으기·충격 고리·갈래 금·튀는 돌·그을린 자국(준비-충격-여운)
+  function fxQ() { const v = +Q.get('fxq'); return Q.has('fxq') && v >= 0 && v <= 3 ? v : 3; }
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  function dith(x, y, a) { return a >= 1 || (a > 0 && BAYER[(y & 3) * 4 + (x & 3)] < a * 16); }
+  function abPx(g, x, y, w, col, a, q) { x = Math.round(x); y = Math.round(y); if (q >= 2) { if (!dith(x, y, a)) return; g.globalAlpha = 1; } else g.globalAlpha = a; g.fillStyle = col; g.fillRect(x, y, w, w); }
+  function abLine(g, x0, y0, x1, y1, w, col, a, q) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); for (let i = 0; i <= n; i++) abPx(g, x0 + (x1 - x0) * i / n - w / 2, y0 + (y1 - y0) * i / n - w / 2, w, col, a, q); }
+  function abEll(g, cx, cy, rx, ry, col, a, q) { if (rx < .5 || ry < .5) return; for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) { const h = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y / ry) ** 2)));
+      if (q >= 2 && a < 1) { for (let x = -h; x < h; x++) abPx(g, cx + x, cy + y, 1, col, a, q); } else { g.globalAlpha = a; g.fillStyle = col; g.fillRect(Math.round(cx - h), Math.round(cy + y), h * 2, 1); } } }
+  function abyssDark(g, f) { const q = fxQ(); if (q < 1 || !f.fx || f.fx === 'pillar') return; const a = Math.min(.62, .62 * f.t / Math.max(.01, f.fz)); g.save(); g.globalAlpha = 1; g.fillStyle = `rgba(10,0,26,${a})`; g.fillRect(S.camI[0] - 4, S.camI[1] - 4, LW + 8, LH + 8); g.restore(); }
+  function drawAbyssLow(g, f) { const U = f.U, q = fxQ(), P = AB_PAL; let e = f.t - f.fz - f.ci; if (q >= 2) e = Math.floor(e * 12) / 12; const end = U.dur;
+    const hx = hero.x, hy = hero.y - 4, cy0 = hero.y - 12; g.save();
+    if (q >= 3 && e < 0 && e > -.3) { const k = 1 + e / .3; for (let i = 0; i < 18; i++) { const a = hash(f.seed + i) * TAU, r = (1 - k) * (26 + hash(i + 3) * 22) + 2; abPx(g, hx + Math.cos(a) * r, cy0 + Math.sin(a) * r * .7, i % 4 ? 1 : 2, i % 3 ? P.lit : P.core, 1, q); } } // 힘 모으기: motes implode into the chest
+    if (e < 0) { g.restore(); return; }
+    const fade = e > end - .4 ? Math.max(0, (end - e) / .4) : 1, vic = f.vic.slice().sort((a, b) => Math.hypot(a.x - hx, a.y - hy) - Math.hypot(b.x - hx, b.y - hy)), SP = 300;
+    if (q >= 3 && e < .18) { const r = 6 + e * 260; for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; abPx(g, hx + Math.cos(a) * r, hy + Math.sin(a) * r * .55, 2, e < .08 ? P.core : P.lit, 1 - e / .18, q); } } // 충격 고리
+    if (f.fx === 'rift' || f.fx === 'both') {
       const targets = vic.map(m => [m.x, m.y]).concat(Array.from({ length: 5 }, (_, i) => { const a = i / 5 * TAU + hash(f.seed + i); return [hx + Math.cos(a) * 600, hy + Math.sin(a) * 380]; }));
-      targets.forEach(([tx, ty], j) => { const L = Math.hypot(tx - hx, ty - hy), reach = Math.min(L, e * SP), segs = Math.max(2, Math.round(L / 14)); let px = hx, py = hy; const age = e - L / SP; g.globalAlpha = fade * (age > .35 ? Math.max(.25, 1 - (age - .35) / .5) : 1);
+      targets.forEach(([tx, ty], j) => { const L = Math.hypot(tx - hx, ty - hy), reach = Math.min(L, e * SP), segs = Math.max(2, Math.round(L / 14)), age = e - L / SP, ca = fade * (age > .35 ? Math.max(.3, 1 - (age - .35) / .5) : 1); let px = hx, py = hy;
         for (let k = 1; k <= segs; k++) { const d = L * k / segs; if (d > reach + 14) break; const jit = (hash(f.seed + j * 31 + k) - .5) * 10, nx = (ty - hy) / L, ny = -(tx - hx) / L;
           const qx = hx + (tx - hx) * k / segs + (k < segs ? nx * jit : 0), qy = hy + (ty - hy) * k / segs + (k < segs ? ny * jit * .6 : 0), cut = Math.min(1, Math.max(0, (reach - d + 14) / 14));
-          const ex = px + (qx - px) * cut, ey = py + (qy - py) * cut; pxLine(g, px, py, ex, ey, k < 3 ? 3 : 2, AB_PAL.deep); pxLine(g, px, py, ex, ey, 1, (Math.floor(e * 20) + k) % 3 ? AB_PAL.vio : AB_PAL.lit); px = qx; py = qy; } }); g.globalAlpha = fade;
-      vic.forEach((m, j) => { const at = Math.hypot(m.x - hx, m.y - hy) / SP, q = e - at; if (q < 0) return;
-        const open = Math.min(1, q / .25), r = 12 * open * (q > end - at - .5 ? Math.max(0, (end - e) / .5) : 1), pul = U.hitT.some(t => e - t >= 0 && e - t < .08);
-        pxEllipse(g, m.x, m.y + 2, r + 2, (r + 2) * .45, pul ? AB_PAL.core : AB_PAL.lit); pxEllipse(g, m.x, m.y + 2, r + 1, (r + 1) * .45, AB_PAL.vio); pxEllipse(g, m.x, m.y + 2, r, r * .45, AB_PAL.void);
-        for (let k = 0; k < 10; k++) { const a = hash(f.seed + j * 7 + k) * TAU + e * 6, rr = (1 - ((e * 1.6 + hash(k + j)) % 1)) * 22 + 2; g.fillStyle = k % 3 ? AB_PAL.lit : AB_PAL.core; g.fillRect(Math.round(m.x + Math.cos(a) * rr), Math.round(m.y - 6 + Math.sin(a) * rr * .6), 1, 1); } }); }
-    if (f.fx === 'trail' || f.fx === 'both') { // 사멸의 궤적: one slash trail leaps enemy to enemy (near -> far), X-cut on arrival, all flash on the last hit
-      const n = vic.length, t0 = U.hitT[0], span = Math.max(.3, U.hitT[U.hitT.length - 1] - t0 - .2); let px = hx, py = hy - 4;
-      vic.forEach((m, j) => { const tj = t0 + span * j / Math.max(1, n), q = e - tj, mx = m.x, my = m.y - 8;
-        if (q >= -.12 && q < .3) { const head = Math.min(1, (q + .12) / .12), tail = Math.max(0, q / .3); const ax = px + (mx - px) * tail, ay = py + (my - py) * tail, bx = px + (mx - px) * head, by = py + (my - py) * head;
-          pxLine(g, ax, ay, bx, by, 4, AB_PAL.void); pxLine(g, ax, ay, bx, by, 2, AB_PAL.vio); pxLine(g, ax, ay, bx, by, 1, AB_PAL.core); }
-        if (q >= 0 && q < .45) { const L = 10 + 6 * Math.min(1, q / .08), al = 1 - q / .45; g.globalAlpha = fade * al;
-          pxLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 3, AB_PAL.vio); pxLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 3, AB_PAL.vio);
-          pxLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 1, AB_PAL.core); pxLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 1, AB_PAL.core);
-          for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + j, d = q * 70; g.fillStyle = k % 2 ? AB_PAL.lit : AB_PAL.void; g.fillRect(Math.round(mx + Math.cos(a) * d), Math.round(my + Math.sin(a) * d * .7), 2, 2); }
-          g.globalAlpha = fade; }
-        px = mx; py = my; });
-      const last = U.hitT[U.hitT.length - 1], q = e - last; if (q >= 0 && q < .3) for (const m of vic) pxEllipse(g, m.x, m.y - 8, 14 * (1 - q / .3) + 2, (14 * (1 - q / .3) + 2) * .8, (Math.floor(q * 30) % 2) ? AB_PAL.core : AB_PAL.vio); }
+          const ex = px + (qx - px) * cut, ey = py + (qy - py) * cut, hot = (Math.floor(e * 12) + k) % 3 === 0;
+          abLine(g, px, py, ex, ey, k < 3 ? 3 : 2, P.void, ca, q); abLine(g, px, py, ex, ey, 1, hot ? P.core : P.lit, ca, q);
+          if (q >= 3 && cut >= 1 && hash(f.seed + j * 13 + k) > .62) { const sgn = hash(k + j) > .5 ? 1 : -1, ba = Math.atan2(ty - hy, tx - hx) + sgn * .7, bl = 6 + hash(k * 7 + j) * 10, grow = Math.min(1, (reach - d) / 20); // 갈래 금
+            abLine(g, qx, qy, qx + Math.cos(ba) * bl * grow, qy + Math.sin(ba) * bl * grow * .7, 1, P.vio, ca, q); }
+          px = qx; py = qy; }
+        if (q >= 3 && reach < L) { const fx_ = hx + (tx - hx) * reach / L, fy_ = hy + (ty - hy) * reach / L; for (let i = 0; i < 3; i++) { const ph = ((e * 5 + i / 3 + hash(j)) % 1), back = ph * 18, hop = Math.sin(ph * Math.PI) * 7; // 튀는 돌
+          abPx(g, fx_ - (tx - hx) / L * back + (i - 1) * 2, fy_ - (ty - hy) / L * back - hop, 1, i ? P.deep : P.lit, 1, q); } } });
+      vic.forEach((m, j) => { const at = Math.hypot(m.x - hx, m.y - hy) / SP, t = e - at; if (t < 0) return;
+        const open = Math.min(1, t / .25), shut = t > end - at - .5 ? Math.max(0, (end - e) / .5) : 1, r = 12 * open * shut, pul = U.hitT.some(tt => e - tt >= 0 && e - tt < .1);
+        abEll(g, m.x, m.y + 2, r + 2, (r + 2) * .45, pul ? P.core : P.lit, 1, q); abEll(g, m.x, m.y + 2, r + 1, (r + 1) * .45, P.vio, 1, q); abEll(g, m.x, m.y + 2, r, r * .45, P.void, 1, q);
+        if (q >= 3) for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + hash(j + k) , len = r * (.6 + .5 * Math.abs(Math.sin(e * 9 + k))); abLine(g, m.x + Math.cos(a) * r * .7, m.y + 2 + Math.sin(a) * r * .3, m.x + Math.cos(a) * (r * .7 + len * .5), m.y + 2 + Math.sin(a) * r * .3 - len * .9, 1, P.deep, open * shut, q); } // 촉수
+        for (let k = 0; k < 10; k++) { const a = hash(f.seed + j * 7 + k) * TAU + e * 6, rr = (1 - ((e * 1.6 + hash(k + j)) % 1)) * 22 + 2; abPx(g, m.x + Math.cos(a) * rr, m.y - 6 + Math.sin(a) * rr * .6, 1, k % 3 ? P.lit : P.core, 1, q); } }); }
+    if (f.fx === 'trail' || f.fx === 'both') { const n = vic.length, t0 = U.hitT[0], span = Math.max(.3, U.hitT[U.hitT.length - 1] - t0 - .2); let px = hx, py = hy - 4;
+      vic.forEach((m, j) => { const tj = t0 + span * j / Math.max(1, n), t = e - tj, mx = m.x, my = m.y - 8;
+        if (t >= -.12 && t < .3) { const head = Math.min(1, (t + .12) / .12), tail = Math.max(0, t / .3); const ax = px + (mx - px) * tail, ay = py + (my - py) * tail, bx = px + (mx - px) * head, by = py + (my - py) * head;
+          abLine(g, ax, ay, bx, by, 4, P.void, fade, q); abLine(g, ax, ay, bx, by, 2, P.vio, fade, q); abLine(g, ax, ay, bx, by, 1, P.core, fade, q); }
+        if (t >= 0 && t < .45) { const L = 10 + 6 * Math.min(1, t / .08), al = fade * (1 - t / .45); abLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 3, P.vio, al, q); abLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 3, P.vio, al, q); abLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 1, P.core, al, q); abLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 1, P.core, al, q); }
+        px = mx; py = my; }); }
     g.restore(); }
   function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - f.fz - f.ci, c = f.t - f.fz;
     ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
-    ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / f.fz)})`; ctx.fillRect(ox, oy, SW, SH);
+    if (!(U.whole && f.fx && f.fx !== 'pillar' && fxQ() >= 1)) { ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / f.fz)})`; ctx.fillRect(ox, oy, SW, SH); } // q1+: the map is darkened on the world canvas instead, so the effect stays bright
     if (U.whole && e >= 0 && (!f.fx || f.fx === 'pillar')) { const [hx, hy] = W2S(hero.x, hero.y - 8), R = Math.hypot(SW, SH); ctx.globalCompositeOperation = 'lighter'; // 심연: rings sweep the whole map from the hero
       for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .2) / .7; if (q < 0 || q > 1) continue; ctx.strokeStyle = `rgba(${U.col[1]},${(1 - q) * .9})`; ctx.lineWidth = (18 - q * 14) * u;
         ctx.beginPath(); ctx.ellipse(hx, hy, R * q, R * q * .62, 0, 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${(1 - q) * .7})`; ctx.lineWidth = 2 * u; ctx.stroke(); }
