@@ -112,3 +112,55 @@
 {"t": "2026-10-23 12:49:29", "name": "hd_atelier_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 12:50:22", "name": "hd_burned_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 12:51:14", "name": "hd_house_v2", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:24:57", "name": "grok_inn_b", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 13:24:58", "name": "grok_inn_a", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 13:25:05", "name": "grok_se_house_a", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 13:25:09", "name": "grok_se_house_b", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 13:25:24", "name": "grok_inn_a", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 13:26:06", "name": "grok_inn_a", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:26:28", "name": "grok_inn_b", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:26:48", "name": "grok_se_house_a", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:27:59", "name": "grok_se_house_b", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:31:02", "name": "rb_inn_a.png", "endpoint": "/remove-background", "status": "completed", "usage": null, "n": 0.0}
+{"t": "2026-10-23 13:31:42", "name": "rb_se_house_a.png", "endpoint": "/remove-background", "status": "completed", "usage": null, "n": 0.0}
+{"t": "2026-10-23 13:33:13", "name": "grok_inn_m", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:34:05", "name": "grok_se_house_m", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:36:42", "name": "grok_linette_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:36:50", "name": "grok_west_edge_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:37:03", "name": "grok_inn_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:37:45", "name": "grok_web_arch_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:38:04", "name": "grok_west_a_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:38:07", "name": "grok_se_house_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:38:35", "name": "grok_red_stall_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:38:45", "name": "grok_west_b_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:39:14", "name": "grok_s_house_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:39:20", "name": "grok_fountain_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:39:21", "name": "grok_stall_n_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:39:44", "name": "grok_e_row_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:39:53", "name": "grok_castle_l_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:40:15", "name": "grok_chapel_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:40:33", "name": "grok_shop_sign_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:40:35", "name": "grok_castle_r_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:40:55", "name": "grok_watchtower_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:41:45", "name": "grok_sw_house_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:41:51", "name": "grok_mausoleum_p", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:44:02", "name": "rb_se_house_p.png", "endpoint": "/remove-background", "status": "completed", "usage": null, "n": 0.0}
+{"t": "2026-10-23 13:44:54", "name": "rb_s_house_p.png", "endpoint": "/remove-background", "status": "completed", "usage": null, "n": 0.0}
+{"t": "2026-10-23 13:46:26", "name": "grok_woodpile_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:46:30", "name": "grok_watchtower_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:46:42", "name": "grok_shop_sign_q", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:46:58", "name": "grok_anvil_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:46:58", "name": "grok_inn_q", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:47:03", "name": "grok_mausoleum_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:47:39", "name": "grok_castle_l_q", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:47:41", "name": "grok_well_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:47:44", "name": "grok_tombs_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:48:01", "name": "grok_se_house_q", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:48:26", "name": "grok_fence_iron_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:48:48", "name": "grok_s_house_q", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:48:52", "name": "grok_herb_rack_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:49:05", "name": "grok_barrels_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:49:29", "name": "grok_rubble_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:49:57", "name": "grok_bench_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:50:22", "name": "grok_sign_post_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 13:53:34", "name": "grok_linette_r", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}

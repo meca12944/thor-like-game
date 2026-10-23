@@ -1,0 +1,378 @@
+{
+ "_doc": "Felt (그록 대표 그림 배치) 부품. D=3 (월드 1px = 그림 3px), view low top-down, 빛 왼쪽 위, 마을 32색. 투명 PNG 크기 그대로 쓰기. ax/ay = 발밑 기준점. grok_foot × 0.8 = 3번방 구도 판 월드 px 자리. 건물은 그록 크기의 0.7배 이하로 그렸으니 충돌 칸(solid)은 그림 아래쪽 폭에 맞춰 다시 잡기.",
+ "D": 3,
+ "parts": {
+  "inn": {
+   "img": "inn.png",
+   "w": 384,
+   "h": 396,
+   "ax": 192,
+   "ay": 395,
+   "grok_foot": [
+    1076,
+    470
+   ],
+   "role": "[7] 마르타의 여관",
+   "kind": "building"
+  },
+  "se_house": {
+   "img": "se_house.png",
+   "w": 394,
+   "h": 352,
+   "ax": 197,
+   "ay": 351,
+   "grok_foot": [
+    957,
+    730
+   ],
+   "role": "[11] 롬의 대장간",
+   "kind": "building"
+  },
+  "s_house": {
+   "img": "s_house.png",
+   "w": 394,
+   "h": 334,
+   "ax": 197,
+   "ay": 333,
+   "grok_foot": [
+    642,
+    825
+   ],
+   "role": "[12] 이장 바르트의 집",
+   "kind": "building"
+  },
+  "shop_sign": {
+   "img": "shop_sign.png",
+   "w": 394,
+   "h": 372,
+   "ax": 197,
+   "ay": 371,
+   "grok_foot": [
+    425,
+    690
+   ],
+   "role": "[13] 잡화점",
+   "kind": "building"
+  },
+  "castle_l": {
+   "img": "castle_l.png",
+   "w": 342,
+   "h": 286,
+   "ax": 171,
+   "ay": 285,
+   "grok_foot": [
+    602,
+    230
+   ],
+   "role": "[2] 불탄 왕성 왼쪽",
+   "kind": "building"
+  },
+  "e_row": {
+   "img": "e_row.png",
+   "w": 273,
+   "h": 382,
+   "ax": 136,
+   "ay": 381,
+   "grok_foot": [
+    1315,
+    620
+   ],
+   "role": "[8] 세라의 약초 오두막",
+   "kind": "building"
+  },
+  "chapel": {
+   "img": "chapel.png",
+   "w": 131,
+   "h": 211,
+   "ax": 65,
+   "ay": 210,
+   "grok_foot": [
+    1031,
+    198
+   ],
+   "role": "[5] 예배당 종탑",
+   "kind": "building"
+  },
+  "west_a": {
+   "img": "west_a.png",
+   "w": 202,
+   "h": 383,
+   "ax": 101,
+   "ay": 382,
+   "grok_foot": [
+    181,
+    460
+   ],
+   "role": "[14] 중고 무기점",
+   "kind": "building"
+  },
+  "west_b": {
+   "img": "west_b.png",
+   "w": 266,
+   "h": 391,
+   "ax": 133,
+   "ay": 390,
+   "grok_foot": [
+    325,
+    410
+   ],
+   "role": "[15] 시장 거리 집",
+   "kind": "building"
+  },
+  "stall_n": {
+   "img": "stall_n.png",
+   "w": 210,
+   "h": 226,
+   "ax": 105,
+   "ay": 225,
+   "grok_foot": [
+    498,
+    400
+   ],
+   "role": "[15] 시장 노점",
+   "kind": "building"
+  },
+  "sw_house": {
+   "img": "sw_house.png",
+   "w": 318,
+   "h": 396,
+   "ax": 159,
+   "ay": 395,
+   "grok_foot": [
+    118,
+    834
+   ],
+   "role": "[16] 주민 빈집",
+   "kind": "building"
+  },
+  "west_edge": {
+   "img": "west_edge.png",
+   "w": 169,
+   "h": 372,
+   "ax": 84,
+   "ay": 371,
+   "grok_foot": [
+    55,
+    440
+   ],
+   "role": "경비 초소 본채(맨 왼쪽)",
+   "kind": "building"
+  },
+  "web_arch": {
+   "img": "web_arch.png",
+   "w": 194,
+   "h": 395,
+   "ax": 97,
+   "ay": 394,
+   "grok_foot": [
+    1468,
+    705
+   ],
+   "role": "[9] 아라크네의 폐공방",
+   "kind": "building"
+  },
+  "red_stall": {
+   "img": "red_stall.png",
+   "w": 394,
+   "h": 307,
+   "ax": 197,
+   "ay": 306,
+   "grok_foot": [
+    1251,
+    834
+   ],
+   "role": "[10] 벤의 노점",
+   "kind": "building"
+  },
+  "fountain": {
+   "img": "fountain.png",
+   "w": 294,
+   "h": 210,
+   "ax": 147,
+   "ay": 209,
+   "grok_foot": [
+    692,
+    530
+   ],
+   "role": "[1] 분수",
+   "kind": "building"
+  },
+  "castle_r": {
+   "img": "castle_r.png",
+   "w": 342,
+   "h": 286,
+   "ax": 171,
+   "ay": 285,
+   "grok_foot": [
+    808,
+    230
+   ],
+   "role": "[2] 불탄 왕성 오른쪽",
+   "kind": "building"
+  },
+  "watchtower": {
+   "img": "watchtower.png",
+   "w": 79,
+   "h": 226,
+   "ax": 39,
+   "ay": 225,
+   "kind": "building",
+   "role": "[4] 경비 초소 감시탑",
+   "grok_foot": [
+    455,
+    200
+   ]
+  },
+  "mausoleum": {
+   "img": "mausoleum.png",
+   "w": 94,
+   "h": 142,
+   "ax": 47,
+   "ay": 141,
+   "kind": "prop",
+   "role": "[6] 예배당 뒤 묘지 납골당",
+   "grok_foot": [
+    1385,
+    215
+   ]
+  },
+  "tombs": {
+   "img": "tombs.png",
+   "w": 141,
+   "h": 113,
+   "ax": 70,
+   "ay": 112,
+   "kind": "prop"
+  },
+  "fence_iron": {
+   "img": "fence_iron.png",
+   "w": 101,
+   "h": 57,
+   "ax": 50,
+   "ay": 56,
+   "kind": "prop"
+  },
+  "barrels": {
+   "img": "barrels.png",
+   "w": 44,
+   "h": 57,
+   "ax": 22,
+   "ay": 56,
+   "kind": "prop"
+  },
+  "bench": {
+   "img": "bench.png",
+   "w": 72,
+   "h": 36,
+   "ax": 36,
+   "ay": 35,
+   "kind": "prop"
+  },
+  "woodpile": {
+   "img": "woodpile.png",
+   "w": 55,
+   "h": 53,
+   "ax": 27,
+   "ay": 52,
+   "kind": "prop"
+  },
+  "anvil": {
+   "img": "anvil.png",
+   "w": 49,
+   "h": 35,
+   "ax": 24,
+   "ay": 34,
+   "kind": "prop"
+  },
+  "well": {
+   "img": "well.png",
+   "w": 74,
+   "h": 93,
+   "ax": 37,
+   "ay": 92,
+   "kind": "prop"
+  },
+  "herb_rack": {
+   "img": "herb_rack.png",
+   "w": 89,
+   "h": 90,
+   "ax": 44,
+   "ay": 89,
+   "kind": "prop"
+  },
+  "rubble": {
+   "img": "rubble.png",
+   "w": 54,
+   "h": 33,
+   "ax": 27,
+   "ay": 32,
+   "kind": "prop"
+  },
+  "sign_post": {
+   "img": "sign_post.png",
+   "w": 57,
+   "h": 90,
+   "ax": 28,
+   "ay": 89,
+   "kind": "prop"
+  },
+  "linette": {
+   "img": "linette.png",
+   "w": 333,
+   "h": 276,
+   "ax": 166,
+   "ay": 275,
+   "grok_foot": [
+    700,
+    305
+   ],
+   "role": "[3] 리네트의 공방 (왕실 의상실 폐허)",
+   "kind": "building"
+  },
+  "bl_house": {
+   "img": "bl_house.png",
+   "w": 259,
+   "h": 231,
+   "ax": 129,
+   "ay": 230,
+   "kind": "building",
+   "grok_foot": [
+    70,
+    860
+   ],
+   "role": "주민 집 (felt_hd house_v2)"
+  },
+  "lamp": {
+   "img": "lamp.png",
+   "w": 29,
+   "h": 80,
+   "ax": 14,
+   "ay": 79,
+   "kind": "prop"
+  },
+  "brazier": {
+   "img": "brazier.png",
+   "w": 40,
+   "h": 63,
+   "ax": 20,
+   "ay": 62,
+   "kind": "prop"
+  },
+  "cart": {
+   "img": "cart.png",
+   "w": 83,
+   "h": 75,
+   "ax": 41,
+   "ay": 74,
+   "kind": "prop"
+  },
+  "crates": {
+   "img": "crates.png",
+   "w": 80,
+   "h": 60,
+   "ax": 40,
+   "ay": 59,
+   "kind": "prop"
+  }
+ }
+}
