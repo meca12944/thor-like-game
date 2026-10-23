@@ -221,7 +221,8 @@
   const DEFKEYS = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], attack: ['KeyJ', 'KeyZ'], dash: ['KeyK', 'KeyX'],
     interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
   function KM() { const g = window.__game; return (g && g.ctl && g.ctl.KEYMAP) || DEFKEYS; }
-  function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
+  const ARROW = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' }; // 방향키는 언제나 이동 (owner 10-23)
+  function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (ARROW[a] && !l.includes(ARROW[a])) l.push(ARROW[a]); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
   const isHeld = a => codesOf(a).some(c => held.has(c));
   const takePress = a => { const cs = codesOf(a); const i = queue.findIndex(c => cs.includes(c)); if (i < 0) return false; queue.splice(i, 1); return true; };
   const active = () => (S.scene !== 'town' || !!S.trans) && !(window.__game && window.__game.ui); // a DOM UI (shop over a town-B door) takes the keys

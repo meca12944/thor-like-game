@@ -327,7 +327,9 @@ const LSK='townDemo.keys',MAXK=3;
 const RESERVED={F12:'개발자 도구',F11:'전체 화면',MetaLeft:'OS 키',MetaRight:'OS 키',ContextMenu:'메뉴 키'};
 let KEYMAP={},CODE2ACT={};
 function defaultKeys(){const m={};for(const a of ACTIONS)m[a.id]=a.def.slice();return m;}
-function rebuildCodes(){CODE2ACT={};for(const a of ACTIONS)for(const c of KEYMAP[a.id])CODE2ACT[c]=a.id;}
+const ARROWS={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'}; // 방향키는 언제나 이동 (owner 10-23 「일반 커서 방향키로」): an old saved key setup can't take them away
+function rebuildCodes(){for(const d in ARROWS){const c=ARROWS[d];for(const a of ACTIONS)if(a.id!==d&&KEYMAP[a.id])KEYMAP[a.id]=KEYMAP[a.id].filter(x=>x!==c);if(KEYMAP[d]&&!KEYMAP[d].includes(c))KEYMAP[d]=[c,...KEYMAP[d]].slice(0,MAXK);}
+ CODE2ACT={};for(const a of ACTIONS)for(const c of KEYMAP[a.id])CODE2ACT[c]=a.id;}
 function loadKeys(){KEYMAP=defaultKeys();
  try{const v=JSON.parse(localStorage.getItem(LSK));if(v&&typeof v==='object')for(const a of ACTIONS)if(Array.isArray(v[a.id]))KEYMAP[a.id]=v[a.id].filter(c=>typeof c==='string'&&c&&!RESERVED[c]).slice(0,MAXK);}catch(e){}
  const seen=new Set(['Escape']);KEYMAP.menu=['Escape',...KEYMAP.menu.filter(c=>c!=='Escape')].slice(0,MAXK);
@@ -355,6 +357,8 @@ function syncHeld(){for(const a of ACTIONS)keys[a.id]=KEYMAP[a.id].some(c=>press
  for(const id in SKILL_ACT)skHeld[SKILL_ACT[id]]=keys[id];}
 function releaseAll(){pressed.clear();for(const k in keys)keys[k]=false;for(let i=0;i<3;i++)skHeld[i]=false;atkPressed=dashPressed=jumpPressed=areaPressed=ultPressed=false;skPress.length=0;skBuf.length=0;}
 addEventListener('blur',releaseAll);
+// keyboard focus (owner 10-23 「방향키가 안먹히고」): when the game sits inside another page's frame, grab focus on load / tap / mouse-over
+{const kbFocus=()=>{try{window.focus();}catch(e){}};kbFocus();addEventListener('load',kbFocus);addEventListener('pointerdown',kbFocus,true);addEventListener('mouseenter',kbFocus);document.addEventListener('visibilitychange',kbFocus);}
 addEventListener('keydown',e=>{const code=codeOf(e);
  if(rebind){e.preventDefault();captureKey(code);return;}
  const act=CODE2ACT[code];
