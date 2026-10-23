@@ -4,6 +4,8 @@ description: 「필멸자」 test128에 몬스터를 추가하거나 기존 몹�
 ---
 # 몹 추가 (test128)
 
+**먼저 `handoff/claude/MONSTER_TEXTBOOK_ko.md`(몬스터 교본)를 읽는다** — 만드는 순서(0부)와 공격 기준표(1부: 역할 1개 + 겨냥 공격 2~3개, 경고, 공격 뒤 빈틈). 이 스킬은 파일·코드 손순서만.
+
 규칙: 작업은 브랜치 → PR. main 머지는 주인이 "인게임 넣어/적용해" 한 뒤에만. 이펙트(검기·투사체 빛)는 그림에 굽지 말고 코드로 그린다. PixelLab 쓰면 작업마다 크레딧 보고.
 
 ## 1. 그림 고르기
@@ -17,7 +19,7 @@ description: 「필멸자」 test128에 몬스터를 추가하거나 기존 몹�
   - `fx`: 탄 종류 `beam arrow firearrow spike ink bolt feather orb` (world.js FELT_SHOT 에서 코드로 그림), drop/aoe 는 `rock sand bolt poison shock wave`
   - `pat`: `ring`(8방향) / `fan`(3갈래), `sp: 0` = 고정형
 - HP·피해는 area 로 자동 (50+14×(area-1), 5+0.6×(area-1)).
-- **모든 피해 공격은 예고 먼저** (W.hazard warn / lineTele). 예고 없는 공격 금지 — 구르기로 피할 수 있어야 함.
+- **모든 피해 공격은 예고 먼저** (W.hazard warn / lineTele). 예고 없는 공격 금지 — 회피대시로 피할 수 있어야 함.
 - 기존 AI에 새 그림만 입힐 땐 `def[k].s47 = '<strip id>'`.
 
 ## 3. 배치
