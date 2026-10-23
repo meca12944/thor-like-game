@@ -429,7 +429,7 @@
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) S.pause = !S.pause;
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; go('town', null, { card: false }); } queue.length = 0; return; }
-    if (S.ultFx) { stepUlt(dt); queue.length = 0; updateCam(dt); return; } // 필살기: world frozen (timers, mobs, hazards, shots)
+    if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
     if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -947,18 +947,19 @@
   const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 };
   // 컷인 방식 실험 (?cut=band|zoom|eye|hybrid): band = 일러스트 초상화 띠(옛), zoom = 게임 화면 그대로 주인공 확대, eye = 도트 얼굴 눈 띠, hybrid = 확대 + 눈 띠
   const CUT_T = { band: [.2, 1.05], zoom: [.08, .72], eye: [.08, .62], hybrid: [.08, .8] };
-  function cutMode() { const q = Q.get('cut'); return CUT_T[q] ? q : 'band'; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
+  // 연구 결과 (handoff/claude/ult_research/CUTIN_ko.md): 심연 초필살기 = hybrid (드물게 쓰니 크게), 일반 필살기 = zoom (자주 쓰니 짧게). 공격/조사 키로 컷인 건너뛰기
+  function cutMode(def) { const q = Q.get('cut'); return CUT_T[q] ? q : def; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    const cm = cutMode(); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
+    const cm = cutMode('hybrid'); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function abyssRest() { S.abyssSpent = false; if (S.lastStand) S.lastStand.cd = 0; } // 쉼터·여관·비석에서 쉬면 다시 쓸 수 있음
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
     if (hero.hp <= 0 || S.deadT > 0) return;
     const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    const cm = cutMode(); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
+    const cm = cutMode('zoom'); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
     try { g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function stepUlt(dt) { const f = S.ultFx, U = f.U, g = window.__game; f.t += dt; hero.inv = Math.max(hero.inv, 1); S.shake = Math.max(0, S.shake - dt * 14);
     const e = f.t - f.fz - f.ci;
