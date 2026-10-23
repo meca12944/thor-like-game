@@ -119,12 +119,12 @@ cols = {k: hx(v) for k, v in dict(d0='#201810', d1='#2e2318', d2='#38291b', d3='
 img = np.zeros((GH, GW, 3))
 def sel(conds, cs, other): return np.select([c[..., None] for c in conds], cs, other)
 # earth: dark dirt mottled, dead grass tufts
-e = n1 * .6 + n2 * .3 + n3 * .1; img[:] = sel([e < .35, e < .5, e < .65], [cols['d1'], cols['d2'], cols['d3']], cols['d4'])
+e = n1 * .6 + n2 * .3 + n3 * .1; t = np.clip((e - .25) / .5, 0, 1)[..., None]; img[:] = cols['d2'] * (1 - t) + cols['d3'] * t   # soft mottling (low contrast, continuous)
 tuft = (vnoise(1.5, 9) > .7) & (vnoise(10, 10) > .62); img[tuft] = cols['g1'] * .6 + cols['d2'] * .4
 img[yard] = np.where((n3[yard] > .45)[:, None], cols['g1'], np.where((n2[yard] > .5)[:, None], cols['g1'] * .8 + cols['d3'] * .2, cols['d3']))
 # roads: packed dirt, darker rim, ruts and pebbles
 road = dr < 0; rim = (dr >= 0) & (dr < 3)
-rv = n2 * .7 + n3 * .3; img[road] = sel([rv[road] < .35, rv[road] < .55, rv[road] < .75], [cols['r1'], cols['r2'], cols['r3']], cols['r4'])
+rv = n2 * .7 + n3 * .3; t = np.clip((rv[road] - .25) / .55, 0, 1)[:, None]; img[road] = cols['r2'] * (1 - t) + cols['r3'] * t   # soft packed dirt
 img[rim] = cols['r0']; peb = road & (n3 > .8) & (vnoise(1.2, 4) > .7); img[peb] = cols['r5']; img[road & (vnoise(1.5, 5) > .86)] = cols['d4']
 # plaza: cobble ring (stone cells by jittered grid), mortar in between, inner basin ring stones
 cell = 4.0; jx, jy = vnoise(4, 6) * 1.6, vnoise(4, 7) * 1.6
@@ -138,6 +138,8 @@ edge = np.minimum.reduce([wxp, wyp, W * T - wxp, H * T - wyp]); img *= np.clip(.
 img[wyp < 175 * S] *= .7
 # snap to the town palette (base24 + accents)
 pal = np.array([hx(c) for c in (PAL['base24'] + PAL['accent8'] if PAL else [v for v in ('#201810',)])])
+BAYER = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16 - .47)[(yy % 4).astype(int), (xx % 4).astype(int)][..., None]   # ordered dither: fine 1-pixel grain instead of big blotches
+img = img + BAYER * 12
 flat = img.reshape(-1, 3); idx = np.empty(len(flat), int)
 for i in range(0, len(flat), 1 << 18): idx[i:i + (1 << 18)] = np.argmin(((flat[i:i + (1 << 18), None, :] - pal[None]) ** 2).sum(2), 1)
 Image.fromarray(pal[idx].reshape(GH, GW, 3).astype(np.uint8)).save(os.path.join(OUT, 'ground.png'), optimize=True)

@@ -42,13 +42,13 @@ def sel(conds, cs, other): return np.select([c[..., None] for c in conds], cs, o
 img = np.zeros((GH, GW, 3))
 # grass: mottled dead grass, short blades (vertical 2-px strokes)
 gv = n1 * .55 + n2 * .3 + n3 * .15
-img[:] = sel([gv < .38, gv < .52, gv < .66], [cols['d2'], cols['g2'], cols['g1'] * .7 + cols['d3'] * .3], cols['g1'] * .85 + cols['r2'] * .15)
+t = np.clip((gv - .3) / .4, 0, 1)[..., None]; img[:] = cols['g2'] * (1 - t) + (cols['g1'] * .7 + cols['d3'] * .3) * t   # soft mottling (low contrast, continuous)
 bv = vnoise(1.1, 4); blade = (bv > .8) & (np.roll(bv, 1, 0) <= .8) & (n1 > .4); img[blade] = img[blade] * 1.18   # sparse short blades
 # tall grass: denser, lighter, longer blades
 tg = C == 1; sway = np.floor((xx + np.floor(vnoise(4, 5) * 3)) / 2) % 3 == 0          # tall grass: thin vertical stalks in clumps, lit tips
 tb = sway & (vnoise(2.2, 15) > .42) & tg; img[tg] = cols['d3'] * .6 + cols['g1'] * .4; img[tb] = cols['g1']; img[tb & ~np.roll(tb, 2, 0)] = cols['r3'] * .7 + cols['g1'] * .3
 # dirt road
-rd = C == 2; rv = n2 * .7 + n3 * .3; img[rd] = sel([rv[rd] < .35, rv[rd] < .55, rv[rd] < .75], [cols['r1'], cols['r2'], cols['r3']], cols['r4'])
+rd = C == 2; rv = n2 * .7 + n3 * .3; t = np.clip((rv[rd] - .25) / .55, 0, 1)[:, None]; img[rd] = cols['r2'] * (1 - t) + cols['r3'] * t   # soft packed dirt
 img[rd & (vnoise(1.2, 6) > .82)] = cols['r5']
 # sand: pale, fine speckle
 sd = C == 7; img[sd] = sel([n3[sd] < .5], [cols['sa'] * .85], cols['sa']); img[sd & (vnoise(1, 7) > .85)] = cols['r4']
@@ -77,6 +77,8 @@ for _ in range(40):
 k = np.clip((wyp - 8) / (5 * T), .15, .9); img = ash(img, k)
 edge = np.minimum(wxp, W * T - wxp); img *= np.clip(.7 + edge / 80, .7, 1)[..., None]
 pal = np.array([hx(c) for c in PAL['base24'] + PAL['accent8']]); pal = np.concatenate([pal, ash(pal)])   # town colours + their ash twins
+BAYER = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16 - .47)[(yy % 4).astype(int), (xx % 4).astype(int)][..., None]   # ordered dither: fine 1-pixel grain instead of big blotches
+img = img + BAYER * 14
 flat = img.reshape(-1, 3); out = np.empty(len(flat), int)
 for i in range(0, len(flat), 1 << 18): out[i:i + (1 << 18)] = np.argmin(((flat[i:i + (1 << 18), None, :] - pal[None]) ** 2).sum(2), 1)
 Image.fromarray(pal[out].reshape(GH, GW, 3).clip(0, 255).astype(np.uint8)).save(os.path.join(OUT, 'ground.png'), optimize=True)
