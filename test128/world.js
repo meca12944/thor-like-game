@@ -101,13 +101,31 @@
 
   // sprite helpers ------------------------------------------------------------
   const tintCache = {};
-  function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray'
+  // 맵 색 보정 (map JSON "grade"): 'ash' = 잿빛 들판 (주인 10-23 "다시 칠해라") — ground + scenery only; hero, mobs and effects keep their colours
+  const GRADE = { ash: (r, g, b) => { const L = (r * .3 + g * .59 + b * .11) * .82, k = .9, t = [L * .9 + 12, L * .84 + 9, L * .88 + 14]; return [r + (t[0] - r) * k, g + (t[1] - g) * k, b + (t[2] - b) * k]; } };
+  function gradeCanvas(c, mode) { const f = GRADE[mode]; if (!f) return c; const g = c.getContext('2d'), d = g.getImageData(0, 0, c.width, c.height), a = d.data;
+    for (let i = 0; i < a.length; i += 4) { if (!a[i + 3]) continue; const o = f(a[i], a[i + 1], a[i + 2]); a[i] = o[0]; a[i + 1] = o[1]; a[i + 2] = o[2]; } g.putImageData(d, 0, 0); return c; }
+  function scarGround(m, c) { if (m.grade !== 'ash') return c; const g = c.getContext('2d'), T = m.T, R = n => { const x = Math.sin(n * 91.7 + m.w) * 43758.5453; return x - Math.floor(x); }; // 그을린 자국 + 거미줄 실, baked once (dither, no gradients)
+    const free = (x, y) => { const tx = Math.floor(x / T), ty = Math.floor(y / T); return tx >= 0 && ty >= 0 && tx < m.w && ty < m.h && !m.solidG[ty * m.w + tx]; };
+    for (let i = 0; i < 46; i++) { const cx = R(i) * m.pw, cy = R(i + 300) * m.ph; if (!free(cx, cy)) continue; const rx = 8 + R(i + 600) * 22, ry = rx * .45;
+      for (let y = -ry; y <= ry; y++) for (let x = -rx; x <= rx; x++) { const q = (x / rx) ** 2 + (y / ry) ** 2; if (q > 1) continue; const px = Math.round(cx + x), py = Math.round(cy + y); if (q > .55 && (px + py) & 1) continue; if (q > .82 && (px & 1)) continue;
+        g.fillStyle = q < .3 ? 'rgba(14,10,16,.55)' : 'rgba(26,20,24,.4)'; g.fillRect(px, py, 1, 1); } }
+    for (let i = 0; i < 18; i++) { let ax = R(i + 900) * m.pw, ay = R(i + 1200) * m.ph, bx = ax + (R(i + 1500) - .5) * 70, by = ay + (R(i + 1800) - .3) * 40; // threads strung between nearby trees
+      const sag = 6 + R(i + 2100) * 8, n = Math.ceil(Math.hypot(bx - ax, by - ay)); g.fillStyle = 'rgba(214,206,220,.5)';
+      for (let k = 0; k <= n; k += 1) { const t = k / n, x = ax + (bx - ax) * t, y = ay + (by - ay) * t + Math.sin(t * Math.PI) * sag; if (k % 3 !== 2) g.fillRect(Math.round(x), Math.round(y), 1, 1); }
+      if (i % 3 === 0) { const wx = Math.round(ax), wy = Math.round(ay); g.fillStyle = 'rgba(220,214,228,.42)'; for (let a = 0; a < 6; a++) { const an = a / 6 * Math.PI * 2; for (let d = 1; d < 7; d++) g.fillRect(Math.round(wx + Math.cos(an) * d), Math.round(wy + Math.sin(an) * d * .7), 1, 1); }
+        for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
+    return c; }
+  function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
+      const x = ((Math.abs(h1) * LW + Math.sin(S.t * .6 + i) * 6) % LW + LW) % LW, y = ((Math.abs(h2) * LH + S.t * sp) % (LH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+  function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
     const r = ATLAS.sprites.rects[name]; if (!r) return null;
     const c = document.createElement('canvas'); c.width = r[2]; c.height = r[3]; const g = c.getContext('2d');
     g.drawImage(IMG.spr, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]);
     if (mode === 'white') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = '#fff'; g.fillRect(0, 0, r[2], r[3]); }
     if (mode === 'dodge') { const AI = (DG() && DG().afterimage) || {}; g.globalCompositeOperation = 'source-atop'; g.globalAlpha = AI.tintMix ?? .45; g.fillStyle = AI.tint || '#bff4ff'; g.fillRect(0, 0, r[2], r[3]); g.globalAlpha = 1; }
+    if (GRADE[mode]) gradeCanvas(c, mode);
     if (mode === 'rage') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,40,20,.35)'; g.fillRect(0, 0, r[2], r[3]); }
     if (mode === 'gray') { const d = g.getImageData(0, 0, r[2], r[3]); for (let i = 0; i < d.data.length; i += 4) { const v = (d.data[i] * .3 + d.data[i + 1] * .59 + d.data[i + 2] * .11) * .7; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; } g.putImageData(d, 0, 0); }
     return (tintCache[key] = c);
@@ -391,7 +409,7 @@
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
-      if (!m.groundC) m.groundC = renderGround(m);
+      if (!m.groundC) m.groundC = m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
       if (!sp && spawnName && spawnName.startsWith('snap:')) sp = spawnName.slice(5).split(',').map(Number).concat([hero.face]); // death retry: just before the fight
@@ -761,7 +779,7 @@
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => drawSpr(g, d.spr, d.x, d.y + 1) });
+    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => drawSpr(g, d.spr, d.x, d.y + 1, m.grade ? { mode: m.grade } : {}) });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
@@ -788,6 +806,7 @@
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
+    drawAshFall(g, m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, LW + 1, LH + 1);
       d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW + 1, LH + 1); d.globalCompositeOperation = 'destination-out';
@@ -843,7 +862,7 @@
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
     const fc = /^(right|left|up|down)$/.test(h.face) ? h.face : 'down', vert = !!H.diag && (fc === 'down' || fc === 'up'), hl = vert ? (f8.includes('left') || (!f8.includes('right') && h.hz === 'left')) : fc === 'left';
     const sd = vert ? (hl ? 'left' : 'right') : fc, L8 = H.left && sd === 'left'; let fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd;
-    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { if (vert && DIAG8.test(k) && H.anims[k + '_' + fc]) { fl = hl; d = fc; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
+    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
     const A = k => pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')], /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
@@ -1436,6 +1455,6 @@
   const GO = new URLSearchParams(location.search).get('go');
   if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default'); }, 100); });
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
-  const START = Q.get('start') || (Q.has('old') ? null : 'felt'); // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
+  const START = GO ? null : Q.get('start') || (Q.has('old') ? null : 'felt'); /* ?go= (샌드박스·시험) wins over the Felt start */ // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
   if (START) ready.then(() => { const id = START; let t0 = Date.now(); const tryGo = () => { const g = window.__game, T = window.__titleScreen; if (T && T.active) { t0 = Date.now(); setTimeout(tryGo, 100); return; } /* wait for the title: the map canvas would cover it while it still takes the keys */ const R0 = !Q.get('start') && !Q.has('nosave') && SAVE.resume; /* 이어하기 (owner 10-23): saved in a field -> start there */ if (g && g.ready && (R0 ? (S.pendingHp = R0.hp, S.pendingMsg = '이어하기 — 저장한 곳에서 시작', go(R0.map, 'resume', { card: false })) : go(id, 'default', { card: false }))) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
 })();

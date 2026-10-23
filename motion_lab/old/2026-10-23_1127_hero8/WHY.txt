@@ -1,0 +1,1 @@
+이 다음 최신본에서 바뀐 동작: cast_s1_right, cast_s2_right, cast_s3_right, dash_down, dash_dr, dash_right, dash_up, death_right, hurt_down, hurt_right, hurt_up, idle_down, idle_dr, idle_right, idle_up, jump_down, jump_dr, jump_right, jump_up, run_down, run_dr, run_right, run_up, walk_down, walk_dr, walk_right, walk_up
