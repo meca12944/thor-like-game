@@ -40,7 +40,7 @@
    "thread_stake"
   ],
   "b": [
-   "bridge_wood"
+   "bridge_3"
   ],
   "\"": [
    "dry_reeds"
@@ -624,10 +624,6 @@
    "ax": 88,
    "ay": 45,
    "kind": "prop",
-   "field_legend": [
-    "b"
-   ],
-   "zone": "field",
    "flip": false
   },
   "dry_reeds": {
@@ -669,6 +665,20 @@
    ],
    "zone": "field",
    "flip": false
+  },
+  "bridge_3": {
+   "img": "bridge_3.png",
+   "w": 120,
+   "h": 144,
+   "ax": 60,
+   "ay": 143,
+   "kind": "prop",
+   "zone": "field",
+   "flip": false,
+   "note": "세로 3칸 개울 다리 (가로로 건넘), 주인공 아래 깔기",
+   "field_legend": [
+    "b"
+   ]
   },
   "cocoons": {
    "img": "cocoons.png",

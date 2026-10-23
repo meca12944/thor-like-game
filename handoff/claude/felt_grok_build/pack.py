@@ -83,9 +83,19 @@ for n in ('ash_tree_a', 'ash_tree_b', 'ash_bush'):   # 잿빛 들판: 잎 초록
 # 들판용 울타리 1칸(48px) 이어 붙이는 조각: 판자 7px 주기, 이음새(빈 2줄) 하나 포함
 fw = Image.open('final/fence_wood.png'); fw.crop((101, 0, 149, fw.height)).save('final/fence_tile.png')
 parts['fence_tile'] = {'img': 'fence_tile.png', 'w': 48, 'h': fw.height, 'ax': 24, 'ay': fw.height - 1, 'kind': 'prop', 'tile': 1}
+# 개울 다리 세로 3칸(144px)판: 위 난간 + 판자 줄을 이어 늘림 + 아래 난간 (무료). 폭은 가운데 120px
+bw = Image.open('final/bridge_wood.png').convert('RGBA'); cx = bw.width // 2; X0, X1 = cx - 60, cx + 60
+top, deck, bot = bw.crop((X0, 0, X1, 16)), bw.crop((X0, 16, X1, 27)), bw.crop((X0, 28, X1, bw.height))   # 판자 16~27줄만 (위아래 어두운 띠 빼기)
+H3 = 144; b3 = Image.new('RGBA', (120, H3)); b3.alpha_composite(top, (0, 0)); y = 16; k = 0
+while y < H3 - bot.height:
+    piece = deck   # 뒤집지 않아야 세로 판자가 끊기지 않음
+    b3.alpha_composite(piece.crop((0, 0, 120, min(11, H3 - bot.height - y))), (0, y)); y += 11; k += 1
+b3.alpha_composite(bot, (0, H3 - bot.height)); b3.save('final/bridge_3.png')
+parts['bridge_3'] = {'img': 'bridge_3.png', 'w': 120, 'h': H3, 'ax': 60, 'ay': H3 - 1, 'kind': 'prop', 'zone': 'field', 'flip': False,
+                     'note': '세로 3칸 개울 다리 (가로로 건넘), 주인공 아래 깔기'}
 FIELD = {'T': ['ash_tree_a', 'ash_tree_b', 'dead_tree'], 'P': ['burnt_pine_a', 'burnt_pine_b'], 'Y': ['ash_tree_b'], 'u': ['bush_b', 'ash_bush'],
          'R': ['boulder'], 'r': ['stone_low'], 's': ['stump'], 'm': ['pale_mushrooms'], 'f': ['fence_tile'], 'O': ['ruin_pillar'],
-         'c': ['thread_stake'], 'b': ['bridge_wood'], '"': ['dry_reeds'], 'clue:f00_clue_corpse': ['deer_corpse']}
+         'c': ['thread_stake'], 'b': ['bridge_3'], '"': ['dry_reeds'], 'clue:f00_clue_corpse': ['deer_corpse']}
 for ch, ids in FIELD.items():
     for i in ids:
         parts[i].setdefault('field_legend', []).append(ch)
