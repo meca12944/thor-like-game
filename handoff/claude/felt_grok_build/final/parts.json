@@ -736,6 +736,39 @@
    "role": "비석(순간이동)",
    "flip": false
   },
+  "d_cocoon_m": {
+   "img": "d_cocoon_m.png",
+   "w": 30,
+   "h": 104,
+   "ax": 15,
+   "ay": 103,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 매달린(중)",
+   "flip": false
+  },
+  "d_spool_tower": {
+   "img": "d_spool_tower.png",
+   "w": 115,
+   "h": 243,
+   "ax": 57,
+   "ay": 242,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "실패 탑",
+   "flip": false
+  },
+  "d_cocoon_throne": {
+   "img": "d_cocoon_throne.png",
+   "w": 201,
+   "h": 225,
+   "ax": 100,
+   "ay": 224,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "보스방: 실 고치 왕좌",
+   "flip": false
+  },
   "ember_rubble": {
    "img": "ember_rubble.png",
    "w": 116,
@@ -865,6 +898,28 @@
    "kind": "prop",
    "zone": "dungeon1",
    "role": "보스방: 해골 영혼 베틀(큰 장식)",
+   "flip": false
+  },
+  "d_cocoon_s": {
+   "img": "d_cocoon_s.png",
+   "w": 42,
+   "h": 90,
+   "ax": 21,
+   "ay": 89,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 작은",
+   "flip": false
+  },
+  "d_cocoon_l": {
+   "img": "d_cocoon_l.png",
+   "w": 84,
+   "h": 94,
+   "ax": 42,
+   "ay": 93,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 무더기(큰)",
    "flip": false
   },
   "cocoons": {

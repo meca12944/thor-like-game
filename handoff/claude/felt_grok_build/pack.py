@@ -61,7 +61,8 @@ def key(a, thr=14):   # 테두리와 이어진 단색 바탕 지우기
     fl, _ = ndimage.label(flat); e = set(np.unique(np.concatenate([fl[0], fl[-1], fl[:, 0], fl[:, -1]]))) - {0}
     a[:, :, 3] = np.where(np.isin(fl, list(e)), 0, a[:, :, 3]); return a
 SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a', 'bridge_wood', 'dry_reeds', 'pale_mushrooms',
-        'd_loom_a', 'd_stairs_down', 'd_mannequins', 'd_fabric_pile', 'd_boss_loom', 'd_boss_loom3'}   # 던전: 작게 나온 1차·배경 박힌 판 버림   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
+        'd_loom_a', 'd_stairs_down', 'd_mannequins', 'd_fabric_pile', 'd_boss_loom', 'd_boss_loom3',
+        'd_cocoon_s', 'd_cocoon_l', 'd_wall_strip', 'd_thread_curtain', 'd_fabric_pile3'}   # 너무 작거나 빈 그림 (벽 띠·실 커튼은 3번방 코드)   # 던전: 작게 나온 1차·배경 박힌 판 버림   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
 for pid in gen.TEXT:
     if pid in SKIP or not os.path.exists(f'out/{pid}_t.png'): continue
     a = tight(key(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA')))); Image.fromarray(a).save(f'final/{pid}.png')
@@ -102,7 +103,12 @@ if 'd_boss_loom' in parts:
     src = np.array(Image.open('out/d_boss_loom2_t.png').convert('RGBA')); c = src[0, 0, :3].astype(int)
     src[..., 3] = np.where(np.abs(src[..., :3].astype(int) - c).sum(2) < 16, 0, src[..., 3]); a = tight(src)
     Image.fromarray(a).save('final/d_boss_loom.png'); parts['d_boss_loom'].update(w=a.shape[1], h=a.shape[0], ax=a.shape[1] // 2, ay=a.shape[0] - 1)
-DROLE = {'d_loom_a': '베틀(부서진)', 'd_loom_b': '태피스트리 베틀', 'd_spool_rack': '큰 실패 선반', 'd_mannequins': '마네킹 무리', 'd_mannequin': '마네킹 1',
+# 고치 크기 3종: 작은 = 고치 무더기에서 1개 잘라 냄(무료), 중 = d_cocoon_m(매달린), 큰 = cocoons 그대로
+cc = np.array(Image.open('final/cocoons2.png').convert('RGBA'))
+a = cc[:, : cc.shape[1] // 2].copy(); a = tight(a); Image.fromarray(a).save('final/d_cocoon_s.png')
+parts['d_cocoon_s'] = {'img': 'd_cocoon_s.png', 'w': a.shape[1], 'h': a.shape[0], 'ax': a.shape[1] // 2, 'ay': a.shape[0] - 1, 'kind': 'prop'}
+Image.open('final/cocoons2.png').save('final/d_cocoon_l.png'); parts['d_cocoon_l'] = dict(parts['cocoons2'], img='d_cocoon_l.png')
+DROLE = {'d_cocoon_s': '고치 작은', 'd_cocoon_m': '고치 매달린(중)', 'd_cocoon_l': '고치 무더기(큰)', 'd_spool_tower': '실패 탑', 'd_cocoon_throne': '보스방: 실 고치 왕좌','d_loom_a': '베틀(부서진)', 'd_loom_b': '태피스트리 베틀', 'd_spool_rack': '큰 실패 선반', 'd_mannequins': '마네킹 무리', 'd_mannequin': '마네킹 1',
          'd_cut_table': '재단대', 'd_fabric_pile': '천 더미', 'd_cocoon_wall': '고치 벽(벽면 판)', 'd_web_sheet': '거미줄 막', 'd_thread_pillar': '실 감긴 기둥',
          'd_bones': '뼈 더미', 'd_wardrobe': '옷장', 'd_door_arch': '아치 나무문', 'd_stair_arch': '계단 입구 아치', 'd_wall_arch': '아치 벽 조각',
          'd_chest': '보물상자', 'd_waystone': '비석(순간이동)', 'd_boss_loom': '보스방: 해골 영혼 베틀(큰 장식)'}

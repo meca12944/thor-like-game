@@ -134,6 +134,14 @@ TEXT = {  # id: (크기, 설명) — init 없이 글자+색만, 투명 배경
  'd_fabric_pile2': ((160, 112), "large heap of rotting fabric bolts, rolled cloth and torn curtains, filling the frame, seen from slightly above, 16-bit JRPG", 17),
  'd_boss_loom2': ((320, 304), "isolated enormous black wooden loom frame with a giant spider web woven between its beams, ghostly pale faces caught in the threads, bone decorations, transparent background, seen from slightly above, 16-bit JRPG", 17),
  'd_boss_loom3': ((320, 304), "isolated giant ominous throne-like loom of dark wood and bones with a huge web stretched across it and spools of red thread, transparent background, seen from slightly above, 16-bit JRPG", 29),
+ 'd_cocoon_s': ((64, 80), "single small white silk cocoon wrapped in spider web lying on the floor, seen from slightly above, 16-bit JRPG"),
+ 'd_cocoon_m': ((96, 160), "human-sized white silk cocoon hanging from a thick thread strand, slightly swaying, seen from slightly above, 16-bit JRPG"),
+ 'd_cocoon_l': ((160, 176), "cluster of three large human-sized silk cocoons bound together with thick webs on the floor, seen from slightly above, 16-bit JRPG"),
+ 'd_spool_tower': ((128, 256), "tall tower of stacked giant wooden thread spools with silver and red thread unraveling down, seen from slightly above, 16-bit JRPG"),
+ 'd_cocoon_throne': ((256, 256), "isolated eerie throne made of fused white silk cocoons and threads with a high web back, spider queen's seat, transparent background, seen from slightly above, 16-bit JRPG"),
+ 'd_wall_strip': ((192, 96), "seamless horizontal strip of dark old stone dungeon wall front face, mossy bricks with a few hanging threads, edge to edge, seen from the front slightly above, 16-bit JRPG"),
+ 'd_thread_curtain': ((96, 128), "curtain of hanging pale spider silk threads in a doorway, seen from slightly above, 16-bit JRPG"),
+ 'd_fabric_pile3': ((160, 112), "heap of rotting cloth rolls and torn curtains, seen from slightly above, 16-bit JRPG"),
  'ember_rubble':   ((160, 96),  "pile of charred burned stone rubble and black beams with a few glowing orange embers, thin smoke, seen from slightly above, 16-bit JRPG", None, 'palette_32.png'),
 }
 
