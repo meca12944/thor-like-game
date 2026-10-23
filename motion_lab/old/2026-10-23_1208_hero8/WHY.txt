@@ -1,0 +1,1 @@
+이 다음 최신본에서 바뀐 동작: dash_down, hurt_down, idle_down, jump_down, run_down, run_dr, run_right, run_up, walk_down
