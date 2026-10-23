@@ -148,7 +148,9 @@
    "role": "이장",
    "main": 1,
    "idle": "30년 전 그 불길을 아직도 기억하네. 하늘까지 붉었지…… 왕도는 하룻밤 사이에 재가 됐어.",
-   "art": "a_chief"
+   "art": "a_chief",
+   "anim": "felt_bart",
+   "wander": 2
   },
   {
    "type": "npc",
@@ -160,7 +162,9 @@
    "main": 0,
    "idle": "괴물한테 칼을 팔 생각은 없어. …돈은 있나? 그럼 얘기가 달라지지.",
    "art": "a_smith",
-   "forge": 1
+   "forge": 1,
+   "anim": "felt_rom",
+   "wander": 1
   },
   {
    "type": "npc",
@@ -172,7 +176,9 @@
    "main": 0,
    "idle": "…또 보이네. 저 골목 끝에 실이 걸려 있는 게. 아, 손님이구나. 약초 사러 왔어?",
    "art": "a_herb",
-   "shop": "f_herb"
+   "shop": "f_herb",
+   "anim": "felt_sera",
+   "wander": 1.5
   },
   {
    "type": "npc",
@@ -186,7 +192,9 @@
    "art": "a_guard",
    "quests": [
     "q_felt_corpse"
-   ]
+   ],
+   "anim": "felt_gas",
+   "wander": 2
   },
   {
    "type": "npc",
@@ -197,7 +205,9 @@
    "role": "여관 주인",
    "main": 0,
    "idle": "외지인은 안 받아. …하룻밤만이야. 문제 일으키면 바로 내쫓을 거다.",
-   "art": "c_innkeeper"
+   "art": "c_innkeeper",
+   "anim": "felt_martha",
+   "wander": 1.5
   },
   {
    "type": "npc",
@@ -211,7 +221,9 @@
    "art": "a_kid",
    "quests": [
     "q_felt_toby"
-   ]
+   ],
+   "anim": "felt_toby",
+   "wander": 3
   },
   {
    "type": "npc",
@@ -222,7 +234,9 @@
    "role": "수도사",
    "main": 0,
    "idle": "기도하시오, 이방인. 밤마다 종이 울리면… 저 아래에서 응답이 들려오니.",
-   "art": "c_priest"
+   "art": "c_priest",
+   "anim": "felt_oswald",
+   "wander": 2
   },
   {
    "type": "npc",
@@ -237,7 +251,9 @@
    "shop": "f_ben",
    "quests": [
     "q_felt_ledger"
-   ]
+   ],
+   "anim": "felt_ben",
+   "wander": 1.2
   },
   {
    "type": "npc",
@@ -248,7 +264,9 @@
    "role": "시인",
    "main": 0,
    "idle": "「불탄 왕도에 실이 내리고……」 아, 또 이런 가사가 나오네. 요즘은 밝은 노래가 안 써져.",
-   "art": "a_bard"
+   "art": "a_bard",
+   "anim": "felt_luca",
+   "wander": 3
   },
   {
    "type": "npc",

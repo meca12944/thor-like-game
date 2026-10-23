@@ -85,6 +85,9 @@
   function loadBg(j) { return new Promise(res => { const im = new Image(); im.onload = () => { BGIMG[j.bg] = im; res(j); }; im.onerror = () => res(j); im.src = j.bg; }); }
   const NPCIMG = {};
   function npcImg(id) { if (!NPCIMG[id]) { const im = new Image(); im.src = 'assets/npcs/' + id + '.png'; NPCIMG[id] = im; } return NPCIMG[id]; }
+  // Felt NPCs (owner 10-23): 4-way walk/idle atlas assets/npcs/felt/<anim>.json (hero atlas format, figure ~118 px = hero scale), drawn hi-res like the hero
+  const NPCA = {};
+  function npcAnim(id) { if (NPCA[id] === undefined) { NPCA[id] = null; getJSON('assets/npcs/felt/' + id + '.json').then(j => { const im = new Image(); im.onload = () => { NPCA[id] = { J: j, im }; }; im.src = 'assets/npcs/felt/' + j.sheets[0]; }).catch(() => {}); } return NPCA[id]; }
   const PORIMG = {};
   function porImg(id) { if (!PORIMG[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORIMG[id] = im; } return PORIMG[id]; }
   const ready = getJSON('assets/world/world_atlas.json').then(a => { ATLAS = a;
@@ -133,7 +136,7 @@
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
     }
     for (const o of (j.objects || [])) if (!['spawn', 'champion'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
-    for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -232,7 +235,26 @@
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   function solidAt(px, py) { const m = M(); if (!m) return true; const x = Math.floor(px / m.T), y = Math.floor(py / m.T);
     if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x]) return true;
-    for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true; return false; }
+    for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true;
+    for (const o of m.objs) if (o.wander && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
+  let npcSelf = null;
+  // Felt NPC wander: idle 2-5 s, then walk to a random free spot within o.wander tiles of the home spot; stop and face the hero when he comes close
+  function stepNpcs(dt) { const m = M();
+    for (const o of m.objs) { if (o.type !== 'npc' || !o.wander) continue;
+      if (o.hx === undefined) { o.hx = o.x; o.hy = o.y; o.wt = 1 + Math.random() * 3; o.face = 'down'; o.at = Math.random() * 9; }
+      o.at += dt; const dh = Math.hypot(hero.x - o.x, hero.y - o.y);
+      if (dh < 28 || S.talked === o.id && S.dialog) { o.tgt = null; const dx = hero.x - o.x, dy = hero.y - o.y; o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); continue; }
+      if (!o.tgt) { if ((o.wt -= dt) > 0) continue; const R = o.wander * m.T, a = Math.random() * TAU, r = R * (.35 + .65 * Math.random()), tx = o.hx + Math.cos(a) * r, ty = o.hy + Math.sin(a) * r * .7;
+        npcSelf = o; const ok = !blocked(tx, ty + 6, 4); npcSelf = null; if (ok) { o.tgt = [tx, ty]; o.at = 0; } else o.wt = .5; continue; }
+      const dx = o.tgt[0] - o.x, dy = o.tgt[1] - o.y, L = Math.hypot(dx, dy), v = 18 * dt;
+      if (L < v) { o.tgt = null; o.wt = 2 + Math.random() * 3; o.at = 0; continue; }
+      o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      npcSelf = o; const nx = o.x + dx / L * v, ny = o.y + dy / L * v; if (!blocked(nx, ny + 6, 4) && Math.hypot(hero.x - nx, hero.y - ny) > 10) { o.x = nx; o.y = ny; } else { o.tgt = null; o.wt = 1; } npcSelf = null; } }
+  function npcCell(o) { const A = npcAnim(o.anim); if (!A) return null; const J = A.J, seq = J.anims[(o.tgt ? 'walk_' : 'idle_') + (o.face || 'down')] || J.anims.idle_down; let t = Math.floor((o.at || 0) * 60) % seq.reduce((a, s) => a + s[2], 0);
+    for (const s of seq) { if (t < s[2]) return [A.im, J.cells[s[0]][s[1]]]; t -= s[2]; } return null; }
+  function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
+    for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
+      const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, LW * v.k, LH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   function moveCol(e, dx, dy, r, fly) {
     const m = M(); let ok = true;
@@ -455,7 +477,7 @@
     }
   }
   function stepMap(dt) {
-    const m = M(); stepLastStand(dt);
+    const m = M(); stepLastStand(dt); stepNpcs(dt);
     hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt); hero.atkCd = Math.max(0, (hero.atkCd || 0) - dt);
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
@@ -635,8 +657,8 @@
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = k * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * k - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * k - py * kz - oy) * (1 - mix));
-        ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, vx, vy, LW * kz, LH * kz); S.view = { k: kz, ox: vx, oy: vy }; drawHeroHi(kz); ctx.restore(); S.view = { k, ox, oy }; }
-      else { ctx.drawImage(low, ox, oy, LW * k, LH * k); drawHeroHi(k); }
+        ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, vx, vy, LW * kz, LH * kz); S.view = { k: kz, ox: vx, oy: vy }; drawNpcHi(kz, 0); drawHeroHi(kz); drawNpcHi(kz, 1); ctx.restore(); S.view = { k, ox, oy }; }
+      else { ctx.drawImage(low, ox, oy, LW * k, LH * k); drawNpcHi(k, 0); drawHeroHi(k); drawNpcHi(k, 1); }
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -666,7 +688,9 @@
       if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.sin(S.t * 3 + o.x) > .8) list.push({ y: o.y, f: () => { g.fillStyle = '#fff8c0'; g.fillRect(o.x - 1, o.y - 7, 2, 3); g.fillRect(o.x - 3, o.y - 6, 6, 1); } });
       if (o.type === 'warp') list.push({ y: o.y, f: () => drawWarp(g, o) });
       if (o.type === 'clue' && clueReady(o) && Math.sin(S.t * 4 + o.x) > .3) list.push({ y: o.y, f: () => { g.fillStyle = '#fff3a0'; g.fillRect(o.x - 1, o.y - 8, 2, 5); g.fillRect(o.x - 3, o.y - 6, 6, 1); } });
-      if (o.type === 'npc') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art);
+      if (o.type === 'npc' && o.anim && npcAnim(o.anim)) list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill();
+        if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } });
+      else if (o.type === 'npc') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art);
         if (im && im.complete && im.naturalWidth) { const h = o.h || 26, w = im.naturalWidth * h / im.naturalHeight; g.drawImage(im, Math.round(o.x - w / 2), Math.round(o.y + 7 - h), w, h); }
         else drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7);
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - (o.h || 26)) - 4, 2, 2); } } });
