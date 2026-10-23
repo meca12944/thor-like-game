@@ -81,6 +81,10 @@ SRC['jump']['down']=(SK+'/jump_south-east_diag',[0,3,4,5,11,3,0],_JT)
 SRC['jump']['up']=(SK+'/jump_north-east_diag',[0,3,4,5,13,3,0],_JT)
 # owner 10-22 "위로 달리기가 완전한 위방향이 아니라 살짝 오른쪽": back run redrawn as a STRICT straight back view (key from the straight back walk + 8-frame key->key cycle, linette_runn_v2)
 SRC['run']['north']=(B+'/linette_runn_v2/run_n8',None,[4]*8)
+# owner 10-23 "기본 서있는 자세가 정면이 아니고 대각선": straight front / back idle from the v1 front/back idle frames (already made, 0 credits);
+# front: calm frames 0-2 ping-pong (frames 3-8 flick the ponytail), back: 0-7 ping-pong. Used when she faces straight down/up and at the start.
+SRC['idle']['south']=(V1+'/idle/south',[0,1,2,1],[9]*4)
+SRC['idle']['north']=(V1+'/idle/north',[0,1,2,3,4,3,2,1],[8]*8)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}

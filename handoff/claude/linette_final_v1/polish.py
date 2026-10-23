@@ -15,7 +15,7 @@ BOB={('walk','down'):(2,1),('walk','up'):(2,1),('run','down'):(3,1),('run','up')
 shutil.rmtree(OUT,ignore_errors=True); log={}
 for m,dd in man['motions'].items():
     for d in dd:
-        fs=sorted(glob.glob(f'{IN}/{m}/{d}/*.png')); t0,b0,c0=body(fs[0]); ref=sorted(glob.glob(f'{IN}/idle/{d}/*.png')) or sorted(glob.glob(f'{IN}/idle/right/*.png')); ti,bi,ci=body(ref[0])
+        fs=sorted(glob.glob(f'{IN}/{m}/{d}/*.png')); t0,b0,c0=body(fs[0]); ref=(sorted(glob.glob(f'{IN}/idle/{d}/*.png')) if d not in ('south','north') else []) or sorted(glob.glob(f'{IN}/idle/right/*.png')); ti,bi,ci=body(ref[0])   # front/back: always the side idle height (10-23: the new idle_south must not change the walks)
         sc=1.0
         if m in STAND and abs((bi-ti)/(b0-t0)-1)>0.03: sc=(bi-ti)/(b0-t0)
         if m in SAME_AS:   # continue exactly where atk1's lunge frame was drawn
@@ -47,6 +47,7 @@ def upper(f):
 _r=[upper(f) for f in sorted(glob.glob(f'{OUT}/idle/right/*.png'))];UTGT=sorted(v for v in _r if v)[len(_r)//2]
 for m in ('idle','walk','run'):
     for d in os.listdir(f'{OUT}/{m}'):
+        if m=='idle' and d in ('south','north'):continue   # 10-23 front/back idle: ribbon/strap colours fool head-to-skirt; frame-0 height = side idle (first pass)
         fs=sorted(glob.glob(f'{OUT}/{m}/{d}/*.png'));us=sorted(v for v in (upper(f) for f in fs) if v);med=us[len(us)//2];sc=UTGT/med
         if abs(sc-1)<0.015:continue
         for f in fs:
@@ -123,3 +124,11 @@ for m in ('dash','jump','rjump','cast'):
     for f in glob.glob(f'{OUT}/{m}/*/*.png'):
         im=Image.open(f);b=im.getbbox()
         if b and b[3]>190:c=Image.new('RGBA',(256,256));c.paste(im,(0,190-b[3]),im);c.save(f)
+# 10-23 front/back idle: same standing height as the front/back walk of that view (median bbox height), one scale for the clip
+for d in ('south','north'):
+    if not os.path.isdir(f'{OUT}/idle/{d}'):continue
+    hh=lambda f:(lambda b:b[3]-b[1])(Image.open(f).getbbox());fi=sorted(glob.glob(f'{OUT}/idle/{d}/*.png'));fw=sorted(glob.glob(f'{OUT}/walk/{d}/*.png'))
+    sc=sorted(map(hh,fw))[len(fw)//2]/sorted(map(hh,fi))[len(fi)//2]
+    if abs(sc-1)<0.015:continue
+    for f in fi:
+        im=Image.open(f);b=im.getbbox();cx,fy=(b[0]+b[2])/2,b[3];im2=pxscale(im,sc);c=Image.new('RGBA',(256,256));c.paste(im2,(round(cx-cx*sc),round(fy-fy*sc)),im2);c.save(f)
