@@ -1,0 +1,78 @@
+{
+ "_doc": "Felt HD test parts for 3번방 (D=3 px per world px, view low top-down, light upper-left). Transparent PNG, pixel size unchanged. ax/ay = foot anchor px (bottom centre). foot_tiles_w = width of the base in map tiles (for a solid rect).",
+ "D": 3,
+ "parts": {
+  "chapel": {
+   "img": "cut/chapel.png",
+   "w": 262,
+   "h": 347,
+   "ax": 131,
+   "ay": 347,
+   "foot_tiles_w": 5.33,
+   "note": "building"
+  },
+  "atelier_v2": {
+   "img": "cut/atelier_v2.png",
+   "w": 391,
+   "h": 355,
+   "ax": 195,
+   "ay": 355,
+   "foot_tiles_w": 8.04,
+   "note": "building"
+  },
+  "house_v2": {
+   "img": "cut/house_v2.png",
+   "w": 259,
+   "h": 231,
+   "ax": 129,
+   "ay": 231,
+   "foot_tiles_w": 4.65,
+   "note": "building"
+  },
+  "burned_v2": {
+   "img": "cut/burned_v2.png",
+   "w": 250,
+   "h": 222,
+   "ax": 125,
+   "ay": 222,
+   "foot_tiles_w": 5.21,
+   "note": "building"
+  },
+  "lamp": {
+   "img": "cut/lamp.png",
+   "w": 29,
+   "h": 80,
+   "ax": 14,
+   "ay": 80,
+   "foot_tiles_w": 0.44,
+   "note": "prop"
+  },
+  "brazier": {
+   "img": "cut/brazier.png",
+   "w": 40,
+   "h": 63,
+   "ax": 20,
+   "ay": 63,
+   "foot_tiles_w": 0.73,
+   "note": "prop"
+  },
+  "cart": {
+   "img": "cut/cart.png",
+   "w": 83,
+   "h": 75,
+   "ax": 41,
+   "ay": 75,
+   "foot_tiles_w": 1.62,
+   "note": "prop"
+  },
+  "crates": {
+   "img": "cut/crates.png",
+   "w": 80,
+   "h": 60,
+   "ax": 40,
+   "ay": 60,
+   "foot_tiles_w": 1.67,
+   "note": "prop"
+  }
+ }
+}

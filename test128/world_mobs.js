@@ -391,6 +391,10 @@
     a9_07_gargoyle_statue: s47({ name: '가고일 석상', area: 9, h: 50, ai: 'melee' }),
     a9_08_cursed_doll: s47({ name: '저주 인형', area: 9, h: 41, ai: 'shoot', fx: 'orb', pat: 'fan' }),
   };
+  // 1장 던전 placeholders (owner 10-23 「제1던전까지」) until the monster room's real champions / boss land under the same ids: bigger copies of the felt mobs
+  for (const [id, base, name, title, hp, boss] of [['champ_c1_loom', 'c1_thread_puppet', '베틀 파수꾼', '실 공방의 우두머리', 260], ['champ_c1_cocoon', 'c1_needle_spider', '고치 어미', '고치 저장고의 우두머리', 240],
+    ['arachne', 'c1_silmamul', '아라크네', '실타래의 재단사', 900, 1]]) if (!def[id]) { const B = def[base];
+    def[id] = Object.assign({}, B, { name, title, hp, champion: !boss, boss: !!boss, stub: true, h: Math.round(B.h * (boss ? 1.8 : 1.4)), r: Math.round(B.r * 1.4), anim: Object.assign({}, B.anim, { F: B.anim.F * (boss ? 1.8 : 1.4) }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3 }) }); }
   for (const k in def) if (def[k].s47 === undefined && def[k].ai) def[k].s47 = k;
   // area-1 regulars keep their AI and get the room-3 hi-res strips (body height x1.3)
   for (const [k, id] of Object.entries({ mushroom: 'field_mushroom', rabbit: 'field_horned_rabbit', wasp: 'field_wasp', boar: 'field_boar', scarecrow: 'field_scarecrow', slime: 'a1_06_forest_slime', squirrel: 'a1_07_acorn_squirrel', sprout: 'a1_08_spirit_sprout' })) { def[k].s47 = id; def[k].h = Math.round(def[k].h * 1.3); }

@@ -22,7 +22,7 @@
   const st = { miniMode: 0, screen: null, uiA: .65, uiT: 0, dirty: true, checkT: 0, periodicT: 0, goal: null, extra: 0, label: '', destKey: '', noRoute: false, lastTile: -1 };
 
   // ---------------- boot ----------------
-  const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
+  const getJSON = u => fetch(window.__v ? __v(u) : u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
   function boot() {
     const h = H(); if (!h) { setTimeout(boot, 50); return; }
     h.ready.then(() => Promise.all([getJSON('maps/index.json'), getJSON('maps/quests.json')])).then(([idx, q]) => {

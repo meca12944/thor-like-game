@@ -7,7 +7,7 @@
 (function(){
 'use strict';
 const BASE='assets/tachie/';
-let IDX=null;const ready=fetch(BASE+'index.json').then(r=>r.json()).then(j=>{IDX=j;}).catch(()=>{IDX={chars:{},expressions:[],alias:{}};});
+let IDX=null;const ready=fetch(window.__v?__v(BASE+'index.json'):BASE+'index.json').then(r=>r.json()).then(j=>{IDX=j;}).catch(()=>{IDX={chars:{},expressions:[],alias:{}};});
 const css=`#tachie{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:strict}
 #tachie .ts{position:absolute;bottom:-2vh;height:min(96vh,2150px);aspect-ratio:750/2150;opacity:0;transform:translate3d(var(--off),0,0) scale(var(--sc,1));transform-origin:50% 100%;
  transition:opacity .24s ease,transform .32s cubic-bezier(.2,.8,.25,1),filter .22s ease;will-change:transform,opacity,filter;filter:brightness(1)}
