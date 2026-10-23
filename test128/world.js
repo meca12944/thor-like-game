@@ -476,7 +476,7 @@
     else if (hero.atk) { const a = hero.atk; a.t += dt; const dv = FACEV[hero.face]; const H = (h128() || {}).H128 || {}, AT = atkT(a.i), lv = a.i >= 3 ? (a.t < AT.a1 ? (spOf(a.i).lunge || 0) * .3 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : a.runSlash && a.t < AT.a1 ? 20 + HERO_SPEED * RUN.mul * (1 - a.t / AT.a1) : H.v4 ? (a.t < AT.a1 ? (H.lunge || [9, 11, 14])[Math.min(2, a.i)] * 29 / 96 / AT.a1 * 2 * (1 - a.t / AT.a1) : 0) : 20; // hero v4: per-hit forward advance (town px scaled to field)
       moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
       if (!SLASH_BODY && !a.gk && a.t >= AT.a0 - 2 / 60) { a.gk = true; gkSpawn(a.i); }
-      if (a.t >= AT.a0 && a.t <= AT.a1) { const R = hbR(a.i), cosA = Math.cos(hbA(a.i) / 2 * Math.PI / 180);
+      if (SLASH_BODY && a.t >= AT.a0 && a.t <= AT.a1) { // 검기 mode: hits are dealt by the flying arc (gkTick) const R = hbR(a.i), cosA = Math.cos(hbA(a.i) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
           const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
           if (dd < R + mm.r + mh * .2 && (dd < 6 || (ddx * dv[0] + ddy * dv[1]) / dd >= cosA)) { /* forward sector (same radius/arc as the trail) */ a.hit.add(mm); if (!SLASH_BODY) { S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: a.i >= 2 }); } hitMob(mm, a.i >= 3 ? ATK_DMG[0] * (spOf(a.i).dmgMul || 1) : ATK_DMG[Math.min(2, a.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (a.i >= 3) sfx(a.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
@@ -618,7 +618,7 @@
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
       ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); // hi-res bodies stay inside the view (no spill into the letterbox)
-      drawFeltHi(k, mm => mm.y <= hero.y); drawPetHi(k, false); drawHeroHi(k); drawPetHi(k, true); drawFeltHi(k, mm => mm.y > hero.y); ctx.restore(); drawHiRes(k, ox, oy);
+      drawFeltHi(k, mm => mm.y <= hero.y); drawPetHi(k, false); drawHeroHi(k); drawPetHi(k, true); drawFeltHi(k, mm => mm.y > hero.y); if (!SLASH_BODY) gkDraw(k); /* 검기 above the mobs it hits */ ctx.restore(); drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
       if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
@@ -751,13 +751,23 @@
       if (al < 230) { const e = sField(R * .78, span * .85, T * .45, head * .95, tail + .1, ca, sa, rev, sq, flip, x, y); if (e && Math.abs(e[2]) < e[1] / 2) { cr = 150; cg = 225; cb = 255; al = Math.max(al, 180 * e[0]); } }
       if (al) { d[i] = cr; d[i + 1] = cg; d[i + 2] = cb; d[i + 3] = al; } }
     g.putImageData(id, 0, 0); sCache.set(key, c2); return c2; }
-  function gkSpawn(i) { const v = FACEV[hero.face] || [1, 0], l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n];
-    S.gk = S.gk || []; S.gk.push({ n, dir: [dx, dy], rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
-  function gkTick() { if (S.gk) { for (const f of S.gk) f.t++; S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  // owner 10-23 "검흔 문제점": the hit used to reach 2-3x past the drawn arc (old painted-slash hitbox) and land before the arc flew.
+  // Now each arc flies out to the hit range (hbR) in GK_FLY steps and hits a mob only when its front passes it; diagonal input = 45° arc.
+  const GK_FLY = 8, GK_K = H128FIG / 117; // arc steps to reach the hit range; atlas px -> field px
+  function gkDir() { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null; if (f8 && f8 !== hero.face) { const a = DIR8.indexOf(f8) * Math.PI / 4; return [Math.cos(a), Math.sin(a)]; } return FACEV[hero.face] || [1, 0]; }
+  function gkSpawn(i) { const v = gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = hbR(i);
+    const sp = Math.max(Y.v, (reach / GK_K - Y.fwd - Y.R * (1 + .025 * GK_FLY)) / GK_FLY);
+    S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos(hbA(i) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
+  function gkHits(f) { const a = f.t * GK_STEP; if (a > GK_FLY + 1) return; const Y = GK[f.n], front = Math.min(f.reach, GK_K * (Y.fwd + Y.R * (1 + .025 * a) + a * f.v)), [dx, dy] = f.dir;
+    for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1), pad = mm.r + mh * .2;
+      const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
+      if (dd < front + pad && (dd < 6 || (ddx * dx + ddy * dy) / dd >= f.cosA)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2 });
+        hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8); } } }
+  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) { const a = f.t * GK_STEP, Y = GK[f.n], head = Math.min(1, (a + 1) / 2.5), tail = a < 4 ? 0 : Math.min(1, (a - 4) / 7), [dx, dy] = f.dir, fl = dx < 0;
-      const ox = f.rx + dx * a * Y.v, oy = f.ry + dy * a * Y.v; // rides with the hero and flies forward
+      const ox = f.rx + dx * a * f.v, oy = f.ry + dy * a * f.v; // rides with the hero and flies forward
       if (tail < head) { const ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI, T = Y.T * (a < 6 ? 1 : Math.max(.35, 1 - (a - 6) / 7)), q = v => Math.round(v * 4) / 4;
         const im = sArc(Y.R * (1 + .025 * q(a)), Y.span, T, q(head), q(tail), Y.rot + ang * (fl ? -1 : 1), Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
       const nx = -dy, ny = dx, big = f.n === 2; let sd = f.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
@@ -775,7 +785,7 @@
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
     let kx = 0, ky = 0, sq = 1; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.x * f; ky = v[1] * K.x * f * .5; sq = K.sq; }
     const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); ctx.translate(-fx, -fy);
-    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore(); if (!SLASH_BODY) gkDraw(k);
+    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
