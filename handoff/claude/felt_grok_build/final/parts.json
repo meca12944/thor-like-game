@@ -31,7 +31,7 @@
    "pale_mushrooms"
   ],
   "f": [
-   "fence_wood"
+   "fence_tile"
   ],
   "O": [
    "ruin_pillar"
@@ -400,9 +400,6 @@
    "ax": 95,
    "ay": 42,
    "kind": "prop",
-   "field_legend": [
-    "f"
-   ],
    "zone": "남 입구 나무 울타리",
    "flip": false
   },
@@ -658,6 +655,20 @@
    ],
    "zone": "field",
    "flip": true
+  },
+  "fence_tile": {
+   "img": "fence_tile.png",
+   "w": 48,
+   "h": 43,
+   "ax": 24,
+   "ay": 42,
+   "kind": "prop",
+   "tile": 1,
+   "field_legend": [
+    "f"
+   ],
+   "zone": "field",
+   "flip": false
   },
   "cocoons": {
    "img": "cocoons.png",

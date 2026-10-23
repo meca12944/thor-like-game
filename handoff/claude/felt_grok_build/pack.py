@@ -80,11 +80,16 @@ for n in ('burnt_pine_a', 'burnt_pine_b'):   # 청록 잎 → 잿빛 올리브 (
 for n in ('ash_tree_a', 'ash_tree_b', 'ash_bush'):   # 잿빛 들판: 잎 초록을 40% 빼기 (무료)
     a = np.array(Image.open(f'final/{n}.png').convert('RGBA')).astype(float); L = a[..., :3].mean(2, keepdims=True)
     a[..., :3] = a[..., :3] * .6 + L * .4; Image.fromarray(a.clip(0, 255).astype(np.uint8)).save(f'final/{n}.png')
+# 들판용 울타리 1칸(48px) 이어 붙이는 조각: 판자 7px 주기, 이음새(빈 2줄) 하나 포함
+fw = Image.open('final/fence_wood.png'); fw.crop((101, 0, 149, fw.height)).save('final/fence_tile.png')
+parts['fence_tile'] = {'img': 'fence_tile.png', 'w': 48, 'h': fw.height, 'ax': 24, 'ay': fw.height - 1, 'kind': 'prop', 'tile': 1}
 FIELD = {'T': ['ash_tree_a', 'ash_tree_b', 'dead_tree'], 'P': ['burnt_pine_a', 'burnt_pine_b'], 'Y': ['ash_tree_b'], 'u': ['bush_b', 'ash_bush'],
-         'R': ['boulder'], 'r': ['stone_low'], 's': ['stump'], 'm': ['pale_mushrooms'], 'f': ['fence_wood'], 'O': ['ruin_pillar'],
+         'R': ['boulder'], 'r': ['stone_low'], 's': ['stump'], 'm': ['pale_mushrooms'], 'f': ['fence_tile'], 'O': ['ruin_pillar'],
          'c': ['thread_stake'], 'b': ['bridge_wood'], '"': ['dry_reeds'], 'clue:f00_clue_corpse': ['deer_corpse']}
 for ch, ids in FIELD.items():
-    for i in ids: parts[i].setdefault('field_legend', []).append(ch); parts[i]['zone'] = parts[i].get('zone') or 'field'
+    for i in ids:
+        parts[i].setdefault('field_legend', []).append(ch)
+        z = parts[i].get('zone'); parts[i]['zone'] = 'field' if not z else ('field·' + z if not z.startswith('field') else z)
 parts['cocoons'] = parts.pop('cocoons2'); parts['cocoons']['img'] = 'cocoons.png'; os.replace('final/cocoons2.png', 'final/cocoons.png')
 ZONE = {'south_gate': '남 입구 문', 'fence_wood': '남 입구 나무 울타리', 'anvil': '남(대장간) 모루', 'woodpile': '남(대장간) 장작',
         'string_lights': '서 시장 줄등', 'candelabra': '북동 예배당 촛대', 'tombs': '북동 묘비', 'fence_iron': '북동 묘지 쇠울타리',
