@@ -678,6 +678,7 @@
     list.push({ y: hero.y, f: () => drawHeroSprite(g, 1) });
     for (const f of S.fx) if (f.type === 'heart') list.push({ y: f.y, f: () => drawHeartPick(g, f) });
     list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+    if (S.ultFx && S.ultFx.U.whole && S.ultFx.fx && S.ultFx.fx !== 'pillar') drawAbyssLow(g, S.ultFx); // pixel effect in the world canvas (same pixels as the map)
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
@@ -953,7 +954,7 @@
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    const cm = cutMode('hybrid'); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
+    const cm = cutMode('hybrid'), fx = ['pillar', 'rift', 'trail', 'both'].includes(Q.get('fx')) ? Q.get('fx') : 'pillar'; S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fx, seed: Math.random() * 1000, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function abyssRest() { S.abyssSpent = false; if (S.lastStand) S.lastStand.cd = 0; } // 쉼터·여관·비석에서 쉬면 다시 쓸 수 있음
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
@@ -990,14 +991,45 @@
       ctx.drawImage(im, fx0, fy0, faceW, faceH, sx, by - faceH * sc * .45, faceW * sc, faceH * sc); }
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = `rgba(${U.col[1]},.25)`; ctx.fillRect(ox, by - bh / 2, SW, bh); ctx.restore();
     const fs = Math.round(SH * .06); ctx.globalAlpha = inn * (1 - out); textOut(U.name, ox + SW * .27, by + fs * .3, fs, U.band); ctx.globalAlpha = 1; }
+  // 심연 초필살기 도트 이펙트 실험 (?fx=pillar|rift|trail|both): 맵과 같은 저해상도 캔버스에 fillRect만으로 (그라데이션·부드러운 선 없음)
+  const AB_PAL = { void: '#0b0614', deep: '#2a0f4a', vio: '#6b2bd6', lit: '#b98cff', core: '#efe2ff' };
+  function pxLine(g, x0, y0, x1, y1, w, col) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); g.fillStyle = col; for (let i = 0; i <= n; i++) g.fillRect(Math.round(x0 + (x1 - x0) * i / n - w / 2), Math.round(y0 + (y1 - y0) * i / n - w / 2), w, w); }
+  function pxEllipse(g, cx, cy, rx, ry, col) { if (rx < .5 || ry < .5) return; g.fillStyle = col; for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) { const h = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y / ry) ** 2))); g.fillRect(Math.round(cx - h), Math.round(cy + y), h * 2, 1); } }
+  function hash(n) { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); }
+  function drawAbyssLow(g, f) { const U = f.U, e = f.t - f.fz - f.ci, end = U.dur; if (e < 0) return; const fade = e > end - .4 ? Math.max(0, (end - e) / .4) : 1;
+    const hx = hero.x, hy = hero.y - 4, vic = f.vic.slice().sort((a, b) => Math.hypot(a.x - hx, a.y - hy) - Math.hypot(b.x - hx, b.y - hy)), SP = 300; // cracks: 300 px/s
+    g.save(); g.globalAlpha = fade;
+    if (f.fx === 'rift' || f.fx === 'both') { // 공허 균열: jagged ground cracks race out from the hero; each enemy is swallowed by a void maw when its crack arrives
+      const targets = vic.map(m => [m.x, m.y]).concat(Array.from({ length: 8 }, (_, i) => { const a = i / 8 * TAU + hash(f.seed + i); return [hx + Math.cos(a) * 600, hy + Math.sin(a) * 380]; }));
+      targets.forEach(([tx, ty], j) => { const L = Math.hypot(tx - hx, ty - hy), reach = Math.min(L, e * SP), segs = Math.max(2, Math.round(L / 14)); let px = hx, py = hy;
+        for (let k = 1; k <= segs; k++) { const d = L * k / segs; if (d > reach + 14) break; const jit = (hash(f.seed + j * 31 + k) - .5) * 10, nx = (ty - hy) / L, ny = -(tx - hx) / L;
+          const qx = hx + (tx - hx) * k / segs + (k < segs ? nx * jit : 0), qy = hy + (ty - hy) * k / segs + (k < segs ? ny * jit * .6 : 0), cut = Math.min(1, Math.max(0, (reach - d + 14) / 14));
+          const ex = px + (qx - px) * cut, ey = py + (qy - py) * cut; pxLine(g, px, py, ex, ey, k < 3 ? 3 : 2, AB_PAL.deep); pxLine(g, px, py, ex, ey, 1, (Math.floor(e * 20) + k) % 3 ? AB_PAL.vio : AB_PAL.lit); px = qx; py = qy; } });
+      vic.forEach((m, j) => { const at = Math.hypot(m.x - hx, m.y - hy) / SP, q = e - at; if (q < 0) return;
+        const open = Math.min(1, q / .25), r = 12 * open * (q > end - at - .5 ? Math.max(0, (end - e) / .5) : 1), pul = U.hitT.some(t => e - t >= 0 && e - t < .08);
+        pxEllipse(g, m.x, m.y + 2, r + 2, (r + 2) * .45, pul ? AB_PAL.core : AB_PAL.lit); pxEllipse(g, m.x, m.y + 2, r + 1, (r + 1) * .45, AB_PAL.vio); pxEllipse(g, m.x, m.y + 2, r, r * .45, AB_PAL.void);
+        for (let k = 0; k < 10; k++) { const a = hash(f.seed + j * 7 + k) * TAU + e * 6, rr = (1 - ((e * 1.6 + hash(k + j)) % 1)) * 22 + 2; g.fillStyle = k % 3 ? AB_PAL.lit : AB_PAL.core; g.fillRect(Math.round(m.x + Math.cos(a) * rr), Math.round(m.y - 6 + Math.sin(a) * rr * .6), 1, 1); } }); }
+    if (f.fx === 'trail' || f.fx === 'both') { // 사멸의 궤적: one slash trail leaps enemy to enemy (near -> far), X-cut on arrival, all flash on the last hit
+      const n = vic.length, t0 = U.hitT[0], span = Math.max(.3, U.hitT[U.hitT.length - 1] - t0 - .2); let px = hx, py = hy - 4;
+      vic.forEach((m, j) => { const tj = t0 + span * j / Math.max(1, n), q = e - tj, mx = m.x, my = m.y - 8;
+        if (q >= -.12 && q < .3) { const head = Math.min(1, (q + .12) / .12), tail = Math.max(0, q / .3); const ax = px + (mx - px) * tail, ay = py + (my - py) * tail, bx = px + (mx - px) * head, by = py + (my - py) * head;
+          pxLine(g, ax, ay, bx, by, 4, AB_PAL.void); pxLine(g, ax, ay, bx, by, 2, AB_PAL.vio); pxLine(g, ax, ay, bx, by, 1, AB_PAL.core); }
+        if (q >= 0 && q < .45) { const L = 10 + 6 * Math.min(1, q / .08), al = 1 - q / .45; g.globalAlpha = fade * al;
+          pxLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 3, AB_PAL.vio); pxLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 3, AB_PAL.vio);
+          pxLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 1, AB_PAL.core); pxLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 1, AB_PAL.core);
+          for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + j, d = q * 70; g.fillStyle = k % 2 ? AB_PAL.lit : AB_PAL.void; g.fillRect(Math.round(mx + Math.cos(a) * d), Math.round(my + Math.sin(a) * d * .7), 2, 2); }
+          g.globalAlpha = fade; }
+        px = mx; py = my; });
+      const last = U.hitT[U.hitT.length - 1], q = e - last; if (q >= 0 && q < .3) for (const m of vic) pxEllipse(g, m.x, m.y - 8, 14 * (1 - q / .3) + 2, (14 * (1 - q / .3) + 2) * .8, (Math.floor(q * 30) % 2) ? AB_PAL.core : AB_PAL.vio); }
+    g.restore(); }
   function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - f.fz - f.ci, c = f.t - f.fz;
     ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
     ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / f.fz)})`; ctx.fillRect(ox, oy, SW, SH);
-    if (U.whole && e >= 0) { const [hx, hy] = W2S(hero.x, hero.y - 8), R = Math.hypot(SW, SH); ctx.globalCompositeOperation = 'lighter'; // 심연: rings sweep the whole map from the hero
+    if (U.whole && e >= 0 && (!f.fx || f.fx === 'pillar')) { const [hx, hy] = W2S(hero.x, hero.y - 8), R = Math.hypot(SW, SH); ctx.globalCompositeOperation = 'lighter'; // 심연: rings sweep the whole map from the hero
       for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .2) / .7; if (q < 0 || q > 1) continue; ctx.strokeStyle = `rgba(${U.col[1]},${(1 - q) * .9})`; ctx.lineWidth = (18 - q * 14) * u;
         ctx.beginPath(); ctx.ellipse(hx, hy, R * q, R * q * .62, 0, 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${(1 - q) * .7})`; ctx.lineWidth = 2 * u; ctx.stroke(); }
       ctx.globalCompositeOperation = 'source-over'; }
-    if (e >= 0) { ctx.globalCompositeOperation = 'lighter';
+    if (e >= 0 && !(U.whole && f.fx && f.fx !== 'pillar')) { ctx.globalCompositeOperation = 'lighter';
       for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .15) / .5; if (q < 0 || q > 1) continue; const al = 1 - q;
         if (U.id === 'chan') { const ang = [-.42, .38, -.12, .6, -.7][i % 5], cy = oy + SH * (.3 + .1 * i); ctx.save(); ctx.translate(ox + SW / 2, cy); ctx.rotate(ang); const L = SW * 1.4 * Math.min(1, q * 4);
           ctx.fillStyle = `rgba(${U.col[1]},${al * .6})`; ctx.fillRect(-L / 2, -14 * u * (1 - q), L, 28 * u * (1 - q)); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L / 2, -3 * u, L, 6 * u); ctx.restore(); }
