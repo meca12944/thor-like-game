@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>리네트 테스트</title>
+<style>
+html,body{margin:0;height:100%;background:#2c3a26;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,sans-serif}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;left:8px;top:calc(6px + env(safe-area-inset-top));color:#fff;font-size:13px;text-shadow:0 1px 2px #000;pointer-events:none}
+.btn{position:absolute;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.55);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn.on{background:rgba(255,200,60,.55)}
+.small{width:48px;height:48px;font-size:11px}
+#stick{position:absolute;left:calc(24px + env(safe-area-inset-left));bottom:calc(24px + env(safe-area-inset-bottom));width:120px;height:120px;border-radius:50%;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.4)}
+#knob{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="hud">리네트 테스트 · 이동 방향키/WASD · 달리기 Shift(누르는 동안) 또는 L(켜기/끄기) · 공격 J/Z · 대시 방향키 두 번 또는 K/X · 스킬 U/C · 점프 Space · 피격 H · 사망 G<br><span id="kbhint">PC: 화면을 한 번 클릭하면 키보드로 조작돼요</span></div>
+<div id="stick"><div id="knob"></div></div>
+<div class="btn" id="bAtk" style="right:calc(24px + env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:76px;height:76px">공격</div>
+<div class="btn" id="bDash" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">대시</div>
+<div class="btn" id="bRun" style="right:calc(112px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom))">달리기</div>
+<div class="btn" id="bCast" style="right:calc(30px + env(safe-area-inset-right));bottom:calc(130px + env(safe-area-inset-bottom));font-size:12px">스킬</div>
+<div class="btn" id="bJump" style="right:calc(196px + env(safe-area-inset-right));bottom:calc(28px + env(safe-area-inset-bottom))">점프</div>
+<div class="btn small" id="bHurt" style="right:calc(16px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">피격</div>
+<div class="btn small" id="bDie" style="right:calc(72px + env(safe-area-inset-right));top:calc(40px + env(safe-area-inset-top))">사망</div>
+<script>
+// Linette sandbox: atlas = assets/anim/linette8.json (hero8 format: cells [x,y,w,h,ax,ay], anims "<motion>_<dir>" = [[sheet,cell,ticks]]),
+// left = right mirrored; no north/south views (owner 10-20): idle/walk/run/dash/skill/attacks facing up/down use the diagonal clips (hurt/death keep the last side), attacks facing down/up use the diagonal clips (down/downl, up/upl) picked by the last left/right facing.
+// Thrust trails are drawn in code from A.thrust (tip/dir at the lunge frame), like the hero's engine-drawn trails.
+const cv=document.getElementById('c');let ctx=cv.getContext('2d');   // let: the stab streaks are drawn into the pixel canvas (pxBegin/pxEnd) by swapping ctx
+let A,SH=[],VW=480,VH=270,SC=1;
+function resize(){const d=devicePixelRatio||1,w=innerWidth*d,h=innerHeight*d;SC=Math.max(1,Math.floor(Math.min(w/360,h/300)));VW=Math.ceil(w/SC);VH=Math.ceil(h/SC);cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;}
+addEventListener('resize',resize);resize();
+// hero's magic circle + PixelLab fire ring (same assets/rules as test128 index CASTFIRE): the fire runs once around the circle from the front,
+// revealing the circle where it has passed, then burns out in 4 frames. S1 cyan / S2 red / S3 gold, cycling on each skill press.
+let FX=null,FIRE=null;
+const CIRC=[[[115,143,115,46,57,24],[463,143,115,46,57,24]],[[345,49,115,46,57,24],[693,49,115,46,57,24]],[[230,96,115,46,57,24],[578,96,115,46,57,24]]]; // [full, faded] per skill
+const FC=[0,85,170].flatMap(y=>[0,124,248,372,496].map(x=>[x,y,123,84,60,63])),RING=[-1,-2.5,57,22.5],A0=Math.PI/2,LAP0=2,LAPEND=26,POST=[4,12,22,34];
+function blitC(img,c,x,y){ctx.drawImage(img,c[0],c[1],c[2],c[3],x-c[4],y-c[5],c[2],c[3]);}
+function castFx(front,sx,sy){
+  if(!FX||P.skill==null)return;const casting=P.st==='cast',t=P.t,cx=sx+RING[0],cy=sy+RING[1],rx=RING[2],ry=RING[3];
+  if(!casting&&!P.cf)return;
+  const p=casting?(t-LAP0)/(LAPEND-LAP0):2,clipHalf=()=>{ctx.beginPath();ctx.rect(cx-rx-30,front?cy:cy-ry*3-60,rx*2+60,ry*3+60);ctx.clip();},
+        sector=sw=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.ellipse(cx,cy,rx+12,ry+12,0,A0,A0+sw);ctx.closePath();ctx.clip();};
+  if(!front&&casting){ctx.save();if(p<1){if(p<=0){ctx.restore();}else{sector(p*Math.PI*2);blitC(FX,CIRC[P.skill][0],sx,sy);ctx.restore();}}else{const T=total(clip(P.clip));blitC(FX,CIRC[P.skill][t>T-10?1:0],sx,sy);ctx.restore();}}
+  if(casting&&p>0&&p<1){ctx.save();clipHalf();sector(p*Math.PI*2);blitC(FIRE,FC[P.skill*5],sx,sy);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35;blitC(FIRE,FC[P.skill*5],sx,sy);ctx.restore();}
+  else if(p>=1){if(!P.cf)P.cf={t0:P.gt};const k=POST.findIndex(v=>P.gt-P.cf.t0<v);if(k<0){if(!casting)P.cf=null;return;}ctx.save();clipHalf();blitC(FIRE,FC[P.skill*5+1+k],sx,sy);ctx.restore();}
+}
+// grass field (pre-rendered tile)
+const TILE=document.createElement('canvas');TILE.width=TILE.height=256;{const g=TILE.getContext('2d');g.fillStyle='#567c46';g.fillRect(0,0,256,256);let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+ for(let i=0;i<520;i++){g.fillStyle=r()<.6?'#486c3a':'#688e52';g.fillRect(r()*256|0,r()*256|0,2,1);}for(let i=0;i<14;i++){g.fillStyle='#7a9e5e';const x=r()*256|0,y=r()*256|0;g.fillRect(x,y,1,3);g.fillRect(x+2,y+1,1,2);}}
+const P={x:0,y:0,face:'right',lastH:'right',st:'idle',t:0,clip:null,atk:null,run:false,dashT:0,dead:false};
+const K={};let joy={x:0,y:0};
+// keyboard (owner 10-21 "조작 키보드로 할수있게"): arrows/WASD move, Shift held = run (L toggles), J/Z attack (held = combo), K/X dash, U/C skill, Space jump, H hurt, G death.
+// Keys never scroll the page; holding a key does not re-toggle; the touch pad hides while the keyboard is used and comes back on touch.
+// double-tap a direction key = dash (owner 10-21 "앞으로 2번 하면 대쉬")
+const GAME_KEYS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','KeyJ','KeyZ','KeyK','KeyX','KeyL','KeyU','KeyC','KeyH','KeyG','ShiftLeft','ShiftRight'];
+function touchUI(on){for(const el of document.querySelectorAll('.btn,#stick'))el.style.display=on?'':'none';const h=document.getElementById('kbhint');if(h)h.style.display=on?'':'none';}
+addEventListener('keydown',e=>{if(GAME_KEYS.includes(e.code))e.preventDefault();if(!K.__kb){K.__kb=1;touchUI(false);}
+  const c=e.code;if(c==='KeyJ'||c==='KeyZ'){attack();}if(e.repeat){K[c]=1;return;}K[c]=1;
+  const DT={ArrowRight:'right',KeyD:'right',ArrowLeft:'left',KeyA:'left',ArrowDown:'down',KeyS:'down',ArrowUp:'up',KeyW:'up'}[c];   // double-tap a direction = dash that way
+  if(DT){const now=performance.now();if(K.__tapDir===DT&&now-K.__tapT<260){K.__tapT=0;if(DT==='left'||DT==='right'){P.face=DT;P.lastH=DT;}else P.face=DT;P.diag=false;dash();}else{K.__tapDir=DT;K.__tapT=now;}}
+  if(c==='KeyK'||c==='KeyX')dash();if(c==='KeyL'){P.run=!P.run;ui();}if(c==='KeyU'||c==='KeyC')cast();if(c==='Space')jump();if(c==='KeyH')hurt();if(c==='KeyG')die();});
+addEventListener('keyup',e=>{K[e.code]=0;});
+addEventListener('blur',()=>{for(const k in K)if(k!=='__kb')K[k]=0;});   // focus lost -> no stuck keys
+addEventListener('touchstart',()=>{if(K.__kb){K.__kb=0;touchUI(true);}},{passive:true});
+addEventListener('pointerdown',()=>{window.focus();},{capture:true});
+function tap(id,f){const b=document.getElementById(id);b.addEventListener('pointerdown',e=>{e.preventDefault();f();});}
+tap('bAtk',attack);tap('bDash',dash);tap('bRun',()=>{P.run=!P.run;ui();});tap('bCast',cast);tap('bHurt',hurt);tap('bJump',jump);tap('bDie',die);
+const runHeld=()=>P.run||K.ShiftLeft||K.ShiftRight;   // L toggle or Shift held
+function ui(){document.getElementById('bRun').classList.toggle('on',P.run);}
+{const st=document.getElementById('stick'),kn=document.getElementById('knob');let id=null;
+ const mv=e=>{const r=st.getBoundingClientRect();let dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;const m=Math.hypot(dx,dy),R=44;if(m>R){dx*=R/m;dy*=R/m;}kn.style.left=38+dx+'px';kn.style.top=38+dy+'px';joy={x:dx/R,y:dy/R};};
+ st.addEventListener('pointerdown',e=>{id=e.pointerId;st.setPointerCapture(id);mv(e);});st.addEventListener('pointermove',e=>{if(e.pointerId===id)mv(e);});
+ const up=e=>{if(e.pointerId!==id)return;id=null;kn.style.left=kn.style.top='38px';joy={x:0,y:0};};st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);}
+const clip=n=>A.anims[n];
+const total=L=>L.reduce((s,e)=>s+e[2],0);
+function frameAt(L,t,loop){if(loop)t%=total(L);for(const e of L){if(t<e[2])return e;t-=e[2];}return L[L.length-1];}
+// owner 10-20: moving up/down uses the true front/back walk + run clips (walk_south / walk_north ...); idle and the rest keep the diagonal art
+// diagonal attacks: facing diagonally (last move had both axes) -> the stab flies at 45deg on screen (slightly flattened for the top-down view)
+function dir8(){if(!P.diag||P.face!=='down'&&P.face!=='up')return null;const sx=P.lastH==='left'?-1:1,sy=P.face==='down'?1:-1;return [sx*0.78,sy*0.62];}
+function diagMeta(m,d){if(!d)return m;const nx=-d[1],ny=d[0],tp=[d[0]*26,-62+d[1]*14];return {...m,dir:d,tip:m.tip2?[tp[0]+nx*6,tp[1]+ny*6]:tp,tip2:m.tip2?[tp[0]-nx*6,tp[1]-ny*6]:null};}
+function atkDir(){return P.face==='right'||P.face==='left'?P.face:P.face==='down'?(P.lastH==='left'?'downl':'down'):(P.lastH==='left'?'upl':'up');}
+function start(st,name){P.st=st;P.t=0;P.clip=name;if(st!=='idle'){P.vx=P.vy=0;P.skid=0;}}   // a new action drops the walk/run velocity (no skid after a dash/jump/cast)
+// owner 10-20 "이 컨셉으로 간다": attacks are an overlay - she keeps walking/running/jumping/standing (no attack pose) and the trail flies from where she is.
+// P.atk = {n: combo 1-3, t: ticks, clip: atk clip used only for timing + trail data}; trails live in world space (TR) so they keep flying while she moves.
+function attack(){snapFace();if(P.dead||P.st==='hurt'||P.st==='death')return;if(P.atk){P.atk.q=true;return;}P.atk={n:1,t:0,clip:'atk1_'+atkDir(),d8:dir8()};}
+// owner 10-22 "대시 모션뒤에 잔상 남기고 대시 길이 더 길게, 주인공이랑 똑같이": the hero's dash v2 (test128 index DODGE + drawDash8/drawGhosts8):
+// burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
+// a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
+const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
+function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:idleName(),lines:null};start('dash',P.f8===2&&A.anims.dash_south?'dash_south':P.f8===6&&A.anims.dash_north?'dash_north':'dash_'+atkDir());}   // straight down/up: front/back dash (10-23)
+const TINTC=document.createElement('canvas');
+function blitTint(e,x,y,alpha,col,mix){const [s,c]=e,[cx,cy,w,h,ax,ay]=A.cells[s][c];if(TINTC.width<w)TINTC.width=w;if(TINTC.height<h)TINTC.height=h;const g=TINTC.getContext('2d');
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.clearRect(0,0,TINTC.width,TINTC.height);g.drawImage(SH[s],cx,cy,w,h,0,0,w,h);g.globalCompositeOperation='source-atop';g.globalAlpha=mix;g.fillStyle=col;g.fillRect(0,0,w,h);
+  ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(TINTC,0,0,w,h,Math.round(x-ax),Math.round(y-ay),w,h);ctx.restore();}
+function drawDash(camX,camY,behind){
+  if(behind){for(let i=0;i<GH.length;i++){const g=GH[i],r=GH.length-1-i,a=GH8.alpha[r]*Math.max(0,Math.min(1,(GH8.life-g.a)/(GH8.life-GH8.fadeFrom)));if(a>0)blitTint(g.e,g.x-camX,g.y-camY,a,'#6ed7ff',.75);}
+    const d=P.dsh;if(d&&P.st==='dash'&&P.t<4){const L=clip(d.idle);if(L)blitTint(L[0],d.x0-camX,d.y0-camY,(150/255)*(1-P.t/4),'#dcfaff',.85);}return;}
+  const d=P.dsh;if(!d||P.st!=='dash'||P.t>DSH.burst+2)return;const fade=P.t<=DSH.burst?1:.5;
+  if(!d.lines){let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;d.lines=Array.from({length:9},()=>[rnd()*2-1,10+rnd()*30,45+rnd()*65,rnd()*3|0]);}
+  const px=-d.dy,py=d.dx,k=117/124,cx=P.x-camX,cy=P.y-jz()-camY-40*k,half=40*k;
+  for(const[o,st,ln,ci]of d.lines){const x=cx+o*half*px,y=cy+o*half*py*1.4,s0=st*k,s1=(st+ln)*k;ctx.strokeStyle=['rgba(140,230,255,','rgba(220,250,255,','rgba(90,200,250,'][ci]+(.9*fade)+')';ctx.lineWidth=ci===1?2:1;
+    ctx.beginPath();ctx.moveTo(x-d.dx*s0,y-d.dy*s0*.8);ctx.lineTo(x-d.dx*s1,y-d.dy*s1*.8);ctx.stroke();}}
+function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast',vName('cast'));}   // straight down/up -> front/back cast (10-23), else side/diagonal
+function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&A.anims[rjName()];start('jump',rj?rjName():vName('jump'));}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function hurt(){if(P.dead)return;P.atk=null;start('hurt',P.f8===2&&A.anims.hurt_south?'hurt_south':P.f8===6&&A.anims.hurt_north?'hurt_north':'hurt_'+P.lastH);}
+function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death',P.f8===2&&A.anims.death_south?'death_south':P.f8===6&&A.anims.death_north?'death_north':'death_'+P.lastH);}
+const MV={ySc:0.8,walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
+let DUST=[];function dust(x,y,n,v){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=Math.random();DUST.push({x:x+(Math.random()-.5)*12,y:y-1,vx:Math.cos(a)*v*r/60,vy:-Math.abs(Math.sin(a))*v*r/120,t:0,life:14+Math.random()*10,c:Math.random()<.5?'#e8dcc0':'#cbb894',s:Math.random()<.5?2:3});}}
+let TR=[];   // flying thrust trails (world space)
+const JUMP_AIR=[8,32];   // owner 10-22 standing jump re-timed: crouch 0-8, air 8-32 (legs-together frames), landing stance + absorb after 32
+function jz(){if(P.st!=='jump')return 0;const T=total(clip(P.clip)),rj=P.clip.startsWith('rjump'),u=rj?Math.min(1,Math.max(0,(P.t-4)/(T-10))):Math.min(1,Math.max(0,(P.t-JUMP_AIR[0])/(JUMP_AIR[1]-JUMP_AIR[0])));return Math.round(Math.sin(u*Math.PI)*(rj?72:60));}   // jump height: rjump = push-off 2 frames, arc, landing 2 frames; standing jump arcs mid-clip
+const DV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0],downl:[0,1],upl:[0,-1]};
+// owner 10-22 "방향전환시 좀더 부드럽게": 8 facings 0=right 1=down-right 2=down 3=down-left 4=left 5=up-left 6=up 7=up-right.
+// The shown facing walks one 45-degree step every TURN.step ticks toward the input (a 180-degree turn passes through the front, toward the camera),
+// so right->left reads right, down-right, down, down-left, left. Attacks/dash/skill/jump snap to the input at once (no delay on actions).
+// Letting go of a diagonal (two keys are never released on the same tick) keeps the diagonal instead of flashing the straight direction.
+const TURN={step:3,grace:6};
+function dir8of(ix,iy){const dg=Math.abs(ix)>0.38&&Math.abs(iy)>0.38;if(dg)return ix>0?(iy>0?1:7):(iy>0?3:5);if(Math.abs(ix)>=Math.abs(iy))return ix>0?0:4;return iy>0?2:6;}
+function setF8(i){P.f8=i;P.diag=i%2===1;if(i===0||i===1||i===7)P.lastH='right';else if(i===3||i===4||i===5)P.lastH='left';P.face=i===0?'right':i===4?'left':(i>=1&&i<=3)?'down':'up';}
+function turnStep(t){const now=P.gt||0;if(t!==P.t8){P.t8p=P.t8;P.t8=t;P.t8T=now;}
+  if(P.f8==null){setF8(t);P.turnT=0;return;}if(P.f8===t)return;if((P.turnT=(P.turnT||0)-1)>0)return;P.turnT=TURN.step;
+  const d=((t-P.f8)%8+8)%8,via=k=>[1,2,3].some(j=>(P.f8+k*j+8)%8===2);   // 180-degree turn: the side whose path passes the front (down); up<->down: the side she was facing
+  const dirn=d!==4?(d<4?1:-1):via(1)?1:via(-1)?-1:((P.f8===6)===(P.lastH==='right')?1:-1);setF8((P.f8+dirn+8)%8);}
+// owner 10-23 "기본 서있는 자세가 정면이 아니고 대각선": facing straight down/up -> the straight front/back idle (idle_south / idle_north), diagonals and sides keep theirs; she starts facing the front
+function idleName(){return P.f8===2&&A.anims.idle_south?'idle_south':P.f8===6&&A.anims.idle_north?'idle_north':'idle_'+atkDir();}
+// owner 10-23 "다음 고칠점 1·2": straight down/up use the front/back clip when it exists (cast, jump, hurt, death), and the running jump exists for
+// every facing (side, both diagonals, front, back) - it carries her along the facing direction
+const F8V=[[1,0],[.71,.71],[0,1],[-.71,.71],[-1,0],[-.71,-.71],[0,-1],[.71,-.71]];
+function vName(m){return P.f8===2&&A.anims[m+'_south']?m+'_south':P.f8===6&&A.anims[m+'_north']?m+'_north':m+'_'+atkDir();}
+function rjName(){return P.f8===2?'rjump_south':P.f8===6?'rjump_north':P.diag?'rjump_'+atkDir():'rjump_'+P.face;}
+function snapFace(){if(P.t8!=null&&P.f8!==P.t8)setF8(P.t8);P.turnT=0;}
+function step(){
+  let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
+  if(P.stop>0){P.stop--;return;}   // hit-stop: everything freezes for a few ticks
+  const moving=m>0.2;P.t++;
+  for(const d of DUST){d.t++;d.x+=d.vx;d.y+=d.vy;d.vy+=0.02;}DUST=DUST.filter(d=>d.t<d.life);
+  for(const g of GH)g.a++;GH=GH.filter(g=>g.a<GH8.life).slice(-GH8.alpha.length);
+  if(K.KeyJ||K.KeyZ)attack();   // holding the attack key keeps the combo going (no waiting for the OS key repeat)
+  if(P.atk){const a=P.atk,C=CMB[a.n-1];a.t++;   // owner 10-22 "검흔 문제점 전부": combo rhythm like the hero (hits at 5 / 20 / 41 ticks = 0.08 / 0.33 / 0.68 s)
+    if(a.t===C.hit){const lt=tmeta(a.clip);if(lt){const mm=shapeHit(diagMeta(lt,a.d8),a.n-1);TR.push({x:P.x,y:P.y-jz(),gy:P.y,m:mm,t0:P.gt,hi:a.n-1});strike(a.clip,a.n-1,mm);
+      P.nudge={t:4,d:mm.dir};sfx(a.n===3?'swing_heavy':'swing_light');}}
+    if(a.q&&a.n<3&&a.t>=C.next)P.atk={n:a.n+1,t:0,clip:'atk'+(a.n+1)+'_'+atkDir(),d8:dir8()};else if(a.t>=C.end)P.atk=null;}
+  if(P.nudge&&--P.nudge.t<=0)P.nudge=null;
+  for(const T of TR)if(P.gt-T.t0<7){T.x=P.x;T.y=P.y-jz();T.gy=P.y;}   // (4) the streak rides with her while it shoots out (no lagging behind when she runs)
+  for(const k of SPK)k.t++;SPK=SPK.filter(k=>k.t<12);
+  skillStep();
+  if(P.st==='idle'||P.st==='move'){
+    if(moving){turnStep(dir8of(ix,iy));   // owner 10-22 "방향전환시 좀더 부드럽게": the facing turns through the in-between directions (see turnStep)
+      // owner 10-22 "비슷한 게임보다 머가 이상한지 -> 전부 다 해라": (1) no foot sliding - the leg cycle advances by the distance she covers (MV.stride px per
+      // clip tick: walk stride ~45px per 24 ticks, run ~65px per 16 ticks), (2) speeds matched to that stride (walk 1.0 -> 2.0, run 2.2 -> 4.0 px/tick),
+      // (3) a walk/run starts on a passing frame (legs together) instead of the widest stride, (6) near-instant start like the hero (accelTicks 2),
+      // (5) hero's run start: 10-tick burst (x2.3/1.9) with a dust kick-up, dust puffs on every run footfall. Stopping = (4) short skid (see the else branch).
+      P.skid=0;const running=runHeld(),wasRun=P.clip&&P.clip.startsWith('run_');if(running&&!(P.st==='move'&&wasRun)){P.runT=10;dust(P.x-ix*10,P.y,8,130);}
+      const tg=(running?MV.run:MV.walk)*(running&&P.runT>0?1+(MV.burst-1)*P.runT/10:1);if(P.runT>0)P.runT--;
+      const ka=((P.vx||0)*ix+(P.vy||0)*iy)<0?0.25:0.5;P.vx=(P.vx||0)+(ix*tg-(P.vx||0))*ka;P.vy=(P.vy||0)+(iy*tg*MV.ySc-(P.vy||0))*ka;   // (10-22) reversing = a short brake before speeding the other way
+         // (10-22) up/down at 0.8x: depth + less sliding on the front/back walks
+      P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.spd=sp;
+      const n=(running?'run_':'walk_')+(P.diag?atkDir():P.face==='down'?'south':P.face==='up'?'north':atkDir());
+      if(P.st!=='move'){P.st='move';P.clip=n;P.mt=total(clip(n).slice(0,MV.startFrame[running?1:0]));}else if(P.clip!==n){const To=total(clip(P.clip)),Tn=total(clip(n));P.mt=((P.mt||0)%To)/To*Tn;P.clip=n;}
+      const fi=t=>clip(n).indexOf(frameAt(clip(n),t,true));const f0=fi(P.mt||0);P.mt=(P.mt||0)+sp/(running?MV.runStride:MV.walkStride);const f1=fi(P.mt);
+      if(running&&f1!==f0&&(f1===0||f1===4))dust(P.x-P.vx*2,P.y,2,40);}   // footfall puff on the two stride frames
+    else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(Math.abs(P.t8-P.t8p)===1||Math.abs(P.t8-P.t8p)===7)&&(P.gt||0)-P.t8T<TURN.grace){/* only when the straight dir is one of that diagonal's two keys */P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
+      if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
+      // owner 10-22 "멈출 때 서 있는 자세로 미끄러짐": during the skid she keeps stepping (the walk/run legs advance by the distance, slowing down) and stands once nearly stopped
+      if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle',idleName());}}
+      else if(P.st!=='idle'||P.clip!==idleName())start('idle',idleName());}
+  }else{
+    const L=clip(P.clip),T=total(L);
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=F8V[P.f8??0];P.x+=v[0]*sp+ix*0.3;P.y+=v[1]*sp*MV.ySc+iy*0.3;}else{P.x+=ix*sp;P.y+=iy*sp*MV.ySc;}}   // running jump carries forward even without input
+    if(P.st==='dash'&&P.dsh){const d=P.dsh,E=q=>1-Math.pow(1-q,2.6),p0=Math.min(1,(P.t-1)/DSH.burst),p=Math.min(1,P.t/DSH.burst),st=DSH.travel*(E(p)-E(Math.max(0,p0)));P.x+=d.dx*st;P.y+=d.dy*st*.8;
+      if((P.t-1)%2===0&&P.t-1<DSH.dur)GH.push({e:frameAt(L,P.t,false),x:P.x,y:P.y-jz(),a:0});}
+    if(P.t>=T){if(P.st==='death'){P.t=T;return;}if(P.st==='jump')dust(P.x,P.y,8,110);start('idle',idleName());}
+  }
+}
+// hit feel (owner 10-20 "1번"): up/down attacks drive the trail straight up/down the screen (the art is diagonal), lunge along the input,
+// hit-stop + screen shake on the strike, shockwave + flash on the 3rd hit, training dummies that react.
+const VERT={down:1,downl:1,up:-1,upl:-1};
+function tmeta(n){const m=A.thrust[n];if(!m)return null;const d=n.split('_')[1],v=VERT[d];if(!v)return STILL?{...m,dir:[d==='left'?-1:1,0],tip:[m.tip[0]*0.4,m.tip[1]],tip2:m.tip2?[m.tip2[0]*0.4,m.tip2[1]]:null}:{...m,dir:[d==='left'?-1:1,0]};   // STILL: trail starts at the body front   // owner 10-20: left/right thrusts go straight ahead (measured needle angle ignored)
+  const tx=m.tip[0]*0.2,ty=v>0?-20:-96,o=m.tip2?6:0;return {...m,dir:[0,v],tip:[tx-o,ty],tip2:m.tip2?[tx+o,ty]:null};}
+// owner 10-20 "사람은 가만히 있고 특수효과만 나가게" + "검흔만 나가게" + "동작 모션 없이": STILL = no attack pose (stays in idle), no lunge step, only the thrust trail flies forward (no shockwave ring / flash / tip sparkle) and hits further away
+const STILL=true,FLY=7,ATK_SPEED=2;
+// owner 10-22 "공격 검흔이 너무 크다, 일반 탑다운 게임 히트박스 크기만큼": reach was 144-170px from the needle tip (~1.5 body lengths) while the streak
+// drew only 105-135px, so hits landed past the visible streak. Now one number for both: 1st/2nd hit 80px, 3rd hit 105px from the needle tip
+// (~1.0 / 1.2 body lengths from her body, like the hero's thrust 118/83 world px and common top-down melee ~1 body length), half-width 18 / 22.
+// The streak head stops exactly at the end of the hit box. ?hb=1 draws the hit boxes for checking.
+// (1) rhythm: hit = tick of the strike, next = earliest tick the queued next hit starts, end = combo over (hero 14/18/27-tick swings, hits at 5/20/41)
+const CMB=[{hit:5,next:15,end:24},{hit:5,next:18,end:26},{hit:8,next:99,end:22}];
+// (2) three different hits: 1 = quick straight stab, 2 = the other hand (same straight direction, a little lower), 3 = finisher: three needles in a fan + a ring at the end,
+// with a short gathering glow at the needle tip before it fires (ticks 0-8)
+function shapeHit(m,hi){if(hi!==1)return {...m,hi};   /* owner 10-23 "한개 검흔이 대각선으로 발현": no tilt - the 2nd stab goes the same straight way, from the other hand (5px lower / 4px back) */
+  const o=Math.abs(m.dir[0])>0.01?[-m.dir[0]*4,5]:[(P.lastH==='left'?-1:1)*6,-m.dir[1]*4];return {...m,hi,tip:[m.tip[0]+o[0],m.tip[1]+o[1]],tip2:null};}
+// (6) the hero's sound files (assets/sfx); (3) hit sparks at the contact point
+const SFX={};for(const n of ['swing_light','swing_heavy','hit_light','hit_heavy'])try{SFX[n]=new Audio('assets/sfx/'+n+'.ogg');SFX[n].volume=.45;}catch(e){}
+function sfx(n){const a=SFX[n];if(!a)return;try{const c=a.cloneNode();c.volume=a.volume;c.play().catch(()=>{});}catch(e){}}
+let SPK=[];
+const ATKR={len:[80,80,105],half:[18,18,22]},SHOWHB=/[?&]hb=1/.test(location.search);   // ATK_SPEED: attack clock per tick (owner 10-21 "공속 빠르게" -> 2x)
+const HIT=[{push:8,stop:4,shake:1.5,dmg:12},{push:10,stop:5,shake:2,dmg:14},{push:18,stop:9,shake:4,dmg:30}];
+const DUM=[[120,0],[-120,0],[0,95],[0,-95],[90,80],[-90,-80]].map(([x,y])=>({x,y,hx:x,hy:y,fl:0,pops:[]}));
+let SHAKE=0,FLASH=0,WAVES=[];
+function strike(n,hi,mo){const m=mo||tmeta(n);if(!m)return;const H=HIT[hi];let any=false;   // hit-stop/shake only when something is hit, so walking/running attacks don't stutter
+  const [dx,dy]=m.dir,reach=ATKR.len[hi],half=ATKR.half[hi],tips=m.tip2?[m.tip,m.tip2]:[m.tip];
+  for(const t of tips){const ox=P.x+t[0],oy=P.y+dy*12;   // (10-22) hits are judged on the GROUND (feet line), like every top-down game: the streak is drawn at chest height, the dummy is where its feet areif(hi===2&&!STILL)WAVES.push({x:ox+dx*reach*.7,y:oy+dy*reach*.7,a:0});
+    for(const D of DUM){const rx=D.x-ox,ry=D.y-oy,along=rx*dx+ry*dy,perp=Math.abs(rx*dy-ry*dx);
+      if(along>-8&&along<reach&&perp<half&&D.fl<6){D.fl=10;D.x+=dx*H.push*.8;D.y+=dy*H.push*.8;D.pops.push({v:H.dmg,a:0,big:hi===2});any=true;SPK.push({x:D.x,y:D.y-34,t:0,big:hi===2,d:[dx,dy],p:Array.from({length:hi===2?8:5},()=>[Math.random()*2-1,Math.random()*.8+.4])});}}}
+  if(any){sfx(hi===2?'hit_heavy':'hit_light');P.stop=H.stop;SHAKE=Math.max(SHAKE,H.shake);if(hi===2&&!STILL)FLASH=4;}}
+// thrust trail (port of fx.py)
+function lance(cx,cy,dx,dy,nx,ny,back,ahead,w,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(cx-dx*back,cy-dy*back);ctx.lineTo(cx+nx*w/2,cy+ny*w/2);ctx.lineTo(cx+dx*ahead,cy+dy*ahead);ctx.lineTo(cx-nx*w/2,cy-ny*w/2);ctx.closePath();ctx.fill();}
+// owner 10-21 "좀더 앞으로 찌르는 듯한 검흔": a stab streak - a sharp spear-point head shoots forward fast (ease-out), the tail stays at the
+// needle tip for a moment and then snaps forward after the head, so it reads as one straight piercing line; thin speed lines beside it.
+// owner 10-23 "더 괜찮은 검흔" -> 1) dot-art streaks: the stabs and rings are drawn into their own canvas, then every pixel is snapped to a 4-colour
+// palette (white / pale pink / red / dark red) with hard edges, faint parts become a checkerboard dither - same look as the pixel sprites, no smooth blur.
+// 3) a 1-2 frame white flash at the needle tip when a stab fires (stabOne).
+const PXC=document.createElement('canvas'),PXX=PXC.getContext('2d');let PXREAL=null;
+const PXPAL=[[255,255,255],[255,214,222],[255,84,108],[176,26,56]];
+function pxBegin(){if(PXC.width!==VW||PXC.height!==VH){PXC.width=VW;PXC.height=VH;}PXX.clearRect(0,0,VW,VH);PXREAL=ctx;ctx=PXX;}
+function pxEnd(){ctx=PXREAL;if(!TR.length&&!WAVES.length)return;const im=PXX.getImageData(0,0,VW,VH),d=im.data;
+  for(let i=0;i<d.length;i+=4){const a=d[i+3];if(!a)continue;const px=(i>>2)%VW,py=((i>>2)/VW)|0;
+    if(a<40||(a<110&&(px+py)&1)){d[i+3]=0;continue;}   // faint edge: gone or checkerboard dither
+    const r=d[i],g=d[i+1],l=(r+2*g)/3,c=PXPAL[l>225?0:l>165?1:l>100?2:3];d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255;}
+  PXX.putImageData(im,0,0);ctx.drawImage(PXC,0,0);}
+function stabOne(x,y,m,tip,age,heavy){const life=heavy?16:12;if(age<0||age>=life)return;const [dx,dy]=m.dir,nx=-dy,ny=dx,L=ATKR.len[heavy?2:0],W=heavy?9:6;
+  const e=Math.min(1,age/4),H=L*(1-Math.pow(1-e,3)),k=Math.max(0,(age-3)/(life-3)),Tl=H*Math.pow(k,1.3),a=age<life*0.6?1:1-(age-life*0.6)/(life*0.4);
+  const ox=x+tip[0],oy=y+tip[1],P=d=>[ox+dx*d,oy+dy*d];
+  const blade=(w,tailW,col,headLen)=>{const t=P(Tl),h=P(H),hb=P(Math.max(Tl,H-headLen));ctx.fillStyle=col;ctx.beginPath();
+    ctx.moveTo(t[0]+nx*tailW/2,t[1]+ny*tailW/2);ctx.lineTo(hb[0]+nx*w/2,hb[1]+ny*w/2);ctx.lineTo(h[0],h[1]);ctx.lineTo(hb[0]-nx*w/2,hb[1]-ny*w/2);ctx.lineTo(t[0]-nx*tailW/2,t[1]-ny*tailW/2);ctx.closePath();ctx.fill();};
+  if(heavy)blade(W*2.2,0,`rgba(200,30,60,${.30*a})`,26);
+  blade(W*1.4,0,`rgba(255,85,110,${.5*a})`,22);blade(W*0.7,0,`rgba(255,232,236,${.92*a})`,18);blade(Math.max(1.5,W*0.28),0,`rgba(255,255,255,${a})`,14);
+  ctx.strokeStyle=`rgba(255,170,185,${.6*a})`;ctx.lineWidth=1;
+  for(const[o,f]of(heavy?[[1.3,.55],[-1.3,.45],[2.1,.3],[-2.1,.35]]:[[1.2,.5],[-1.2,.4]])){const s0=Tl+(H-Tl)*0.1,s1=Tl+(H-Tl)*(0.1+f),p0=P(s0),p1=P(s1);ctx.beginPath();ctx.moveTo(p0[0]+nx*o*W,p0[1]+ny*o*W);ctx.lineTo(p1[0]+nx*o*W,p1[1]+ny*o*W);ctx.stroke();}
+  if(age<2){const r=heavy?5:3;ctx.fillStyle='#ffffff';ctx.beginPath();ctx.moveTo(ox-r*2,oy);ctx.lineTo(ox,oy-r);ctx.lineTo(ox+r*2,oy);ctx.lineTo(ox,oy+r);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,214,222,.9)';ctx.fillRect(ox-r*3,oy,r*6,1);ctx.fillRect(ox,oy-r*2,1,r*4);}   // 3) fire flash at the needle tip
+  if(age<3){const h=P(H+2),r=heavy?6:4;ctx.fillStyle=`rgba(255,255,255,${1-age/3})`;ctx.fillRect(h[0]-r,h[1],2*r,1);ctx.fillRect(h[0],h[1]-r,1,2*r);}}
+function trailOne(x,y,m,tip,age,heavy){if(STILL)return stabOne(x,y,m,tip,age,heavy);const big=m.big,life=heavy?20:big?16:12;if(age<0||age>=life)return;const g=Math.min(1,(age+1)/2),a=1-age/life,[dx,dy]=m.dir,nx=-dy,ny=dx;
+  const fly=STILL?age*FLY:0,tx=x+tip[0]+dx*fly,ty=y+tip[1]+dy*fly,ahead=(heavy?92:big?70:52)*g,back=heavy?40:big?34:26,W=heavy?16:big?12:9,cx=tx+dx*ahead*.35,cy=ty+dy*ahead*.35;
+  if(heavy)lance(cx,cy,dx,dy,nx,ny,back+ahead*.45,ahead*.75,W*1.6,`rgba(60,150,255,${.31*a})`);
+  lance(cx,cy,dx,dy,nx,ny,back+ahead*.35,ahead*.65,W,`rgba(90,210,255,${.47*a})`);lance(cx,cy,dx,dy,nx,ny,back*.8+ahead*.3,ahead*.6,W*.45,`rgba(210,250,255,${.86*a})`);
+  lance(cx,cy,dx,dy,nx,ny,back*.6+ahead*.25,ahead*.55,Math.max(1.5,W*.18),`rgba(255,255,255,${a})`);
+  ctx.strokeStyle=`rgba(200,245,255,${.67*a})`;ctx.lineWidth=1;for(const[o,l]of(big?[[.9,.6],[-.9,.5],[1.6,.35],[-1.6,.3]]:[[.9,.55],[-.9,.45]])){const sx=cx+nx*o*W-dx*back*.6,sy=cy+ny*o*W-dy*back*.6,L=(back+ahead)*l;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+dx*L,sy+dy*L);ctx.stroke();}
+  if(!STILL&&age<4){const ex=tx+dx*ahead*.95,ey=ty+dy*ahead*.95,r=big?5:4;ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(ex-r,ey,2*r,1);ctx.fillRect(ex,ey-r,1,2*r);}}
+function draw(){   // STILL: during attacks she keeps the idle pose (no attack frames drawn)
+  const shx=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0,shy=SHAKE?Math.round((Math.random()*2-1)*SHAKE):0;SHAKE=SHAKE>0.3?SHAKE*0.82:0;
+  const camX=Math.round(P.x-VW/2)+shx,camY=Math.round(P.y-VH*0.55)+shy;
+  for(let y=Math.floor(camY/256)*256;y<camY+VH;y+=256)for(let x=Math.floor(camX/256)*256;x<camX+VW;x+=256)ctx.drawImage(TILE,x-camX,y-camY);
+  const sx=Math.round(P.x-camX),sy0=Math.round(P.y-camY);let sy=sy0;
+  sy-=jz();
+  const drawDummy=D=>{const x=Math.round(D.x-camX),y=Math.round(D.y-camY);ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(x,y,14,4,0,0,7);ctx.fill();
+    const w=D.fl>0&&D.fl%2?'#fff':null;ctx.fillStyle=w||'#7a5230';ctx.fillRect(x-3,y-44,6,44);ctx.fillStyle=w||'#a8743f';ctx.fillRect(x-14,y-38,28,6);ctx.beginPath();ctx.arc(x,y-50,9,0,7);ctx.fillStyle=w||'#c9a06a';ctx.fill();
+    if(D.fl>0)D.fl--;D.x+=(D.hx-D.x)*0.06;D.y+=(D.hy-D.y)*0.06;
+    for(const q of D.pops){ctx.font=(q.big?'bold 15px':'bold 12px')+' system-ui';ctx.fillStyle=`rgba(255,${q.big?220:255},${q.big?90:255},${1-q.a/40})`;ctx.fillText(q.v,x-8,y-64-q.a*0.6);q.a++;}D.pops=D.pops.filter(q=>q.a<40);};
+  for(const D of DUM)if(D.y<=P.y)drawDummy(D);
+  ctx.fillStyle='rgba(0,0,0,.24)';ctx.beginPath();ctx.ellipse(sx,sy0,24*(1-jz()/160),6*(1-jz()/160),0,0,7);ctx.fill();
+  for(const d of DUST){ctx.globalAlpha=1-d.t/d.life;ctx.fillStyle=d.c;ctx.fillRect(Math.round(d.x-camX),Math.round(d.y-camY),d.s,d.s);}ctx.globalAlpha=1;
+  drawDash(camX,camY,true);castFx(false,sx,sy);sewFx(false,camX,camY);
+  const L=clip(P.clip);const e=frameAt(L,P.st==='move'?Math.floor(P.mt||0):P.t,P.st==='idle'||P.st==='move');const [s,c]=e;const [x,y,w,h,ax,ay]=A.cells[s][c];
+  const nu=P.nudge?Math.min(2,P.nudge.t*.6):0,nx=P.nudge?Math.round(P.nudge.d[0]*nu):0,ny=P.nudge?Math.round(P.nudge.d[1]*nu*.6):0;ctx.drawImage(SH[s],x,y,w,h,sx-ax+nx,sy-ay+ny,w,h);   // (7) 1-2px 'flinch' toward the stab, no attack pose
+  castFx(true,sx,sy);sewFx(true,camX,camY);   // owner 10-22 "속도선 제거해": no dash speed lines (drawDash(...,false) not called)
+  for(const D of DUM)if(D.y>P.y)drawDummy(D);
+  pxBegin();
+  for(const W of WAVES){const x=W.x-camX,y=W.y-camY,r=6+W.a*2.6;ctx.strokeStyle=W.red?`rgba(255,110,130,${1-W.a/16})`:`rgba(200,245,255,${1-W.a/16})`;ctx.lineWidth=3-W.a/8;ctx.beginPath();ctx.ellipse(x,y,r,r*0.45,0,0,7);ctx.stroke();W.a++;}WAVES=WAVES.filter(W=>W.a<16);
+  for(const T of TR){const age=P.gt-T.t0,x=Math.round(T.x-camX),y=Math.round(T.y-camY);if(T.hi===2){const c=[(T.m.tip[0]+(T.m.tip2||T.m.tip)[0])/2,(T.m.tip[1]+(T.m.tip2||T.m.tip)[1])/2];for(const r of [-0.13,0.13]){const cs=Math.cos(r),sn=Math.sin(r),d=T.m.dir;trailOne(x,y,{...T.m,dir:[d[0]*cs-d[1]*sn,d[0]*sn+d[1]*cs]},c,age-1,false);}trailOne(x,y,T.m,c,age,true);
+    if(age>=6&&!T.w){T.w=1;WAVES.push({x:T.x+c[0]+T.m.dir[0]*ATKR.len[2],y:T.y+c[1]+T.m.dir[1]*ATKR.len[2],a:0,red:1});}}else trailOne(x,y,T.m,T.m.tip,age,false);}TR=TR.filter(T=>P.gt-T.t0<20);
+  pxEnd();
+  if(FLASH>0){ctx.fillStyle=`rgba(255,255,255,${FLASH*0.05})`;ctx.fillRect(0,0,VW,VH);FLASH--;}
+  for(const k of SPK){const x=k.x-camX,y=k.y-camY,q=k.t/12,a=1-q,r=(k.big?14:9)*Math.min(1,k.t/3+.3);ctx.fillStyle=`rgba(255,255,255,${a})`;   // (3) hit spark: 4-point star + flying bits
+    ctx.fillRect(Math.round(x-r),Math.round(y),Math.round(2*r),1);ctx.fillRect(Math.round(x),Math.round(y-r),1,Math.round(2*r));ctx.fillStyle=`rgba(255,80,100,${a*.8})`;ctx.fillRect(Math.round(x-r*.6),Math.round(y-r*.6),2,2);ctx.fillRect(Math.round(x+r*.6),Math.round(y+r*.6),2,2);
+    for(const[u,v]of k.p){const dd=k.t*3*v;ctx.fillStyle=u>0?`rgba(230,235,245,${a})`:`rgba(255,90,110,${a})`;ctx.fillRect(Math.round(x+k.d[0]*dd+(-k.d[1])*u*dd*.8),Math.round(y+k.d[1]*dd+k.d[0]*u*dd*.8),2,2);}}
+  if(P.atk&&P.atk.n===3&&P.atk.t<CMB[2].hit){const lt=tmeta(P.atk.clip);if(lt){const m=diagMeta(lt,P.atk.d8),c=m.tip2?[(m.tip[0]+m.tip2[0])/2,(m.tip[1]+m.tip2[1])/2]:m.tip,g=P.atk.t/CMB[2].hit,x=P.x+c[0]-camX,y=P.y-jz()+c[1]-camY;   // finisher gathering glow
+    ctx.fillStyle=`rgba(255,90,110,${.35*g})`;ctx.beginPath();ctx.arc(x,y,3+6*g,0,7);ctx.fill();ctx.fillStyle=`rgba(255,240,245,${.9*g})`;ctx.fillRect(Math.round(x-1),Math.round(y-1),3,3);}}
+  if(SHOWHB)for(const T of TR){if(P.gt-T.t0>14)continue;const [dx,dy]=T.m.dir,L=ATKR.len[T.hi||0],h=ATKR.half[T.hi||0];ctx.strokeStyle='#ff3040';ctx.lineWidth=1;
+    for(const t of T.m.tip2?[T.m.tip,T.m.tip2]:[T.m.tip]){const ox=T.x+t[0]-camX,oy=(T.gy??T.y)+dy*12-camY,c=[[-8,-h],[L,-h],[L,h],[-8,h]].map(([u,v])=>[ox+dx*u-dy*v,oy+dy*u+dx*v]);ctx.beginPath();ctx.moveTo(...c[0]);for(const q of c.slice(1))ctx.lineTo(...q);ctx.closePath();ctx.stroke();}}   // ?hb=1: red = hit box
+}
+// owner 10-21 "리네트 스킬 만들어보자" -> 재봉사 실/바늘, 3 skills cycling on each press (cast pose = her two needle-rapiers spreading):
+// S1 바늘비: a fan of needles with red thread tails flies forward and pierces. S2 실 묶기: one needle on a red thread shoots out,
+// wraps the first dummy it hits in thread loops and yanks it back. S3 재봉진: a needle sews a running-stitch circle around her
+// (starts at the front, one lap) and then the stitches flash gold and 12 needles burst outward. All drawn in code as pixel lines.
+const SKN=['S1 바늘비','S2 실 묶기','S3 재봉진'];
+const NC={tip:'#ffffff',body:'#dfe6ee',shade:'#8d98a6',th:'#d8283a',thl:'#ff6a78',gold:'#ffd25a'};
+let NDL=[],ROPE=null,STITCH=null;
+function skDir(){const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);return [d[0]/m,d[1]/m];}
+function pline(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);ctx.fillStyle=col;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;
+  for(let i=0;i<400;i++){ctx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+function needle(x,y,dx,dy,len,a){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a*.35;ctx.strokeStyle='#bfe8ff';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x-dx*len*.5,y-dy*len*.5);ctx.lineTo(x+dx*len*.6,y+dy*len*.6);ctx.stroke();ctx.restore();ctx.globalAlpha=a;const tx=x+dx*len*.5,ty=y+dy*len*.5,bx=x-dx*len*.5,by=y-dy*len*.5;
+  pline(bx-dy,by+dx,tx-dy,ty+dx,NC.shade);pline(bx,by,tx,ty,NC.body);pline(bx+dy,by-dx,tx+dy,ty-dx,NC.body);pline(tx-dx*2,ty-dy*2,tx,ty,NC.tip);ctx.fillStyle=NC.shade;ctx.fillRect(Math.round(bx),Math.round(by),1,1);ctx.globalAlpha=1;}
+function thread(pts,a,col){ctx.globalAlpha=a;for(let i=1;i<pts.length;i++){pline(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],col||NC.th);pline(pts[i-1][0],pts[i-1][1]+1,pts[i][0],pts[i][1]+1,col||NC.th);}ctx.globalAlpha=1;}
+function hitD(D,dmg,push,dx,dy,big){if(D.fl>=6)return false;D.fl=10;D.x+=dx*push;D.y+=dy*push;D.pops.push({v:dmg,a:0,big});return true;}
+const inD=(D,x,y,w)=>Math.abs(x-D.x)<w&&y>D.y-100&&y<D.y+6;   // dummy body box (post + head + room above), so needles thrown from her raised hand still hit
+// owner 10-21 "몇몇 동작에서 손에 실이 안나온다": the thread starts at the needle in her hand = measured tip of the current cast frame (A.casttip)
+function tipNow(){const n=P.clip,T=A.casttip&&A.casttip[n];if(P.st!=='cast'||!T)return null;const L=clip(n);let t=P.t;for(let i=0;i<L.length;i++){if(t<L[i][2])return T[i];t-=L[i][2];}return T[T.length-1];}
+function hand(){const tp=tipNow();if(tp){P.lastTip=tp;P.lastTipClip=P.clip;}const q=tp||(P.lastTip&&P.sk?P.lastTip:null);if(q)return [P.x+q[0],P.y-jz()+q[1]];const d=P.sk?P.sk.d:[1,0];return [P.x+d[0]*34,P.y-jz()-66+d[1]*8];}
+function skillStep(){
+  if(P.st==='cast'&&P.sk){const k=P.skill,t=P.t,S=P.sk,[dx,dy]=S.d;
+    if(k===0&&t>=22&&S.fired<7&&t%1===0){const i=S.fired++,o=[0,-1,1,-2,2,-3,3][i]*0.13,ca=Math.cos(o),sa=Math.sin(o),vx=dx*ca-dy*sa,vy=dx*sa+dy*ca,[hx,hy]=hand();
+      NDL.push({x:hx,y:hy,vx:vx*7.5,vy:vy*7.5,age:0,life:30,hit:new Set(),tail:[],dmg:9});}
+    if(k===1&&t===20&&!S.fired){S.fired=1;const [hx,hy]=hand();ROPE={x:hx,y:hy,dx,dy,age:0,ph:'fly',dist:0,D:null};}
+    if(k===2&&t===2&&!S.fired){S.fired=1;STITCH={age:0,x:P.x,y:P.y,a0:Math.atan2(dy,dx)};}
+  }
+  for(const n of NDL){n.age++;n.tail.unshift([n.x,n.y]);if(n.tail.length>7)n.tail.pop();n.x+=n.vx;n.y+=n.vy;
+    for(const D of DUM){if(n.hit.has(D))continue;if(inD(D,n.x,n.y,14)){n.hit.add(D);const m=Math.hypot(n.vx,n.vy);if(hitD(D,n.dmg,n.big?6:3,n.vx/m,n.vy/m,n.big)){P.stop=Math.max(P.stop||0,n.big?4:1);SHAKE=Math.max(SHAKE,n.big?2.5:1);}}}}
+  NDL=NDL.filter(n=>n.age<n.life);
+  if(ROPE){const R=ROPE;R.age++;
+    if(R.ph==='fly'){R.dist+=11;R.x+=R.dx*11;R.y+=R.dy*11;for(const D of DUM)if(inD(D,R.x,R.y,16)){R.D=D;R.ph='wrap';R.t0=R.age;hitD(D,16,0,R.dx,R.dy,false);P.stop=3;SHAKE=Math.max(SHAKE,1.5);break;}if(R.ph==='fly'&&R.dist>210){R.ph='back';}}
+    else if(R.ph==='wrap'){const D=R.D;R.x=D.x;R.y=D.y-34;if(R.age-R.t0>=16){R.ph='yank';R.t0=R.age;const [hx,hy]=hand(),vx=hx-D.x,vy=(hy+30)-D.y,m=Math.hypot(vx,vy)||1;hitD(D,34,Math.min(70,m-34),vx/m,vy/m,true);P.stop=8;SHAKE=Math.max(SHAKE,4);}}
+    else if(R.ph==='yank'){const D=R.D;R.x=D.x;R.y=D.y-34;if(R.age-R.t0>=22)ROPE=null;}
+    else if(R.ph==='back'){const [hx,hy]=hand(),vx=hx-R.x,vy=hy-R.y,m=Math.hypot(vx,vy);if(m<14)ROPE=null;else{R.x+=vx/m*14;R.y+=vy/m*14;}}}
+  if(STITCH){const S=STITCH;S.age++;S.x=P.x;S.y=P.y;
+    if(S.age===30){const R0=[74,30];for(let i=0;i<12;i++){const a=S.a0+i*Math.PI/6,cx=Math.cos(a),cy=Math.sin(a),m=Math.hypot(cx,cy*0.5);
+      NDL.push({x:S.x+cx*R0[0],y:S.y-6+cy*R0[1],vx:cx/m*8,vy:cy*0.5/m*8,age:0,life:22,hit:new Set(),tail:[],dmg:28,big:true});}SHAKE=Math.max(SHAKE,3);}
+    if(S.age>44)STITCH=null;}
+}
+// one stitch lap: front (angle a0 = facing) round once; stitches = short dashes on the ellipse, back half drawn behind her
+function sewFx(front,camX,camY){
+  if(STITCH){const S=STITCH,cx=S.x-camX,cy=S.y-6-camY,rx=74,ry=30,p=Math.min(1,(S.age-2)/24),N=28,flash=S.age>=30;
+    const fade=S.age>34?1-(S.age-34)/10:1;
+    for(let i=0;i<N*p;i++){const a0=S.a0+i/N*Math.PI*2,a1=a0+0.6/N*Math.PI*2,y0=Math.sin(a0);if(front!==(y0>=0))continue;
+      const col=flash?(S.age<33?'#ffffff':NC.gold):(i%2?NC.th:NC.thl);ctx.globalAlpha=fade;pline(cx+Math.cos(a0)*rx,cy+y0*ry,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry,col);pline(cx+Math.cos(a0)*rx,cy+y0*ry+1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry+1,col);
+      if(flash&&S.age<38){ctx.globalAlpha=fade*.45;pline(cx+Math.cos(a0)*rx,cy+y0*ry-1,cx+Math.cos(a1)*rx,cy+Math.sin(a1)*ry-1,NC.gold);}ctx.globalAlpha=1;}
+    if(!flash&&p<1&&p>0){const a=S.a0+p*Math.PI*2,y=Math.sin(a);if(front===(y>=0)){const nx=cx+Math.cos(a)*rx,ny=cy+y*ry,tx=-Math.sin(a),ty=Math.cos(a)*ry/rx,m=Math.hypot(tx,ty);needle(nx,ny-2,tx/m,ty/m,15,1);}}}
+  if(!front)return;
+  if(P.st==='cast'&&P.sk){const [hx,hy]=hand(),x=hx-camX,y=hy-camY,t=P.t;
+    if(t<20){for(let i=0;i<3;i++){const a0=t*0.5+i*2.1;thread([[x,y],[x+Math.cos(a0)*6,y+Math.sin(a0)*3-2],[x+Math.cos(a0+1.2)*7,y+Math.sin(a0+1.2)*3.5-2]],.9,i%2?NC.thl:NC.th);}}   // winding: little thread loops spinning on the needle
+    else if(P.skill===0){for(const n of NDL)if(!n.big&&n.age<10)thread([[x,y],[n.x-camX,n.y-camY]],1-n.age/10,NC.th);}
+    else if(P.skill===2&&STITCH&&STITCH.age<30){const S=STITCH,p=Math.min(1,(S.age-2)/24),a=S.a0+p*Math.PI*2;thread([[x,y],[S.x-camX+Math.cos(a)*74,S.y-6-camY+Math.sin(a)*30]],.8,NC.th);}}
+  for(const n of NDL){const a=n.age>n.life-6?(n.life-n.age)/6:1,m=Math.hypot(n.vx,n.vy),x=n.x-camX,y=n.y-camY;
+    if(n.tail.length>1)thread([[x,y],...n.tail.map(q=>[q[0]-camX+(Math.random()<.5?0:1),q[1]-camY])],a*.85,n.big?NC.gold:NC.th);
+    needle(x,y,n.vx/m,n.vy/m,n.big?18:15,a);}
+  if(ROPE){const R=ROPE,[hx,hy]=hand(),x0=hx-camX,y0=hy-camY,x1=R.x-camX,y1=R.y-camY,sag=R.ph==='fly'||R.ph==='back'?8:R.ph==='wrap'?3:0,pts=[];
+    for(let i=0;i<=10;i++){const u=i/10;pts.push([x0+(x1-x0)*u,y0+(y1-y0)*u+Math.sin(u*Math.PI)*sag]);}thread(pts,1,NC.th);thread(pts.map(q=>[q[0],q[1]-1]),.5,NC.thl);
+    if(R.ph==='fly'||R.ph==='back')needle(x1,y1,R.dx,R.dy,16,1);
+    if(R.D&&(R.ph==='wrap'||R.ph==='yank')){const D=R.D,dx=D.x-camX,dy=D.y-camY,n=R.ph==='wrap'?Math.min(4,1+(R.age-R.t0)/4):4,a=R.ph==='yank'?Math.max(0,1-(R.age-R.t0-10)/12):1;
+      for(let i=0;i<n;i++){const yy=dy-14-i*9,rx=12-i*0.5,ry=3.5;ctx.globalAlpha=a;for(let j=0;j<16;j++){const a0=j/16*Math.PI*2,a1=(j+1)/16*Math.PI*2;pline(dx+Math.cos(a0)*rx,yy+Math.sin(a0)*ry,dx+Math.cos(a1)*rx,yy+Math.sin(a1)*ry,j%2?NC.th:NC.thl);}ctx.globalAlpha=1;}}}
+}
+let acc=0,last=performance.now();
+function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
+fetch('assets/anim/linette8.json?v=47').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=45';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
+</script></body></html>

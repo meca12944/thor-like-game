@@ -1,15 +1,130 @@
 {
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
- "maps": ["felt", "field00", "field01", "dungeon01_b1", "dungeon01_b2", "boss01"],
+ "maps": [
+  "felt",
+  "field00",
+  "field01",
+  "dungeon01_b1",
+  "dungeon01_b2",
+  "boss01",
+  "field02",
+  "field03",
+  "field04",
+  "field05",
+  "field06",
+  "field07",
+  "field08",
+  "field09"
+ ],
  "regions": {
-  "area1":    {"name": "1지역 · 시작의 숲", "worldNode": "area1", "maps": ["felt", "field00", "field01"],
-               "town": {"label": "시작 마을", "map": "field00", "x": 27, "y": -3}},
-  "temple01": {"name": "고대 숲 신전", "worldNode": "area1", "maps": ["dungeon01_b1", "dungeon01_b2", "boss01"]}
+  "area1": {
+   "name": "1지역 · 시작의 숲",
+   "worldNode": "area1",
+   "maps": [
+    "felt",
+    "field00",
+    "field01"
+   ],
+   "town": {
+    "label": "시작 마을",
+    "map": "field00",
+    "x": 27,
+    "y": -3
+   }
+  },
+  "temple01": {
+   "name": "고대 숲 신전",
+   "worldNode": "area1",
+   "maps": [
+    "dungeon01_b1",
+    "dungeon01_b2",
+    "boss01"
+   ]
+  },
+  "area2": {
+   "name": "2지역 · 수정 동굴",
+   "worldNode": "area2",
+   "maps": [
+    "field02"
+   ]
+  },
+  "area3": {
+   "name": "3지역 · 모래 사막",
+   "worldNode": "area3",
+   "maps": [
+    "field03"
+   ]
+  },
+  "area4": {
+   "name": "4지역 · 피라미드",
+   "worldNode": "area4",
+   "maps": [
+    "field04"
+   ]
+  },
+  "area5": {
+   "name": "5지역 · 산호 바다",
+   "worldNode": "area5",
+   "maps": [
+    "field05"
+   ]
+  },
+  "area6": {
+   "name": "6지역 · 해안 절벽",
+   "worldNode": "area6",
+   "maps": [
+    "field06"
+   ]
+  },
+  "area7": {
+   "name": "7지역 · 화산 성채",
+   "worldNode": "area7",
+   "maps": [
+    "field07"
+   ]
+  },
+  "area8": {
+   "name": "8지역 · 설산 뇌전 탑",
+   "worldNode": "area8",
+   "maps": [
+    "field08"
+   ]
+  },
+  "area9": {
+   "name": "9지역 · 어둠 신전",
+   "worldNode": "area9",
+   "maps": [
+    "field09"
+   ]
+  }
  },
  "destinations": [
-  {"id": "dest_town",    "label": "시작 마을",          "kind": "town",    "map": "field00", "x": 27, "y": 0},
-  {"id": "dest_temple",  "label": "고대 숲 신전 입구",  "kind": "dungeon", "map": "field01", "x": 46, "y": 4},
-  {"id": "dest_boss",    "label": "골렘의 방",          "kind": "boss",    "map": "dungeon01_b2", "x": 38, "y": 13}
+  {
+   "id": "dest_town",
+   "label": "시작 마을",
+   "kind": "town",
+   "map": "field00",
+   "x": 27,
+   "y": 0
+  },
+  {
+   "id": "dest_temple",
+   "label": "고대 숲 신전 입구",
+   "kind": "dungeon",
+   "map": "field01",
+   "x": 46,
+   "y": 4
+  },
+  {
+   "id": "dest_boss",
+   "label": "골렘의 방",
+   "kind": "boss",
+   "map": "dungeon01_b2",
+   "x": 38,
+   "y": 13
+  }
  ],
- "portalNames": {"town": "시작 마을"}
+ "portalNames": {
+  "town": "시작 마을"
+ }
 }

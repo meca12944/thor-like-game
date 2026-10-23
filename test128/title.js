@@ -10,7 +10,7 @@
   'use strict';
   const Q = new URLSearchParams(location.search);
   const force = Q.get('titlescreen') === '1';
-  if (!force && (Q.has('notitle') || navigator.webdriver)) { window.__titleScreen = { active: false, skipped: true }; return; }
+  if (!force && (Q.has('notitle') || Q.has('start') || navigator.webdriver)) { window.__titleScreen = { active: false, skipped: true }; return; }
   const LSQ = 'townDemo.quicksave';
   const hasSave = (() => { try { const d = JSON.parse(localStorage.getItem(LSQ)); return !!(d && d.v === 1); } catch (e) { return false; } })();
   const TS = window.__titleScreen = { active: true, stage: 'press', sel: 0, choice: null };
@@ -57,6 +57,7 @@
   function toMenu() { TS.stage = 'menu'; press.hidden = true; ul.hidden = false; draw(); }
   function startGame(choice) {
     TS.choice = choice;
+    // owner 10-23: 새 게임 / 이어하기 both enter the real game (the hero sandbox had an older hero and dash; it is no longer reachable from the title)
     if (choice === 'new' && hasSave) {   // fresh run without deleting the quick save
       const q = new URLSearchParams(location.search); q.set('nosave', ''); q.set('notitle', '');
       location.search = q.toString().replace(/=(&|$)/g, '$1'); return;
