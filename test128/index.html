@@ -1701,7 +1701,7 @@ function h8hb(s,i){if(!(H8&&H8.v3)||s.special||s.leap||s.titleSpin||s.kind==='th
 const TOWN_GK=true,townGk=[];
 const gkSwing=s=>TOWN_GK&&!s.titleSpin&&!s.leap&&s.kind!=='thrust';
 function townGkSpawn(a){const s=a.s,G=window.GKART;if(!G)return;const v=face8V(),l=Math.hypot(v[0],v[1])||1,dx=v[0]/l,dy=v[1]/l,n=Math.min(2,a.i),Y=G.GK[n];
- const hb=h8hb(s,a.i),reach=hb?hb[0]:swingRange(s),deg=hb?hb[1]:(s.arc||FEEL.arcDeg),sp=Math.max(Y.v,(reach*LSC-Y.fwd-Y.R*(1+.025*G.FLY))/G.FLY);
+ const hb=h8hb(s,a.i),tight=hb&&G.REACH,reach=tight?G.REACH[a.i]/G.K/LSC:hb?hb[0]:swingRange(s),deg=tight?G.ARC[a.i]:hb?hb[1]:(s.arc||FEEL.arcDeg), /* same reach / arc as the field 검기 (field px -> atlas px -> town px) */sp=Math.max(Y.v,(reach*LSC-Y.fwd-Y.R*(1+.025*G.FLY))/G.FLY);
  townGk.push({n,i:a.i,s,dir:[dx,dy],v:sp,reach,deg,hit:new Set(),rx:dx*Y.fwd,ry:Math.abs(dx)<.1?-44+dy*(Y.fwd+20):-Y.y+dy*20,t:0,seed:(Math.random()*2147483646|0)+1});}
 function townGkStep(dt){const G=window.GKART;if(!G)return;for(let k=townGk.length-1;k>=0;k--){const f=townGk[k];f.t+=dt*60;const a=f.t*G.STEP;if(a>G.LIFE+3){townGk.splice(k,1);continue;}if(a>G.FLY+1)continue;
   const Y=G.GK[f.n],front=Math.min(f.reach,(Y.fwd+Y.R*(1+.025*a)+a*f.v)/LSC),s=f.s;

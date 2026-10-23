@@ -776,7 +776,7 @@
       const tx = ox + dx * Y.R * .95, ty = oy + dy * Y.R * .95;
       if (a <= 3) { const L = (big ? 10 : 7) * (1 - a / 4) + 3, al = 1 - a / 4; ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(Math.round(tx - L), Math.round(ty) - 1, Math.round(2 * L), 2); ctx.fillRect(Math.round(tx), Math.round(ty - L * .6), 1, Math.round(L * 1.2)); ctx.fillStyle = `rgba(220,245,255,${al})`; ctx.beginPath(); ctx.arc(tx, ty, 3, 0, TAU); ctx.fill(); }
       if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
-  window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, draw: gkArcDraw };
+  window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
   function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
