@@ -1,0 +1,12 @@
+{"tag": "edit_jump_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_hurt_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_dash_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_walk_key.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_walk_key2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "edit_dash_key2.png", "status": "completed", "usage": {"type": "generations", "generations": 10.0}}
+{"tag": "anim_tw_hurt", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.021253152204884423}}
+{"tag": "anim_tw_dash_in", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.022230383488867016}}
+{"tag": "anim_tw_dash_out", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.02433575075864792}}
+{"tag": "anim_tw_jump_up", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.024849431806140476}}
+{"tag": "anim_cyc_walk", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 8, "cost_if_paid": 0.024717648684978485}}
+{"tag": "anim_tw_jump_down", "status": "completed", "usage": {"usd": 0.0, "type": "generations", "generations": 4, "cost_if_paid": 0.025422137485610112}}
