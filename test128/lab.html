@@ -51,14 +51,14 @@
   <a class="btn" data-arena="c1_unrotting_hound"><b>썩지 않는 들개</b><span>돌진 — 빗나가면 한 번 더</span></a>
 
   <h2>그대로</h2>
-  <a class="btn" href="index.html?go=field00"><b>바람길 들판</b><span>게임 그대로의 배치 (리네트 동행)</span></a>
+  <a class="btn" href="index.html?go=field_felt"><b>잿빛 들판</b><span>게임 그대로의 배치 (펠트 밖 정본 들판)</span></a>
 
   <h2>조작</h2>
   <div class="keys">이동 방향키·WASD · 공격 J/Z (누르고 있으면 연타) · 회피대시 Shift/K/X · 큰 스킬 R<br>공격이 맞기 직전에 회피대시 = 저스트 회피 (슬로모션 + 게이지 +15)<br>폰은 화면 터치 패드</div>
 </main>
 <script src="world_mobs.js"></script>
 <script>
-  const build = a => { let u = 'index.html?go=field01&at=17,18&arena=' + encodeURIComponent(a).replace(/%2C/g, ',').replace(/%2A/g, '*');
+  const build = a => { let u = 'index.html?go=field_felt&at=28,17&arena=' + encodeURIComponent(a).replace(/%2C/g, ',').replace(/%2A/g, '*');
     if (document.getElementById('tough').checked) u += '&tough=1'; if (document.getElementById('ult').checked) u += '&ult=full'; return u; };
   const sync = () => document.querySelectorAll('a[data-arena]').forEach(el => el.href = build(el.dataset.arena));
   // every mob in the game, read from the game's own world_mobs.js (always the latest list / behaviour)
