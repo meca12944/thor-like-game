@@ -15,7 +15,7 @@ OUT = os.path.join(ROOT, 'assets', 'world', 'felt_v4'); os.makedirs(OUT, exist_o
 S, T, D, GD = 0.56, 16, 3, 2                      # world px per Grok px, tile, part D, ground D
 PJ = json.load(open(os.path.join(SRC, 'parts.json')))['parts']
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json'))); _top = [x for x, c in enumerate(FF['ground'][0]) if c in ".'=,"]
-W, H = max(54, int(860 * S // T) - (_top[0] + _top[-1]) // 2 + FF['w']), 32                                     # 1536 x 864 Grok px x 0.56 = 860 x 484 world px (+ 2 rows below the south stalls)
+W, H = max(54, int(860 * S // T) - (_top[0] + _top[-1]) // 2 + FF['w']), 35                                     # 1536 x 864 Grok px x 0.56 = 860 x 484 world px (+ 2 rows below the south stalls + 3 rows of seam outside the south gate)
 g2w = lambda gx, gy: (gx * S, gy * S)              # Grok px -> world px
 rnd = random.Random(7)
 
@@ -48,7 +48,10 @@ for pid, im in IM.items(): im.save(os.path.join(OUT, PJ[pid]['img']), optimize=T
 
 # ---------- placement ----------
 SC = json.load(open(os.path.join(SRC, 'scene_suggest.json')))['scene']   # the town-art room's entrance scene + district accents (Grok px)
-EXTRA = [tuple(e) for e in SC] + [  # + mine (Grok px): plaza lamps / bench, market, inn, herbs, web quarter, castle rubble
+SC = [['sign_post', 990, 818] if e[0] == 'sign_post' else e for e in SC]   # 이정표 비켜 세움 (남문 간판과 겹침, art room)
+SEAM = [('dead_tree', 700, 975), ('dead_tree', 1040, 985), ('bush_b', 790, 960), ('bush_b', 935, 965), ('bush_b', 610, 1000), ('bush_b', 1150, 995),
+        ('stone_low', 650, 925), ('stone_low', 1085, 930), ('bush_b', 480, 990), ('stone_low', 1250, 990)]   # 남문 바깥 이음매 (art room 30131c70): town ground runs 3 rows past the gate, dry scrub on it, field trees start below
+EXTRA = [tuple(e) for e in SC] + SEAM + [  # + mine (Grok px): plaza lamps / bench, market, inn, herbs, web quarter, castle rubble
  ('tombs', 1450, 305), ('fence_iron', 1215, 335), ('fence_iron', 1300, 340), ('candelabra', 1000, 215), ('cocoons', 1500, 640),
  ('lamp', 600, 452), ('lamp', 785, 452), ('lamp', 600, 575), ('lamp', 790, 575), ('lamp', 175, 560),
  ('bench', 742, 585), ('crates', 575, 405), ('barrels', 395, 425), ('cart', 850, 430),
@@ -57,6 +60,9 @@ props, solid = [], [[False] * W for _ in range(H)]
 for x in range(W): solid[0][x] = solid[H - 1][x] = True
 for y in range(H): solid[y][0] = solid[y][W - 1] = True
 for y in range(int(175 * S // T)): solid[y] = [True] * W           # far backdrop above the castle line
+GX = int(860 * S // T)                                               # south road column
+for y in range(H - 4, H):                                            # seam outside the gate: only the road walks on to the ash field
+    for x in range(W): solid[y][x] = abs(x - GX) > 1
 def bottom_span(im):                               # opaque columns in the bottom 12 % of the picture
     al = np.asarray(im)[..., 3]; h = al.shape[0]; rows = al[int(h * .88):]; cols = np.where(rows.max(0) > 0)[0]
     return (cols[0], cols[-1]) if len(cols) else (0, al.shape[1] - 1)
@@ -97,7 +103,7 @@ def seg_dist(px, py, ax, ay, bx, by):
 ROADS = [  # Grok px polylines, width (the key art's road web: plaza hub, radial roads + ring, south exit)
  ([(692, 470), (620, 390), (540, 300), (470, 235)], 46), ([(700, 420), (760, 330), (790, 255)], 40), ([(760, 430), (880, 330), (990, 230)], 44),
  ([(800, 480), (960, 470), (1110, 530), (1270, 600), (1430, 700)], 54), ([(600, 470), (440, 430), (280, 470), (120, 510), (0, 520)], 50),
- ([(620, 540), (470, 610), (300, 690), (170, 790)], 46), ([(700, 560), (760, 650), (840, 760), (860, 864)], 56),
+ ([(620, 540), (470, 610), (300, 690), (170, 790)], 46), ([(700, 560), (760, 650), (840, 760), (860, 864), (860, 1010)], 56),
  ([(250, 780), (500, 800), (840, 790), (1100, 760), (1300, 720)], 42), ([(840, 560), (1000, 640), (1120, 700)], 40),
  ([(1040, 250), (1180, 280)], 30), ([(470, 235), (600, 228), (800, 240), (990, 230)], 34)]
 dr = np.full((GH, GW), 1e9)
