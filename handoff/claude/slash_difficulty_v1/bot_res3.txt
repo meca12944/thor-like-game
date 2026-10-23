@@ -1,0 +1,5 @@
+{"reachX":1,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":21,"dmgTakenPerMin":39.3,"dmgPerKill":1.9,"swingsPerKill":19.7,"safeHitPct":19}
+{"reachX":0.8,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":13.8,"dmgTakenPerMin":33.4,"dmgPerKill":2.4,"swingsPerKill":16.2,"safeHitPct":2}
+{"reachX":0.8,"arcX":1.3,"react":0.3,"dodgeP":0.6,"killsPerMin":17,"dmgTakenPerMin":38.3,"dmgPerKill":2.3,"swingsPerKill":16.1,"safeHitPct":2}
+{"map":"felt"}
+errs []

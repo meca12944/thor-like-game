@@ -1,0 +1,12 @@
+{"reachX":1.2,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":29,"dmgTakenPerMin":43.5,"dmgPerKill":1.5,"swingsPerKill":20.5}
+{"reachX":1,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":12,"dmgTakenPerMin":21.5,"dmgPerKill":1.8,"swingsPerKill":15.2}
+{"reachX":0.85,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":18.5,"dmgTakenPerMin":42.5,"dmgPerKill":2.3,"swingsPerKill":15.7}
+{"reachX":0.7,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":12.5,"dmgTakenPerMin":60,"dmgPerKill":4.8,"swingsPerKill":13.8}
+{"reachX":0.6,"arcX":1,"react":0.3,"dodgeP":0.6,"killsPerMin":7,"dmgTakenPerMin":33.5,"dmgPerKill":4.8,"swingsPerKill":11.5}
+{"reachX":1.2,"arcX":1,"react":0.2,"dodgeP":0.9,"killsPerMin":14,"dmgTakenPerMin":25,"dmgPerKill":1.8,"swingsPerKill":26}
+{"reachX":1,"arcX":1,"react":0.2,"dodgeP":0.9,"killsPerMin":15.5,"dmgTakenPerMin":23.5,"dmgPerKill":1.5,"swingsPerKill":20.2}
+{"reachX":0.85,"arcX":1,"react":0.2,"dodgeP":0.9,"killsPerMin":14.5,"dmgTakenPerMin":29.5,"dmgPerKill":2,"swingsPerKill":19.4}
+{"reachX":0.7,"arcX":1,"react":0.2,"dodgeP":0.9,"killsPerMin":6,"dmgTakenPerMin":22,"dmgPerKill":3.7,"swingsPerKill":13.3}
+{"reachX":0.6,"arcX":1,"react":0.2,"dodgeP":0.9,"killsPerMin":4.5,"dmgTakenPerMin":28,"dmgPerKill":6.2,"swingsPerKill":12}
+{"map":"felt"}
+errs []
