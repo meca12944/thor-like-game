@@ -100,7 +100,7 @@
     const rows = Array.from({ length: H }, () => Array(W).fill('#')), legend = {}, solid = new Set(), objects = [], spawns = {}, areas = [], chests = {};
     j.compose.forEach((p, i) => { const r = parts[i]; Object.assign(legend, r.legend || {}); for (const c of r.solid || []) solid.add(c);
       r.ground.forEach((row, y) => { for (let x = 0; x < r.w; x++) rows[p.y + y][p.x + x] = row[x] || '#'; });
-      for (const o of r.objects || []) { if (o.type === 'exit' && ids.includes(o.to)) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
+      for (const o of r.objects || []) { if (o.type === 'exit' && (ids.includes(o.to) || (j.dropExits || []).includes(o.to))) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
       for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
       for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
       if (r.hd) (j._hds = j._hds || []).push(Object.assign({}, r.hd, { gx: p.x, gy: p.y }));
@@ -190,7 +190,7 @@
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
     }
-    for (const o of (j.objects || [])) if (!['spawn', 'champion'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
+    for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
     m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
