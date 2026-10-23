@@ -88,7 +88,7 @@ function attack(){snapFace();if(P.dead||P.st==='hurt'||P.st==='death')return;if(
 // burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
 // a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
 const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
-function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:'idle_'+atkDir(),lines:null};start('dash','dash_'+atkDir());}
+function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:idleName(),lines:null};start('dash',P.f8===2&&A.anims.dash_south?'dash_south':P.f8===6&&A.anims.dash_north?'dash_north':'dash_'+atkDir());}   // straight down/up: front/back dash (10-23)
 const TINTC=document.createElement('canvas');
 function blitTint(e,x,y,alpha,col,mix){const [s,c]=e,[cx,cy,w,h,ax,ay]=A.cells[s][c];if(TINTC.width<w)TINTC.width=w;if(TINTC.height<h)TINTC.height=h;const g=TINTC.getContext('2d');
   g.globalCompositeOperation='source-over';g.globalAlpha=1;g.clearRect(0,0,TINTC.width,TINTC.height);g.drawImage(SH[s],cx,cy,w,h,0,0,w,h);g.globalCompositeOperation='source-atop';g.globalAlpha=mix;g.fillStyle=col;g.fillRect(0,0,w,h);
@@ -101,10 +101,10 @@ function drawDash(camX,camY,behind){
   const px=-d.dy,py=d.dx,k=117/124,cx=P.x-camX,cy=P.y-jz()-camY-40*k,half=40*k;
   for(const[o,st,ln,ci]of d.lines){const x=cx+o*half*px,y=cy+o*half*py*1.4,s0=st*k,s1=(st+ln)*k;ctx.strokeStyle=['rgba(140,230,255,','rgba(220,250,255,','rgba(90,200,250,'][ci]+(.9*fade)+')';ctx.lineWidth=ci===1?2:1;
     ctx.beginPath();ctx.moveTo(x-d.dx*s0,y-d.dy*s0*.8);ctx.lineTo(x-d.dx*s1,y-d.dy*s1*.8);ctx.stroke();}}
-function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast','cast_'+atkDir());}   // facing up/down -> diagonal cast like the attacks
-function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&(P.face==='right'||P.face==='left');start('jump',rj?'rjump_'+P.face:'jump_'+atkDir());}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
-function hurt(){if(P.dead)return;P.atk=null;start('hurt','hurt_'+P.lastH);}
-function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death','death_'+P.lastH);}
+function cast(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;P.skill=((P.skill??-1)+1)%3;P.cf=null;P.sk={d:skDir(),fired:0};document.getElementById('bCast').textContent=SKN[P.skill];start('cast',vName('cast'));}   // straight down/up -> front/back cast (10-23), else side/diagonal
+function jump(){snapFace();if(P.dead||P.st!=='idle'&&P.st!=='move')return;dust(P.x,P.y,6,90);const rj=runHeld()&&P.st==='move'&&A.anims[rjName()];start('jump',rj?rjName():vName('jump'));}   // running + facing left/right -> hero's running jump (rjump, side only)   // hero's jump motion on Linette; height is drawn in code
+function hurt(){if(P.dead)return;P.atk=null;start('hurt',P.f8===2&&A.anims.hurt_south?'hurt_south':P.f8===6&&A.anims.hurt_north?'hurt_north':'hurt_'+P.lastH);}
+function die(){if(P.dead){P.dead=false;start('idle','idle_'+P.lastH);return;}P.dead=true;P.atk=null;start('death',P.f8===2&&A.anims.death_south?'death_south':P.f8===6&&A.anims.death_north?'death_north':'death_'+P.lastH);}
 const MV={ySc:0.8,walk:2.0,run:4.0,burst:2.3/1.9,walkStride:1.9,runStride:4.0,startFrame:[2,2]};   // px per tick; stride = px of ground per clip tick (feet stay planted)
 let DUST=[];function dust(x,y,n,v){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=Math.random();DUST.push({x:x+(Math.random()-.5)*12,y:y-1,vx:Math.cos(a)*v*r/60,vy:-Math.abs(Math.sin(a))*v*r/120,t:0,life:14+Math.random()*10,c:Math.random()<.5?'#e8dcc0':'#cbb894',s:Math.random()<.5?2:3});}}
 let TR=[];   // flying thrust trails (world space)
@@ -122,6 +122,13 @@ function turnStep(t){const now=P.gt||0;if(t!==P.t8){P.t8p=P.t8;P.t8=t;P.t8T=now;
   if(P.f8==null){setF8(t);P.turnT=0;return;}if(P.f8===t)return;if((P.turnT=(P.turnT||0)-1)>0)return;P.turnT=TURN.step;
   const d=((t-P.f8)%8+8)%8,via=k=>[1,2,3].some(j=>(P.f8+k*j+8)%8===2);   // 180-degree turn: the side whose path passes the front (down); up<->down: the side she was facing
   const dirn=d!==4?(d<4?1:-1):via(1)?1:via(-1)?-1:((P.f8===6)===(P.lastH==='right')?1:-1);setF8((P.f8+dirn+8)%8);}
+// owner 10-23 "기본 서있는 자세가 정면이 아니고 대각선": facing straight down/up -> the straight front/back idle (idle_south / idle_north), diagonals and sides keep theirs; she starts facing the front
+function idleName(){return P.f8===2&&A.anims.idle_south?'idle_south':P.f8===6&&A.anims.idle_north?'idle_north':'idle_'+atkDir();}
+// owner 10-23 "다음 고칠점 1·2": straight down/up use the front/back clip when it exists (cast, jump, hurt, death), and the running jump exists for
+// every facing (side, both diagonals, front, back) - it carries her along the facing direction
+const F8V=[[1,0],[.71,.71],[0,1],[-.71,.71],[-1,0],[-.71,-.71],[0,-1],[.71,-.71]];
+function vName(m){return P.f8===2&&A.anims[m+'_south']?m+'_south':P.f8===6&&A.anims[m+'_north']?m+'_north':m+'_'+atkDir();}
+function rjName(){return P.f8===2?'rjump_south':P.f8===6?'rjump_north':P.diag?'rjump_'+atkDir():'rjump_'+P.face;}
 function snapFace(){if(P.t8!=null&&P.f8!==P.t8)setF8(P.t8);P.turnT=0;}
 function step(){
   let ix=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+joy.x,iy=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+joy.y;const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}
@@ -156,14 +163,14 @@ function step(){
     else{if(P.st==='move'&&!P.skid&&P.t8p!=null&&P.t8p%2===1&&(Math.abs(P.t8-P.t8p)===1||Math.abs(P.t8-P.t8p)===7)&&(P.gt||0)-P.t8T<TURN.grace){/* only when the straight dir is one of that diagonal's two keys */P.t8=P.t8p;setF8(P.t8p);}   // diagonal released one key at a time -> keep the diagonal
       if(P.st==='move'&&!P.skid){const sp=Math.hypot(P.vx||0,P.vy||0);P.skid=P.clip.startsWith('run_')?12:6;if(P.skid===12&&sp>MV.walk*1.2)dust(P.x+P.vx*2,P.y,6,90);}   // (4) release -> short skid like the hero (walk 6 / run 12 ticks, dust after a run)
       // owner 10-22 "멈출 때 서 있는 자세로 미끄러짐": during the skid she keeps stepping (the walk/run legs advance by the distance, slowing down) and stands once nearly stopped
-      if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle','idle_'+atkDir());}}
-      else if(P.st!=='idle'||P.clip!=='idle_'+atkDir())start('idle','idle_'+atkDir());}
+      if(P.skid&&P.st==='move'){const k=1.6/P.skid;P.vx*=1-k;P.vy*=1-k;P.x+=P.vx;P.y+=P.vy;const sp=Math.hypot(P.vx,P.vy);P.mt+=sp/(P.clip.startsWith('run_')?MV.runStride:MV.walkStride);if(sp<0.35){P.vx=P.vy=0;P.skid=0;start('idle',idleName());}}
+      else if(P.st!=='idle'||P.clip!==idleName())start('idle',idleName());}
   }else{
     const L=clip(P.clip),T=total(L);
-    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=DV[P.face];P.x+=v[0]*sp+ix*0.3;P.y+=iy*0.9;}else{P.x+=ix*sp;P.y+=iy*sp*MV.ySc;}}   // running jump carries forward even without input
+    if(P.st==='jump'){const rj=P.clip.startsWith('rjump'),sp=rj?5.4:runHeld()?3.2:1.8;if(rj){const v=F8V[P.f8??0];P.x+=v[0]*sp+ix*0.3;P.y+=v[1]*sp*MV.ySc+iy*0.3;}else{P.x+=ix*sp;P.y+=iy*sp*MV.ySc;}}   // running jump carries forward even without input
     if(P.st==='dash'&&P.dsh){const d=P.dsh,E=q=>1-Math.pow(1-q,2.6),p0=Math.min(1,(P.t-1)/DSH.burst),p=Math.min(1,P.t/DSH.burst),st=DSH.travel*(E(p)-E(Math.max(0,p0)));P.x+=d.dx*st;P.y+=d.dy*st*.8;
       if((P.t-1)%2===0&&P.t-1<DSH.dur)GH.push({e:frameAt(L,P.t,false),x:P.x,y:P.y-jz(),a:0});}
-    if(P.t>=T){if(P.st==='death'){P.t=T;return;}if(P.st==='jump')dust(P.x,P.y,8,110);start('idle','idle_'+atkDir());}
+    if(P.t>=T){if(P.st==='death'){P.t=T;return;}if(P.st==='jump')dust(P.x,P.y,8,110);start('idle',idleName());}
   }
 }
 // hit feel (owner 10-20 "1번"): up/down attacks drive the trail straight up/down the screen (the art is diagonal), lunge along the input,
@@ -324,5 +331,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=42').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=42';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;start('idle','idle_right');requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=45').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=45';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
 </script></body></html>
