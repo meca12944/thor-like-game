@@ -24,9 +24,26 @@ F=lambda d:[Image.open(f).convert('RGBA') for f in sorted(glob.glob(f'{D}/{d}/*.
 I=[sbx(f) for f in SA['anims']['idle_s']];t0,b0,X0=body(I[3]);H0=(b0-t0)*SC   # reference: front idle, lowered sword
 CL={}
 CL['idle_down']=[place(I[k],SC,0,X0) for k in (3,4,5,6,7,6,5,4)]
-W=F('cyc_walk')[:8];CL['walk_down']=[place(f,H0/(body(f)[1]-body(f)[0]),0,X0) for f in W]
-R=[sbx(f) for f in SA["anims"]["run_s"]];gnd=b0
-CL['run_down']=[place(r,SC,int(min(4,max(0,gnd-body(r)[1]))),X0) for r in R]       # air 0..4 px
+# walk / run keep their own motion (owner 10-23 "수정전보다 뻣뻣하다"): v1 scaled every frame to the same height and pinned every
+# frame's feet / centre, which flattened the body rise of the walk and turned the run's jump into a crouch. Now one scale and one
+# shift per clip (about the canvas feet point), and only frames that sink below the ground are lifted back onto it.
+def keep(frames,s,ground=None,clamp=True):
+    sc=[]
+    for im in frames:
+        if abs(s-1)>.005:im2=pxscale(im,s);c=Image.new('RGBA',(256,256));c.paste(im2,(round(128-128*s),round(189-189*s)),im2);im=c
+        sc.append(im)
+    bs=[body(im) for im in sc];g=max(b for _,b,_ in bs) if ground is None else ground;dx=round(X0-np.mean([x for _,_,x in bs]))
+    out=[]
+    for im,(t,b,x) in zip(sc,bs):
+        dy=189-g if ground is not None or clamp else 0;dy-=max(0,b+dy-189) if clamp else 0;c=Image.new('RGBA',(256,256));c.paste(im,(dx,dy),im);out.append(c)
+    return out
+W=F('cyc_walk')[:8];CL['walk_down']=keep(W,H0/(body(W[0])[1]-body(W[0])[0]))
+def sway(frames,amp):   # weight shift onto the standing leg: one side-to-side swing per full cycle (2 steps)
+    out=[]
+    for i,im in enumerate(frames):c=Image.new('RGBA',(256,256));c.paste(im,(round(amp*np.sin(2*np.pi*i/len(frames))),0),im);out.append(c)
+    return out
+CL['walk_down']=sway(CL['walk_down'],2)
+R=[sbx(f) for f in SA["anims"]["run_s"]];CL['run_down']=keep(R,SC,None,False)   # the run's own up/down kept as drawn (lifting its 2 landing frames made the head jump)
 def clip(frames):  # transitions: one scale for the clip (from its first, standing frame), feet on the ground, centre from frame 0
     s=H0/(body(frames[0])[1]-body(frames[0])[0]);dx=None;out=[]
     for f in frames:out.append(place(f,s,0,X0))
