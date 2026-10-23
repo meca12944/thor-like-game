@@ -344,6 +344,33 @@
    "kind": "prop",
    "zone": "북동 예배당 촛대"
   },
+  "bush_b": {
+   "img": "bush_b.png",
+   "w": 92,
+   "h": 54,
+   "ax": 46,
+   "ay": 53,
+   "kind": "prop",
+   "zone": "남문 바깥 이음매 덤불"
+  },
+  "dead_tree": {
+   "img": "dead_tree.png",
+   "w": 128,
+   "h": 182,
+   "ax": 64,
+   "ay": 181,
+   "kind": "prop",
+   "zone": "남문 바깥 이음매 마른 나무"
+  },
+  "stone_low": {
+   "img": "stone_low.png",
+   "w": 140,
+   "h": 44,
+   "ax": 70,
+   "ay": 43,
+   "kind": "prop",
+   "zone": "남문 바깥 이음매 돌무더기"
+  },
   "ember_rubble": {
    "img": "ember_rubble.png",
    "w": 116,

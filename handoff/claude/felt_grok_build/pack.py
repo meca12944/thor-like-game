@@ -60,7 +60,7 @@ def key(a, thr=14):   # 테두리와 이어진 단색 바탕 지우기
     c = a[0, 0, :3].astype(int); flat = np.abs(a[:, :, :3].astype(int) - c).sum(2) < thr
     fl, _ = ndimage.label(flat); e = set(np.unique(np.concatenate([fl[0], fl[-1], fl[:, 0], fl[:, -1]]))) - {0}
     a[:, :, 3] = np.where(np.isin(fl, list(e)), 0, a[:, :, 3]); return a
-SKIP = {'fountain_king', 'fountain_king2', 'cocoons'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
+SKIP = {'fountain_king', 'fountain_king2', 'cocoons', 'bush_a'}   # 버린 판 (석상 분수는 아래 fountain 으로, 고치는 cocoons2)
 for pid in gen.TEXT:
     if pid in SKIP: continue
     a = tight(key(np.array(Image.open(f'out/{pid}_t.png').convert('RGBA')))); Image.fromarray(a).save(f'final/{pid}.png')
@@ -72,7 +72,7 @@ parts['fountain'] = {'img': 'fountain.png', 'w': a.shape[1], 'h': a.shape[0], 'a
 parts['cocoons'] = parts.pop('cocoons2'); parts['cocoons']['img'] = 'cocoons.png'; os.replace('final/cocoons2.png', 'final/cocoons.png')
 ZONE = {'south_gate': '남 입구 문', 'fence_wood': '남 입구 나무 울타리', 'anvil': '남(대장간) 모루', 'woodpile': '남(대장간) 장작',
         'string_lights': '서 시장 줄등', 'candelabra': '북동 예배당 촛대', 'tombs': '북동 묘비', 'fence_iron': '북동 묘지 쇠울타리',
-        'cocoons': '동 거미줄 구역 고치', 'ember_rubble': '북 왕성 불씨 잔해', 'rubble': '북 왕성 잔해'}
+        'cocoons': '동 거미줄 구역 고치', 'bush_b': '남문 바깥 이음매 덤불', 'dead_tree': '남문 바깥 이음매 마른 나무', 'stone_low': '남문 바깥 이음매 돌무더기', 'ember_rubble': '북 왕성 불씨 잔해', 'rubble': '북 왕성 잔해'}
 for k, z in ZONE.items(): parts[k]['zone'] = z
 parts['watchtower'].update(role='[4] 경비 초소 감시탑', grok_foot=[455, 200], kind='building')
 parts['mausoleum'].update(role='[6] 예배당 뒤 묘지 납골당', grok_foot=[1385, 215])

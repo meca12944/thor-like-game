@@ -174,3 +174,7 @@
 {"t": "2026-10-23 13:59:06", "name": "grok_candelabra_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 14:00:30", "name": "grok_fountain_king_i", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 14:02:00", "name": "grok_cocoons2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 14:20:18", "name": "grok_bush_a_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 14:20:46", "name": "grok_dead_tree_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 14:21:21", "name": "grok_bush_b_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 14:21:42", "name": "grok_stone_low_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}

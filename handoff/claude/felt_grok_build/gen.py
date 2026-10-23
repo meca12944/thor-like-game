@@ -90,6 +90,10 @@ TEXT = {  # id: (크기, 설명) — init 없이 글자+색만, 투명 배경
  'candelabra':     ((64, 128),  "tall iron standing candelabra with melted candles and wax drips, seen from slightly above, 16-bit JRPG"),
  'cocoons':        ((128, 160), "cluster of three human-sized white silk spider cocoons hanging from a broken beam, thick webs, seen from slightly above, 16-bit JRPG"),
  'cocoons2':       ((128, 128), "three large white silk cocoons wrapped tightly in spider web, lying in a heap on the ground with web strands, seen from slightly above, 16-bit JRPG", 3),
+ 'bush_a':         ((128, 96),  "low dry thorny bush with a few withered leaves, dusty brown and olive, seen from slightly above, 16-bit JRPG"),
+ 'bush_b':         ((160, 112), "cluster of dry scrub bushes and tall dead grass, dusty brown and dark olive, seen from slightly above, 16-bit JRPG", 13),
+ 'dead_tree':      ((160, 224), "leafless dead tree with twisted dark branches and exposed roots, seen from slightly above, 16-bit JRPG"),
+ 'stone_low':      ((144, 80),  "low pile of mossy grey roadside stones with dry grass tufts, seen from slightly above, 16-bit JRPG"),
  'ember_rubble':   ((160, 96),  "pile of charred burned stone rubble and black beams with a few glowing orange embers, thin smoke, seen from slightly above, 16-bit JRPG", None, 'palette_32.png'),
 }
 

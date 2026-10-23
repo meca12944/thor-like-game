@@ -1,6 +1,6 @@
 # 펠트 부품 (그록 대표 그림 배치용) — 2026-10-23
 
-사장님 크레딧 승인(약 80) 뒤 만든 것. 이번에 쓴 크레딧 **53** (126 → 179, `../felt_pixellab/usage.jsonl`).
+사장님 크레딧 승인(약 80) 뒤 만든 것. 이번에 쓴 크레딧 **57** (126 → 183, `../felt_pixellab/usage.jsonl`).
 
 ## 게임에 쓸 것 → `final/`
 - 34개 투명 PNG, **D=3** (월드 1px = 그림 3px, 주인공과 같은 점 크기), view low top-down, 마을 32색(`../felt_grok_layout/palette_32.png`)
@@ -33,3 +33,6 @@
 - 구역 소품(parts.json `zone`): 남 입구 문·나무 울타리·모루·장작 / 서 시장 줄등 / 북동 촛대·묘비·쇠울타리 / 동 거미 고치 / 북 불씨 잔해·잔해
 - 입구 첫 장면 제안: `preview_entrance.png`, 자리 `final/scene_suggest.json` (그록 좌표)
 - 버린 판: 석상 분수 글자만 2장(방 벽이 나오거나 바닥 원판이 어색), 고치 1차(너무 작음)
+
+## 3차 — 남문 바깥 이음매 소품 4크레딧
+`bush_b`(마른 덤불·풀), `dead_tree`, `stone_low`. bush_a 는 집 모양으로 나와 버림.
