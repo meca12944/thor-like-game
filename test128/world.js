@@ -104,7 +104,7 @@
       for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
       for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
       if (r.hd) (j._hds = j._hds || []).push(Object.assign({}, r.hd, { gx: p.x, gy: p.y }));
-      areas.push({ zoom: r.viewZoom, id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
+      areas.push({ town: r.type === 'town', zoom: r.viewZoom, id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
     spawns.default = spawns.default || spawns[ids[0] + ':default'];
     return Object.assign({}, parts[0], j, { type: 'field', w: W, h: H, ground: rows.map(r => r.join('')), legend, solid: [...solid], objects, spawns, chests, areas: j.areas || areas, bg: null, grade: null,
       title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0], hd: null, hds: j._hds || null }); }); }
@@ -380,7 +380,8 @@
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   function moveCol(e, dx, dy, r, fly) {
     const m = M(); let ok = true;
-    const bl = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
+    const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
+    const bl = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
     if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else ok = false; }
     if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else ok = false; }
     return ok;

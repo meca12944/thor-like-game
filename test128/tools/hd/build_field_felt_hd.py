@@ -75,6 +75,7 @@ for _ in range(40):
     img[(q < .35)] = cols['d1'] * .7; img[(q >= .35) & (q < 1) & (((xx + yy) % 2) == 0)] = cols['d1']
 # ash grade: town warm at the top rows (south-gate seam) -> full ash by row 5
 k = np.clip((wyp - 8) / (5 * T), .15, .9); img = ash(img, k)
+f = np.clip(1 - wyp / (5 * T), 0, 1)[..., None]; img = img * (1 - f + f * np.array([206, 196, 222.]) / 255)   # the town's 'dusk' grade fades out over the top rows: no bright band at the gate seam
 edge = np.minimum(wxp, W * T - wxp); img *= np.clip(.7 + edge / 80, .7, 1)[..., None]
 pal = np.array([hx(c) for c in PAL['base24'] + PAL['accent8']]); pal = np.concatenate([pal, ash(pal)])   # town colours + their ash twins
 BAYER = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16 - .47)[(yy % 4).astype(int), (xx % 4).astype(int)][..., None]   # ordered dither: fine 1-pixel grain instead of big blotches
