@@ -1,8 +1,7 @@
 {
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
  "maps": [
-  "felt",
-  "field_felt",
+  "ch1",
   "field00",
   "dungeon01_b1",
   "boss01",
@@ -20,8 +19,7 @@
    "name": "1장 · 펠트",
    "worldNode": "area1",
    "maps": [
-    "felt",
-    "field_felt"
+    "ch1"
    ]
   },
   "area1": {

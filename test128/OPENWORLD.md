@@ -18,10 +18,12 @@
   - 원본 `maps/src/dungeon01_b1.json` · `dungeon01_b2.json` → `python3 tools/stitch_temple01.py` → `maps/dungeon01_b1.json`. 옛 이름 `dungeon01_b2`(보스방 출구 등)는 `ALIAS` 로 `dungeon01_b1` + `b2_…`.
   - 열쇠 → 잠긴 문 → 비탈길 → 레버 2개 → 철창 → 봉인된 문 순서는 그대로. **보스방(골렘의 방)만 문 너머 따로** (신전 안 유일한 화면 전환).
   - 봉인된 문 앞에 새 비석 「골렘의 방 앞 비석」 (규칙: 보스 앞 비석).
+- **새 판 1장: 펠트 + 잿빛 들판 = 이어진 지도 하나 (`maps/ch1.json`)**. 펠트 아래 길로 걸어 나가면 화면 전환 없이 잿빛 들판. 구역 카드 + 음악이 구역을 따라 바뀜 (펠트 「잿더미의 종」 → 들판 곡). 펠트의 그린 배경 · 들판의 잿빛 색 보정은 각자 구역에만.
+  - 원본 `felt.json` · `field_felt.json` 은 **그대로 고치면 된다** — world.js `composeMap` 이 켜질 때 붙인다 (다시 만들 필요 없음). 옛 이름 `felt` · `field_felt` (?go=, ?at=, 퀘스트 목표, 월드맵)는 `ALIAS`/`aliasPt` 가 자동으로 `ch1` 좌표로 바꿔 준다.
 - 지도 화면(M) · 미니맵 · 길 안내는 합친 지도 그대로 동작 (예전 field00/field01 탐험 안개는 한 번 초기화됨).
 
 ## 시험
-`PW_CHROME=/opt/pw-browsers/chromium python3 tools/test_openworld.py http://127.0.0.1:8931/index.html` — 15항목: 합친 지도, 이음매 걸어서 통과(전환 없음), 구역 카드, 첫 진입 자동 저장, 전투 중 F5 거절, 평소 F5 저장, 비석 = 부활 지점, 가시덩굴, 다시 도전, T = 비석, field01 별칭, 신전 비탈길 걸어서 통과, dungeon01_b2 별칭, 다시 켜면 이어하기, 페이지 오류 없음.
+`PW_CHROME=/opt/pw-browsers/chromium python3 tools/test_openworld.py http://127.0.0.1:8931/index.html` — 17항목: 합친 지도, 이음매 걸어서 통과(전환 없음), 구역 카드, 첫 진입 자동 저장, 전투 중 F5 거절, 평소 F5 저장, 비석 = 부활 지점, 가시덩굴, 다시 도전, T = 비석, field01 별칭, 신전 비탈길 걸어서 통과, dungeon01_b2 별칭, 펠트→들판 이어진 지도, field_felt 별칭, 다시 켜면 이어하기, 페이지 오류 없음.
 
 ## 다음 단계 (아직 안 함)
 - 2~10지역도 같은 방식 (지역당 큰 지도 하나, 비석 3~4개: 입구 · 갈림길 · 챔피언/보스 앞).

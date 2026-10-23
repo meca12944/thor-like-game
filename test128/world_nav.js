@@ -28,7 +28,7 @@
     h.ready.then(() => Promise.all([getJSON('maps/index.json'), getJSON('maps/quests.json')])).then(([idx, q]) => {
       IDX = idx; QUESTS = (q.quests || []).filter(x => OLD || /^q_felt/.test(x.id)); for (const x of QUESTS) QBY[x.id] = x; // 새 판: chapter-1 quests only (?old = all)
       return Promise.all(idx.maps.map(id => h.loadMap(id).then(m => navData(m))));
-    }).then(() => { booted = true; st.dirty = true; }).catch(e => console.error('[nav] boot', e));
+    }).then(() => { if (h.aliasPt) { for (const x of QUESTS) for (const t of x.targets || []) h.aliasPt(t); for (const t of IDX.destinations || []) h.aliasPt(t); } /* part maps (felt, field_felt) live inside ch1 */ booted = true; st.dirty = true; }).catch(e => console.error('[nav] boot', e));
   }
   boot();
 

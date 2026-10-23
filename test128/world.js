@@ -84,7 +84,31 @@
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
   const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = src; });
   const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
-  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.bg ? loadBg(j) : j).then(j => (MAPS[id] = buildMap(j))); }
+  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(j => (MAPS[id] = buildMap(j))); }
+  // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
+  // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
+  // Each part becomes an area {part, name, sub, bgm, grade, bg}: painted backgrounds and colour grades stay per part, the music follows the area.
+  function composeMap(j) { return Promise.all(j.compose.map(p => getJSON('maps/' + p.map + '.json').then(r => r.bg ? loadBg(r) : r))).then(parts => {
+    const ids = j.compose.map(p => p.map), W = Math.max(...j.compose.map((p, i) => p.x + parts[i].w)), H = Math.max(...j.compose.map((p, i) => p.y + parts[i].h));
+    const rows = Array.from({ length: H }, () => Array(W).fill('#')), legend = {}, solid = new Set(), objects = [], spawns = {}, areas = [], chests = {};
+    j.compose.forEach((p, i) => { const r = parts[i]; Object.assign(legend, r.legend || {}); for (const c of r.solid || []) solid.add(c);
+      r.ground.forEach((row, y) => { for (let x = 0; x < r.w; x++) rows[p.y + y][p.x + x] = row[x] || '#'; });
+      for (const o of r.objects || []) { if (o.type === 'exit' && ids.includes(o.to)) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
+      for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
+      for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
+      areas.push({ id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
+    spawns.default = spawns.default || spawns[ids[0] + ':default'];
+    return Object.assign({}, parts[0], j, { type: 'field', w: W, h: H, ground: rows.map(r => r.join('')), legend, solid: [...solid], objects, spawns, chests, areas: j.areas || areas, bg: null, grade: null,
+      title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0] }); }); }
+  function composeGround(m) { const c = renderGround(m), g = c.getContext('2d'), T = m.T; // tiles everywhere, then each part's painting / grade on its own rectangle
+    for (const a of m.areas) { const x = a.x * T, y = a.y * T, w = a.w * T, h = a.h * T;
+      if (a.bg && BGIMG[a.bg]) { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(BGIMG[a.bg], x, y, w, h); g.imageSmoothingEnabled = false; continue; }
+      if (a.grade) { const sub = document.createElement('canvas'); sub.width = w; sub.height = h; sub.getContext('2d').drawImage(c, x, y, w, h, 0, 0, w, h);
+        const sm = { T, w: a.w, h: a.h, pw: w, ph: h, grade: a.grade, solidG: Uint8Array.from({ length: a.w * a.h }, (_, i) => m.solidG[(a.y + Math.floor(i / a.w)) * m.w + a.x + i % a.w]) };
+        scarGround(sm, gradeCanvas(sub, a.grade)); g.clearRect(x, y, w, h); g.drawImage(sub, x, y); } }
+    return c; }
+  const areaOf = (m, x, y) => (m && m.areas) ? m.areas.find(a => x >= a.x * m.T && x < (a.x + a.w) * m.T && y >= a.y * m.T && y < (a.y + a.h) * m.T) || null : null;
+  const gradeAt = (m, x, y) => { const a = m && m.compose ? areaOf(m, x, y) : null; return a ? a.grade : m && m.grade; };
   // painted-background maps (town B): j.bg = image drawn over the whole map instead of tiles; ground rows only carry collision
   const BGIMG = {};
   function loadBg(j) { return new Promise(res => { const im = new Image(); im.onload = () => { BGIMG[j.bg] = im; res(j); }; im.onerror = () => res(j); im.src = j.bg; }); }
@@ -395,10 +419,12 @@
 
   // ---------------- scene manager ----------------
   // 세미 오픈월드 (owner 10-23): field01 (시작의 숲) now lives inside field00 at x+56 (tools/stitch_region01.py); old links keep working
-  const ALIAS = { field01: { to: 'field00', pre: 'f01_' }, dungeon01_b2: { to: 'dungeon01_b1', pre: 'b2_' } }; // + 신전 B2 at x+46 (tools/stitch_temple01.py)
+  const ALIAS = { field01: { to: 'field00', pre: 'f01_' }, dungeon01_b2: { to: 'dungeon01_b1', pre: 'b2_' }, felt: { to: 'ch1', pre: 'felt:' }, field_felt: { to: 'ch1', pre: 'field_felt:' } }; // 1장: 펠트 + 잿빛 들판 = maps/ch1.json (composeMap)
+  // a point given in a part map's own tiles (quest targets, ?at=) -> the composite map
+  function aliasPt(t) { const A = ALIAS[t.map]; if (!A) return t; const m = MAPS[A.to], a = m && m.areas && m.areas.find(q => q.part === t.map); if (a) { t.x += a.x; t.y += a.y; } t.map = A.to; return t; } // + 신전 B2 at x+46 (tools/stitch_temple01.py)
   function go(to, spawnName, opt = {}) {
     if (S.trans) return false;
-    const AL = ALIAS[to]; if (AL) { to = AL.to; spawnName = AL.pre + (spawnName || 'default'); }
+    const AL = ALIAS[to]; S.aliasFrom = AL ? to : null; if (AL) { to = AL.to; spawnName = AL.pre + (spawnName || 'default'); }
     S.trans = { phase: 'out', t: 0, to, spawn: spawnName, card: opt.card, fromTown: S.scene === 'town' };
     if (S.trans.fromTown) { const g = window.__game; S.townPos = { x: g.hero.x, y: g.hero.y - 34 }; g.setManual(true); syncFromTown(); show(true); }
     return true;
@@ -409,7 +435,7 @@
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
-      if (!m.groundC) m.groundC = m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+      if (!m.groundC) m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
       if (!sp && spawnName && spawnName.startsWith('snap:')) sp = spawnName.slice(5).split(',').map(Number).concat([hero.face]); // death retry: just before the fight
@@ -515,7 +541,7 @@
   //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
   const AQ = new URLSearchParams(location.search), ARENA = (AQ.get('arena') || '').split(',').filter(Boolean).flatMap(t => { const [k, n] = t.split('*'); return Array(Math.max(1, Math.min(8, +n || 1))).fill(k); }), TOUGH = AQ.get('tough') === '1';
   function arenaTick(dt) { if (!ARENA.length || !S.map || S.map.type === 'world') return;
-    if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; const at = (AQ.get('at') || '').split(',').map(Number); if (at.length === 2 && at.every(v => v >= 0)) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; snapCam(); } /* at=tx,ty: start in an open spot */ for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
+    if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; const at = (AQ.get('at') || '').split(',').map(Number); if (S.aliasFrom && at.length === 2) { const q = aliasPt({ map: S.aliasFrom, x: at[0], y: at[1] }); at[0] = q.x; at[1] = q.y; } /* ?go=field_felt&at= is in the part map's tiles */ if (at.length === 2 && at.every(v => v >= 0)) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; snapCam(); } /* at=tx,ty: start in an open spot */ for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
     if (TOUGH && hero.hp < 15) { hero.hp = hero.maxHp; addFx('text', hero.x, hero.y - 34, { text: '체력 회복 (시험장)', life: .8, color: '#9fffb0' }); }
     if (S.mobs.some(m => !m.dead && m.arena)) return;
     if ((S.arenaT -= dt) > 0) return; S.arenaT = 1.5;
@@ -663,9 +689,9 @@
       if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); sfx('heart', .7); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
-    const e = S.engaged; let want = m.bgm;
+    const e = S.engaged, arM = m.compose ? areaOf(m, hero.x, hero.y) : null; let want = (arM && arM.bgm) || m.bgm;
     if (m.type === 'boss') want = S.bossRef && !S.bossRef.dead ? (S.bossRef.phase === 2 ? m.bgm2 : m.bgm) : (m.bgmAfter || 'area01_forest');
-    else if (e && !e.dead && e.D.champion && dist(e, hero) < 260) want = m.battleBgm || 'battle_champion';
+    else if (e && !e.dead && e.D.champion && dist(e, hero) < 260) want = (arM && arM.battleBgm) || m.battleBgm || 'battle_champion';
     S.bgm = want;
   }
   function onTile(name) { const m = M(); const c = m.cells[Math.floor(hero.y / m.T) * m.w + Math.floor(hero.x / m.T)]; return c && c.g === name; }
@@ -779,7 +805,7 @@
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => drawSpr(g, d.spr, d.x, d.y + 1, m.grade ? { mode: m.grade } : {}) });
+    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
@@ -806,7 +832,7 @@
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
-    drawAshFall(g, m, cx, cy);
+    drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, LW + 1, LH + 1);
       d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW + 1, LH + 1); d.globalCompositeOperation = 'destination-out';
@@ -1437,7 +1463,7 @@
     publish();
     requestAnimationFrame(frame);
   }
-  window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
+  window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, aliasPt, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = {
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
     go, dirTap, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; },

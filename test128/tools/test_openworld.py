@@ -65,6 +65,15 @@ with sync_playwright() as p:
     ev("()=>__world.go('dungeon01_b2','boss')"); settle(); adv(.2)
     b2 = ev("()=>({map:__world.map.id,t:__world.tile()})")
     check('dungeon01_b2 alias (boss room exit)', b2['map'] == 'dungeon01_b1' and abs(b2['t'][0] - 84) <= 1, b2)
+    # 1장 (새 판): 펠트 + 잿빛 들판 = one map (maps/ch1.json composeMap), music follows the area, ?go=field_felt&at= still lands right
+    ev("()=>__world.go('felt','default')"); settle(); adv(.2)
+    ev("()=>{__world.killAll();__world.setHeroTile(28,33,'down');__world.S.area='felt'}"); ev("()=>__world.key('ArrowDown',true)")
+    c1 = ev("()=>{let tr=false,card=null;for(let i=0;i<200;i++){__world.advance(1/60);if(__world.trans)tr=true;if(__world.S.areaCard)card=__world.S.areaCard.a.name;}__world.key('ArrowDown',false);return {tr,card,y:__world.tile()[1],map:__world.map.id,bgm:__world.S.bgm}}")
+    pg.screenshot(path=O + '/10_ch1_seam.png')
+    check('felt -> ash field one map', c1['map'] == 'ch1' and not c1['tr'] and c1['y'] >= 39 and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest', c1)
+    ev("()=>__world.go('field_felt','felt')"); settle(); adv(.2)
+    ff = ev("()=>({map:__world.map.id,t:__world.tile()})")
+    check('field_felt alias', ff['map'] == 'ch1' and abs(ff['t'][1] - 40) <= 1, ff)
     # resume after a reload: last save = here
     ev("()=>{__world.killAll();__world.tap('F5')}"); adv(.1); sv = ev("()=>__world.SAVE.resume")
     pg.goto(B); pg.wait_for_function('window.__world&&__world.ready&&__world.scene!=="town"&&!__world.trans', timeout=30000); pg.wait_for_timeout(600)
