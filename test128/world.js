@@ -940,7 +940,7 @@
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
       textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH); }
-    if (m.type !== 'world') drawFieldUlt(k, ox, oy, SW, SH);
+    if (m.type !== 'world') { drawFieldUlt(k, ox, oy, SW, SH); { const now = performance.now(), dt = S._rT ? Math.min(.1, (now - S._rT) / 1000) : 0; S._rT = now; drawUlt2Result(ox, oy, SW, SH, manual ? 1 / 30 : dt); } }
   }
   // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬검·해동), same cut-in timing,
   // world frozen + hero invulnerable for the whole move, damage to every enemy on screen. Consumes the full gauge (template ULT_CFG / addUlt).
@@ -948,6 +948,9 @@
   const ABYSS_U = { id: 'abyss', name: '사멸의 궤적', en: 'Trail of Extinction', route: '심연', hitT: [.3, .55, .8, 1.05, 1.3, 1.6], por: 'hero', band: '#c9a0ff', tint: '16,0,34',
     col: ['230,200,255', '130,50,230', '40,0,90'], dur: 2.3, whole: true, label: '심연 반격 초필살기', mob: 999, champ: .30, boss: .15, stun: 3 };
   const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 };
+  // 요즘 연출 실험 (?ult2=lb,impact,type,punch,slow,result | none): lb 영화 띠 · impact 임팩트 프레임(반전 2프레임) · type 기술 이름 베기 등장 · punch 타격마다 카메라 펀치 · slow 마지막 타격 슬로모션 · result 결과 표시
+  const ULT2 = new Set(((Q.get('ult2') ?? 'lb,impact,type,punch,slow,result') === 'none' ? '' : (Q.get('ult2') ?? 'lb,impact,type,punch,slow,result')).split(',').filter(Boolean));
+  function u2(k, f) { return f && f.U.whole && ULT2.has(k); }
   // 컷인 방식 실험 (?cut=band|zoom|eye|hybrid): band = 일러스트 초상화 띠(옛), zoom = 게임 화면 그대로 주인공 확대, eye = 도트 얼굴 눈 띠, hybrid = 확대 + 눈 띠
   const CUT_T = { band: [.2, 1.05], zoom: [.08, .72], eye: [.08, .62], hybrid: [.08, .8] };
   // 연구 결과 (handoff/claude/ult_research/CUTIN_ko.md): 심연 초필살기 = hybrid (드물게 쓰니 크게), 일반 필살기 = zoom (자주 쓰니 짧게). 공격/조사 키로 컷인 건너뛰기
@@ -964,16 +967,17 @@
     const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
     const cm = cutMode('zoom'); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
     try { g.SFX.play('ult_cutin', 1); } catch (e) {} }
-  function stepUlt(dt) { const f = S.ultFx, U = f.U, g = window.__game; f.t += dt; hero.inv = Math.max(hero.inv, 1); S.shake = Math.max(0, S.shake - dt * 14);
+  function stepUlt(dt) { const f = S.ultFx, U = f.U, g = window.__game; { const e0 = f.t - f.fz - f.ci, L = U.hitT[U.hitT.length - 1]; if (u2('slow', f) && e0 > L - .06 && e0 < L + .28) dt *= .35; } f.t += dt; hero.inv = Math.max(hero.inv, 1); S.shake = Math.max(0, S.shake - dt * 14);
     const e = f.t - f.fz - f.ci;
     if (e >= 0 && !f.boomed) { f.boomed = true; shake(2); try { g.SFX.play('ult_boom', 1); } catch (er) {} } // modest: 2px boom, 1px per hit (world cap 3px + '화면 흔들림' option)
     while (e >= 0 && f.hitI < U.hitT.length && e >= U.hitT[f.hitI]) { f.hitI++; shake(1); const n = U.hitT.length;
       for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, F = U.whole ? U : FULT, tot = D.boss ? mm.maxHp * F.boss : D.champion ? mm.maxHp * F.champ : F.mob, d = Math.max(1, Math.round(tot / n));
         mm.hp -= d; mm.hitT = .3; mm.flash = U.whole && f.fx && f.fx !== 'pillar' && fxQ() >= 3 ? 0 : .12; mm.lagDelay = .35; // the world is frozen during the ult: a flash would stay white the whole time if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
         if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
-    if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.whole && f.fx === 'rift' && fxQ() >= 3) for (const mm of f.vic) addFx('scorch', mm.x, mm.y + 2, { life: 1.6 }); if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
-  function cutZoom() { const f = S.ultFx; if (!f || (f.cut !== 'zoom' && f.cut !== 'hybrid')) return 1; const c = f.t - f.fz, e = c - f.ci; // push in during the cut, snap back on the boom
-    if (c < 0) return 1; if (e < 0) { const q = Math.min(1, c / (f.ci * .85)); return 1 + .75 * (q * q * (3 - 2 * q)); } return e < .12 ? 1 + .75 * (1 - e / .12) : 1; }
+    if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.whole && f.fx === 'rift' && fxQ() >= 3) for (const mm of f.vic) addFx('scorch', mm.x, mm.y + 2, { life: 1.6 }); if (u2('result', f)) { const n = f.vic.filter(mm => mm.dead).length, b = f.vic.find(mm => !mm.dead && (mm.D.boss || mm.D.champion)); S.ult2Res = { t: 0, text: n ? `적 ${n} 소멸` : '', sub: b ? `${b.D.name || '강적'} 3초 기절` : '' }; } if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
+  function cutZoom() { const f = S.ultFx; if (!f || (f.cut !== 'zoom' && f.cut !== 'hybrid' && !u2('punch', f))) return 1; const c = f.t - f.fz, e = c - f.ci; // push in during the cut, snap back on the boom
+    if (c < 0) return 1; if (e < 0) { const q = Math.min(1, c / (f.ci * .85)); return 1 + .75 * (q * q * (3 - 2 * q)); } let z = e < .12 ? 1 + .75 * (1 - e / .12) : 1;
+    if (u2('punch', f)) for (const t of f.U.hitT) { const d = e - t; if (d >= 0 && d < .1) z = Math.max(z, 1 + .06 * (1 - d / .1)); } return z; }
   function drawCutZoom(f, U, q, u, ox, oy, SW, SH) { const [hx, hy] = W2S(hero.x, hero.y - 14), k = S.view.k; // spotlight on the hero, chest emblem lights up, name in the world
     const r0 = Math.max(SW, SH) * (1 - .55 * Math.min(1, q * 1.6)), gr = ctx.createRadialGradient(hx, hy, r0 * .12, hx, hy, r0);
     gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(${U.tint},.85)`); ctx.fillStyle = gr; ctx.fillRect(ox, oy, SW, SH);
@@ -1035,6 +1039,21 @@
         if (t >= 0 && t < .45) { const L = 10 + 6 * Math.min(1, t / .08), al = fade * (1 - t / .45); abLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 3, P.vio, al, q); abLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 3, P.vio, al, q); abLine(g, mx - L, my - L * .7, mx + L, my + L * .7, 1, P.core, al, q); abLine(g, mx - L, my + L * .7, mx + L, my - L * .7, 1, P.core, al, q); }
         px = mx; py = my; }); }
     g.restore(); }
+  function drawUlt2(f, U, e, u, ox, oy, SW, SH) { if (!U.whole) return;
+    if (u2('impact', f)) { const L = U.hitT[U.hitT.length - 1], on = (e >= 0 && e < 2 / 30) || (e >= L && e < L + 2 / 30); // impact frames: 2 frames of a violet negative at the boom and the last hit
+      if (on) { ctx.save(); ctx.globalCompositeOperation = 'difference'; ctx.fillStyle = '#fff'; ctx.fillRect(ox, oy, SW, SH); ctx.globalCompositeOperation = 'saturation'; ctx.fillStyle = '#808080'; ctx.fillRect(ox, oy, SW, SH);
+        ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#b48cff'; ctx.fillRect(ox, oy, SW, SH); ctx.restore(); } }
+    if (u2('lb', f)) { const tot = f.fz + f.ci + U.dur, inn = Math.min(1, f.t / .18), out = Math.min(1, Math.max(0, (tot - f.t) / .25)), h = Math.round(SH * .1 * inn * out); // cinema bars
+      ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, h); ctx.fillRect(ox, oy + SH - h, SW, h); }
+    if (u2('type', f) && e >= 0 && e < 1.5) { const rv = Math.min(1, e / .16), al = e > 1.2 ? 1 - (e - 1.2) / .3 : 1, fs = Math.round(SH * .085), x0 = ox + SW * .06, y0 = oy + SH * .8; // skill name slashes in, lower left
+      ctx.save(); ctx.globalAlpha = al; ctx.translate(x0, y0); ctx.transform(1, 0, -.22, 1, 0, 0); ctx.font = font(fs); const w = ctx.measureText(U.name).width + fs * .4;
+      ctx.fillStyle = `rgba(${U.col[1]},.9)`; ctx.fillRect(-fs * .2, fs * .12, w * Math.min(1, e / .1), Math.max(2, fs * .1));
+      ctx.beginPath(); ctx.rect(-fs * .3, -fs * 1.1, w * rv + fs * .2, fs * 1.4); ctx.clip(); textOut(U.name, 0, 0, fs, '#f3eaff', '#14002e', 'left');
+      textOut((U.label || '') + ' · ' + U.en, fs * .05, fs * .62, Math.round(fs * .3), '#c9a0ff', '#000', 'left');
+      if (e < .16) { ctx.fillStyle = '#fff'; ctx.fillRect(w * rv - fs * .25, -fs * 1.05, Math.max(2, fs * .06), fs * 1.3); } ctx.restore(); } }
+  function drawUlt2Result(ox, oy, SW, SH, dt) { const R = S.ult2Res; if (!R) return; R.t += dt; if (R.t > 1.8 || !R.text) { if (R.t > 1.8) S.ult2Res = null; return; } // 결과 표시: kills (+ stunned boss), lower left, after the move
+    const a = Math.min(1, R.t / .12) * (R.t > 1.4 ? (1.8 - R.t) / .4 : 1), fs = Math.round(SH * .045), x = ox + SW * .06 + (1 - Math.min(1, R.t / .15)) * -20, y = oy + SH * .8;
+    ctx.globalAlpha = a; textOut(R.text, x, y, fs, '#f3eaff', '#14002e', 'left'); if (R.sub) textOut(R.sub, x, y + fs * 1.1, Math.round(fs * .7), '#c9a0ff', '#000', 'left'); ctx.globalAlpha = 1; }
   function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - f.fz - f.ci, c = f.t - f.fz;
     ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
     if (!(U.whole && f.fx && f.fx !== 'pillar' && fxQ() >= 1)) { ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / f.fz)})`; ctx.fillRect(ox, oy, SW, SH); } // q1+: the map is darkened on the world canvas instead, so the effect stays bright
@@ -1064,6 +1083,7 @@
       ctx.restore();
       const tx = ox + SW * .62 - (1 - Math.min(1, q / .25)) * SW * .3, fs = Math.round(SH * .085); ctx.globalAlpha = Math.min(1, q / .2) * (1 - out);
       textOut(U.name, tx, by + fs * .25, fs, U.band); textOut((U.label || U.route + ' 필살기') + ' · ' + U.en, tx, by + fs * .25 + SH * .05, Math.round(SH * .026), '#fff'); ctx.globalAlpha = 1; }
+    drawUlt2(f, U, e, u, ox, oy, SW, SH);
     if (e >= 0 && e < .25) { ctx.fillStyle = U.whole && f.fx && f.fx !== 'pillar' ? `rgba(20,0,48,${.75 * (1 - e / .25)})` : `rgba(255,255,255,${.6 * (1 - e / .25)})`; ctx.fillRect(ox, oy, SW, SH); } // 심연: darkness falls instead of a white flash // softer flash than the town (.9)
     ctx.restore(); }
   function b0() { const b = S.bossRef; return !!(b && !b.dead); }
