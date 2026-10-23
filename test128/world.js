@@ -857,7 +857,8 @@
   }
   // ---- chapter-1 Felt mobs: PixelLab strips (256px cells, foot at y 250, art faces right) drawn in the hi-res pass, y-split around the hero
   const FELTIMG = {}; function feltImg(src) { if (!FELTIMG[src]) { const im = new Image(); im.src = src + '.png'; FELTIMG[src] = im; } return FELTIMG[src]; }
-  function feltFrame(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
+  function feltFrame(m) { const a = m.D.anim[m.anim || 'walk'], i = feltFrame0(m); return a && a.map ? a.map[i] : i; } // optional frame remap per strip
+  function feltFrame0(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
     if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
