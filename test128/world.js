@@ -909,7 +909,7 @@
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R' }); }
       textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
-      if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
+      if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초 · ${keyHint('ult') || 'R'}: 초필살기 「사멸의 궤적」`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
       textOut(m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
@@ -936,10 +936,15 @@
   }
   // ---------------- 필살기 (R) in fields / dungeons / boss rooms: reuses the town ULTS (천광낙뢰 / 멸계강림 / 찬검·해동), same cut-in timing,
   // world frozen + hero invulnerable for the whole move, damage to every enemy on screen. Consumes the full gauge (template ULT_CFG / addUlt).
+  // 심연 초필살기 (주인 10-23 "심연의 힘이 켜지면 맵 전체 초필살기, 창세기전 2처럼"): 심연의 힘 동안 필살기 키 -> 게이지 없이 맵 전체의 적을 친다, 쓰면 심연의 힘이 끝난다
+  const ABYSS_U = { id: 'abyss', name: '사멸의 궤적', en: 'Trail of Extinction', route: '심연', hitT: [.3, .55, .8, 1.05, 1.3, 1.6], por: 'hero', band: '#c9a0ff', tint: '16,0,34',
+    col: ['230,200,255', '130,50,230', '40,0,90'], dur: 2.3, whole: true, label: '심연 초필살기', mob: 999, champ: .45, boss: .35 };
   const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 }; // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
+    if (lastStandOn() && hero.hp > 0 && !(S.deadT > 0)) { const U = ABYSS_U; S.lastStand.t = 0; S.lastStand.cd = LAST_STAND.cd; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
+      S.ultFx = { U, t: 0, hitI: 0, boomed: false, vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g.SFX.play('ult_cutin', 1); } catch (e) {} return; } // whole map, no gauge
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
     if (hero.hp <= 0 || S.deadT > 0) return;
     const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
@@ -949,13 +954,17 @@
     const e = f.t - FULT.freeze - FULT.cutin;
     if (e >= 0 && !f.boomed) { f.boomed = true; shake(2); try { g.SFX.play('ult_boom', 1); } catch (er) {} } // modest: 2px boom, 1px per hit (world cap 3px + '화면 흔들림' option)
     while (e >= 0 && f.hitI < U.hitT.length && e >= U.hitT[f.hitI]) { f.hitI++; shake(1); const n = U.hitT.length;
-      for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, tot = D.boss ? mm.maxHp * FULT.boss : D.champion ? mm.maxHp * FULT.champ : FULT.mob, d = Math.max(1, Math.round(tot / n));
-        mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' });
+      for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, F = U.whole ? U : FULT, tot = D.boss ? mm.maxHp * F.boss : D.champion ? mm.maxHp * F.champ : F.mob, d = Math.max(1, Math.round(tot / n));
+        mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
         if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
     if (e >= U.dur) { S.ultFx = null; hero.inv = .6; } }
   function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - FULT.freeze - FULT.cutin, c = f.t - FULT.freeze;
     ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
     ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / FULT.freeze)})`; ctx.fillRect(ox, oy, SW, SH);
+    if (U.whole && e >= 0) { const [hx, hy] = W2S(hero.x, hero.y - 8), R = Math.hypot(SW, SH); ctx.globalCompositeOperation = 'lighter'; // 심연: rings sweep the whole map from the hero
+      for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .2) / .7; if (q < 0 || q > 1) continue; ctx.strokeStyle = `rgba(${U.col[1]},${(1 - q) * .9})`; ctx.lineWidth = (18 - q * 14) * u;
+        ctx.beginPath(); ctx.ellipse(hx, hy, R * q, R * q * .62, 0, 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${(1 - q) * .7})`; ctx.lineWidth = 2 * u; ctx.stroke(); }
+      ctx.globalCompositeOperation = 'source-over'; }
     if (e >= 0) { ctx.globalCompositeOperation = 'lighter';
       for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .15) / .5; if (q < 0 || q > 1) continue; const al = 1 - q;
         if (U.id === 'chan') { const ang = [-.42, .38, -.12, .6, -.7][i % 5], cy = oy + SH * (.3 + .1 * i); ctx.save(); ctx.translate(ox + SW / 2, cy); ctx.rotate(ang); const L = SW * 1.4 * Math.min(1, q * 4);
@@ -975,7 +984,7 @@
         ctx.save(); ctx.beginPath(); ctx.rect(-SW, -bh / 2, SW * 2, bh); ctx.clip(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, px - SW / 2, -ih * .42, iw, ih); ctx.restore(); }
       ctx.restore();
       const tx = ox + SW * .62 - (1 - Math.min(1, q / .25)) * SW * .3, fs = Math.round(SH * .085); ctx.globalAlpha = Math.min(1, q / .2) * (1 - out);
-      textOut(U.name, tx, by + fs * .25, fs, U.band); textOut(U.route + ' 필살기 · ' + U.en, tx, by + fs * .25 + SH * .05, Math.round(SH * .026), '#fff'); ctx.globalAlpha = 1; }
+      textOut(U.name, tx, by + fs * .25, fs, U.band); textOut((U.label || U.route + ' 필살기') + ' · ' + U.en, tx, by + fs * .25 + SH * .05, Math.round(SH * .026), '#fff'); ctx.globalAlpha = 1; }
     if (e >= 0 && e < .25) { ctx.fillStyle = `rgba(255,255,255,${.6 * (1 - e / .25)})`; ctx.fillRect(ox, oy, SW, SH); } // softer flash than the town (.9)
     ctx.restore(); }
   function b0() { const b = S.bossRef; return !!(b && !b.dead); }
