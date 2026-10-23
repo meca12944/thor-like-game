@@ -316,7 +316,7 @@
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { const im = HDIMG[q.img]; if (!im) continue;
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
-      const sc = k / h.D, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / h.D, wr = wl + im.width / h.D, wt = fy - ay / h.D;
+      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy);
       if (q.shadow) { ctx.save(); ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); ctx.restore(); }
