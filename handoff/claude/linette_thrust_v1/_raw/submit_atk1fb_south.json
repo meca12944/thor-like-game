@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "288a9aa9-a986-49d8-abf2-cd29e74c0197"
+  ],
+  "directions": [
+   "south"
+  ],
+  "animation_group_id": "b2b356dc-d104-49f6-b6ea-930bbdcfa84d",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 1 of 3: a short, straight stab. She pulls the RIGHT needle back to her hip (needle stays pointing down), then steps toward the viewer and stabs the right needle straight DOWN the screen in front of her body, ending exactly in the pose of the end frame. The needles never go above her shoulders. FRONT VIEW facing the camera every frame; she never turns sideways. Same character, outfit and size in every frame; no effects, no trails, no sparks.",
+  "frame_count": 8,
+  "directions": [
+   "south"
+  ],
+  "animation_name": "atk1fb",
+  "keep_first_frame": true,
+  "seed": 41
+ }
+}

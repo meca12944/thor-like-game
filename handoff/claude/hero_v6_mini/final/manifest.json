@@ -1,0 +1,74 @@
+{
+ "canvas": 256,
+ "foot_root": [
+  128,
+  189
+ ],
+ "mirror": {
+  "west": "east",
+  "south-west": "south-east",
+  "north-west": "north-east"
+ },
+ "clips": {
+  "idle/south": {
+   "frames": 6,
+   "cycle_ticks": 48
+  },
+  "idle/south-east": {
+   "frames": 6,
+   "cycle_ticks": 48
+  },
+  "idle/east": {
+   "frames": 6,
+   "cycle_ticks": 48
+  },
+  "idle/north-east": {
+   "frames": 6,
+   "cycle_ticks": 48
+  },
+  "idle/north": {
+   "frames": 6,
+   "cycle_ticks": 48
+  },
+  "walk/south": {
+   "frames": 8,
+   "cycle_ticks": 48
+  },
+  "walk/south-east": {
+   "frames": 8,
+   "cycle_ticks": 48
+  },
+  "walk/east": {
+   "frames": 9,
+   "cycle_ticks": 52
+  },
+  "walk/north-east": {
+   "frames": 10,
+   "cycle_ticks": 50
+  },
+  "walk/north": {
+   "frames": 8,
+   "cycle_ticks": 48
+  },
+  "run/south": {
+   "frames": 8,
+   "cycle_ticks": 40
+  },
+  "run/south-east": {
+   "frames": 8,
+   "cycle_ticks": 40
+  },
+  "run/east": {
+   "frames": 10,
+   "cycle_ticks": 44
+  },
+  "run/north-east": {
+   "frames": 9,
+   "cycle_ticks": 36
+  },
+  "run/north": {
+   "frames": 8,
+   "cycle_ticks": 40
+  }
+ }
+}

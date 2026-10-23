@@ -300,6 +300,18 @@
    "respawn": 30
   },
   {
+   "type": "clue",
+   "id": "f00_clue_corpse",
+   "x": 12,
+   "y": 21,
+   "name": "굳은 사슴 사체",
+   "flag": "felt_corpse_seen",
+   "needQuest": "q_felt_corpse",
+   "textIdle": "풀숲에 무언가 쓰러져 있다.",
+   "text": "며칠은 지났을 사슴인데 썩지 않았다. 가죽이 돌처럼 딱딱하게 굳어 있다.\n필멸자: (자기 손바닥을 내려다본다) ……",
+   "textDone": "썩지 않고 굳어 버린 사슴이다."
+  },
+  {
    "type": "waystone",
    "id": "ws_temple",
    "x": 98,

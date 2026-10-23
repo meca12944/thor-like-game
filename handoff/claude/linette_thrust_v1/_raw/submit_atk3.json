@@ -1,0 +1,27 @@
+{
+ "http": 200,
+ "body": {
+  "background_job_ids": [
+   "a39c6d52-d516-4492-9bf8-7031c578383d"
+  ],
+  "directions": [
+   "south-east"
+  ],
+  "animation_group_id": "3c6ff7fe-0936-49b8-875f-c652ab8c228e",
+  "status": "processing",
+  "enhanced_prompt": null,
+  "enhance_usage": null
+ },
+ "request": {
+  "character_id": "7e26e0f3-b375-4384-b955-3304cacebff3",
+  "mode": "v3",
+  "action_description": "Attack 3 of 3, the finisher: she crouches and coils with both needles drawn back, then launches into a very long lunge and thrusts BOTH needles straight ahead together, ending exactly in the deep lunge pose of the end frame. Three-quarter FRONT view facing down-right every frame; the thrust goes down-right toward the camera side. She never turns away. Same character, outfit and size in every frame; no effects, no trails.",
+  "frame_count": 8,
+  "directions": [
+   "south-east"
+  ],
+  "animation_name": "atk3",
+  "keep_first_frame": true,
+  "seed": 13
+ }
+}
