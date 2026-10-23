@@ -88,7 +88,7 @@ function attack(){snapFace();if(P.dead||P.st==='hurt'||P.st==='death')return;if(
 // burst 14 ticks with ease 1-(1-q)^2.6, 17 ticks of afterimages, travel 150px at the hero's size -> 142px for Linette (117 vs 124px tall), y squashed x0.8,
 // a ghost copy every 2 ticks (last 4 kept, alpha .55/.38/.22/.10, cyan #6ed7ff tint 75%, fade from age 8 to 18), a pale blink at the start point (speed lines removed 10-22).
 const DSH={travel:142,burst:14,dur:17},GH8={alpha:[.55,.38,.22,.10],fadeFrom:8,life:18};let GH=[];
-function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:idleName(),lines:null};start('dash','dash_'+atkDir());}
+function dash(){snapFace();if(P.dead||P.st==='dash')return;const d=dir8()||DV[P.face]||[1,0],m=Math.hypot(d[0],d[1]);P.dsh={t:0,dx:d[0]/m,dy:d[1]/m,x0:P.x,y0:P.y-jz(),idle:idleName(),lines:null};start('dash',P.f8===2&&A.anims.dash_south?'dash_south':P.f8===6&&A.anims.dash_north?'dash_north':'dash_'+atkDir());}   // straight down/up: front/back dash (10-23)
 const TINTC=document.createElement('canvas');
 function blitTint(e,x,y,alpha,col,mix){const [s,c]=e,[cx,cy,w,h,ax,ay]=A.cells[s][c];if(TINTC.width<w)TINTC.width=w;if(TINTC.height<h)TINTC.height=h;const g=TINTC.getContext('2d');
   g.globalCompositeOperation='source-over';g.globalAlpha=1;g.clearRect(0,0,TINTC.width,TINTC.height);g.drawImage(SH[s],cx,cy,w,h,0,0,w,h);g.globalCompositeOperation='source-atop';g.globalAlpha=mix;g.fillStyle=col;g.fillRect(0,0,w,h);
@@ -326,5 +326,5 @@ function sewFx(front,camX,camY){
 }
 let acc=0,last=performance.now();
 function loop(now){acc+=Math.min(100,now-last);last=now;while(acc>=1000/60){step();P.gt=(P.gt||0)+1;acc-=1000/60;}draw();requestAnimationFrame(loop);}
-fetch('assets/anim/linette8.json?v=43').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=43';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
+fetch('assets/anim/linette8.json?v=44').then(r=>r.json()).then(j=>{A=j;return Promise.all(A.sheets.map(p=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src='assets/'+p+'?v=44';})));}).then(ims=>{SH=ims;const ld=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});return Promise.all([ld('assets/anim/hero8_castfx.webp?v=1'),ld('assets/anim/hero8_castfire.webp?v=1')]);}).then(([a,b])=>{FX=a;FIRE=b;setF8(2);P.t8=2;start('idle',idleName());requestAnimationFrame(loop);});
 </script></body></html>
