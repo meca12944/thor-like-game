@@ -29,10 +29,10 @@ PLACES = [('대장간', 'f_door_smith'), ('잡화점', 'f_door_tool'), ('무기�
           ('리네트', 'f_door_atelier'), ('예배당', 'f_door_chapel'), ('폐공방', 'f_arachne_gate')] + [(o.get('name', i), i) for i, o in objs.items() if o['type'] == 'waystone']
 times = {n: door_time(i) for n, i in PLACES}
 # landmark sight: the landmark's picture box (world tiles) overlaps the view round the hero standing on a tile
-VW, VH, CY = 24, 13.5, 10 / T
-def box(p): d = p.get('D', D); x0 = p['x'] - p['ax'] / d / T; return (x0, p['y'] - p['ay'] / d / T, x0 + p.get('w', p['ax'] * 2) / d / T, p['y'])
+VZ = m.get('viewZoom', 1); VW, VH, CY = 24 / VZ, 13.5 / VZ, 10 / T   # town view zoom widens the view
+def box(p): d = p.get('D', D); x0 = p['x'] - p['ax'] / d / T; return (x0, p['y'] - p['ay'] / d / T, x0 + p.get('w', p['ax'] * 2 + 1) / d / T, p['y'])
 walk = list(dist.keys()); sight = {}
-for lm in ('castle', 'chapel', 'web_arch', 'fountain', 'smoke_castle'):
+for lm in ('castle', 'castle_l', 'castle_r', 'chapel', 'web_arch', 'fountain', 'smoke_castle'):
     if lm not in props: continue
     bx0, by0, bx1, by1 = box(props[lm]); n = 0
     for (x, y) in walk:
