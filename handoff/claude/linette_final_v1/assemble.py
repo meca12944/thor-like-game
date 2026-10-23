@@ -61,6 +61,46 @@ for _m in ('walk','run'):
 SRC['run']['south']=(f'{KN}/b_s_run8',None,[4]*8)   # 10-21 "아래 뛸때 한쪽팔 고정": front run redrawn with both arms swinging
 SRC['rjump']={'right':(f'{SK}/rjump_east_v2',None,[3]*12)}   # owner 10-20: running jump = the hero's own rjump skeleton (CMU 127_25, frames 2-13) refit to Linette, run arms kept (v1 from estimated hero frames was too crouched); side only (left mirrored)
 SRC['cast']['down']=(V1+'/cast/south-east',None,[5]*9); SRC['cast']['up']=(V1+'/cast/north-east',None,[5]*9)   # owner 10-20: diagonal cast (down-right / up-right; mirrored -> downl/upl)
+# owner 10-21 "실 감고 던지기": new cast = X-cross the rapiers at the chest, twirl (winding thread), step and throw (PixelLab key pose + in-betweens, linette_cast_v1);
+# the throw key lands at tick 20 (skills fire at 20-22), held, then back to idle; 45 ticks like before so the magic circle timing is unchanged.
+CV=B+'/linette_cast_v1';_back=[2,3,3,3,4,3,2,12,4,4,5]
+SRC['cast']={'right':(CV+'/cast_e_seq',[0,1,2,3,4,6,7,8,7,1,0],_back),
+             'down':(CV+'/tw_se',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5]),
+             'up':(CV+'/tw_ne',[0,2,3,4,5,6,7,8,7,1,0],[2,3,3,3,4,3,2,12,4,4,5])}
+# owner 10-22 "가만히 서있는 얼굴과 뛰는 얼굴이 틀리다": side walk + run redrawn from the face-fixed idle (new face) - key pose + one 8-frame key->key cycle (linette_face_v2)
+FV=B+'/linette_face_v2';SRC['walk']['right']=(FV+'/walk_e8',None,[6]*8);SRC['run']['right']=(FV+'/run_e8',None,[4]*8)
+# owner 10-22 "주인공 대시 모션 그대로 가지고와": side dash = the hero's side dash (hero8 dash_right: stand, low lunge, hold, recover) on Linette by skeleton,
+# same ticks as the hero (4,4,4,5); diagonal dashes were already the hero's (dash_*_diag, ticks 2,1,3,2,3,3,3)
+SRC['dash']['right']=(SK+'/dash_east_hero',None,[4,4,4,5])
+# owner 10-22 "일반 점프시 다리 모양이 부자연" -> A (re-time, no new art): the wide landing stances were shown while she was in the air.
+# New order: stand -> crouch (anticipation) -> legs-together frame while rising -> slightly opened frame at the peak/fall -> landing stance
+# (only after touching down) -> crouch (absorb) -> stand. Air = ticks 8..32 (linette.html JUMP_AIR), same for all three views.
+_JT=[2,6,14,10,5,4,2]
+SRC['jump']['right']=(SK+'/jump_east',[0,1,2,3,7,1,0],_JT)
+SRC['jump']['down']=(SK+'/jump_south-east_diag',[0,3,4,5,11,3,0],_JT)
+SRC['jump']['up']=(SK+'/jump_north-east_diag',[0,3,4,5,13,3,0],_JT)
+# owner 10-22 "위로 달리기가 완전한 위방향이 아니라 살짝 오른쪽": back run redrawn as a STRICT straight back view (key from the straight back walk + 8-frame key->key cycle, linette_runn_v2)
+SRC['run']['north']=(B+'/linette_runn_v2/run_n8',None,[4]*8)
+# owner 10-23 "기본 서있는 자세가 정면이 아니고 대각선": straight front / back idle from the v1 front/back idle frames (already made, 0 credits);
+# front: calm frames 0-2 ping-pong (frames 3-8 flick the ponytail), back: 0-7 ping-pong. Used when she faces straight down/up and at the start.
+SRC['idle']['south']=(V1+'/idle/south',[0,1,2,1],[9]*4)
+SRC['idle']['north']=(V1+'/idle/north',[0,1,2,3,4,3,2,1],[8]*8)
+# owner 10-23 "대시 방향별로 / 리네트 폼대로": straight front/back dash in Linette's own form (key pose: knees bent, feet under her, arms close, leaning in;
+# + idle->key in-betweens, linette_dashns_v1), 17 ticks like the other dashes: stand, drop, lunge (held), back up
+DN=B+'/linette_dashns_v1';_DT=[2,2,3,6,2,2]
+SRC['dash']['south']=(DN+'/tw_s',[0,1,3,4,3,1],_DT);SRC['dash']['north']=(DN+'/tw_n',[0,1,3,4,3,1],_DT)
+# owner 10-23 "다음 고칠점 3": diagonal-down idle jumped at frames 9-11 (needle flips) and at the loop seam (x2.9) -> calm frames 0-8 ping-pong
+SRC['idle']['down']=(SRC['idle']['down'][0],[0,1,2,3,2,1],[10,10,10,10,10,10])   # frames 0-3 only (4 and 9-11 jump)
+# owner 10-23 "추천 순서랑 크레딧 사용해서 전부": straight front/back cast, jump, hurt, death + running jump for both diagonals and front/back
+# (key poses + in-betweens, linette_ns2_v1). Frames where PixelLab painted effects (thread loops, hit bursts) are skipped.
+NS=B+'/linette_ns2_v1'
+for _v,_d in (('s','south'),('n','north')):
+    SRC['cast'][_d]=(f'{NS}/cast_{_v}_seq',None,[2,3,3,3,9,2,12,4,7])        # stand, raise, X (winding held), throw (held from tick 22), back
+    SRC['jump'][_d]=(f'{NS}/tw_jump_{_v}',[0,1,4,3,2,1,0],[2,6,14,10,5,4,2])  # same timing as the other standing jumps (air ticks 8-32)
+    SRC['hurt'][_d]=(f'{NS}/tw_hurt_{_v}',[0,3,4,3,0],[3,5,6,4,4])
+    SRC['death'][_d]=(f'{NS}/tw_death_{_v}',None,[6]*9)
+    SRC['rjump'][_d]=(f'{NS}/rj_{_v}_seq',None,[4]*9)
+SRC['rjump']['down']=(f'{NS}/rj_d_seq',None,[4]*9);SRC['rjump']['up']=(f'{NS}/rj_u_seq',None,[4]*9)
 man={'_doc':'Linette (PixelLab 7e26e0f3, 117px) motion set v1. frames/<motion>/<dir>/NNN.png, 256x256, feet root (128,189). left = right mirrored. ticks @60fps per frame.','motions':{}}
 for m,dd in SRC.items():
     man['motions'][m]={}
