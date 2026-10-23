@@ -17,7 +17,7 @@
   const OFF_ROUTE = 2.5;         // tiles away from the route => replan
   const FOG_R = { field: 8, dungeon: 5, boss: 7 };
   const MINI = [{ w: 112, h: 76, tile: 3 }, { w: 216, h: 140, tile: 0 }]; // display units (u); tile 0 = fit the whole map
-  let IDX = null, QUESTS = [], QBY = {}, booted = false;
+  let IDX = null, QUESTS = [], QBY = {}, booted = false; const OLD = new URLSearchParams(location.search).has('old');
   const NM = {};                 // per-map nav data: { portals, markers, fog, img, mini, cost }
   const st = { miniMode: 0, screen: null, uiA: .65, uiT: 0, dirty: true, checkT: 0, periodicT: 0, goal: null, extra: 0, label: '', destKey: '', noRoute: false, lastTile: -1 };
 
@@ -26,7 +26,7 @@
   function boot() {
     const h = H(); if (!h) { setTimeout(boot, 50); return; }
     h.ready.then(() => Promise.all([getJSON('maps/index.json'), getJSON('maps/quests.json')])).then(([idx, q]) => {
-      IDX = idx; QUESTS = q.quests || []; for (const x of QUESTS) QBY[x.id] = x;
+      IDX = idx; QUESTS = (q.quests || []).filter(x => OLD || /^q_felt/.test(x.id)); for (const x of QUESTS) QBY[x.id] = x; // 새 판: chapter-1 quests only (?old = all)
       return Promise.all(idx.maps.map(id => h.loadMap(id).then(m => navData(m))));
     }).then(() => { booted = true; st.dirty = true; }).catch(e => console.error('[nav] boot', e));
   }
@@ -146,7 +146,7 @@
   function autoGoal() {
     for (const q of QUESTS) if (qs(q.id) === 'active') { const g = questGoal(q); if (g) return g; }
     for (const q of QUESTS) if (avail(q)) { const g = questGoal(q); if (g) return g; }
-    const t = IDX && IDX.destinations.find(d => d.kind === 'dungeon'); return t && !H().SAVE.flags.boss01 ? Object.assign({}, t) : null;
+    if (!OLD) return null; const t = IDX && IDX.destinations.find(d => d.kind === 'dungeon'); return t && !H().SAVE.flags.boss01 ? Object.assign({}, t) : null;
   }
   function currentDest() {
     const S = H().SAVE, d = S.dest;

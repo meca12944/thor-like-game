@@ -1,0 +1,20 @@
+{
+ "usage": {
+  "type": "generations",
+  "generations": 8.0
+ },
+ "id": "d6874473-fd8b-49f8-9bf1-422d1a43008b",
+ "status": "completed",
+ "created_at": "2026-10-23T09:01:31.759516+00:00",
+ "last_response_keys": [
+  "status",
+  "character_id",
+  "storage_urls",
+  "billing_usage",
+  "character_name",
+  "directions_type",
+  "generation_mode",
+  "directions_count",
+  "character_description"
+ ]
+}

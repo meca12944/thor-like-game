@@ -21,6 +21,8 @@
   const SWING = { range: 29, arc: 150, arc3: 100, r3: 1.15 }; // hit 3 = finishing slash: 100 deg forward, reach x1.15 (longer swing timing ATK3 kept)
   const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => (window.__game && window.__game.DODGE) || null; // dodge dash config (ANIM.dodge); ROLL kept as fallback
   const EASE = { outCubic: p => 1 - (1 - p) ** 3, outQuad: p => 1 - (1 - p) ** 2, linear: p => p };
+  const BUILD_V = (Date.parse(document.lastModified) || 0).toString(36); // deploy stamp (see index.html): new deploy -> new asset URLs
+  function fieldDash(D) { return D.travel ? D.travel * 1.5 / 124 * H128FIG : D.tiles * 16 * .68; } // town: travel (=150 logical px / LSC 1.5) for a 124 px figure -> same ratio for the 30 px field figure (36 px, 1.21 hero-heights)
   function rollDur() { const D = DG(); return D ? D.durTicks / 60 : ROLL.dur; }
   // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
@@ -73,6 +75,7 @@
   let SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null };
   try { Object.assign(SAVE, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   if (Q.has('worldreset')) SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null };
+  if (Q.has('worldreset') && !navigator.webdriver) { try { localStorage.setItem(LS, JSON.stringify(SAVE)); } catch (e) {} try { const u = new URL(location.href); u.searchParams.delete('worldreset'); history.replaceState(null, '', u.pathname + u.search.replace(/=(&|$)/g, '$1') + u.hash); } catch (e) {} } // new game: wipe once, then drop the flag so a page refresh keeps the progress
   for (const k of ['explored', 'waystones', 'landmarks', 'quests']) SAVE[k] = SAVE[k] || {};
   if (SAVE.fogV !== 'temple01') { for (const k of ['field00', 'field01', 'dungeon01_b1', 'dungeon01_b2']) delete SAVE.explored[k]; SAVE.fogV = 'temple01'; } // 바람길 + 시작의 숲 stitched into one map (owner 10-23)
   const save = () => { try { localStorage.setItem(LS, JSON.stringify(SAVE)); } catch (e) {} };
@@ -301,7 +304,7 @@
         hero.roll.just = true; S.slowmo = .3; addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
     if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = .07; ultAdd('gainHit', 1);
-    if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); moveCol(hero, Math.cos(a) * 8, Math.sin(a) * 8, 5); }
+    if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); if (!hero.atk) setFace(-Math.cos(a), -Math.sin(a)); hero.kb = { x: Math.cos(a) * 3.3, y: Math.sin(a) * 3.3, n: 0 }; } // turn to the attacker (the recoil pose leans away from it) and slide ~8px over 7 ticks instead of a 1-tick teleport (motion lab 10-23)
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp(); checkLastStand();
     if (hero.hp <= 0) die();
@@ -503,13 +506,14 @@
   function step(dt) {
     S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
+    if (hero.kb) { const K = hero.kb; moveCol(hero, K.x, K.y, 5); K.x *= .6; K.y *= .6; if (++K.n >= 7) hero.kb = null; } // hit knockback slide (see hurt)
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
     if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) S.pause = !S.pause;
-    if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; go('town', null, { card: false }); } queue.length = 0; return; }
+    if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
     if (S.freezeT > 0) { S.freezeT -= dt; updateCam(dt); return; } // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
@@ -560,7 +564,7 @@
     if (takePress('interact')) interact();
     tickTrail(dt);
     if (hero.roll) { const r = hero.roll, D = DG(), RD = rollDur(); const p0 = Math.min(1, r.t / RD); r.t += dt; const p = Math.min(1, r.t / RD);
-      if (D && D.burstTicks) { const TB = D.burstTicks / 60, q0 = Math.min(1, (r.t - dt) / TB), q1 = Math.min(1, r.t / TB), E2 = q => 1 - Math.pow(1 - q, 2.6), st = D.tiles * 16 * .68 * (E2(q1) - E2(q0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5);
+      if (D && D.burstTicks) { const TB = D.burstTicks / 60, q0 = Math.min(1, (r.t - dt) / TB), q1 = Math.min(1, r.t / TB), E2 = q => 1 - Math.pow(1 - q, 2.6), st = fieldDash(D) * (E2(q1) - E2(q0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5);
         const tt = Math.round((r.t - dt) * 60); if (tt % 2 === 0 && tt < D.burstTicks && h128()) { S.trail = S.trail || []; S.trail.push({ c128: h128Cell(), x: hero.x, y: hero.y, t: 0, life: (D.durTicks - tt) / 60 + .05, a: .8 * Math.pow(.8, S.trail.length) }); } }
       else if (D) { const E = EASE[D.ease] || EASE.outCubic, st = D.tiles * 16 * (E(p) - E(p0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5); // dash: fixed distance, ease-out
         const AI = D.afterimage || {}; r.ai = (r.ai || 0) - 1; r.ain = r.ain || 0; if (r.ai <= 0 && r.ain < (AI.count || 5) && p < .95) { r.ai = AI.intervalTicks || 2; r.ain++; S.trail = S.trail || []; S.trail.push({ c128: h128() ? h128Cell() : null, name: heroFrameName(), x: hero.x, y: hero.y, flip: hero.face === 'left', t: 0, life: AI.fade || .25, a: AI.alpha ?? .55 }); } }
@@ -916,12 +920,19 @@
     for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
       if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
-  function gkKick(a) { const AT = atkT(a.i), u = a.t; return u < AT.a0 ? { x: -2 * u / Math.max(AT.a0, 1e-3), sq: 1 } : { x: 4 * Math.exp(-(u - AT.a0) * 14), sq: 1 - .05 * Math.exp(-(u - AT.a0) * 14) }; } // atlas px: lean back, snap forward, squash
+  function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
+    // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
+    const AT = atkT(a.i), u = a.t, big = a.i === 2;
+    if (u < AT.a0) { const q = u / Math.max(AT.a0, 1e-3), e = q * q * (3 - 2 * q); return { lean: -3 * e, step: 0, sq: 1 - .04 * e }; }
+    const t = u - AT.a0, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), sp = Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
+    const L0 = big ? 9 : 6, st = (big ? 5 : 1.5) * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
+    return { lean: L0 * sp, step: st, sq: 1 + .045 * Math.exp(-t * 30) * Math.cos(t * 40) };
+  }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
-    let kx = 0, ky = 0, sq = 1; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.x * f; ky = v[1] * K.x * f * .5; sq = K.sq; }
-    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); ctx.translate(-fx, -fy);
+    let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
@@ -1012,7 +1023,7 @@
       blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
   // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
-  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json').then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p; return i; }); }).catch(() => {});
+  const PET = { A: null, IM: [] }; getJSON('assets/anim/linette8.json?v=' + BUILD_V).then(j => { PET.A = j; PET.IM = j.sheets.map(p => { const i = new Image(); i.src = 'assets/' + p + '?v=' + BUILD_V; return i; }); }).catch(() => {});
   const PET_MAPS = ['field00'];
   const petDir = (dx, dy, cur) => Math.abs(dx) > Math.abs(dy) * 1.4 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'down' : 'downl') : (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'up' : 'upl');
   const petTot = L => L.reduce((a, f) => a + f[2], 0);
@@ -1030,10 +1041,10 @@
       P.dir = dir; P.atk = { t: 0, clip, dir, tg, hitT: petTot(L.slice(0, th ? th.frame : 4)) }; P.cd = 0.9; P.moving = false; return; }
     else if (d > (tg ? 3 : 14)) { const v = (sp || (d > 60 ? 130 : 78)) * dt, k = Math.min(1, v / d); moveCol(P, dx * k, dy * k, 4); P.run = sp ? true : d > 60; }
     const mx = P.x - x0, my = P.y - y0; P.moving = Math.abs(mx) + Math.abs(my) > 1e-3; if (P.moving) P.dir = petDir(mx, my, P.dir); else if (tg) P.dir = petDir(tg.x - P.x, tg.y - P.y, P.dir);
-    if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 46 : 32)) % 1; }
+    if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 32.8 : 23.4)) % 1; } // one cycle per field px = Linette's drawn stride (walk 1.9 / run 4.0 art px per tick x clip ticks x 30/117): feet stay planted (motion lab 10-23; was 46/32 = ~1.4x foot slide)
   function drawPetHi(k, front) { const P = S.pet; if (!P || !PET.A || P.map !== S.map || (P.y > hero.y) !== front) return; const A = PET.A, a = P.atk;
     const an = a ? a.clip : P.moving ? (P.run ? 'run' : 'walk') : 'idle', L = A.anims[an + '_' + (a ? a.dir : P.dir)] || A.anims[an + '_right']; if (!L) return;
-    let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) e = L[Math.floor((P.gp || 0) * L.length) % L.length]; else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
+    let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) { let t = ((P.gp || 0) % 1) * petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } /* walk/run frames have their own ticks (longer where the foot travels further) */ else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
     const im = PET.IM[e[0]], c = A.cells[e[0]][e[1]]; if (!im || !im.complete) return; const sc = k * H128FIG / 117, [sx, sy] = W2S(P.x, P.y);
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(sx, sy, 6 * k, 2.5 * k, 0, 0, TAU); ctx.fill(); ctx.imageSmoothingEnabled = sc < 1;
     ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc));
@@ -1198,7 +1209,7 @@
       const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }
       { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
-      if (m.area) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
+      if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
       const b = S.bossRef; if (b && !b.dead) { const w = 260 * u, y = oy + SH - 20 * u; hpBar(b, cxs, y, w, 7 * u);
         textOut(b.D.name + (b.phase === 2 ? '  — 2페이즈' : ''), cxs, y - 5 * u, 12 * u, b.phase === 2 ? '#ff9a7a' : '#fff');
@@ -1217,7 +1228,7 @@
       S.dialog.text.split('\n').forEach((l, i) => textOut(l, tx, y + ((S.dialog.name ? 38 : 28) + i * 20) * u, 13 * u, '#fff', '#000', 'left'));
       textOut('▼ ' + keyHint('interact'), x + w - 14 * u, y + 76 * u, 10 * u, '#ffe08a', '#000', 'right'); }
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
-      textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut('Esc: 계속   ·   T: 마을로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
+      textOut('일시정지', cxs, oy + SH / 2 - 14 * u, 20 * u, '#ffe08a'); textOut(Q.has('old') ? 'Esc: 계속   ·   T: 마을로 귀환' : 'Esc: 계속   ·   T: 펠트로 귀환', cxs, oy + SH / 2 + 18 * u, 13 * u, '#fff'); }
     if (S.deadT > 0) { ctx.fillStyle = `rgba(60,0,0,${Math.min(.6, S.deadT)})`; ctx.fillRect(ox, oy, SW, SH);
       if (S.deadT > 1.4) { panel(cxs - 170 * u, oy + SH / 2 - 46 * u, 340 * u, 92 * u); textOut('쓰러졌다', cxs, oy + SH / 2 - 16 * u, 19 * u, '#ffb0a0');
         textOut(S.snap ? `${keyHint('attack')}  다시 도전 (전투 직전부터)` : `${keyHint('attack')}  마지막 비석에서`, cxs, oy + SH / 2 + 10 * u, 13 * u, '#fff'); textOut('T  마지막 비석에서', cxs, oy + SH / 2 + 30 * u, 13 * u, '#ddd'); } }
@@ -1422,8 +1433,7 @@
   // ?go=world | field00..field09 | dungeon01_b1 ... : start straight in that scene instead of the town (owner 10-22 "실행할수 있게")
   const GO = new URLSearchParams(location.search).get('go');
   if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default'); }, 100); });
-  else if (SAVE.resume && !Q.has('nosave')) ready.then(() => { const R0 = SAVE.resume, t = setInterval(() => { const g = window.__game; if (!g || !g.ready) return; clearInterval(t); // 이어하기: saved in the field -> start there
-    S.pendingHp = R0.hp; S.pendingMsg = '이어하기 — 저장한 곳에서 시작'; go(R0.map, 'resume', { card: false }); }, 100); });
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
-  if (Q.get('start')) ready.then(() => { const id = Q.get('start'), t0 = Date.now(); const tryGo = () => { const g = window.__game; if (g && g.ready && go(id, 'default', { card: false })) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
+  const START = Q.get('start') || (Q.has('old') ? null : 'felt'); // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
+  if (START) ready.then(() => { const id = START; let t0 = Date.now(); const tryGo = () => { const g = window.__game, T = window.__titleScreen; if (T && T.active) { t0 = Date.now(); setTimeout(tryGo, 100); return; } /* wait for the title: the map canvas would cover it while it still takes the keys */ const R0 = !Q.get('start') && !Q.has('nosave') && SAVE.resume; /* 이어하기 (owner 10-23): saved in a field -> start there */ if (g && g.ready && (R0 ? (S.pendingHp = R0.hp, S.pendingMsg = '이어하기 — 저장한 곳에서 시작', go(R0.map, 'resume', { card: false })) : go(id, 'default', { card: false }))) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
 })();
