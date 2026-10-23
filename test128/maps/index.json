@@ -1,12 +1,9 @@
 {
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
  "maps": [
-  "felt",
-  "field_felt",
+  "ch1",
   "field00",
-  "field01",
   "dungeon01_b1",
-  "dungeon01_b2",
   "boss01",
   "field02",
   "field03",
@@ -22,16 +19,14 @@
    "name": "1장 · 펠트",
    "worldNode": "area1",
    "maps": [
-    "felt",
-    "field_felt"
+    "ch1"
    ]
   },
   "area1": {
    "name": "1지역 · 시작의 숲",
    "worldNode": "area1",
    "maps": [
-    "field00",
-    "field01"
+    "field00"
    ],
    "town": {
     "label": "시작 마을",
@@ -45,7 +40,6 @@
    "worldNode": "area1",
    "maps": [
     "dungeon01_b1",
-    "dungeon01_b2",
     "boss01"
    ]
   },
@@ -119,16 +113,16 @@
    "id": "dest_temple",
    "label": "고대 숲 신전 입구",
    "kind": "dungeon",
-   "map": "field01",
-   "x": 46,
+   "map": "field00",
+   "x": 102,
    "y": 4
   },
   {
    "id": "dest_boss",
    "label": "골렘의 방",
    "kind": "boss",
-   "map": "dungeon01_b2",
-   "x": 38,
+   "map": "dungeon01_b1",
+   "x": 84,
    "y": 13
   }
  ],
