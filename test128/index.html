@@ -2,6 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>/* 휴대폰 옛 판 막기 (주인 10-23 「모바일이라 접속하니 옛날버전」): Pages가 모든 파일을 10분 저장해 두므로, 배포 시각을 주소 뒤에 붙여 새 배포 = 새 주소.
+ __v(u) 는 js·지도·그림 주소에 ?v=배포시각 을 붙인다 (index.html 은 Pages 10분 저장을 피할 수 없어서 index 가 바뀌는 순간부터 나머지가 모두 새로 받아짐). */
+window.__BUILD=(Date.parse(document.lastModified)||0).toString(36);
+window.__v=function(u){return u+(u.indexOf('?')<0?'?':'&')+'v='+window.__BUILD;};
+window.__js=function(u){document.write('<script src="'+window.__v(u)+'"><\/script>');};</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Town Demo</title>
 <style>
@@ -152,7 +157,7 @@ img.wmap{width:100%;display:block;border:3px solid #0b0b14;image-rendering:auto}
 <div style="font-size:11px;color:#c9d3f0">스킬을 누르면 빈 슬롯에 장착 · 슬롯이 꽉 찼으면 스킬 선택 후 슬롯 1/2/3을 눌러 교체 · 선택 없이 슬롯을 누르면 해제</div>
 <div id="wslots"></div><div id="wlist"></div>
 <div id="wnote">※ 데모: 10개 스킬 모두 해금 (DEMO.unlockAll). 실제 게임에서는 각 보스를 쓰러뜨리고 흡수해야 습득. 기력(파란 게이지)은 데모용으로 천천히 자동 회복.</div></div></div>
-<script src="hud.js"></script><!-- modern HUD gauges: HP/MP/EXP/필살기 (town/hud.js) -->
+<script>__js("hud.js")</script><!-- modern HUD gauges: HP/MP/EXP/필살기 (town/hud.js) -->
 <script>
 // 최신 판만 (owner 10-23 「인게임 기록은 최신 수정만 들어가고 기존 버전은 삭제」): GAME_VER changes whenever the game data / saves / defaults change.
 // A browser that last ran an older GAME_VER loses its old play records (progress, quick save, key setup, skill slots, dive items) once,
@@ -1896,11 +1901,11 @@ Promise.all(jobs).then(()=>{
  requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame);});
 }).catch(e=>{console.error(e);document.body.insertAdjacentHTML('beforeend','<p style="color:#fff">'+e.message+'</p>');});
 </script>
-<script src="bgm.js"></script><!-- BGM manager (tools/music, audio/bgm) -->
-<script src="title.js"></script><!-- [title] title screen + title BGM (town/title.js) -->
+<script>__js("bgm.js")</script><!-- BGM manager (tools/music, audio/bgm) -->
+<script>__js("title.js")</script><!-- [title] title screen + title BGM (town/title.js) -->
 <!-- [world] outside world: scene manager, Ys-style connected fields, dungeon, boss, minimap/map screen/route guide (world.js, world_mobs.js, world_nav.js, maps/*.json; see WORLD.md) -->
-<script src="sfx_synth.js"></script><!-- code-made combat SFX (field/dungeon) -->
-<script src="world_mobs.js"></script><script src="world_nav.js"></script><script src="world.js"></script>
-<script src="tachie.js"></script><!-- [tachie] full-body dialogue portraits (town/tachie.js, assets/tachie) -->
+<script>__js("sfx_synth.js")</script><!-- code-made combat SFX (field/dungeon) -->
+<script>__js("world_mobs.js")</script><script>__js("world_nav.js")</script><script>__js("world.js")</script>
+<script>__js("tachie.js")</script><!-- [tachie] full-body dialogue portraits (town/tachie.js, assets/tachie) -->
 </body>
 </html>
