@@ -416,10 +416,21 @@
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
   const DIR8 = ['right', 'downright', 'down', 'downleft', 'left', 'upleft', 'up', 'upright']; // test128 hero8: 8-way facing for the new hero frames (hitboxes stay 4-way FACEV)
+  // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_silmamul,c1_unrotting_hound*2[&tough=1][&ult=full]
+  //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
+  const AQ = new URLSearchParams(location.search), ARENA = (AQ.get('arena') || '').split(',').filter(Boolean).flatMap(t => { const [k, n] = t.split('*'); return Array(Math.max(1, Math.min(8, +n || 1))).fill(k); }), TOUGH = AQ.get('tough') === '1';
+  function arenaTick(dt) { if (!ARENA.length || !S.map || S.map.type === 'world') return;
+    if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; const at = (AQ.get('at') || '').split(',').map(Number); if (at.length === 2 && at.every(v => v >= 0)) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; snapCam(); } /* at=tx,ty: start in an open spot */ for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
+    if (TOUGH && hero.hp < 15) { hero.hp = hero.maxHp; addFx('text', hero.x, hero.y - 34, { text: '체력 회복 (시험장)', life: .8, color: '#9fffb0' }); }
+    if (S.mobs.some(m => !m.dead && m.arena)) return;
+    if ((S.arenaT -= dt) > 0) return; S.arenaT = 1.5;
+    ARENA.forEach((k, i) => { let x = hero.x, y = hero.y; for (let t = 0; t < 12; t++) { const a = i * 2.4 + t * .7, r = 95 + t * 4; x = hero.x + Math.cos(a) * r; y = hero.y + Math.sin(a) * r * .8; if (!blocked(x, y, 6)) break; }
+      const m = spawn(k, x, y); if (m) m.arena = true; }); }
   function step(dt) {
     S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
     if (S.scene === 'town') return;
+    arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
     if (S.dialog) { if (takePress('interact') || takePress('attack') || takePress('menu')) S.dialog = null; queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
