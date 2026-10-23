@@ -58,8 +58,9 @@
   function startGame(choice) {
     TS.choice = choice;
     // owner 10-23: 새 게임 / 이어하기 both enter the real game (the hero sandbox had an older hero and dash; it is no longer reachable from the title)
-    if (choice === 'new' && hasSave) {   // fresh run without deleting the quick save
-      const q = new URLSearchParams(location.search); q.set('nosave', ''); q.set('notitle', '');
+    const hasWorld = (() => { try { const w = JSON.parse(localStorage.getItem('thor.world.v1') || '{}'); return Object.keys(w.quests || {}).length || Object.keys(w.flags || {}).length; } catch (e) { return false; } })();
+    if (choice === 'new' && (hasSave || hasWorld)) {   // fresh run: no quick save, world progress reset (quests/flags), without deleting the quick save
+      const q = new URLSearchParams(location.search); q.set('nosave', ''); q.set('notitle', ''); q.set('worldreset', '');
       location.search = q.toString().replace(/=(&|$)/g, '$1'); return;
     }
     TS.stage = 'out'; TS.active = false; el.classList.add('out');

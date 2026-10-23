@@ -2,6 +2,7 @@
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
  "maps": [
   "felt",
+  "field_felt",
   "field00",
   "field01",
   "dungeon01_b1",
@@ -17,11 +18,18 @@
   "field09"
  ],
  "regions": {
+  "ch1": {
+   "name": "1장 · 펠트",
+   "worldNode": "area1",
+   "maps": [
+    "felt",
+    "field_felt"
+   ]
+  },
   "area1": {
    "name": "1지역 · 시작의 숲",
    "worldNode": "area1",
    "maps": [
-    "felt",
     "field00",
     "field01"
    ],

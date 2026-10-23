@@ -1,0 +1,306 @@
+{
+ "id": "field_felt",
+ "type": "field",
+ "area": 1,
+ "region": "ch1",
+ "mapPos": [
+  0,
+  0
+ ],
+ "name": "펠트 외곽 — 잿빛 들판",
+ "title": {
+  "kicker": "1장 · 펠트",
+  "name": "잿빛 들판",
+  "sub": "불탄 왕도 외곽, 실에 얽힌 들"
+ },
+ "bgm": "area01_forest",
+ "battleBgm": "battle_champion",
+ "tileset": "field",
+ "tile": 16,
+ "w": 56,
+ "h": 36,
+ "legend": {
+  ".": "grass",
+  ",": "grass_tuft",
+  "'": "grass_flowers",
+  "=": "dirt",
+  "~": "water",
+  "b": "bridge_h",
+  ":": "stones",
+  "#": "cliff",
+  "\"": "tallgrass",
+  "_": "sand",
+  "T": {
+   "ground": "grass",
+   "deco": "tree"
+  },
+  "P": {
+   "ground": "grass",
+   "deco": "pine"
+  },
+  "Y": {
+   "ground": "grass",
+   "deco": "tree",
+   "solid": false
+  },
+  "R": {
+   "ground": "grass",
+   "deco": "boulder"
+  },
+  "r": {
+   "ground": "grass",
+   "deco": "rocks"
+  },
+  "u": {
+   "ground": "grass",
+   "deco": "bush"
+  },
+  "s": {
+   "ground": "grass",
+   "deco": "stump"
+  },
+  "m": {
+   "ground": "grass",
+   "deco": "mushrooms",
+   "solid": false
+  },
+  "f": {
+   "ground": "grass",
+   "deco": "fence"
+  },
+  "O": {
+   "ground": "grass",
+   "deco": "pillar"
+  },
+  "c": {
+   "ground": "grass",
+   "deco": "crystal"
+  }
+ },
+ "solid": [
+  "~",
+  "#",
+  "T",
+  "P",
+  "R",
+  "r",
+  "u",
+  "s",
+  "f",
+  "O",
+  "c"
+ ],
+ "spawns": {
+  "default": [
+   27.5,
+   2.5,
+   "down"
+  ],
+  "felt": [
+   27.5,
+   2.5,
+   "down"
+  ]
+ },
+ "objects": [
+  {
+   "type": "exit",
+   "x": 24,
+   "y": 0,
+   "w": 7,
+   "h": 1,
+   "to": "felt",
+   "spawn": "field",
+   "label": "펠트 마을"
+  },
+  {
+   "type": "sign",
+   "x": 25,
+   "y": 10,
+   "text": "↑ 펠트 마을\n→ 길이 무너져 있다"
+  },
+  {
+   "type": "sign",
+   "x": 35,
+   "y": 28,
+   "text": "무너진 길. 아래쪽은 아직 갈 수 없다."
+  },
+  {
+   "type": "waystone",
+   "id": "ws_ashfield",
+   "x": 8,
+   "y": 6,
+   "name": "잿빛 들판 비석"
+  },
+  {
+   "type": "chest",
+   "id": "ff_chest_hill",
+   "x": 6,
+   "y": 8,
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "m_hardwood",
+     1
+    ]
+   ]
+  },
+  {
+   "type": "landmark",
+   "id": "lm_bridge00",
+   "x": 45,
+   "y": 19,
+   "name": "개울 다리"
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 31,
+   "y": 11,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 34,
+   "y": 22,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 31,
+   "y": 21,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 33,
+   "y": 12,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 30,
+   "y": 13,
+   "respawn": 30
+  },
+  {
+   "type": "clue",
+   "id": "f00_clue_corpse",
+   "x": 12,
+   "y": 21,
+   "name": "굳은 사슴 사체",
+   "flag": "felt_corpse_seen",
+   "needQuest": "q_felt_corpse",
+   "textIdle": "풀숲에 무언가 쓰러져 있다.",
+   "text": "며칠은 지났을 사슴인데 썩지 않았다. 가죽이 돌처럼 딱딱하게 굳어 있다.\n필멸자: (자기 손바닥을 내려다본다) ……",
+   "textDone": "썩지 않고 굳어 버린 사슴이다."
+  },
+  {
+   "type": "sign",
+   "x": 53,
+   "y": 19,
+   "text": "폐허가 된 왕도 쪽 길. 아직 갈 수 없다."
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 20,
+   "y": 6,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 38,
+   "y": 22,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 15,
+   "y": 18,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 42,
+   "y": 15,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 22,
+   "y": 26,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 49,
+   "y": 24,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 8,
+   "y": 22,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_unrotting_hound",
+   "x": 51,
+   "y": 11,
+   "respawn": 30
+  }
+ ],
+ "ground": [
+  "TTPTTTTTTTTTTTTPTPPTTTPP.'===..TTTTTPTTPTTPTPTTTTTTPTTTT",
+  "TPTTTTTTTTTTPTTTTTTTTTTP..===..TTTTPPTTTTTTPPTPTPTTPPTTP",
+  "TP....,.'.......P..Tffffff===ffffffT..T.........,.....TT",
+  "TT..........'...T.TT......==='....T,PT,'..~~~~~~..,...PT",
+  "TP.,.O=====O.'..P..TT,,..'===....TPTPT.T.~~~~~~~~...T.PT",
+  "TT.'.=======......TTP.,...===.....P..TT..~~~~~~~~'.TTTTT",
+  "TT...=======.....'..'..'.,===,r..'.TTTP.,~~~~~~~~..TTTTT",
+  "PP..,=======..,.,'...,...'===....'..T....~~~~~~~~..T..TT",
+  "PP''.==========.......,...===,.,........'~~~~~~~~..,..PT",
+  "PP...O=====O.,================..........,.~~~~~~.,...,TT",
+  "TP.,.................','..=====,'........,...~~.....,.TT",
+  "TT.....,..,.u..............===='..,',........~~,.....,TT",
+  "PP............u,,......R.,.======........,..~~..\"\"\"\"\".TP",
+  "TP..'TTT,...........T.,,....=====.....u.....~~',\"\"\"\"\".TT",
+  "PP.TTPP..P..,...,..T.T.,...,.======.......,~~.,.\"\"\"\"\".TT",
+  "TT.TTTTTTT....,....,TTT....,,.=======.'....~~...\"\"\"\"\".TT",
+  "PT..TTT.T,T.....'...TP.........========...,~~..,......TP",
+  "TT.TTTTT.T....'.....P,.'.........==========bb===.,.,....",
+  "TT,T,,P.TT,..'...,....'....,.,....=========bb===========",
+  "TT.,PP,T..,.......,,...,......,..,=.=======bb===========",
+  "TT....T,......\"\"\"\"\"\"'...,s'',...'.=...,.'..~~.==========",
+  "TP.,..........\"\"\"\"\"\"...,..,.......=..,..m..~~.....,..',,",
+  "TP.....,......\"\"\"\"\"\",.,.,.,....'..=....,...~~.....R...TT",
+  "TT......,..'.,\"\"\"\"\"\"...,',,.......=.......,~~..,..T...TT",
+  "TT...,...'TPPP..,...,..,....,.....=.\"\"\"\"\"\"..~~..TTTTP.PT",
+  "TP.,,..PTTPTPP'..m........,.r.....='\"\"\"\"\"\"..~~..TT,TTPTT",
+  "TP....'.T.TTPTT...,'..P.,,......'==.\"\"\"\"\"\"..~~...,TTTTTT",
+  "PT....TP.TTPTT..,...T.T.T.,......=,.\"\"\"\"\"\"...~~.T.T.PPTT",
+  "PT.,..,PTPT,PT.,...T..TPTP.....,.=..\"\"\"\"\"\"...~~T.T..PTTT",
+  "TT....TTTTTTP.P....,TTTT.P......R=..,...,....~~TTTTTPPPT",
+  "TP.....T.T.TPPT...TT.PT.TT....rRrRr'...,.....~~.T.T.T.TT",
+  "TP.','TP.TTTTTT.,,.TTPTPTT,....r=r.....TPT...~~.....,.TT",
+  "TT.....T...TPT,.,..TT..TT.,,....=.....,TTTT..~~.......PT",
+  "TT..',...,T.........TPPT..'.....=......TTT...~~.......TT",
+  "PTTPTTPPTPTTTTTTTPTPTTTPTTTTTTTT=TTTTTPPTPTTT~~TTTTPTTPT",
+  "TTTTPTPTPTTTPTTTTTTTPTTTPPTTPTTT=TPPTTTPTTTTT~~PTTTTTTTT"
+ ]
+}

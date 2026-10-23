@@ -37,6 +37,11 @@
    28.5,
    35.5,
    "up"
+  ],
+  "field": [
+   28.5,
+   35.5,
+   "up"
   ]
  },
  "objects": [
@@ -46,9 +51,9 @@
    "y": 37,
    "w": 3,
    "h": 1,
-   "to": "world",
-   "spawn": "townA",
-   "label": "↓ 차가운 대지 · 월드맵"
+   "to": "field_felt",
+   "spawn": "felt",
+   "label": "↓ 잿빛 들판"
   },
   {
    "type": "sign",
