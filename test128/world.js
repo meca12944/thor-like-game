@@ -39,7 +39,10 @@
     S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
   const ATK = { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
   const ATK3 = Object.assign({}, ATK, { dur: 0.38, a0: 0.07, a1: 0.24 }); // hit 3: longer active window + follow-through
-  const atkT = i => i >= 3 ? atkTS(i) : i === 2 ? ATK3 : ATK;
+  const atkT = i => i >= 3 ? atkTS(i) : wTiming(i);
+  // [검흔 무기별 v1] basic-hit timing follows the equipped weapon type (town hero.json weapons), as a ratio of the sword's ticks
+  function wTiming(i) { const base = i === 2 ? ATK3 : ATK, g = window.__game, A = g && g.ANIM && g.ANIM.weapons; if (!A) return base; const c = A[wType()] && A[wType()].combo[i], s0 = A.sword && A.sword.combo[i]; if (!c || !s0) return base;
+    return Object.assign({}, base, { dur: base.dur * c.dur / s0.dur, a0: base.a0 * c.a0 / s0.a0, a1: base.a1 * c.a1 / s0.a1 }); }
   // dash attack (run + attack, i 3) / charge attack lv1 / lv2 (hold attack, i 4 / 5): same data as the town (__game.ANIM.special), town px x .3, ticks / 60
   const SPW_DEF = { dash: { dur: 26, a0: 4, a1: 12, lunge: 90, rangeMul: 1, arc: 100, dmgMul: 1.3, cool: .3 }, charge: { t1: .6, t2: 1.2, moveMul: .4,
     lv1: { dur: 34, a0: 6, a1: 14, lunge: 24, rangeMul: 1.15, arc: 100, dmgMul: 2, cool: .25 }, lv2: { dur: 40, a0: 6, a1: 16, lunge: 30, rangeMul: 1.4, arc: 100, dmgMul: 3, cool: .3, wave: { speed: 560, range: 260, rad: 28, dmgMul: 1 } } } };
@@ -770,16 +773,42 @@
   const GK_LIFE = 13, GK_STEP = .8, sCache = new Map();
   function sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y) { if (flip) x = -x; const xr = x * ca + y * sa, yr = (-x * sa + y * ca) / sq, r = Math.hypot(xr, yr); let u = (Math.atan2(yr, xr) * 180 / Math.PI + span / 2) / span; if (rev) u = 1 - u;
     if (u < tail || u > head || u < 0 || u > 1) return null; const k = Math.min(1, Math.max(0, (u - tail) / Math.max(head - tail, 1e-3))), w = T * Math.pow(Math.sin(Math.PI * u), .6) * (.15 + .85 * Math.pow(k, 1.3)); return [k, w, r - R + w * .35]; }
-  function sArc(R, span, T, head, tail, rot, rev, sq, flip) { const key = [R, span, T, head, tail, rot, rev, sq, flip].map(v => Math.round(v * 100)).join('|'); let c2 = sCache.get(key); if (c2) return c2;
+  function sArc(R, span, T, head, tail, rot, rev, sq, flip, pal = 0) { const P = GKPAL[pal] || GKPAL[0]; const key = [R, span, T, head, tail, rot, rev, sq, flip, pal].map(v => Math.round(v * 100)).join('|'); let c2 = sCache.get(key); if (c2) return c2;
     if (sCache.size > 400) sCache.clear(); const N = Math.ceil(2 * R + 2 * T + 30), c = N / 2; c2 = document.createElement('canvas'); c2.width = c2.height = N; const g = c2.getContext('2d'), id = g.createImageData(N, N), d = id.data, an = rot * Math.PI / 180, ca = Math.cos(an), sa = Math.sin(an);
     for (let py = 0; py < N; py++) for (let px = 0; px < N; px++) { const x = px - c, y = py - c, i = (py * N + px) * 4; let f = sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y), cr = 0, cg = 0, cb = 0, al = 0;
-      if (f) { const [k, w, dd] = f, ad = Math.abs(dd); if (ad < w / 2 + 6) { cr = 40; cg = 110; cb = 255; al = 40 + 80 * k; } if (ad < w / 2) { cr = 90 + 165 * k * k; cg = 190 + 65 * k; cb = 255; al = 230; } if ((ad < w / 5 && k > .25) || (dd > w / 2 - 1.5 && dd < w / 2 && k > .4)) { cr = cg = cb = 255; al = 255; } }
-      if (al < 230) { const e = sField(R * .78, span * .85, T * .45, head * .95, tail + .1, ca, sa, rev, sq, flip, x, y); if (e && Math.abs(e[2]) < e[1] / 2) { cr = 150; cg = 225; cb = 255; al = Math.max(al, 180 * e[0]); } }
+      if (f) { const [k, w, dd] = f, ad = Math.abs(dd); if (ad < w / 2 + 6) { [cr, cg, cb] = P[0]; al = 40 + 80 * k; } if (ad < w / 2) { const q = k * k; cr = P[1][0] + (P[2][0] - P[1][0]) * q; cg = P[1][1] + (P[2][1] - P[1][1]) * q; cb = P[1][2] + (P[2][2] - P[1][2]) * q; al = 230; } if ((ad < w / 5 && k > .25) || (dd > w / 2 - 1.5 && dd < w / 2 && k > .4)) { [cr, cg, cb] = P[4]; al = 255; } }
+      if (al < 230) { const e = sField(R * .78, span * .85, T * .45, head * .95, tail + .1, ca, sa, rev, sq, flip, x, y); if (e && Math.abs(e[2]) < e[1] / 2) { [cr, cg, cb] = P[3]; al = Math.max(al, 180 * e[0]); } }
       if (al) { d[i] = cr; d[i + 1] = cg; d[i + 2] = cb; d[i + 3] = al; } }
     g.putImageData(id, 0, 0); sCache.set(key, c2); return c2; }
   // owner 10-23 "검흔 문제점": the hit used to reach 2-3x past the drawn arc (old painted-slash hitbox) and land before the arc flew.
   // Now each arc flies out to the hit range (hbR) in GK_FLY steps and hits a mob only when its front passes it; diagonal input = 45° arc.
   const GK_FLY = 8, GK_K = H128FIG / 117; // arc steps to reach the hit range; atlas px -> field px
+  // [검흔 무기별 v1, owner 10-23 "검을 바꿀때마다 검흔이 변경"] each weapon type (town hero.json weapons) sends its own sword energy:
+  // palette [glow, body from, body to, inner echo, edge], and per combo hit a list of arcs: shape arc | thrust, size (Rm, Tm), reach (field px),
+  // arc width, fly (keeps flying to reach x fly), tip (outer 35% of the reach x tip damage), quake (ground ring at the end, radius px), dm (damage share), turn (deg), rot/rev.
+  const GKPAL = [[[40, 110, 255], [90, 190, 255], [255, 255, 255], [150, 225, 255], [255, 255, 255]],   // 0 blue
+    [[200, 110, 20], [255, 190, 70], [255, 250, 220], [255, 220, 140], [255, 255, 235]],                    // 1 gold
+    [[20, 140, 90], [80, 230, 160], [235, 255, 245], [160, 255, 210], [255, 255, 255]],                      // 2 jade
+    [[200, 50, 10], [255, 130, 40], [255, 240, 200], [255, 190, 110], [255, 255, 230]],                      // 3 ember
+    [[110, 130, 170], [200, 215, 240], [255, 255, 255], [225, 235, 255], [255, 255, 255]],                   // 4 silver
+    [[110, 40, 200], [190, 120, 255], [250, 235, 255], [215, 180, 255], [255, 255, 255]],                    // 5 violet
+    [[150, 10, 40], [255, 80, 100], [255, 230, 235], [255, 160, 170], [255, 255, 255]],                      // 6 crimson
+    [[30, 60, 160], [120, 170, 255], [235, 245, 255], [170, 200, 255], [255, 255, 255]],                     // 7 moon
+    [[20, 0, 30], [120, 60, 170], [255, 240, 190], [255, 220, 150], [255, 250, 220]],                        // 8 eclipse
+    [[60, 0, 0], [200, 20, 40], [255, 200, 180], [255, 90, 60], [255, 230, 210]]];                           // 9 demon
+  const GKW = {
+    sword: { pal: 0, dmg: 1.1, hits: [[{}], [{}], [{}]] },
+    saber: { pal: 1, dmg: .9, hits: [[{ fly: 2.2, Tm: .7, reach: 40 }], [{ fly: 2.2, Tm: .7, reach: 40 }], [{ fly: 1.9, reach: 44 }]] },
+    dagger: { pal: 2, dmg: 1, hits: [[{ Rm: .7, Tm: .6, reach: 28, arc: 70, dm: .6, turn: -10 }, { Rm: .7, Tm: .6, reach: 28, arc: 70, dm: .6, turn: 10, rev: 1, at: 2 }], [{ Rm: .7, Tm: .6, reach: 28, arc: 70, dm: .6, turn: 10, rev: 1 }, { Rm: .7, Tm: .6, reach: 28, arc: 70, dm: .6, turn: -10, at: 2 }], [{ Rm: .85, Tm: .8, reach: 32, arc: 80, dm: .6, rot: 35 }, { Rm: .85, Tm: .8, reach: 32, arc: 80, dm: .6, rot: -35, rev: 1, at: 3 }]] },
+    greatsword: { pal: 3, dmg: 1.6, hits: [[{ Rm: 1.3, Tm: 1.5, reach: 52, arc: 180 }], [{ Rm: 1.3, Tm: 1.5, reach: 52, arc: 180 }], [{ Rm: 1.35, Tm: 1.6, reach: 54, arc: 140, quake: 50 }]] },
+    spear: { pal: 4, dmg: 1.65, hits: [[{ shape: 'thrust', reach: 72 }], [{ shape: 'thrust', reach: 72 }], [{ shape: 'thrust', reach: 84, Tm: 1.4 }]] },
+    whip: { pal: 5, dmg: 1, hits: [[{ Rm: 1.45, Tm: .5, reach: 70, arc: 110, tip: 2.1, band: .55 }], [{ Rm: 1.45, Tm: .5, reach: 70, arc: 110, tip: 2.1, band: .55 }], [{ Rm: 1.5, Tm: .6, reach: 74, arc: 100, tip: 2.1, band: .5 }]] },
+    twin: { pal: 6, dmg: 1, hits: [[{ reach: 36, dm: .55 }, { reach: 36, dm: .55, rev: 1, rot: 30, at: 1 }], [{ reach: 36, dm: .55, rev: 1 }, { reach: 36, dm: .55, rot: -30, at: 1 }], [{ reach: 44, dm: .55, rot: 25 }, { reach: 44, dm: .55, rot: -25, rev: 1, at: 2 }]] },
+    hidden: { pal: 1, dmg: 1.15, hits: [[{ reach: 46, fly: 1.3 }], [{ reach: 46, fly: 1.3, pal: 7 }], [{ reach: 52, fly: 1.3, dm: .6, rot: 20 }, { reach: 52, fly: 1.3, dm: .6, rot: -20, rev: 1, pal: 7 }]] },
+    chan: { pal: 8, dmg: 1.2, hits: [[{ reach: 48, Tm: 1.2 }], [{ reach: 48, Tm: 1.2 }], [{ reach: 58, Tm: 1.3, quake: 40 }]] },
+    demon: { pal: 9, dmg: 1.3, hits: [[{ reach: 50, Tm: 1.2 }], [{ reach: 50, Tm: 1.2 }], [{ reach: 58, dm: .5, turn: -28, fly: 1.4 }, { reach: 58, dm: .5, fly: 1.4 }, { reach: 58, dm: .5, turn: 28, fly: 1.4 }]] } };
+  const GK_VIS = [1.35, 1.4]; // [검흔 무기별 v1] field arcs drawn 1.35x bigger / 1.4x thicker so the weapon's shape and colour read over the mobs (hit reach unchanged)
+  function wType() { const g = window.__game; let t = 'sword'; try { const v = g && g.weaponType; t = (typeof v === 'function' ? v() : v) || 'sword'; } catch (e) { } /* __game.weaponType is a getter */ return GKW[t] ? t : 'sword'; }
   // [combat research] no stick held at the press: turn to the nearest mob within reach + 30px and 70° of the facing (8 directions)
   function aimAssist(i) { const v = gkDir(), reach = (i <= 2 ? GK_REACH[i] : hbR(i)) + 30; let best = null, bd = 1e9;
     for (const mm of S.mobs) { if (mm.dead) continue; const dx = mm.x - hero.x, dy = (mm.y - hero.y) / .8, d = Math.hypot(dx, dy); if (d > reach || d < 1) continue; if ((dx * v[0] + dy * v[1]) / d < Math.cos(70 * Math.PI / 180)) continue; if (d < bd) { bd = d; best = [dx, dy]; } }
@@ -787,34 +816,49 @@
   function gkDir() { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null; if (f8 && f8 !== hero.face) { const a = DIR8.indexOf(f8) * Math.PI / 4; return [Math.cos(a), Math.sin(a)]; } return FACEV[hero.face] || [1, 0]; }
   // owner 10-23 "게임을 좀 어렵게 / 검기 판정 줄여": the hit reaches about as far as the drawn arc (was 67 / 49 / 62 px, 150-170°) and only in front
   const GK_REACH = [40, 38, 46], GK_ARC = [100, 110, 120]; // field px per combo hit 1-3 (specials 3+ keep hbR), degrees
-  function gkSpawn(i) { const v = gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = i <= 2 ? GK_REACH[i] : hbR(i);
+  function gkSpawn(i) { const W0 = GKW[wType()], n = Math.min(2, i), list = i <= 2 ? W0.hits[n] : [{}], grp = { stopped: false };
+    for (const o of list) gkSpawn1(i, o, W0.pal, grp); }
+  function gkSpawn1(i, o, pal0, grp) { let v = gkDir(); if (o.turn) { const a = Math.atan2(v[1], v[0]) + o.turn * Math.PI / 180; v = [Math.cos(a), Math.sin(a)]; }
+    const l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y0 = GK[n], Y = Object.assign({}, Y0, { R: Y0.R * (o.Rm || 1) * GK_VIS[0], T: Y0.T * (o.Tm || 1) * GK_VIS[1], rot: o.rot !== undefined ? o.rot : Y0.rot, rev: o.rev !== undefined ? o.rev : Y0.rev }),
+      reach = i <= 2 ? (o.reach || GK_REACH[i]) : hbR(i), fly = o.fly || 1;
     const sp = Math.max(Y.v, (reach / GK_K - Y.fwd - Y.R * (1 + .025 * GK_FLY)) / GK_FLY);
-    S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
-  function gkHits(f) { const a = f.t * GK_STEP; if (a > GK_FLY + 1) return; const Y = GK[f.n], front = Math.min(f.reach, GK_K * (Y.fwd + Y.R * (1 + .025 * a) + a * f.v)), [dx, dy] = f.dir;
+    S.gk = S.gk || []; S.gk.push({ Y, o, grp, wdm: (GKW[wType()] || {}).dmg || 1, pal: o.pal !== undefined ? o.pal : pal0, fly, delay: o.at || 0, n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? (o.arc || GK_ARC[i]) : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
+  function gkHits(f) { const a = (f.t - (f.delay || 0) / GK_STEP) * GK_STEP; if (a < 0 || a > GK_FLY * (f.fly || 1) + 1) return; const Y = f.Y || GK[f.n], o = f.o || {}, front = Math.min(f.reach * (f.fly || 1), GK_K * (Y.fwd + Y.R * (1 + .025 * a) + a * f.v)), [dx, dy] = f.dir;
+    if (o.quake && !f.quaked && front >= f.reach * .98) { f.quaked = true; const qx = hero.x + dx * front, qy = hero.y + dy * front * .8; S.gkQ = S.gkQ || []; S.gkQ.push({ x: qx, y: qy, r: o.quake, t: 0, pal: f.pal }); shake(2.5);
+      for (const mm of S.mobs) { if (mm.dead) continue; if (Math.hypot(mm.x - qx, (mm.y - qy) / .8) < o.quake + mm.r) { hitMob(mm, ATK_DMG[2] * .6, Math.atan2(mm.y - qy, mm.x - qx), true); S.freezeT = Math.max(S.freezeT || 0, 6 / 60); } } }
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1), pad = mm.r + mh * .2;
       const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
-      if (dd < front + pad && (dd < 6 || (ddx * dx + ddy * dy) / dd >= f.cosA)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2 });
-        hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
-        if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+      const thr = o.shape === 'thrust', along = ddx * dx + ddy * dy, inHit = thr ? (along > -4 && along < front + pad && Math.abs(ddx * dy - ddy * dx) < 9 + pad) : (dd < front + pad && (!o.band || dd + pad > front * o.band) && (dd < 6 || along / dd >= f.cosA));
+      if (inHit) { f.hit.add(mm); const tipHit = o.tip && dd > front * .65; S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, pal: f.pal });
+        hitMob(mm, (f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)]) * (o.dm || 1) * (f.wdm || 1) * (tipHit ? o.tip : 1), Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3 || tipHit) sfx(f.i === 5 || tipHit ? 'hit_crit' : 'hit_heavy', .8);
+        if (tipHit) { S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: true, pal: f.pal }); } mm.flash = Math.min(mm.flash, .05);
+        const G = f.grp || f; if (!G.stopped) { G.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const HITSTOP_HERO = [2 / 60, 3 / 60, 5 / 60, 5 / 60];
-  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE * (f.fly || 1) + 3 + (f.delay || 0) && f.map === S.map); } if (S.gkQ) { for (const q of S.gkQ) q.t++; S.gkQ = S.gkQ.filter(q => q.t < 16); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
-    const a = f.t * GK_STEP, Y = GK[f.n], head = Math.min(1, (a + 1) / 2.5), tail = a < 4 ? 0 : Math.min(1, (a - 4) / 7), [dx, dy] = f.dir, fl = dx < 0;
+    const a = f.t * GK_STEP - (f.delay || 0), Y = f.Y || GK[f.n], fly = f.fly || 1, t0 = 4 + GK_FLY * (fly - 1), head = Math.min(1, (a + 1) / 2.5), tail = a < t0 ? 0 : Math.min(1, (a - t0) / 7), [dx, dy] = f.dir, fl = dx < 0; if (a < 0) return;
+      if (f.o && f.o.shape === 'thrust') { gkThrustDraw(ctx, f, a, Y); return; }
       const ox = f.rx + dx * a * f.v, oy = f.ry + dy * a * f.v; // rides with the hero and flies forward
-      if (tail < head) { const ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI, T = Y.T * (a < 6 ? 1 : Math.max(.35, 1 - (a - 6) / 7)), q = v => Math.round(v * 4) / 4;
-        const im = sArc(Y.R * (1 + .025 * q(a)), Y.span, T, q(head), q(tail), Y.rot + ang * (fl ? -1 : 1), Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
+      if (tail < head) { const ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI, T = Y.T * (a < t0 + 2 ? 1 : Math.max(.35, 1 - (a - t0 - 2) / 7)), q = v => Math.round(v * 4) / 4;
+        const im = sArc(Y.R * (1 + .025 * q(a)), Y.span, T, q(head), q(tail), Y.rot + ang * (fl ? -1 : 1), Y.rev, Y.sq, fl, f.pal || 0); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
       const nx = -dy, ny = dx, big = f.n === 2; let sd = f.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
       const la = Math.max(0, 1 - a / 8); if (la > 0) { ctx.fillStyle = `rgba(200,240,255,${.86 * la})`; for (let i = 0; i < (big ? 7 : 4); i++) { const o = rnd() * 60 - 30, L = 14 + rnd() * 20, b = Y.R * .4 - rnd() * 30 + a * 5; for (let j = 0; j < L; j++) ctx.fillRect(Math.round(ox + dx * (b + j) + nx * o), Math.round(oy + dy * (b + j) + ny * o), 1, 1); } } // speed lines
       const tx = ox + dx * Y.R * .95, ty = oy + dy * Y.R * .95;
       if (a <= 3) { const L = (big ? 10 : 7) * (1 - a / 4) + 3, al = 1 - a / 4; ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(Math.round(tx - L), Math.round(ty) - 1, Math.round(2 * L), 2); ctx.fillRect(Math.round(tx), Math.round(ty - L * .6), 1, Math.round(L * 1.2)); ctx.fillStyle = `rgba(220,245,255,${al})`; ctx.beginPath(); ctx.arc(tx, ty, 3, 0, TAU); ctx.fill(); }
       if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
+  function gkThrustDraw(ctx, f, a, Y) { // spear: a straight piercing spike that shoots out to the reach and fades
+    const [dx, dy] = f.dir, P = GKPAL[f.pal || 0], L = Math.min(f.reach / GK_K, (Y.fwd + 20) + a * f.v * 1.6), al = a < 6 ? 1 : Math.max(0, 1 - (a - 6) / 6), x0 = f.rx - dx * 10, y0 = f.ry - dy * 10, nx = -dy, ny = dx;
+    const pt = (u, w) => [x0 + dx * u + nx * w, y0 + dy * u + ny * w], c = v => `rgba(${v[0]},${v[1]},${v[2]},`;
+    for (const [w, col, k] of [[9, P[0], .45], [5, P[1], .9], [2, P[4], 1]]) { ctx.fillStyle = c(col) + (al * k) + ')'; ctx.beginPath(); ctx.moveTo(...pt(0, -w)); ctx.lineTo(...pt(L, 0)); ctx.lineTo(...pt(0, w)); ctx.closePath(); ctx.fill(); }
+    ctx.strokeStyle = c(P[3]) + al + ')'; ctx.lineWidth = 1; for (let k = 0; k < 3; k++) { const [rx, ry] = pt(L * (.45 + .2 * k), 0), r = 9 - k * 2 + a * .4; ctx.beginPath(); ctx.ellipse(rx, ry, Math.max(1, r * .35), r, Math.atan2(dy, dx), 0, TAU); ctx.stroke(); } }
   window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
-  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
+  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && (!S.gkQ || !S.gkQ.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
     ctx.restore();
+    for (const q of S.gkQ || []) { const [x, y] = W2S(q.x, q.y), P = GKPAL[q.pal || 0], al = 1 - q.t / 16, rr = (q.r * (.4 + .6 * Math.min(1, q.t / 5))) * k; ctx.strokeStyle = `rgba(${P[4]},${al})`; ctx.lineWidth = 3 * k * .5 + 1; ctx.beginPath(); ctx.ellipse(x, y, rr, rr * .4, 0, 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(${P[1]},${al * .7})`; ctx.beginPath(); ctx.ellipse(x, y, rr * .7, rr * .28, 0, 0, TAU); ctx.stroke(); }
     for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
-      ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
+      const IP = GKPAL[m.pal || 0]; ctx.strokeStyle = `rgba(${IP[1]},${al})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 5 + a * (m.big ? 5 : 3.5), 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(${IP[4]},${al})`; ctx.lineWidth = 1; ctx.stroke(); /* impact ring in the weapon's colour */
       if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
   function gkKick(a) { const AT = atkT(a.i), u = a.t; return u < AT.a0 ? { x: -2 * u / Math.max(AT.a0, 1e-3), sq: 1 } : { x: 4 * Math.exp(-(u - AT.a0) * 14), sq: 1 - .05 * Math.exp(-(u - AT.a0) * 14) }; } // atlas px: lean back, snap forward, squash
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
