@@ -302,6 +302,7 @@
       + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
       + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
       + '#wtb_pot{right:max(40px,env(safe-area-inset-right));bottom:max(232px,calc(env(safe-area-inset-bottom) + 202px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#ffb0c0,#c03050 60%,#5a1020)}'
+      + '#wtb_pot .pc{position:absolute;right:-6px;top:-8px;min-width:22px;height:22px;line-height:18px;border-radius:11px;background:#141826;border:2px solid #e8d6b0;font:bold 12px sans-serif;text-shadow:none}#wtb_pot::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(0,0,0,.55) var(--cd,0%),transparent 0);pointer-events:none}#wtb_pot.zero{filter:grayscale(1) brightness(.6)}'
       + '#wtb_menu{left:50%;transform:translateX(-50%);top:max(8px,env(safe-area-inset-top));width:auto;height:auto;padding:4px 14px;border-radius:12px;font-size:13px;line-height:18px;background:#1b2550}#wtb_menu.on{transform:translateX(-50%) scale(.92)}';
     document.head.appendChild(st); const ui = document.getElementById('ui') || document.body;
     const send = (code, down) => dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { code, key: code, bubbles: true }));
@@ -396,7 +397,7 @@
     m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재' };
   const itemName = id => NAMES[id] || id;
   function giveLoot(list) { const g = window.__game; const names = [];
-    for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) names.push('금화 ' + n); continue; } try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
+    for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff'); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
       names.push(itemName(id) + (n > 1 ? ' ×' + n : '')); }
     return names.join(', '); }
 
@@ -467,7 +468,7 @@
     { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } // 심연: pixel void burst instead of the white puff sfx('mob_die', .8);
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) { sfx('coin', .6); } if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
-    if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); addFx('text', m.x, m.y - 26, { text: '+' + itemName(D.mat) + (n > 1 ? ' ×' + n : ''), life: 1, color: '#ffe08a' }); }
+    if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); } // shown in the pickup feed (right), not as text over the fight
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
     if (m.flag) { SAVE.flags[m.flag] = true; save(); }
     if (D.champion) { banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const left = ['champ_boar', 'champ_wasp'].filter(f => !SAVE.flags[f]).length;
@@ -640,6 +641,8 @@
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
     if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
+    if (S.qs) { const Q = S.qs; Q.flash = Math.max(0, (Q.flash || 0) - dt * 2.5); Q.shake = Math.max(0, (Q.shake || 0) - dt * 4); Q.noteT = Math.max(0, (Q.noteT || 0) - dt); }
+    if (S.feed) { for (const f of S.feed) f.t += dt; S.feed = S.feed.filter(f => f.t < f.life); }
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
     if (S.jingleT > 0) S.jingleT -= dt;
     S.shake = Math.max(0, S.shake - dt * 14);
@@ -777,9 +780,14 @@
   const spikeUp = o => spikePhase(o) > 2.0;
   const spikeWarn = o => spikePhase(o) > 1.5 && spikePhase(o) <= 2.0;
   const trapAt = (cx, cy) => M().objs.some(o => (o.type === 'spikes' || o.type === 'pit') && Math.abs(o.tx - cx) <= 1 && Math.abs(o.ty - cy) <= 1);
-  function usePotion() { const g = window.__game; const n = g ? g.potions : 0; if (!n) { msg('물약이 없다'); return; } if (hero.hp >= hero.maxHp) { msg('체력이 가득하다'); return; }
-    if (g.potionCd > 0) { msg('물약 재사용 대기 ' + g.potionCd.toFixed(1) + '초'); return; }
-    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20); msg('물약 사용 (+' + hv + ' HP)  남은 물약 ' + (n - 1)); }
+  // potion = one key, no pop-up boxes (owner 10-23 "불쾌감 없이 세련되고 깔끔한 아이템 UI"): the HUD slot shakes / shows a short grey word when it can't be used,
+  // flashes green when it is, and the heal shows as a green number on the hero. The centre message box is kept for story, not for item spam.
+  function usePotion() { const g = window.__game; const n = g ? g.potions : 0, Q = S.qs || (S.qs = {});
+    const deny = (word, k) => { Q.shake = k; Q.note = word; Q.noteT = word ? 1.1 : 0; sfx('deny', .5); };
+    if (!n) return deny('물약 없음', 1); if (hero.hp >= hero.maxHp) return deny('체력 가득', .6); if (g.potionCd > 0) return deny('', .6);
+    const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20);
+    addFx('text', hero.x, hero.y - 32, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
+  function feedAdd(name, n, col) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -1363,7 +1371,10 @@
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
-      textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
+      if (window.HUD && HUD.drawQuick) { const Q = S.qs || {}; hb = HUD.drawQuick(ctx, { x: ox + 12 * hu, y: hb - 6 * hu, u: hu, n: g ? g.potions : 0, cap: DIFF().potion_cap || 5, cd: g ? g.potionCd : 0, cdMax: POT.cd, key: keyHint('potion'), low: hero.hp > 0 && hero.hp < hero.maxHp * .35, flash: Q.flash || 0, shake: Q.shake || 0, note: Q.noteT > 0 ? Q.note : '' }) + 4 * hu; if (S.hudY) S.hudY = hb; }
+      else textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
+      { const pb = document.getElementById('wtb_pot'); if (pb && g) { const n = g.potions || 0, cf = g.potionCd > 0 ? g.potionCd / POT.cd : 0, sig = n + '|' + Math.round(cf * 40); if (pb._sig !== sig) { pb._sig = sig; pb.innerHTML = '물약<b class="pc">' + n + '</b>'; pb.style.setProperty('--cd', (cf * 100).toFixed(1) + '%'); pb.classList.toggle('zero', !n); } } } // touch button = same count / cooldown as the HUD slot
+      if (window.HUD && HUD.drawFeed && S.feed && S.feed.length) HUD.drawFeed(ctx, { x: ox + SW - 12 * hu, y: oy + SH - 40 * hu, u: hu, items: S.feed });
       if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초 · 저스트 회피 → 반격 「사멸의 궤적」`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
       const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }

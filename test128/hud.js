@@ -79,5 +79,40 @@
     const sub = full && !o.key ? o.fieldNote : o.name; if (sub) txt(c, sub, o.cx, y + h + 6 * u, 7.5 * u, full ? 'rgba(255,236,190,.9)' : 'rgba(220,210,190,.6)', 'center', 500);
     c.restore();
   }
-  window.HUD = { drawPlayer, drawUlt, CFG, reset() { for (const k in st) delete st[k]; } };
+  // ---- quick item slot (owner 10-23 "아이템 사용 세련되고 깔끔한 ui"): one round slot for the potion, under the HP panel.
+  // o { x, y (top-left), u, n, cap, cd (s left), cdMax, key, low (HP low -> soft glow when usable), flash (0..1 just used), shake (0..1 denied), note (short grey word) }
+  // States read at a glance without text: count badge, cooldown = dark sweep + seconds, empty = grey, usable while low HP = slow warm glow.
+  function flask(c, cx, cy, r, fill, grey) { // code-drawn flask icon (no art): neck, round body, liquid level, highlight
+    const glass = grey ? 'rgba(170,170,180,.55)' : 'rgba(235,240,255,.9)', liq = grey ? 'rgba(120,120,130,.6)' : '#e2364a', liq2 = grey ? 'rgba(150,150,160,.6)' : '#ff7a7a';
+    c.save(); c.lineWidth = Math.max(1.2, r * .09); c.strokeStyle = glass;
+    c.beginPath(); c.arc(cx, cy + r * .18, r * .52, 0, Math.PI * 2); c.save(); c.clip();
+    const top = cy + r * .18 + r * .52 - fill * r * 1.04; const g = c.createLinearGradient(0, top, 0, cy + r * .7); g.addColorStop(0, liq2); g.addColorStop(1, liq); c.fillStyle = g; c.fillRect(cx - r, top, r * 2, r * 2); c.restore(); c.stroke();
+    c.fillStyle = 'rgba(0,0,0,0)'; c.strokeRect(cx - r * .14, cy - r * .58, r * .28, r * .3);
+    c.fillStyle = grey ? 'rgba(140,120,100,.6)' : '#b48a5a'; c.fillRect(cx - r * .18, cy - r * .7, r * .36, r * .14);   // cork
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(cx - r * .2, cy + r * .02, r * .08, r * .16, -.5, 0, Math.PI * 2); c.fill(); c.restore(); }
+  function drawQuick(c, o) {
+    const u = o.u, R = Math.round(17 * u), sx = (o.shake > 0 ? Math.sin(T * 70) * 3 * u * o.shake : 0), cx = Math.round(o.x + R + sx), cy = Math.round(o.y + R), has = o.n > 0, cdOn = o.cd > 0;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    if (o.low && has && !cdOn) { const a = .25 + .25 * (.5 - .5 * Math.cos(T * Math.PI * 2 * .9)); const gr = c.createRadialGradient(cx, cy, R * .6, cx, cy, R * 1.9); gr.addColorStop(0, `rgba(255,90,80,${a})`); gr.addColorStop(1, 'rgba(255,90,80,0)'); c.fillStyle = gr; c.fillRect(cx - R * 2, cy - R * 2, R * 4, R * 4); }
+    c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fillStyle = 'rgba(8,10,18,.55)'; c.fill(); c.lineWidth = Math.max(1, u * 1.2); c.strokeStyle = has ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.1)'; c.stroke();
+    flask(c, cx, cy, R * .82, has ? Math.min(1, o.n / Math.max(1, o.cap)) * .8 + .15 : .12, !has || cdOn);
+    if (cdOn) { const f = Math.min(1, o.cd / (o.cdMax || 1)); c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, R - 1, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); c.closePath(); c.fillStyle = 'rgba(0,0,0,.5)'; c.fill();
+      txt(c, o.cd < 1 ? o.cd.toFixed(1) : String(Math.ceil(o.cd)), cx, cy + 4 * u, 11 * u, '#fff', 'center', 700); }
+    if (o.flash > 0) { c.beginPath(); c.arc(cx, cy, R + (1 - o.flash) * 10 * u, 0, Math.PI * 2); c.strokeStyle = `rgba(150,255,170,${o.flash})`; c.lineWidth = 2 * u; c.stroke(); }
+    // count badge (top-right) + key (bottom-right)
+    const bx = cx + R * .78, by = cy - R * .72; c.beginPath(); c.arc(bx, by, 7 * u, 0, Math.PI * 2); c.fillStyle = has ? 'rgba(20,24,34,.95)' : 'rgba(40,40,46,.9)'; c.fill(); c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.stroke();
+    txt(c, String(o.n), bx, by + 3.5 * u, 9.5 * u, has ? '#fff' : '#999', 'center', 700);
+    if (o.key) { const kx = cx + R * .78, ky = cy + R * .74; rr(c, kx - 6.5 * u, ky - 6.5 * u, 13 * u, 12 * u, 3 * u); c.fillStyle = 'rgba(255,255,255,.88)'; c.fill(); txt(c, o.key, kx, ky + 3 * u, 8.5 * u, '#1a1d26', 'center', 800); }
+    if (o.note) txt(c, o.note, cx + R + 8 * u, cy + 4 * u, 10 * u, 'rgba(225,230,240,.85)', 'left', 600);
+    c.restore(); return o.y + R * 2 + 10 * u; }
+  // ---- pickup feed (right side, stacks upward, merges repeats, fades): small and quiet, never blocks the play area centre
+  function drawFeed(c, o) { // o { x (right edge), y (bottom), u, items:[{name,n,col,t,life}] }
+    const u = o.u; c.save(); c.setTransform(1, 0, 0, 1, 0, 0); let y = o.y;
+    for (let i = o.items.length - 1; i >= 0; i--) { const it = o.items[i], age = it.t, a = Math.min(1, age * 6, (it.life - age) * 2.5); if (a <= 0) continue;
+      const label = it.name + (it.n > 1 ? '  ×' + it.n : ''); c.font = `600 ${Math.round(11 * u)}px ${FONT}`; const w = c.measureText(label).width + 26 * u, h = 20 * u, slide = (1 - Math.min(1, age * 6)) * 14 * u;
+      c.globalAlpha = a; rr(c, o.x - w + slide, y - h, w, h, h / 2); c.fillStyle = 'rgba(8,10,18,.55)'; c.fill();
+      c.beginPath(); c.arc(o.x - w + slide + 10 * u, y - h / 2, 4 * u, 0, Math.PI * 2); c.fillStyle = it.col || '#ffe08a'; c.fill();
+      txt(c, label, o.x - w + slide + 18 * u, y - 6 * u, 11 * u, '#f2f0ea', 'left', 600); c.globalAlpha = 1; y -= h + 4 * u; }
+    c.restore(); }
+  window.HUD = { drawPlayer, drawUlt, drawQuick, drawFeed, CFG, reset() { for (const k in st) delete st[k]; } };
 })();
