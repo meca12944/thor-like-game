@@ -785,12 +785,19 @@
     for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
       if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
-  function gkKick(a) { const AT = atkT(a.i), u = a.t; return u < AT.a0 ? { x: -2 * u / Math.max(AT.a0, 1e-3), sq: 1 } : { x: 4 * Math.exp(-(u - AT.a0) * 14), sq: 1 - .05 * Math.exp(-(u - AT.a0) * 14) }; } // atlas px: lean back, snap forward, squash
+  function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
+    // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
+    const AT = atkT(a.i), u = a.t, big = a.i === 2;
+    if (u < AT.a0) { const q = u / Math.max(AT.a0, 1e-3), e = q * q * (3 - 2 * q); return { lean: -3 * e, step: 0, sq: 1 - .04 * e }; }
+    const t = u - AT.a0, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), sp = Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
+    const L0 = big ? 9 : 6, st = (big ? 5 : 1.5) * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
+    return { lean: L0 * sp, step: st, sq: 1 + .045 * Math.exp(-t * 30) * Math.cos(t * 40) };
+  }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0) return;
-    let kx = 0, ky = 0, sq = 1; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.x * f; ky = v[1] * K.x * f * .5; sq = K.sq; }
-    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); ctx.translate(-fx, -fy);
+    let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
