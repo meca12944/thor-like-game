@@ -19,7 +19,8 @@
   - 열쇠 → 잠긴 문 → 비탈길 → 레버 2개 → 철창 → 봉인된 문 순서는 그대로. **보스방(골렘의 방)만 문 너머 따로** (신전 안 유일한 화면 전환).
   - 봉인된 문 앞에 새 비석 「골렘의 방 앞 비석」 (규칙: 보스 앞 비석).
 - **새 판 1장: 펠트 + 잿빛 들판 = 이어진 지도 하나 (`maps/ch1.json`)**. 펠트 아래 길로 걸어 나가면 화면 전환 없이 잿빛 들판. 구역 카드 + 음악이 구역을 따라 바뀜 (펠트 「잿더미의 종」 → 들판 곡). 펠트의 그린 배경 · 들판의 잿빛 색 보정은 각자 구역에만.
-  - 원본 `felt.json` · `field_felt.json` 은 **그대로 고치면 된다** — world.js `composeMap` 이 켜질 때 붙인다 (다시 만들 필요 없음). 옛 이름 `felt` · `field_felt` (?go=, ?at=, 퀘스트 목표, 월드맵)는 `ALIAS`/`aliasPt` 가 자동으로 `ch1` 좌표로 바꿔 준다.
+  - **펠트 = 그록 대표 그림 + 마을배경방 D=3 부품** (10-23): 문·NPC·대사·단서 원본은 `maps/src/felt.json` 에서 고치고 `python3 tools/hd/build_felt.py <부품 폴더>` 로 `maps/felt.json` + `maps/ch1.json`(들판 붙일 자리)을 다시 만든다. 자세한 것 = `handoff/claude/TOWN_LAYOUT_ko.md` 4.
+  - `field_felt.json` 은 그대로 고치면 된다 (composeMap 이 켜질 때 붙임). 바닥·나무 그림(hd)만 `python3 tools/hd/build_field_felt_hd.py` 로 다시 뽑는다 (칸을 바꾸면 다시 뽑기). 옛 이름 `felt` · `field_felt` (?go=, ?at=, 퀘스트 목표, 월드맵)는 `ALIAS`/`aliasPt` 가 자동으로 `ch1` 좌표로 바꿔 준다.
 - 지도 화면(M) · 미니맵 · 길 안내는 합친 지도 그대로 동작 (예전 field00/field01 탐험 안개는 한 번 초기화됨).
 
 ## 시험

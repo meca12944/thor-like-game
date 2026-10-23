@@ -62,7 +62,7 @@
   const cv = document.createElement('canvas'); cv.id = 'wc';
   cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:40;display:none;image-rendering:pixelated;background:transparent';
   const ctx = cv.getContext('2d');
-  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
+  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); let EW = LW, EH = LH; // EW x EH = world px on screen (bigger than LW x LH when a town view zooms out, owner 10-23 「마을 카메라 조금 멀리」) // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
   const gateHint = document.createElement('div');
   gateHint.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:35;padding:3px 12px;background:rgba(12,18,44,.7);color:#ffe08a;font:bold 13px sans-serif;border:2px solid #e2c27a;border-radius:3px;pointer-events:none;display:none';
   gateHint.textContent = '▼ 마을 밖으로 (바람길)';
@@ -84,7 +84,14 @@
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
   const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = src; });
   const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
-  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(j => (MAPS[id] = buildMap(j))); }
+  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(loadHD).then(j => (MAPS[id] = buildMap(j))); }
+  // 고해상도 배경 (owner 10-23 「펠트 마을 최고 퀄리티」, 마을배경방과 정한 형식): map JSON "hd" = {D, ground, props[], lights[], grade}.
+  // Drawn at the characters' pixel density (D art px per world px) on the screen canvas, not in the 384x216 low canvas: the ground picture
+  // under everything, props (buildings / trees) one by one, y-sorted with the hero (see-through when the hero is behind), light pools on top.
+  const HDIMG = {};
+  function loadHD(j) { if (!j.hds && j.hd) j.hds = [Object.assign({}, j.hd, { gx: 0, gy: 0 })]; if (!j.hds) return j;
+    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); for (const q of h.props || []) urls.add(q.img); for (const k in h.decoArt || {}) for (const v of h.decoArt[k]) urls.add(v.img); }
+    return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = u; }))).then(() => j); }
   // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
   // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
   // Each part becomes an area {part, name, sub, bgm, grade, bg}: painted backgrounds and colour grades stay per part, the music follows the area.
@@ -93,13 +100,14 @@
     const rows = Array.from({ length: H }, () => Array(W).fill('#')), legend = {}, solid = new Set(), objects = [], spawns = {}, areas = [], chests = {};
     j.compose.forEach((p, i) => { const r = parts[i]; Object.assign(legend, r.legend || {}); for (const c of r.solid || []) solid.add(c);
       r.ground.forEach((row, y) => { for (let x = 0; x < r.w; x++) rows[p.y + y][p.x + x] = row[x] || '#'; });
-      for (const o of r.objects || []) { if (o.type === 'exit' && ids.includes(o.to)) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
+      for (const o of r.objects || []) { if (o.type === 'exit' && (ids.includes(o.to) || (j.dropExits || []).includes(o.to))) continue; objects.push(Object.assign({}, o, { x: o.x + p.x, y: o.y + p.y })); }
       for (const k in r.spawns || {}) { const v = r.spawns[k]; spawns[p.map + ':' + k] = [v[0] + p.x, v[1] + p.y].concat(v.slice(2)); }
       for (const k in r.chests || {}) { const [cx, cy] = k.split(',').map(Number); chests[(cx + p.x) + ',' + (cy + p.y)] = r.chests[k]; }
-      areas.push({ id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
+      if (r.hd) (j._hds = j._hds || []).push(Object.assign({}, r.hd, { gx: p.x, gy: p.y }));
+      areas.push({ town: r.type === 'town', zoom: r.viewZoom, id: p.map, part: p.map, name: (r.title && r.title.name) || r.name, sub: (r.title && r.title.sub) || '', x: p.x, y: p.y, w: r.w, h: r.h, bgm: r.bgm, battleBgm: r.battleBgm, grade: r.grade, bg: r.bg }); });
     spawns.default = spawns.default || spawns[ids[0] + ':default'];
     return Object.assign({}, parts[0], j, { type: 'field', w: W, h: H, ground: rows.map(r => r.join('')), legend, solid: [...solid], objects, spawns, chests, areas: j.areas || areas, bg: null, grade: null,
-      title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0] }); }); }
+      title: j.title || parts[0].title, name: j.name || parts[0].name, bgm: parts[0].bgm, mapPos: [0, 0], hd: null, hds: j._hds || null }); }); }
   function composeGround(m) { const c = renderGround(m), g = c.getContext('2d'), T = m.T; // tiles everywhere, then each part's painting / grade on its own rectangle
     for (const a of m.areas) { const x = a.x * T, y = a.y * T, w = a.w * T, h = a.h * T;
       if (a.bg && BGIMG[a.bg]) { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(BGIMG[a.bg], x, y, w, h); g.imageSmoothingEnabled = false; continue; }
@@ -141,7 +149,7 @@
         for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
     return c; }
   function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
-      const x = ((Math.abs(h1) * LW + Math.sin(S.t * .6 + i) * 6) % LW + LW) % LW, y = ((Math.abs(h2) * LH + S.t * sp) % (LH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+      const x = ((Math.abs(h1) * EW + Math.sin(S.t * .6 + i) * 6) % EW + EW) % EW, y = ((Math.abs(h2) * EH + S.t * sp) % (EH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
   function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
     const r = ATLAS.sprites.rects[name]; if (!r) return null;
@@ -182,8 +190,15 @@
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
     }
-    for (const o of (j.objects || [])) if (!['spawn', 'champion'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
+    const byId = {}; for (const o of (j.objects || [])) if (o.id) byId[o.id] = o; // NPC spot relative to a building/landmark: near:[id,dx,dy] (owner 10-23, survives a village re-layout)
+    for (const o of (j.objects || [])) if (o.near && byId[o.near[0]]) { const r = byId[o.near[0]]; o.x = r.x + o.near[1]; o.y = r.y + o.near[2]; }
+    for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {legend char or deco name: [{img, ax, ay, flip}]}):
+      for (const d of m.decos) { const vs = A[(j.ground[d.ty] || '')[d.tx]] || A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
+        const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
+        const jt = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: jt && f(2) < .5, dx: jt * Math.round((f(3) - .5) * 5), dy: jt * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
+    m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -278,6 +293,23 @@
   addEventListener('keyup', e => { held.delete(e.code); }, true);
   addEventListener('blur', () => held.clear());
 
+  // ---------------- 폰 터치 (사장님 10-23 "핸드폰으로 조작하게"): 마을 화면의 이동 패드·공격·대시·달리기 버튼을 게임 지도 위로 올리고,
+  // 공격 버튼을 이쪽 공격 키(J)에 잇고, 지도에서 필요한 조사·물약·필살기·메뉴 버튼을 더함(키를 누른 것처럼 보냄). 키보드 조작은 그대로.
+  { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #jumpb,body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
+      + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
+      + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
+      + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
+      + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
+      + '#wtb_pot{right:max(40px,env(safe-area-inset-right));bottom:max(232px,calc(env(safe-area-inset-bottom) + 202px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#ffb0c0,#c03050 60%,#5a1020)}'
+      + '#wtb_menu{left:50%;transform:translateX(-50%);top:max(8px,env(safe-area-inset-top));width:auto;height:auto;padding:4px 14px;border-radius:12px;font-size:13px;line-height:18px;background:#1b2550}#wtb_menu.on{transform:translateX(-50%) scale(.92)}';
+    document.head.appendChild(st); const ui = document.getElementById('ui') || document.body;
+    const send = (code, down) => dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { code, key: code, bubbles: true }));
+    const wire = (el, code) => { if (!el) return; const dn = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.add('on'); send(code, true); },
+      up = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.remove('on'); send(code, false); };
+      el.addEventListener('touchstart', dn, { passive: false, capture: true }); el.addEventListener('touchend', up, { passive: false, capture: true }); el.addEventListener('touchcancel', up, { passive: false, capture: true }); };
+    wire(document.getElementById('atk'), 'KeyJ'); // town attack button -> this scene's attack key (hold = charge, same as the key)
+    for (const [id, label, code] of [['wtb_ult', '필살기', 'KeyR'], ['wtb_act', '조사', 'KeyL'], ['wtb_pot', '물약', 'KeyE'], ['wtb_menu', '메뉴', 'Escape']]) { const el = document.createElement('div'); el.id = id; el.className = 'wtb'; el.textContent = label; ui.appendChild(el); wire(el, code); } }
+
   // ---------------- helpers ----------------
   const M = () => S.map;
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -289,24 +321,67 @@
   // Felt NPC wander: idle 2-5 s, then walk to a random free spot within o.wander tiles of the home spot; stop and face the hero when he comes close
   function stepNpcs(dt) { const m = M();
     for (const o of m.objs) { if (o.type !== 'npc' || !o.wander) continue;
-      if (o.hx === undefined) { o.hx = o.x; o.hy = o.y; o.wt = 1 + Math.random() * 3; o.face = 'down'; o.at = Math.random() * 9; }
+      if (o.hx === undefined) { o.hx = o.x; o.hy = o.y; o.wt = 1 + Math.random() * 3; o.face = o.face0 || 'down'; o.at = Math.random() * 9; }
       o.at += dt; const dh = Math.hypot(hero.x - o.x, hero.y - o.y);
       if (dh < 28 || S.talked === o.id && S.dialog) { o.tgt = null; const dx = hero.x - o.x, dy = hero.y - o.y; o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); continue; }
       if (!o.tgt) { if ((o.wt -= dt) > 0) continue; const R = o.wander * m.T, a = Math.random() * TAU, r = R * (.35 + .65 * Math.random()), tx = o.hx + Math.cos(a) * r, ty = o.hy + Math.sin(a) * r * .7;
         npcSelf = o; const ok = !blocked(tx, ty + 6, 4); npcSelf = null; if (ok) { o.tgt = [tx, ty]; o.at = 0; } else o.wt = .5; continue; }
       const dx = o.tgt[0] - o.x, dy = o.tgt[1] - o.y, L = Math.hypot(dx, dy), v = 18 * dt;
-      if (L < v) { o.tgt = null; o.wt = 2 + Math.random() * 3; o.at = 0; continue; }
+      if (L < v) { o.tgt = null; o.wt = 2 + Math.random() * 3; o.at = 0; if (o.face0) o.face = o.face0; continue; } // back at rest: turn to the spot's own facing (롬 = forge)
       o.face = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
       npcSelf = o; const nx = o.x + dx / L * v, ny = o.y + dy / L * v; if (!blocked(nx, ny + 6, 4) && Math.hypot(hero.x - nx, hero.y - ny) > 10) { o.x = nx; o.y = ny; } else { o.tgt = null; o.wt = 1; } npcSelf = null; } }
   function npcCell(o) { const A = npcAnim(o.anim); if (!A) return null; const J = A.J, seq = J.anims[(o.tgt ? 'walk_' : 'idle_') + (o.face || 'down')] || J.anims.idle_down; let t = Math.floor((o.at || 0) * 60) % seq.reduce((a, s) => a + s[2], 0);
     for (const s of seq) { if (t < s[2]) return [A.im, J.cells[s[0]][s[1]]]; t -= s[2]; } return null; }
+  // ---- hd map layer (see loadHD) ----
+  function drawHDGround(k) { const m = M(); if (!m || !m.hds) return; ctx.imageSmoothingEnabled = false;
+    for (const h of m.hds) { const im = HDIMG[h.ground]; if (!im) continue; const [sx, sy] = W2S(h.gx * m.T, h.gy * m.T), sc = k / h.D;
+      ctx.drawImage(im, Math.round(sx), Math.round(sy), Math.round(im.width * sc), Math.round(im.height * sc));
+      for (const q of h.props || []) { if (!q.under) continue; const pi = HDIMG[q.img]; if (!pi) continue; const Dq = q.D || h.D, s2 = k / Dq, [px, py] = W2S((h.gx + q.x) * m.T, (h.gy + q.y) * m.T); // under: walked on (bridge planks)
+        ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
+  function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
+    for (const h of m.hds) for (const q of h.props || []) { const im = HDIMG[q.img]; if (!im || q.under) continue;
+      const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
+      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
+      const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
+      const [sx, sy] = W2S(fx, fy);
+      if (q.shadow) { ctx.save(); ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); ctx.restore(); }
+      ctx.save(); ctx.globalAlpha = q._a; ctx.imageSmoothingEnabled = false; ctx.translate(Math.round(sx), Math.round(sy)); if (q.flip) ctx.scale(-1, 1); ctx.drawImage(im, -Math.round(ax * sc), -Math.round(ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); }
+    const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
+    for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
+      const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
+      const behind = im.height / e.D > 28 && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; d._a = (d._a ?? 1) + ((behind ? .5 : 1) - (d._a ?? 1)) * .2;
+      const [sx, sy] = W2S(fx, fy); ctx.save(); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
+      ctx.globalAlpha = d._a; ctx.imageSmoothingEnabled = false; ctx.translate(Math.round(sx), Math.round(sy)); if (e.flip) ctx.scale(-1, 1);
+      ctx.drawImage(im, -Math.round(e.v.ax * sc), -Math.round(e.v.ay * sc), Math.round(im.width * sc), Math.round(im.height * sc)); ctx.restore(); } }
+  function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
+    for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
+      if (h.grade === 'dusk') { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ox, oy, gw, gh); ctx.restore(); } // dusk: one grade over ground, props and characters alike
+      if (h.webs) { ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag, al] of h.webs) { // 거미줄 실 (breadcrumbs toward the Arachne gate), swaying a little
+        const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
+        ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
+        ctx.restore(); }
+      if (h.water) { ctx.save(); ctx.fillStyle = 'rgba(170,184,196,.22)'; const v = S.view, ph = S.t * 5; // 잔물결 (code): short pale dashes drifting along each water run [y, x0, x1]
+        for (const [y, x0, x1] of h.water) { const [, sy] = W2S(0, (h.gy + y) * T); if (sy < v.oy - T * k || sy > v.oy + (EH + 2) * k) continue;
+          for (let x = x0; x <= x1; x++) for (let j = 0; j < 2; j++) { const hsh = Math.sin((x * 12.9 + y * 78.2 + j * 37.7)) * 43758.5, f = hsh - Math.floor(hsh), u = (f * T + ph * (1 + f)) % T, a = Math.sin(S.t * 1.7 + f * 6.3);
+            if (a < .2) continue; const [sx, sy2] = W2S((h.gx + x) * T + u, (h.gy + y) * T + 3 + j * 8 + f * 3); ctx.fillRect(Math.round(sx), Math.round(sy2), Math.round((2 + 3 * a) * k), Math.max(1, Math.round(k * .5))); } }
+        ctx.restore(); }
+      for (const [x0, y0, sz] of h.smoke || []) for (let i = 0; i < 9; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade
+        const ph = (S.t * .16 + i / 9 + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz, [sx, sy] = W2S(wx, wy);
+        ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (const [lx, ly, r, col, a] of h.lights || []) { const [sx, sy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R0 = r * k * (1 + .04 * Math.sin(S.t * 7 + lx)), gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, R0);
+        const c = col.replace('#', ''), rr = parseInt(c.slice(0, 2), 16), gg = parseInt(c.slice(2, 4), 16), bb = parseInt(c.slice(4, 6), 16);
+        gr.addColorStop(0, `rgba(${rr},${gg},${bb},${.32 * a})`); gr.addColorStop(.5, `rgba(${rr},${gg},${bb},${.12 * a})`); gr.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        ctx.fillStyle = gr; ctx.save(); ctx.translate(sx, sy); ctx.scale(1, .72); ctx.translate(-sx, -sy); ctx.fillRect(sx - R0, sy - R0, R0 * 2, R0 * 2); ctx.restore(); }
+      ctx.restore(); } }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
-      const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, LW * v.k, LH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
+      const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   function moveCol(e, dx, dy, r, fly) {
     const m = M(); let ok = true;
-    const bl = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
+    const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
+    const bl = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
     if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else ok = false; }
     if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else ok = false; }
     return ok;
@@ -429,13 +504,14 @@
     if (S.trans.fromTown) { const g = window.__game; S.townPos = { x: g.hero.x, y: g.hero.y - 34 }; g.setManual(true); syncFromTown(); show(true); }
     return true;
   }
-  function show(v) { cv.style.display = v ? 'block' : 'none'; }
+  function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
     S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
-      if (!m.groundC) m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+      if (!m.groundC) { m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+        for (const h of m.hds || []) { const im = HDIMG[h.ground]; if (im) m.groundC.getContext('2d').clearRect(h.gx * m.T, h.gy * m.T, im.width / h.D, im.height / h.D); } }
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
       if (!sp && spawnName && spawnName.startsWith('snap:')) sp = spawnName.slice(5).split(',').map(Number).concat([hero.face]); // death retry: just before the fight
@@ -761,9 +837,11 @@
 
   // ---------------- camera ----------------
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
-  function camTarget() { const m = M(); return [clampC(hero.x - LW / 2, m.pw - LW), clampC(hero.y - 10 - LH / 2, m.ph - LH)]; }
+  function camTarget() { const m = M(); return [clampC(hero.x - EW / 2, m.pw - EW), clampC(hero.y - 10 - EH / 2, m.ph - EH)]; }
   function snapCam() { if (M()) S.cam = camTarget(); }
-  function updateCam(dt) { if (!M()) return; const [tx, ty] = camTarget(); const k = 1 - Math.pow(.0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
+  function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function updateCam(dt) { if (!M()) return; { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+    const [tx, ty] = camTarget(); const k = 1 - Math.pow(.0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
   function render() {
@@ -777,11 +855,12 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
-      if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = k * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
-        const vx = Math.round(ox + (zx - ox) * mix + (ox + px * k - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * k - py * kz - oy) * (1 - mix));
-        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, vx, vy, (LW + 1) * kz, (LH + 1) * kz); S.view = { k: kz, ox: vx, oy: vy }; bodies(kz); ctx.restore(); S.view = { k, ox, oy }; S.camF = cf; }
-      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, ox - Math.round(cf[0] * k), oy - Math.round(cf[1] * k), (LW + 1) * k, (LH + 1) * k); bodies(k); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
+      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
+      const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
+      if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
+        const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
+        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); ctx.drawImage(low, vx, vy, (EW + 1) * kz, (EH + 1) * kz); bodies(kz); ctx.restore(); S.view = { k: kv, ox, oy }; S.camF = cf; }
+      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(kv); ctx.drawImage(low, ox - Math.round(cf[0] * kv), oy - Math.round(cf[1] * kv), (EW + 1) * kv, (EH + 1) * kv); bodies(kv); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -796,7 +875,7 @@
     let cx = Math.floor(S.cam[0]), cy = Math.floor(S.cam[1]); S.camF = [S.cam[0] - cx, S.cam[1] - cy];
     if (S.shake > 0) { cx += Math.round((Math.random() - .5) * S.shake * 2); cy += Math.round((Math.random() - .5) * S.shake * 2); }
     S.camI = [cx, cy];
-    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; g.fillRect(0, 0, LW + 1, LH + 1);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (low.width !== EW + 1 || low.height !== EH + 1) { low.width = EW + 1; low.height = EH + 1; } if (m.hds) g.clearRect(0, 0, EW + 1, EH + 1); else g.fillRect(0, 0, EW + 1, EH + 1);
     g.drawImage(m.groundC, -cx, -cy);
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
@@ -805,7 +884,7 @@
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
     const list = [];                                         // y-sorted sprites
-    for (const d of m.decos) if (!d.broken && d.x > cx - 40 && d.x < cx + LW + 40 && d.y > cy - 10 && d.y < cy + LH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
+    for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
@@ -834,8 +913,8 @@
     for (const f of S.fx) drawFx(g, f);
     drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
-      const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, LW + 1, LH + 1);
-      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, LW + 1, LH + 1); d.globalCompositeOperation = 'destination-out';
+      const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
+      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, EW + 1, EH + 1); d.globalCompositeOperation = 'destination-out';
       const light = (x, y, r) => { const gr = d.createRadialGradient(x - cx, y - cy, 0, x - cx, y - cy, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.6, 'rgba(0,0,0,.7)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - cx - r, y - cy - r, r * 2, r * 2); };
       light(hero.x, hero.y - 10, 100);
       for (const o of m.objs) if (o.type === 'torch') light(o.x, o.y + 8, 50 + Math.sin(S.t * 9 + o.x) * 3);
@@ -846,7 +925,7 @@
     if (S.ult) drawUlt(g, S.ult);
     g.setTransform(1, 0, 0, 1, 0, 0);
   }
-  let _dark = null; function darkLayer() { if (!_dark) { _dark = document.createElement('canvas'); _dark.width = LW + 1; _dark.height = LH + 1; } return _dark; }
+  let _dark = null; function darkLayer() { if (!_dark) _dark = document.createElement('canvas'); if (_dark.width !== EW + 1 || _dark.height !== EH + 1) { _dark.width = EW + 1; _dark.height = EH + 1; } return _dark; }
   let _ultC = null;
   function drawWaystone(g, o) { const on = SAVE.waystones[o.id], p = .5 + .5 * Math.sin(S.t * 3);
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(o.x, o.y + 6, 8, 3, 0, 0, TAU); g.fill();
@@ -906,8 +985,10 @@
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
     const fc = H.diag && h.vd != null ? (f8.includes('down') ? 'down' : f8.includes('up') ? 'up' : f8) : /^(right|left|up|down)$/.test(h.face) ? h.face : 'down', vert = !!H.diag && (fc === 'down' || fc === 'up'), hl = vert ? (f8.includes('left') || (!f8.includes('right') && h.hz === 'left')) : fc === 'left';
     const sd = vert ? (hl ? 'left' : 'right') : fc, L8 = H.left && sd === 'left'; let fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd;
-    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
+    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc === 'up' && f8 === 'up' && H.anims[k + '_n'] ? 'n' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), ↑ = *_n straight back (never mirrored), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = dk === 'n' ? false : hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
     let LL = null; const A = k => (LL = pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')]), /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
+    // 출발·멈춤 (모션연구방 10-23, 걷기 박자 연구): 서 있다 출발하면 다리 모인 장(한 바퀴의 0.28)부터, 멈추면 다음 다리 모인 장까지 빠르게 마저 디딘 뒤 서기
+    if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
@@ -915,6 +996,8 @@
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
     else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
+    else if (h.stopT != null && S.t - h.stopT < .2 && !h.atk && !h.roll && !h.charge) { const dd = ((.28 - (h.gp || 0)) % .5 + .5) % .5, adv = Math.min(dd, Math.max(0, S.t - (h.stopU ?? S.t)) * 3); h.stopU = S.t; h.gp = ((h.gp || 0) + adv) % 1;
+      if (dd - adv < .01) { h.stopT = null; const L = A('idle'); e = H.v4 ? seq(L, (S.t * 60) % tot(L)) : L[0]; } else { const L = A(h.stopRun ? 'run' : 'walk'); e = L[Math.floor(h.gp * L.length) % L.length]; } } // finish the step onto the legs-together frame
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
     if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; c.ox = h8Pop(h, c, LL, fl); return c; }
@@ -994,10 +1077,19 @@
     const L0 = big ? 9 : 6, st = (big ? 5 : 1.5) * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
     return { lean: L0 * sp, step: st, sq: 1 + .045 * Math.exp(-t * 30) * Math.cos(t * 40) };
   }
+  // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
+  // 출발하면 앞으로 숙였다 돌아오고, 멈추면 뒤로 버텼다가 살짝 앞으로 넘어갔다 섬. 발은 땅에 그대로(그리기에서 기울이기만). 단위: 머리 높이에서 그림 px
+  const LEAN = { kick: 150, w: 14, z: .4, max: 12 };
+  function h8Lean(h) { const now = S.t, sp = h.moving && !h.roll ? (h.run ? RUN.mul : 1) : 0; let dt = Math.min(.1, Math.max(0, now - (h.lnT ?? now))); h.lnT = now;
+    if (h.lnSp == null) h.lnSp = sp; const dv = sp - h.lnSp; h.lnSp = sp; if (h.roll || S.deadT > 0) { h.lnL = h.lnV = 0; return null; }
+    if (dv) { if (h.moving) h.lnDir = FACEV[h.face] || [1, 0]; h.lnV = (h.lnV || 0) + dv * LEAN.kick; }
+    for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
+    const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
@@ -1314,7 +1406,7 @@
   // 연구 결과 (handoff/claude/ult_research/CUTIN_ko.md): 심연 초필살기 = hybrid (드물게 쓰니 크게), 일반 필살기 = zoom (자주 쓰니 짧게). 공격/조사 키로 컷인 건너뛰기
   function cutMode(def) { const q = Q.get('cut'); return CUT_T[q] ? q : def; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
-  function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
+  function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + EW + 8 && mm.y > y0 - 8 && mm.y < y0 + EH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
     const cm = cutMode('hybrid'), fx = ['pillar', 'rift', 'trail', 'both'].includes(Q.get('fx')) ? Q.get('fx') : 'rift'; S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fx, seed: Math.random() * 1000, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
@@ -1366,7 +1458,7 @@
   function abLine(g, x0, y0, x1, y1, w, col, a, q) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); for (let i = 0; i <= n; i++) abPx(g, x0 + (x1 - x0) * i / n - w / 2, y0 + (y1 - y0) * i / n - w / 2, w, col, a, q); }
   function abEll(g, cx, cy, rx, ry, col, a, q) { if (rx < .5 || ry < .5) return; for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) { const h = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y / ry) ** 2)));
       if (q >= 2 && a < 1) { for (let x = -h; x < h; x++) abPx(g, cx + x, cy + y, 1, col, a, q); } else { g.globalAlpha = a; g.fillStyle = col; g.fillRect(Math.round(cx - h), Math.round(cy + y), h * 2, 1); } } }
-  function abyssDark(g, f) { const q = fxQ(); if (q < 1 || !f.fx || f.fx === 'pillar') return; const a = Math.min(.62, .62 * f.t / Math.max(.01, f.fz)); g.save(); g.globalAlpha = 1; g.fillStyle = `rgba(10,0,26,${a})`; g.fillRect(S.camI[0] - 4, S.camI[1] - 4, LW + 8, LH + 8); g.restore(); }
+  function abyssDark(g, f) { const q = fxQ(); if (q < 1 || !f.fx || f.fx === 'pillar') return; const a = Math.min(.62, .62 * f.t / Math.max(.01, f.fz)); g.save(); g.globalAlpha = 1; g.fillStyle = `rgba(10,0,26,${a})`; g.fillRect(S.camI[0] - 4, S.camI[1] - 4, EW + 8, EH + 8); g.restore(); }
   function drawAbyssLow(g, f) { const U = f.U, q = fxQ(), P = AB_PAL; let e = f.t - f.fz - f.ci; if (q >= 2) e = Math.floor(e * 12) / 12; const end = U.dur;
     const hx = hero.x, hy = hero.y - 4, cy0 = hero.y - 12; g.save();
     if (q >= 3 && e < 0 && e > -.3) { const k = 1 + e / .3; for (let i = 0; i < 18; i++) { const a = hash(f.seed + i) * TAU, r = (1 - k) * (26 + hash(i + 3) * 22) + 2; abPx(g, hx + Math.cos(a) * r, cy0 + Math.sin(a) * r * .7, i % 4 ? 1 : 2, i % 3 ? P.lit : P.core, 1, q); } } // 힘 모으기: motes implode into the chest
