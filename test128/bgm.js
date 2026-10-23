@@ -46,7 +46,7 @@
   (document.body ? Promise.resolve() : new Promise(r => addEventListener('DOMContentLoaded', r))).then(() => document.body.appendChild(toast));
 
   function manifest() {
-    if (!manP) manP = fetch(BASE + 'bgm.json').then(r => { if (!r.ok) throw new Error('bgm.json ' + r.status); return r.json(); })
+    if (!manP) manP = fetch(window.__v ? __v(BASE + 'bgm.json') : BASE + 'bgm.json').then(r => { if (!r.ok) throw new Error('bgm.json ' + r.status); return r.json(); })
       .then(j => (man = j)).catch(e => { failed = true; console.warn('[bgm] manifest unavailable:', e.message); return null; });
     return manP;
   }

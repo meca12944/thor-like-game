@@ -1,0 +1,10 @@
+atelier ok
+chapel ok
+burned ok
+fountain no image {'usage': {'type': 'usd', 'usd': 0.0}, 'id': '48e7bf69-9e32-4beb-8dd7-bb6e90c3a8f3', 'status': 'failed', 'created_at': '2026-10-23T12:43:57.828332+00:00', 'last_response': {'error': 'Generation failed
+lamp ok
+crates ok
+cart ok
+deadtree no image {'usage': {'type': 'usd', 'usd': 0.0}, 'id': '7d32e0a3-599f-4d8a-a27c-6722503ed275', 'status': 'failed', 'created_at': '2026-10-23T12:46:30.535787+00:00', 'last_response': {'error': 'Generation failed
+brazier ok
+spent total (felt log) 123.0
