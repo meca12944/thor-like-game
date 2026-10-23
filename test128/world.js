@@ -632,8 +632,12 @@
     const showWorld = S.scene !== 'town' && S.map && !(tr && (tr.phase === 'load' || (tr.phase === 'out' && tr.fromTown)));
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
-      drawLow(); ctx.imageSmoothingEnabled = false; ctx.drawImage(low, ox, oy, LW * k, LH * k);
-      drawHeroHi(k); drawHiRes(k, ox, oy);
+      drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
+      if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = k * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
+        const vx = Math.round(ox + (zx - ox) * mix + (ox + px * k - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * k - py * kz - oy) * (1 - mix));
+        ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); ctx.drawImage(low, vx, vy, LW * kz, LH * kz); S.view = { k: kz, ox: vx, oy: vy }; drawHeroHi(kz); ctx.restore(); S.view = { k, ox, oy }; }
+      else { ctx.drawImage(low, ox, oy, LW * k, LH * k); drawHeroHi(k); }
+      drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
       if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
@@ -940,30 +944,53 @@
   // 심연 초필살기 (주인 10-23 "심연의 힘이 켜지면 맵 전체 초필살기, 창세기전 2처럼"): 심연의 힘 동안 필살기 키 -> 게이지 없이 맵 전체의 적을 친다, 쓰면 심연의 힘이 끝난다
   const ABYSS_U = { id: 'abyss', name: '사멸의 궤적', en: 'Trail of Extinction', route: '심연', hitT: [.3, .55, .8, 1.05, 1.3, 1.6], por: 'hero', band: '#c9a0ff', tint: '16,0,34',
     col: ['230,200,255', '130,50,230', '40,0,90'], dur: 2.3, whole: true, label: '심연 반격 초필살기', mob: 999, champ: .30, boss: .15, stun: 3 };
-  const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 }; // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
+  const FULT = { freeze: .2, cutin: 1.05, mob: 150, champ: .25, boss: .22 };
+  // 컷인 방식 실험 (?cut=band|zoom|eye|hybrid): band = 일러스트 초상화 띠(옛), zoom = 게임 화면 그대로 주인공 확대, eye = 도트 얼굴 눈 띠, hybrid = 확대 + 눈 띠
+  const CUT_T = { band: [.2, 1.05], zoom: [.08, .72], eye: [.08, .62], hybrid: [.08, .8] };
+  function cutMode() { const q = Q.get('cut'); return CUT_T[q] ? q : 'band'; } // total over all hits: normal mobs 150 (lethal), champion 25% / boss 22% of max HP (cap, so medium-hard bosses stay a fight)
   const PORI = {}; function porImg(id) { if (!PORI[id]) { const im = new Image(); im.src = 'assets/portraits/' + id + '.png'; PORI[id] = im; } return PORI[id]; }
   function onScreen(mm) { const x0 = S.camI[0], y0 = S.camI[1]; return mm.x > x0 - 8 && mm.x < x0 + LW + 8 && mm.y > y0 - 8 && mm.y < y0 + LH + 24; }
   function castAbyss() { const g = window.__game; if (S.ultFx || hero.hp <= 0 || S.deadT > 0) return; // 심연 초필살기: 심연의 힘 중 저스트 회피 = 반격 (한 번 쉴 때마다 한 번)
     const U = ABYSS_U; S.abyssSpent = true; S.lastStand.t = 0; S.lastStand.cd = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    S.ultFx = { U, t: 0, hitI: 0, boomed: false, vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
+    const cm = cutMode(); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0)) }; try { g && g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function abyssRest() { S.abyssSpent = false; if (S.lastStand) S.lastStand.cd = 0; } // 쉼터·여관·비석에서 쉬면 다시 쓸 수 있음
   function castUlt() { const g = window.__game; if (!g || !g.ULTS || !g.ULT_CFG || S.ultFx) return;
     if (g.ultG < g.ULT_CFG.max) { msg('필살기 게이지 부족 (' + Math.floor(g.ultG) + '%)'); return; }
     if (hero.hp <= 0 || S.deadT > 0) return;
     const U = g.ULTS[g.ultId ? g.ultId() : 'tenkou'] || g.ULTS.tenkou; g.ultG = 0; S.msg = null; hero.atk = null; hero.roll = null; hero.inv = 9; porImg(U.por);
-    S.ultFx = { U, t: 0, hitI: 0, boomed: false, vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
+    const cm = cutMode(); S.ultFx = { U, t: 0, hitI: 0, boomed: false, cut: cm, fz: CUT_T[cm][0], ci: CUT_T[cm][1], vic: S.mobs.filter(mm => !mm.dead && !(mm.spawnT > 0) && onScreen(mm)) };
     try { g.SFX.play('ult_cutin', 1); } catch (e) {} }
   function stepUlt(dt) { const f = S.ultFx, U = f.U, g = window.__game; f.t += dt; hero.inv = Math.max(hero.inv, 1); S.shake = Math.max(0, S.shake - dt * 14);
-    const e = f.t - FULT.freeze - FULT.cutin;
+    const e = f.t - f.fz - f.ci;
     if (e >= 0 && !f.boomed) { f.boomed = true; shake(2); try { g.SFX.play('ult_boom', 1); } catch (er) {} } // modest: 2px boom, 1px per hit (world cap 3px + '화면 흔들림' option)
     while (e >= 0 && f.hitI < U.hitT.length && e >= U.hitT[f.hitI]) { f.hitI++; shake(1); const n = U.hitT.length;
       for (const mm of f.vic) { if (mm.dead || mm.invuln) continue; const D = mm.D, F = U.whole ? U : FULT, tot = D.boss ? mm.maxHp * F.boss : D.champion ? mm.maxHp * F.champ : F.mob, d = Math.max(1, Math.round(tot / n));
         mm.hp -= d; mm.hitT = .3; mm.flash = .12; mm.lagDelay = .35; if (onScreen(mm)) { addFx('spark', mm.x, mm.y - (D.h || 20) / 2, { life: .25 }); addFx('text', mm.x, mm.y - (D.h || 20) - 4 - f.hitI * 3, { text: String(d), life: .8, color: '#ffe9a8' }); }
         if (D.boss || D.champion) engage(mm); if (mm.hp <= 0) killMob(mm); } }
     if (e >= U.dur) { S.ultFx = null; hero.inv = .6; if (U.stun) { S.hazards.length = 0; S.shots.length = 0; for (const mm of f.vic) if (!mm.dead) { mm.abyStun = U.stun; mm.atk = null; } banner('적이 심연에 짓눌려 움직이지 못한다!', 1.6, true); } } }
-  function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - FULT.freeze - FULT.cutin, c = f.t - FULT.freeze;
+  function cutZoom() { const f = S.ultFx; if (!f || (f.cut !== 'zoom' && f.cut !== 'hybrid')) return 1; const c = f.t - f.fz, e = c - f.ci; // push in during the cut, snap back on the boom
+    if (c < 0) return 1; if (e < 0) { const q = Math.min(1, c / (f.ci * .85)); return 1 + .75 * (q * q * (3 - 2 * q)); } return e < .12 ? 1 + .75 * (1 - e / .12) : 1; }
+  function drawCutZoom(f, U, q, u, ox, oy, SW, SH) { const [hx, hy] = W2S(hero.x, hero.y - 14), k = S.view.k; // spotlight on the hero, chest emblem lights up, name in the world
+    const r0 = Math.max(SW, SH) * (1 - .55 * Math.min(1, q * 1.6)), gr = ctx.createRadialGradient(hx, hy, r0 * .12, hx, hy, r0);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(${U.tint},.85)`); ctx.fillStyle = gr; ctx.fillRect(ox, oy, SW, SH);
+    const pul = .5 + .5 * Math.sin(f.t * 30), cy = hy - 2 * k * cutZoom(); ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 3; i++) { ctx.fillStyle = `rgba(${U.col[1]},${(.35 - i * .1) * Math.min(1, q * 3)})`; ctx.beginPath(); ctx.arc(hx, cy, (6 + i * 7 + pul * 3) * k * .5 * Math.min(1, q * 2.5), 0, TAU); ctx.fill(); }
+    const L = (SW * .5) * Math.min(1, Math.max(0, q - .35) * 2.2); ctx.strokeStyle = `rgba(${U.col[0]},.9)`; ctx.lineWidth = Math.max(1, k * .5);
+    for (let i = 0; i < 8; i++) { const a = i / 8 * TAU + f.t * .6; ctx.beginPath(); ctx.moveTo(hx + Math.cos(a) * 8 * k, cy + Math.sin(a) * 8 * k); ctx.lineTo(hx + Math.cos(a) * (8 * k + L), cy + Math.sin(a) * (8 * k + L)); ctx.stroke(); }
+    ctx.restore(); const fs = Math.round(SH * .075), a = Math.min(1, Math.max(0, q - .3) * 3); ctx.globalAlpha = a;
+    textOut(U.name, ox + SW / 2, oy + SH * .2, fs, U.band); textOut(U.label || U.route + ' 필살기', ox + SW / 2, oy + SH * .2 + fs * .75, Math.round(SH * .028), '#fff'); ctx.globalAlpha = 1; }
+  function drawCutEye(f, U, q, u, ox, oy, SW, SH) { // pixel eye strip: the in-game hero sprite's face, nearest-scaled, sliding through a thin band
+    const inn = Math.min(1, q / .2), out = q > .82 ? (q - .82) / .18 : 0, bh = SH * .2 * inn * (1 - out), by = oy + SH * .42; if (bh < 2) return;
+    ctx.save(); ctx.fillStyle = 'rgba(4,2,10,.92)'; ctx.fillRect(ox, by - bh / 2, SW, bh); const lw = Math.max(2, SH * .006); ctx.fillStyle = U.band; ctx.fillRect(ox, by - bh / 2, SW, lw); ctx.fillRect(ox, by + bh / 2 - lw, SW, lw);
+    ctx.beginPath(); ctx.rect(ox, by - bh / 2 + lw, SW, bh - lw * 2); ctx.clip();
+    const G = h128(), c = G && h128Cell(); let im = null; if (c) im = c.h8 !== undefined ? G.H8img(c.h8) : G.H128img;
+    if (im && c) { const faceH = c[3] * .3, sc = SH * .2 * 1.5 / faceH, w = c[2] * sc, sx = ox + SW * (.62 - q * .14) - w / 2; ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(im, c[0], c[1] + c[3] * .1, c[2], faceH, sx, by - faceH * sc / 2, w, faceH * sc); }
+    ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = `rgba(${U.col[1]},.25)`; ctx.fillRect(ox, by - bh / 2, SW, bh); ctx.restore();
+    const fs = Math.round(SH * .06); ctx.globalAlpha = inn * (1 - out); textOut(U.name, ox + SW * .27, by + fs * .3, fs, U.band); ctx.globalAlpha = 1; }
+  function drawFieldUlt(k, ox, oy, SW, SH) { const f = S.ultFx; if (!f) return; const U = f.U, u = k / 3, e = f.t - f.fz - f.ci, c = f.t - f.fz;
     ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip();
-    ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / FULT.freeze)})`; ctx.fillRect(ox, oy, SW, SH);
+    ctx.fillStyle = `rgba(${U.tint},${.45 * Math.min(1, f.t / f.fz)})`; ctx.fillRect(ox, oy, SW, SH);
     if (U.whole && e >= 0) { const [hx, hy] = W2S(hero.x, hero.y - 8), R = Math.hypot(SW, SH); ctx.globalCompositeOperation = 'lighter'; // 심연: rings sweep the whole map from the hero
       for (let i = 0; i < U.hitT.length; i++) { const q = (e - U.hitT[i] + .2) / .7; if (q < 0 || q > 1) continue; ctx.strokeStyle = `rgba(${U.col[1]},${(1 - q) * .9})`; ctx.lineWidth = (18 - q * 14) * u;
         ctx.beginPath(); ctx.ellipse(hx, hy, R * q, R * q * .62, 0, 0, TAU); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${(1 - q) * .7})`; ctx.lineWidth = 2 * u; ctx.stroke(); }
@@ -978,7 +1005,9 @@
           ctx.fillStyle = gr; ctx.fillRect(sx - w / 2, oy, w, sy - oy); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(sx - w * .18, oy, w * .36, sy - oy);
           ctx.fillStyle = `rgba(${U.col[1]},${al * .8})`; ctx.beginPath(); ctx.ellipse(sx, sy, w * 1.8 * (.6 + q), w * .6 * (.6 + q), 0, 0, TAU); ctx.fill(); } }
       ctx.globalCompositeOperation = 'source-over'; }
-    if (c >= 0 && c < FULT.cutin) { const q = c / FULT.cutin, inn = Math.min(1, q / .15), out = q > .85 ? (q - .85) / .15 : 0, bh = SH * .34 * inn * (1 - out), by = oy + SH * .5;
+    if (c >= 0 && c < f.ci && (f.cut === 'zoom' || f.cut === 'hybrid')) drawCutZoom(f, U, c / f.ci, u, ox, oy, SW, SH);
+    if (c >= 0 && c < f.ci && (f.cut === 'eye' || (f.cut === 'hybrid' && c / f.ci > .45))) drawCutEye(f, U, f.cut === 'hybrid' ? (c / f.ci - .45) / .55 : c / f.ci, u, ox, oy, SW, SH);
+    if (c >= 0 && c < f.ci && f.cut === 'band') { const q = c / f.ci, inn = Math.min(1, q / .15), out = q > .85 ? (q - .85) / .15 : 0, bh = SH * .34 * inn * (1 - out), by = oy + SH * .5;
       ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(ox, oy, SW, SH);
       ctx.save(); ctx.translate(ox + SW / 2, by); ctx.rotate(-.06); ctx.fillStyle = '#07070c'; ctx.fillRect(-SW, -bh / 2, SW * 2, bh); const lw = Math.max(2, SH * .006);
       ctx.fillStyle = U.band; ctx.fillRect(-SW, -bh / 2, SW * 2, lw); ctx.fillRect(-SW, bh / 2 - lw, SW * 2, lw);
