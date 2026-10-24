@@ -834,11 +834,11 @@
         if (!it || it.who !== who) { it = { who, lines: [] }; out.push(it); } it.lines.push(t); if (who && who.narr) { it = null; } } }
     return out; }
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
-    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
+    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
   function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
-  function playScene(key, delay) { after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
+  function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -1232,7 +1232,8 @@
   const FELTIMG = {}; function feltImg(src) { if (!FELTIMG[src]) { const im = new Image(); im.src = V(src + '.png'); FELTIMG[src] = im; } return FELTIMG[src]; }
   function feltFrame(m) { const a = m.D.anim[m.anim || 'walk'], i = feltFrame0(m); return a && a.map ? a.map[i] : i; } // optional frame remap per strip
   function feltFrame0(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
-    if (m.anim === 'attack' || m.anim === 'shoot') { const key = m.anim === 'attack' ? a.hit : a.release, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
+    if (a && a.once) { let t = m.at; for (let i = 0; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; } // one-shot strip (hurt)
+    if (m.anim === 'attack' || m.anim === 'shoot' || m.anim === 'pounce') { const key = m.anim === 'shoot' ? a.release : a.hit, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
@@ -1241,7 +1242,7 @@
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
-      const atkA = name === 'attack' || name === 'shoot', tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
+      const atkA = name === 'attack' || name === 'shoot' || name === 'pounce', tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
       if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
       if (mm.hitT > .18) { bx *= 1.12; by *= .88; }
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
@@ -1387,6 +1388,8 @@
     if (f.type === 'heal') { g.fillStyle = `rgba(120,255,140,${1 - p})`; g.fillRect(f.x - 1, f.y - p * 14 - 3, 2, 6); g.fillRect(f.x - 3, f.y - p * 14 - 1, 6, 2); }
     if (f.type === 'stars') { g.fillStyle = '#ffe060'; for (let i = 0; i < 3; i++) { const a = S.t * 6 + i * 2.1; g.fillRect(f.x + Math.cos(a) * 6, f.y + Math.sin(a) * 2, 2, 2); } }
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
+    if (f.type === 'strip') { const im = feltImg(f.src); let t = f.t, i = 0; for (; i < f.ticks.length - 1; i++) { t -= f.ticks[i] / 60; if (t < 0) break; } // a one-shot body strip left in the world (boss death: legs fold, she slumps)
+      if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(1, (f.life - f.t) * 1.5)); g.translate(Math.round(f.x), Math.round(f.y)); if (f.face < 0) g.scale(-1, 1); g.drawImage(im, i * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
     if (f.type === 'tclone') { const tt = f.t, k = tt < f.warn ? 0 : Math.min(1, (tt - f.warn) / f.dash), x = f.x + (f.x1 - f.x) * k, y = f.y + (f.y1 - f.y) * k, im = feltImg(f.src + '_attack'); // 실 분신: pale thread copy of the boss, dashes on the beat
       if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(.85, tt * 3, (f.life - tt) * 3)); g.filter = 'grayscale(1) brightness(1.5) contrast(1.3)'; g.translate(Math.round(x), Math.round(y)); if (f.face < 0) g.scale(-1, 1);
         g.drawImage(im, (tt < f.warn ? 2 : 6) * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
@@ -1431,7 +1434,7 @@
     ctx.fillStyle = '#8a2a2a'; for (let i = 0; i < w - 24 * u; i += 3 * u) if ((i / u | 0) % 7 !== 3) ctx.fillRect(x + 12 * u + i, y + 3 * u + Math.round(Math.sin(i / (14 * u) + d.t * .6) * u), 2 * u, Math.max(1, u)); // 붉은 실 한 가닥 (1장 = 아라크네의 실)
     for (const [cx, cy] of [[x, y], [x + w, y], [x, y + h], [x + w, y + h]]) { ctx.fillStyle = '#7a6448'; ctx.fillRect(cx - 3 * u, cy - 3 * u, 6 * u, 6 * u); ctx.fillStyle = '#1a1420'; ctx.fillRect(cx - u, cy - u, 2 * u, 2 * u); }
     let tx = x + 18 * u;
-    if (port) { const px = x + 10 * u, py = y + (h - sz) / 2; ctx.fillStyle = '#16111c'; ctx.fillRect(px, py, sz, sz); if (hasB) dlgBust(d, px, py, sz); else { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, px, py, sz, sz); ctx.imageSmoothingEnabled = false; }
+    if (port) { const px = x + 10 * u, py = y + (h - sz) / 2; ctx.fillStyle = '#16111c'; ctx.fillRect(px, py, sz, sz); if (hasB) dlgBust(d, px, py, sz); else { const j = d.creep ? [(Math.random() * 3 | 0) - 1, (Math.random() * 3 | 0) - 1] : [0, 0]; ctx.imageSmoothingEnabled = false; ctx.drawImage(pi, px + j[0] * u, py + j[1] * u, sz, sz); if (d.creep && Math.sin(d.t * 23) > .7) { ctx.fillStyle = 'rgba(140,0,10,.22)'; ctx.fillRect(px, py, sz, sz); } } /* creep = horror twitch + red flicker (아라크네) */
       ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(px, py, sz, sz); tx = px + sz + 14 * u; }
     if (d.name) { ctx.font = font(nf); const nw = ctx.measureText(d.name).width + (d.role ? ctx.measureText(' · ' + d.role).width * .85 : 0) + nf * 1.8, ny = y - nf * 1.2;
       ctx.fillStyle = 'rgba(10,8,14,.95)'; ctx.fillRect(tx - 10 * u, ny, nw, nf * 1.5); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(tx - 10 * u, ny, nw, nf * 1.5);

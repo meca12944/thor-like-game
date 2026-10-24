@@ -12,12 +12,12 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
 KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
 SETUP = "()=>{const W=__world;W.setManual(true);(W.map.objects||[]).forEach(o=>{if(o.type==='spawn')o.respawn=1e9});}"
 ONE = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll(m=>!m.D.boss);W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
-  const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.last||m.D.ai||'');if(s!==prev){if(!['idle','rest','hop','walk','stagger','stun','dormant','rise','aim','intro','phase'].includes(s))seq.push(s);prev=s;}
+  const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.S.dialog=null;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.last||m.D.ai||'');if(s!==prev){if(!['idle','rest','hop','walk','stagger','stun','dormant','rise','aim','intro','phase'].includes(s))seq.push(s);prev=s;}
    if(m.st==='rest'||(m.st==='lunge'&&m.sub==='rec'))still+=1/60;}
   let run=1,best=1;for(let i=1;i<seq.length;i++){run=seq[i]===seq[i-1]?run+1:1;best=Math.max(best,run);}return {name:m.D.name,attacks:seq.length,longestRepeat:best,openSec:+still.toFixed(1)}}"""
 PACK = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll(m=>!m.D.boss);W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;
   const ms=[0,1,2].map(i=>W.spawn(K,h.x+70*Math.cos(i*2.1),h.y+70*Math.sin(i*2.1)));let away=0,mv=0,ov=0,n=0;
-  for(let i=0;i<1200;i++){h.hp=999;h.inv=0;W.advance(1/60);n++;
+  for(let i=0;i<1200;i++){h.hp=999;h.inv=0;W.S.dialog=null;W.advance(1/60);n++;
    for(const m of ms){if(m.dead)continue;if(m.moving&&m.st==='idle'){mv++;if((h.x-m.x)*m.face<0)away++;}}
    for(let a=0;a<3;a++)for(let c=a+1;c<3;c++)if(Math.hypot(ms[a].x-ms[c].x,ms[a].y-ms[c].y)<ms[a].r+ms[c].r)ov++;}
   return {facingAwayPct:Math.round(away/Math.max(1,mv)*100),overlapPct:Math.round(ov/n/3*100)}}"""
