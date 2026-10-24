@@ -956,7 +956,10 @@
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - (o.h || 26)) - 4, 2, 2); } } });
       if (o.type === 'waystone' && o.art !== 'hd') list.push({ y: o.y + 6, f: () => drawWaystone(g, o) }); // art:'hd' = the map's hd part is the stone
     }
-    for (const t of S.temp) list.push({ y: t.y + 3, f: () => drawSpr(g, 'crystal', t.x, t.y + 5, { alpha: Math.min(1, t.life * 3) }) });
+    for (const t of S.temp) list.push({ y: t.y + 3, f: () => { if (t.kind !== 'thread') return drawSpr(g, 'crystal', t.x, t.y + 5, { alpha: Math.min(1, t.life * 3) });
+      const x = Math.round(t.x), y = Math.round(t.y); g.globalAlpha = Math.min(1, t.life * 3); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x - 5, y + 2, 10, 3); // 실 감옥 기둥 (아라크네): a steel-thread spool post, code-drawn
+        g.fillStyle = '#5a3a22'; g.fillRect(x - 5, y - 13, 10, 3); g.fillRect(x - 5, y, 10, 3); g.fillStyle = '#9aa0ae'; g.fillRect(x - 4, y - 10, 8, 10); g.fillStyle = '#d8dce6'; for (let i = 0; i < 4; i++) g.fillRect(x - 4, y - 9 + i * 3, 8, 1);
+        g.fillStyle = 'rgba(230,232,245,.55)'; g.fillRect(x, y - 22, 1, 9); g.globalAlpha = 1; } });
     for (const mm of S.mobs) if (!mm.dead) list.push({ y: mm.y + (mm.D.hover ? 8 : 0), f: () => drawMob(g, mm) });
     if (lastStandOn()) list.push({ y: hero.y - .1, f: () => { const p = .5 + .5 * Math.sin(S.t * 10); g.save(); for (let i = 0; i < 3; i++) { g.fillStyle = `rgba(${18 + i * 30},0,${40 + i * 40},${.45 - i * .12 + p * .1})`; g.beginPath(); g.ellipse(hero.x, hero.y + 2, 8 + i * 4 + p * 2, 3.5 + i * 2 + p, 0, 0, TAU); g.fill(); } /* void wisps rising from the feet */ g.globalCompositeOperation = 'lighter'; for (let k = 0; k < 6; k++) { const ph = (S.t * .9 + k / 6) % 1, ax = hero.x + Math.sin(k * 2.4 + S.t * 3) * (6 + k % 3 * 2), ay = hero.y + 2 - ph * 26; g.fillStyle = `rgba(150,90,255,${.5 * (1 - ph)})`; g.fillRect(Math.round(ax), Math.round(ay), 1, 2 + (k % 2)); } g.restore(); } });
     list.push({ y: hero.y, f: () => drawHeroSprite(g, 1) });
@@ -1240,7 +1243,7 @@
       const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
       if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry
       ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); if (rot) ctx.rotate(rot); ctx.scale(bx, by);
-      if (mm.flash > 0) ctx.filter = 'brightness(3)';
+      if (mm.flash > 0) ctx.filter = 'brightness(3)'; else if (mm.D.tint) ctx.filter = mm.D.tint; // champions: recoloured felt art
       blitFrame(im, f, 256, 256, sz / 256, Math.round(-sz / 2), Math.round(-sz * 250 / 256)); ctx.restore(); } }
   // ---- companion Linette (owner 10-22 "전캐릭 인게임"): follows the hero in 바람길 (field00) and thrusts at nearby mobs.
   // Atlas assets/anim/linette8.json (hero8 format, 117px figure = hero scale); thrust tip/dir from A.thrust, trail drawn in code.
@@ -1378,6 +1381,9 @@
     if (f.type === 'heal') { g.fillStyle = `rgba(120,255,140,${1 - p})`; g.fillRect(f.x - 1, f.y - p * 14 - 3, 2, 6); g.fillRect(f.x - 3, f.y - p * 14 - 1, 6, 2); }
     if (f.type === 'stars') { g.fillStyle = '#ffe060'; for (let i = 0; i < 3; i++) { const a = S.t * 6 + i * 2.1; g.fillRect(f.x + Math.cos(a) * 6, f.y + Math.sin(a) * 2, 2, 2); } }
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
+    if (f.type === 'tclone') { const tt = f.t, k = tt < f.warn ? 0 : Math.min(1, (tt - f.warn) / f.dash), x = f.x + (f.x1 - f.x) * k, y = f.y + (f.y1 - f.y) * k, im = feltImg(f.src + '_attack'); // 실 분신: pale thread copy of the boss, dashes on the beat
+      if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(.85, tt * 3, (f.life - tt) * 3)); g.filter = 'grayscale(1) brightness(1.5) contrast(1.3)'; g.translate(Math.round(x), Math.round(y)); if (f.face < 0) g.scale(-1, 1);
+        g.drawImage(im, (tt < f.warn ? 2 : 6) * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
     if (f.type === 'fluff') { const n = f.n || 12; for (let i = 0; i < n; i++) { const a = i * 2.39996 + (f.x % 7), sp = 10 + (i * 37 % 13), x = f.x + Math.cos(a) * sp * p * 1.6, y = f.y + Math.sin(a) * sp * p * .9 - Math.sin(Math.min(1, p * 1.6) * Math.PI) * 10 + p * p * 8; // felt fluff + thread bits
         g.globalAlpha = Math.max(0, 1 - p * p); g.fillStyle = i % 3 === 0 ? '#f2ede2' : (f.col || '#b0a890'); if (i % 4 === 1) g.fillRect(x, y, 4, 1); else g.fillRect(x - 1, y - 1, 3, 3); } g.globalAlpha = 1; }
     if (f.type === 'claw') { g.save(); g.translate(f.x, f.y); g.rotate(f.a + Math.PI / 2); const R = (f.r || 12) * 1.1, L = Math.min(1, p * 3); g.globalAlpha = Math.max(0, 1 - p); g.lineWidth = 2; // 3 curved scratches sweeping across the strike circle
