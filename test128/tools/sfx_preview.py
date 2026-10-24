@@ -8,9 +8,9 @@ os.makedirs(O+'/f',exist_ok=True);FPS=30;N=FPS*14
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path=os.environ.get('PW_CHROME') or None);pg=b.new_page(viewport={'width':1280,'height':720});errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto(B);pg.wait_for_function('window.__world&&window.__game&&window.SFX2',timeout=30000);pg.wait_for_timeout(1200)
-    pg.evaluate("(mp)=>{const W=__world;W.setManual(true);W.go(mp,'default');}",MP);pg.evaluate("()=>{for(let i=0;i<30&&__world.trans;i++)__world.advance(.5)}")
-    pg.evaluate('''()=>{const W=__world,M=W.S.map;window.__LOG=[];const T0=W.S.t;const lg=(k,v)=>__LOG.push([k,W.S.t-T0,v==null?1:v]);
-      SFX2.play=(k,v)=>lg(k,v);const G=__game;if(G.SFX)G.SFX.play=(k,v)=>lg(k,v);
+    pg.evaluate("(mp)=>{const W=__world;W.setManual(true);W.go(mp,'default');}",MP);pg.evaluate("()=>{for(let i=0;i<30&&__world.trans;i++)__world.advance(.5);for(let i=0;i<40&&!__world.mobs.some(m=>!m.dead);i++)__world.advance(.25)}")  # mobs (arena / area spawns) may appear a moment after arrival
+    pg.evaluate('''()=>{const W=__world,M=W.S.map;window.__LOG=[];const T0=W.S.t;const lg=(k,v,r)=>__LOG.push([k,W.S.t-T0,v==null?1:v,r||1,W.S.lastStop==null?-1:W.S.lastStop-T0]);
+      SFX2.play=(k,v,r)=>lg(k,v,r);const G=__game;if(G.SFX)G.SFX.play=(k,v,r)=>lg(k,v,r);
       let bx=Math.floor(M.w/2),by=Math.floor(M.h/2);for(let r=0;r<12&&M.solidG[by*M.w+bx];r++)bx++;W.setHeroTile(bx,by,'right');const h=W.hero;
       let k=0;for(const m of W.mobs){if(m.dead||m.D.champion)continue;if(k>=4){m.dead=true;continue;}const a=k*1.6;m.x=h.x+Math.cos(a)*50;m.y=h.y+Math.sin(a)*36;m.home=[m.x,m.y];k++;}}''')
     for i in range(N):
@@ -24,9 +24,9 @@ with sync_playwright() as p:
     pcm=pg.evaluate('''async([log,secs])=>{const sr=44100,syn=log.filter(e=>SFX2.has(e[0])),a=await SFX2.render(syn,secs),out=Float32Array.from(a);
       const oc=new OfflineAudioContext(1,sr*secs,sr),dec={};for(const e of log){if(SFX2.has(e[0])||dec[e[0]]||typeof SFX_DATA==='undefined'||!SFX_DATA[e[0]])continue;
         const ab=await (await fetch(SFX_DATA[e[0]])).arrayBuffer();dec[e[0]]=await oc.decodeAudioData(ab);}
-      for(const e of log){const bf=dec[e[0]];if(!bf)continue;const s=bf.getChannelData(0),o=Math.floor(e[1]*sr);for(let i=0;i<s.length&&o+i<out.length;i++)out[o+i]+=s[i]*e[2]*.6;}
+      for(const e of log){const bf=dec[e[0]];if(!bf)continue;const s=bf.getChannelData(0),o=Math.floor(e[1]*sr);const rt=e[3]||1;for(let i=0;i*rt<s.length-1&&o+i<out.length;i++)out[o+i]+=s[Math.floor(i*rt)]*e[2]*.6;}
       return Array.from(out);}''',[log,N/FPS])
-    print(json.dumps({'sounds':sorted({e[0] for e in log}),'calls':len(log),'errors':errs[:3]},ensure_ascii=False));b.close()
+    open(O+'/log.json','w').write(json.dumps(log));print(json.dumps({'sounds':sorted({e[0] for e in log}),'calls':len(log),'errors':errs[:3]},ensure_ascii=False));b.close()
 with wave.open(f'{O}/a.wav','wb') as w:
     w.setnchannels(1);w.setsampwidth(2);w.setframerate(44100);w.writeframes(b''.join(struct.pack('<h',max(-32767,min(32767,int(v*32767)))) for v in pcm))
 subprocess.run(['ffmpeg','-loglevel','error','-y','-framerate',str(FPS),'-i',f'{O}/f/%04d.png','-i',f'{O}/a.wav','-vf','scale=960:-2','-c:v','libx264','-pix_fmt','yuv420p','-crf','22','-c:a','aac','-b:a','128k','-shortest',f'{O}/sfx_preview.mp4'],check=True)
