@@ -1440,6 +1440,7 @@
     else if (s.kind === 'shard') { g.fillStyle = '#8affb0'; g.beginPath(); g.moveTo(6, 0); g.lineTo(-4, -3); g.lineTo(-4, 3); g.fill(); g.fillStyle = '#e8fff0'; g.fillRect(-1, -1, 5, 2); }
     else { g.fillStyle = '#ffe070'; g.fillRect(-4, -1, 8, 2); g.fillStyle = '#3a2a10'; g.fillRect(3, -1, 2, 2); }
     g.restore(); }
+  function hazMute(r, g, b) { const y = .3 * r + .59 * g + .11 * b; return [Math.round(r * .78 + y * .22), Math.round(g * .78 + y * .22), Math.round(b * .78 + y * .22)]; } // 채도 낮춘 예고색
   function hazColor(h) { return ({ web: [225, 225, 240], poison: [170, 80, 255], root: [120, 220, 80], crystal: [90, 255, 160], cage: [90, 255, 160], summon: [255, 220, 60], acorn: [255, 160, 60] })[h.kind] || [255, 60, 50]; }
 
   // ---- 실 효과 (보스전 팀 10-24, 공격 검흔 담당; 이펙트는 코드로): 1장 펠트(실) 몹·아라크네의 겨냥 실 / 실 감옥 실 가닥 / 끊어질 때 파편 /
@@ -1463,7 +1464,7 @@
       threadLine(g, A.x, A.y - 18, B.x, B.y - 18, 1.2, S.t * 6 + A.x, red, al, 1); threadLine(g, A.x, A.y - 8, B.x, B.y - 8, 1, S.t * 5 + B.y, red, al * .8, 1); }
     if (red) for (const h of S.hazards) { if (!h.dmg || h.t >= h.warn || h.shape === 'all') continue; // 팀장 10-24: phase 2 reddens the room -> every damaging warning gets a dark rim + pale-gold edge, and the inside flickers white on the last third
       const p = h.t / (h.warn || 1e-3), fl = p > .66 && Math.floor(S.t * 12) % 2 === 0, path = () => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2;
-          g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } };
+          g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) { g.moveTo(h.x + h.r0, h.y); g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } } };
       path(); if (fl) { g.fillStyle = 'rgba(255,248,225,.3)'; g.fill('evenodd'); }
       g.strokeStyle = 'rgba(8,2,6,.55)'; g.lineWidth = 4; g.stroke(); g.strokeStyle = `rgba(255,240,190,${.9 + .1 * hb})`; g.lineWidth = 2; g.stroke(); }
     if (red) for (const m of S.mobs) { if (m.dead || !m.D.boss || !m.D.felt) continue; // phase 2: red threads hang from the dark above her and throb
@@ -1479,20 +1480,23 @@
   function drawHazard(g, h, top) {
     if (h.shape === 'all') return;
     const [r, gg, b] = hazColor(h), warnP = Math.min(1, h.t / (h.warn || 1e-3)), live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
-    if (!top && h.t < h.warn) { // telegraph: outline + an inner fill that grows until impact (the timing cue for the roll)
-      const pulse = .5 + .5 * Math.sin(h.t * 22);
-      g.strokeStyle = `rgba(${r},${gg},${b},${.55 + .35 * pulse})`; g.fillStyle = `rgba(${r},${gg},${b},${.10 + .2 * warnP})`; g.lineWidth = 1;
-      if (h.shape === 'circle') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); g.fill(); g.stroke(); g.fillStyle = `rgba(${r},${gg},${b},.35)`; g.beginPath(); g.ellipse(h.x, h.y, h.r * warnP, h.r * warnP / 1.15, 0, 0, TAU); g.fill(); }
-      if (h.shape === 'ring') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); g.fill('evenodd'); g.stroke(); }
-      if (h.shape === 'line') { g.save(); g.translate(h.x, h.y); g.rotate(Math.atan2(h.y2 - h.y, h.x2 - h.x)); const L = Math.hypot(h.x2 - h.x, h.y2 - h.y);
-        g.fillRect(0, -h.width / 2, L, h.width); g.fillStyle = `rgba(${r},${gg},${b},.35)`; g.fillRect(0, -h.width / 2, L * warnP, h.width);
-        g.strokeRect(0, -h.width / 2, L, h.width); for (let i = 10; i < L; i += 14) { g.beginPath(); g.moveTo(i - 3, -2); g.lineTo(i + 1, 0); g.lineTo(i - 3, 2); g.stroke(); } g.restore(); }
+    if (!top && h.t < h.warn) { // telegraph (사장님 10-24 「촌스럽다, 깔끔하게」): faint fill + 1px dark rim + thin muted outline; a fill sweeps from the centre (circle) /
+      // the inner edge (ring) / the back (line) and reaches the outline on the hit = the time left; the outline flickers only in the last 0.15 s
+      const pulse = .5 + .5 * Math.sin(h.t * 22), [cr, cg, cb] = hazMute(r, gg, b), left = h.warn - h.t, flick = left < .15 && Math.floor(h.t * 30) % 2 === 0, e = 1 - Math.pow(1 - warnP, 1.6);
+      const path = (k0, k1) => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2, a0 = L * k0, a1 = L * k1;
+          g.moveTo(h.x + ux * a0 - uy * w, h.y + uy * a0 + ux * w); g.lineTo(h.x + ux * a1 - uy * w, h.y + uy * a1 + ux * w); g.lineTo(h.x + ux * a1 + uy * w, h.y + uy * a1 - ux * w); g.lineTo(h.x + ux * a0 + uy * w, h.y + uy * a0 - ux * w); g.closePath(); }
+        else { const r0 = h.shape === 'ring' ? (h.r0 || 0) : 0, ra = r0 + (h.r - r0) * k0, rb = r0 + (h.r - r0) * k1; g.ellipse(h.x, h.y, rb, rb / 1.15, 0, 0, TAU); if (ra > .5) { g.moveTo(h.x + ra, h.y); g.ellipse(h.x, h.y, ra, ra / 1.15, 0, 0, TAU, true); } } }; // moveTo: no seam line between the two edges
+      if (h.shape === 'circle' || h.shape === 'ring' || h.shape === 'line') {
+        path(0, 1); g.fillStyle = `rgba(${cr},${cg},${cb},.06)`; g.fill('evenodd'); // the whole area, barely there
+        path(0, e); g.fillStyle = `rgba(${cr},${cg},${cb},${.1 + .08 * warnP})`; g.fill('evenodd'); // the sweep = the countdown
+        path(Math.max(0, e - .06), e); g.fillStyle = `rgba(${Math.min(255, cr + 50)},${Math.min(255, cg + 50)},${Math.min(255, cb + 50)},.7)`; g.fill('evenodd'); // its leading edge
+        path(0, 1); g.strokeStyle = 'rgba(8,4,6,.55)'; g.lineWidth = 3; g.stroke(); g.strokeStyle = flick ? 'rgba(255,246,236,.95)' : `rgba(${cr},${cg},${cb},.85)`; g.lineWidth = 1; g.stroke(); }
       if (h.kind === 'acorn' && h.from) { const p = warnP, x = h.from[0] + (h.x - h.from[0]) * p, y = h.from[1] + (h.y - h.from[1]) * p - Math.sin(p * Math.PI) * 30; g.fillStyle = '#8a5a2a'; g.beginPath(); g.arc(x, y, 2.5, 0, TAU); g.fill(); }
       if (h.kind === 'rock') { const p = warnP; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(h.x, h.y, h.r * p, h.r * p / 1.6, 0, 0, TAU); g.fill(); if (p > .6) { g.fillStyle = '#7a7060'; g.fillRect(h.x - 4, h.y - (1 - p) * 120 - 8, 8, 7); } }
       if (h.kind === 'cage') { g.globalAlpha = .35 + .3 * pulse; drawSpr(g, 'crystal', h.x, h.y + 5); g.globalAlpha = 1; }
     }
     if (top && live) {
-      g.fillStyle = `rgba(${Math.min(255, r + 60)},${Math.min(255, gg + 60)},${Math.min(255, b + 60)},.55)`;
+      const [mr, mg, mb] = hazMute(r, gg, b); g.fillStyle = `rgba(${Math.min(255, mr + 90)},${Math.min(255, mg + 90)},${Math.min(255, mb + 90)},.5)`; // the hit: one short bright flash of the area
       if (h.shape === 'circle') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); g.fill(); }
       if (h.shape === 'ring') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); g.fill('evenodd');
         for (let i = 0; i < 12; i++) { const a = i / 12 * TAU, rr = (h.r + h.r0) / 2; drawSpr(g, 'crystal', h.x + Math.cos(a) * rr, h.y + Math.sin(a) * rr / 1.15 + 4, { scale: .7 }); } }
