@@ -618,16 +618,6 @@
   },
   {
    "from": "sw_mid",
-   "to": "ch4",
-   "kind": "secret",
-   "at": [
-    189,
-    150
-   ],
-   "label": "2장 하수도 저수조 동쪽 비밀문 ↔ 4장 뒷골목 맨홀 (베르디가 금서를 해독하면 열림)"
-  },
-  {
-   "from": "sw_mid",
    "to": "ch3",
    "kind": "shortcut",
    "at": [

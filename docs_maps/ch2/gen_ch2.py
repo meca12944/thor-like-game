@@ -68,7 +68,6 @@ links = [
     dict(**{'from': 'sw_entry', 'to': 'sw_dead', 'kind': 'door', 'at': [195, 420], 'label': '갈라진 배수로'}),
     dict(**{'from': 'sw_slum', 'to': 'sw_deep', 'kind': 'door', 'at': [300, 165], 'label': '맹독 구역 (렌즈 반지 필요)'}),
     dict(**{'from': 'sw_slum', 'to': 'road_n', 'kind': 'shortcut', 'at': [390, 230], 'label': '사다리 지름길 (안에서 엶)'}),
-    dict(**{'from': 'sw_mid', 'to': 'ch4', 'kind': 'secret', 'at': [189, 150], 'label': '2장 하수도 저수조 동쪽 비밀문 ↔ 4장 뒷골목 맨홀 (베르디가 금서를 해독하면 열림)'}),
     dict(**{'from': 'sw_mid', 'to': 'ch3', 'kind': 'shortcut', 'at': [60, 0], 'label': '↑ 배수 통로 → 3장 대서고 지하 (3장에서 엶)'}),
 ]
 
