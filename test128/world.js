@@ -154,8 +154,21 @@
       if (i % 3 === 0) { const wx = Math.round(ax), wy = Math.round(ay); g.fillStyle = 'rgba(220,214,228,.42)'; for (let a = 0; a < 6; a++) { const an = a / 6 * Math.PI * 2; for (let d = 1; d < 7; d++) g.fillRect(Math.round(wx + Math.cos(an) * d), Math.round(wy + Math.sin(an) * d * .7), 1, 1); }
         for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
     return c; }
-  function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
-      const x = ((Math.abs(h1) * EW + Math.sin(S.t * .6 + i) * 6) % EW + EW) % EW, y = ((Math.abs(h2) * EH + S.t * sp) % (EH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+  // 잿가루 바람 + 먼 안개 띠 (경관 회의 10-24, 효과 담당): 그림에 굽지 않고 코드로, 화면 좌표만 계산 (저장·화소 계산 없음).
+  // 바람 = m.wind [x, y] px/초 (없으면 [9, 0]) + 느린 돌풍. 개수 = 화면 넓이에 비례 (전망 줌으로 물러나도 밀도 그대로), m.ash 로 구역마다 조절 (기본 46 = 줌 1 기준).
+  function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; const wd = m.wind || ASH_WIND, gust = 1 + .6 * Math.sin(S.t * .35) * Math.sin(S.t * .13 + 1), wx = wd[0] * gust, wy = wd[1] * gust;
+    const n = Math.min(160, Math.round((m.ash || 46) * EW * EH / (LW * LH))), W = EW + 8, H = EH + 8;
+    for (let i = 0; i < n; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
+      const x = ((Math.abs(h1) * W + Math.sin(S.t * .6 + i) * 6 + S.t * wx * (.7 + Math.abs(h2) * .6)) % W + W) % W - 4, y = ((Math.abs(h2) * H + S.t * (sp + wy)) % H + H) % H - 4;
+      g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), Math.abs(wx) > 14 && i % 3 === 0 ? 2 : 1, 1); } } // strong wind: some flakes streak 2 px
+  const ASH_WIND = [9, 0];
+  // 먼 안개 띠: 화면 위쪽(= 북쪽 먼 곳) 38%에 아래로 옅어지는 안개 한 장. 그라데이션은 1x64 캔버스에 한 번만 그리고 drawImage 로 늘림 (한 장면 drawImage 1번).
+  // 전망 줌으로 물러나면(S.vz < 1) 진해져서 깊이가 산다. m.fog = 진하기 (기본 .32), 밖(던전·m.dark)은 안 그림.
+  let _fogC = null;
+  function drawFarFog(g, m, cx, cy) { if (m.grade !== 'ash' || m.dark) return; if (!_fogC) { _fogC = document.createElement('canvas'); _fogC.width = 1; _fogC.height = 64; const f = _fogC.getContext('2d'), gr = f.createLinearGradient(0, 0, 0, 64);
+      gr.addColorStop(0, 'rgba(178,172,188,1)'); gr.addColorStop(.45, 'rgba(160,154,172,.55)'); gr.addColorStop(1, 'rgba(150,144,160,0)'); f.fillStyle = gr; f.fillRect(0, 0, 1, 64); }
+    const z = S.vz || 1, a = Math.min(.75, (m.fog ?? .32) * (1 + Math.max(0, 1 - z) * 2.2)) * (.92 + .08 * Math.sin(S.t * .4)); if (a <= .01) return;
+    g.save(); g.globalAlpha = a; g.imageSmoothingEnabled = true; g.drawImage(_fogC, Math.floor(cx) - 1, Math.floor(cy) - 1, EW + 3, Math.round(EH * .38)); g.restore(); }
   // 던전 분위기 층 (팀장 마을배경방, 주인 10-24 「다크한 설정이 잘 나오게 · 웅장한 보스전」): m.dark 지도 전부 — 떠도는 먼지(어둠 아래라 빛 근처만 보임),
   // 천장에서 늘어진 실 가닥(월드에 붙어 흔들림), 위에서 비스듬히 내려오는 희미한 빛줄기, 가장자리 어둠. 보스 2페이즈면 붉게 맥박친다.
   const hsh = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -1052,7 +1065,7 @@
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1]; return [clampC(fx - EW / 2, m.pw - EW), clampC(fy - EH / 2, m.ph - EH)]; } // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { if (M()) S.cam = camTarget(); }
   function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
-  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
@@ -1130,7 +1143,7 @@
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
-    drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
+    { const ar = m.compose ? areaOf(m, hero.x, hero.y) : null, am = m.compose ? { grade: gradeAt(m, hero.x, hero.y), wind: ar && ar.wind, ash: ar && ar.ash, fog: ar && ar.fog } : m; drawFarFog(g, am, cx, cy); drawAshFall(g, am, cx, cy); }
     drawLairBelow(g, m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
