@@ -403,7 +403,7 @@
       if (m.phase === 1 && m.hp <= m.maxHp / 2 && m.st !== 'phase') { m.phase = 2; set(m, 'phase'); m.invuln = true; m.anim = 'shoot'; startAnim(m, 'shoot', A.shoot, A.shoot.release, .9);
         W.banner('2페이즈 — 재단사가 강철 실을 풀어 놓는다!', 2); W.shake(4); for (let i = 0; i < 12; i++) W.fx('text', m.x + Math.cos(i / 12 * TAU) * 34, m.y - 20 + Math.sin(i / 12 * TAU) * 20, { text: '✂', life: .7, color: '#d8d8e8' }); return; }
       switch (m.st) {
-        case 'intro': m.moving = false; look(); if (m.t > 1.6) set(m, 'idle'); return;
+        case 'intro': m.moving = false; look(); if (m.t > Math.max(1.6, ((W.map && W.map.boss && W.map.boss.intro) || 0) + 1.2)) set(m, 'idle'); return; // waits out the camera intro + the boss_pre dialogue (shown 0.6s after it; the world is paused while it is open)
         case 'phase': m.moving = false; if (m.t > 1.8) { m.invuln = false; set(m, 'idle'); m.cd = .4; m.anim = 'walk'; } return;
         case 'rest': m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; // the opening: stands still, run in and slash
         case 'atk': if (m.at > m.dur && m.t > (m.hold || 0)) rest(m.last); return; // waiting for the strike / clones / volleys to finish
