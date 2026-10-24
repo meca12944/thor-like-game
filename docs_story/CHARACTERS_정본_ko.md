@@ -1,7 +1,7 @@
 # 등장인물 설정 — 「사멸의 궤적」 정본 기준 (2026-10-24 마스터 플랜으로 다시 정리)
 
 > **최우선 정본: `MASTER_PLAN_정본_20261024_ko.md`** (사장님 2026-10-24 「정본 전면 수정」). 이 파일은 거기서 사람만 뽑아 모은 것이다. 어긋나면 마스터 플랜을 따른다.
-> 지금 게임 1장과 다른 점: `MASTER_PLAN_CH1_DIFF_ko.md`. 드라이브 새 정본: https://docs.google.com/document/d/1pscARuYlP29Zana-CVkyQuo7uPKbPjVIyNzU_3BQ70U/edit
+> 지금 게임 1장과 다른 점: `MASTER_PLAN_CH1_DIFF_ko.md`. 드라이브 새 정본: https://docs.google.com/document/d/1p8GN-pZEmoVZN0Ju_C_XuitqvJ2Zwp8wM94CPfBOGQ0/edit
 
 ## 맨 위 규칙 (모든 문서·대사·그림 공통)
 1. **아동 절대 보호 법칙**: 아이(토비·펠릭스·이안 등)에게는 **몸을 다치게 하는 일이나 죽음이 절대 닿지 않는다.** 어떤 루트·선택·보스전에서도 마찬가지. 사라진 아이(펠릭스)는 "살아 있음을 암시"하는 방식으로만 다룬다.
