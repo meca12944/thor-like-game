@@ -1442,6 +1442,11 @@
     for (let i = 0; i < posts.length; i++) for (let j = i + 1; j < posts.length; j++) { const A = posts[i], B = posts[j], d = Math.hypot(A.x - B.x, A.y - B.y); if (d > 34) continue;
       const al = Math.min(1, Math.min(A.life, B.life) * 3) * (.75 + .15 * Math.sin(S.t * 7 + A.x) + hb * .3);
       threadLine(g, A.x, A.y - 18, B.x, B.y - 18, 1.2, S.t * 6 + A.x, red, al, 1); threadLine(g, A.x, A.y - 8, B.x, B.y - 8, 1, S.t * 5 + B.y, red, al * .8, 1); }
+    if (red) for (const h of S.hazards) { if (!h.dmg || h.t >= h.warn || h.shape === 'all') continue; // 팀장 10-24: phase 2 reddens the room -> every damaging warning gets a dark rim + pale-gold edge, and the inside flickers white on the last third
+      const p = h.t / (h.warn || 1e-3), fl = p > .66 && Math.floor(S.t * 12) % 2 === 0, path = () => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2;
+          g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } };
+      path(); if (fl) { g.fillStyle = 'rgba(255,248,225,.3)'; g.fill('evenodd'); }
+      g.strokeStyle = 'rgba(8,2,6,.55)'; g.lineWidth = 4; g.stroke(); g.strokeStyle = `rgba(255,240,190,${.9 + .1 * hb})`; g.lineWidth = 2; g.stroke(); }
     if (red) for (const m of S.mobs) { if (m.dead || !m.D.boss || !m.D.felt) continue; // phase 2: red threads hang from the dark above her and throb
       for (let k = 0; k < 6; k++) { const ox = (k - 2.5) * 9, sw = Math.sin(S.t * 1.7 + k * 1.3) * 4; threadLine(g, m.x + ox, m.y - 34, m.x + ox * 1.8 + sw, m.y - 150, 1.5, S.t * 3 + k, true, .25 + .55 * hb, 1); }
       g.fillStyle = thrCol(true, 1, .10 + .22 * hb); g.beginPath(); g.ellipse(m.x, m.y, 30 + hb * 6, 12 + hb * 2, 0, 0, TAU); g.fill(); }
