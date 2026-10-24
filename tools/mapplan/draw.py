@@ -25,6 +25,9 @@ AREA_COL = {  # 지형 덩어리
     'grave': (80, 80, 84), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
 PATH_COL = {'road': (176, 156, 120), 'river': (60, 96, 130), 'wall': (16, 14, 14), 'cliff': (24, 20, 20),
             'bridge': (150, 110, 70), 'corridor': (128, 118, 110), 'sewer': (70, 96, 60), 'rail': (110, 100, 90)}
+KO = {'start': '시작', 'save': '모닥불(쉼터)', 'npc': '인물', 'item': '아이템', 'chest': '상자', 'mob': '몹 무리',
+      'elite': '정예', 'hidden_elite': '히든 정예', 'midboss': '중간 보스', 'boss': '보스', 'quest': '이야기 장면',
+      'landmark': '표지물', 'shortcut': '지름길', 'trap': '함정', 'shop': '상점'}
 MARK = {  # type: (색, 모양, 글자)
     'start': ((255, 255, 255), 'star', 'S'), 'save': ((255, 150, 40), 'circle', '화'),
     'npc': ((90, 170, 255), 'circle', ''), 'item': ((255, 210, 60), 'diamond', ''),
@@ -50,6 +53,11 @@ def check(m):
             bad.append(f"구역 {z['id']} 이 지도 밖으로 나감")
         if z['w'] * z['h'] > 260 * 260 and z.get('kind') != 'sky':
             bad.append(f"구역 {z['id']} {z['w']}x{z['h']} 너무 큼 (한 구역 ≤ 260x260, 나눠서 링크)")
+    zl = m['zones']
+    for i, a in enumerate(zl):
+        for b in zl[i + 1:]:
+            if a['x'] < b['x'] + b['w'] and b['x'] < a['x'] + a['w'] and a['y'] < b['y'] + b['h'] and b['y'] < a['y'] + a['h']:
+                bad.append(f"구역 {a['id']} 와 {b['id']} 가 겹침")
     for k in m.get('markers', []):
         zid = k.get('zone')
         if zid and zid in zones:
@@ -120,13 +128,14 @@ def draw(m, out, zone=None, maxpx=3000):
             d.polygon(pts, fill=col, outline=(0, 0, 0))
         if ch: d.text((x - r * .45, y - r * .7), ch, fill=(0, 0, 0), font=font(max(10, r)))
         k['_n'] = i
-        d.text((x + r + 2, y - r), f"{i}.{k['name']}", fill=col, font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
+        if zone or k['type'] != 'mob':  # 전체 지도에서는 몹 무리 글자를 빼서 안 겹치게 (구역 그림에서 보임)
+            d.text((x + r + 2, y - r), f"{i}.{k['name']}", fill=col, font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
     d.text((10, 10), f"{m['chapter']} {m['title']}   전체 {m['w']}x{m['h']} 타일 (1타일=16px, 달리기 약 5타일/초 → 가로 {m['w'] / 5:.0f}초)",
            fill=(255, 230, 200), font=f3)
     # 범례
     lx, ly = 10, top + H * s + 10
     for t, (col, shp, ch) in MARK.items():
-        d.rectangle([lx, ly, lx + 14, ly + 14], fill=col); d.text((lx + 18, ly - 2), t, fill=(220, 220, 220), font=font(14))
+        d.rectangle([lx, ly, lx + 14, ly + 14], fill=col); d.text((lx + 18, ly - 2), KO.get(t, t), fill=(220, 220, 220), font=font(16))
         lx += 130
         if lx > W * s - 140: lx, ly = 10, ly + 22
     im.save(out)
