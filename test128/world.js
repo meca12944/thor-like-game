@@ -574,7 +574,7 @@
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
     if (m.flag) { SAVE.flags[m.flag] = true; save(); }
     if (m.loot && !m.noDrop) { const got = giveLoot(m.loot); if (got) banner('얻었다: ' + got, 2); }
-    if (D.champion) { banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const L = (M().links || {}).boss_door || {}, left = (L.needFlags || ['champ_boar', 'champ_wasp']).filter(f => !SAVE.flags[f]).length;
+    if (D.champion) { if (m.flag) playScene('champ:' + m.flag, 2.8); banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const L = (M().links || {}).boss_door || {}, left = (L.needFlags || ['champ_boar', 'champ_wasp']).filter(f => !SAVE.flags[f]).length;
       after(2.3, () => msg(left ? '남은 챔피언: ' + left + ' — 모두 쓰러뜨리면 ' + (L.openText || '골렘의 방이 열린다') : (L.doneText || '숲의 두 우두머리를 쓰러뜨렸다! 신전 B2의 봉인된 문이 열린다.'), 3.5)); } // per-dungeon text (links.boss_door)
     if (D.boss) bossDefeated(m);
     if (m.spawnRef && m.spawnRef.respawn > 0) m.spawnRef.timer = m.spawnRef.respawn;
@@ -960,7 +960,7 @@
           S.wish = (S.wish || 0) + 1; S.dialog = { text: '동전을 던졌다… (-10G)\n' + F[Math.floor(Math.random() * F.length)] + (lucky ? '\n우물이 반짝이며 40G를 돌려주었다!' : ''), name: o.name }; S.door = o.id; return; }
         if (o.race) { S.dialog = { text: '광차 경주 트랙. 「바퀴」가 접수를 받는다.\n광차 경주 미니게임은 아직 준비 중이다. (stub)', name: o.name }; S.door = o.id; return; }
         if (o.heal) { abyssRest(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); }
-        if (o.to) { go(o.to, o.spawn || 'default'); return; } // a door into another map (펠트 → 아라크네의 폐공방)
+        if (o.to) { const sk = o.scene, t = sk && !Q.has('noscene') && DLGD && DLGD.scenes && DLGD.scenes[sk]; if (t && !SAVE.flags['scene_' + sk]) { SAVE.flags['scene_' + sk] = true; save(); playSeq(withArt(toSeq(t), sk), { then: () => go(o.to, o.spawn || 'default') }); return; } go(o.to, o.spawn || 'default'); return; } // o.scene plays once before the door opens // a door into another map (펠트 → 아라크네의 폐공방)
         S.dialog = { text: o.text || ('「' + (o.name || '건물') + '」'), name: o.name }; S.door = o.id; return; }
       if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; SAVE.lastWay = { map: m.id, id: o.id }; save(); abyssRest(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); saveHere('way');
         S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 저장 완료 · 쓰러지면 여기서 다시 시작\n지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
@@ -983,7 +983,8 @@
     if (o.needQuest && !questOn(o.needQuest)) { S.dialog = { text: o.textIdle || o.textLocked || '…', name: o.name }; return; }
     if (!(o.needFlags || []).every(f => SAVE.flags[f])) { S.dialog = { text: o.textLocked || '지금은 할 수 있는 게 없다.', name: o.name }; return; }
     SAVE.flags[o.flag] = true; save(); const got = o.loot ? giveLoot(o.loot) : '';
-    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg, cgDx: o.cgDx || 0 }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
+    const more = (o.textMore || []).filter(([c]) => c.startsWith('quest:') ? SAVE.quests[c.slice(6)] === 'done' : SAVE.flags[c]).map(([, t]) => '\n\n' + t).join(''); // textMore: lines that only make sense after something else (제미나이 1장 연결)
+    S.dialog = { text: o.text + more + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg, cgDx: o.cgDx || 0 }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
     if (!keyId) { if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
