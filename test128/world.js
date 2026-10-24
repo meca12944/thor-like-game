@@ -401,7 +401,7 @@
           ctx.restore();
           ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag] of P.threads || []) { const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 2 + x1) * k;
             ctx.strokeStyle = `rgba(190,40,55,${.55 * p})`; ctx.lineWidth = Math.max(1, k * .5); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
-          for (const [x, y] of P.cocoons || []) { const [sx, sy] = W2S((h.gx + x) * T, (h.gy + y) * T), sw = Math.sin(S.t * 1.7 + x * 3) * 2 * k, top = sy - 60 * k * p; // hanging cocoons drop into view
+          for (const [ci, [x, y]] of (P.cocoons || []).entries()) { if ((S.cocoonGone || []).includes(ci)) continue; const [sx, sy] = W2S((h.gx + x) * T, (h.gy + y) * T), sw = Math.sin(S.t * 1.7 + x * 3) * 2 * k, top = sy - 60 * k * p; // hanging cocoons drop into view
             ctx.strokeStyle = `rgba(230,220,230,${.6 * p})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(sx, v.oy); ctx.lineTo(sx + sw, top); ctx.stroke();
             ctx.fillStyle = `rgba(214,200,190,${p})`; ctx.beginPath(); ctx.ellipse(sx + sw, top + 9 * k, 5 * k, 10 * k, 0, 0, TAU); ctx.fill(); ctx.fillStyle = `rgba(150,30,45,${.5 * p})`; ctx.fillRect(sx + sw - k, top + 4 * k, 2 * k, 12 * k); }
           ctx.restore(); } }
@@ -543,7 +543,7 @@
   }
   function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
-    S.roomP2 = undefined; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    S.roomP2 = undefined; S.cocoonGone = []; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
@@ -852,7 +852,8 @@
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
-  addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; }); // the red threads unravel slowly
+  addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
+  addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
