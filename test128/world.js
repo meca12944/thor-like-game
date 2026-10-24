@@ -375,12 +375,14 @@
         ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
+      if (q.show && !(FL() && FL().show(q.show))) continue; // felt_live.js: story variants (memorial wall day / night, thread clump / cut)
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
-      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
+      const fw = q.frames ? im.width / q.frames : im.width, fi = q.seq ? seqFrame(q.seq, q.ph) : 0; // strips: frames side by side, q.seq = [[frame, ms], ...] (loop / ping-pong / hold)
+      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? fw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + fw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
-      const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
-      if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); }
-      hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a); }
+      const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, fw * sc, im.height * sc + 4 * k)) continue;
+      if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, fw * sc * .42, Math.max(3 * k, fw * sc * .06), 0, 0, TAU); ctx.fill(); }
+      hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a, fi, fw); }
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
       const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
@@ -388,18 +390,20 @@
       const [sx, sy] = W2S(fx, fy); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
       hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a); }
     if (FL()) for (const h of m.hds) if (h.live) FL().props(k, front, h, T); } // felt_live.js: fountain water, shop signs (code)
-  function hdBlit(im, sx, sy, ax, ay, sc, flip, a) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame)
-    ctx.imageSmoothingEnabled = false; ctx.globalAlpha = a ?? 1; const X = Math.round(sx), Y = Math.round(sy), w = Math.round(im.width * sc), h = Math.round(im.height * sc);
-    if (flip) { ctx.setTransform(-1, 0, 0, 1, X, Y); ctx.drawImage(im, -Math.round(ax), -Math.round(ay), w, h); ctx.setTransform(1, 0, 0, 1, 0, 0); } else ctx.drawImage(im, X - Math.round(ax), Y - Math.round(ay), w, h);
+  function hdBlit(im, sx, sy, ax, ay, sc, flip, a, fi, fw) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame); fi / fw = one frame of a strip
+    ctx.imageSmoothingEnabled = false; ctx.globalAlpha = a ?? 1; const sw = fw || im.width, X = Math.round(sx), Y = Math.round(sy), w = Math.round(sw * sc), h = Math.round(im.height * sc), u = (fi || 0) * sw;
+    if (flip) { ctx.setTransform(-1, 0, 0, 1, X, Y); ctx.drawImage(im, u, 0, sw, im.height, -Math.round(ax), -Math.round(ay), w, h); ctx.setTransform(1, 0, 0, 1, 0, 0); } else ctx.drawImage(im, u, 0, sw, im.height, X - Math.round(ax), Y - Math.round(ay), w, h);
     ctx.globalAlpha = 1; }
+  function seqFrame(seq, ph) { let n = 0; for (const s of seq) n += s[1]; let t = (S.t * 1000 + (ph || 0)) % n; for (const [f, ms] of seq) { if (t < ms) return f; t -= ms; } return 0; }
   // light pools are static: baked ONCE per map into the ground picture and into each prop's picture (lit copy) — no per-frame additive pass
   // (owner 10-23 「최적화」: the additive light pass was the costliest part of a town frame; characters keep the dusk grade only)
   function hdBake(h, T) { if (h._g !== undefined) return h._g; const im = HDIMG[h.ground]; if (!im) return null; if (!(h.lights && h.lights.length)) return (h._g = im);
     const lm = document.createElement('canvas'); lm.width = Math.ceil(im.width / h.D / 2); lm.height = Math.ceil(im.height / h.D / 2); const g = lm.getContext('2d'); g.globalCompositeOperation = 'lighter';
     for (const [lx, ly, r, col, a] of h.lights) g.drawImage(lightSprite(col, a, Math.round(r / 2)), lx * T / 2 - r / 2, ly * T / 2 - r / 2 * .72, r, r * .72); // half world px: soft anyway
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const cg = c.getContext('2d'); cg.drawImage(im, 0, 0); cg.globalCompositeOperation = 'lighter'; cg.imageSmoothingEnabled = true; cg.drawImage(lm, 0, 0, lm.width * 2 * h.D, lm.height * 2 * h.D);
-    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
-      const t = document.createElement('canvas'); t.width = pi.width; t.height = pi.height; const tg = t.getContext('2d'); tg.imageSmoothingEnabled = true; tg.drawImage(lm, wl / 2, wt / 2, pi.width / Dq / 2, pi.height / Dq / 2, 0, 0, pi.width, pi.height);
+    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / (q.frames || 1) / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
+      const t = document.createElement('canvas'); t.width = pi.width; t.height = pi.height; const tg = t.getContext('2d'); tg.imageSmoothingEnabled = true; const nf = q.frames || 1, fw = pi.width / nf; // a strip: the same light on every frame
+      for (let f = 0; f < nf; f++) tg.drawImage(lm, wl / 2, wt / 2, fw / Dq / 2, pi.height / Dq / 2, f * fw, 0, fw, pi.height);
       tg.globalCompositeOperation = 'destination-in'; tg.drawImage(pi, 0, 0); const o = document.createElement('canvas'); o.width = pi.width; o.height = pi.height; const og = o.getContext('2d'); og.drawImage(pi, 0, 0); og.globalCompositeOperation = 'lighter'; og.drawImage(t, 0, 0);
       q._lit = o; }
     return (h._g = c); }

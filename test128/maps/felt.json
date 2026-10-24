@@ -14,7 +14,7 @@
  "id": "felt",
  "name": "펠트",
  "viewZoom": 1.3,
- "w": 59,
+ "w": 72,
  "h": 35,
  "legend": {
   ".": "dirt",
@@ -24,41 +24,41 @@
   "#"
  ],
  "ground": [
-  "###########################################################",
-  "###########################################################",
-  "###########################################################",
-  "###########################################################",
-  "###########################################################",
-  "###########################################################",
-  "#..............##.######.#######...###.........###........#",
-  "#.................######.#######...#.#.........###........#",
-  "#.................##.#######..##..........................#",
-  "#..............#####.#######................###...........#",
-  "#..............#####.#######......................##......#",
-  "#........#####.#####.##..................######...........#",
-  "####.....#####.#####......................................#",
-  "####.#########.######.............#######.................#",
-  "####.##########..............##...#######.................#",
-  "####.#####...#.......#.....#......#######.................#",
-  "#....................######......########.................#",
-  "#....................######...............................#",
-  "#....................######...............................#",
-  "#.....#....................................######.........#",
-  "#....................#...#.#...............######.........#",
-  "#..........########........................######...#.....#",
-  "#..........########.....................##.......####.....#",
-  "#..........########...........#######...##.......####.....#",
-  "#...........##................#######...########.####.....#",
-  "#..........................##.########..#######.##........#",
-  "#######............#######..............########..........#",
-  "#######............#######..............########..........#",
-  "#######............#######........#.....########..........#",
-  "#######.....................#.........##########..........#",
-  "#........................####...###.......................#",
-  "#############################....##########################",
-  "#############################...###########################",
-  "#############################...###########################",
-  "#############################...###########################"
+  "########################################################################",
+  "########################################################################",
+  "########################################################################",
+  "########################################################################",
+  "########################################################################",
+  "########################################################################",
+  "#..............##.######.#######...###.........###........#...........##",
+  "#.................######.#######...#.#.........###........#.....#......#",
+  "#.................##.#######..##.......................#..#.#...#......#",
+  "#..............#####.#######................###...#.......#.#......###.#",
+  "#..............#####.#######......................##......#........###.#",
+  "#........#####.#####.##..................######...........#............#",
+  "####.....#####.#####..........###.........................#..##........#",
+  "####.#########.######.............#######.........###.##..#..##.......##",
+  "####.##########..............##...#######.................#...........##",
+  "####.#####...#.......#.....#......#######...............###......###...#",
+  "#....................######..############.................#............#",
+  "#....................######...............................#............#",
+  "#....................######...........................###.#.#.......##.#",
+  "#.....#....................................######.........#....#.......#",
+  "#....................#...#.#...............######.........#............#",
+  "#.....##...########........................######.........#..##.....#..#",
+  "#..........########.....................##................#.#..####.##.#",
+  "#..........########...........#######...##.....................#######.#",
+  "#...........##................#######...########...............######..#",
+  "#..........................##.########..#########.........#............#",
+  "#######............#######..............########..........#...#.....#..#",
+  "#######............#######..............########..........#.#.......####",
+  "#######............#######........#.....########..........#.........####",
+  "#######.....................#.........##########..........#...###.#....#",
+  "#........................####...###.......................#.##....#....#",
+  "#############################....#######################################",
+  "#############################...########################################",
+  "#############################...########################################",
+  "#############################...########################################"
  ],
  "objects": [
   {
@@ -164,7 +164,7 @@
   {
    "type": "door",
    "id": "f_arachne_gate",
-   "x": 51,
+   "x": 65,
    "y": 24,
    "name": "아라크네의 폐공방",
    "text": "거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.",
@@ -196,7 +196,7 @@
   {
    "type": "waystone",
    "id": "ws_arachne",
-   "x": 47,
+   "x": 61,
    "y": 25,
    "name": "폐공방 앞 비석"
   },
@@ -417,9 +417,17 @@
   {
    "type": "sign",
    "id": "f_sign_gate_night",
-   "x": 32,
-   "y": 29,
+   "x": 27,
+   "y": 28,
    "text": "「해 지면 문 닫음」\n— 펠트 경비대",
+   "live": 1
+  },
+  {
+   "type": "sign",
+   "id": "f_sign_side_gate",
+   "x": 57,
+   "y": 25,
+   "text": "「출입 금지」\n— 가스",
    "live": 1
   }
  ],
@@ -440,7 +448,7 @@
    "up"
   ],
   "arachne": [
-   51.5,
+   65.5,
    25.6,
    "down"
   ],
@@ -470,111 +478,57 @@
   "ground": "assets/world/felt/ground.png",
   "props": [
    {
-    "id": "inn",
-    "role": "[7] 마르타의 여관",
-    "img": "assets/world/felt/inn.png",
-    "x": 37.660000000000004,
-    "y": 16.450000000000003,
-    "ax": 192,
-    "ay": 395,
+    "id": "burnt_pine_a_67",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_a.png",
+    "x": 67.0,
+    "y": 5.6,
+    "ax": 29,
+    "ay": 192,
     "solid": [
-     34,
-     13,
-     40,
-     16
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "se_house",
-    "role": "[11] 롬의 대장간",
-    "img": "assets/world/felt/se_house.png",
-    "x": 33.495000000000005,
-    "y": 25.55,
-    "ax": 197,
-    "ay": 351,
-    "solid": [
-     30,
-     23,
-     36,
-     25
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "s_house",
-    "role": "[12] 이장 바르트의 집",
-    "img": "assets/world/felt/s_house.png",
-    "x": 22.470000000000002,
-    "y": 28.875000000000004,
-    "ax": 197,
-    "ay": 333,
-    "solid": [
-     19,
-     26,
-     25,
-     28
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "shop_sign",
-    "role": "[13] 잡화점",
-    "img": "assets/world/felt/shop_sign.png",
-    "x": 14.875000000000002,
-    "y": 24.150000000000002,
-    "ax": 197,
-    "ay": 371,
-    "solid": [
-     11,
-     21,
-     18,
-     23
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "castle_l",
-    "role": "[2] 불탄 왕성 왼쪽",
-    "img": "assets/world/felt/castle_l.png",
-    "x": 21.07,
-    "y": 8.05,
-    "ax": 171,
-    "ay": 285,
-    "solid": [
-     18,
+     66,
      4,
-     23,
-     7
+     67,
+     5
     ],
-    "fade": 1,
-    "shadow": 0,
+    "fade": 0,
+    "shadow": 1,
     "D": 3
    },
    {
-    "id": "e_row",
-    "role": "[8] 세라의 약초 오두막",
-    "img": "assets/world/felt/e_row.png",
-    "x": 46.025000000000006,
-    "y": 21.700000000000003,
-    "ax": 136,
-    "ay": 381,
+    "id": "burnt_pine_b_66",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_b.png",
+    "x": 62.2,
+    "y": 5.9,
+    "ax": 47,
+    "ay": 200,
     "solid": [
-     43,
-     19,
-     48,
-     21
+     62,
+     5,
+     62,
+     5
     ],
-    "fade": 1,
-    "shadow": 0,
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_b_68",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_b.png",
+    "x": 70.6,
+    "y": 6.6,
+    "ax": 47,
+    "ay": 200,
+    "solid": [
+     70,
+     5,
+     70,
+     6
+    ],
+    "fade": 0,
+    "shadow": 1,
     "D": 3
    },
    {
@@ -596,126 +550,116 @@
     "D": 3
    },
    {
-    "id": "west_a",
-    "role": "[14] 중고 무기점",
-    "img": "assets/world/felt/west_a.png",
-    "x": 6.335000000000001,
-    "y": 16.1,
-    "ax": 101,
-    "ay": 382,
-    "solid": [
-     5,
-     13,
-     8,
-     15
-    ],
+    "id": "wall_e_6",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 7.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
     "fade": 1,
     "shadow": 0,
     "D": 3
    },
    {
-    "id": "west_b",
-    "role": "[15] 시장 거리 집",
-    "img": "assets/world/felt/west_b.png",
-    "x": 11.375000000000002,
-    "y": 14.350000000000001,
-    "ax": 133,
-    "ay": 390,
-    "solid": [
-     9,
-     11,
-     13,
-     14
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "stall_n",
-    "role": "[15] 시장 노점",
-    "img": "assets/world/felt/stall_n.png",
-    "x": 17.430000000000003,
-    "y": 14.000000000000002,
-    "ax": 105,
+    "id": "watchtower",
+    "role": "[4] 경비 초소 감시탑",
+    "img": "assets/world/felt/watchtower.png",
+    "x": 15.925,
+    "y": 7.000000000000001,
+    "ax": 39,
     "ay": 225,
     "solid": [
      15,
-     9,
-     19,
-     13
+     5,
+     16,
+     6
     ],
     "fade": 1,
     "shadow": 0,
     "D": 3
    },
    {
-    "id": "sw_house",
-    "role": "[16] 주민 빈집",
-    "img": "assets/world/felt/sw_house.png",
-    "x": 4.130000000000001,
-    "y": 29.19,
-    "ax": 159,
-    "ay": 395,
+    "id": "candelabra_9",
+    "role": "",
+    "img": "assets/world/felt/candelabra.png",
+    "x": 37.800000000000004,
+    "y": 7.175000000000001,
+    "ax": 15,
+    "ay": 113,
     "solid": [
-     1,
-     26,
-     6,
-     29
+     37,
+     7,
+     37,
+     7
     ],
-    "fade": 1,
-    "shadow": 0,
+    "fade": 0,
+    "shadow": 1,
     "D": 3
    },
    {
-    "id": "west_edge",
-    "role": "경비 초소 본채(맨 왼쪽)",
-    "img": "assets/world/felt/west_edge.png",
-    "x": 1.9250000000000003,
-    "y": 15.400000000000002,
-    "ax": 84,
-    "ay": 371,
+    "id": "mausoleum",
+    "role": "[6] 예배당 뒤 묘지 납골당",
+    "img": "assets/world/felt/mausoleum.png",
+    "x": 48.475,
+    "y": 7.525,
+    "ax": 47,
+    "ay": 141,
     "solid": [
-     0,
-     12,
-     3,
-     15
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "web_arch",
-    "role": "[9] 아라크네의 폐공방",
-    "img": "assets/world/felt/web_arch.png",
-    "x": 51.38,
-    "y": 24.675,
-    "ax": 97,
-    "ay": 394,
-    "solid": [
-     49,
-     22,
-     52,
-     24
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "red_stall",
-    "role": "[10] 벤의 노점",
-    "img": "assets/world/felt/red_stall.png",
-    "x": 43.785000000000004,
-    "y": 29.19,
-    "ax": 197,
-    "ay": 306,
-    "solid": [
-     40,
-     24,
      47,
-     29
+     6,
+     49,
+     7
+    ],
+    "fade": 1,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "candelabra_26",
+    "role": "",
+    "img": "assets/world/felt/candelabra.png",
+    "x": 35.0,
+    "y": 7.525,
+    "ax": 15,
+    "ay": 113,
+    "solid": [
+     35,
+     7,
+     35,
+     7
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_7",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 8.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "castle_l",
+    "role": "[2] 불탄 왕성 왼쪽",
+    "img": "assets/world/felt/castle_l.png",
+    "x": 21.07,
+    "y": 8.05,
+    "ax": 171,
+    "ay": 285,
+    "solid": [
+     18,
+     4,
+     23,
+     7
     ],
     "fade": 1,
     "shadow": 0,
@@ -740,278 +684,103 @@
     "D": 3
    },
    {
-    "id": "watchtower",
-    "role": "[4] 경비 초소 감시탑",
-    "img": "assets/world/felt/watchtower.png",
-    "x": 15.925,
-    "y": 7.000000000000001,
-    "ax": 39,
-    "ay": 225,
-    "solid": [
-     15,
-     5,
-     16,
-     6
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "mausoleum",
-    "role": "[6] 예배당 뒤 묘지 납골당",
-    "img": "assets/world/felt/mausoleum.png",
-    "x": 48.475,
-    "y": 7.525,
+    "id": "burnt_pine_b_44",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_b.png",
+    "x": 64.2,
+    "y": 8.6,
     "ax": 47,
-    "ay": 141,
+    "ay": 200,
     "solid": [
-     47,
-     6,
-     49,
-     7
-    ],
-    "fade": 1,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "fountain",
-    "role": "[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)",
-    "img": "assets/world/felt/fountain.png",
-    "x": 24.220000000000002,
-    "y": 18.55,
-    "ax": 146,
-    "ay": 310,
-    "solid": [
-     21,
-     16,
-     26,
-     18
-    ],
-    "fade": 1,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "linette",
-    "role": "[3] 리네트의 공방 (왕실 의상실 폐허)",
-    "img": "assets/world/felt/linette.png",
-    "x": 24.500000000000004,
-    "y": 10.675,
-    "ax": 166,
-    "ay": 275,
-    "solid": [
-     21,
-     8,
-     27,
-     10
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "bl_house",
-    "role": "주민 집 (felt_hd house_v2)",
-    "img": "assets/world/felt/bl_house.png",
-    "x": 2.45,
-    "y": 30.1,
-    "ax": 129,
-    "ay": 230,
-    "solid": [
-     0,
-     28,
-     4,
-     29
-    ],
-    "fade": 1,
-    "shadow": 0,
-    "D": 3
-   },
-   {
-    "id": "well_shop",
-    "role": "",
-    "img": "assets/world/felt/well.png",
-    "x": 12.958333333333334,
-    "y": 24.290000000000003,
-    "ax": 37,
-    "ay": 92,
-    "solid": [
-     12,
-     23,
-     13,
-     24
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "fence_wood_0",
-    "role": "",
-    "img": "assets/world/felt/fence_wood.png",
-    "x": 26.950000000000003,
-    "y": 30.310000000000002,
-    "ax": 95,
-    "ay": 42,
-    "solid": [
-     25,
-     30,
-     28,
-     30
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "fence_wood_1",
-    "role": "",
-    "img": "assets/world/felt/fence_wood.png",
-    "x": 33.6,
-    "y": 30.310000000000002,
-    "ax": 95,
-    "ay": 42,
-    "solid": [
-     32,
-     30,
-     34,
-     30
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "south_gate_2",
-    "role": "",
-    "img": "assets/world/felt/south_gate.png",
-    "x": 30.1,
-    "y": 30.450000000000003,
-    "ax": 160,
-    "ay": 211,
-    "solid": null,
-    "fade": 1,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "brazier_3",
-    "role": "",
-    "img": "assets/world/felt/brazier.png",
-    "x": 28.000000000000004,
-    "y": 29.225,
-    "ax": 20,
-    "ay": 62,
-    "solid": [
-     28,
-     29,
-     28,
-     29
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "anvil_4",
-    "role": "",
-    "img": "assets/world/felt/anvil.png",
-    "x": 35.0,
-    "y": 26.075000000000003,
-    "ax": 24,
-    "ay": 34,
-    "solid": [
-     34,
-     25,
-     35,
-     25
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "woodpile_5",
-    "role": "",
-    "img": "assets/world/felt/woodpile.png",
-    "x": 37.1,
-    "y": 25.900000000000002,
-    "ax": 27,
-    "ay": 52,
-    "solid": [
-     36,
-     25,
-     37,
-     25
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "barrels_6",
-    "role": "",
-    "img": "assets/world/felt/barrels.png",
-    "x": 27.650000000000002,
-    "y": 26.075000000000003,
-    "ax": 22,
-    "ay": 56,
-    "solid": [
-     27,
-     25,
-     28,
-     25
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "sign_post_7",
-    "role": "",
-    "img": "assets/world/felt/sign_post.png",
-    "x": 34.650000000000006,
-    "y": 28.630000000000003,
-    "ax": 28,
-    "ay": 89,
-    "solid": [
-     34,
-     28,
-     34,
-     28
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "string_lights_8",
-    "role": "",
-    "img": "assets/world/felt/string_lights.png",
-    "x": 11.55,
-    "y": 15.575000000000001,
-    "ax": 100,
-    "ay": 121,
-    "solid": null,
-    "fade": 1,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "candelabra_9",
-    "role": "",
-    "img": "assets/world/felt/candelabra.png",
-    "x": 37.800000000000004,
-    "y": 7.175000000000001,
-    "ax": 15,
-    "ay": 113,
-    "solid": [
-     37,
+     64,
      7,
-     37,
-     7
+     64,
+     8
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "rubble_40",
+    "role": "",
+    "img": "assets/world/felt/rubble.png",
+    "x": 19.075000000000003,
+    "y": 8.925,
+    "ax": 27,
+    "ay": 32,
+    "solid": [
+     18,
+     8,
+     19,
+     8
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_8",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 9.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "rubble_41",
+    "role": "",
+    "img": "assets/world/felt/rubble.png",
+    "x": 30.800000000000004,
+    "y": 9.170000000000002,
+    "ax": 27,
+    "ay": 32,
+    "solid": [
+     30,
+     8,
+     31,
+     8
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_burnt_stump_d2",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_d.png",
+    "x": 55.4,
+    "y": 9.6,
+    "ax": 24.5,
+    "ay": 37,
+    "solid": [
+     55,
+     8,
+     55,
+     8
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_a_43",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_a.png",
+    "x": 60.6,
+    "y": 9.600000000000001,
+    "ax": 29,
+    "ay": 192,
+    "solid": [
+     60,
+     8,
+     60,
+     9
     ],
     "fade": 0,
     "shadow": 1,
@@ -1036,219 +805,70 @@
     "D": 3
    },
    {
-    "id": "cocoons_11",
-    "role": "",
-    "img": "assets/world/felt/cocoons.png",
-    "x": 49.7,
-    "y": 25.200000000000003,
-    "ax": 42,
-    "ay": 93,
-    "solid": [
-     49,
-     24,
-     49,
-     25
-    ],
-    "fade": 0,
-    "shadow": 1,
+    "id": "wall_e_9",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 10.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
     "D": 3
    },
    {
-    "id": "ember_rubble_12",
-    "role": "",
-    "img": "assets/world/felt/ember_rubble.png",
-    "x": 22.400000000000002,
-    "y": 11.55,
-    "ax": 58,
-    "ay": 63,
+    "id": "slot_burnt_stump_a2",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_a.png",
+    "x": 50.6,
+    "y": 10.4,
+    "ax": 22.0,
+    "ay": 41,
     "solid": [
-     21,
-     11,
-     22,
-     11
+     50,
+     9,
+     50,
+     9
     ],
     "fade": 0,
-    "shadow": 1,
+    "shadow": 0,
     "D": 3
    },
    {
-    "id": "dead_tree_13",
+    "id": "dead_tree_45",
     "role": "",
     "img": "assets/world/felt/dead_tree.png",
+    "x": 68.6,
+    "y": 10.6,
+    "ax": 64,
+    "ay": 175,
+    "solid": [
+     67,
+     9,
+     69,
+     10
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "linette",
+    "role": "[3] 리네트의 공방 (왕실 의상실 폐허)",
+    "img": "assets/world/felt/linette.png",
     "x": 24.500000000000004,
-    "y": 34.125,
-    "ax": 64,
-    "ay": 175,
+    "y": 10.675,
+    "ax": 166,
+    "ay": 275,
     "solid": [
-     23,
-     33,
-     25,
-     33
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "dead_tree_14",
-    "role": "",
-    "img": "assets/world/felt/dead_tree.png",
-    "x": 36.400000000000006,
-    "y": 34.475,
-    "ax": 64,
-    "ay": 175,
-    "solid": [
-     35,
-     33,
-     37,
-     34
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "bush_b_15",
-    "role": "",
-    "img": "assets/world/felt/bush_b.png",
-    "x": 27.650000000000002,
-    "y": 33.6,
-    "ax": 46,
-    "ay": 53,
-    "solid": [
+     21,
+     8,
      27,
-     33,
-     28,
-     33
+     10
     ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "bush_b_16",
-    "role": "",
-    "img": "assets/world/felt/bush_b.png",
-    "x": 32.725,
-    "y": 33.775000000000006,
-    "ax": 46,
-    "ay": 53,
-    "solid": [
-     32,
-     33,
-     33,
-     33
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "bush_b_17",
-    "role": "",
-    "img": "assets/world/felt/bush_b.png",
-    "x": 21.35,
-    "y": 35.0,
-    "ax": 46,
-    "ay": 53,
-    "solid": [
-     20,
-     34,
-     21,
-     34
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "bush_b_18",
-    "role": "",
-    "img": "assets/world/felt/bush_b.png",
-    "x": 40.25000000000001,
-    "y": 34.825,
-    "ax": 46,
-    "ay": 53,
-    "solid": [
-     39,
-     34,
-     40,
-     34
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "stone_low_19",
-    "role": "",
-    "img": "assets/world/felt/stone_low.png",
-    "x": 22.750000000000004,
-    "y": 32.375,
-    "ax": 70,
-    "ay": 43,
-    "solid": [
-     21,
-     32,
-     23,
-     32
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "stone_low_20",
-    "role": "",
-    "img": "assets/world/felt/stone_low.png",
-    "x": 37.975,
-    "y": 32.550000000000004,
-    "ax": 70,
-    "ay": 43,
-    "solid": [
-     37,
-     32,
-     38,
-     32
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "bush_b_21",
-    "role": "",
-    "img": "assets/world/felt/bush_b.png",
-    "x": 16.8,
-    "y": 34.650000000000006,
-    "ax": 46,
-    "ay": 53,
-    "solid": [
-     16,
-     34,
-     17,
-     34
-    ],
-    "fade": 0,
-    "shadow": 1,
-    "D": 3
-   },
-   {
-    "id": "stone_low_22",
-    "role": "",
-    "img": "assets/world/felt/stone_low.png",
-    "x": 43.75000000000001,
-    "y": 34.650000000000006,
-    "ax": 70,
-    "ay": 43,
-    "solid": [
-     42,
-     34,
-     44,
-     34
-    ],
-    "fade": 0,
-    "shadow": 1,
+    "fade": 1,
+    "shadow": 0,
     "D": 3
    },
    {
@@ -1264,6 +884,50 @@
      10,
      51,
      10
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_10",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 11.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_gold_arch",
+    "role": "slot",
+    "img": "assets/world/felt_slots/gold_arch.png",
+    "x": 25.5,
+    "y": 11.21,
+    "ax": 72.0,
+    "ay": 160,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "ember_rubble_12",
+    "role": "",
+    "img": "assets/world/felt/ember_rubble.png",
+    "x": 22.400000000000002,
+    "y": 11.55,
+    "ax": 58,
+    "ay": 63,
+    "solid": [
+     21,
+     11,
+     22,
+     11
     ],
     "fade": 0,
     "shadow": 1,
@@ -1306,39 +970,369 @@
     "D": 3
    },
    {
-    "id": "candelabra_26",
-    "role": "",
-    "img": "assets/world/felt/candelabra.png",
-    "x": 35.0,
-    "y": 7.525,
-    "ax": 15,
-    "ay": 113,
+    "id": "wall_e_11",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 12.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_memorial_wall_day",
+    "role": "slot",
+    "img": "assets/world/felt_slots/memorial_wall_day.png",
+    "x": 31.59,
+    "y": 12.71,
+    "ax": 92.5,
+    "ay": 148,
     "solid": [
-     35,
-     7,
-     35,
-     7
+     30,
+     12,
+     32,
+     12
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "show": "day",
+    "D": 3
+   },
+   {
+    "id": "slot_memorial_wall_night",
+    "role": "slot",
+    "img": "assets/world/felt_slots/memorial_wall_night_strip.png",
+    "x": 31.59,
+    "y": 12.71,
+    "ax": 92.5,
+    "ay": 148,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "frames": 2,
+    "seq": [
+     [
+      0,
+      300
+     ],
+     [
+      1,
+      300
+     ]
+    ],
+    "show": "night",
+    "D": 3
+   },
+   {
+    "id": "wall_e_12",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 13.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "ruin_pillar_47",
+    "role": "",
+    "img": "assets/world/felt/ruin_pillar.png",
+    "x": 61.6,
+    "y": 13.2,
+    "ax": 38,
+    "ay": 143,
+    "solid": [
+     61,
+     12,
+     62,
+     13
     ],
     "fade": 0,
     "shadow": 1,
     "D": 3
    },
    {
-    "id": "cocoons_27",
-    "role": "",
-    "img": "assets/world/felt/cocoons.png",
-    "x": 52.50000000000001,
-    "y": 22.400000000000002,
-    "ax": 42,
-    "ay": 93,
+    "id": "slot_refugee_tent_crest_a",
+    "role": "slot",
+    "img": "assets/world/felt_slots/refugee_tent_crest_a.png",
+    "x": 54.6,
+    "y": 13.6,
+    "ax": 70.0,
+    "ay": 120,
     "solid": [
-     52,
-     21,
-     52,
-     22
+     54,
+     13,
+     55,
+     13
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "wall_e_13",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 14.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "stall_n",
+    "role": "[15] 시장 노점",
+    "img": "assets/world/felt/stall_n.png",
+    "x": 17.430000000000003,
+    "y": 14.000000000000002,
+    "ax": 105,
+    "ay": 225,
+    "solid": [
+     15,
+     9,
+     19,
+     13
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "crates_34",
+    "role": "",
+    "img": "assets/world/felt/crates.png",
+    "x": 20.125000000000004,
+    "y": 14.175,
+    "ax": 40,
+    "ay": 59,
+    "solid": [
+     19,
+     13,
+     20,
+     13
     ],
     "fade": 0,
     "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_a_46",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_a.png",
+    "x": 70.2,
+    "y": 14.2,
+    "ax": 29,
+    "ay": 192,
+    "solid": [
+     70,
+     13,
+     70,
+     14
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_refugee_tent_a",
+    "role": "slot",
+    "img": "assets/world/felt_slots/refugee_tent_a.png",
+    "x": 51.0,
+    "y": 14.21,
+    "ax": 70.0,
+    "ay": 126,
+    "solid": [
+     50,
+     13,
+     52,
+     13
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "west_b",
+    "role": "[15] 시장 거리 집",
+    "img": "assets/world/felt/west_b.png",
+    "x": 11.375000000000002,
+    "y": 14.350000000000001,
+    "ax": 133,
+    "ay": 390,
+    "solid": [
+     9,
+     11,
+     13,
+     14
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_sign_weapon_sword",
+    "role": "slot",
+    "img": "assets/world/felt_slots/sign_weapon_sword.png",
+    "x": 9.21,
+    "y": 14.360000000000001,
+    "ax": 30.0,
+    "ay": 166.20000000000002,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "barrels_35",
+    "role": "",
+    "img": "assets/world/felt/barrels.png",
+    "x": 13.825000000000001,
+    "y": 14.875000000000002,
+    "ax": 22,
+    "ay": 56,
+    "solid": [
+     13,
+     14,
+     14,
+     14
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_14",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 15.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "cart_36",
+    "role": "",
+    "img": "assets/world/felt/cart.png",
+    "x": 29.750000000000004,
+    "y": 15.05,
+    "ax": 41,
+    "ay": 74,
+    "solid": [
+     29,
+     14,
+     30,
+     14
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_3",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_3.png",
+    "x": 49.6,
+    "y": 15.4,
+    "ax": 20.0,
+    "ay": 41,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread:3",
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_3_cut",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_3_cut.png",
+    "x": 49.6,
+    "y": 15.4,
+    "ax": 20.0,
+    "ay": 41,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread_cut:3",
+    "D": 3
+   },
+   {
+    "id": "west_edge",
+    "role": "경비 초소 본채(맨 왼쪽)",
+    "img": "assets/world/felt/west_edge.png",
+    "x": 1.9250000000000003,
+    "y": 15.400000000000002,
+    "ax": 84,
+    "ay": 371,
+    "solid": [
+     0,
+     12,
+     3,
+     15
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "string_lights_8",
+    "role": "",
+    "img": "assets/world/felt/string_lights.png",
+    "x": 11.55,
+    "y": 15.575000000000001,
+    "ax": 100,
+    "ay": 121,
+    "solid": null,
+    "fade": 1,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "stone_low_48",
+    "role": "",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 66.2,
+    "y": 15.6,
+    "ax": 70,
+    "ay": 43,
+    "solid": [
+     65,
+     15,
+     67,
+     15
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_refugee_tent_b",
+    "role": "slot",
+    "img": "assets/world/felt_slots/refugee_tent_b.png",
+    "x": 56.9,
+    "y": 15.6,
+    "ax": 69.0,
+    "ay": 109,
+    "solid": [
+     56,
+     15,
+     57,
+     15
+    ],
+    "fade": 0,
+    "shadow": 0,
     "D": 3
    },
    {
@@ -1378,6 +1372,291 @@
     "D": 3
    },
    {
+    "id": "wall_e_15",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 16.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "west_a",
+    "role": "[14] 중고 무기점",
+    "img": "assets/world/felt/west_a.png",
+    "x": 6.335000000000001,
+    "y": 16.1,
+    "ax": 101,
+    "ay": 382,
+    "solid": [
+     5,
+     13,
+     8,
+     15
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "inn",
+    "role": "[7] 마르타의 여관",
+    "img": "assets/world/felt/inn.png",
+    "x": 37.660000000000004,
+    "y": 16.450000000000003,
+    "ax": 192,
+    "ay": 395,
+    "solid": [
+     34,
+     13,
+     40,
+     16
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "barrels_37",
+    "role": "",
+    "img": "assets/world/felt/barrels.png",
+    "x": 33.775000000000006,
+    "y": 16.73,
+    "ax": 22,
+    "ay": 56,
+    "solid": [
+     33,
+     16,
+     34,
+     16
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_16",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 17.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_ration_tent",
+    "role": "slot",
+    "img": "assets/world/felt_slots/ration_tent.png",
+    "x": 30.4,
+    "y": 17.4,
+    "ax": 116.0,
+    "ay": 222,
+    "solid": [
+     29,
+     16,
+     32,
+     16
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "wall_e_17",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 18.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "ash_bush_50",
+    "role": "",
+    "img": "assets/world/felt/ash_bush.png",
+    "x": 60.6,
+    "y": 18.4,
+    "ax": 45,
+    "ay": 54,
+    "solid": [
+     60,
+     18,
+     60,
+     18
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "fountain",
+    "role": "[1] 금 간 분수 + 부서진 왕 석상 (광장 랜드마크)",
+    "img": "assets/world/felt/fountain.png",
+    "x": 24.220000000000002,
+    "y": 18.55,
+    "ax": 146,
+    "ay": 310,
+    "solid": [
+     21,
+     16,
+     26,
+     18
+    ],
+    "fade": 1,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_fountain_water",
+    "role": "slot",
+    "img": "assets/world/felt_slots/fountain_water_strip.png",
+    "x": 24.220000000000002,
+    "y": 18.5501,
+    "ax": 146,
+    "ay": 310,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "frames": 6,
+    "seq": [
+     [
+      0,
+      120
+     ],
+     [
+      1,
+      120
+     ],
+     [
+      2,
+      120
+     ],
+     [
+      3,
+      120
+     ],
+     [
+      4,
+      120
+     ],
+     [
+      5,
+      120
+     ]
+    ],
+    "D": 3
+   },
+   {
+    "id": "slot_refugee_tent_c",
+    "role": "slot",
+    "img": "assets/world/felt_slots/refugee_tent_c.png",
+    "x": 55.41,
+    "y": 18.6,
+    "ax": 69.5,
+    "ay": 116,
+    "solid": [
+     54,
+     18,
+     56,
+     18
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "boulder_49",
+    "role": "",
+    "img": "assets/world/felt/boulder.png",
+    "x": 69.2,
+    "y": 18.8,
+    "ax": 41,
+    "ay": 87,
+    "solid": [
+     68,
+     18,
+     69,
+     18
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_18",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 19.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "stump_51",
+    "role": "",
+    "img": "assets/world/felt/stump.png",
+    "x": 63.6,
+    "y": 19.4,
+    "ax": 25,
+    "ay": 46,
+    "solid": [
+     63,
+     19,
+     63,
+     19
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "lamp_32",
+    "role": "",
+    "img": "assets/world/felt/lamp.png",
+    "x": 6.125000000000001,
+    "y": 19.6,
+    "ax": 14,
+    "ay": 79,
+    "solid": [
+     6,
+     19,
+     6,
+     19
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_19",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 20.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
     "id": "lamp_30",
     "role": "",
     "img": "assets/world/felt/lamp.png",
@@ -1414,21 +1693,43 @@
     "D": 3
    },
    {
-    "id": "lamp_32",
-    "role": "",
-    "img": "assets/world/felt/lamp.png",
-    "x": 6.125000000000001,
-    "y": 19.6,
-    "ax": 14,
-    "ay": 79,
-    "solid": [
-     6,
-     19,
-     6,
-     19
-    ],
+    "id": "slot_laundry_line",
+    "role": "slot",
+    "img": "assets/world/felt_slots/laundry_line_strip.png",
+    "x": 3.41,
+    "y": 20.4,
+    "ax": 53.5,
+    "ay": 82,
+    "solid": null,
     "fade": 0,
-    "shadow": 1,
+    "shadow": 0,
+    "frames": 4,
+    "seq": [
+     [
+      0,
+      180
+     ],
+     [
+      1,
+      180
+     ],
+     [
+      2,
+      180
+     ],
+     [
+      3,
+      180
+     ],
+     [
+      2,
+      180
+     ],
+     [
+      1,
+      180
+     ]
+    ],
     "D": 3
    },
    {
@@ -1450,75 +1751,201 @@
     "D": 3
    },
    {
-    "id": "crates_34",
+    "id": "wall_e_20",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 21.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "ember_rubble_52",
     "role": "",
-    "img": "assets/world/felt/crates.png",
-    "x": 20.125000000000004,
-    "y": 14.175,
-    "ax": 40,
-    "ay": 59,
+    "img": "assets/world/felt/ember_rubble.png",
+    "x": 62.4,
+    "y": 21.4,
+    "ax": 58,
+    "ay": 63,
     "solid": [
+     61,
+     21,
+     62,
+     21
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_refugee_tent_d",
+    "role": "slot",
+    "img": "assets/world/felt_slots/refugee_tent_d.png",
+    "x": 6.59,
+    "y": 21.6,
+    "ax": 70.5,
+    "ay": 113,
+    "solid": [
+     6,
+     21,
+     7,
+     21
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "e_row",
+    "role": "[8] 세라의 약초 오두막",
+    "img": "assets/world/felt/e_row.png",
+    "x": 46.025000000000006,
+    "y": 21.700000000000003,
+    "ax": 136,
+    "ay": 381,
+    "solid": [
+     43,
      19,
-     13,
-     20,
-     13
+     48,
+     21
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_1",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_1.png",
+    "x": 47.2,
+    "y": 21.710000000000004,
+    "ax": 20.5,
+    "ay": 46.28000000000014,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread:1",
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_1_cut",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_1_cut.png",
+    "x": 47.2,
+    "y": 21.710000000000004,
+    "ax": 20.5,
+    "ay": 46.28000000000014,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread_cut:1",
+    "D": 3
+   },
+   {
+    "id": "cocoons_27",
+    "role": "",
+    "img": "assets/world/felt/cocoons.png",
+    "x": 68.4,
+    "y": 21.900000000000002,
+    "ax": 42,
+    "ay": 93,
+    "solid": [
+     68,
+     21,
+     68,
+     21
     ],
     "fade": 0,
     "shadow": 1,
     "D": 3
    },
    {
-    "id": "barrels_35",
+    "id": "wall_e_21",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 22.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_sign_herb_leaf",
+    "role": "slot",
+    "img": "assets/world/felt_slots/sign_herb_leaf.png",
+    "x": 44.59,
+    "y": 22.0,
+    "ax": 29.5,
+    "ay": 51,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "thread_stake_53",
     "role": "",
-    "img": "assets/world/felt/barrels.png",
-    "x": 13.825000000000001,
-    "y": 14.875000000000002,
-    "ax": 22,
-    "ay": 56,
+    "img": "assets/world/felt/thread_stake.png",
+    "x": 60.9,
+    "y": 22.9,
+    "ax": 8,
+    "ay": 116,
     "solid": [
-     13,
-     14,
-     14,
-     14
+     60,
+     22,
+     60,
+     22
     ],
     "fade": 0,
     "shadow": 1,
     "D": 3
    },
    {
-    "id": "cart_36",
-    "role": "",
-    "img": "assets/world/felt/cart.png",
-    "x": 29.750000000000004,
-    "y": 15.05,
-    "ax": 41,
-    "ay": 74,
-    "solid": [
-     29,
-     14,
-     30,
-     14
-    ],
-    "fade": 0,
-    "shadow": 1,
+    "id": "wall_e_22",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 23.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
     "D": 3
    },
    {
-    "id": "barrels_37",
-    "role": "",
-    "img": "assets/world/felt/barrels.png",
-    "x": 33.775000000000006,
-    "y": 16.73,
-    "ax": 22,
-    "ay": 56,
-    "solid": [
-     33,
-     16,
-     34,
-     16
-    ],
+    "id": "slot_thread_clump_2",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_2.png",
+    "x": 48.0,
+    "y": 23.29,
+    "ax": 24.0,
+    "ay": 41,
+    "solid": null,
     "fade": 0,
-    "shadow": 1,
+    "shadow": 0,
+    "show": "thread:2",
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_2_cut",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_2_cut.png",
+    "x": 48.0,
+    "y": 23.29,
+    "ax": 24.0,
+    "ay": 41,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread_cut:2",
     "D": 3
    },
    {
@@ -1540,6 +1967,135 @@
     "D": 3
    },
    {
+    "id": "ruin_pillar_57",
+    "role": "",
+    "img": "assets/world/felt/ruin_pillar.png",
+    "x": 69.0,
+    "y": 23.6,
+    "ax": 38,
+    "ay": 143,
+    "solid": [
+     68,
+     22,
+     69,
+     23
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_pile_4",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_pile_4.png",
+    "x": 62.0,
+    "y": 24.0,
+    "ax": 21.0,
+    "ay": 34,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "shop_sign",
+    "role": "[13] 잡화점",
+    "img": "assets/world/felt/shop_sign.png",
+    "x": 14.875000000000002,
+    "y": 24.150000000000002,
+    "ax": 197,
+    "ay": 371,
+    "solid": [
+     11,
+     21,
+     18,
+     23
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_sign_tool_hammer_bag",
+    "role": "slot",
+    "img": "assets/world/felt_slots/sign_tool_hammer_bag.png",
+    "x": 18.6,
+    "y": 24.160000000000004,
+    "ax": 32.0,
+    "ay": 144.48000000000025,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "d_web_sheet_56",
+    "role": "거미줄 막",
+    "img": "assets/world/felt/d_web_sheet.png",
+    "x": 67.8,
+    "y": 24.2,
+    "ax": 41,
+    "ay": 106,
+    "solid": [
+     67,
+     23,
+     68,
+     24
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "well_shop",
+    "role": "",
+    "img": "assets/world/felt/well.png",
+    "x": 12.958333333333334,
+    "y": 24.290000000000003,
+    "ax": 37,
+    "ay": 92,
+    "solid": [
+     12,
+     23,
+     13,
+     24
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "web_arch",
+    "role": "[9] 아라크네의 폐공방",
+    "img": "assets/world/felt/web_arch.png",
+    "x": 65.1,
+    "y": 24.7,
+    "ax": 97,
+    "ay": 394,
+    "solid": [
+     63,
+     22,
+     66,
+     24
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_pile_2",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_pile_2.png",
+    "x": 48.01,
+    "y": 25.0,
+    "ax": 22.5,
+    "ay": 31,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
     "id": "rubble_39",
     "role": "",
     "img": "assets/world/felt/rubble.png",
@@ -1558,36 +2114,360 @@
     "D": 3
    },
    {
-    "id": "rubble_40",
-    "role": "",
-    "img": "assets/world/felt/rubble.png",
-    "x": 19.075000000000003,
-    "y": 8.925,
-    "ax": 27,
-    "ay": 32,
+    "id": "se_house",
+    "role": "[11] 롬의 대장간",
+    "img": "assets/world/felt/se_house.png",
+    "x": 33.495000000000005,
+    "y": 25.55,
+    "ax": 197,
+    "ay": 351,
     "solid": [
-     18,
-     8,
-     19,
-     8
+     30,
+     23,
+     36,
+     25
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_4",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_4.png",
+    "x": 44.0,
+    "y": 25.6,
+    "ax": 21.0,
+    "ay": 36,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread:4",
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_4_cut",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_4_cut.png",
+    "x": 44.0,
+    "y": 25.6,
+    "ax": 21.0,
+    "ay": 36,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread_cut:4",
+    "D": 3
+   },
+   {
+    "id": "woodpile_5",
+    "role": "",
+    "img": "assets/world/felt/woodpile.png",
+    "x": 37.1,
+    "y": 25.900000000000002,
+    "ax": 27,
+    "ay": 52,
+    "solid": [
+     36,
+     25,
+     37,
+     25
     ],
     "fade": 0,
     "shadow": 1,
     "D": 3
    },
    {
-    "id": "rubble_41",
+    "id": "slot_rope_barrier",
+    "role": "slot",
+    "img": "assets/world/felt_slots/rope_barrier.png",
+    "x": 58.5,
+    "y": 26.0,
+    "ax": 59.5,
+    "ay": 78,
+    "solid": [
+     58,
+     25,
+     58,
+     25
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "anvil_4",
+    "role": "",
+    "img": "assets/world/felt/anvil.png",
+    "x": 35.0,
+    "y": 26.075000000000003,
+    "ax": 24,
+    "ay": 34,
+    "solid": [
+     34,
+     25,
+     35,
+     25
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "barrels_6",
+    "role": "",
+    "img": "assets/world/felt/barrels.png",
+    "x": 27.650000000000002,
+    "y": 26.075000000000003,
+    "ax": 22,
+    "ay": 56,
+    "solid": [
+     27,
+     25,
+     28,
+     25
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_5",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_5.png",
+    "x": 49.59,
+    "y": 26.21,
+    "ax": 20.5,
+    "ay": 46,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread:5",
+    "D": 3
+   },
+   {
+    "id": "slot_thread_clump_5_cut",
+    "role": "slot",
+    "img": "assets/world/felt_slots/thread_clump_5_cut.png",
+    "x": 49.59,
+    "y": 26.21,
+    "ax": 20.5,
+    "ay": 46,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "show": "thread_cut:5",
+    "D": 3
+   },
+   {
+    "id": "thread_stake_54",
+    "role": "",
+    "img": "assets/world/felt/thread_stake.png",
+    "x": 62.9,
+    "y": 26.9,
+    "ax": 8,
+    "ay": 116,
+    "solid": [
+     62,
+     26,
+     62,
+     26
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "cocoons_11",
+    "role": "",
+    "img": "assets/world/felt/cocoons.png",
+    "x": 68.6,
+    "y": 26.95,
+    "ax": 42,
+    "ay": 93,
+    "solid": [
+     68,
+     26,
+     68,
+     26
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_26",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 27.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "rubble_55",
     "role": "",
     "img": "assets/world/felt/rubble.png",
-    "x": 30.800000000000004,
-    "y": 9.170000000000002,
+    "x": 60.3,
+    "y": 27.6,
     "ax": 27,
     "ay": 32,
     "solid": [
-     30,
-     8,
-     31,
-     8
+     60,
+     27,
+     60,
+     27
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_27",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 28.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "dead_tree_58",
+    "role": "",
+    "img": "assets/world/felt/dead_tree.png",
+    "x": 69.6,
+    "y": 28.4,
+    "ax": 64,
+    "ay": 175,
+    "solid": [
+     68,
+     27,
+     70,
+     28
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_sign_gate_sunset",
+    "role": "slot",
+    "img": "assets/world/felt_slots/sign_gate_sunset.png",
+    "x": 27.4,
+    "y": 28.4,
+    "ax": 26.0,
+    "ay": 64,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "sign_post_7",
+    "role": "",
+    "img": "assets/world/felt/sign_post.png",
+    "x": 34.650000000000006,
+    "y": 28.630000000000003,
+    "ax": 28,
+    "ay": 89,
+    "solid": [
+     34,
+     28,
+     34,
+     28
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "s_house",
+    "role": "[12] 이장 바르트의 집",
+    "img": "assets/world/felt/s_house.png",
+    "x": 22.470000000000002,
+    "y": 28.875000000000004,
+    "ax": 197,
+    "ay": 333,
+    "solid": [
+     19,
+     26,
+     25,
+     28
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "wall_e_28",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 29.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "sw_house",
+    "role": "[16] 주민 빈집",
+    "img": "assets/world/felt/sw_house.png",
+    "x": 4.130000000000001,
+    "y": 29.19,
+    "ax": 159,
+    "ay": 395,
+    "solid": [
+     1,
+     26,
+     6,
+     29
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "red_stall",
+    "role": "[10] 벤의 노점",
+    "img": "assets/world/felt/red_stall.png",
+    "x": 43.785000000000004,
+    "y": 29.19,
+    "ax": 197,
+    "ay": 306,
+    "solid": [
+     40,
+     24,
+     47,
+     29
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "brazier_3",
+    "role": "",
+    "img": "assets/world/felt/brazier.png",
+    "x": 28.000000000000004,
+    "y": 29.225,
+    "ax": 20,
+    "ay": 62,
+    "solid": [
+     28,
+     29,
+     28,
+     29
     ],
     "fade": 0,
     "shadow": 1,
@@ -1606,6 +2486,520 @@
      29,
      39,
      29
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "stone_low_60",
+    "role": "",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 63.6,
+    "y": 29.8,
+    "ax": 70,
+    "ay": 43,
+    "solid": [
+     62,
+     29,
+     64,
+     29
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_29",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 30.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_burnt_stump_a",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_a.png",
+    "x": 40.9,
+    "y": 30.0,
+    "ax": 22.0,
+    "ay": 41,
+    "solid": [
+     40,
+     29,
+     40,
+     29
+    ],
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "bl_house",
+    "role": "주민 집 (felt_hd house_v2)",
+    "img": "assets/world/felt/bl_house.png",
+    "x": 2.45,
+    "y": 30.1,
+    "ax": 129,
+    "ay": 230,
+    "solid": [
+     0,
+     28,
+     4,
+     29
+    ],
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "fence_wood_0",
+    "role": "",
+    "img": "assets/world/felt/fence_wood.png",
+    "x": 26.950000000000003,
+    "y": 30.310000000000002,
+    "ax": 95,
+    "ay": 42,
+    "solid": [
+     25,
+     30,
+     28,
+     30
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "fence_wood_1",
+    "role": "",
+    "img": "assets/world/felt/fence_wood.png",
+    "x": 33.6,
+    "y": 30.310000000000002,
+    "ax": 95,
+    "ay": 42,
+    "solid": [
+     32,
+     30,
+     34,
+     30
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_b_59",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_b.png",
+    "x": 66.8,
+    "y": 30.4,
+    "ax": 47,
+    "ay": 200,
+    "solid": [
+     66,
+     29,
+     66,
+     30
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "south_gate_2",
+    "role": "",
+    "img": "assets/world/felt/south_gate.png",
+    "x": 30.1,
+    "y": 30.450000000000003,
+    "ax": 160,
+    "ay": 211,
+    "solid": null,
+    "fade": 1,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "boulder_61",
+    "role": "",
+    "img": "assets/world/felt/boulder.png",
+    "x": 60.6,
+    "y": 30.6,
+    "ax": 41,
+    "ay": 87,
+    "solid": [
+     60,
+     30,
+     61,
+     30
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "wall_e_30",
+    "role": "wall",
+    "img": "assets/world/felt/palisade_ns.png",
+    "x": 58.5,
+    "y": 31.0,
+    "ax": 16,
+    "ay": 90,
+    "solid": null,
+    "fade": 1,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_burnt_stump_d",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_d.png",
+    "x": 47.59,
+    "y": 31.0,
+    "ax": 24.5,
+    "ay": 37,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_charred_cart_a",
+    "role": "slot",
+    "img": "assets/world/felt_slots/charred_cart_a.png",
+    "x": 35.2,
+    "y": 32.21,
+    "ax": 47.5,
+    "ay": 70,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "stone_low_19",
+    "role": "",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 22.750000000000004,
+    "y": 32.375,
+    "ax": 70,
+    "ay": 43,
+    "solid": [
+     21,
+     32,
+     23,
+     32
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "stone_low_20",
+    "role": "",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 37.975,
+    "y": 32.550000000000004,
+    "ax": 70,
+    "ay": 43,
+    "solid": [
+     37,
+     32,
+     38,
+     32
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_ribbon_tree",
+    "role": "slot",
+    "img": "assets/world/felt_slots/ribbon_tree_strip.png",
+    "x": 38.21,
+    "y": 32.6,
+    "ax": 113.0,
+    "ay": 203,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "frames": 4,
+    "seq": [
+     [
+      0,
+      200
+     ],
+     [
+      1,
+      200
+     ],
+     [
+      2,
+      200
+     ],
+     [
+      3,
+      200
+     ]
+    ],
+    "D": 3
+   },
+   {
+    "id": "slot_burnt_stump_c",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_c.png",
+    "x": 56.59,
+    "y": 33.21,
+    "ax": 26.5,
+    "ay": 47,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "dead_tree_63",
+    "role": "",
+    "img": "assets/world/felt/dead_tree.png",
+    "x": 64.0,
+    "y": 33.4,
+    "ax": 64,
+    "ay": 175,
+    "solid": [
+     63,
+     32,
+     64,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "slot_charred_cart_b",
+    "role": "slot",
+    "img": "assets/world/felt_slots/charred_cart_b.png",
+    "x": 52.3,
+    "y": 33.4,
+    "ax": 50.5,
+    "ay": 91,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "slot_burnt_stump_b",
+    "role": "slot",
+    "img": "assets/world/felt_slots/burnt_stump_b.png",
+    "x": 48.21,
+    "y": 33.4,
+    "ax": 28.0,
+    "ay": 37,
+    "solid": null,
+    "fade": 0,
+    "shadow": 0,
+    "D": 3
+   },
+   {
+    "id": "bush_b_15",
+    "role": "",
+    "img": "assets/world/felt/bush_b.png",
+    "x": 27.650000000000002,
+    "y": 33.6,
+    "ax": 46,
+    "ay": 53,
+    "solid": [
+     27,
+     33,
+     28,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_a_65",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_a.png",
+    "x": 70.4,
+    "y": 33.6,
+    "ax": 29,
+    "ay": 192,
+    "solid": [
+     70,
+     32,
+     70,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "bush_b_16",
+    "role": "",
+    "img": "assets/world/felt/bush_b.png",
+    "x": 32.725,
+    "y": 33.775000000000006,
+    "ax": 46,
+    "ay": 53,
+    "solid": [
+     32,
+     33,
+     33,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_a_62",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_a.png",
+    "x": 60.6,
+    "y": 33.9,
+    "ax": 29,
+    "ay": 192,
+    "solid": [
+     60,
+     33,
+     60,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "dead_tree_13",
+    "role": "",
+    "img": "assets/world/felt/dead_tree.png",
+    "x": 24.500000000000004,
+    "y": 34.125,
+    "ax": 64,
+    "ay": 175,
+    "solid": [
+     23,
+     33,
+     25,
+     33
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "dead_tree_14",
+    "role": "",
+    "img": "assets/world/felt/dead_tree.png",
+    "x": 36.400000000000006,
+    "y": 34.475,
+    "ax": 64,
+    "ay": 175,
+    "solid": [
+     35,
+     33,
+     37,
+     34
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "bush_b_21",
+    "role": "",
+    "img": "assets/world/felt/bush_b.png",
+    "x": 16.8,
+    "y": 34.650000000000006,
+    "ax": 46,
+    "ay": 53,
+    "solid": [
+     16,
+     34,
+     17,
+     34
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "stone_low_22",
+    "role": "",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 43.75000000000001,
+    "y": 34.650000000000006,
+    "ax": 70,
+    "ay": 43,
+    "solid": [
+     42,
+     34,
+     44,
+     34
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "burnt_pine_b_64",
+    "role": "",
+    "img": "assets/world/felt/burnt_pine_b.png",
+    "x": 67.6,
+    "y": 34.7,
+    "ax": 47,
+    "ay": 200,
+    "solid": [
+     67,
+     34,
+     67,
+     34
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "bush_b_18",
+    "role": "",
+    "img": "assets/world/felt/bush_b.png",
+    "x": 40.25000000000001,
+    "y": 34.825,
+    "ax": 46,
+    "ay": 53,
+    "solid": [
+     39,
+     34,
+     40,
+     34
+    ],
+    "fade": 0,
+    "shadow": 1,
+    "D": 3
+   },
+   {
+    "id": "bush_b_17",
+    "role": "",
+    "img": "assets/world/felt/bush_b.png",
+    "x": 21.35,
+    "y": 35.0,
+    "ax": 46,
+    "ay": 53,
+    "solid": [
+     20,
+     34,
+     21,
+     34
     ],
     "fade": 0,
     "shadow": 1,
@@ -1712,8 +3106,8 @@
     0.5
    ],
    [
-    51.38,
-    23.675,
+    65.1,
+    23.7,
     56,
     "#c8d8ff",
     0.7
@@ -1775,6 +3169,13 @@
     0.9
    ],
    [
+    62.4,
+    20.9,
+    22,
+    "#ff6a2a",
+    0.9
+   ],
+   [
     37.800000000000004,
     4.9750000000000005,
     22,
@@ -1806,252 +3207,188 @@
     0.25
    ],
    [
-    30.349674553260172,
-    16.484032913451646,
-    31.71572484898491,
-    18.284032913451647,
-    0.666050295724737,
-    0.3330251478623685
+    30.034444444444446,
+    16.211111111111112,
+    31.295555555555556,
+    18.011111111111113,
+    0.5611111111111111,
+    0.28055555555555556
    ],
    [
-    32.64764894739327,
-    17.06734094445339,
-    34.11739844862943,
-    18.867340944453392,
-    0.7697495012361583,
-    0.38487475061807913
+    33.39888888888889,
+    16.872222222222224,
+    34.721111111111114,
+    18.672222222222224,
+    0.6222222222222222,
+    0.3111111111111111
    ],
    [
-    34.059520743873705,
-    17.565334123839783,
-    35.617802365889666,
-    19.365334123839784,
-    0.8582816220159614,
-    0.4291408110079807
+    36.763333333333335,
+    17.533333333333335,
+    38.14666666666667,
+    19.333333333333336,
+    0.6833333333333333,
+    0.3416666666666667
    ],
    [
-    35.159520743873706,
-    16.565334123839783,
-    36.71780236588967,
-    19.365334123839784,
-    0.8582816220159614,
-    0.4291408110079807
+    40.12777777777778,
+    18.194444444444443,
+    41.57222222222223,
+    19.994444444444444,
+    0.7444444444444445,
+    0.37222222222222223
    ],
    [
-    35.83071936419302,
-    18.0149276364434,
-    37.468928721782966,
-    19.8149276364434,
-    0.9382093575899377,
-    0.46910467879496887
+    43.492222222222225,
+    18.855555555555554,
+    44.997777777777785,
+    20.655555555555555,
+    0.8055555555555556,
+    0.4027777777777778
    ],
    [
-    36.930719364193024,
-    17.0149276364434,
-    38.56892872178297,
-    19.8149276364434,
-    0.9382093575899377,
-    0.46910467879496887
+    46.306666666666665,
+    19.516666666666666,
+    47.873333333333335,
+    21.316666666666666,
+    0.8666666666666667,
+    0.43333333333333335
    ],
    [
-    37.47241901575324,
-    18.431649682473466,
-    39.184712292637414,
-    20.231649682473467,
-    1.0122932768841717,
-    0.5061466384420858
+    47.406666666666666,
+    18.516666666666666,
+    48.973333333333336,
+    21.316666666666666,
+    0.8666666666666667,
+    0.43333333333333335
    ],
    [
-    38.57241901575324,
-    17.431649682473466,
-    40.284712292637415,
-    20.231649682473467,
-    1.0122932768841717,
-    0.5061466384420858
+    49.67111111111111,
+    20.177777777777777,
+    51.29888888888889,
+    21.977777777777778,
+    0.9277777777777778,
+    0.4638888888888889
    ],
    [
-    39.017789500262914,
-    18.823919943094715,
-    40.799819712368645,
-    20.623919943094716,
-    1.0820302121057273,
-    0.5410151060528636
+    50.77111111111111,
+    19.177777777777777,
+    52.39888888888889,
+    21.977777777777778,
+    0.9277777777777778,
+    0.4638888888888889
    ],
    [
-    40.117789500262916,
-    17.823919943094715,
-    41.89981971236865,
-    20.623919943094716,
-    1.0820302121057273,
-    0.5410151060528636
+    53.035555555555554,
+    20.83888888888889,
+    54.724444444444444,
+    22.63888888888889,
+    0.9888888888888889,
+    0.49444444444444446
    ],
    [
-    40.48739518365053,
-    19.196958389351725,
-    42.33574334175751,
-    20.996958389351725,
-    1.1483481581069732,
-    0.5741740790534866
+    54.135555555555555,
+    19.83888888888889,
+    55.824444444444445,
+    22.63888888888889,
+    0.9888888888888889,
+    0.49444444444444446
    ],
    [
-    41.58739518365053,
-    18.196958389351725,
-    43.43574334175751,
-    20.996958389351725,
-    1.1483481581069732,
-    0.5741740790534866
+    56.4,
+    21.5,
+    58.15,
+    23.3,
+    1.05,
+    0.525
    ],
    [
-    41.345110147817365,
-    19.554286759091728,
-    43.256983349433675,
-    21.35428675909173,
-    1.211873201616307,
-    0.6059366008081535
+    57.5,
+    20.5,
+    59.25,
+    23.3,
+    1.05,
+    0.525
    ],
    [
-    42.44511014781737,
-    18.554286759091728,
-    44.356983349433676,
-    21.35428675909173,
-    1.211873201616307,
-    0.6059366008081535
+    58.4,
+    21.5,
+    60.15,
+    23.3,
+    1.05,
+    0.525
    ],
    [
-    43.54511014781736,
-    19.554286759091728,
-    45.45698334943367,
-    21.35428675909173,
-    1.211873201616307,
-    0.6059366008081535
+    59.5,
+    20.5,
+    61.25,
+    23.3,
+    1.05,
+    0.525
    ],
    [
-    42.700860006777326,
-    19.89842452789361,
-    44.67391325618064,
-    21.69842452789361,
-    1.2730532494033087,
-    0.6365266247016543
+    59.599999999999994,
+    21.4,
+    61.43333333333333,
+    23.2,
+    1.1333333333333333,
+    0.5666666666666667
    ],
    [
-    43.80086000677733,
-    18.89842452789361,
-    45.77391325618064,
-    21.69842452789361,
-    1.2730532494033087,
-    0.6365266247016543
+    60.699999999999996,
+    20.4,
+    62.53333333333333,
+    23.2,
+    1.1333333333333333,
+    0.5666666666666667
    ],
    [
-    44.90086000677732,
-    19.89842452789361,
-    46.873913256180636,
-    21.69842452789361,
-    1.2730532494033087,
-    0.6365266247016543
+    60.25,
+    21.3,
+    62.16666666666667,
+    23.1,
+    1.2166666666666668,
+    0.6083333333333334
    ],
    [
-    44.01205909997134,
-    20.231253720096515,
-    46.04428198354405,
-    22.031253720096515,
-    1.3322228835727137,
-    0.6661114417863568
+    61.35,
+    20.3,
+    63.26666666666667,
+    23.1,
+    1.2166666666666668,
+    0.6083333333333334
    ],
    [
-    45.11205909997134,
-    19.231253720096515,
-    47.144281983544055,
-    22.031253720096515,
-    1.3322228835727137,
-    0.6661114417863568
+    62.449999999999996,
+    21.3,
+    64.36666666666666,
+    23.1,
+    1.2166666666666668,
+    0.6083333333333334
    ],
    [
-    46.212059099971334,
-    20.231253720096515,
-    48.24428198354405,
-    22.031253720096515,
-    1.3322228835727137,
-    0.6661114417863568
+    61.449999999999996,
+    21.2,
+    63.449999999999996,
+    23.0,
+    1.3,
+    0.65
    ],
    [
-    45.28443291180533,
-    20.554227668271885,
-    47.37407338616478,
-    22.354227668271886,
-    1.389640474359446,
-    0.694820237179723
+    62.55,
+    20.2,
+    64.55,
+    23.0,
+    1.3,
+    0.65
    ],
    [
-    46.384432911805334,
-    19.554227668271885,
-    48.47407338616478,
-    22.354227668271886,
-    1.389640474359446,
-    0.694820237179723
-   ],
-   [
-    47.48443291180533,
-    20.554227668271885,
-    49.57407338616478,
-    22.354227668271886,
-    1.389640474359446,
-    0.694820237179723
-   ],
-   [
-    46.52252085857369,
-    20.868498638514307,
-    48.668031727642905,
-    22.668498638514308,
-    1.44551086906921,
-    0.722755434534605
-   ],
-   [
-    47.622520858573694,
-    19.868498638514307,
-    49.76803172764291,
-    22.668498638514308,
-    1.44551086906921,
-    0.722755434534605
-   ],
-   [
-    48.72252085857369,
-    20.868498638514307,
-    50.8680317276429,
-    22.668498638514308,
-    1.44551086906921,
-    0.722755434534605
-   ],
-   [
-    47.18,
-    21.175,
-    49.38,
-    22.975,
-    1.5,
-    0.75
-   ],
-   [
-    48.28,
-    20.175,
-    50.480000000000004,
-    22.975,
-    1.5,
-    0.75
-   ],
-   [
-    49.38,
-    21.175,
-    51.580000000000005,
-    22.975,
-    1.5,
-    0.75
-   ],
-   [
-    50.480000000000004,
-    20.175,
-    52.68000000000001,
-    22.975,
-    1.5,
-    0.75
+    63.64999999999999,
+    21.2,
+    65.64999999999999,
+    23.0,
+    1.3,
+    0.65
    ]
   ],
   "smoke": [
@@ -2117,7 +3454,8 @@
       200,
       250
      ]
-    ]
+    ],
+    "art": 1
    },
    "flick": [
     [
@@ -2179,21 +3517,6 @@
    ],
    "signs": [
     [
-     7.6,
-     14.8,
-     "sword"
-    ],
-    [
-     15.6,
-     23.0,
-     "bag"
-    ],
-    [
-     44.6,
-     20.0,
-     "leaf"
-    ],
-    [
      38.8,
      14.8,
      "mug"
@@ -2208,10 +3531,6 @@
      9.0,
      "needle"
     ]
-   ],
-   "gateSign": [
-    32.35,
-    29.8
    ]
   }
  },

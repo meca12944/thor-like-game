@@ -1,0 +1,505 @@
+{
+ "note": "펠트 아트 슬롯 표 (owner 10-24 펠트 업그레이드 2단계, 일러스트 1d91e38a docs_art/felt_props). ONE table: tools/hd/build_felt.py copies each file to assets/world/felt_slots/ and places it. x, y = foot tile (48 asset px = 1 tile, D=3). anchor foot = bottom centre (ax = frame w / 2, ay = h); center = decal on the ground layer (baked into ground.png). solid = absolute tile rect [x0, y0, x1, y1] or null. frames + seq [[frame, ms], ...] = strip. show = felt_live.js story switch (day / night / thread:N / thread_cut:N). mount = wall sign or eaves thread: drawn just after the building it hangs on. at = same foot + anchor as that prop (fountain water). Uncoloured art: the time-of-day tint is the engine grade (felt_live.js grade()).",
+ "slots": [
+  {
+   "id": "fountain_water",
+   "name_ko": "분수 물 (6프레임)",
+   "file": "fountain_water_strip.png",
+   "at": "fountain",
+   "ax": 146,
+   "ay": 310,
+   "frames": 6,
+   "seq": [
+    [
+     0,
+     120
+    ],
+    [
+     1,
+     120
+    ],
+    [
+     2,
+     120
+    ],
+    [
+     3,
+     120
+    ],
+    [
+     4,
+     120
+    ],
+    [
+     5,
+     120
+    ]
+   ]
+  },
+  {
+   "id": "ration_tent",
+   "name_ko": "배급 천막",
+   "file": "ration_tent.png",
+   "x": 30.4,
+   "y": 17.4,
+   "solid": [
+    29,
+    16,
+    32,
+    16
+   ],
+   "fade": 1
+  },
+  {
+   "id": "gold_arch",
+   "name_ko": "금빛 아치 (리네트 공방)",
+   "file": "gold_arch.png",
+   "x": 25.5,
+   "y": 11.21,
+   "fade": 1
+  },
+  {
+   "id": "memorial_wall_day",
+   "name_ko": "추모의 벽 (낮)",
+   "file": "memorial_wall_day.png",
+   "x": 31.59,
+   "y": 12.71,
+   "solid": [
+    30,
+    12,
+    32,
+    12
+   ],
+   "show": "day"
+  },
+  {
+   "id": "memorial_wall_night",
+   "name_ko": "추모의 벽 (밤, 촛불 2프레임)",
+   "file": "memorial_wall_night_strip.png",
+   "x": 31.59,
+   "y": 12.71,
+   "frames": 2,
+   "seq": [
+    [
+     0,
+     300
+    ],
+    [
+     1,
+     300
+    ]
+   ],
+   "show": "night"
+  },
+  {
+   "id": "refugee_tent_a",
+   "name_ko": "난민 천막 A",
+   "file": "refugee_tent_a.png",
+   "x": 51.0,
+   "y": 14.21,
+   "solid": [
+    50,
+    13,
+    52,
+    13
+   ]
+  },
+  {
+   "id": "refugee_tent_crest_a",
+   "name_ko": "난민 천막 (그을린 문장)",
+   "file": "refugee_tent_crest_a.png",
+   "x": 54.6,
+   "y": 13.6,
+   "solid": [
+    54,
+    13,
+    55,
+    13
+   ]
+  },
+  {
+   "id": "refugee_tent_b",
+   "name_ko": "난민 천막 B (성벽 밑)",
+   "file": "refugee_tent_b.png",
+   "x": 56.9,
+   "y": 15.6,
+   "solid": [
+    56,
+    15,
+    57,
+    15
+   ]
+  },
+  {
+   "id": "refugee_tent_c",
+   "name_ko": "난민 천막 C",
+   "file": "refugee_tent_c.png",
+   "x": 55.41,
+   "y": 18.6,
+   "solid": [
+    54,
+    18,
+    56,
+    18
+   ]
+  },
+  {
+   "id": "refugee_tent_d",
+   "name_ko": "난민 천막 D (서쪽)",
+   "file": "refugee_tent_d.png",
+   "x": 6.59,
+   "y": 21.6,
+   "solid": [
+    6,
+    21,
+    7,
+    21
+   ]
+  },
+  {
+   "id": "laundry_line",
+   "name_ko": "빨랫줄 (4프레임 핑퐁)",
+   "file": "laundry_line_strip.png",
+   "x": 3.41,
+   "y": 20.4,
+   "frames": 4,
+   "seq": [
+    [
+     0,
+     180
+    ],
+    [
+     1,
+     180
+    ],
+    [
+     2,
+     180
+    ],
+    [
+     3,
+     180
+    ],
+    [
+     2,
+     180
+    ],
+    [
+     1,
+     180
+    ]
+   ]
+  },
+  {
+   "id": "ribbon_tree",
+   "name_ko": "실종자 리본 나무 (4프레임)",
+   "file": "ribbon_tree_strip.png",
+   "x": 38.21,
+   "y": 32.6,
+   "frames": 4,
+   "seq": [
+    [
+     0,
+     200
+    ],
+    [
+     1,
+     200
+    ],
+    [
+     2,
+     200
+    ],
+    [
+     3,
+     200
+    ]
+   ]
+  },
+  {
+   "id": "charred_cart_a",
+   "name_ko": "탄 수레 (뼈대)",
+   "file": "charred_cart_a.png",
+   "x": 35.2,
+   "y": 32.21
+  },
+  {
+   "id": "charred_cart_b",
+   "name_ko": "반쯤 탄 수레",
+   "file": "charred_cart_b.png",
+   "x": 52.3,
+   "y": 33.4
+  },
+  {
+   "id": "burnt_stump_a",
+   "name_ko": "그루터기 A",
+   "file": "burnt_stump_a.png",
+   "x": 40.9,
+   "y": 30.0,
+   "solid": [
+    40,
+    29,
+    40,
+    29
+   ]
+  },
+  {
+   "id": "burnt_stump_b",
+   "name_ko": "그루터기 B",
+   "file": "burnt_stump_b.png",
+   "x": 48.21,
+   "y": 33.4
+  },
+  {
+   "id": "burnt_stump_c",
+   "name_ko": "그루터기 C",
+   "file": "burnt_stump_c.png",
+   "x": 56.59,
+   "y": 33.21
+  },
+  {
+   "id": "burnt_stump_d",
+   "name_ko": "그루터기 D",
+   "file": "burnt_stump_d.png",
+   "x": 47.59,
+   "y": 31.0
+  },
+  {
+   "id": "burnt_stump_a2",
+   "name_ko": "그루터기 (북쪽 잿더미 지구)",
+   "file": "burnt_stump_a.png",
+   "x": 50.6,
+   "y": 10.4,
+   "solid": [
+    50,
+    9,
+    50,
+    9
+   ]
+  },
+  {
+   "id": "burnt_stump_d2",
+   "name_ko": "그루터기 (북쪽 잿더미 지구)",
+   "file": "burnt_stump_d.png",
+   "x": 55.4,
+   "y": 9.6,
+   "solid": [
+    55,
+    8,
+    55,
+    8
+   ]
+  },
+  {
+   "id": "sign_gate_sunset",
+   "name_ko": "남문 간판 (해 지면 문 닫음)",
+   "file": "sign_gate_sunset.png",
+   "x": 27.4,
+   "y": 28.4
+  },
+  {
+   "id": "sign_weapon_sword",
+   "name_ko": "무기점 간판",
+   "file": "sign_weapon_sword.png",
+   "x": 9.21,
+   "y": 12.21,
+   "mount": 1
+  },
+  {
+   "id": "sign_tool_hammer_bag",
+   "name_ko": "잡화·도구점 간판",
+   "file": "sign_tool_hammer_bag.png",
+   "x": 18.6,
+   "y": 22.4,
+   "mount": 1
+  },
+  {
+   "id": "sign_herb_leaf",
+   "name_ko": "약초점 간판",
+   "file": "sign_herb_leaf.png",
+   "x": 44.59,
+   "y": 22.0,
+   "mount": 1
+  },
+  {
+   "id": "rope_barrier",
+   "name_ko": "가스의 밧줄 + 「출입 금지」 판자 (동쪽 쪽문)",
+   "file": "rope_barrier.png",
+   "x": 58.5,
+   "y": 26.0,
+   "solid": [
+    58,
+    25,
+    58,
+    25
+   ]
+  },
+  {
+   "id": "thread_clump_1",
+   "name_ko": "흰 실 뭉치 1",
+   "file": "thread_clump_1.png",
+   "x": 47.2,
+   "y": 21.6,
+   "mount": 1,
+   "show": "thread:1"
+  },
+  {
+   "id": "thread_clump_1_cut",
+   "name_ko": "흰 실 뭉치 1 (끊김)",
+   "file": "thread_clump_1_cut.png",
+   "x": 47.2,
+   "y": 21.6,
+   "mount": 1,
+   "show": "thread_cut:1"
+  },
+  {
+   "id": "thread_clump_2",
+   "name_ko": "흰 실 뭉치 2",
+   "file": "thread_clump_2.png",
+   "x": 48.0,
+   "y": 23.29,
+   "show": "thread:2"
+  },
+  {
+   "id": "thread_clump_2_cut",
+   "name_ko": "흰 실 뭉치 2 (끊김)",
+   "file": "thread_clump_2_cut.png",
+   "x": 48.0,
+   "y": 23.29,
+   "show": "thread_cut:2"
+  },
+  {
+   "id": "thread_clump_3",
+   "name_ko": "흰 실 뭉치 3",
+   "file": "thread_clump_3.png",
+   "x": 49.6,
+   "y": 15.4,
+   "show": "thread:3"
+  },
+  {
+   "id": "thread_clump_3_cut",
+   "name_ko": "흰 실 뭉치 3 (끊김)",
+   "file": "thread_clump_3_cut.png",
+   "x": 49.6,
+   "y": 15.4,
+   "show": "thread_cut:3"
+  },
+  {
+   "id": "thread_clump_4",
+   "name_ko": "흰 실 뭉치 4",
+   "file": "thread_clump_4.png",
+   "x": 44.0,
+   "y": 25.6,
+   "show": "thread:4"
+  },
+  {
+   "id": "thread_clump_4_cut",
+   "name_ko": "흰 실 뭉치 4 (끊김)",
+   "file": "thread_clump_4_cut.png",
+   "x": 44.0,
+   "y": 25.6,
+   "show": "thread_cut:4"
+  },
+  {
+   "id": "thread_clump_5",
+   "name_ko": "흰 실 뭉치 5",
+   "file": "thread_clump_5.png",
+   "x": 49.59,
+   "y": 26.21,
+   "show": "thread:5"
+  },
+  {
+   "id": "thread_clump_5_cut",
+   "name_ko": "흰 실 뭉치 5 (끊김)",
+   "file": "thread_clump_5_cut.png",
+   "x": 49.59,
+   "y": 26.21,
+   "show": "thread_cut:5"
+  },
+  {
+   "id": "thread_pile_2",
+   "name_ko": "떨어진 실 더미",
+   "file": "thread_pile_2.png",
+   "x": 48.01,
+   "y": 25.0
+  },
+  {
+   "id": "thread_pile_4",
+   "name_ko": "떨어진 실 더미 (쪽문 밖)",
+   "file": "thread_pile_4.png",
+   "x": 62.0,
+   "y": 24.0
+  },
+  {
+   "id": "ash_decal_b",
+   "name_ko": "재 데칼 B",
+   "file": "ash_decal_b.png",
+   "x": 50.0,
+   "y": 33.21,
+   "anchor": "center"
+  },
+  {
+   "id": "ash_decal_c",
+   "name_ko": "재 데칼 C",
+   "file": "ash_decal_c.png",
+   "x": 54.51,
+   "y": 32.81,
+   "anchor": "center"
+  },
+  {
+   "id": "ash_decal_a",
+   "name_ko": "재 데칼 A (북쪽 잿더미 지구)",
+   "file": "ash_decal_a.png",
+   "x": 53.0,
+   "y": 10.0,
+   "anchor": "center"
+  },
+  {
+   "id": "ash_decal_a2",
+   "name_ko": "재 데칼 A (폐공방 길)",
+   "file": "ash_decal_a.png",
+   "x": 66.0,
+   "y": 27.6,
+   "anchor": "center"
+  },
+  {
+   "id": "ash_decal_c2",
+   "name_ko": "재 데칼 C (폐공방 길)",
+   "file": "ash_decal_c.png",
+   "x": 61.0,
+   "y": 20.0,
+   "anchor": "center"
+  },
+  {
+   "id": "ash_ground_tiles",
+   "name_ko": "재 바닥 타일 (쪽문 밖 전체 + 북쪽 잿더미 지구, 이음매 없이 반복; 길은 그 위)",
+   "file": [
+    "ash_ground_tile_a.png",
+    "ash_ground_tile_b.png"
+   ],
+   "anchor": "center",
+   "fill": [
+    "outside the east wall",
+    "north ash district ellipse (53.2, 10.2) r 4.6 x 2.6"
+   ]
+  },
+  {
+   "id": "shadow_strip",
+   "name_ko": "건물 정면 그림자 띠",
+   "file": "shadow_strip.png",
+   "anchor": "center",
+   "under": [
+    "inn",
+    "se_house",
+    "s_house",
+    "shop_sign",
+    "west_a",
+    "west_b",
+    "sw_house",
+    "e_row",
+    "linette",
+    "west_edge"
+   ]
+  }
+ ]
+}

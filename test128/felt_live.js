@@ -1,8 +1,9 @@
 /* felt_live.js — Felt's live layer (owner 10-24 「펠트 업그레이드」): everything here is drawn by code each frame, nothing is baked.
  *  - fountain: falling streams + rings + drifting glints over the (now wet) basin, and a quiet looping water sound by distance (SFX2.ambient)
  *  - flicker: 5-8 flames (brazier, forge, plaza lamps, chapel candles) breathe on top of the baked light pools
- *  - picture signs over the shops, the south gate's 「해 지면 문 닫음」 plank
- * Data = maps/felt.json hd.live (written by tools/hd/build_felt.py). world.js calls FELT_LIVE.props / .over / .grade / .bgm. */
+ *  - code sign planks only where no illustrator sign exists (inn / smith / atelier); the rest are art (maps/src/felt_slots.json)
+ *  - story switches for the art slots (show): memorial wall day / night, thread clump whole / cut
+ * Data = maps/felt.json hd.live (written by tools/hd/build_felt.py). world.js calls FELT_LIVE.props / .over / .grade / .bgm / .show. */
 (function () {
   'use strict';
   const TAU = Math.PI * 2, W = () => window.__worldHooks;
@@ -14,6 +15,7 @@
   function fountainProp(h) { return h._fq || (h._fq = (h.props || []).find(q => q.id === 'fountain')); }
   function drawFountain(k, h, T) { const w = W(), ctx = w.ctx, S = w.S, F = h.live.fountain, q = fountainProp(h), a0 = q && q._a !== undefined ? q._a : 1, t = S.t;
     const [cx, cy] = fpx(h, F, F.pool[0], F.pool[1], T), rx = F.pool[2] / F.D, ry = F.pool[3] / F.D, [sx, sy] = w.W2S(cx, cy);
+    if (F.art) return waterSound(w, cx, cy);                                                    // the illustrator's fountain_water_strip draws the water now (a prop right above fountain.png)
     if (sx < -200 * k || sy < -200 * k || sx > innerWidth * 3 || sy > innerHeight * 3) return;
     const [px, py] = w.W2S(...fpx(h, F, F.ped[0], F.ped[1], T)), prx = F.ped[2] / F.D * k, pry = F.ped[3] / F.D * k;
     ctx.save(); ctx.globalAlpha = a0; ctx.beginPath(); ctx.ellipse(sx, sy, rx * k, ry * k, 0, 0, TAU); ctx.clip(); // stay inside the basin, off the pedestal
@@ -31,7 +33,8 @@
       ctx.fillStyle = 'rgba(232,246,250,.85)'; for (let i = 0; i < 4; i++) { const ph = (t * 1.6 + i / 4 + jx * .07) % 1, yy = ay + L * ph * ph; ctx.fillRect(Math.round(ax - k * .4), Math.round(yy), Math.max(1, Math.round(k * .8)), Math.round(k * (1.2 + ph * 1.6))); }
       ctx.fillStyle = 'rgba(232,246,250,.6)'; for (let i = 0; i < 3; i++) { const ph = (t * 2.2 + i / 3 + jx) % 1, dx = (hash(i + jx) - .5) * 5 * k * ph; ctx.fillRect(Math.round(ax + dx), Math.round(by - ph * (1 - ph) * 9 * k), Math.max(1, Math.round(k * .6)), Math.max(1, Math.round(k * .6))); } } // splash
     ctx.restore();
-    // water sound: louder near the basin (quiet: a background murmur, never over the music)
+    waterSound(w, cx, cy); }
+  function waterSound(w, cx, cy) { // louder near the basin (quiet: a background murmur, never over the music)
     const hero = w.hero, d = Math.hypot(hero.x - cx, hero.y - cy), g = Math.max(0, 1 - d / 170); lastSound = performance.now();
     if (window.SFX2 && SFX2.ambient) SFX2.ambient('water', .32 * g * g); }
   setInterval(() => { if (performance.now() - lastSound > 400 && window.SFX2 && SFX2.ambient) SFX2.ambient('water', 0); }, 300); // left Felt / paused: fade out
@@ -50,9 +53,7 @@
     for (const [x, y, kind] of h.live.signs || []) { const wx = (h.gx + x) * T, wy = (h.gy + y) * T; if ((wy > hero.y) !== !!front) continue; const [sx, sy] = w.W2S(wx, wy), sw = Math.sin(S.t * 1.1 + x) * .5 * k;
       ctx.fillStyle = '#2e2318'; ctx.fillRect(Math.round(sx - 5 * k), Math.round(sy - 14 * k), Math.round(10 * k), Math.max(1, Math.round(k * .8))); // bracket
       ctx.save(); ctx.translate(sx + sw, sy - 13 * k); plank(ctx, 0, 0, k, 9, 9, 0); icon(ctx, kind, 0, 4.5 * k, k * .9); ctx.restore(); }
-    const G = h.live.gateSign; if (G) { const wx = (h.gx + G[0]) * T, wy = (h.gy + G[1]) * T; if ((wy > hero.y) === !!front) { const [sx, sy] = w.W2S(wx, wy); // 남문 plank: 「해 지면 문 닫음」
-      ctx.fillStyle = '#2e2318'; ctx.fillRect(Math.round(sx - 14 * k), Math.round(sy - 13 * k), Math.max(1, Math.round(k)), Math.round(13 * k)); ctx.fillRect(Math.round(sx + 13 * k), Math.round(sy - 13 * k), Math.max(1, Math.round(k)), Math.round(13 * k)); // two nails/legs
-      plank(ctx, sx, sy - 19 * k, k, 40, 10); ctx.fillStyle = '#9a7a52'; ctx.fillRect(Math.round(sx - 19 * k), Math.round(sy - 18 * k), Math.round(38 * k), Math.round(8 * k)); ctx.fillStyle = '#24180e'; ctx.font = `bold ${Math.max(6, Math.round(5 * k))}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('해 지면 문 닫음', sx, sy - 13.8 * k); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; } } }
+    }   // the south gate plank is art now (sign_gate_sunset.png, felt_slots.json)
   // flames: a glow that breathes over the baked pool + a small bright core
   const GL = {}; function glow(col) { if (GL[col]) return GL[col]; const c = GL[col] = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
     const r = parseInt(col.slice(1, 3), 16), gg = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16); gr.addColorStop(0, `rgba(${r},${gg},${b},.55)`); gr.addColorStop(.4, `rgba(${r},${gg},${b},.18)`); gr.addColorStop(1, `rgba(${r},${gg},${b},0)`); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c; }
@@ -61,10 +62,17 @@
       ctx.globalAlpha = Math.min(1, a * (.25 + .55 * n) * (boost || 1)); ctx.drawImage(glow(col), sx - R, sy - R * .8, R * 2, R * 1.6);
       ctx.globalAlpha = Math.min(1, a * (.5 + .5 * n)); ctx.drawImage(glow('#fff0c0'), sx - 3 * k, sy - 3.5 * k - n * k, 6 * k, 6 * k); }
     ctx.restore(); }
+  const flags = () => { const w = W(); return (w && w.SAVE && w.SAVE.flags) || {}; };
+  // story time of day (STORY_ANSWERS 시간표): arrival = late afternoon, after Linette joins = dusk, after the boss = night (candles / prayer), the day you leave = morning
+  function phase() { const F = flags(); if (F.felt_morning) return 'morning'; if (F.boss_arachne) return 'night'; const w = W(); if (w && w.SAVE && w.SAVE.quests && w.SAVE.quests.q_felt_main) return 'dusk'; return 'afternoon'; }
   window.FELT_LIVE = {
     props(k, front, h, T) { if (!h.live) return; if (!front && h.live.fountain) drawFountain(k, h, T); drawSigns(k, front, h, T); },
     over(k, h, T) { if (!h.live) return; drawFlick(k, h, T, 1); },
     grade(h) { return h.live ? 'rgb(224,216,232)' : null; },   // Felt's dusk grade: weaker than the old rgb(206,196,222) (owner 10-24 「노을 약하게」)
+    phase,
+    show(key) { const [k, n] = key.split(':'), p = phase(), F = flags();   // art-slot story switches (felt_slots.json show)
+      if (k === 'day') return p !== 'night'; if (k === 'night') return p === 'night';
+      const cut = !!(F.boss_arachne || F['felt_thread_' + n]); if (k === 'thread') return !cut; if (k === 'thread_cut') return cut; return true; },
     bgm(want) { return want; },
   };
 })();
