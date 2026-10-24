@@ -1152,7 +1152,7 @@
     let LL = null; const A = k => (LL = pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')]), /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     // 출발·멈춤 (모션연구방 10-23, 걷기 박자 연구): 서 있다 출발하면 다리 모인 장(한 바퀴의 0.28)부터, 멈추면 다음 다리 모인 장까지 빠르게 마저 디딘 뒤 서기
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
-    { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
+    { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
@@ -1164,7 +1164,9 @@
       if (dd - adv < .01) { h.stopT = null; const L = A('idle'); e = H.v4 ? seq(L, (S.t * 60) % tot(L)) : L[0]; } else { const L = A(h.stopRun ? 'run' : 'walk'); e = L[Math.floor(h.gp * L.length) % L.length]; } } // finish the step onto the legs-together frame
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
+    h.gaitK = h8GaitK(H, LL); // per-clip leg speed (H8.gaitMul): clips drawn with a shorter stride step a little faster so the planted foot slides less (motion lab 10-24)
     if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; c.ox = h8Pop(h, c, LL, fl); return c; }
+  function h8GaitK(H, L) { if (!H.gaitMul || !L) return 1; if (!H._gk) { H._gk = new Map(); for (const k in H.gaitMul) if (H.anims[k]) H._gk.set(H.anims[k], H.gaitMul[k]); } return H._gk.get(L) || 1; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
     else if (h.atk) { const i = h.atk.i, AT = atkT(i); an = i >= 4 || i === 2 ? 'attack3' : i === 1 ? 'attack2' : 'attack1'; const k = AT.a1 / AT.dur; const q = h.atk.t / AT.dur; p = q < AT.a0 / AT.dur ? .25 * q / (AT.a0 / AT.dur) : q < k ? .25 + .35 * (q - AT.a0 / AT.dur) / Math.max(1e-6, k - AT.a0 / AT.dur) : .6 + .4 * Math.min(1, (q - k) / Math.max(1e-6, 1 - k)); }
