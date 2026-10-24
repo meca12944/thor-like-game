@@ -1236,7 +1236,7 @@
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) { const e = sField(P.R, P.Y.span, P.T, gkQ(P.head), gkQ(P.tail), ca, sa, P.Y.rev, P.Y.sq, P.fl, (mm.x + ex - hero.x) / GK_K - P.ox, (mm.y - mh * j / 4 - hero.y) / GK_K - P.oy);
       if (e && Math.abs(e[2]) < e[1] / 2 + 6) return true; }
     return false; }
-  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 14); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
       if (P.tail < P.head) { const im = sArc(P.R, Y.span, P.T, gkQ(P.head), gkQ(P.tail), P.rot, Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
@@ -1250,10 +1250,28 @@
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
     ctx.restore();
-    for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
+    for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
       if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); }
-      if (m.thread) threadSpray(ctx, m, al); ctx.restore(); } }
+      impactFx(ctx, m); if (m.thread && al > 0) threadSpray(ctx, m, al); ctx.restore(); } }
+
+  // [타격감 10-24, 팀장 「때렸을 때 반응이 약하다」] on every 검기 hit, in atlas px at the impact point (short and bright; Hades / 로스트아크 style):
+  // frame 0-2 a white impact star across the cut, sparks thrown along the cut (dark rim so they read on light ground), a few chips that fall;
+  // 3타(big): twice the sparks + radial speed lines + a second ring. hit-stop / shake / the mob's own white flash stay where they are.
+  const IMPACT_K = 1.8;
+  function impactFx(ctx, m) { const t = m.t, big = m.big, b = m.a ?? 0; let sd = (m.seed || 7) + 11; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    ctx.save(); ctx.lineCap = 'round'; ctx.scale(IMPACT_K, IMPACT_K); ctx.rotate(b); // IMPACT_K: atlas px are small on screen (×0.77) — the burst has to read at a glance
+    if (t < 3) { const k = 1 - t / 3, L = (big ? 34 : 22) * (.6 + .4 * k), W = (big ? 7 : 5) * k; ctx.fillStyle = `rgba(255,255,255,${k})`; // star: long across the cut, short along it
+      ctx.beginPath(); ctx.moveTo(0, -L); ctx.lineTo(W, 0); ctx.lineTo(0, L); ctx.lineTo(-W, 0); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-L * .45, 0); ctx.lineTo(0, W * .7); ctx.lineTo(L * .45, 0); ctx.lineTo(0, -W * .7); ctx.closePath(); ctx.fill(); }
+    const n = big ? 12 : 7; for (let i = 0; i < n; i++) { const g = (rnd() - .5) * 1.8, sp = 5 + rnd() * 6, len = (6 + rnd() * 8) * Math.max(0, 1 - t / 9), r0 = t * sp; if (t > 9 || len <= .5) { rnd(); continue; }
+      const x0 = Math.cos(g) * r0, y0 = Math.sin(g) * r0 + t * t * .12, x1 = x0 + Math.cos(g) * len, y1 = y0 + Math.sin(g) * len, al = 1 - t / 9;
+      ctx.strokeStyle = `rgba(16,28,72,${al * .55})`; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.strokeStyle = i % 3 ? `rgba(255,255,255,${al})` : `rgba(255,232,170,${al})`; ctx.lineWidth = 1.6; ctx.stroke(); }
+    ctx.rotate(-b); for (let i = 0; i < (big ? 7 : 4); i++) { const g = b + Math.PI + (rnd() - .5) * 2.2, v = 3 + rnd() * 3, x = Math.cos(g) * v * t, y = Math.sin(g) * v * t * .6 - 6 * t + .9 * t * t, al = Math.max(0, 1 - t / 14); // chips: thrown back, then fall
+      ctx.fillStyle = `rgba(70,64,74,${al})`; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3); ctx.fillStyle = `rgba(200,196,206,${al})`; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 2, 1); }
+    if (big && t < 6) { const al = 1 - t / 6; ctx.strokeStyle = `rgba(230,245,255,${al * .8})`; ctx.lineWidth = 1.2; for (let i = 0; i < 12; i++) { const g = i / 12 * TAU + rnd() * .2, r0 = 18 + t * 4, r1 = r0 + 10 + rnd() * 10; ctx.beginPath(); ctx.moveTo(Math.cos(g) * r0, Math.sin(g) * r0 * .8); ctx.lineTo(Math.cos(g) * r1, Math.sin(g) * r1 * .8); ctx.stroke(); }
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(0, 0, 8 + t * 7, 0, TAU); ctx.stroke(); }
+    ctx.restore(); }
   function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
     const AT = atkT(a.i), u = a.t, big = a.i === 2;
@@ -1491,6 +1509,12 @@
     for (let i = 0; i < posts.length; i++) for (let j = i + 1; j < posts.length; j++) { const A = posts[i], B = posts[j], d = Math.hypot(A.x - B.x, A.y - B.y); if (d > 34) continue;
       const al = Math.min(1, Math.min(A.life, B.life) * 3) * (.75 + .15 * Math.sin(S.t * 7 + A.x) + hb * .3);
       threadLine(g, A.x, A.y - 18, B.x, B.y - 18, 1.2, S.t * 6 + A.x, red, al, 1); threadLine(g, A.x, A.y - 8, B.x, B.y - 8, 1, S.t * 5 + B.y, red, al * .8, 1); }
+    if (!red && M() && M().dark) for (const h of S.hazards) { if (!h.dmg || h.t >= h.warn || h.shape === 'all' || !(h.shape === 'circle' || h.shape === 'ring' || h.shape === 'line')) continue; // [팀장 10-24 「어두운 던전 바닥에서 빨간 경고가 안 보임」]
+      const p = h.t / (h.warn || 1e-3), [cr, cg, cb] = hazColor(h), flick = h.warn - h.t < .15 && Math.floor(h.t * 30) % 2 === 0; // the outline glows above the darkness: soft wide halo + thin light line; brighter as the hit nears, white flicker only in the last 0.15 s
+      g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2; g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); }
+      else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) { g.moveTo(h.x + h.r0, h.y); g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } }
+      g.strokeStyle = `rgba(${cr},${Math.min(255, cg + 30)},${Math.min(255, cb + 30)},${.18 + .14 * p})`; g.lineWidth = 3; g.stroke();
+      g.strokeStyle = flick ? 'rgba(255,246,236,.95)' : `rgba(255,${Math.min(255, 140 + (cg >> 1))},${Math.min(255, 130 + (cb >> 1))},${.55 + .3 * p})`; g.lineWidth = 1; g.stroke(); }
     if (red) for (const h of S.hazards) { if (!h.dmg || h.t >= h.warn || h.shape === 'all') continue; // 팀장 10-24: phase 2 reddens the room -> every damaging warning gets a dark rim + pale-gold edge, and the inside flickers white on the last third
       const p = h.t / (h.warn || 1e-3), fl = p > .66 && Math.floor(S.t * 12) % 2 === 0, path = () => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2;
           g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) { g.moveTo(h.x + h.r0, h.y); g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } } };
