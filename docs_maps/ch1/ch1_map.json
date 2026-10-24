@@ -757,6 +757,16 @@
   },
   {
    "from": "field_e",
+   "to": "ch4",
+   "kind": "secret",
+   "at": [
+    629,
+    200
+   ],
+   "label": "→ 4장 귀족가 직행 샛길 (베르디가 금서 해독 뒤 열림)"
+  },
+  {
+   "from": "field_e",
    "to": "ch2",
    "kind": "lift",
    "at": [

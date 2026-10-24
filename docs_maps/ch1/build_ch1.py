@@ -64,6 +64,7 @@ links = [
     {'from': 'ws_b1', 'to': 'field_c', 'kind': 'shortcut', 'at': [160, 210], 'label': '지름길② 고문실 하수 구멍 → 들판 (안에서 열림)'},
     {'from': 'cliff_n', 'to': 'field_e', 'kind': 'shortcut', 'at': [440, 70], 'label': '지름길③ 밧줄 다리 (내리기)'},
     {'from': 'field_e', 'to': 'ch2', 'kind': 'gate', 'at': [629, 76], 'label': '→ 2장 철혈의 가도'},
+    {'from': 'field_e', 'to': 'ch4', 'kind': 'secret', 'at': [629, 200], 'label': '→ 4장 귀족가 직행 샛길 (베르디가 금서 해독 뒤 열림)'},
     {'from': 'field_e', 'to': 'ch2', 'kind': 'lift', 'at': [600, 280], 'label': '1~2장 리프트 (2장 카일라가 엶)'},
 ]
 
