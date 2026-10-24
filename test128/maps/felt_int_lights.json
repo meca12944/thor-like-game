@@ -1,0 +1,372 @@
+{
+ "felt_int_v3_inn_1_hall": {
+  "size": [
+   3072,
+   1728
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "sconce_01",
+    "type": "sconce",
+    "x": 2457.2,
+    "y": 463.3
+   },
+   {
+    "id": "sconce_02",
+    "type": "sconce",
+    "x": 1893.2,
+    "y": 393.8
+   },
+   {
+    "id": "sconce_03",
+    "type": "sconce",
+    "x": 1216.2,
+    "y": 324.0
+   },
+   {
+    "id": "lantern_04",
+    "type": "lantern",
+    "x": 356.0,
+    "y": 418.7
+   },
+   {
+    "id": "candle_05",
+    "type": "candle",
+    "x": 843.0,
+    "y": 946.9
+   },
+   {
+    "id": "candle_06",
+    "type": "candle",
+    "x": 490.5,
+    "y": 1066.9
+   },
+   {
+    "id": "candle_07",
+    "type": "candle",
+    "x": 860.0,
+    "y": 1275.6
+   },
+   {
+    "id": "candle_08",
+    "type": "candle",
+    "x": 1275.0,
+    "y": 1119.6
+   },
+   {
+    "id": "candle_09",
+    "type": "candle",
+    "x": 1366.5,
+    "y": 704.6
+   },
+   {
+    "id": "candle_10",
+    "type": "candle",
+    "x": 1750.5,
+    "y": 817.1
+   },
+   {
+    "id": "candle_11",
+    "type": "candle",
+    "x": 2379.0,
+    "y": 937.1
+   },
+   {
+    "id": "candle_12",
+    "type": "candle",
+    "x": 1764.5,
+    "y": 1162.9
+   },
+   {
+    "id": "candle_13",
+    "type": "candle",
+    "x": 2441.5,
+    "y": 1309.1
+   },
+   {
+    "id": "hearth_01",
+    "type": "hearth",
+    "x": 2085,
+    "y": 800
+   },
+   {
+    "id": "hearth_02",
+    "type": "hearth",
+    "x": 2145,
+    "y": 792
+   },
+   {
+    "id": "hearth_03",
+    "type": "hearth",
+    "x": 2205,
+    "y": 778
+   }
+  ],
+  "windows_new": 2,
+  "existing_window_shafts": 0
+ },
+ "felt_int_v3_inn_2_kitchen": {
+  "size": [
+   2304,
+   1296
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "lantern_01",
+    "type": "lantern",
+    "x": 1508.0,
+    "y": 305.3
+   },
+   {
+    "id": "lantern_02",
+    "type": "lantern",
+    "x": 984.5,
+    "y": 175.7
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 1105.8,
+    "y": 642.5
+   },
+   {
+    "id": "candle_04",
+    "type": "candle",
+    "x": 1369.8,
+    "y": 758.0
+   }
+  ],
+  "windows_new": 2,
+  "existing_window_shafts": 0
+ },
+ "felt_int_v3_inn_3_upstairs": {
+  "size": [
+   3072,
+   1728
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "sconce_01",
+    "type": "sconce",
+    "x": 491.5,
+    "y": 900.8
+   },
+   {
+    "id": "sconce_02",
+    "type": "sconce",
+    "x": 2279.5,
+    "y": 365.8
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 2420.0,
+    "y": 398.2
+   }
+  ],
+  "windows_new": 2,
+  "existing_window_shafts": 1
+ },
+ "felt_int_v3_chief_1_office": {
+  "size": [
+   2816,
+   1584
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "sconce_01",
+    "type": "sconce",
+    "x": 838.0,
+    "y": 194.2
+   },
+   {
+    "id": "sconce_02",
+    "type": "sconce",
+    "x": 1083.0,
+    "y": 177.7
+   },
+   {
+    "id": "sconce_03",
+    "type": "sconce",
+    "x": 1942.0,
+    "y": 194.2
+   },
+   {
+    "id": "lantern_04",
+    "type": "lantern",
+    "x": 2391.0,
+    "y": 270.0
+   },
+   {
+    "id": "candle_05",
+    "type": "candle",
+    "x": 760.2,
+    "y": 784.0
+   },
+   {
+    "id": "candle_06",
+    "type": "candle",
+    "x": 1986.5,
+    "y": 815.3
+   },
+   {
+    "id": "candle_07",
+    "type": "candle",
+    "x": 2099.2,
+    "y": 959.3
+   },
+   {
+    "id": "hearth_01",
+    "type": "hearth",
+    "x": 990,
+    "y": 762
+   },
+   {
+    "id": "hearth_02",
+    "type": "hearth",
+    "x": 1032,
+    "y": 744
+   }
+  ],
+  "windows_new": 1,
+  "existing_window_shafts": 3
+ },
+ "felt_int_v3_chief_2_bedroom_library": {
+  "size": [
+   2816,
+   1584
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "sconce_01",
+    "type": "sconce",
+    "x": 1361.5,
+    "y": 211.2
+   },
+   {
+    "id": "lantern_02",
+    "type": "lantern",
+    "x": 1956.5,
+    "y": 222.0
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 1535.2,
+    "y": 460.0
+   }
+  ],
+  "windows_new": 2,
+  "existing_window_shafts": 2
+ },
+ "felt_int_v3_chief_3_cellar": {
+  "size": [
+   2304,
+   1296
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "lantern_01",
+    "type": "lantern",
+    "x": 1505.5,
+    "y": 370.2
+   },
+   {
+    "id": "candle_02",
+    "type": "candle",
+    "x": 1645.8,
+    "y": 460.0
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 1120.2,
+    "y": 421.5
+   },
+   {
+    "id": "candle_04",
+    "type": "candle",
+    "x": 1210.5,
+    "y": 391.8
+   }
+  ],
+  "windows_new": 2,
+  "existing_window_shafts": 0
+ },
+ "felt_int_08_chapel": {
+  "size": [
+   1536,
+   864
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "lantern_01",
+    "type": "lantern",
+    "x": 245.5,
+    "y": 353.8
+   },
+   {
+    "id": "sconce_02",
+    "type": "sconce",
+    "x": 916.2,
+    "y": 202.5
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 1050.8,
+    "y": 418.5
+   },
+   {
+    "id": "candle_04",
+    "type": "candle",
+    "x": 505.8,
+    "y": 449.5
+   }
+  ],
+  "windows_new": 1,
+  "existing_window_shafts": 0
+ },
+ "felt_int_09_atelier": {
+  "size": [
+   1536,
+   864
+  ],
+  "coord": "final-image px, origin top-left, flame centre",
+  "flames": [
+   {
+    "id": "sconce_01",
+    "type": "sconce",
+    "x": 570.8,
+    "y": 149.5
+   },
+   {
+    "id": "lantern_02",
+    "type": "lantern",
+    "x": 423.0,
+    "y": 285.3
+   },
+   {
+    "id": "candle_03",
+    "type": "candle",
+    "x": 829.8,
+    "y": 492.5
+   },
+   {
+    "id": "candle_04",
+    "type": "candle",
+    "x": 666.8,
+    "y": 502.5
+   }
+  ],
+  "windows_new": 1,
+  "existing_window_shafts": 1
+ }
+}
