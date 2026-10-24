@@ -386,7 +386,8 @@
       const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
       const behind = im.height / e.D > 28 && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; d._a = (d._a ?? 1) + ((behind ? .5 : 1) - (d._a ?? 1)) * .2;
       const [sx, sy] = W2S(fx, fy); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
-      hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a); } }
+      hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a); }
+    if (FL()) for (const h of m.hds) if (h.live) FL().props(k, front, h, T); } // felt_live.js: fountain water, shop signs (code)
   function hdBlit(im, sx, sy, ax, ay, sc, flip, a) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame)
     ctx.imageSmoothingEnabled = false; ctx.globalAlpha = a ?? 1; const X = Math.round(sx), Y = Math.round(sy), w = Math.round(im.width * sc), h = Math.round(im.height * sc);
     if (flip) { ctx.setTransform(-1, 0, 0, 1, X, Y); ctx.drawImage(im, -Math.round(ax), -Math.round(ay), w, h); ctx.setTransform(1, 0, 0, 1, 0, 0); } else ctx.drawImage(im, X - Math.round(ax), Y - Math.round(ay), w, h);
@@ -406,10 +407,11 @@
     const key = col + a + '|' + R; let c = LIGHTC[key]; if (c) return c; c = LIGHTC[key] = document.createElement('canvas'); c.width = c.height = R * 2; const g = c.getContext('2d'), gr = g.createRadialGradient(R, R, 0, R, R, R);
     const h = col.replace('#', ''), rr = parseInt(h.slice(0, 2), 16), gg = parseInt(h.slice(2, 4), 16), bb = parseInt(h.slice(4, 6), 16);
     gr.addColorStop(0, `rgba(${rr},${gg},${bb},${.32 * a})`); gr.addColorStop(.5, `rgba(${rr},${gg},${bb},${.12 * a})`); gr.addColorStop(1, `rgba(${rr},${gg},${bb},0)`); g.fillStyle = gr; g.fillRect(0, 0, R * 2, R * 2); return c; }
+  const FL = () => window.FELT_LIVE; // felt_live.js (owner 10-24 펠트 업그레이드), optional
   function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
     for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
       if (h.grade === 'dusk') { const ax = Math.max(ox, v.ox), ay = Math.max(oy, v.oy), bx = Math.min(ox + gw, v.ox + (EW + 1) * v.k), by = Math.min(oy + gh, v.oy + (EH + 1) * v.k);
-        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
+        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = (FL() && FL().grade(h)) || 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
       if (h.webs) { ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag, al] of h.webs) { // 거미줄 실 (breadcrumbs toward the Arachne gate), swaying a little
         const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
         ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
@@ -419,6 +421,7 @@
           for (let x = x0; x <= x1; x++) for (let j = 0; j < 2; j++) { const hsh = Math.sin((x * 12.9 + y * 78.2 + j * 37.7)) * 43758.5, f = hsh - Math.floor(hsh), u = (f * T + ph * (1 + f)) % T, a = Math.sin(S.t * 1.7 + f * 6.3);
             if (a < .2) continue; const [sx, sy2] = W2S((h.gx + x) * T + u, (h.gy + y) * T + 3 + j * 8 + f * 3); ctx.fillRect(Math.round(sx), Math.round(sy2), Math.round((2 + 3 * a) * k), Math.max(1, Math.round(k * .5))); } }
         ctx.restore(); }
+      if (h.live && FL()) FL().over(k, h, T); // felt_live.js: flames that breathe (code)
       if (h.phase2) { const b = S.bossRef, on = S.roomP2 !== undefined ? +S.roomP2 : b && !b.dead && b.phase === 2 ? 1 : 0; h._p2 = (h._p2 || 0) + (on - (h._p2 || 0)) * (S.roomP2Rate || .025); const p = h._p2; // turns with the boss' roar ('boss-phase' event), unravels on 'boss-dead' // 보스 2페이즈: the room turns (red threads close in, light goes red, cocoons sway overhead)
         if (p > .01) { const P = h.phase2; ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(${Math.round(255 - 30 * p)},${Math.round(255 - 40 * p)},${Math.round(255 - 36 * p)},1)`; ctx.fillRect(v.ox, v.oy, (EW + 1) * v.k, (EH + 1) * v.k); ctx.restore(); // floor keeps ~85 % of its stone colour: the red telegraphs must stay the brightest red (team lead)
           ctx.save(); ctx.globalCompositeOperation = 'lighter'; const seen = new Set(); for (const [x1, y1, x2, y2] of P.threads || []) for (const [x, y] of [[x1, y1], [x2, y2]]) { const key = x + ',' + y; if (seen.has(key)) continue; seen.add(key); // red only where the threads are tied (pillars, walls)
@@ -890,7 +893,7 @@
       if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); sfx('heart', .7); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
     // music: area theme / champion battle / boss (phase 2 track) / back to area theme after the clear
-    const e = S.engaged, arM = m.compose ? areaOf(m, hero.x, hero.y) : null; let want = (arM && arM.bgm) || m.bgm;
+    const e = S.engaged, arM = m.compose ? areaOf(m, hero.x, hero.y) : null; let want = (arM && arM.bgm) || m.bgm; if (FL()) want = FL().bgm(want, m, arM);
     if (m.type === 'boss') want = S.bossRef && !S.bossRef.dead ? (S.bossRef.phase === 2 ? m.bgm2 : m.bgm) : (m.bgmAfter || 'area01_forest');
     else if (e && !e.dead && e.D.champion && dist(e, hero) < 260) want = (arM && arM.battleBgm) || m.battleBgm || 'battle_champion';
     S.bgm = want;
@@ -1009,7 +1012,7 @@
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1]; return [clampC(fx - EW / 2, m.pw - EW), clampC(fy - EH / 2, m.ph - EH)]; } // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { if (M()) S.cam = camTarget(); }
   function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
-  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (the zoom block below sat inside this comment since 95da13a1: viewZoom never applied) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
@@ -1058,7 +1061,7 @@
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'secret_wall' && SAVE.flags[o.flag]) list.push({ y: o.y - 9, f: () => { g.fillStyle = '#0b0806'; g.fillRect(o.x - 7, o.y - 9, 14, 17); g.fillStyle = '#3e362e'; for (const [dx, dy] of [[-7, 6], [-3, 7], [4, 6], [6, 7], [0, 8]]) g.fillRect(o.x + dx, o.y + dy, 2, 1); } }); // the broken wall: a dark gap + rubble
-      if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
+      if (o.type === 'sign' && !o.live) list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
       if (o.type === 'heal') list.push({ y: o.y + 6, f: () => drawBench(g, o) });
       if (o.type === 'door_deco') list.push({ y: o.y - 8, f: () => drawSpr(g, o.sprite, o.x, o.y + 8) });
       if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.sin(S.t * 3 + o.x) > .8) list.push({ y: o.y, f: () => { g.fillStyle = '#fff8c0'; g.fillRect(o.x - 1, o.y - 7, 2, 3); g.fillRect(o.x - 3, o.y - 6, 6, 1); } });

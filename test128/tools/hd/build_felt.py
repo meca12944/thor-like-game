@@ -1,6 +1,6 @@
 """Felt v4 = the Grok composition built from the town-art room's final D=3 parts (owner 10-23 「그록 그림 대표」 + credits approved).
 Parts: handoff/claude/felt_grok_build/final/ (the town-art room) -> copied to assets/world/felt/ (fixed here, 0 credits):
-  fountain water darkened (canon = dry cracked fountain), the "o305" text on the weapon-shop sign wiped, the baked-in villager in front of the
+  fountain pool wet again (owner 10-24 펠트 업그레이드: 물이 도는 분수; ripples / falling water = code in felt_live.js), the "o305" text on the weapon-shop sign wiped, the baked-in villager in front of the
   general store hidden behind a well. Places = grok_foot x 0.56 world px (the parts are drawn at 0.7 x Grok size, so the gaps shrink with them).
 Ground = code (palette.json colours): packed-dirt roads traced from the key art as polylines, a cobbled plaza ring, dark earth with dead
   grass, a fenced grave lawn. Solid = each picture's bottom opaque width. Doors / marks / NPCs / clues / waystones / signs follow felt.json
@@ -23,12 +23,13 @@ rnd = random.Random(7)
 # ---------- parts (copy + 0-credit fixes) ----------
 def load(pid): return Image.open(os.path.join(SRC, PJ[pid]['img'])).convert('RGBA')
 IM = {pid: load(pid) for pid in PJ}
-def dry_fountain(im):   # (unused since the art room's statue fountain is dry)                               # blue water -> dark still water / cracked basin (colours from palette base24 + accent #2f4a52)
-    a = np.asarray(im).astype(float); r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
-    blue = (b > r + 18) & (b > g - 4) & (al > 0); L = (.3 * r + .59 * g + .11 * b) / 255
-    dark = np.array([23, 17, 12.]); teal = np.array([47, 74, 82.]); mud = np.array([62, 54, 46.])
-    t = np.clip((L - .25) / .6, 0, 1)[..., None]; col = dark * (1 - t) + np.where(t > .55, mud, teal) * t
-    a[..., :3] = np.where(blue[..., None], col, a[..., :3]); return Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+def wet_fountain(im):   # owner 10-24 「분수 물」: the art room's dry, cracked basin -> still dark-teal water (shade kept from the picture); jets / ripples move in code (felt_live.js)
+    a = np.asarray(im).astype(float); h, w = a.shape[:2]; yy, xx = np.mgrid[0:h, 0:w]
+    r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]; L = (.3 * r + .59 * g + .11 * b) / 255
+    pool = (((xx - 146) / 119.) ** 2 + ((yy - 250) / 46.) ** 2 < 1) & (al > 0)                       # basin (picture px), the pedestal cut out
+    ped = (((xx - 148) / 54.) ** 2 + ((yy - 236) / 27.) ** 2 < 1) | ((yy < 236) & (np.abs(xx - 148) < 54))
+    dark, light = np.array([22, 44, 54.]), np.array([96, 140, 150.]); t = np.clip((L - .12) / .45, 0, 1)[..., None]
+    a[..., :3] = np.where((pool & ~ped)[..., None], dark * (1 - t) + light * t, a[..., :3]); return Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
 def wipe_sign(im, box=(73, 116, 123, 137)):         # "o305" -> blank wooden plate
     a = np.asarray(im).copy(); x0, y0, x1, y1 = box; p = a[y0:y1, x0:x1, :3].astype(int); L = p.sum(2)
     base = np.median(p[L < np.percentile(L, 45)], 0).astype(np.uint8); hi = L > np.percentile(L, 45)
@@ -42,7 +43,7 @@ def ragged(im, r=14):                               # cut sides (opaque right up
         if edge.mean() > .12: dist = np.minimum(dist, d)
     keep = np.clip(dist / r + (nz - .5) * .9, 0, 1) > .35
     a[..., 3] = np.where(keep, a[..., 3], 0); return Image.fromarray(a, 'RGBA')
-IM['fountain'] = dry_fountain(IM['fountain'])
+IM['fountain'] = wet_fountain(IM['fountain'])
 for pid in IM:
     if PJ[pid].get('kind') == 'building' and pid not in ('linette', 'bl_house'): IM[pid] = ragged(IM[pid]); IM['west_a'] = wipe_sign(IM['west_a'])
 
@@ -131,16 +132,17 @@ img[yard] = np.where((n3[yard] > .45)[:, None], cols['g1'], np.where((n2[yard] >
 road = dr < 0; rim = (dr >= 0) & (dr < 3)
 rv = n2 * .7 + n3 * .3; t = np.clip((rv[road] - .25) / .55, 0, 1)[:, None]; img[road] = cols['r2'] * (1 - t) + cols['r3'] * t   # soft packed dirt
 img[rim] = cols['r0']; peb = road & (n3 > .8) & (vnoise(1.2, 4) > .7); img[peb] = cols['r5']; img[road & (vnoise(1.5, 5) > .86)] = cols['d4']
+img[road | rim] *= 1.17                                                    # owner 10-24: paths 15-20 % brighter (the roads read from the dirt)
 # plaza: cobble ring (stone cells by jittered grid), mortar in between, inner basin ring stones
 cell = 4.0; jx, jy = vnoise(4, 6) * 1.6, vnoise(4, 7) * 1.6
 cx, cy = (wxp + jx) / cell, (wyp + (np.floor((wxp + jx) / cell) % 2) * cell / 2 + jy) / cell
 fx, fy = cx - np.floor(cx), cy - np.floor(cy); mort = (fx < .16) | (fy < .2); shade = vnoise(cell, 8)
 plaza = pr < 1 + (n2 - .5) * .12
 stone = sel([shade < .35, shade < .6, shade < .82], [cols['s1'], cols['s2'], cols['s3']], cols['s4'])
-img[plaza] = np.where(mort[plaza][:, None], cols['s0'], stone[plaza]); img[plaza & (pr > .9) & (pr < .97)] = cols['s0']
+img[plaza] = np.where(mort[plaza][:, None], cols['s0'], stone[plaza]); img[plaza & (pr > .9) & (pr < .97)] = cols['s0']; img[plaza] *= 1.12
 # edges: darker toward the map border (no hard frame), backdrop band darker still
 edge = np.minimum.reduce([wxp, wyp, W * T - wxp, H * T - wyp + 400])   # no dark band at the bottom: the ash field joins there; img *= np.clip(.55 + edge / 60, .55, 1)[..., None]
-img[wyp < 175 * S] *= .7
+img[wyp < 175 * S] *= .84                                                  # backdrop band: gentler (owner 10-24, was .7)
 # snap to the town palette (base24 + accents)
 pal = np.array([hx(c) for c in (PAL['base24'] + PAL['accent8'] if PAL else [v for v in ('#201810',)])])
 BAYER = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16 - .47)[(yy % 4).astype(int), (xx % 4).astype(int)][..., None]   # ordered dither: fine 1-pixel grain instead of big blotches
@@ -170,7 +172,7 @@ for o in F['objects']:
         o['x'], o['y'] = {'f_mark_fountain': foot('fountain', 0, -2), 'f_mark_stall': foot('red_stall'), 'f_mark_gate': [EX[0], EX[1] - 1]}.get(i, [o['x'], o['y']])
     elif t == 'npc': o['x'], o['y'] = int(o['x'] * W / 56), int(o['y'] * H / 38)    # no near rule -> scaled spot (fixed below)
     objs.append(o)
-NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', -4, 0],
+NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', 0, 1],
         'f_linette': ['f_door_atelier', -4, 1], 'f_luca': ['f_mark_fountain', 5, 1],  # -4: the door's own tile is inside the building picture, she needs open ground to pace. 바르트·마르타·오스왈드는 집 안에만 있다
         'f_toby': ['f_mark_fountain', 2, 4], 'f_gas': ['f_mark_gate', -2, -5]}
 if not any(o['type'] == 'mark' for o in objs):
@@ -204,6 +206,20 @@ ax0, ay0 = P['fountain']['x'] + 3, P['fountain']['y'] - 1; ax1, ay1 = P['web_arc
 for i in range(14):
     t = (i / 13) ** .7; x = ax0 + (ax1 - ax0) * t; y = ay0 + (ay1 - ay0) * t; n = 1 + int(t * 3)
     for j in range(n): dx = (j - n / 2) * 1.1; WEBS.append([x + dx, y - 2 - (j % 2), x + dx + 1.2 + t, y - .2, .5 + t, .25 + .5 * t])
+# ---------- live layer (felt_live.js, owner 10-24 펠트 업그레이드): code-drawn water, flicker, signs; nothing baked ----------
+fo = P['fountain']
+FOUNTAIN = {'x': fo['x'], 'y': fo['y'], 'ax': fo['ax'], 'ay': fo['ay'], 'D': D, 'pool': [146, 250, 119, 46], 'ped': [148, 236, 54, 27],   # picture px (fountain.png)
+            'jets': [[88, 200, 255], [98, 208, 263], [147, 213, 277], [190, 207, 267], [202, 200, 250]]}                             # [x, top, bottom] of each falling stream
+FLICK = [lp(next(q['id'] for q in props if q['id'].startswith('brazier')), 0, -.6, 34, '#ff9a40', 1), lp('se_house', -1, -2, 30, '#ff8a3a', 1)]   # 5-8 live flames (brazier, forge, plaza lamps, chapel candles)
+FLICK += [[q['x'], q['y'] - 1.4, 16, '#ffc070', .8] for q in props if q['id'].startswith('lamp_') and 20 <= q['x'] <= 28]
+FLICK += [[q['x'], q['y'] - 2.2, 14, '#ffd090', .8] for q in props if q['id'].startswith('candelabra')]
+def door(i): return next(o for o in objs if o.get('id') == i)
+SIGNS = [[door(i)['x'] + dx, door(i)['y'] + dy, icon] for i, dx, dy, icon in (                                                  # 그림 간판 (placeholder shapes, code)
+    ('f_door_weapon', 1.6, -1.2, 'sword'), ('f_door_tool', 1.6, -1.0, 'bag'), ('f_door_herb', -1.4, -1.0, 'leaf'),
+    ('f_door_inn', 1.8, -1.2, 'mug'), ('f_door_smith', 1.8, -1.0, 'anvil'), ('f_door_atelier', 2.2, -1.0, 'needle'))]
+GATE_SIGN = [EX[0] + 2.35, EX[1] - 4.2]                                                                                        # 남문 「해 지면 문 닫음」 plank on the east gate post
+objs.append({'type': 'sign', 'id': 'f_sign_gate_night', 'x': EX[0] + 2, 'y': EX[1] - 5, 'text': '「해 지면 문 닫음」\n— 펠트 경비대', 'live': 1})
+LIVE = {'fountain': FOUNTAIN, 'flick': FLICK, 'signs': SIGNS, 'gateSign': GATE_SIGN}
 def nearest_floor(x, y, avoid=()):
     best = None
     for dy in range(-4, 5):
@@ -233,9 +249,10 @@ SPAWNS = {'default': [EX[0] + .5, EX[1] - 7.5, 'up'], 'world': [EX[0] + .5, EX[1
 for o in objs:
     if o.get('type') == 'door' and o.get('out'): SPAWNS[o['out']] = [o['x'] + .5, o['y'] + 1.5, 'up']  # step back out on the tile in front of that door
 m = {k: F[k] for k in ('type', 'area', 'region', 'title', 'bgm', 'battleBgm', 'tileset', 'tile') if k in F}
-m.update(id='felt', name='펠트', w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
+m.update(id='felt', name='펠트', viewZoom=1.3, w=W, h=H,   # viewZoom: owner 10-24 「카메라 1.3배」
+         legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
          spawns=SPAWNS,   # start inside the south gate (forge, chief's house, statue ahead); out-spawns = walk back out of an interior
-         hd={'D': GD, 'ground': 'assets/world/felt/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk'},
+         hd={'D': GD, 'ground': 'assets/world/felt/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk', 'live': LIVE},
          note='GENERATED by tools/hd/build_felt.py from the town-art room parts + maps/src/felt.json (doors / NPCs / clues) - do not hand-edit')
 json.dump(m, open(os.path.join(ROOT, 'maps', 'felt.json'), 'w'), ensure_ascii=False, indent=1)
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json')))

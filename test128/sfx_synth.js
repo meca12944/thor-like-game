@@ -49,5 +49,13 @@
     voice(ac, master, noiseBuf, k, vol, rate, now); }
   function render(list, secs) { const sr = 44100, oc = new OfflineAudioContext(1, Math.ceil(sr * secs), sr), m = oc.createGain(); m.gain.value = .45; m.connect(oc.destination); const nb = mkNoise(oc);
     for (const [k, t, v] of list) voice(oc, m, nb, k, v || 1, 1, t); return oc.startRendering().then(b => Array.from(b.getChannelData(0))); }
-  window.SFX2 = { play, setVol(v) { vol = Math.max(0, Math.min(1, v)); if (master) master.gain.value = .45 * vol; }, get vol() { return vol; }, render, has: k => !!DEF[k], names: Object.keys(DEF), get ready() { return !!ac; } };
+  // looped ambient beds (owner 10-24 펠트 「분수 물소리」): one per name, built on first use, level eased (no clicks); 0 = silent but kept
+  const AMB = {};
+  function ambient(name, g) { if (OFF || !ac || !noiseBuf) return; let a = AMB[name];
+    if (!a) { if (!(g > 0)) return; const src = ac.createBufferSource(); src.buffer = noiseBuf; src.loop = true; src.playbackRate.value = .5;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; const pk = ac.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 2600; pk.Q.value = 1.4; pk.gain.value = 5;  // water: dark rush + a soft splash band
+      const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .23; lg.gain.value = 260; lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+      const out = ac.createGain(); out.gain.value = 0; src.connect(lp); lp.connect(pk); pk.connect(out); out.connect(master); src.start(); a = AMB[name] = { out, g: 0 }; }
+    g = Math.max(0, Math.min(1, g || 0)); if (Math.abs(g - a.g) < .005) return; a.g = g; a.out.gain.setTargetAtTime(g * .5, ac.currentTime, .25); }
+  window.SFX2 = { play, ambient, setVol(v) { vol = Math.max(0, Math.min(1, v)); if (master) master.gain.value = .45 * vol; }, get vol() { return vol; }, render, has: k => !!DEF[k], names: Object.keys(DEF), get ready() { return !!ac; } };
 })();
