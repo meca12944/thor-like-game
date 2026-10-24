@@ -828,7 +828,7 @@
         if (!it || it.who !== who) { it = { who, lines: [] }; out.push(it); } it.lines.push(t); if (who && who.narr) { it = null; } } }
     return out; }
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
-    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
+    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
   function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
@@ -1417,7 +1417,7 @@
     ctx.fillStyle = '#8a2a2a'; for (let i = 0; i < w - 24 * u; i += 3 * u) if ((i / u | 0) % 7 !== 3) ctx.fillRect(x + 12 * u + i, y + 3 * u + Math.round(Math.sin(i / (14 * u) + d.t * .6) * u), 2 * u, Math.max(1, u)); // 붉은 실 한 가닥 (1장 = 아라크네의 실)
     for (const [cx, cy] of [[x, y], [x + w, y], [x, y + h], [x + w, y + h]]) { ctx.fillStyle = '#7a6448'; ctx.fillRect(cx - 3 * u, cy - 3 * u, 6 * u, 6 * u); ctx.fillStyle = '#1a1420'; ctx.fillRect(cx - u, cy - u, 2 * u, 2 * u); }
     let tx = x + 18 * u;
-    if (port) { const px = x + 10 * u, py = y + (h - sz) / 2; ctx.fillStyle = '#16111c'; ctx.fillRect(px, py, sz, sz); if (hasB) dlgBust(d, px, py, sz); else { ctx.imageSmoothingEnabled = true; ctx.drawImage(pi, px, py, sz, sz); ctx.imageSmoothingEnabled = false; }
+    if (port) { const px = x + 10 * u, py = y + (h - sz) / 2; ctx.fillStyle = '#16111c'; ctx.fillRect(px, py, sz, sz); if (hasB) dlgBust(d, px, py, sz); else { const j = d.creep ? [(Math.random() * 3 | 0) - 1, (Math.random() * 3 | 0) - 1] : [0, 0]; ctx.imageSmoothingEnabled = false; ctx.drawImage(pi, px + j[0] * u, py + j[1] * u, sz, sz); if (d.creep && Math.sin(d.t * 23) > .7) { ctx.fillStyle = 'rgba(140,0,10,.22)'; ctx.fillRect(px, py, sz, sz); } } /* creep = horror twitch + red flicker (아라크네) */
       ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(px, py, sz, sz); tx = px + sz + 14 * u; }
     if (d.name) { ctx.font = font(12 * u); const nw = ctx.measureText(d.name).width + (d.role ? ctx.measureText(' · ' + d.role).width * .85 : 0) + 22 * u, ny = y - 14 * u;
       ctx.fillStyle = 'rgba(10,8,14,.95)'; ctx.fillRect(tx - 10 * u, ny, nw, 18 * u); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(tx - 10 * u, ny, nw, 18 * u);
