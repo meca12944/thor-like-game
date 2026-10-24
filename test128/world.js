@@ -562,9 +562,9 @@
     const B = M().boss; SAVE.flags[B.flag] = true; save(); playScene('boss_post:' + (B.id || B.kind), 1.2);
     S.hazards.length = 0; S.shots.length = 0; S.temp.length = 0; S.ult = null;
     S.mobs.forEach(o => { if (o !== m && !o.dead) killMob(o); });
-    shake(5); jingle(); banner(B.name + ' 격파!', 3);
-    after(1.6, () => { const l = giveLoot(B.reward || []); msg('능력 흡수: ' + B.absorb + (l ? '  ·  획득: ' + l : ''), 5); });
-    after(3.2, () => { addWarp(M()); msg('빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다', 4); });
+    shake(5); jingle(); banner((m.D && m.D.title ? m.D.title + ' ' : '') + B.name + ' — 쓰러뜨렸다', 3.4); S.slowT = 1.1; S.killFlash = 1; // 처치 연출 (팀장): 1.1초 느린 화면 → 하얀 번쩍 → 이름 띠
+    after(1.6, () => { const l = giveLoot(B.reward || []); msg((B.absorb ? '능력 흡수: ' + B.absorb + (l ? '  ·  ' : '') : '') + (l ? '획득: ' + l : ''), 5); });
+    after(3.2, () => { addWarp(M()); msg(B.exitMsg || (B.exit && B.exit.to === 'felt' ? '빛의 문이 열렸다 — 들어가면 펠트로 돌아간다' : '빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다'), 4); });
   }
   function addWarp(m) { if (!m.objs.some(o => o.type === 'warp')) m.objs.push({ type: 'warp', x: m.pw / 2, y: m.ph / 2 + 16, tx: -1, ty: -1, to: m.boss.exit.to, spawn: m.boss.exit.spawn }); }
   function phase2(m) { banner('2페이즈 — 골렘이 수정 갑옷을 일으킨다!', 2); shake(5); for (let i = 0; i < 14; i++) addFx('crystal', m.x + Math.cos(i / 14 * TAU) * 30, m.y + Math.sin(i / 14 * TAU) * 22, { life: .8 }); }
@@ -589,7 +589,7 @@
   }
   function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
-    S.roomP2 = undefined; S.splashT = 0; S.cineA = 0; S.bTrailId = null; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    S.roomP2 = undefined; S.splashT = 0; S.cineA = 0; S.slowT = 0; S.killFlash = 0; S.bTrailId = null; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
@@ -1556,6 +1556,7 @@
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (S.bossRef || S.cineA) drawBossCine(ox, oy, SW, SH, u);
+    if (S.killFlash > 0) { const kf = S.killFlash; ctx.save(); ctx.globalAlpha = Math.min(1, kf * 1.4) * .85; ctx.fillStyle = '#fff'; ctx.fillRect(ox, oy, SW, SH); ctx.restore(); S.killFlash = Math.max(0, kf - .025); if (S.slowT > 0) { const bar = Math.round(SH * .1); ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bar); ctx.fillRect(ox, oy + SH - bar, SW, bar); } }
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
@@ -1744,7 +1745,7 @@
   function frame(t) {
     const dt = Math.min(.1, (t - last) / 1000 || 0); last = t;
     if (FPSEL) { fpsN++; fpsW = Math.max(fpsW, dt * 1000); if (t - fpsT > 1000) { FPSEL.textContent = Math.round(fpsN * 1000 / (t - fpsT)) + ' fps · 최악 ' + Math.round(fpsW) + 'ms'; fpsN = 0; fpsT = t; fpsW = 0; } }
-    if (!manual) { if (S.scene === 'town' && !S.trans) watchTown(); else { acc += dt; let n = 0; while (acc >= DT && n < 6) { step(DT); acc -= DT; n++; } if (n >= 6) acc = 0; } }
+    if (!manual) { if (S.scene === 'town' && !S.trans) watchTown(); else { if (S.slowT > 0) { S.slowT -= dt; } acc += dt * (S.slowT > 0 ? .28 : 1); let n = 0; while (acc >= DT && n < 6) { step(DT); acc -= DT; n++; } if (n >= 6) acc = 0; } }
     if (S.scene !== 'town' || S.trans) render();
     publish();
     requestAnimationFrame(frame);
@@ -1752,7 +1753,7 @@
   window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, aliasPt, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = { replayScene: (k, d) => { delete SAVE.flags["scene_" + k]; playScene(k, d || 0); }, /* test: replay a 1장 scene */
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
-    go, dirTap, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },
+    go, dirTap, hitMob, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
     tap(code) { queue.push(code); },
