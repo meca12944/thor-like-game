@@ -307,7 +307,7 @@
   const held = new Set(), queue = [];
   const PASS = new Set(['KeyB', 'KeyN', 'Minus', 'Equal', 'NumpadSubtract', 'NumpadAdd', 'F12']); // BGM keys keep working
   const DEFKEYS = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], attack: ['KeyJ', 'KeyZ'], dash: ['KeyK', 'KeyX'],
-    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
+    interact: ['KeyL', 'KeyC', 'Enter'], dive: ['Space'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
   function KM() { const g = window.__game; return (g && g.ctl && g.ctl.KEYMAP) || DEFKEYS; }
   const ARROW = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' }; // 방향키는 언제나 이동 (owner 10-23)
   function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (ARROW[a] && !l.includes(ARROW[a])) l.push(ARROW[a]); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
@@ -323,7 +323,7 @@
 
   // ---------------- 폰 터치 (사장님 10-23 "핸드폰으로 조작하게"): 마을 화면의 이동 패드·공격·대시·달리기 버튼을 게임 지도 위로 올리고,
   // 공격 버튼을 이쪽 공격 키(J)에 잇고, 지도에서 필요한 조사·물약·필살기·메뉴 버튼을 더함(키를 누른 것처럼 보냄). 키보드 조작은 그대로.
-  { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #jumpb,body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
+  { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
       + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
@@ -337,7 +337,7 @@
     const wire = (el, code) => { if (!el) return; const dn = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.add('on'); send(code, true); },
       up = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.remove('on'); send(code, false); };
       el.addEventListener('touchstart', dn, { passive: false, capture: true }); el.addEventListener('touchend', up, { passive: false, capture: true }); el.addEventListener('touchcancel', up, { passive: false, capture: true }); };
-    wire(document.getElementById('atk'), 'KeyJ'); // town attack button -> this scene's attack key (hold = charge, same as the key)
+    wire(document.getElementById('atk'), 'KeyJ'); wire(document.getElementById('jumpb'), 'Space'); // 점프 버튼 (10-24) // town attack button -> this scene's attack key (hold = charge, same as the key)
     for (const [id, label, code] of [['wtb_ult', '필살기', 'KeyR'], ['wtb_act', '조사', 'KeyL'], ['wtb_pot', '물약', 'KeyE'], ['wtb_menu', '메뉴', 'Escape']]) { const el = document.createElement('div'); el.id = id; el.className = 'wtb'; el.textContent = label; ui.appendChild(el); wire(el, code); } }
 
   addEventListener('pointerdown', e => { if (S.dialog && e.target && e.target.tagName === 'CANVAS') S.dlgTap = true; }); // phone: tap the picture to go on
@@ -767,6 +767,12 @@
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
     if (takePress('ult') && !S.ultFx) castUlt();
+    // 점프 (사장님 10-24 「점프 모션 입력시켜」, 2번방): 마을과 같은 박자(웅크림 4틱 → 공중 0.5초 → 착지 8틱), 공중 높이 16px = 주인공 키의 반, 높이 뜬 동안 바닥 공격(원·줄 장판) 넘김
+    if (takePress('dive') && !hero.jump && !hero.roll && !hero.atk && !hero.charge && hero.hp > 0) { const run = hero.run && hero.moving; hero.jump = { t: 0, T: JUMP.T, pre: run ? 0 : JUMP.pre, land: JUMP.land, run }; addFx('dust', hero.x, hero.y, { life: .3 }); sfx('roll', .35, 1.5); }
+    if (hero.jump) { const J = hero.jump; J.t += dt; const ta = J.t - J.pre, p = Math.max(0, Math.min(1, ta / J.T)); J.air = ta > 0 && ta < J.T; hero.z = J.air ? 4 * p * (1 - p) * JUMP.h : 0;
+      if (J.air) for (const c of codesOf('dash').concat(codesOf('attack'))) { const qi = queue.indexOf(c); if (qi >= 0) queue.splice(qi, 1); } // no dash / swing in the air (same as the town)
+      if (ta >= J.T && !J.landed) { J.landed = true; addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); }
+      if (J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
@@ -846,7 +852,7 @@
     for (let i = S.hazards.length - 1; i >= 0; i--) { const h = S.hazards[i]; h.t += dt;
       if (h.owner && h.owner.dead && h.t < h.warn) { S.hazards.splice(i, 1); continue; }
       const live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
-      if (live && h.dmg && !h.hit && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
+      if (live && h.dmg && !h.hit && !(hero.z > JUMP.h * .45 && h.shape !== 'all') && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
       if (live && h.zone && inHaz(h, hero.x, hero.y - 4)) hero.slowT = Math.max(hero.slowT, .15);
       if (h.t >= h.warn && !h.fired) { h.fired = true; if (h.onEnd) h.onEnd(h); hazardFx(h); }
       if (h.linger && h.t >= h.warn + (h.act || 0) && h.t < h.warn + h.act + h.linger && !h.hit && Math.hypot(hero.x - h.x, (hero.y - h.y) * 1.15) < h.r * .8) { if (hurt(1, h)) h.hit = true; }
@@ -1142,6 +1148,7 @@
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
+    else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
     else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
@@ -1197,6 +1204,7 @@
       if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+  const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const HITSTOP_HERO = [2 / 60, 3 / 60, 5 / 60, 5 / 60];
   // [검흔 어울림 연구 10-23 「맞는 곳 = 보이는 곳」] one arc placement for the drawing and the hit: the arc stops flying at its reach (GK_FLY)
   // and sits where it crosses a mob's body (side +27, up +60, down -75 atlas px); a mob is hit when a point of its body (feet..head x left/mid/right)
@@ -1248,7 +1256,7 @@
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
-    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
+    ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
@@ -1264,7 +1272,7 @@
     const h = hero; if (h.inv > 0 && S.scene !== 'world' && Math.floor(h.inv * 20) % 2 && !h.roll) return;
     const d = h.face === 'left' ? 'right' : h.face; const fi = h.moving || h.roll ? Math.floor(h.walkT * 8) % 4 : 0;
     const name = 'hero_' + d + '_' + fi;
-    g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(h.x, h.y, 6 * zoom + 1, 2.5 * zoom + .5, 0, 0, TAU); g.fill();
+    { const zs = 1 - Math.min(.45, (h.z || 0) / 36); g.fillStyle = `rgba(0,0,0,${.28 * zs})`; g.beginPath(); g.ellipse(h.x, h.y, (6 * zoom + 1) * zs, (2.5 * zoom + .5) * zs, 0, 0, TAU); g.fill(); } // jump: the shadow stays on the ground and shrinks
     if (zoom === 1 && h128() && S.map && S.map.type !== 'world') return; // test128: body + trail + slash drawn by drawHeroHi
     if (S.trail) for (const a of S.trail) { const q = 1 - a.t / a.life; drawSpr(g, a.name, a.x, a.y, { flip: a.flip, alpha: q * q * a.a, mode: 'dodge' }); } // dash afterimages
     if (h.roll) { if (DG()) { drawSpr(g, heroFrameName(), h.x, h.y, { flip: h.face === 'left' }); if (h.roll.t < iframe()) { g.fillStyle = 'rgba(160,240,255,.22)'; g.beginPath(); g.ellipse(h.x, h.y - 9, 8, 10, 0, 0, TAU); g.fill(); } return; }
