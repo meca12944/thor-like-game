@@ -33,7 +33,9 @@ L=[dict(**{'from':'ch6','to':'rampart'},kind='stairs',at=[14,440],label='6장 �
    dict(**{'from':'altar','to':'ch8'},kind='oneway',at=[472,185],label='8장 공허의 틈새로'),
    dict(**{'from':'gallery','to':'sandfall'},kind='shortcut',at=[335,112],label='지름길1 근위대 승강기 → 대계단·전정 (대회랑에서 열기)'),
    dict(**{'from':'sidegarden','to':'rampart'},kind='shortcut',at=[120,285],label='지름길2 무너진 성벽 사다리 (정원에서 내리기)'),
-   dict(**{'from':'rampart','to':'ch5'},kind='gate',at=[30,300],label='귀환 길 → 5장 수장고 석관 (핏방울 3/3 넣으러)')]
+   dict(**{'from':'gallery','to':'ch5'},kind='gate',at=[180,22],label='북문 → 5장 대성당 (핏방울 3/3을 수장고 석관에)'),
+   dict(**{'from':'forecourt','to':'ch3'},kind='gate',at=[418,380],label='서문 → 3장 대서고'),
+   dict(**{'from':'rampart','to':'ch4'},kind='gate',at=[12,330],label='동문 → 4장 귀족가')]
 M=[]
 def mk(t,name,zone,x,y,ref='',note=''):M.append(dict(type=t,name=name,zone=zone,x=x,y=y,ref=ref,note=note))
 mk('start','7장 시작 (6장에서 올라옴)','rampart',22,432,'정본 6장: 클로비스 처치 → 왕가의 열쇠')
@@ -76,11 +78,26 @@ G=[dict(kind='bg',name='왕성 성벽길 바닥',size='타일 16px 세트',desc=
    dict(kind='bg',name='석화된 왕실 정원',size='타일 세트',desc='모래에 묻힌 분수, 굳은 나무, 깨진 석상'),
    dict(kind='bg',name='대회랑',size='타일 세트 + 기둥 소품',desc='붉은 카펫이 바랜 긴 회랑, 양옆 근위대 석상'),
    dict(kind='bg',name='옥좌의 방',size='40x30 타일 한 장',desc='황금 예복의 군주가 굳어 앉은 옥좌, 잿빛 안개'),
+   dict(kind='bg',name='왕성 탑 (멀리 보이는 배경)',size='화면 배경 한 장',desc='왕도 어디서나 보이는 왕성 탑 — 7장에서는 바로 머리 위로 솟음 (다른 장 배경에도 같은 탑)'),
    dict(kind='bg',name='옥좌 뒤 제단',size='20x15 타일',desc='부서진 옥좌 뒤 숨은 제단, 붉은 틈이 열림'),
    dict(kind='mob',name='석화 근위대 (팀 제안)',size='주인공 크기 1배',desc='갑옷째 석회로 굳은 근위병, 창'),
    dict(kind='mob',name='모래 껍데기 (팀 제안)',size='0.8배',desc='모래로 빚은 사람 껍데기, 흩어졌다 뭉침'),
    dict(kind='elite',name='근위대장 석상',size='1.6배',desc='대회랑 끝 거대 석상, 깨어나 대검을 듦'),
    dict(kind='boss',name='루드비히 「멈춰버린 군주」',size='2.5배',desc='황금 예복, 잿빛 석회·모래로 굳은 몸, 부서진 대검의 불길한 광채'),
    dict(kind='npc',name='루드비히의 왕비 (비밀 인물)',size='1배',desc='정본 외형 없음 — 스토리 담당 확정 뒤 부탁')]
+# 세계 지도(사장님 10-24 「거대한 성, 그 안 왕도」): 왕성은 한가운데, 6장은 동남 → 처음 그린 지도를 좌우로 뒤집어 6장 입구를 동남에 둠. 둘레는 내성벽.
+W7=520
+def fx(x):return W7-x
+for z in Z:z['x']=W7-z['x']-z['w']
+for a in A:a['poly']=[[fx(x),y] for x,y in a['poly']]
+for q in P:q['pts']=[[fx(x),y] for x,y in q['pts']]
+for l in L:l['at']=[fx(l['at'][0]),l['at'][1]]
+for k in M:k['x']=fx(k['x'])-1
+SW=lambda t:t.replace('서쪽','@').replace('동쪽','서쪽').replace('@','동쪽')
+for o in Z+L+M:
+    for f in ('name','label','note'):
+        if f in o:o[f]=SW(o[f])
+A+=[dict(kind='wall',poly=[[0,0],[520,0],[520,6],[0,6]]),dict(kind='wall',poly=[[0,454],[520,454],[520,460],[0,460]]),
+    dict(kind='wall',poly=[[0,0],[6,0],[6,460],[0,460]]),dict(kind='wall',poly=[[514,0],[520,0],[520,460],[514,460]])]   # 내성벽 (지도 가장자리)
 json.dump(dict(chapter='ch7',title='왕성 옥좌의 방',w=520,h=460,zones=Z,areas=A,paths=P,links=L,markers=M,grok=G),open(f'{D}/ch7_map.json','w'),ensure_ascii=False,indent=1)
 print('markers',len(M))
