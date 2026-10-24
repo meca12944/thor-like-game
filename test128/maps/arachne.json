@@ -135,6 +135,7 @@
    "spawn": "arachne"
   },
   "boss_door": {
+   "label": "재단사의 방",
    "to": "arachne_boss",
    "spawn": "default",
    "needFlags": [
