@@ -213,6 +213,7 @@
       m.cells.push({ ch, g: L.ground, deco: L.deco, obj: L.obj });
       let solid = solidChars.has(ch); if (L.solid !== undefined) solid = L.solid;
       if (ts.solidTiles && ts.solidTiles.includes(L.ground)) solid = true;
+      if (L.hop) { (m.hopG || (m.hopG = new Uint8Array(j.w * j.h)))[y * j.w + x] = 1; solid = true; } // 점프로만 넘는 칸 (울타리·개울·구멍; 3번방 약속 10-24)
       m.solidG[y * j.w + x] = solid ? 1 : 0;
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
@@ -345,7 +346,7 @@
   const M = () => S.map;
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   function solidAt(px, py) { const m = M(); if (!m) return true; const x = Math.floor(px / m.T), y = Math.floor(py / m.T);
-    if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x]) return true;
+    if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x] && !(hopNow && m.hopG && m.hopG[y * m.w + x])) return true;
     for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true;
     for (const o of m.objs) if (o.wander && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
   let npcSelf = null;
@@ -438,13 +439,14 @@
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
+  let hopNow = false; // true only while the airborne hero moves: hop cells are open for him alone
   function moveCol(e, dx, dy, r, fly) {
-    const m = M(); let ok = true;
+    const m = M(); let ok = true; hopNow = e === hero && !!(hero.jump && hero.jump.air);
     const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
     const bl = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
     if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else ok = false; }
     if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else ok = false; }
-    return ok;
+    hopNow = false; return ok;
   }
   function msg(text, t = 2.2) { S.msg = { text, t }; }
   // ---- 보스전 연출 (2번방 10-24, 팀장 「재밌고 다크하고 웅장한 보스전」): 시네마 띠 + 등장 그림 · 2페이즈 글자 · 처치 슬로·번쩍 · 화면 번쩍
@@ -771,8 +773,10 @@
     if (takePress('dive') && !hero.jump && !hero.roll && !hero.atk && !hero.charge && hero.hp > 0) { const run = hero.run && hero.moving; hero.jump = { t: 0, T: JUMP.T, pre: run ? 0 : JUMP.pre, land: JUMP.land, run }; addFx('dust', hero.x, hero.y, { life: .3 }); sfx('roll', .35, 1.5); }
     if (hero.jump) { const J = hero.jump; J.t += dt; const ta = J.t - J.pre, p = Math.max(0, Math.min(1, ta / J.T)); J.air = ta > 0 && ta < J.T; hero.z = J.air ? 4 * p * (1 - p) * JUMP.h : 0;
       if (J.air) for (const c of codesOf('dash').concat(codesOf('attack'))) { const qi = queue.indexOf(c); if (qi >= 0) queue.splice(qi, 1); } // no dash / swing in the air (same as the town)
-      if (ta >= J.T && !J.landed) { J.landed = true; addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); }
-      if (J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
+      if (ta >= J.T && !J.landed) { J.landed = true; const mm = M(), tx = Math.floor(hero.x / mm.T), ty = Math.floor(hero.y / mm.T);
+        if (mm.hopG && mm.hopG[ty * mm.w + tx]) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(3, null, true); hero.jump = null; hero.z = 0; } // landed in a gap / water: small hit, back to the last solid ground
+        else { addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); } }
+      if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
@@ -835,7 +839,7 @@
     }
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
     if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
-    else if (!onSpike && !hero.roll && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
+    else if (!onSpike && !hero.roll && !hero.jump && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
