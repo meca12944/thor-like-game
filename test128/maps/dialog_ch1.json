@@ -73,14 +73,14 @@
  "sceneArt": {
   "area:felt": [
    [
-    "cg/cg_felt_arrival.png",
+    "cg/cg_felt_arrival.jpg",
     0,
     1
    ]
   ],
   "meet:f_linette": [
    [
-    "cg/cg_linette_meet.png",
+    "cg/cg_linette_meet.jpg",
     0,
     -1
    ]
@@ -94,12 +94,12 @@
   ],
   "boss_post:arachne": [
    [
-    "cg/cg_arachne_end.png",
+    "cg/cg_arachne_end.jpg",
     0,
     -1
    ],
    [
-    "cg/cg_memory_fire.png",
+    "cg/cg_memory_fire.jpg",
     4,
     0
    ]
