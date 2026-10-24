@@ -22,7 +22,7 @@ AREA_COL = {  # 지형 덩어리
     'water': (44, 70, 92), 'poison': (60, 92, 48), 'mercury': (130, 140, 150), 'cliff': (30, 28, 28),
     'forest': (44, 62, 40), 'ruin': (96, 92, 86), 'ash': (120, 116, 108), 'fire': (150, 60, 30),
     'web': (150, 40, 50), 'wall': (20, 18, 18), 'pit': (10, 10, 12), 'building': (110, 96, 80),
-    'grave': (80, 80, 84), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
+    'grave': (80, 80, 84), 'citywall': (170, 158, 130), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
 PATH_COL = {'road': (176, 156, 120), 'river': (60, 96, 130), 'wall': (16, 14, 14), 'cliff': (24, 20, 20),
             'bridge': (150, 110, 70), 'corridor': (128, 118, 110), 'sewer': (70, 96, 60), 'rail': (110, 100, 90)}
 KO = {'start': '시작', 'save': '모닥불(쉼터)', 'npc': '인물', 'item': '아이템', 'chest': '상자', 'mob': '몹 무리',
@@ -46,6 +46,7 @@ def load(p):
 def check(m):
     """규칙 검사. 반환: 문제 목록."""
     bad = []
+    if m['chapter'] == 'world': return bad   # 세계 지도는 챕터 상자만 그림 (검사 없음)
     W, H = m['w'], m['h']
     zones = {z['id']: z for z in m['zones']}
     for z in m['zones']:
@@ -89,6 +90,7 @@ def draw(m, out, zone=None, maxpx=3000):
     d = ImageDraw.Draw(im)
     P = lambda x, y: ((x - X0) * s, (y - Y0) * s + top)
     f1, f2, f3 = font(max(12, s * 2)), font(max(11, int(s * 1.5))), font(28)
+    if m['chapter'] == 'world': f1, f2, f3 = font(40), font(30), font(44)   # 세계 지도는 칸이 작아서 글자를 크게
     for z in m['zones']:
         a, b = P(z['x'], z['y']); c, e = P(z['x'] + z['w'], z['y'] + z['h'])
         d.rectangle([a, b, c, e], fill=ZONE_COL.get(z.get('kind'), (70, 70, 70)), outline=(200, 190, 170), width=2)
