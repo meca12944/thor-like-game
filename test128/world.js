@@ -418,8 +418,8 @@
           for (let x = x0; x <= x1; x++) for (let j = 0; j < 2; j++) { const hsh = Math.sin((x * 12.9 + y * 78.2 + j * 37.7)) * 43758.5, f = hsh - Math.floor(hsh), u = (f * T + ph * (1 + f)) % T, a = Math.sin(S.t * 1.7 + f * 6.3);
             if (a < .2) continue; const [sx, sy2] = W2S((h.gx + x) * T + u, (h.gy + y) * T + 3 + j * 8 + f * 3); ctx.fillRect(Math.round(sx), Math.round(sy2), Math.round((2 + 3 * a) * k), Math.max(1, Math.round(k * .5))); } }
         ctx.restore(); }
-      if (h.phase2) { const b = S.bossRef, on = b && !b.dead && b.phase === 2 ? 1 : 0; h._p2 = (h._p2 || 0) + (on - (h._p2 || 0)) * .025; const p = h._p2; // 보스 2페이즈: the room turns (red threads close in, light goes red, cocoons sway overhead)
-        if (p > .01) { const P = h.phase2; ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(255,${Math.round(255 - 120 * p)},${Math.round(255 - 110 * p)},1)`; ctx.fillRect(v.ox, v.oy, (EW + 1) * v.k, (EH + 1) * v.k); ctx.restore();
+      if (h.phase2) { const b = S.bossRef, on = S.roomP2 !== undefined ? +S.roomP2 : b && !b.dead && b.phase === 2 ? 1 : 0; h._p2 = (h._p2 || 0) + (on - (h._p2 || 0)) * (S.roomP2Rate || .025); const p = h._p2; // turns with the boss' roar ('boss-phase' event), unravels on 'boss-dead' // 보스 2페이즈: the room turns (red threads close in, light goes red, cocoons sway overhead)
+        if (p > .01) { const P = h.phase2; ctx.save(); ctx.globalCompositeOperation = 'multiply'; const red = M().dark ? 70 : 120; ctx.fillStyle = `rgba(255,${Math.round(255 - red * p)},${Math.round(255 - (red - 10) * p)},1)`; // softer where the lair layer already pulses red ctx.fillRect(v.ox, v.oy, (EW + 1) * v.k, (EH + 1) * v.k); ctx.restore();
           ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag] of P.threads || []) { const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 2 + x1) * k;
             ctx.strokeStyle = `rgba(220,40,60,${.75 * p})`; ctx.lineWidth = Math.max(1, k * .5); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
           for (const [x, y] of P.cocoons || []) { const [sx, sy] = W2S((h.gx + x) * T, (h.gy + y) * T), sw = Math.sin(S.t * 1.7 + x * 3) * 2 * k, top = sy - 60 * k * p; // hanging cocoons drop into view
@@ -564,7 +564,7 @@
   }
   function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
-    S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    S.roomP2 = undefined; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
@@ -872,6 +872,8 @@
   function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
+  addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
+  addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; }); // the red threads unravel slowly
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
