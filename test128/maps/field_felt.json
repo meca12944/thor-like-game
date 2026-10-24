@@ -263,6 +263,13 @@
    "x": 51,
    "y": 11,
    "respawn": 30
+  },
+  {
+   "type": "champion",
+   "id": "champ_c1_hound",
+   "mob": "champ_c1_hound",
+   "x": 48,
+   "y": 13
   }
  ],
  "ground": [
