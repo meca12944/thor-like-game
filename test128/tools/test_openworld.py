@@ -36,7 +36,7 @@ with sync_playwright() as p:
     check('F5 saves when calm', bool(r2['resume']), r2)
     # waystone (신전 앞 비석 at 98,9): register = respawn point
     ev("()=>{__world.setHeroTile(98,10,'up')}"); ev("()=>__world.tap('KeyL')"); adv(.05)
-    r3 = ev("()=>__world.SAVE.lastWay"); ev("()=>__world.tap('KeyL')"); adv(.05); ev("()=>__world.tap('KeyL')"); adv(.05)   # dialog types out: 1st press shows all, 2nd closes
+    r3 = ev("()=>__world.SAVE.lastWay"); ev("()=>{for(let i=0;i<30&&__world.S.dialog;i++){__world.advance(.15);__world.tap('KeyL');__world.advance(.02);}}")   # close the dialog (it types out, ignores presses in its first 0.12 s, may have pages)
     check('waystone = respawn point', r3 and r3['id'] == 'ws_temple', r3)
     # champion ring: walk up to 돌엄니 (49+56, 26)
     ev("()=>{__world.killAll(m=>!m.D.champion);const c=__world.mobs.find(m=>m.kind==='champ_boar');__world.hero.x=c.x-70;__world.hero.y=c.y;__world.hero.hp=__world.hero.maxHp}"); adv(.1)
