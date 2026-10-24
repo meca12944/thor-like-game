@@ -26,7 +26,7 @@ AREA_COL = {  # 지형 덩어리
     # 경관 (사장님 10-24 「엘든링처럼 웅장하게」)
     'plateau': (104, 100, 86), 'chasm': (8, 6, 8), 'dune': (140, 132, 118), 'petrified': (96, 94, 90),
     'aqueduct': (156, 146, 124), 'colossus': (132, 126, 118), 'threads': (170, 30, 40), 'blacklake': (16, 20, 30),
-    'oldwall': (124, 114, 98), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
+    'oldwall': (124, 114, 98), 'sword': (170, 170, 176), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
 PATH_COL = {'road': (176, 156, 120), 'river': (60, 96, 130), 'wall': (16, 14, 14), 'cliff': (24, 20, 20),
             'bridge': (150, 110, 70), 'corridor': (128, 118, 110), 'sewer': (70, 96, 60), 'rail': (110, 100, 90)}
 KO = {'start': '시작', 'save': '모닥불(쉼터)', 'npc': '인물', 'item': '아이템', 'chest': '상자', 'mob': '몹 무리',
@@ -47,6 +47,8 @@ LINK_COL = {'gate': (240, 240, 240), 'door': (220, 200, 160), 'stairs': (200, 20
 
 def load(p):
     with open(p, encoding='utf-8') as f: return json.load(f)
+
+NOWALK = ('cliff', 'wall', 'pit', 'water', 'blacklake', 'chasm', 'petrified', 'aqueduct', 'colossus', 'sword', 'citywall', 'building', 'ruin')
 
 def check(m):
     """규칙 검사. 반환: 문제 목록."""
@@ -80,7 +82,11 @@ def check(m):
     for z in m['zones']:
         if z.get('kind') != 'field': continue
         mobs = [k for k in m.get('markers', []) if k.get('zone') == z['id'] and k['type'] in ('mob', 'elite', 'hidden_elite')]
-        need = max(1, (z['w'] * z['h']) // 2500)  # 50x50 타일(달리기 10초)마다 1무리
+        def parea(p): return abs(sum(p[i][0] * p[(i + 1) % len(p)][1] - p[(i + 1) % len(p)][0] * p[i][1] for i in range(len(p)))) / 2
+        def inz(p): cx = sum(q[0] for q in p) / len(p); cy = sum(q[1] for q in p) / len(p); return z['x'] <= cx < z['x'] + z['w'] and z['y'] <= cy < z['y'] + z['h']
+        blocked = sum(parea(a['poly']) for a in m.get('areas', []) + m.get('scenery', []) if a['kind'] in NOWALK and inz(a['poly']))
+        blocked += sum(3.14 * v.get('clear', 30) ** 2 for v in m.get('vistas', []) if z['x'] <= v['x'] < z['x'] + z['w'] and z['y'] <= v['y'] < z['y'] + z['h'])
+        need = max(1, int(z['w'] * z['h'] - blocked) // 2500)  # 걸을 수 있는 50x50 타일(달리기 10초)마다 1무리 (물·구덩이·벽·전망 빈터는 뺌)
         if len(mobs) < need: bad.append(f"필드 {z['id']} 몹 무리 {len(mobs)}개 < 권장 {need}개 (50x50마다 1무리)")
     return bad
 
@@ -149,7 +155,7 @@ def draw(m, out, zone=None, maxpx=3000):
     for v in m.get('vistas', []):
         x, y = P(v['x'], v['y']); r = max(8, s * 2)
         d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 230, 140), outline=(0, 0, 0), width=2)
-        d.text((x + r + 3, y - r), f"전망 {v['name']} (×{v.get('zoom', .7)})", fill=(255, 230, 140), font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
+        d.text((x + r + 3, y - r), f"전망 {v['name']} (×{v.get('zoom', .7)}{', 밀기 ' + str(v['pan']) if v.get('pan') else ''}) → {v.get('show', '')}", fill=(255, 230, 140), font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
     for sc in m.get('scenery', []):
         xs = [p[0] for p in sc['poly']]; ys = [p[1] for p in sc['poly']]
         x, y = P(sum(xs) / len(xs), sum(ys) / len(ys))
