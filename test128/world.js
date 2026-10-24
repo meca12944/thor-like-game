@@ -571,7 +571,7 @@
   }
   function killMob(m) {
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
-    { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } // 심연: pixel void burst instead of the white puff sfx('mob_die', .8);
+    { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } sfx('mob_die', .8); // 심연: pixel void burst instead of the white puff (the death sound used to sit inside this comment = silent)
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) { sfx('coin', .6); } if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); } // shown in the pickup feed (right), not as text over the fight
@@ -1024,7 +1024,7 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
+      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); if (!SLASH_BODY) gkFanDraw(kk, 0); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDraw(kk, 1); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
       const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
@@ -1243,15 +1243,12 @@
   // and sits where it crosses a mob's body (side +27, up +60, down -75 atlas px); a mob is hit when a point of its body (feet..head x left/mid/right)
   // is inside the drawn band. Measured with 1132 dummy mobs x 3 directions: hit-but-not-touched 25% -> 3%, touched-but-missed 35% -> 20%, reach same.
   const GK_DY = { side: 27, up: 60, down: -75 }, GK_HITA = 11, gkQ = v => Math.round(v * 4) / 4;
-  // [검흔 손맛 연구 10-24, 사장님 「공격 모션 없이 검흔만으로 사실적으로」] ?gk=sweep: the arc does not fly out like a beam — it is already at its reach and
-  // leaves the blade and snaps out to its reach in 3 frames (ease-out, hit lands 2-3 frames after the press, was 6) while it sweeps open along the blade's path, the whole swept sector cuts, a white blade streak leads the sweep
-  const GK_SWEEP = Q.get('gk') === 'sweep';
-  function gkPose(f) { const a = f.t * GK_STEP, Y = GK[f.n], [dx, dy] = f.dir, fl = dx < 0, tr = GK_SWEEP ? GK_FLY * (1 - Math.pow(1 - Math.min(1, a / 2.6), 2)) : Math.min(a, GK_FLY), ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI;
-    return { a, Y, fl, head: GK_SWEEP ? Math.min(1, (a + .3) / 2) : Math.min(1, (a + 1) / 2.5), tail: GK_SWEEP ? (a < 3 ? 0 : Math.min(1, (a - 3) / 7)) : a < 4 ? 0 : Math.min(1, (a - 4) / 7), ox: f.rx + dx * tr * f.v, oy: f.ry + dy * tr * f.v + (Math.abs(dx) < .1 ? (dy < 0 ? GK_DY.up : GK_DY.down) : GK_DY.side),
+  function gkPose(f) { const a = f.t * GK_STEP, Y = GK[f.n], [dx, dy] = f.dir, fl = dx < 0, tr = Math.min(a, GK_FLY), ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI;
+    return { a, Y, fl, head: Math.min(1, (a + 1) / 2.5), tail: a < 4 ? 0 : Math.min(1, (a - 4) / 7), ox: f.rx + dx * tr * f.v, oy: f.ry + dy * tr * f.v + (Math.abs(dx) < .1 ? (dy < 0 ? GK_DY.up : GK_DY.down) : GK_DY.side),
       R: Y.R * (1 + .025 * gkQ(a)), T: Y.T * (a < 6 ? 1 : Math.max(.35, 1 - (a - 6) / 7)), rot: Y.rot + ang * (fl ? -1 : 1) }; }
   function gkTouch(f, mm, mh) { const P = gkPose(f); if (!(P.tail < P.head)) return false; const an = P.rot * Math.PI / 180, ca = Math.cos(an), sa = Math.sin(an), r = mm.r || 6;
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) { const e = sField(P.R, P.Y.span, P.T, gkQ(P.head), gkQ(P.tail), ca, sa, P.Y.rev, P.Y.sq, P.fl, (mm.x + ex - hero.x) / GK_K - P.ox, (mm.y - mh * j / 4 - hero.y) / GK_K - P.oy);
-      if (e && (GK_SWEEP ? e[2] < e[1] / 2 + 6 : Math.abs(e[2]) < e[1] / 2 + 6)) return true; } // sweep: everything inside the swept sector is cut
+      if (e && Math.abs(e[2]) < e[1] / 2 + 6) return true; }
     return false; }
   // [히트박스 v3 10-24, owner 「0.7배로 두고 판정도 줄여」] combo hits 1-3 hit with a body-centred fan = the drawn slash area (slash_dark_designs/v3_hitbox/hitbox_spec.json):
   // R = GK_REACH x .7, centre = feet + c, +x = facing (mirrored for left); p is in <=> after un-rotating by rot and y / .8: r <= R and the angle is in the swept part
@@ -1259,11 +1256,15 @@
   const GK_SQ = .8, GK_FAN = [{ c: [0, -13], R: GK_REACH[0] * .7, rot: 0, a0: -70, a1: 70, t0: 3, t1: 10, sw: 4.2 }, { c: [0, -13], R: GK_REACH[1] * .7, rot: -15, a0: 70, a1: -70, t0: 3, t1: 10, sw: 4.2 }, { c: [2, -16], R: GK_REACH[2] * .7, rot: 0, a0: -100, a1: 70, t0: 4, t1: 14, sw: 6 }];
   const gkFanT = f => (f.at0 || 0) + f.t - 1; // f.t is 1 on the spawn tick (gkTick runs after the spawn)
   function gkFanHead(F, t) { if (t < F.t0 || t > F.t1) return -1; const x = Math.min(1, Math.max(0, (t - F.t0 + 1) / F.sw)); return 1 - (1 - x) * (1 - x); }
-  function gkFanIn(F, dir, head, px, py) { let dx = dir[0], dy = dir[1]; if (dx < 0) { px = -px; dx = -dx; } // px, py: field px from the hero's feet
+  function gkFanPolar(F, dir, px, py) { let dx = dir[0], dy = dir[1]; if (dx < 0) { px = -px; dx = -dx; } // px, py: field px from the hero's feet -> [r, u] in the fan (u = swept fraction a0 -> a1)
     const ph = Math.atan2(dy, dx), cp = Math.cos(ph), sp = Math.sin(ph), gx = px - F.c[0] * cp, gy = (py - F.c[1] - F.c[0] * sp * GK_SQ) / GK_SQ; // ground plane, from the fan centre
     const fx = gx * cp + gy * sp, fy = (-gx * sp + gy * cp) * GK_SQ, t = F.rot * Math.PI / 180, ct = Math.cos(t), st = Math.sin(t); // facing frame (= the spec's east frame), back to screen y
-    const qx = fx * ct + fy * st, qy = (-fx * st + fy * ct) / GK_SQ; if (Math.hypot(qx, qy) > F.R) return false;
-    const u = (Math.atan2(qy, qx) * 180 / Math.PI - F.a0) / (F.a1 - F.a0); return u >= 0 && u <= 1 && u <= head; }
+    const qx = fx * ct + fy * st, qy = (-fx * st + fy * ct) / GK_SQ; return [Math.hypot(qx, qy), (Math.atan2(qy, qx) * 180 / Math.PI - F.a0) / (F.a1 - F.a0)]; }
+  function gkFanIn(F, dir, head, px, py) { const [r, u] = gkFanPolar(F, dir, px, py); return r <= F.R && u >= 0 && u <= 1 && u <= head; }
+  function gkFanPt(F, dir, r, u) { // the inverse: fan (r, u) -> field px from the feet (blade tip, sparkle, particles)
+    const an = (F.a0 + (F.a1 - F.a0) * u) * Math.PI / 180, qx = r * Math.cos(an), qy = r * Math.sin(an) * GK_SQ, t = F.rot * Math.PI / 180, fx = qx * Math.cos(t) - qy * Math.sin(t), fy = qx * Math.sin(t) + qy * Math.cos(t);
+    let dx = dir[0], dy = dir[1]; const L = dx < 0; if (L) dx = -dx; const ph = Math.atan2(dy, dx), cp = Math.cos(ph), sp = Math.sin(ph), g2y = fy / GK_SQ, gx = fx * cp - g2y * sp, gy = fx * sp + g2y * cp;
+    const px = gx + F.c[0] * cp, py = gy * GK_SQ + F.c[1] + F.c[0] * sp * GK_SQ; return [L ? -px : px, py]; }
   function gkFanTouch(F, f, head, mm, mh) { const r = mm.r || 6; // same mob body points as gkTouch (feet..head x left/mid/right)
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) if (gkFanIn(F, f.dir, head, mm.x + ex - hero.x, mm.y - mh * j / 4 - hero.y)) return true;
     return false; }
@@ -1272,13 +1273,50 @@
       for (let y = -45; y <= 20; y += .5) for (let x = -40; x <= 40; x += .5) { if (!gkFanIn(F, f.dir, 1, x, y)) continue; ctx.fillStyle = hd >= 0 && gkFanIn(F, f.dir, hd, x, y) ? 'rgba(255,40,40,.45)' : 'rgba(255,220,40,.22)'; ctx.fillRect(Math.round(hx + x * k), Math.round(hy + y * k), Math.ceil(k / 2), Math.ceil(k / 2)); }
       ctx.fillStyle = '#fff'; ctx.fillRect(Math.round(hx + (f.dir[0] < 0 ? -1 : 1) * F.c[0] * k) - 1, Math.round(hy + F.c[1] * k) - 1, 3, 3); } }
   window.__gkFan = { FAN: GK_FAN, inFan: gkFanIn, head: gkFanHead }; // test hook (numeric checks)
-  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+
+  // ---- 콤보 1~3타 검흔 = 판정 부채꼴(GK_FAN)을 그대로 그림 (그록 다크 검흔 v3, 「보이는 곳 = 맞는 곳」, 효과는 코드로). 1 그림px = 필드 1px.
+  // 같은 gkFanPolar 로 화소마다 계산: 열림 = gkFanHead(t)(판정 틱 t0~t1), 판정 끝 뒤 GK_FADE 틱 동안 면이 안쪽부터 접혀 테두리로 모였다가 꺼짐.
+  // 면(어두운 3단 + 1px 선)은 주인공 뒤, 테두리 날(칼끝 쪽으로 굵고 밝아짐)·칼끝 반짝임·스타일 조각은 앞. 8방향 = 판정과 같은 땅 평면 회전.
+  // 색 = 파쇄 강철 (사장님 10-24 그록 6종 중 「4 파쇄 강철」): 가는 강철 선이 판정이 끝나면 금 가며 각진 조각으로 떨어짐.
+  const GK_FADE = 10, hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const GKC = { fan: ['#1a1f27', '#1d232c', '#222933'].map(hexRGB), line: hexRGB('#0b0e12'), ol: hexRGB('#0f1318'), rim: ['#45515e', '#6d7d8d', '#a8b5c1', '#dce3ea'].map(hexRGB), part: ['#a8b5c1', '#dce3ea'] }; // fan 3 tones / edge / outline, rim shadow-body-hi-glint, shards
+  const FAN_W = 100, FAN_H = 84, FAN_X0 = -50, FAN_Y0 = -60; let _fanC = null;
+  function gkFanState(f) { const F = GK_FAN[f.i], t = gkFanT(f); if (t < F.t0) return null; const open = t <= F.t1; return { F, t, open, head: open ? gkFanHead(F, t) : 1, k: open ? 0 : (t - F.t1) / GK_FADE }; }
+  function gkFanImg(f, St, layer) { // the fan as a field-px image (layer 0 = body behind the hero, 1 = rim in front)
+    const C = GKC, { F, head, k, open } = St; if (!_fanC) { _fanC = document.createElement('canvas'); _fanC.width = FAN_W; _fanC.height = FAN_H; }
+    const g = _fanC.getContext('2d'), id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R, arc = Math.abs(F.a1 - F.a0) * Math.PI / 180 * R; // arc length in px (for the 1px edge on the swept ends)
+    const put = (i, c, a) => { d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = a; };
+    for (let y = 0; y < FAN_H; y++) for (let x = 0; x < FAN_W; x++) { const [r, u] = gkFanPolar(F, f.dir, FAN_X0 + x + .5, FAN_Y0 + y + .5), i = (y * FAN_W + x) * 4;
+      if (u < 0 || u > head || u > 1) continue; const v = head > 0 ? u / head : 0, rn = r / R; // v: 0 at the start of the swing, 1 at the blade (tip)
+      if (layer === 0) { if (r > R || rn < k) continue; const edge = r > R - 1 || u * arc < 1 || (head - u) * arc < 1 || rn < k + 1 / R; // fill collapses outward on the fade
+        if (edge) put(i, C.line, 235 * (1 - k * .5)); else put(i, rn < .55 ? C.fan[0] : rn < .82 ? C.fan[1] : C.fan[2], 205 * (1 - k * .6)); continue; }
+      const w = (open ? 1 + 3.2 * Math.pow(v, 1.4) : (1 + 2 * v) * (1 - k)) * (u < .04 ? u / .04 : 1), rr = R - r; // rim trail: thicker and brighter toward the tip, thins out on the fade
+      if (!open && ((Math.floor(u * 15) * 7919) % 97) / 97 < k * 1.25) continue; // crack: the rim splits into ~15 angular pieces that go out one by one
+      if (rr >= 0 && rr < w) { const c = v > .9 && rr < w * .6 ? C.rim[3] : v > .6 ? (rr < w * .5 ? C.rim[2] : C.rim[1]) : v > .25 ? C.rim[1] : C.rim[0]; put(i, c, 255 * (open ? 1 : Math.sqrt(1 - k))); }
+      else if (rr < 0 && rr > -1.2 && v > .12 && w > .6) put(i, C.ol, 230 * (open ? 1 : 1 - k)); } // 1px dark outline outside the rim (reads on light floors)
+    g.putImageData(id, 0, 0); return _fanC; }
+  function gkFanDraw(k, layer) { if (!S.gk) return; const [hx, hy] = W2S(hero.x, hero.y);
+    for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const St = gkFanState(f); if (!St) continue;
+      const im = gkFanImg(f, St, layer); ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(hx + FAN_X0 * k), Math.round(hy + FAN_Y0 * k), FAN_W * k, FAN_H * k); ctx.restore();
+      if (layer === 1) { gkFanBlade(k, f, St, hx, hy); gkFanBits(k, f, St, hx, hy); } } }
+  function gkFanBits(k, f, St, hx, hy) { const { F, head, open, t } = St, C = GKC, P = (r, u) => { const [x, y] = gkFanPt(F, f.dir, r, u); return [hx + x * k, hy + y * k]; }; ctx.save();
+    if (open && head < 1) { const [sx, sy] = P(F.R - .5, head), L = 2.5 * k; ctx.fillStyle = '#dce3ea'; ctx.fillRect(Math.round(sx - L), Math.round(sy - k / 2), Math.round(2 * L), Math.round(k)); ctx.fillRect(Math.round(sx - k / 2), Math.round(sy - L), Math.round(k), Math.round(2 * L)); } // tip sparkle
+    const age = t - (F.t1 - 3); if (age > 0 && age < GK_FADE + 4) { let sd = (f.seed || 1) + 5; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, q = age / (GK_FADE + 4); // style bits shed off the rim
+      for (let n = 0; n < 9; n++) { const u = .25 + rnd() * .75, [x0, y0] = P(F.R - .5, u), a = rnd() * TAU, s = rnd(); let x = x0, y = y0, sz = k;
+        x += Math.cos(a) * age * .4 * k; y += (age * age * .06 + s) * k; sz = k * (s > .5 ? 2 : 1); // angular shards drop
+        ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
+    ctx.restore(); }
+  function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
+  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC()) return; const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
+    const gx = hx + gx0 * sc, gy = hy + gy0 * sc, [tx, ty] = gkFanPt(F, f.dir, F.R, hd), ex = hx + tx * k, ey = hy + ty * k, L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
+    ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(ex, ey); ctx.stroke(); };
+    seg('#0d0f13', 3.2 * sc, 0); seg('#9aa3ad', 1.8 * sc, 2 * sc); seg('#cfd5db', .7 * sc, 4 * sc); // outline / steel / edge light (the shared steel colours)
+    ctx.strokeStyle = '#b8902e'; ctx.lineWidth = 1.6 * sc; ctx.beginPath(); ctx.moveTo(gx - uy * 4 * sc, gy + ux * 4 * sc); ctx.lineTo(gx + uy * 4 * sc, gy - ux * 4 * sc); ctx.stroke(); ctx.restore(); } // guard
+  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
+    if (f.i !== undefined && f.i <= 2 && S.gk && S.gk.includes(f)) return; // field combo 1-3 = the body fan (gkFanDraw); dashes / charges keep the flying arc
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
       if (P.tail < P.head) { const im = sArc(P.R, Y.span, P.T, gkQ(P.head), gkQ(P.tail), P.rot, Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
-      if (GK_SWEEP && a < 3.2) { const u = Y.rev ? 1 - P.head : P.head, th = (u * Y.span - Y.span / 2) * Math.PI / 180, an = P.rot * Math.PI / 180, al = 1 - a / 3.2; // blade streak at the sweep's leading edge (the sword itself)
-        const pt = r => { const xr = r * Math.cos(th), yr = r * Math.sin(th) * Y.sq; let x = xr * Math.cos(an) - yr * Math.sin(an); const y = xr * Math.sin(an) + yr * Math.cos(an); if (fl) x = -x; return [ox + x, oy + y]; };
-        const [x0, y0] = pt(P.R * .45), [x1, y1] = pt(P.R + P.T * .6); ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${.6 * al})`; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 3.5; ctx.stroke(); ctx.restore(); }
       const nx = -dy, ny = dx, big = f.n === 2; let sd = f.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
       const la = Math.max(0, 1 - a / 8); if (la > 0) { ctx.fillStyle = `rgba(200,240,255,${.86 * la})`; for (let i = 0; i < (big ? 7 : 4); i++) { const o = rnd() * 60 - 30, L = 14 + rnd() * 20, b = Y.R * .4 - rnd() * 30 + a * 5; for (let j = 0; j < L; j++) ctx.fillRect(Math.round(ox + dx * (b + j) + nx * o), Math.round(oy + dy * (b + j) + ny * o), 1, 1); } } // speed lines
       const tx = ox + dx * Y.R * .95, ty = oy + dy * Y.R * .95;
@@ -1286,26 +1324,19 @@
       if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
   window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
 
-  // ---- C안 (사장님 10-24 「C안으로 가자」): 평소엔 칼 든 그림, 벨 때(검기가 열리는 0~4.5틱)만 칼 없는 몸 그림 + 코드 칼날이 손에서 검기 앞쪽 끝으로 함께 휘둘러짐
-  // (들고 있는 칼끝이 베는 방향과 50°+ 어긋나는 자세가 12세트 중 8세트였음). 그림: H8.nsSheets {시트 번호: 칼 없는 사본(칸 배치 같음)}, 손: H8.grip["시트:칸"] = [dx, dy, deg] (앵커 기준 그림px).
-  // ?sword=mock = 모션 그림 오기 전 시험(칼만 자동으로 지운 anim/ns_mock/), ?sword=off = 끔. 칼 없는 그림이 없으면(기본) 칼 숨김·코드 칼날 모두 꺼짐 → 칼 두 자루가 되지 않음.
-  const SWORD_Q = Q.get('sword'), NS_IMG = [];
-  function nsSrc(i) { const H = h128() && h128().H8; if (!H || SWORD_Q === 'off') return null; if (H.nsSheets && H.nsSheets[i]) return H.nsSheets[i]; return SWORD_Q === 'mock' ? H.sheets[i].replace('anim/', 'anim/ns_mock/') : null; }
+  // ---- C안 (사장님 10-24 「C안으로 가자」, 들고 있는 칼끝이 베는 방향과 50°+ 어긋나는 자세가 12세트 중 8세트였음): 평소엔 칼 든 그림,
+  // 콤보 부채꼴이 휘둘리는 틱(gkFanSwing: t0-1 ~ t1+2)만 같은 칸의 칼 없는 몸(H8.nsSheets = 칸 배치 같은 사본, 모션연구방) + 코드 칼날(gkFanBlade)이 손(H8.grip["시트:칸"])에서 부채꼴 앞끝으로.
+  // 칼 없는 사본이 없는 시트(회피대시·점프 등)는 칼 그대로 → 칼날도 안 그림(칼 두 자루가 되지 않음). 돌진·차지(i≥3)는 칼 그대로.
+  const NS_IMG = [];
+  function nsSrc(i) { const H = h128() && h128().H8; return H && H.nsSheets && H.nsSheets[i] || null; }
   function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
   function swordC() { const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
-  function swordHidden() { return !!(S.gk && S.gk.some(f => f.map === S.map && f.t * GK_STEP <= 4.5) && swordC()); }
-  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return [fl ? -g[0] : g[0], g[1]]; } }
-    return [dir[0] * 14, -58 + dir[1] * 12]; } // no grip table yet: chest height, a little toward the swing
-  function gkBlade(ctx, f) { // the sword itself, drawn in code: grip -> toward the arc's leading edge, one sword long, while the arc opens
-    const P = gkPose(f); if (P.a > 4.5) return; const al = P.a < 3 ? 1 : 1 - (P.a - 3) / 1.5, Y = P.Y, u = Y.rev ? 1 - P.head : P.head, th = (u * Y.span - Y.span / 2) * Math.PI / 180, an = P.rot * Math.PI / 180;
-    const xr = (P.R + P.T * .6) * Math.cos(th), yr = (P.R + P.T * .6) * Math.sin(th) * Y.sq; let X = xr * Math.cos(an) - yr * Math.sin(an); const Y2 = xr * Math.sin(an) + yr * Math.cos(an); if (P.fl) X = -X;
-    const [gx, gy] = gkGrip(f.dir), px = P.ox + X, py = P.oy + Y2, d = Math.hypot(px - gx, py - gy) || 1, ux = (px - gx) / d, uy = (py - gy) / d, BL = 74, x0 = gx + ux * 6, y0 = gy + uy * 6, x1 = gx + ux * BL, y1 = gy + uy * BL;
-    ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${al})`; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); // navy rim (same as the arc)
-    ctx.strokeStyle = `rgba(214,222,236,${al})`; ctx.lineWidth = 5.5; ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0 + ux * 8, y0 + uy * 8); ctx.lineTo(x1, y1); ctx.stroke(); // steel + edge light
-    ctx.strokeStyle = `rgba(200,150,60,${al})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0 - uy * 7, y0 + ux * 7); ctx.lineTo(x0 + uy * 7, y0 - ux * 7); ctx.stroke(); ctx.restore(); } // gold guard
+  function swordHidden() { return !!gkFanSwing() && swordC(); }
+  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1]]; } }
+    return [dir[0] * 14, -58 + dir[1] * 12]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
   function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
-    const SC = swordC(); for (const f of S.gk || []) { gkArcDraw(ctx, f); if (SC) gkBlade(ctx, f); }
+    for (const f of S.gk || []) gkArcDraw(ctx, f);
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
@@ -1335,7 +1366,7 @@
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
     // [모션연구방 10-24] 1→2→3타 점점 세게 (KICK3, 3타 약 2배). 몸이 앞으로 튀어 나가는 순간(rel) = 몸 중심 부채꼴 판정이 열리는 틱(GK_FAN t0: 1·2타 3틱, 3타 4틱)
     // 3타 = 내려베기: 들어 올림(키 늘고 뒤로 젖힘) → 판정 열리고 2틱 더 머리 위 → 내려꽂으며 납작(찌그러짐 최대 = 칼이 앞 아래로 오는 틱 t0+4) + 앞으로 크게 기울고 내딛기
-    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : GK_SWEEP ? AT.a0 - 2 / 60 : AT.a0;
+    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0;
     if (u < rel) { const q = u / Math.max(rel, 1e-3), e = q * q * (3 - 2 * q); return big ? { lean: -4 * R * e, step: 0, sq: 1 + .05 * e } : { lean: -3 * R * e, step: 0, sq: 1 - Math.min(.08, .04 * R) * e }; }
     const t = u - rel, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), spr = t => Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
     if (big) { const x = t * 60, hold = 2 / 60, L0 = 9 * R; // 머리 위 2틱 더 → 내려꽂기
