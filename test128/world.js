@@ -1368,7 +1368,7 @@
   // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
   const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && !ATK_BODY && hero.hp > 0);
   let _swIn = false; // h8Cell(달리기 ↗↖ + 공격) -> swordHidden -> swordC -> h128Cell -> h8Cell ... 끝없는 되부름(Maximum call stack, 챔피언전 멈춤 원인) 막기: 안쪽 호출은 '안 숨김'으로 보고 그때의 칸(run)을 검사
-  function swordHidden() { if (_swIn || ATK_BODY) return false; _swIn = true; try { return !!(gkFanSwing() || comboBlade()) && swordC(); } finally { _swIn = false; } } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
+  function swordHidden() { if (ATK_BODY || _swIn) return false; _swIn = true; try { return !!(gkFanSwing() || comboBlade()) && swordC(); } finally { _swIn = false; } } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
   function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 부채꼴 앞끝.
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
