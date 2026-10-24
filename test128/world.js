@@ -1756,7 +1756,8 @@
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, sz, sz); ctx.clip(); ctx.imageSmoothingEnabled = false; const sc = sz / bw, s0 = Math.max(cx, bx), s1 = Math.min(cx + cw, bx + bw), t1 = Math.min(cy + ch, top + bh); if (s1 > s0 && t1 > top) ctx.drawImage(A.ims[q[0]], s0, top, s1 - s0, t1 - top, Math.round(x + (s0 - bx) * sc), Math.round(y + 2 * sc), Math.round((s1 - s0) * sc), Math.round((t1 - top) * sc)); /* only this cell's pixels (atlas neighbours stay out) */ ctx.restore(); return true; }
   function drawCg(L, e, fade, ox, oy, SW, SH, d) { // story picture (CG_MEETING 결론): darken, 0.4 s fade in, 1.00 -> 1.03 push-in + 5 px drift toward the gaze over 9 s, pixel-crisp
     const im = splashImg('assets/' + L.src), k = Math.min(1, e / 9), a = Math.min(1, e / .4) * fade; ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25) * fade})`; ctx.fillRect(ox, oy, SW, SH);
-    if (im) { const sc = 1 + .03 * k, iw = SW * sc, ih = SH * sc, px = (L.dx || 0) * 5 * (SW / LW) * k; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; const hi = (im.naturalWidth || 384) > 400; ctx.imageSmoothingEnabled = hi; ctx.imageSmoothingQuality = 'high'; const ix = Math.round(ox + (SW - iw) / 2 + px), iy = Math.round(oy + (SH - ih) / 2); if (!cgRigDraw(L.src, im, e, k, ox, oy, SW, SH, px)) ctx.drawImage(im, ix, iy, Math.round(iw), Math.round(ih)); drawSceneFx(ctx, d || { cg: L.src, t: 0 }, e, ix, iy, iw / 384); } ctx.restore(); } // story art is the Grok original (1280x720, smooth); the effects stay in 384x216 picture px
+    if (im) { const sc = 1 + .03 * k, iw = SW * sc, ih = SH * sc, px = (L.dx || 0) * 5 * (SW / LW) * k; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; const hi = (im.naturalWidth || 384) > 400; ctx.imageSmoothingEnabled = hi; ctx.imageSmoothingQuality = 'high'; const ix = Math.round(ox + (SW - iw) / 2 + px), iy = Math.round(oy + (SH - ih) / 2); const name = L.src.replace(/^.*\//, '').replace(/\.\w+$/, ''); if (name in CG_VID) { const v = cgVideo(name, !L.vStarted); L.vStarted = true; ctx.drawImage(v || im, ox, oy, SW, SH); if (d && d.cgLast) drawSceneFx(ctx, d, e, ox, oy, SW / 384); ctx.restore(); return; } // Grok scene video (own camera; only the memory's last-line snap stays on top)
+      ctx.drawImage(im, ix, iy, Math.round(iw), Math.round(ih)); drawSceneFx(ctx, d || { cg: L.src, t: 0 }, e, ix, iy, iw / 384); } ctx.restore(); } // story art is the Grok original (1280x720, smooth); the effects stay in 384x216 picture px
   function drawCgOut(ox, oy, SW, SH) { if (!S.dialog && S.cgL) { S.cgOut = Object.assign({ until: S.t + .4, e: S.t - S.cgL.since }, S.cgL); S.cgL = null; } const O = S.cgOut; if (!O) return; const f = (O.until - S.t) / .4; if (f <= 0 || S.dialog) { S.cgOut = null; return; } drawCg(O, O.e, f, ox, oy, SW, SH); } // 0.4 s fade out after the last line
 
   // ---- 이야기 그림 위 효과 (CG 회의 10-24, 이펙트 담당; 코드로): 정지 그림을 살짝 살림. 그림당 1종, 1~2px, 얼굴 위 금지, 처음 0.4초 정지.
@@ -1768,64 +1769,24 @@
     cg_linette_meet: { kind: 'dust', box: [200, 10, 265, 190], n: 24 },
     cg_arachne_past: { kind: 'dust', c: [161, 104], r: 48, n: 16, warm: true },
     cg_felix_scarf: { kind: 'dust', box: [90, 40, 300, 196], n: 12 } };
-  // ---- 이야기 그림 살리기 (사장님 10-24 「그록 일러스트 장면 살아 움직이듯」, 팀장): 사람·성을 따로 떼어(assets/cg/rig 마스크, 떼어 낸 자리는 메운 배경판 plate)
-  // 층마다 깊이(z)만큼 더 다가오고(2.5D), 숨쉬기(발 기준 세로 0.4~0.7%), 망토·머리카락은 상자 안을 2px 띠로 나눠 바람에 흔들림(붙은 쪽 0 → 끝 1),
-  // 그림 색으로 고른 불·붉은 실은 깜빡임/맥박, 연기·꽃잎·빛줄기는 코드로. 모두 그림 픽셀(384x216) 좌표. 그림이 아직 안 왔으면 예전처럼 한 장.
-  // sway: [x0, y0, x1, y1, 붙은 쪽 l/r/t/b, 흔드는 축 x/y, 폭 px, 빠르기 Hz, 물결 k]
-  const CG_RIG = {
-    cg_felt_arrival: { sky: [0, 0, 384, 60, 2, .05], layers: [{ m: 'castle', z: -.6 }, { m: 'hero', z: 1.2, br: [.006, 3.2], sway: [[0, 98, 100, 192, 'r', 'y', 2, .55, .09], [84, 28, 106, 112, 't', 'x', 1, .7, .15]] }],
-      fx: [{ kind: 'fire', box: [150, 20, 384, 130], col: [255, 130, 40], ph: 1 }, { kind: 'smoke', src: [[318, 24], [24, 58], [46, 68], [372, 40]] }] },
-    cg_linette_meet: { layers: [{ m: 'linette', z: .15, br: [.007, 2.6], sway: [[78, 18, 106, 78, 't', 'x', 1.2, .9, .2]] }, { m: 'hero', z: .5, br: [.005, 3.6], sway: [[300, 70, 346, 188, 't', 'x', .8, .45, .06]] }],
-      fx: [{ kind: 'beam', poly: [[262, 0], [300, 0], [252, 205], [196, 205]] }] },
-    cg_arachne_end: { layers: [{ m: 'arachne', z: .25, br: [.004, 5.2] }, { m: 'hero', z: .7, br: [.005, 3.4], sway: [[276, 0, 330, 74, 't', 'x', .8, .5, .12]] }],
-      fx: [{ kind: 'flakes', n: 14 }] },
-    cg_memory_fire: { layers: [{ m: 'hero', z: 1, br: [.006, 3], sway: [[176, 138, 216, 184, 't', 'x', 1, 1.3, .25]] }],
-      fx: [{ kind: 'fire', box: [0, 0, 384, 216], col: [255, 120, 30] }, { kind: 'pulse' }] } };
-  const CGR = {}, srcOf = {};
-  function cgRigGet(name) { const R = CG_RIG[name]; if (!R) return null; let B = CGR[name]; if (B) return B.ok ? B : null; const P = 'assets/cg/rig/' + name + '__';
-    const plate = splashImg(P + 'plate.jpg'), ms = R.layers.map(l => splashImg(P + l.m + '.png')); if (!plate || ms.some(m => !m)) return null; // still loading
-    const im = splashImg('assets/' + srcOf[name]); if (!im) return null; const NW = im.naturalWidth, NH = im.naturalHeight, f = NW / 384; // work at the art's own size, draw into 384x216 picture px
-    const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }, base = cv(NW, NH), bx = base.getContext('2d'); bx.drawImage(im, 0, 0); const src = bx.getImageData(0, 0, NW, NH).data;
-    const layers = R.layers.map((l, i) => { const mc = cv(NW, NH), mx = mc.getContext('2d'); mx.drawImage(ms[i], 0, 0, NW, NH); const md = mx.getImageData(0, 0, NW, NH), D = md.data; let fy = 0;
-      for (let p = 0; p < NW * NH; p++) { const a = D[p * 4]; D[p * 4] = src[p * 4]; D[p * 4 + 1] = src[p * 4 + 1]; D[p * 4 + 2] = src[p * 4 + 2]; D[p * 4 + 3] = a; if (a > 128) fy = Math.max(fy, (p / NW) | 0); }
-      mx.putImageData(md, 0, 0); return Object.assign({ c: mc, fy: (fy + 1) / f }, l); });
-    const tint = (test, col, box) => { const c = cv(NW, NH), x = c.getContext('2d'), id = x.createImageData(NW, NH), D = id.data, [x0, y0, x1, y1] = (box || [0, 0, 384, 216]).map(v => Math.round(v * f)); // glow mask from the art's own colours; 2 hashed groups so the flicker is not uniform
-      const c2 = cv(NW, NH), x2 = c2.getContext('2d'), id2 = x2.createImageData(NW, NH), E = id2.data, cs = Math.round(8 * f);
-      for (let y = y0; y < y1; y++) for (let X = x0; X < x1; X++) { const p = (y * NW + X) * 4, r = src[p], g = src[p + 1], b = src[p + 2]; if (!test(r, g, b)) continue; const T = ((((X / cs) | 0) * 73856093) ^ (((y / cs) | 0) * 19349663)) & 1 ? E : D; T[p] = col[0]; T[p + 1] = col[1]; T[p + 2] = col[2]; T[p + 3] = 255; }
-      x.putImageData(id, 0, 0); x2.putImageData(id2, 0, 0); return [c, c2]; };
-    const fx = (R.fx || []).map(f => f.kind === 'fire' ? Object.assign({ g: tint((r, g, b) => r > 165 && g > 55 && b < 95 && r > g * 1.45, f.col, f.box) }, f) : f.kind === 'pulse' ? Object.assign({ g: tint((r, g, b) => r > 115 && g < 55 && b < 55 && r > g * 2.4, [255, 40, 50]) }, f) : f);
-    B = CGR[name] = { ok: true, R, plate, layers, fx, f }; return B; }
-  function cgSway(g, c, S, t, q) { const [x0, y0, x1, y1, at, ax, amp, f, kk] = S, W = x1 - x0, H = y1 - y0, st = 1; // 1-px strips (picture px; q = art px per picture px), weight 0 at the attached side -> 1 at the free end
-    if (ax === 'y') for (let x = x0; x < x1; x += st) { const u = at === 'r' ? (x1 - x) / W : at === 'l' ? (x - x0) / W : 1, d = amp * u * u * Math.sin(TAU * f * t + x * kk); g.drawImage(c, x * q, y0 * q, st * q, H * q, x, y0 + d, st + .02, H); }
-    else for (let y = y0; y < y1; y += st) { const u = at === 'b' ? (y1 - y) / H : at === 't' ? (y - y0) / H : 1, d = amp * u * Math.sin(TAU * f * t + y * kk); g.drawImage(c, x0 * q, y * q, W * q, st * q, x0 + d, y, W, st + .02); } }
-  function cgRigDraw(src, im, e, k, ox, oy, SW, SH, px) { const name = (src || '').replace(/^.*\//, '').replace(/\.\w+$/, ''); srcOf[name] = src; const B = cgRigGet(name); if (!B) return false;
-    const R = B.R, t = e, g = ctx, U = SW / 384, at = z => { const s = U * (1 + .03 * k * (1 + z)); return [ox + (SW - 384 * s) / 2 + px * (1 + z), oy + (SH - 216 * s) / 2, s]; };
-    let [ix, iy, s] = at(0); const q = B.f; g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.translate(ix, iy); g.scale(s, s); g.drawImage(B.plate, 0, 0, 384, 216);
-    if (R.sky) { const [x0, y0, x1, y1, amp, f] = R.sky, d = amp * Math.sin(TAU * f * t); g.drawImage(B.plate, x0 * q, y0 * q, (x1 - x0) * q, (y1 - y0) * q, x0 + d, y0, x1 - x0, y1 - y0); } // clouds drift (edges are off-screen after the push-in)
-    g.restore();
-    for (const L of B.layers.slice().sort((a, b) => a.z - b.z)) { [ix, iy, s] = at(L.z); const bs = L.br ? 1 + L.br[0] * Math.sin(TAU * t / L.br[1]) : 1; g.save(); g.translate(ix, iy + L.fy * s); g.scale(s, s * bs); g.translate(0, -L.fy);
-      g.drawImage(L.c, 0, 0, 384, 216); if (L.sway) for (const S of L.sway) cgSway(g, L.c, S, t, q); // the still layer stays under the swaying strips (no see-through seams; a 1-2 px double edge reads as cloth thickness)
-      g.restore(); }
-    [ix, iy, s] = at(0); g.save(); g.translate(ix, iy); g.scale(s, s); const h = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }, kk = Math.min(1, Math.max(0, (e - .4) / .8));
-    for (const F of B.fx) {
-      if (F.kind === 'fire') { g.globalCompositeOperation = 'lighter'; g.globalAlpha = kk * (.16 + .1 * Math.sin(t * 7.3) + .06 * Math.sin(t * 13.1 + 1)); g.drawImage(F.g[0], 0, 0, 384, 216); g.globalAlpha = kk * (.16 + .1 * Math.sin(t * 6.1 + 2) + .06 * Math.sin(t * 11.7)); g.drawImage(F.g[1], 0, 0, 384, 216); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; }
-      if (F.kind === 'pulse') { const c = e % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)), hb = Math.min(1, b(c, .08) + .7 * b(c - .26, .08)); g.globalCompositeOperation = 'lighter'; g.globalAlpha = kk * (.08 + .3 * hb); g.drawImage(F.g[0], 0, 0, 384, 216); g.drawImage(F.g[1], 0, 0, 384, 216); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; } // the red threads beat (lub-dub)
-      if (F.kind === 'smoke') for (const [sx, sy] of F.src) for (let i = 0; i < 6; i++) { const q = (t * .12 + i / 6 + h(sx) ) % 1, x = sx + q * 14 + Math.sin(t * .6 + i + sx) * 2, y = sy - q * 26, r = 1.5 + q * 5; g.fillStyle = `rgba(70,62,64,${kk * .22 * Math.sin(q * Math.PI)})`; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); }
-      if (F.kind === 'beam') { const a = kk * (.05 + .035 * Math.sin(t * .9) + .02 * Math.sin(t * 2.3)), P = F.poly; g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(P[0][0], P[0][1], P[3][0], P[3][1]); gr.addColorStop(0, `rgba(255,236,200,${a * 1.6})`); gr.addColorStop(1, 'rgba(255,220,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(P[0][0], P[0][1]); for (const q of P.slice(1)) g.lineTo(q[0], q[1]); g.closePath(); g.fill(); g.globalCompositeOperation = 'source-over'; }
-      if (F.kind === 'flakes') for (let i = 0; i < F.n; i++) { const v = 6 + h(i) * 6, y = ((t * v + h(i + 3) * 230) % 230) - 10, x = h(i + 1) * 384 + Math.sin(t * .8 + i) * 6 + y * .15, al = kk * (.5 + .3 * Math.sin(t * 2 + i)); g.fillStyle = `rgba(232,226,226,${al})`; g.fillRect(Math.round(x), Math.round(y), 2, 1); g.fillStyle = `rgba(180,170,175,${al * .7})`; g.fillRect(Math.round(x) + (Math.sin(t * 3 + i) > 0 ? 2 : -1), Math.round(y) + 1, 1, 1); } }
-    g.restore(); return true; }
+  // ---- 이야기 그림 영상 (사장님 10-24 「그록이 만든 것을 받아서 적용만」): assets/cg/anim/<그림>.mp4 (그록 scene_anim 1280x720, 소리 없음) 가 있으면 그 영상을,
+  // 없거나 아직 못 읽었으면 같은 이름 그림(= 영상 0번 장면)을 보여 준다. loop 그림은 반복, 한 번 그림(아라크네 최후)은 끝 장면에서 멈춤. 영상은 자체 카메라라 밀어 넣기·코드 효과 없음.
+  const CG_VID = { cg_felt_arrival: 1, cg_linette_meet: 1, cg_memory_fire: 1, cg_arachne_end: 0 }, VIDS = {}; // 1 = loop, 0 = once
+  function cgVideo(name, fresh) { if (!(name in CG_VID)) return null; let v = VIDS[name]; if (!v) { v = VIDS[name] = document.createElement('video'); v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.loop = !!CG_VID[name]; v.src = V('assets/cg/anim/' + name + (v.canPlayType('video/mp4; codecs="avc1.640028"') ? '.mp4' : '.webm')); } // H.264 (phones, Safari) or VP9 (open Chromium)
+    if (fresh) { try { v.currentTime = 0; } catch (e) { } } if (v.paused && !v.ended && !v._busy) { v._busy = true; const p = v.play(); if (p && p.catch) p.catch(() => { }).finally(() => { v._busy = false; }); else v._busy = false; }
+    return v.readyState >= 2 && v.videoWidth ? v : null; }
   function sceneThread(g, x0, y0, x1, y1, amp, ph, al, w) { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(L / 3)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1); // a hair-thin red thread for the art (no dark rim: the art is already dark)
     g.beginPath(); for (let i = 0; i <= n; i++) { const u = i / n, o = Math.sin(u * Math.PI) * Math.sin(u * 7 + ph) * amp; const x = x0 + (x1 - x0) * u + nx * o, y = y0 + (y1 - y0) * u + ny * o; i ? g.lineTo(x, y) : g.moveTo(x, y); }
     g.strokeStyle = thrCol(true, 1, al * .45); g.lineWidth = w * 2.2; g.stroke(); g.strokeStyle = thrCol(true, 0, al); g.lineWidth = w; g.stroke(); }
-  function drawSceneFx(g, d, e, ix, iy, s) { const name = (d.cg || '').replace(/^.*\//, '').replace(/\.\w+$/, ''), F = SCENE_FX[name]; if (!F || e < .4) return;
+  function drawSceneFx(g, d, e, ix, iy, s) { const name = (d.cg || '').replace(/^.*\//, '').replace(/\.\w+$/, ''), F = SCENE_FX[name], vid = name in CG_VID; if (!F || e < .4) return; // video scenes: only the snap
     const k = Math.min(1, (e - .4) / .8), t = e - .4, h = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }; // fade in after the still beat; h = fixed per-mote random
     g.save(); g.translate(ix, iy); g.scale(s, s); g.imageSmoothingEnabled = false;
-    if (F.kind === 'ember') { const [x0, y0, x1, y1] = F.box, H = y1 - y0; for (let i = 0; i < F.n; i++) { const v = 5 + h(i) * 7, y = y1 - ((t * v + h(i + 9) * H) % H), x = x0 + h(i + 3) * (x1 - x0) + Math.sin(t * .7 + i) * 2, life = (y1 - y) / H, fl = .55 + .45 * Math.sin(t * 5 + i * 2.3);
+    if (!vid && F.kind === 'ember') { const [x0, y0, x1, y1] = F.box, H = y1 - y0; for (let i = 0; i < F.n; i++) { const v = 5 + h(i) * 7, y = y1 - ((t * v + h(i + 9) * H) % H), x = x0 + h(i + 3) * (x1 - x0) + Math.sin(t * .7 + i) * 2, life = (y1 - y) / H, fl = .55 + .45 * Math.sin(t * 5 + i * 2.3);
         g.fillStyle = `rgba(255,${120 + (h(i + 5) * 70 | 0)},${50 + (h(i + 7) * 30 | 0)},${k * fl * Math.min(1, life * 4) * (1 - life * .7)})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
-    if (F.kind === 'dust') { for (let i = 0; i < F.n; i++) { let x, y; if (F.c) { const a = h(i) * TAU + t * .08 * (h(i + 2) - .5), r = F.r * Math.sqrt(h(i + 4)); x = F.c[0] + Math.cos(a) * r; y = F.c[1] + Math.sin(a) * r * .8 - ((t * 1.5 + h(i + 6) * 10) % 10); }
+    if (!vid && F.kind === 'dust') { for (let i = 0; i < F.n; i++) { let x, y; if (F.c) { const a = h(i) * TAU + t * .08 * (h(i + 2) - .5), r = F.r * Math.sqrt(h(i + 4)); x = F.c[0] + Math.cos(a) * r; y = F.c[1] + Math.sin(a) * r * .8 - ((t * 1.5 + h(i + 6) * 10) % 10); }
         else { const [x0, y0, x1, y1] = F.box; x = x0 + ((h(i) * (x1 - x0) + t * (1.2 + h(i + 1) * 1.5)) % (x1 - x0)); y = y0 + ((h(i + 2) * (y1 - y0) + t * (2 + h(i + 3) * 2)) % (y1 - y0)); x += Math.sin(t * .5 + i) * 1.5; }
         const tw = .35 + .35 * Math.sin(t * 1.3 + i * 1.7); g.fillStyle = F.warm ? `rgba(255,214,150,${k * tw})` : `rgba(220,214,200,${k * tw * .8})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
-    if (F.kind === 'thread') { const c = e % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)), hb = Math.min(1, b(c, .07) + .7 * b(c - .24, .07)); g.lineCap = 'round'; // same lub-dub as the phase-2 threads
+    if (!vid && F.kind === 'thread') { const c = e % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)), hb = Math.min(1, b(c, .07) + .7 * b(c - .24, .07)); g.lineCap = 'round'; // same lub-dub as the phase-2 threads
       F.lines.forEach((L, i) => sceneThread(g, L[0], L[1], L[2], L[3], 1.5, t * 1.2 + i, k * (.35 + .5 * hb), .6)); }
     if (F.snap && d.cgLast && d.t > .3) { const u = Math.min(1, (d.t - .3) / .25), [fx, fy] = F.snap.from; g.lineCap = 'round'; // the memory's last line: the threads in her chest pull taut and flash
       for (const [tx, ty] of F.snap.to) sceneThread(g, fx, fy, tx, ty, 4 * (1 - u), t * 30, .45 + .45 * u, .6);
