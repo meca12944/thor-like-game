@@ -1235,7 +1235,7 @@
     S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
   function gkHits(f) { if (f.t * GK_STEP > GK_HITA) return;
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-      if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), seed: (Math.random() * 2147483646 | 0) + 1 });
+      if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
@@ -1283,14 +1283,16 @@
   // frame 0-2 a white impact star across the cut, sparks thrown along the cut (dark rim so they read on light ground), a few chips that fall;
   // 3타(big): twice the sparks + radial speed lines + a second ring. hit-stop / shake / the mob's own white flash stay where they are.
   const IMPACT_K = 1.8;
-  function impactFx(ctx, m) { const t = m.t, big = m.big, b = m.a ?? 0; let sd = (m.seed || 7) + 11; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  function impactFx(ctx, m) { const t = m.t, big = m.big, b = m.a ?? 0, tg = b + (m.sw || 1) * Math.PI / 2; /* tg = the way the blade was travelling through the target (tangent of the swing) */ let sd = (m.seed || 7) + 11; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
     ctx.save(); ctx.lineCap = 'round'; ctx.scale(IMPACT_K, IMPACT_K); ctx.rotate(b); // IMPACT_K: atlas px are small on screen (×0.77) — the burst has to read at a glance
     if (t < 3) { const k = 1 - t / 3, L = (big ? 34 : 22) * (.6 + .4 * k), W = (big ? 7 : 5) * k; ctx.fillStyle = `rgba(255,255,255,${k})`; // star: long across the cut, short along it
       ctx.beginPath(); ctx.moveTo(0, -L); ctx.lineTo(W, 0); ctx.lineTo(0, L); ctx.lineTo(-W, 0); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-L * .45, 0); ctx.lineTo(0, W * .7); ctx.lineTo(L * .45, 0); ctx.lineTo(0, -W * .7); ctx.closePath(); ctx.fill(); }
-    const n = big ? 12 : 7; for (let i = 0; i < n; i++) { const g = (rnd() - .5) * 1.8, sp = 5 + rnd() * 6, len = (6 + rnd() * 8) * Math.max(0, 1 - t / 9), r0 = t * sp; if (t > 9 || len <= .5) { rnd(); continue; }
+    if (t < 3) { const k = 1 - t / 3, L = big ? 46 : 32; ctx.rotate(tg - b); ctx.strokeStyle = `rgba(255,255,255,${k})`; ctx.lineWidth = 2.2 * k + .6; ctx.beginPath(); ctx.moveTo(-L, 0); ctx.lineTo(L, 0); ctx.stroke(); ctx.rotate(b - tg); } // the cut line through the target, along the swing
+    const n = big ? 12 : 7; ctx.rotate(tg - b); for (let i = 0; i < n; i++) { const g = (rnd() - .5) * 1.3, sp = 5 + rnd() * 6, len = (6 + rnd() * 8) * Math.max(0, 1 - t / 9), r0 = t * sp; if (t > 9 || len <= .5) { rnd(); continue; }
       const x0 = Math.cos(g) * r0, y0 = Math.sin(g) * r0 + t * t * .12, x1 = x0 + Math.cos(g) * len, y1 = y0 + Math.sin(g) * len, al = 1 - t / 9;
       ctx.strokeStyle = `rgba(16,28,72,${al * .55})`; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
       ctx.strokeStyle = i % 3 ? `rgba(255,255,255,${al})` : `rgba(255,232,170,${al})`; ctx.lineWidth = 1.6; ctx.stroke(); }
+    ctx.rotate(b - tg); // sparks fly on in the blade's direction
     ctx.rotate(-b); for (let i = 0; i < (big ? 7 : 4); i++) { const g = b + Math.PI + (rnd() - .5) * 2.2, v = 3 + rnd() * 3, x = Math.cos(g) * v * t, y = Math.sin(g) * v * t * .6 - 6 * t + .9 * t * t, al = Math.max(0, 1 - t / 14); // chips: thrown back, then fall
       ctx.fillStyle = `rgba(70,64,74,${al})`; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3); ctx.fillStyle = `rgba(200,196,206,${al})`; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 2, 1); }
     if (big && t < 6) { const al = 1 - t / 6; ctx.strokeStyle = `rgba(230,245,255,${al * .8})`; ctx.lineWidth = 1.2; for (let i = 0; i < 12; i++) { const g = i / 12 * TAU + rnd() * .2, r0 = 18 + t * 4, r1 = r0 + 10 + rnd() * 10; ctx.beginPath(); ctx.moveTo(Math.cos(g) * r0, Math.sin(g) * r0 * .8); ctx.lineTo(Math.cos(g) * r1, Math.sin(g) * r1 * .8); ctx.stroke(); }
