@@ -1293,7 +1293,22 @@
   function nsSrc(i) { const H = h128() && h128().H8; if (!H || SWORD_Q === 'off') return null; if (H.nsSheets && H.nsSheets[i]) return H.nsSheets[i]; return SWORD_Q === 'mock' ? H.sheets[i].replace('anim/', 'anim/ns_mock/') : null; }
   function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
   function swordC() { const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
-  function swordHidden() { return !!(S.gk && S.gk.some(f => f.map === S.map && f.t * GK_STEP <= 4.5) && swordC()); }
+  // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
+  const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && hero.hp > 0);
+  function swordHidden() { return !!(((S.gk && S.gk.some(f => f.map === S.map && f.t * GK_STEP <= 4.5)) || comboBlade()) && swordC()); }
+  function fanDirArt(F, dir, a) { // 부채꼴 각도 a(도, 보는 쪽 기준) -> 화면 방향 단위벡터 (gkFanIn 의 거꾸로: rot·y 0.8 찌그러짐·땅 평면에서 돌리기)
+    let dx = dir[0], dy = dir[1]; const fl = dx < 0; if (fl) dx = -dx; const ph = Math.atan2(dy, dx), cp = Math.cos(ph), sp = Math.sin(ph), t = F.rot * Math.PI / 180, ct = Math.cos(t), st = Math.sin(t), r = a * Math.PI / 180;
+    const qx = Math.cos(r), qy = Math.sin(r) * GK_SQ, fx = qx * ct - qy * st, fy = (qx * st + qy * ct) / GK_SQ, gx = fx * cp - fy * sp, gy = fx * sp + fy * cp; let px = gx, py = gy * GK_SQ; if (fl) px = -px; const l = Math.hypot(px, py) || 1; return [px / l, py / l]; }
+  function heroBlade(ctx) { // 그림 칼 대신: 손(grip)에서 부채꼴 각도로 — 당김(시작 각도로 들어 올림) → 판정 틱 동안 휘두름(gkFanHead) → 끝 각도에 멈춤
+    const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(); let [gx, gy] = gkGrip(dir);
+    const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + G.cells[c.h8].indexOf(c)] : null;
+    { const K = gkKick(a), v = FACEV[hero.face] || [1, 0]; gy *= K.sq; gx = gx * (1 + (1 - K.sq) * .6) - v[0] * K.lean * gy / 117 + v[0] * K.step; gy += v[1] * K.step * .5; } // 몸 반동(기울기·내딛기·찌그러짐)을 손도 같이 따라감 (drawHeroHi 와 같은 식)
+    if (tk < F.t0) { const q = tk / F.t0, e = q * q * (3 - 2 * q), v0 = fanDirArt(F, dir, F.a0), d0 = g0 ? (c.fl ? 180 - g0[2] : g0[2]) * Math.PI / 180 : null, w0 = d0 != null ? [Math.cos(d0), Math.sin(d0)] : v0;
+      return bladeLine(ctx, gx, gy, [w0[0] + (v0[0] - w0[0]) * e, w0[1] + (v0[1] - w0[1]) * e], 1); } // 원래 칼 자리 -> 시작 각도로 들어 올림
+    const hd = gkFanHead(F, tk), ang = F.a0 + (F.a1 - F.a0) * (tk > F.t1 ? 1 : Math.max(0, hd)); bladeLine(ctx, gx, gy, fanDirArt(F, dir, ang), 1); }
+  function bladeLine(ctx, gx, gy, v, al) { const l = Math.hypot(v[0], v[1]) || 1, ux = v[0] / l, uy = v[1] / l, BL = 74, x0 = gx + ux * 6, y0 = gy + uy * 6, x1 = gx + ux * BL, y1 = gy + uy * BL;
+    ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${al})`; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.strokeStyle = `rgba(214,222,236,${al})`; ctx.lineWidth = 5.5; ctx.stroke();
+    ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0 + ux * 8, y0 + uy * 8); ctx.lineTo(x1, y1); ctx.stroke(); ctx.strokeStyle = `rgba(200,150,60,${al})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0 - uy * 7, y0 + ux * 7); ctx.lineTo(x0 + uy * 7, y0 - ux * 7); ctx.stroke(); ctx.restore(); }
   function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return [fl ? -g[0] : g[0], g[1]]; } }
     return [dir[0] * 14, -58 + dir[1] * 12]; } // no grip table yet: chest height, a little toward the swing
   function gkBlade(ctx, f) { // the sword itself, drawn in code: grip -> toward the arc's leading edge, one sword long, while the arc opens
@@ -1303,9 +1318,9 @@
     ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${al})`; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); // navy rim (same as the arc)
     ctx.strokeStyle = `rgba(214,222,236,${al})`; ctx.lineWidth = 5.5; ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0 + ux * 8, y0 + uy * 8); ctx.lineTo(x1, y1); ctx.stroke(); // steel + edge light
     ctx.strokeStyle = `rgba(200,150,60,${al})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0 - uy * 7, y0 + ux * 7); ctx.lineTo(x0 + uy * 7, y0 - ux * 7); ctx.stroke(); ctx.restore(); } // gold guard
-  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
+  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC())) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
-    const SC = swordC(); for (const f of S.gk || []) { gkArcDraw(ctx, f); if (SC) gkBlade(ctx, f); }
+    const SC = swordC(), CB = SC && comboBlade(); for (const f of S.gk || []) { gkArcDraw(ctx, f); if (SC && !(CB && f.i <= 2)) gkBlade(ctx, f); } if (CB) heroBlade(ctx);
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
