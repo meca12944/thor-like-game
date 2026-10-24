@@ -437,8 +437,8 @@
       ctx.restore(); } }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
     if (PET.A) for (const o of m.objs) { if (o.type !== 'npc' || o.art !== 'linette8' || (o.y > hero.y) !== !!front) continue; // 팀장 10-24: Felt's Linette = the same 8-way art as the companion (was the old tailor still)
-      const near = Math.hypot(hero.x - o.x, hero.y - o.y) < 60, dir = near ? petDir(hero.x - o.x, hero.y - o.y, 'down') : 'down', L = PET.A.anims['idle_' + dir] || PET.A.anims.idle_down || PET.A.anims.idle_right; if (!L) continue;
-      let t = (S.t * 60 + o.x) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } const e = L[i], im = PET.IM[e[0]], c = PET.A.cells[e[0]][e[1]]; if (!im || !im.complete) continue;
+      const moving = !!o.tgt, near = !moving && Math.hypot(hero.x - o.x, hero.y - o.y) < 60, dir = moving ? petDir(o.tgt[0] - o.x, o.tgt[1] - o.y, o.face || 'down') : near ? petDir(hero.x - o.x, hero.y - o.y, 'down') : 'down', L = PET.A.anims[(moving ? 'walk_' : 'idle_') + dir] || PET.A.anims['idle_' + dir] || PET.A.anims.idle_down || PET.A.anims.idle_right; if (!L) continue;
+      let t = ((moving ? (o.at || 0) : S.t) * 60 + o.x) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } const e = L[i], im = PET.IM[e[0]], c = PET.A.cells[e[0]][e[1]]; if (!im || !im.complete) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7); ctx.save(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
@@ -499,7 +499,7 @@
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
   const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
-    m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재' };
+    m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재', m_leather_strap: '질긴 가죽끈', riceball: '주먹밥' };
   const itemName = id => NAMES[id] || id;
   function giveLoot(list) { const g = window.__game; const names = [];
     for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff'); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
@@ -976,7 +976,7 @@
       if (o.type === 'boss_door') { bossDoor(o); return; }
       if (o.type === 'gate' && !o.open) { msg('철창이다. 어딘가의 레버로 열 수 있을 것 같다'); return; }
     }
-    for (const o of m.objs) if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.hypot(o.x - hero.x, o.y - hero.y) < 22) { SAVE.chests[o.id] = true; save(); banner('풀숲에서 찾았다! ' + giveLoot(o.loot || []), 2.2); return; }
+    for (const o of m.objs) if (o.type === 'hidden' && !SAVE.chests[o.id] && Math.hypot(o.x - hero.x, o.y - hero.y) < 22) { SAVE.chests[o.id] = true; save(); banner((o.find || '풀숲에서 찾았다!') + ' ' + giveLoot(o.loot || []), 2.2); return; }
   }
   function openTrade(o) { const g = window.__game; if (!g) return false;
     if (o.forge && g.openForge) { S.dialog = null; g.openForge(); return true; }
