@@ -1075,7 +1075,7 @@
     return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
-    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || S.engaged || S.dialog) S.vfx = null; }
+    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
     const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
