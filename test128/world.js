@@ -88,7 +88,7 @@
   const IMG = {}; let ATLAS = null, TILESETS = null; const MAPS = {};
   const loadImg = (k, src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => rej(new Error('load ' + src)); i.src = V(src); });
   const getJSON = u => fetch(window.__v ? __v(u) : u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
-  function loadMap(id) { return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(loadHD).then(j => (MAPS[id] = buildMap(j))); }
+  function loadMap(id) { if (id === 'height_test' && HEIGHT_ON && !MAPS[id]) MAPS[id] = buildMap(heightTestMap()); return MAPS[id] ? Promise.resolve(MAPS[id]) : getJSON('maps/' + id + '.json').then(j => j.compose ? composeMap(j) : j.bg ? loadBg(j) : j).then(loadHD).then(j => (MAPS[id] = buildMap(j))); }
   // 고해상도 배경 (owner 10-23 「펠트 마을 최고 퀄리티」, 마을배경방과 정한 형식): map JSON "hd" = {D, ground, props[], lights[], grade}.
   // Drawn at the characters' pixel density (D art px per world px) on the screen canvas, not in the 384x216 low canvas: the ground picture
   // under everything, props (buildings / trees) one by one, y-sorted with the hero (see-through when the hero is behind), light pools on top.
@@ -230,6 +230,8 @@
       let solid = solidChars.has(ch); if (L.solid !== undefined) solid = L.solid;
       if (ts.solidTiles && ts.solidTiles.includes(L.ground)) solid = true;
       if (L.hop) { (m.hopG || (m.hopG = new Uint8Array(j.w * j.h)))[y * j.w + x] = 1; solid = true; } // 점프로만 넘는 칸 (울타리·개울·구멍; 3번방 약속 10-24)
+      if (L.hi) { (m.hiG || (m.hiG = new Uint8Array(j.w * j.h)))[y * j.w + x] = L.hi; solid = false; } // 높은 길 층 (모션연구방 10-24, 1장 경관 회의): 1 높은 길(수도교·거인상 등) 2 계단(두 층 잇기) 3 높은 길의 끊긴 틈
+      if (L.pit) (m.pitG || (m.pitG = new Uint8Array(j.w * j.h)))[y * j.w + x] = 1;
       m.solidG[y * j.w + x] = solid ? 1 : 0;
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
@@ -364,6 +366,7 @@
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   function solidAt(px, py) { const m = M(); if (!m) return true; const x = Math.floor(px / m.T), y = Math.floor(py / m.T);
     if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x] && !(hopNow && m.hopG && m.hopG[y * m.w + x])) return true;
+    if (m.hiG && hiBlock(m, x, y)) return true;
     for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true;
     for (const o of m.objs) if (o.wander && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
   let npcSelf = null;
@@ -463,17 +466,34 @@
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7); ctx.save(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
+  // 높은 길 층 (모션연구방 10-24, 팀장 「높은 길·계단·회피대시 틈 넘기·떨어지면 돌아오기·가장자리 줌」, ?height=1 시험 지도에서만): 주인공 hero.hl 0 = 땅, 1 = 높은 길.
+  // 땅에서는 높은 길·틈 칸이 벽(다리 기둥·구덩이), 높은 길에서는 땅 칸이 난간(벽). 계단 칸 위에서는 두 층 다 열림. 몹은 늘 땅.
+  let hiHero = false;
+  function hiBlock(m, x, y) { const h = m.hiG[y * m.w + x]; if (!hiHero) return h === 1 || h === 3;
+    const on = m.hiG[Math.floor(hero.y / m.T) * m.w + Math.floor(hero.x / m.T)] === 2; if (on) return false;
+    return hero.hl ? h === 0 : (h === 1 || h === 3); }
+  function hiStep(dt) { const m = M(); if (!m || !m.hiG) return; const h = hero; if (h.hfall) { h.hfall.t += dt; if (h.hfall.t >= HI.fall) { const b = h.hiSafe || h.safe; h.x = b[0]; h.y = b[1]; h.hfall = null; h.hl = 1; addFx('text', h.x, h.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); h.inv = 0; hurt(HI.dmg, null, true); } return; }
+    const tx = Math.floor(h.x / m.T), ty = Math.floor(h.y / m.T), c = m.hiG[ty * m.w + tx];
+    if (c === 1) h.hl = 1; else if (c === 0) h.hl = 0; // 계단(2) 위에서는 그대로 → 내려서는 칸이 정함
+    if (h.roll) h.hiRd = [h.roll.dx, h.roll.dy];
+    if (h.hl && c === 3 && !h.roll && h.hiRd) { const [dx, dy] = h.hiRd; h.hiRd = null; for (let d = 2; d <= HI.assist * 16; d += 2) { const X = h.x + dx * d, Y = h.y + dy * d, q = m.hiG[Math.floor(Y / m.T) * m.w + Math.floor(X / m.T)]; if (q === 1 || q === 2) { h.x = X + dx * 3; h.y = Y + dy * 3; return; } } } // 회피대시가 틈 끝에 살짝 못 미치면 건너편에 내려 줌 (HI.assist 칸까지)
+    if (!h.roll) h.hiRd = null;
+    if (h.hl && c === 3 && !h.roll) { h.hfall = { t: 0 }; h.atk = null; sfx('roll', .5, .6); return; } // 틈에 섬 = 떨어짐 (회피대시 중에는 넘어감)
+    let edge = false; if (h.hl) for (let dy = -1; dy <= 1 && !edge; dy++) for (let dx = -1; dx <= 1; dx++) { const q = m.hiG[(ty + dy) * m.w + tx + dx]; if (q === 3 || (q === 0 && m.pitG && m.pitG[(ty + dy) * m.w + tx + dx])) { edge = true; break; } }
+    h.hiEdge = edge; let nearGap = false; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (m.hiG[(ty + dy) * m.w + tx + dx] === 3) nearGap = true;
+    if (h.hl && (c === 1 || c === 2) && !h.roll && !nearGap) h.hiSafe = [(tx + .5) * m.T, (ty + .5) * m.T]; } // 떨어지면 돌아올 자리 = 틈에서 한 칸 떨어진 마지막 높은 길
+  const HI = { assist: 2.1, fall: .38, dmg: 3, zoomEdge: .85, par: .9, dim: .38, blur: .7 };
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   let hopNow = false; // true only while the airborne hero moves: hop cells are open for him alone
   function moveCol(e, dx, dy, r, fly) {
-    const m = M(); let ok = true; hopNow = e === hero && !!(hero.jump && hero.jump.air);
+    const m = M(); let ok = true; hopNow = e === hero && !!(hero.jump && hero.jump.air); hiHero = e === hero;
     const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
     const bl1 = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
     const B = e === hero && !hero.dash && S.bossRef && !S.bossRef.dead && S.bossRef.hp > 0 ? S.bossRef : null, BR = B ? (B.D.r || 16) + 5 : 0; // boss body blocks the hero (팀장 10-24 「보스 몸속에 서서 연타」); a dodge-dash passes through
     const bl = B ? (x, y) => bl1(x, y) || (Math.hypot(x - B.x, y - B.y) < BR && Math.hypot(x - B.x, y - B.y) < Math.hypot(e.x - B.x, e.y - B.y)) : bl1;
     if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else { ok = false; if (e === hero && !dy) slide(e, bl, dx, 0); } }
     if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else { ok = false; if (e === hero && !dx) slide(e, bl, 0, dy); } }
-    hopNow = false; return ok;
+    hopNow = false; hiHero = false; return ok;
   }
   // corner slide (owner 10-24 「방향키 하나로 가면 집·분수에 걸린다」): pushing straight into a corner that is open a few px to the side nudges the hero around it (Zelda-style)
   const SLIDE_PX = 7;
@@ -661,6 +681,7 @@
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
       if (!m.groundC) { m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+        if (m.pitG) { const g = m.groundC.getContext('2d'); for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (m.pitG[y * m.w + x]) { const d = (m.pitG[(y - 1) * m.w + x] ? 0 : 1); g.fillStyle = d ? '#1a1418' : '#050407'; g.fillRect(x * m.T, y * m.T, m.T, m.T); } } // 꺼진 지반: 검은 바닥 (윗줄은 벼랑 끝)
         for (const h of m.hds || []) { const im = HDIMG[h.ground]; if (im) m.groundC.getContext('2d').clearRect(h.gx * m.T, h.gy * m.T, im.width / h.D, im.height / h.D); } }
       let sp = m.spawns && m.spawns[spawnName];
       if (!sp && spawnName && spawnName.startsWith('ws:')) { const w = m.objs.find(o => o.type === 'waystone' && o.id === spawnName.slice(3)); if (w) sp = [w.tx + .5, w.ty + 1.6, 'down']; } // fast travel
@@ -758,7 +779,7 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { if (S.vfx && S.vfx.t < VISTA.lock) return [0, 0]; return rawDir(); }
+  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || hero.hfall) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
@@ -914,6 +935,7 @@
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
     if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
     else if (!onSpike && !hero.roll && !hero.jump && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
+    hiStep(dt);
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
@@ -1078,7 +1100,7 @@
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
     const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
-  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return ((m && m.viewZoom) || 1) * (m && m.hiG && hero.hiEdge ? HI.zoomEdge : 1); } // 높은 길 가장자리: 조금 물러나 아래를 내려다봄 (모션연구방 10-24)
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && S.vfx ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
@@ -1107,6 +1129,39 @@
       if (tr.phase === 'card' && tr.cardData) drawCard(tr, k); else { ctx.fillStyle = `rgba(0,0,0,${a})`; ctx.fillRect(0, 0, CW, CH); }
     }
   }
+  // 높은 길 그리기: 땅 그림(groundC) 위에 높은 길 그림(highC). 주인공이 높은 길에 있으면 아래 땅은 어둡고 흐리고, 카메라를 0.9배만 따라옴(시차) → 높이 느낌. 주인공 크기는 그대로.
+  function hiDrawGround(g, m, cx, cy) { if (!m.highC) m.highC = hiRender(m); const h = hero, on = !!h.hl && !h.hfall;
+    const tgt = on ? (S.hiA ? [(cx - S.hiA[0]) * (1 - HI.par), (cy - S.hiA[1]) * (1 - HI.par)] : [0, 0]) : [0, 0]; if (on && !S.hiA) S.hiA = [cx, cy]; if (!on) S.hiA = null;
+    const P = S.hiP || (S.hiP = [0, 0, 0]); P[0] += (tgt[0] - P[0]) * .25; P[1] += (tgt[1] - P[1]) * .25; P[2] += ((on ? 1 : 0) - P[2]) * .15; // 땅이 늦게 따라오는 양 · 어두움 정도 (부드럽게)
+    if (P[2] > .02) g.filter = `blur(${(HI.blur * P[2]).toFixed(2)}px)`; g.drawImage(m.groundC, -cx + Math.round(P[0]), -cy + Math.round(P[1])); g.filter = 'none';
+    if (P[2] > .02) { g.fillStyle = `rgba(6,5,10,${(HI.dim * P[2]).toFixed(3)})`; g.fillRect(0, 0, EW + 1, EH + 1); }
+    g.drawImage(m.highC, -cx, -cy); }
+  function hiRender(m) { const T = m.T, c = document.createElement('canvas'); c.width = m.pw; c.height = m.ph; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; // 높은 길만: 윗면 + 아래로 드리운 옆면(두께) + 가장자리 선
+    const top = n => { const p = tileXY(m.tileset || 'field', n) || tileXY('field', n); return p ? [IMG[tileXY(m.tileset || 'field', n) ? (m.tileset || 'field') : 'field'], p] : null; };
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) { const h = m.hiG[y * m.w + x]; if (h !== 1 && h !== 2) continue; const L = legendOf(m, m.cells[y * m.w + x].ch), t = top(L.top || 'floor');
+      if (!(m.hiG[(y + 1) * m.w + x] === 1 || m.hiG[(y + 1) * m.w + x] === 2)) { g.fillStyle = '#2a2420'; g.fillRect(x * T, (y + 1) * T, T, 6); g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x * T, (y + 1) * T + 6, T, 4); } // 옆면 두께 + 그늘
+      if (t) g.drawImage(t[0], t[1][0], t[1][1], 16, 16, x * T, y * T, T, T); else { g.fillStyle = '#6a6058'; g.fillRect(x * T, y * T, T, T); }
+      if (h === 2) { g.fillStyle = 'rgba(0,0,0,.28)'; for (let i = 0; i < 4; i++) g.fillRect(x * T, y * T + i * 4, T, 1); } } // 계단: 가로 줄
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) { const h = m.hiG[y * m.w + x]; if (h !== 1 && h !== 2) continue; g.fillStyle = '#d8ccb0'; // 가장자리 밝은 선 (어디까지 걸을 수 있는지)
+      const no = (dx, dy) => { const q = m.hiG[(y + dy) * m.w + x + dx]; return !(q === 1 || q === 2); };
+      if (no(0, -1)) g.fillRect(x * T, y * T, T, 1); if (no(0, 1)) g.fillRect(x * T, y * T + T - 1, T, 1); if (no(-1, 0)) g.fillRect(x * T, y * T, 1, T); if (no(1, 0)) g.fillRect(x * T + T - 1, y * T, 1, T); }
+    return c; }
+  // ?height=1 시험 지도 (임시 타일): 땅 위를 가로지르는 높은 길 하나 + 회피대시로 넘는 3칸 틈 + 떨어지는 5칸 틈(북쪽 갈래) + 양 끝 계단
+  const HEIGHT_ON = Q.get('height') === '1';
+  function heightTestMap() { const W = 44, H = 26, rows = [];
+    for (let y = 0; y < H; y++) { let r = ''; for (let x = 0; x < W; x++) { let c = '.';
+        if (x === 0 || y === 0 || x === W - 1 || y === H - 1) c = '#';
+        else if (x >= 9 && x <= 34 && y >= 6 && y <= 18) c = 'p';                         // 구덩이 (꺼진 지반)
+        if (y >= 11 && y <= 13 && x >= 6 && x <= 37) c = (x >= 9 && x <= 34) ? '=' : 'b'; // 높은 길 (수도교)
+        if (y >= 11 && y <= 13 && (x === 5 || x === 38)) c = 'S';                          // 계단
+        if (y >= 11 && y <= 13 && x >= 16 && x <= 18) c = 'g';                             // 틈 3칸 (회피대시로 넘음)
+        if (x >= 26 && x <= 28 && y >= 3 && y <= 10) c = y >= 6 ? '=' : 'b';               // 북쪽 갈래 길
+        if (x >= 26 && x <= 28 && y >= 5 && y <= 9) c = 'g';                               // 갈래 길 틈 5칸 (못 넘음 → 떨어짐)
+        r += c; } rows.push(r); }
+    return { id: 'height_test', type: 'field', name: '높은 길 시험', tileset: 'dungeon', tile: 16, w: W, h: H, ground: rows, solid: ['#'],
+      legend: { '#': 'wall', '.': 'floor', 'p': { ground: 'floor', pit: true, solid: true }, '=': { ground: 'floor', pit: true, hi: 1, top: 'floor_crack' }, 'b': { ground: 'floor_moss', hi: 1, top: 'floor_crack' },
+        'S': { ground: 'floor', hi: 2, top: 'floor' }, 'g': { ground: 'floor', pit: true, hi: 3 } },
+      spawns: { default: [3, 12, 'right'] }, objects: [] }; }
   function drawLow() {
     const g = lx, m = M();
     // smooth pixel camera: the low canvas is drawn at the whole-pixel camera, the leftover fraction shifts the upscaled image on screen.
@@ -1116,7 +1171,7 @@
     if (S.kick && S.kick.t > 0) { const q = S.kick.t / .12; cx += Math.round(S.kick.x * q); cy += Math.round(S.kick.y * q); } // directional hit kick (decays while the world runs, holds during the hit-stop)
     S.camI = [cx, cy];
     g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (low.width !== EW + 1 || low.height !== EH + 1) { low.width = EW + 1; low.height = EH + 1; } if (m.hds) g.clearRect(0, 0, EW + 1, EH + 1); else g.fillRect(0, 0, EW + 1, EH + 1);
-    g.drawImage(m.groundC, -cx, -cy);
+    if (m.hiG) hiDrawGround(g, m, cx, cy); else g.drawImage(m.groundC, -cx, -cy);
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
     for (const o of m.objs) drawObjTile(g, m, o);
@@ -1509,8 +1564,9 @@
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; const gt = K.t != null ? K.t - 1 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
+    const fp = h.hfall ? Math.min(1, h.hfall.t / HI.fall) : 0; ky += fp * fp * 22; // 높은 길 틈으로 떨어짐: 몸 크기는 그대로, 아래로 가라앉으며 흐려짐
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
-    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
+    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1 - fp * .9, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); drawStam(k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
