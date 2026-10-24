@@ -177,28 +177,6 @@
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, p2 ? `rgba(34,0,6,${.5 + .06 * Math.sin(S.t * 3)})` : 'rgba(2,2,8,.55)'); g.fillStyle = vg; g.fillRect(0, 0, EW + 1, EH + 1);
     // (2페이즈 화면 전체 붉은 칠은 뺌: 지도 담당의 붉은 빛과 겹쳐 붉은 예고가 안 보였음 → 가장자리만 붉게)
     g.restore(); }
-  // 보스 등장 연출 (팀장, 주인 10-24 「웅장하게 보스전」): 위아래 검은 띠(시네마) → 등장 그림 1.7초(살짝 확대·페이드) + 한글 이름판 → 하얀 번쩍 → 카메라가 보스를 비춤
-  const SPLASH_T = 1.7, SPLIMG = {}; function splashImg(src) { if (!SPLIMG[src]) { const im = new Image(); im.src = V(src); SPLIMG[src] = im; } return SPLIMG[src]; }
-  function drawBossCine(ox, oy, SW, SH, u) { const b = S.bossRef, sp = S.splashT > 0, intro = S.introT > 0;
-    S.cineA = Math.max(0, Math.min(1, (S.cineA || 0) + (sp || intro ? .08 : -.05))); const bar = Math.round(SH * .11 * (1 - Math.pow(1 - S.cineA, 3)));
-    if (sp && S.splashImg && S.splashImg.complete && S.splashImg.naturalWidth) { const t = SPLASH_T - S.splashT, a = Math.min(1, t / .3, S.splashT / .25), z = 1 + .04 * (t / SPLASH_T), im = S.splashImg;
-      const sc = Math.max(SW / im.width, SH / im.height) * z, w = im.width * sc, h = im.height * sc; ctx.save(); ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, SH);
-      ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(ox + (SW - w) / 2), Math.round(oy + (SH - h) / 2), Math.round(w), Math.round(h));
-      if (b && b.D) { const q = SH / 216, px = ox + SW * .05, py = oy + SH * .78; ctx.globalAlpha = Math.min(1, Math.max(0, (t - .25) / .3)) * a; // 이름판 (그림의 빈 왼쪽 아래, 화면 크기 비례)
-        ctx.fillStyle = '#9a1420'; ctx.fillRect(px - 5 * q, py - 15 * q, 2 * q, 30 * q);
-        textOut(b.D.title || '', px, py - 9 * q, 6 * q, '#d8b8b8', '#000', 'left'); textOut(b.D.name, px, py + 4 * q, 15 * q, '#f2e6e6', '#000', 'left');
-        textOut(b.D.sub || '영혼을 실에 꿰매는 자', px, py + 13 * q, 5 * q, '#c0a0a0', '#000', 'left'); }
-      if (S.splashT < .12) { ctx.globalAlpha = 1 - S.splashT / .12; ctx.fillStyle = '#fff'; ctx.fillRect(ox, oy, SW, SH); } ctx.restore(); }
-    if (bar > 0) { ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bar); ctx.fillRect(ox, oy + SH - bar, SW, bar); } }
-  // 보스 체력바: 어두운 판 + 금테, 이름·칭호, 깎인 자리 하얀 잔상이 천천히 줄어듦, 50% 눈금(2페이즈), 2페이즈는 진홍
-  function drawBossBar(b, cx, y, w, u) { const r = Math.max(0, b.hp / b.maxHp), p2 = b.phase === 2; S.bTrail = S.bTrailId === b ? Math.max(r, (S.bTrail ?? r) - .004) : r; S.bTrailId = b;
-    const h = 9 * u, x = Math.round(cx - w / 2); ctx.fillStyle = 'rgba(8,6,10,.82)'; ctx.fillRect(x - 4 * u, y - 4 * u, w + 8 * u, h + 8 * u);
-    ctx.strokeStyle = p2 ? '#a0303a' : '#9c8456'; ctx.lineWidth = Math.max(1, u); ctx.strokeRect(x - 4 * u + .5, y - 4 * u + .5, w + 8 * u - 1, h + 8 * u - 1);
-    ctx.fillStyle = '#1c1418'; ctx.fillRect(x, y, w, h); ctx.fillStyle = 'rgba(240,232,220,.85)'; ctx.fillRect(x, y, Math.round(w * S.bTrail), h);
-    const g2 = ctx.createLinearGradient(0, y, 0, y + h); g2.addColorStop(0, p2 ? '#ff5a5a' : '#d8c27a'); g2.addColorStop(1, p2 ? '#8a0e1c' : '#7a5a24'); ctx.fillStyle = g2; ctx.fillRect(x, y, Math.round(w * r), h);
-    if (p2) { ctx.fillStyle = `rgba(255,120,120,${.15 + .15 * Math.sin(S.t * 6)})`; ctx.fillRect(x, y, Math.round(w * r), h); }
-    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fillRect(Math.round(x + w * .5) - 1, y - 2 * u, 2, h + 4 * u); // 2페이즈 눈금
-    textOut((b.D.title ? b.D.title + '  ' : '') + b.D.name + (p2 ? '  · 2페이즈' : ''), cx, y - 8 * u, 12 * u, p2 ? '#ff9a8a' : '#f0e2c0'); }
   function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
     const r = ATLAS.sprites.rects[name]; if (!r) return null;
@@ -562,7 +540,7 @@
     const B = M().boss; SAVE.flags[B.flag] = true; save(); playScene('boss_post:' + (B.id || B.kind), 1.2);
     S.hazards.length = 0; S.shots.length = 0; S.temp.length = 0; S.ult = null;
     S.mobs.forEach(o => { if (o !== m && !o.dead) killMob(o); });
-    shake(5); jingle(); banner((m.D && m.D.title ? m.D.title + ' ' : '') + B.name + ' — 쓰러뜨렸다', 3.4); S.slowT = 1.1; S.killFlash = 1; // 처치 연출 (팀장): 1.1초 느린 화면 → 하얀 번쩍 → 이름 띠
+    shake(5); jingle(); banner(B.name + ' 격파!', 3);
     after(1.6, () => { const l = giveLoot(B.reward || []); msg((B.absorb ? '능력 흡수: ' + B.absorb + (l ? '  ·  ' : '') : '') + (l ? '획득: ' + l : ''), 5); });
     after(3.2, () => { addWarp(M()); msg(B.exitMsg || (B.exit && B.exit.to === 'felt' ? '빛의 문이 열렸다 — 들어가면 펠트로 돌아간다' : '빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다'), 4); });
   }
@@ -589,7 +567,7 @@
   }
   function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
-    S.roomP2 = undefined; S.splashT = 0; S.cineA = 0; S.slowT = 0; S.killFlash = 0; S.bTrailId = null; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    S.roomP2 = undefined; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
@@ -607,7 +585,7 @@
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
         if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id, loot: o.loot }); // o.loot = the champion's drop (map data)
       }
-      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; if (m.boss.splash) { S.splashT = SPLASH_T; S.splashImg = splashImg(m.boss.splash); S.cineT = 0; } playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6 + (m.boss.splash ? SPLASH_T : 0)); }
+      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
@@ -713,7 +691,6 @@
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
-    if (S.splashT > 0) { S.splashT -= dt; queue.length = 0; return; } // 보스 등장 그림 동안 세상 멈춤 (카메라 연출·대사는 그 뒤)
     if (S.dialog) { stepDialog(dt); queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (takePress('menu')) { const g = window.__game; if (g && g.ctl && !S.pause) { g.ctl.openUI('menu'); queue.length = 0; return; } S.pause = !S.pause; } // Esc = the shared pause menu (설정 · 귀환 inside)
@@ -1547,16 +1524,16 @@
       { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
-      const b = S.bossRef; if (b && !b.dead && !(S.splashT > 0)) drawBossBar(b, cxs, oy + SH - 22 * u, 300 * u, u);
+      const b = S.bossRef; if (b && !b.dead) { const w = 260 * u, y = oy + SH - 20 * u; hpBar(b, cxs, y, w, 7 * u);
+        textOut(b.D.name + (b.phase === 2 ? '  — 2페이즈' : ''), cxs, y - 5 * u, 12 * u, b.phase === 2 ? '#ff9a7a' : '#fff');
+        ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(Math.round(cxs) - 1, y - 2 * u, 2, 11 * u); }
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
-      if (!S.dialog && !(b && !b.dead)) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
+      if (!S.dialog) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
-    if (S.bossRef || S.cineA) drawBossCine(ox, oy, SW, SH, u);
-    if (S.killFlash > 0) { const kf = S.killFlash; ctx.save(); ctx.globalAlpha = Math.min(1, kf * 1.4) * .85; ctx.fillStyle = '#fff'; ctx.fillRect(ox, oy, SW, SH); ctx.restore(); S.killFlash = Math.max(0, kf - .025); if (S.slowT > 0) { const bar = Math.round(SH * .1); ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bar); ctx.fillRect(ox, oy + SH - bar, SW, bar); } }
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
@@ -1745,7 +1722,7 @@
   function frame(t) {
     const dt = Math.min(.1, (t - last) / 1000 || 0); last = t;
     if (FPSEL) { fpsN++; fpsW = Math.max(fpsW, dt * 1000); if (t - fpsT > 1000) { FPSEL.textContent = Math.round(fpsN * 1000 / (t - fpsT)) + ' fps · 최악 ' + Math.round(fpsW) + 'ms'; fpsN = 0; fpsT = t; fpsW = 0; } }
-    if (!manual) { if (S.scene === 'town' && !S.trans) watchTown(); else { if (S.slowT > 0) { S.slowT -= dt; } acc += dt * (S.slowT > 0 ? .28 : 1); let n = 0; while (acc >= DT && n < 6) { step(DT); acc -= DT; n++; } if (n >= 6) acc = 0; } }
+    if (!manual) { if (S.scene === 'town' && !S.trans) watchTown(); else { acc += dt; let n = 0; while (acc >= DT && n < 6) { step(DT); acc -= DT; n++; } if (n >= 6) acc = 0; } }
     if (S.scene !== 'town' || S.trans) render();
     publish();
     requestAnimationFrame(frame);

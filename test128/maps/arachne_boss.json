@@ -102,8 +102,7 @@
   "exit": {
    "to": "felt",
    "spawn": "arachne"
-  },
-  "splash": "assets/world/arachne/boss_splash_arachne.png"
+  }
  },
  "objects": [],
  "hd": {
