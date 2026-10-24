@@ -623,7 +623,7 @@
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
       updateGate(m, true);
-      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; playScene('area:' + (ar0 ? ar0.id : m.id), 1.2);
+      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; areaScene(ar0 ? ar0.id : m.id, 1.2);
       if (S.pendingMsg) { msg(S.pendingMsg, 2.2); S.pendingMsg = null; }
       if (S.pendingHp) { hero.hp = Math.max(1, Math.min(hero.maxHp, S.pendingHp)); S.pendingHp = 0; syncTownHp(); }
       snapCam();
@@ -684,7 +684,7 @@
     S.calmT = f ? 0 : (S.calmT || 0) + dt; if (S.calmT > 2.5) S.snap = null; if (!f) { hero.px = hero.x; hero.py = hero.y; }
     // seamless area change: name card only, first visit auto-saves
     const ar = areaAt(m, hero.x, hero.y); if (ar && ar.id !== S.area) { S.area = ar.id; S.areaCard = { a: ar, t: 2.4 }; sfx('page', .4);
-      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } playScene('area:' + ar.id, .9); }
+      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } areaScene(ar.id, .9); }
     if (S.areaCard && (S.areaCard.t -= dt) <= 0) S.areaCard = null; if (S.saved && (S.saved.t -= dt) <= 0) S.saved = null; }
   function drawLock(g) { const L = S.lock; if (!L) return; const k = Math.min(1, L.t / .35), n = 56;
     for (let i = 0; i < n; i++) { const a = i / n * TAU, x = L.x + Math.cos(a) * LOCK_R, y = L.y + Math.sin(a) * LOCK_R * LOCK_SQ, h = (7 + (i % 3) * 3 + Math.sin(S.t * 4 + i) * 1) * k;
@@ -890,6 +890,7 @@
   function dlgPages(d) { if (!d.pages) { const P = []; if (d.wrapF) ctx.font = d.wrapF; for (const pg of String(d.text || '…').split(/\n{2,}/)) { const L = [].concat(...pg.split('\n').map(l => dlgWrap(l, d.wrapW))); for (let i = 0; i < L.length; i += DLG.lines) P.push(L.slice(i, i + DLG.lines).join('\n')); }
       d.pages = P.length ? P : ['…']; d.pi = 0; d.ch = 0; d.sel = 0; d.t = 0; } return d.pages; }
   function stepDialog(dt) { const d = S.dialog, P = dlgPages(d), pg = P[d.pi], full = pg.length, last = d.pi === P.length - 1, b4 = Math.floor(d.ch); d.t += dt;
+    if (d.cg && (!S.cgL || S.cgL.src !== d.cg || S.t - S.cgL.since < .6)) { S.dlgTap = false; return; } // new story picture: 0.6 s of picture alone first
     d.ch = Math.min(full, d.ch + dt * DLG.cps); const n = Math.floor(d.ch); if (n > b4 && n % 2 === 0 && !/\s/.test(pg[n - 1] || ' ')) sfx('talk', .5, d.pitch || 1);
     if (last && d.choices && d.ch >= full) { if (takePress('up')) d.sel = (d.sel + d.choices.length - 1) % d.choices.length; if (takePress('down')) d.sel = (d.sel + 1) % d.choices.length; }
     const adv = takePress('interact') || takePress('attack') || queue.includes('Space') || queue.includes('Enter') || S.dlgTap; S.dlgTap = false; // phone: tap the picture (UI_GUIDE 10)
@@ -906,15 +907,16 @@
         if (!it || it.who !== who) { it = { who, lines: [] }; out.push(it); } it.lines.push(t); if (who && who.narr) { it = null; } } }
     return out; }
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
-    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
-  function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
+    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, cgDx: h.cgDx, cgLast: !!h.cgLast, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
+  function talkAs(o, text, last, artKey) { const sq = toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }); playSeq(artKey ? withArt(sq, artKey) : sq, last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
   addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
+  function areaScene(id, delay) { playScene('area:' + id, delay); if (SAVE.flags.boss_arachne) playScene('area:' + id + ':after', delay + .3); } // ':after' = first visit after the chapter boss (펠트 재방문 → 리네트 동행)
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); const sq = withArt(toSeq(t), key); if (!S.dialog) playSeq(sq); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(sq); }; } }); }
-  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) seq.forEach((it, i) => { for (const [src, from] of A) if (i >= from) it.cg = src; }); return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
+  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) { seq.forEach((it, i) => { for (const [src, from, dx] of A) if (i >= from) { it.cg = src; it.cgDx = dx || 0; } }); seq.forEach((it, i) => { if (it.cg && (!seq[i + 1] || seq[i + 1].cg !== it.cg)) it.cgLast = true; }); } return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터, 시선 -1/0/1]]; cgLast = 그 그림의 마지막 말 (SCENE_FX snap)
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -922,6 +924,7 @@
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
       if (o.type === 'npc') { let text = (o.quests && NAV()) ? NAV().talk(o) : (o.idle || '…'); S.talked = o.id; const plain = text === (o.idle || '…'); if (plain) text = npcLine(o);
         if ((o.shop || o.forge) && plain && window.__game && (window.__game.openForge || window.__game.openShop)) { talkAs(o, text, { choices: [{ t: o.forge ? '강화·제작' : '물건을 본다', f: () => openTrade(o) }, { t: '그만둔다' }] }); return; } // 대사 먼저, 고르면 가게 // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
+        const mk = 'meet:' + o.id, mArt = DLGD && DLGD.sceneArt && DLGD.sceneArt[mk] && !SAVE.flags['cg_' + mk]; if (mArt) { SAVE.flags['cg_' + mk] = true; save(); talkAs(o, text, null, mk); return; } // first talk with story art (리네트 첫 만남)
         if (!o.anim && o.main && !/^[^\s:()「」]{1,8}: /m.test(text)) { S.dialog = { text, name: o.name, role: o.role, por: o.portrait || o.art || o.id }; return; } talkAs(o, text); return; }
       if (o.type === 'clue') { clue(o); return; }
       if (o.type === 'secret_wall') { if (!SAVE.flags[o.flag]) { SAVE.flags[o.flag] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; shake(4); sfx('impact', .8); for (let i = 0; i < 14; i++) addFx('dust', o.x + (Math.random() - .5) * 16, o.y + (Math.random() - .5) * 10, { life: .6 }); banner(o.name || '숨겨진 길이 드러났다', 2); } else S.dialog = { text: o.textDone || '무너진 벽 너머로 좁은 방이 보인다.' }; return; }
@@ -958,7 +961,7 @@
     if (o.needQuest && !questOn(o.needQuest)) { S.dialog = { text: o.textIdle || o.textLocked || '…', name: o.name }; return; }
     if (!(o.needFlags || []).every(f => SAVE.flags[f])) { S.dialog = { text: o.textLocked || '지금은 할 수 있는 게 없다.', name: o.name }; return; }
     SAVE.flags[o.flag] = true; save(); const got = o.loot ? giveLoot(o.loot) : '';
-    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
+    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg, cgDx: o.cgDx || 0 }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
     if (!keyId) { if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
@@ -1555,13 +1558,44 @@
     const A = d.anim && npcAnim(d.anim); if (!A) return false; const seq = A.J.anims.idle_south || A.J.anims.idle_down; if (!seq) return false; const t = Math.floor(d.t * 60) % seq.reduce((a, q) => a + q[2], 0); let q = seq[0], acc = 0; for (const e of seq) { acc += e[2]; if (t < acc) { q = e; break; } }
     const c = A.J.cells[q[0]][q[1]], [cx, cy, cw, ch] = c, top = cy + Math.max(0, c[5] - 124), bh = 64, bw = 64, bx = cx + c[4] - 32; // head + shoulders: top 64 px of a ~124 px figure, centred on the feet anchor
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, sz, sz); ctx.clip(); ctx.imageSmoothingEnabled = false; const sc = sz / bw, s0 = Math.max(cx, bx), s1 = Math.min(cx + cw, bx + bw), t1 = Math.min(cy + ch, top + bh); if (s1 > s0 && t1 > top) ctx.drawImage(A.ims[q[0]], s0, top, s1 - s0, t1 - top, Math.round(x + (s0 - bx) * sc), Math.round(y + 2 * sc), Math.round((s1 - s0) * sc), Math.round((t1 - top) * sc)); /* only this cell's pixels (atlas neighbours stay out) */ ctx.restore(); return true; }
+  function drawCg(L, e, fade, ox, oy, SW, SH, d) { // story picture (CG_MEETING 결론): darken, 0.4 s fade in, 1.00 -> 1.03 push-in + 5 px drift toward the gaze over 9 s, pixel-crisp
+    const im = splashImg('assets/' + L.src), k = Math.min(1, e / 9), a = Math.min(1, e / .4) * fade; ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25) * fade})`; ctx.fillRect(ox, oy, SW, SH);
+    if (im) { const sc = 1 + .03 * k, iw = SW * sc, ih = SH * sc, px = (L.dx || 0) * 5 * (SW / LW) * k; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; const ix = Math.round(ox + (SW - iw) / 2 + px), iy = Math.round(oy + (SH - ih) / 2); ctx.drawImage(im, ix, iy, Math.round(iw), Math.round(ih)); drawSceneFx(ctx, d || { cg: L.src, t: 0 }, e, ix, iy, iw / (im.naturalWidth || 384)); } ctx.restore(); }
+  function drawCgOut(ox, oy, SW, SH) { if (!S.dialog && S.cgL) { S.cgOut = Object.assign({ until: S.t + .4, e: S.t - S.cgL.since }, S.cgL); S.cgL = null; } const O = S.cgOut; if (!O) return; const f = (O.until - S.t) / .4; if (f <= 0 || S.dialog) { S.cgOut = null; return; } drawCg(O, O.e, f, ox, oy, SW, SH); } // 0.4 s fade out after the last line
+
+  // ---- 이야기 그림 위 효과 (CG 회의 10-24, 이펙트 담당; 코드로): 정지 그림을 살짝 살림. 그림당 1종, 1~2px, 얼굴 위 금지, 처음 0.4초 정지.
+  // 좌표 = 그림 픽셀(384x216). ember = 재·불씨 떠오름, dust = 빛줄기 먼지, thread = 붉은 실 흔들림 + 쿵-쿵 맥박, snap = 그 그림 마지막 말에서 실이 팽팽해지며 번쩍.
+  const SCENE_FX = {
+    cg_felt_arrival: { kind: 'ember', box: [130, 95, 384, 216], n: 22 },
+    cg_memory_fire: { kind: 'ember', box: [0, 70, 384, 216], n: 26, snap: { from: [151, 102], to: [[40, 165], [70, 122], [236, 92], [262, 176], [204, 212]] } },
+    cg_arachne_end: { kind: 'thread', lines: [[150, 138, 122, 192], [186, 150, 232, 200], [84, 118, 40, 92], [112, 98, 96, 42], [60, 150, 34, 196]] },
+    cg_linette_meet: { kind: 'dust', box: [30, 14, 196, 206], n: 24 },
+    cg_arachne_past: { kind: 'dust', c: [161, 104], r: 48, n: 16, warm: true },
+    cg_felix_scarf: { kind: 'dust', box: [90, 40, 300, 196], n: 12 } };
+  function sceneThread(g, x0, y0, x1, y1, amp, ph, al, w) { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(L / 3)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1); // a hair-thin red thread for the art (no dark rim: the art is already dark)
+    g.beginPath(); for (let i = 0; i <= n; i++) { const u = i / n, o = Math.sin(u * Math.PI) * Math.sin(u * 7 + ph) * amp; const x = x0 + (x1 - x0) * u + nx * o, y = y0 + (y1 - y0) * u + ny * o; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.strokeStyle = thrCol(true, 1, al * .45); g.lineWidth = w * 2.2; g.stroke(); g.strokeStyle = thrCol(true, 0, al); g.lineWidth = w; g.stroke(); }
+  function drawSceneFx(g, d, e, ix, iy, s) { const name = (d.cg || '').replace(/^.*\//, '').replace(/\.\w+$/, ''), F = SCENE_FX[name]; if (!F || e < .4) return;
+    const k = Math.min(1, (e - .4) / .8), t = e - .4, h = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }; // fade in after the still beat; h = fixed per-mote random
+    g.save(); g.translate(ix, iy); g.scale(s, s); g.imageSmoothingEnabled = false;
+    if (F.kind === 'ember') { const [x0, y0, x1, y1] = F.box, H = y1 - y0; for (let i = 0; i < F.n; i++) { const v = 5 + h(i) * 7, y = y1 - ((t * v + h(i + 9) * H) % H), x = x0 + h(i + 3) * (x1 - x0) + Math.sin(t * .7 + i) * 2, life = (y1 - y) / H, fl = .55 + .45 * Math.sin(t * 5 + i * 2.3);
+        g.fillStyle = `rgba(255,${120 + (h(i + 5) * 70 | 0)},${50 + (h(i + 7) * 30 | 0)},${k * fl * Math.min(1, life * 4) * (1 - life * .7)})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
+    if (F.kind === 'dust') { for (let i = 0; i < F.n; i++) { let x, y; if (F.c) { const a = h(i) * TAU + t * .08 * (h(i + 2) - .5), r = F.r * Math.sqrt(h(i + 4)); x = F.c[0] + Math.cos(a) * r; y = F.c[1] + Math.sin(a) * r * .8 - ((t * 1.5 + h(i + 6) * 10) % 10); }
+        else { const [x0, y0, x1, y1] = F.box; x = x0 + ((h(i) * (x1 - x0) + t * (1.2 + h(i + 1) * 1.5)) % (x1 - x0)); y = y0 + ((h(i + 2) * (y1 - y0) + t * (2 + h(i + 3) * 2)) % (y1 - y0)); x += Math.sin(t * .5 + i) * 1.5; }
+        const tw = .35 + .35 * Math.sin(t * 1.3 + i * 1.7); g.fillStyle = F.warm ? `rgba(255,214,150,${k * tw})` : `rgba(220,214,200,${k * tw * .8})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
+    if (F.kind === 'thread') { const c = e % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)), hb = Math.min(1, b(c, .07) + .7 * b(c - .24, .07)); g.lineCap = 'round'; // same lub-dub as the phase-2 threads
+      F.lines.forEach((L, i) => sceneThread(g, L[0], L[1], L[2], L[3], 1.5, t * 1.2 + i, k * (.35 + .5 * hb), .6)); }
+    if (F.snap && d.cgLast && d.t > .3) { const u = Math.min(1, (d.t - .3) / .25), [fx, fy] = F.snap.from; g.lineCap = 'round'; // the memory's last line: the threads in her chest pull taut and flash
+      for (const [tx, ty] of F.snap.to) sceneThread(g, fx, fy, tx, ty, 4 * (1 - u), t * 30, .45 + .45 * u, .6);
+      const fl = d.t - .55; if (fl > 0 && fl < .35) { const a2 = 1 - fl / .35; g.fillStyle = `rgba(255,236,236,${a2})`; g.beginPath(); g.arc(fx, fy, 3 + fl * 20, 0, TAU); g.fill(); g.fillStyle = `rgba(255,40,60,${a2 * .18})`; g.fillRect(0, 0, 384, 216); } }
+    g.restore(); }
   function drawDialog(ox, oy, SW, SH, u) { const d0 = S.dialog, ts = (window.__game && window.__game.textScale) || 1, dpr = ctx.canvas.width / Math.max(1, innerWidth), fs = Math.round(Math.max(13 * u, 15 * dpr) * ts), lh = Math.round(fs * 1.6), psz = Math.round(Math.min(Math.max(92 * u, lh * 3 + 30 * u) - 16 * u, Math.max(76 * u, lh * 2.6))), nf = Math.round(Math.max(12 * u, fs * .8)); // 글자: 폰에서도 15px 이상 + 설정 → 화면 → 글자 크기 (UI_GUIDE 8)
-    { const wF = font(fs), wW = Math.round(Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)) - 18 * u - (d0.anim || d0.por ? psz + 14 * u : 0) - 24 * u); if (d0.wrapW !== wW || d0.wrapF !== wF) { const keep = d0.pages ? d0.pi : 0; d0.wrapW = wW; d0.wrapF = wF; d0.pages = null; dlgPages(d0); d0.pi = Math.min(keep, d0.pages.length - 1); d0.ch = keep ? 0 : d0.ch; } }
+    { const wF = font(fs), wW = Math.round(Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)) - 18 * u - (!d0.cg && (d0.anim || d0.por) ? psz + 14 * u : 0) - 24 * u); if (d0.wrapW !== wW || d0.wrapF !== wF) { const keep = d0.pages ? d0.pi : 0; d0.wrapW = wW; d0.wrapF = wF; d0.pages = null; dlgPages(d0); d0.pi = Math.min(keep, d0.pages.length - 1); d0.ch = keep ? 0 : d0.ch; } }
     const d = S.dialog, P = dlgPages(d), pg = P[d.pi], shown = pg.slice(0, Math.floor(d.ch)), done = d.ch >= pg.length;
-    if (d.cg) { const now = performance.now(); if (!S.cgL || S.cgL.src !== d.cg) S.cgL = { src: d.cg, since: now }; const im = splashImg('assets/' + d.cg), e = (now - S.cgL.since) / 1000, a = Math.min(1, e / .4); // story art behind the box: darken, 0.4 s fade, very slow 1.00 -> 1.03 push-in
-      ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25)})`; ctx.fillRect(ox, oy, SW, SH); if (im) { const sc = 1 + .03 * Math.min(1, e / 9), iw = SW * sc, ih = SH * sc; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, ox + (SW - iw) / 2, oy + (SH - ih) / 2, iw, ih); } ctx.restore(); } else S.cgL = null;
+    if (d.cg) { if (!S.cgL || S.cgL.src !== d.cg) { S.cgL = { src: d.cg, since: S.t, dx: d.cgDx || 0 }; const sn = SAVE.cgSeen || (SAVE.cgSeen = {}); if (!sn[d.cg]) { sn[d.cg] = true; save(); } } // seen list = 기억 조각 (2차 메뉴)
+      drawCg(S.cgL, S.t - S.cgL.since, 1, ox, oy, SW, SH, d); if (S.t - S.cgL.since < .6) return; } else S.cgL = null;
     const g0 = ctx.createLinearGradient(0, oy + SH * .45, 0, oy + SH); g0.addColorStop(0, 'rgba(6,4,10,0)'); g0.addColorStop(1, 'rgba(6,4,10,.55)'); ctx.fillStyle = g0; ctx.fillRect(ox, oy + SH * .45, SW, SH * .55); // dusk under the box
-    const w = Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)), x = Math.round(ox + (SW - w) / 2), h = Math.max(92 * u, lh * 3 + 30 * u), y = Math.round(oy + SH - h - 16 * u), sz = psz, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = hasB || hasP;
+    const w = Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)), x = Math.round(ox + (SW - w) / 2), h = Math.max(92 * u, lh * 3 + 30 * u), y = Math.round(oy + SH - h - 16 * u), sz = psz, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = !d.cg && (hasB || hasP); /* picture scenes: name tag only */
     ctx.fillStyle = 'rgba(10,8,14,.92)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(x + u, y + u, w - 2 * u, h - 2 * u); ctx.strokeStyle = 'rgba(150,120,90,.25)'; ctx.lineWidth = u; ctx.strokeRect(x + 5 * u, y + 5 * u, w - 10 * u, h - 10 * u);
     ctx.fillStyle = '#8a2a2a'; for (let i = 0; i < w - 24 * u; i += 3 * u) if ((i / u | 0) % 7 !== 3) ctx.fillRect(x + 12 * u + i, y + 3 * u + Math.round(Math.sin(i / (14 * u) + d.t * .6) * u), 2 * u, Math.max(1, u)); // 붉은 실 한 가닥 (1장 = 아라크네의 실)
     for (const [cx, cy] of [[x, y], [x + w, y], [x, y + h], [x + w, y + h]]) { ctx.fillStyle = '#7a6448'; ctx.fillRect(cx - 3 * u, cy - 3 * u, 6 * u, 6 * u); ctx.fillStyle = '#1a1420'; ctx.fillRect(cx - u, cy - u, 2 * u, 2 * u); }
@@ -1614,6 +1648,7 @@
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
+    drawCgOut(ox, oy, SW, SH);
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
