@@ -32,6 +32,22 @@
     return W.hazard({ shape: 'line', x: m.x, y: m.y, x2: m.x + Math.cos(a) * len, y2: m.y + Math.sin(a) * len, width: width || 8, warn, act: 0, dmg: 0, owner: m }).warn;
   }
   function set(m, st) { m.st = st; m.t = 0; }
+  // 몹 움직임 5가지 (사장님 10-24): glide = turn at most 5 rad/s toward the wanted direction (no jitter) and slide along walls;
+  // steer = walk to the hero: straight when it sees the hero, round walls by the flow field when it does not, and fan out around the hero (no queue on one side)
+  let UID = 0;
+  function glide(m, W, dt, a, sp) { if (m.hd === undefined) m.hd = a; const dd = Math.atan2(Math.sin(a - m.hd), Math.cos(a - m.hd)), mx = 3.5 * dt; m.hd += Math.max(-mx, Math.min(mx, dd));
+    if (W.moveCol(m, Math.cos(m.hd) * sp * dt, Math.sin(m.hd) * sp * dt, m.r)) return true; m.hd = a; return W.moveCol(m, Math.cos(a) * sp * dt * .7, Math.sin(a) * sp * dt * .7, m.r); }
+  function steer(m, W, dt, sp, h, spread) { let a = ang(m, h.x, h.y); if (!m.sees && W.flow) { const f = W.flow(m.x, m.y); if (f !== null) a = f; }
+    let vx = Math.cos(a), vy = Math.sin(a);
+    if (spread && m.sees && W.mobs) { // surround slots: the engaged pack shares the circle (one per 360/n deg, first mob = the reference), each walks to its own spot
+      const E = W.mobs.filter(o => !o.dead && o.D.felt && !o.D.boss && o.sees && Math.hypot(o.x - h.x, o.y - h.y) < 160).sort((p, q) => (p.uid || (p.uid = ++UID)) - (q.uid || (q.uid = ++UID)));
+      if (E.length >= 2) { const i = E.indexOf(m), base = Math.atan2(E[0].y - h.y, E[0].x - h.x), sa = base + i * TAU / E.length, R = 42, tx = h.x + Math.cos(sa) * R, ty = h.y + Math.sin(sa) * R * .8;
+        if (i > 0 && Math.hypot(m.x - h.x, m.y - h.y) > 50) a = Math.atan2(ty - m.y, tx - m.x); vx = Math.cos(a); vy = Math.sin(a); } }
+    return glide(m, W, dt, Math.atan2(vy, vx), sp * agg(W)); }
+  function fanOut(m, W, h) { if (!W.mobs) return 0; const am = Math.atan2(m.y - h.y, m.x - h.x); let tg = 0; // +/-: go round the hero away from packmates on the same side (target: one per 120 deg)
+    for (const o of W.mobs) { if (o === m || o.dead || !o.D.felt || o.D.boss || Math.hypot(o.x - h.x, o.y - h.y) > 150) continue; const ao = Math.atan2(o.y - h.y, o.x - h.x), dl = Math.atan2(Math.sin(am - ao), Math.cos(am - ao));
+      if (Math.abs(dl) < 1.6) tg += (dl >= 0 ? 1 : -1) * (1 - Math.abs(dl) / 1.6); }
+    return Math.max(-1, Math.min(1, tg)); }
   const near = (m, W, d) => W.dist(m, W.hero) < d;
   const tok = (m, W, r) => !W.token || W.token(m, r);
 
@@ -57,7 +73,7 @@
     //   duel = 실 꼭두각시 (scissor 2-hit combo + aimed blade boomerang / pin burst).
     return Object.assign({ felt: true, update(m, W, dt) {
       const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; m.losT = (m.losT || 0) - dt; if (m.losT <= 0) { m.losT = .25; m.sees = !W.los || W.los(m, h); }
-      const d = m.sees || m.st !== 'idle' ? W.dist(m, h) : 999; // 팀장 10-24: behind a wall the hero counts as far away (no alert, no shots, just wanders)
+      const d = m.sees || m.st !== 'idle' ? W.dist(m, h) : 999; m.mem = m.sees && W.dist(m, h) < 220 ? 4.5 : (m.mem || 0) - dt; m.catchCd = (m.catchCd || 0) - dt; // mem = seconds it keeps hunting after losing sight // 팀장 10-24: behind a wall the hero counts as far away (no alert, no shots, just wanders)
       m.burstT = (m.burstT || 0) - dt; m.burstCd = (m.burstCd || 0) - dt; m.hopCd = (m.hopCd || 0) - dt; const RG = m.rage ? .8 : 1; // RG: angry = shorter cooldowns
       if (!m.alerted && d < 160) { m.alerted = true; m.alertT = .45; W.fx('text', m.x, m.y - this.h * FELT_SC - 6, { text: '!', life: .7, color: '#ffd84a' }); if (W.sfx) W.sfx('tele', .6); m.cd = Math.max(m.cd, .5); } // first sight: "!" + a hop (drawn)
       if (m.alertT > 0) { m.alertT -= dt; m.anim = 'walk'; m.moving = false; return; }
@@ -80,12 +96,15 @@
       m.anim = 'walk'; const x0 = m.x, y0 = m.y;
       if (m.cd <= 0 && !m.intent) m.intent = pickIntent(P, d, m); // each cooldown: pick one move (distance-weighted, never 3 in a row)
       const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
+      if (m.sees && d > want + 45 && d < 200 && m.burstT <= 0 && m.catchCd <= 0 && m.st === 'idle') { m.burstT = .35; m.catchCd = 2.8; W.fx('dust', m.x, m.y); } // catch up: a short dash when the hero has run off
       if ((P === 'bind' || P === 'duel') && (m.intent === 'melee' || m.intent === 'combo') && d > this.melee.range + 20 && d < 110 && m.burstCd <= 0) { m.burstT = .3; m.burstCd = 2.5; W.fx('dust', m.x, m.y); } // quick scuttle / step-in before a close attack
       const spd = this.sp * FELT_SPD * (m.burstT > 0 ? 3 : 1) * (m.rage ? 1.25 : 1);
-      if (d < 200) { if (d > want + 6) toward(m, W, dt, spd, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
+      if (d < 200) { if (d > want + 6) steer(m, W, dt, spd, h, d < 140); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
         else if (P === 'lunge') { m.orb = m.orb || (Math.random() < .5 ? 1 : -1); const a = ang(m, h.x, h.y) + m.orb * Math.PI / 2, sp = this.sp * FELT_SPD * .6 * agg(W); // circle the hero like a dog pack
-          if (!W.moveCol(m, Math.cos(a) * sp * dt, Math.sin(a) * sp * dt, m.r)) m.orb = -m.orb; m.face = h.x > m.x ? 1 : -1; }
-        else m.face = h.x > m.x ? 1 : -1; }
+          m.orbCd = (m.orbCd || 0) - dt; if (!W.moveCol(m, Math.cos(a) * sp * dt, Math.sin(a) * sp * dt, m.r) && m.orbCd <= 0) { m.orb = -m.orb; m.orbCd = .8; } m.hd = a; m.face = h.x > m.x ? 1 : -1; } // flip the circling side at most every 0.8 s (was every blocked frame = shaking)
+        else { m.sideT = (m.sideT || 0) - dt; if (m.sideT <= 0) { const tg = m.sees ? fanOut(m, W, h) : 0; m.sideDir = Math.abs(tg) > .3 ? (tg > 0 ? 1 : -1) : 0; m.sideK = Math.abs(tg); m.sideT = .5; } // decide the side-step every 0.5 s (no flip-flop)
+          if (m.sideDir) { const am = Math.atan2(m.y - h.y, m.x - h.x); glide(m, W, dt, am + m.sideDir * Math.PI / 2, this.sp * FELT_SPD * .6 * m.sideK); } m.face = h.x > m.x ? 1 : -1; } } // holding: side-step round the hero to fan out
+      else if (m.mem > 0 && m.alerted) steer(m, W, dt, this.sp * FELT_SPD, h, false); // lost sight: hunts round the walls for 4.5 s
       else wander(m, W, dt, this.sp * FELT_SPD * .5);
       if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; // spread out around the hero instead of stacking
         if (dd < gap) { const push = Math.min(gap - dd, 60 * dt); W.moveCol(m, dx / dd * push, dy / dd * push, m.r); } }

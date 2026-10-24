@@ -442,6 +442,20 @@
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7); ctx.save(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
+  // 길찾기 (사장님 10-24 「몹 움직임 5가지 다」): distance field from the hero's tile (BFS, up to 40 tiles), rebuilt when the hero changes tile or every 0.3 s.
+  // flowAng(x, y) = the direction a mob at (x, y) should walk to come round walls toward the hero (null = not reachable / too far: walk straight).
+  const FLOW = { d: null, w: 0, map: null, hx: -1, hy: -1, at: -9 };
+  function flowBuild() { const m = M(); if (!m || !m.solidG) return null; const T = m.T, tx = Math.floor(hero.x / T), ty = Math.floor(hero.y / T);
+    if (FLOW.map === m && FLOW.hx === tx && FLOW.hy === ty && S.t - FLOW.at < .3) return FLOW; if (FLOW.map === m && S.t - FLOW.at < .3 && Math.abs(FLOW.hx - tx) + Math.abs(FLOW.hy - ty) < 2) return FLOW;
+    const w = m.w, h = m.h; if (!FLOW.d || FLOW.d.length !== w * h) FLOW.d = new Int16Array(w * h); const D = FLOW.d; D.fill(-1); FLOW.map = m; FLOW.w = w; FLOW.hx = tx; FLOW.hy = ty; FLOW.at = S.t;
+    if (tx < 0 || ty < 0 || tx >= w || ty >= h) return FLOW; const q = new Int32Array(w * h); let qa = 0, qb = 0; D[ty * w + tx] = 0; q[qb++] = ty * w + tx;
+    while (qa < qb) { const i = q[qa++], x = i % w, y = (i / w) | 0, dv = D[i]; if (dv >= 40) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue; const j = ny * w + nx; if (D[j] >= 0 || m.solidG[j]) continue; D[j] = dv + 1; q[qb++] = j; } }
+    return FLOW; }
+  function flowAng(x, y) { const F = flowBuild(), m = M(); if (!F || !F.d) return null; const T = m.T, w = F.w, tx = Math.floor(x / T), ty = Math.floor(y / T), D = F.d, here = D[ty * w + tx]; if (!(here > 0)) return null;
+    let best = here, bx = 0, by = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { if (!dx && !dy) continue; const nx = tx + dx, ny = ty + dy; if (nx < 0 || ny < 0 || nx >= w || ny >= m.h) continue; const v = D[ny * w + nx]; if (v < 0) continue;
+      if (dx && dy && (m.solidG[ty * w + nx] || m.solidG[ny * w + tx])) continue; const c = v + (dx && dy ? .4 : 0); if (c < best) { best = c; bx = dx; by = dy; } } // no corner cutting
+    if (!bx && !by) return null; return Math.atan2((ty + by + .5) * T - y, (tx + bx + .5) * T - x); }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   let hopNow = false; // true only while the airborne hero moves: hop cells are open for him alone
   function moveCol(e, dx, dy, r, fly) {
@@ -598,7 +612,7 @@
   function jingle() { try { if (window.BGM && BGM.jingle) { BGM.jingle('jingle_victory'); S.jingleT = 3.5; } } catch (e) {} }
 
   // the API handed to mob behaviours (world_mobs.js)
-  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get mobs() { return S.mobs; }, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), los: (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, n = Math.ceil(Math.hypot(dx, dy) / 6); for (let i = 1; i < n; i++) if (solidAt(a.x + dx * i / n, a.y - 6 + dy * i / n)) return false; return true; }, /* line of sight (walls block: a mob in the dark next room does not see / shoot through) */ dist, spawn, count, engage,
+  const W = { get hero() { return hero; }, get map() { return M(); }, hazard, shot, hurt, touch, moveCol, token, get mobs() { return S.mobs; }, get diff() { return DIFF(); }, blockedAt: (x, y) => blocked(x, y, 4), flow: flowAng, los: (a, b) => { const dx = b.x - a.x, dy = b.y - a.y, n = Math.ceil(Math.hypot(dx, dy) / 6); for (let i = 1; i < n; i++) if (solidAt(a.x + dx * i / n, a.y - 6 + dy * i / n)) return false; return true; }, /* line of sight (walls block: a mob in the dark next room does not see / shoot through) */ dist, spawn, count, engage,
     fx: addFx, sfx, shake, banner, after, tempSolid, randomFloor, breakDecoNear, phase2, ult, say: msg };
 
   // ---------------- scene manager ----------------
