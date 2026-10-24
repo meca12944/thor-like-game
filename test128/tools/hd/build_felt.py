@@ -169,8 +169,8 @@ for o in F['objects']:
         o['x'], o['y'] = {'f_mark_fountain': foot('fountain', 0, -2), 'f_mark_stall': foot('red_stall'), 'f_mark_gate': [EX[0], EX[1] - 1]}.get(i, [o['x'], o['y']])
     elif t == 'npc': o['x'], o['y'] = int(o['x'] * W / 56), int(o['y'] * H / 38)    # no near rule -> scaled spot (fixed below)
     objs.append(o)
-NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_bart': ['f_door_chief', -3, 1], 'f_oswald': ['f_door_chapel', -2, 2], 'f_martha': ['f_door_inn', 2, 1],  # off the door step, or talking to them eats the interact
-        'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', -4, 0], 'f_linette': ['f_door_atelier', -4, 1], 'f_luca': ['f_mark_fountain', 5, 1],  # -4: the door's own tile is inside the building picture, she needs open ground to pace
+NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', -4, 0],
+        'f_linette': ['f_door_atelier', -4, 1], 'f_luca': ['f_mark_fountain', 5, 1],  # -4: the door's own tile is inside the building picture, she needs open ground to pace. 바르트·마르타·오스왈드는 집 안에만 있다
         'f_toby': ['f_mark_fountain', 2, 4], 'f_gas': ['f_mark_gate', -2, -5]}
 if not any(o['type'] == 'mark' for o in objs):
     objs += [{'type': 'mark', 'id': 'f_mark_fountain', 'x': foot('fountain', 0, -2)[0], 'y': foot('fountain', 0, -2)[1]},
