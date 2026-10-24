@@ -1,7 +1,9 @@
 /* [title] Title screen "C" (docs_art/title_screen, 고성으로 향하는 외길) — self-contained, never touches game logic.
- *   Owner 10-24 「가만히 서있다가 스타트 누르면 움직이는걸로」:
- *     idle   : still picture (= frame 0 of the bg loop) + logo + live menu 새 게임 / 이어하기 / 설정. Nothing moves.
- *     start  : 새 게임 or 이어하기 -> the bg video plays from frame 0, logo + menu fade out,
+ *   Owner 10-24 「메인 타이틀 서있는 장면도 움직여야지 너무 멈춰있다」 (replaces the earlier frozen idle):
+ *     idle   : the bg loop (title_c_bg.mp4, muted, seamless 9.04 s) plays on repeat under the logo + live menu
+ *              새 게임 / 이어하기 / 설정. The still (= frame 0) shows only until the video is really playing, and stays
+ *              as the fallback when the video fails or autoplay is blocked (then playback is retried on the first input).
+ *     start  : 새 게임 or 이어하기 -> logo + menu fade out while the video keeps playing (not restarted),
  *              after TITLE_INTRO_SEC the screen fades to black and the game appears.
  *   Layers: bg (still/video) covers the whole screen (object-fit: cover, like the game canvas which fills the window);
  *   the logo is drawn in a 1920x1080 stage scaled to fit (contain) so it is never cropped; the menu is live DOM text
@@ -17,7 +19,7 @@
 (function () {
   'use strict';
   // ---- timing (change here) ----
-  // Seconds the bg video plays after Start before the screen is fully black. 'full' = play the whole 9.04 s loop once.
+  // Seconds after Start before the game appears (the bg loop keeps playing meanwhile). 'full' = one 9.04 s loop length.
   const TITLE_INTRO_SEC = 3;
   const OVERLAY_FADE_SEC = 0.7;   // logo + menu fade-out right after Start
   const BLACK_FADE_SEC = 0.9;     // fade to black at the end of the intro (part of TITLE_INTRO_SEC)
@@ -79,10 +81,25 @@
   const still = el.querySelector('img.still'), video = el.querySelector('video');
   video.muted = true; video.defaultMuted = true; video.setAttribute('muted', ''); video.playsInline = true;
   let videoOk = true;
-  video.addEventListener('error', () => { videoOk = false; }, true);
+  video.addEventListener('error', () => { videoOk = false; TS.videoFailed = true; }, true);
+  video.loop = true;               // the clip is a seamless loop; idle plays it on repeat
+  video.autoplay = true;
   video.src = VIDEO;
-  // loop only when the intro is longer than one pass of the clip (default 3 s and 'full' play a single pass from frame 0)
-  video.loop = introSec > LOOP_SEC + 0.05;
+  // frame 0 == the still, so the video is only revealed once it is really playing (no flash); until then / on failure the still stays
+  const reveal = () => { if (!videoOk || video.classList.contains('on')) return; video.classList.add('on'); TS.videoPlaying = true; TS.videoFailed = false; };
+  video.addEventListener('playing', () => { if (video.readyState >= 2) reveal(); });
+  video.addEventListener('timeupdate', () => { if (!video.paused && video.currentTime > 0) reveal(); });
+  // fallback seek-to-0 in case the loop attribute is ignored (some embedded webviews fire 'ended' instead of looping)
+  video.addEventListener('ended', () => { if (TS.active) { try { video.currentTime = 0; } catch (e) {} tryPlay(); } });
+  function tryPlay() {
+    if (!videoOk || !TS.active) return;
+    let p; try { p = video.play(); } catch (e) { TS.autoplayBlocked = true; return; }
+    if (p && p.catch) p.then(() => { TS.autoplayBlocked = false; }).catch(() => { TS.autoplayBlocked = true; });
+  }
+  tryPlay();
+  // autoplay blocked (rare for muted+playsinline): start on the first user input
+  const kick = () => { if (video.paused) tryPlay(); };
+  ['pointerdown', 'keydown', 'touchstart'].forEach(t => addEventListener(t, kick, { capture: true, passive: true }));
   const mount = () => { document.head.appendChild(css); document.body.appendChild(el); layout(); };
   document.body ? mount() : addEventListener('DOMContentLoaded', mount);
 
@@ -120,19 +137,13 @@
   }
   draw();
 
-  // ---- Start: still -> video plays from frame 0, overlay fades, then black, then the game ----
+  // ---- Start: overlay fades while the idle loop keeps playing, then black, then the game ----
   function startGame(choice) {
     if (TS.stage === 'intro') return;
     TS.choice = choice; TS.stage = 'intro'; TS.introT0 = performance.now();
     el.classList.add('go');
-    // video: frame 0 == the still, so it is only revealed once it is really playing (no flash); on failure the still stays
-    if (videoOk) {
-      try { video.currentTime = 0; } catch (e) {}
-      const p = video.play();
-      const reveal = () => { video.classList.add('on'); TS.videoPlaying = true; };
-      if (p && p.then) p.then(() => { if (video.readyState >= 2) reveal(); else video.addEventListener('playing', reveal, { once: true }); }).catch(() => { TS.videoFailed = true; });
-      else video.addEventListener('playing', reveal, { once: true });
-    } else TS.videoFailed = true;
+    // the video is NOT restarted: it just keeps looping (if it was blocked until now, this input starts it)
+    if (videoOk) { if (video.paused) tryPlay(); } else TS.videoFailed = true;
     const blackAt = Math.max(0.3, introSec - BLACK_FADE_SEC);
     setTimeout(() => el.classList.add('end'), blackAt * 1000);
     setTimeout(() => enterGame(choice), introSec * 1000);
