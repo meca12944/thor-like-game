@@ -194,3 +194,45 @@
 {"t": "2026-10-23 14:36:36", "name": "grok_bridge_wood2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 14:37:11", "name": "grok_dry_reeds2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 14:37:47", "name": "grok_pale_mushrooms2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:00:35", "name": "grok_d_loom_a_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:00:38", "name": "grok_d_fabric_pile_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:00:53", "name": "grok_d_door_arch_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:01:41", "name": "grok_d_loom_b_t", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 16:01:45", "name": "grok_d_stairs_down_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:02:01", "name": "grok_d_cocoon_wall_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:02:38", "name": "grok_d_spool_rack_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:02:42", "name": "grok_d_wall_arch_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:03:07", "name": "grok_d_web_sheet_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:03:44", "name": "grok_d_thread_pillar_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:03:50", "name": "grok_d_chest_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:04:41", "name": "grok_d_waystone_t", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 16:05:02", "name": "grok_d_mannequins_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:05:02", "name": "grok_d_bones_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:05:36", "name": "grok_d_boss_loom_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:06:08", "name": "grok_d_wardrobe_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:06:17", "name": "grok_d_mannequin_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:07:25", "name": "grok_d_cut_table_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:08:18", "name": "grok_d_loom_b_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:09:24", "name": "grok_d_waystone_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:10:48", "name": "grok_d_fabric_pile2_t", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 16:11:00", "name": "grok_d_loom_a2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:11:59", "name": "grok_d_boss_loom2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:12:20", "name": "grok_d_stairs2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:13:09", "name": "grok_d_boss_loom3_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:13:48", "name": "grok_d_mannequins2_t", "endpoint": "/map-objects", "status": null, "usage": null, "n": 0.0}
+{"t": "2026-10-23 16:14:46", "name": "grok_d_mannequins2_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:16:33", "name": "grok_d_fabric_pile2_t", "endpoint": "/map-objects", "status": "failed", "usage": {"type": "usd", "usd": 0.0}, "n": 0.0}
+{"t": "2026-10-23 16:18:25", "name": "grok_d_thread_curtain_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:19:08", "name": "grok_d_cocoon_s_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:19:08", "name": "grok_d_spool_tower_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:19:53", "name": "grok_d_cocoon_throne_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:20:05", "name": "grok_d_fabric_pile3_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:20:41", "name": "grok_d_cocoon_m_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:21:29", "name": "grok_d_cocoon_l_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-23 16:21:53", "name": "grok_d_wall_strip_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-24 01:15:01", "name": "team_splash_0", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 01:19:34", "name": "team_splash_1", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 01:43:24", "name": "team_cg_lair_gate", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 01:38:00", "name": "team_cg_arachne_end", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0, "note": "다시 적음 (기록 파일 되돌림으로 빠짐)"}
+{"t": "2026-10-24 01:41:00", "name": "team_cg_linette_join", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0, "note": "다시 적음 (기록 파일 되돌림으로 빠짐)"}
+{"t": "2026-10-24 01:45:59", "name": "team_cg_felt_arrival", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}

@@ -593,6 +593,182 @@
    "zone": "field",
    "flip": true
   },
+  "d_loom_b": {
+   "img": "d_loom_b.png",
+   "w": 141,
+   "h": 137,
+   "ax": 70,
+   "ay": 136,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "태피스트리 베틀",
+   "flip": false
+  },
+  "d_spool_rack": {
+   "img": "d_spool_rack.png",
+   "w": 150,
+   "h": 132,
+   "ax": 75,
+   "ay": 131,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "큰 실패 선반",
+   "flip": false
+  },
+  "d_mannequin": {
+   "img": "d_mannequin.png",
+   "w": 45,
+   "h": 127,
+   "ax": 22,
+   "ay": 126,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "마네킹 1",
+   "flip": false
+  },
+  "d_cut_table": {
+   "img": "d_cut_table.png",
+   "w": 108,
+   "h": 95,
+   "ax": 54,
+   "ay": 94,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "재단대",
+   "flip": false
+  },
+  "d_cocoon_wall": {
+   "img": "d_cocoon_wall.png",
+   "w": 224,
+   "h": 224,
+   "ax": 112,
+   "ay": 223,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 벽(벽면 판)",
+   "flip": false
+  },
+  "d_web_sheet": {
+   "img": "d_web_sheet.png",
+   "w": 82,
+   "h": 107,
+   "ax": 41,
+   "ay": 106,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "거미줄 막",
+   "flip": false
+  },
+  "d_thread_pillar": {
+   "img": "d_thread_pillar.png",
+   "w": 53,
+   "h": 182,
+   "ax": 26,
+   "ay": 181,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "실 감긴 기둥",
+   "flip": false
+  },
+  "d_bones": {
+   "img": "d_bones.png",
+   "w": 73,
+   "h": 42,
+   "ax": 36,
+   "ay": 41,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "뼈 더미",
+   "flip": false
+  },
+  "d_wardrobe": {
+   "img": "d_wardrobe.png",
+   "w": 105,
+   "h": 137,
+   "ax": 52,
+   "ay": 136,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "옷장",
+   "flip": false
+  },
+  "d_door_arch": {
+   "img": "d_door_arch.png",
+   "w": 122,
+   "h": 158,
+   "ax": 61,
+   "ay": 157,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "아치 나무문",
+   "flip": false
+  },
+  "d_wall_arch": {
+   "img": "d_wall_arch.png",
+   "w": 240,
+   "h": 192,
+   "ax": 120,
+   "ay": 191,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "아치 벽 조각",
+   "flip": false
+  },
+  "d_chest": {
+   "img": "d_chest.png",
+   "w": 68,
+   "h": 63,
+   "ax": 34,
+   "ay": 62,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "보물상자",
+   "flip": false
+  },
+  "d_waystone": {
+   "img": "d_waystone.png",
+   "w": 76,
+   "h": 129,
+   "ax": 38,
+   "ay": 128,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "비석(순간이동)",
+   "flip": false
+  },
+  "d_cocoon_m": {
+   "img": "d_cocoon_m.png",
+   "w": 30,
+   "h": 104,
+   "ax": 15,
+   "ay": 103,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 매달린(중)",
+   "flip": false
+  },
+  "d_spool_tower": {
+   "img": "d_spool_tower.png",
+   "w": 115,
+   "h": 243,
+   "ax": 57,
+   "ay": 242,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "실패 탑",
+   "flip": false
+  },
+  "d_cocoon_throne": {
+   "img": "d_cocoon_throne.png",
+   "w": 201,
+   "h": 225,
+   "ax": 100,
+   "ay": 224,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "보스방: 실 고치 왕좌",
+   "flip": false
+  },
   "ember_rubble": {
    "img": "ember_rubble.png",
    "w": 116,
@@ -679,6 +855,72 @@
    "field_legend": [
     "b"
    ]
+  },
+  "d_loom_a": {
+   "img": "d_loom_a.png",
+   "w": 136,
+   "h": 160,
+   "ax": 68,
+   "ay": 159,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "베틀(부서진)",
+   "flip": false
+  },
+  "d_stair_arch": {
+   "img": "d_stair_arch.png",
+   "w": 50,
+   "h": 80,
+   "ax": 25,
+   "ay": 79,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "계단 입구 아치",
+   "flip": false
+  },
+  "d_mannequins": {
+   "img": "d_mannequins.png",
+   "w": 178,
+   "h": 166,
+   "ax": 89,
+   "ay": 165,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "마네킹 무리",
+   "flip": false
+  },
+  "d_boss_loom": {
+   "img": "d_boss_loom.png",
+   "w": 307,
+   "h": 280,
+   "ax": 153,
+   "ay": 279,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "보스방: 해골 영혼 베틀(큰 장식)",
+   "flip": false
+  },
+  "d_cocoon_s": {
+   "img": "d_cocoon_s.png",
+   "w": 42,
+   "h": 90,
+   "ax": 21,
+   "ay": 89,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 작은",
+   "flip": false
+  },
+  "d_cocoon_l": {
+   "img": "d_cocoon_l.png",
+   "w": 84,
+   "h": 94,
+   "ax": 42,
+   "ay": 93,
+   "kind": "prop",
+   "zone": "dungeon1",
+   "role": "고치 무더기(큰)",
+   "flip": false
   },
   "cocoons": {
    "img": "cocoons.png",
