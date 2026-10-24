@@ -344,7 +344,7 @@
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
       + 'body.wvista #atk,body.wvista #jumpb,body.wvista #dashb,body.wvista #runb,body.wvista #stick,body.wvista .wtb{opacity:.25!important;transition:opacity .4s}'
-      + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
+      + 'body.wdlg #atk,body.wdlg #jumpb,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
       + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
       + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
       + '#wtb_pot{right:max(40px,env(safe-area-inset-right));bottom:max(232px,calc(env(safe-area-inset-bottom) + 202px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#ffb0c0,#c03050 60%,#5a1020)}'
@@ -1915,10 +1915,12 @@
       textOut('월드맵', ox + 10 * u, oy + 20 * u, 15 * u, '#ffe08a', '#000', 'left');
       textOut(`이동 방향키/WASD · ${keyHint('interact')}/Enter 들어가기`, ox + 10 * u, oy + 36 * u, 10 * u, '#dde', '#000', 'left');
     } else {
+      ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); /* mob bars · champion names · damage numbers stay inside the game picture (not on the black side bands) */
       for (const mm of S.mobs) { if (mm.dead || mm.spawnT > 0 || mm.D.boss || mm.noBar) continue; if (mm.hp >= mm.maxHp && !mm.D.champion) continue;
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); const pk = f.pop ? 1 + (DMGPOP.from - 1) * Math.max(0, 1 - f.t * 60 / DMGPOP.ticks) : 1; textOut(f.text, sx, sy, Math.round(12 * u * (f.sz || 1) * pk), f.color || '#fff'); ctx.globalAlpha = 1; }
+      ctx.restore(); ctx.globalAlpha = 1;
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; const hudA = S.hudA == null ? 1 : S.hudA; ctx.globalAlpha = hudA; /* 전망 자리: HUD fades */ // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
