@@ -1751,10 +1751,10 @@
   // ---- 이야기 그림 위 효과 (CG 회의 10-24, 이펙트 담당; 코드로): 정지 그림을 살짝 살림. 그림당 1종, 1~2px, 얼굴 위 금지, 처음 0.4초 정지.
   // 좌표 = 그림 픽셀(384x216). ember = 재·불씨 떠오름, dust = 빛줄기 먼지, thread = 붉은 실 흔들림 + 쿵-쿵 맥박, snap = 그 그림 마지막 말에서 실이 팽팽해지며 번쩍.
   const SCENE_FX = {
-    cg_felt_arrival: { kind: 'ember', box: [130, 95, 384, 216], n: 22 },
-    cg_memory_fire: { kind: 'ember', box: [0, 70, 384, 216], n: 26, snap: { from: [151, 102], to: [[40, 165], [70, 122], [236, 92], [262, 176], [204, 212]] } },
-    cg_arachne_end: { kind: 'thread', lines: [[150, 138, 122, 192], [186, 150, 232, 200], [84, 118, 40, 92], [112, 98, 96, 42], [60, 150, 34, 196]] },
-    cg_linette_meet: { kind: 'dust', box: [30, 14, 196, 206], n: 24 },
+    cg_felt_arrival: { kind: 'ember', box: [150, 110, 384, 216], n: 22 },
+    cg_memory_fire: { kind: 'ember', box: [0, 30, 384, 216], n: 26, snap: { from: [192, 106], to: [[40, 120], [70, 60], [300, 55], [350, 140], [150, 205], [262, 200]] } },
+    cg_arachne_end: { kind: 'thread', lines: [[160, 98, 110, 145], [172, 102, 222, 150], [150, 104, 96, 112], [180, 94, 232, 64], [166, 110, 170, 170]] },
+    cg_linette_meet: { kind: 'dust', box: [200, 10, 265, 190], n: 24 },
     cg_arachne_past: { kind: 'dust', c: [161, 104], r: 48, n: 16, warm: true },
     cg_felix_scarf: { kind: 'dust', box: [90, 40, 300, 196], n: 12 } };
   function sceneThread(g, x0, y0, x1, y1, amp, ph, al, w) { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(L / 3)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1); // a hair-thin red thread for the art (no dark rim: the art is already dark)
