@@ -7,7 +7,7 @@ from fix import boot_bot
 from facefix import ref_head,place2
 OUT='/home/user/thor-like-game/motion_lab/research_v1/hero8/frames';LATEST='/home/user/thor-like-game/motion_lab/hero8/frames'
 L=lambda d,ii:[np.array(Image.open(f'pl/{d}/{i:03d}.png').convert('RGBA')) for i in ii]
-C={'swing1_right':L('tw_atk_AB',range(5)),'swing2_right':L('tw_atk_BA',(0,3,4)),'swing3_right':L('tw_atk_CD',range(5))}
+C={'swing1_right':L('tw_atk_AB',range(5)),'swing2_right':L('tw_atk_BA',(0,3,4)),'swing3_right':L('tw_atk_CD',(0,1,2,4))}  # 3타 4번째 장 = 머리카락 삐죽 + 흰 칼자국 박힘 → 뺌 (팀장 10-24)
 P,M=ref_head(np.array(Image.open(f'{LATEST}/idle_right/000.png').convert('RGBA')))
 CJ='/home/user/thor-like-game/motion_lab/research_v1/hero8/clips.json';J=json.load(open(CJ))
 for k,fr in C.items():
