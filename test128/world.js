@@ -832,7 +832,7 @@
   function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
-  function playScene(key, delay) { after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
+  function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); if (!S.dialog) playSeq(toSeq(t)); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(toSeq(t)); }; } }); }
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
