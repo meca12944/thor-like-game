@@ -102,7 +102,9 @@
   "exit": {
    "to": "felt",
    "spawn": "arachne"
-  }
+  },
+  "splash": "assets/boss/arachne_splash.png",
+  "sub": "영혼을 실에 꿰매는 자"
  },
  "objects": [],
  "hd": {
