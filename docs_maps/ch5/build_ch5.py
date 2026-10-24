@@ -33,7 +33,7 @@ A('ruin', (120, 110), (150, 104), (160, 120), (130, 128))   # 제단
 A('ash', (10, 40), (60, 40), (40, 70), (10, 90))
 paths.append({'kind': 'road', 'w': 3, 'pts': [[10, 170], [70, 175], [135, 120], [200, 100], [250, 100]]})
 paths.append({'kind': 'road', 'w': 2, 'pts': [[70, 175], [40, 240]]})
-M('start', '4장에서 들어옴', 'cemetery', 14, 170, '정본 6절 4장→5장', '귀족가 끝에서 묘지 서쪽 문으로')
+M('start', '4장에서 들어옴', 'cemetery', 14, 170, '정본 6절 4장→5장', '동쪽 귀족가 담장 문으로 묘지에 들어옴')
 M('save', '묘지 입구 모닥불', 'cemetery', 24, 160, '팀 제안')
 M('npc', '시몬 (광신도)', 'cemetery', 138, 134, JB + ' 오스왈드 vs 시몬', '제단 주변 배회. 몸에 [가시 박힌 철사]를 꿰맴. 사멸의 파편을 주면 [저주받은 이단의 대검] + 보스전 난입(광폭화)')
 M('quest', '분기: 파편을 시몬에게', 'cemetery', 146, 126, JB, '보상 저주받은 이단의 대검 / 대가: 보스전에 시몬 난입 → 멜키어 광폭화')
@@ -127,8 +127,8 @@ for i, it in enumerate(['1회차 루프의 태초검', '태초의 잿빛 흉갑'
     M('chest', it, 'coffin', 540 + i * 20, 580, JB + ' 히든 / ' + IB, '석관 안 (초대 주인공의 유품)')
 # ---------- 링크 ----------
 L = lambda f, t, k, at, lab: links.append({'from': f, 'to': t, 'kind': k, 'at': at, 'label': lab})
-L('ch4', 'cemetery', 'gate', [10, 170], '4장 귀족가에서')
-L('cemetery', 'nave', 'gate', [248, 100], '대성당 서문')
+L('ch4', 'cemetery', 'gate', [10, 170], '4장 귀족가에서 (동쪽)')
+L('cemetery', 'nave', 'gate', [248, 100], '대성당 동문')
 L('nave', 'choir', 'stairs', [450, 60], '성가대석 계단')
 L('nave', 'tower', 'door', [450, 250], '종탑 문')
 L('nave', 'hub', 'stairs', [350, 270], '지하로')
@@ -137,7 +137,7 @@ L('gate', 'husks', 'stairs', [480, 400], '껍데기 산으로')
 L('husks', 'depths', 'corridor' if False else 'door', [505, 470], '최심부로')
 L('depths', 'boss', 'gate', [645, 465], '보스 문')
 L('depths', 'coffin', 'secret', [575, 535], '밑바닥 (핏방울 3개)')
-L('boss', 'ch6', 'lift', [735, 500], '6장: 지하 기계 장치·파이프 따라 연금술 심장부로')
+L('boss', 'ch6', 'lift', [695, 512], '6장: 지하 기계 장치·파이프 따라 땅 밑으로 동남쪽 연금술 심장부')
 L('gate', 'cemetery', 'shortcut', [236, 262], '지름길 A: 구덩이 사슬 승강대 ↔ 묘지 (안에서 사슬 풀기)')
 L('depths', 'hub', 'shortcut', [405, 395], '지름길 B: 최심부 ↔ 허브 철문 (낡은 열쇠 꾸러미)')
 L('tower', 'cemetery', 'shortcut', [238, 40], '지름길 C: 종탑 종 줄 ↔ 묘지 북쪽 (위에서만 내림)')
@@ -168,6 +168,24 @@ G('mob', '빈 껍데기', '주인공 키', '주인공 옛 시체 (잿빛·붉은
 G('mob', '환영 암살자', '주인공 키', '반투명 잿빛 암살자 (정본 5장)')
 G('mob', '언데드', '주인공 키', '수장고 언데드 계열 (정본 5-1 철염주 망토 설명)')
 G('boss', '멜키어 (P1 거울 인형 / P2 거대 괴수)', 'P1 주인공 2배 / P2 4배', '정본 3절 외형')
+# ---------- 세계 (사장님 10-24 「거대한 성 안 왕도」): 5장 = 왕성 북쪽. 4장 귀족가는 동쪽, 7장 왕성은 남쪽 ----------
+# 원래 서쪽에 그린 묘지를 동쪽(4장 쪽)으로 오게 좌우를 뒤집는다.
+WD = 750
+def fx(x): return WD - x
+for z in zones: z['x'] = WD - z['x'] - z['w']
+for a in areas: a['poly'] = [[fx(x), y] for x, y in a['poly']]
+for p_ in paths: p_['pts'] = [[fx(x), y] for x, y in p_['pts']]
+for l in links: l['at'] = [fx(l['at'][0]), l['at'][1]]
+for k in markers: k['x'] = fx(k['x']) - (1 if fx(k['x']) >= WD else 0)
+# 가장자리 막기: 북쪽 = 왕도 외성벽, 동쪽 묘지 끝 = 귀족가 담장, 서쪽 = 무너진 탑·꺼진 지반 (바깥 세상 없음)
+rect('wall', 0, 0, 750, 8)
+rect('wall', 742, 40, 8, 230)
+A('cliff', (0, 20), (12, 20), (18, 300), (0, 300))
+links.append({'from': 'cemetery', 'to': 'ch7', 'kind': 'gate', 'at': [620, 270], 'label': '왕성 북문 광장 (내성벽, 7장)'})
+markers.append({'type': 'landmark', 'name': '멀리 보이는 왕성 탑', 'zone': 'cemetery', 'x': 600, 'y': 262, 'ref': 'README 세계', 'note': '묘지 남쪽 너머로 왕성 탑이 늘 보임'})
+markers.append({'type': 'landmark', 'name': '왕도 외성벽 (북쪽 끝)', 'zone': 'tower', 'x': 85, 'y': 34, 'ref': 'README 세계', 'note': '종탑 꼭대기에서 성벽 너머는 잿빛 안개뿐'})
+for g in grok:
+    if g['kind'] == 'bg': g['desc'] += ' · 멀리 한가운데 왕성 탑이 보임 (세계: 거대한 성 안 왕도)'
 json.dump({'chapter': 'ch5', 'title': '대성당 & 지하 수장고', 'w': 750, 'h': 600, 'zones': zones, 'areas': areas, 'paths': paths,
            'links': links, 'markers': markers, 'grok': grok}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('markers', len(markers), 'mobs', sum(m['type'] == 'mob' for m in markers), 'cem', n)
