@@ -1571,7 +1571,7 @@
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
-    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
+    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; if (mm.D.h8) { drawH8Mob(mm, k); continue; } const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
@@ -1615,6 +1615,22 @@
     else if (d > (tg ? 3 : 14)) { const v = (sp || (d > 60 ? 130 : 78)) * dt, k = Math.min(1, v / d); moveCol(P, dx * k, dy * k, 4); P.run = sp ? true : d > 60; }
     const mx = P.x - x0, my = P.y - y0; P.moving = Math.abs(mx) + Math.abs(my) > 1e-3; if (P.moving) P.dir = petDir(mx, my, P.dir); else if (tg) P.dir = petDir(tg.x - P.x, tg.y - P.y, P.dir);
     if (P.moving) P.gp = ((P.gp || 0) + Math.hypot(mx, my) / (P.run ? 32.8 : 23.4)) % 1; } // one cycle per field px = Linette's drawn stride (walk 1.9 / run 4.0 art px per tick x clip ticks x 30/117): feet stay planted (motion lab 10-23; was 46/32 = ~1.4x foot slide)
+  // 「방황하는 껍데기」 (c1_husk, 크레딧 0): the hero's own H8 atlas drawn ashen (grey filter + code red eyes) - an old-loop shell of the hero
+  function drawH8Mob(mm, k) { const G = window.__game, H = G && G.H8; if (!H) return; const side = mm.face < 0 ? 'left' : 'right', an = mm.anim || 'idle';
+    const L = H.anims[an + '_' + side] || H.anims['idle_' + side]; if (!L) return; const tot = L.reduce((a, f) => a + f[2], 0);
+    let t = an === 'walk' ? ((mm.wph || 0) % 1) * tot : an === 'idle' ? (S.t * 60 + mm.home[0]) % tot : Math.min(tot - 1, Math.max(0, (an === 'dash' || an === 'hurt' ? mm.t : mm.at) * 60)), i = 0;
+    for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } const e = L[i], im = G.H8img(e[0]), c = H.cells[e[0]][e[1]]; if (!im || !im.complete || !im.naturalWidth) return;
+    const sc = k * H128FIG / 117 * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) return; let [sx, sy] = W2S(mm.x + stopJit(mm), mm.y), rot = 0;
+    if (mm.pushX || mm.pushY) { sx += mm.pushX * k; sy += mm.pushY * k; } if (mm.brkT > 0) { mm.brkT -= 1 / 60; sx += Math.sin(S.t * 40) * 1.2 * k; }
+    if (mm.hitT > .18) { const e2 = .3 - mm.hitT, q2 = e2 < .05 ? 1 : Math.max(0, 1 - (e2 - .05) / .07); rot = (Math.cos(mm.hitDir || 0) >= 0 ? 1 : -1) * .14 * (mm.hitK || 1) * q2; }
+    const tele = an === 'idle' && mm.st === 'atk'; ctx.save();
+    ctx.globalAlpha = tele ? .35 + .2 * Math.sin(S.t * 20) : .28; ctx.fillStyle = tele ? '#ff3c28' : '#000'; ctx.beginPath(); ctx.ellipse(Math.round(sx), Math.round(sy), 7 * k, 2.6 * k, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.translate(Math.round(sx), Math.round(sy)); if (rot) ctx.rotate(rot); ctx.imageSmoothingEnabled = sc < 1;
+    ctx.filter = mm.flash > 0 ? 'brightness(3)' : 'grayscale(1) sepia(.2) brightness(1.7) contrast(.75)';
+    ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), -Math.round(c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.filter = 'none';
+    const fc = side === 'left' ? -1 : 1, gl = .6 + .4 * Math.sin(S.t * 5 + mm.home[1]), hy = -c[5] * sc * .8; ctx.globalCompositeOperation = 'lighter'; // red eyes (code)
+    ctx.fillStyle = `rgba(255,60,40,${gl})`; for (const dx of [1.5, 4.5]) { ctx.beginPath(); ctx.arc(fc * dx * k * .5, hy, Math.max(1.2, k * .7), 0, TAU); ctx.fill(); }
+    ctx.restore(); }
   function drawPetHi(k, front) { const P = S.pet; if (!P || !PET.A || P.map !== S.map || (P.y > hero.y) !== front) return; const A = PET.A, a = P.atk;
     const an = a ? a.clip : P.moving ? (P.run ? 'run' : 'walk') : 'idle', L = A.anims[an + '_' + (a ? a.dir : P.dir)] || A.anims[an + '_right']; if (!L) return;
     let e; if (a) { let t = a.t, i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } else if (P.moving) { let t = ((P.gp || 0) % 1) * petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; } /* walk/run frames have their own ticks (longer where the foot travels further) */ else { let t = (S.t * 60) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } e = L[i]; }
@@ -1772,6 +1788,7 @@
     if (f.type === 'spark') { g.fillStyle = `rgba(255,255,220,${1 - p})`; for (let i = 0; i < 4; i++) { const a = i * 1.57 + .7; g.fillRect(f.x + Math.cos(a) * p * 8 - 1, f.y + Math.sin(a) * p * 8 - 1, 2, 2); } }
     if (f.type === 'poof') { g.fillStyle = `rgba(240,240,255,${.8 * (1 - p)})`; const R = (f.big ? 22 : 9) * (0.4 + p); for (let i = 0; i < 6; i++) { const a = i * TAU / 6; g.beginPath(); g.arc(f.x + Math.cos(a) * R, f.y + Math.sin(a) * R * .6, 3 * (1 - p) + 1, 0, TAU); g.fill(); } }
     if (f.type === 'skid') { const a = (1 - p) * .55; g.fillStyle = `rgba(70,52,36,${a})`; for (const o of [-2, 2]) for (let i = 0; i < 9; i++) g.fillRect(Math.round(f.x - f.dy * o - f.dx * i * 1.2), Math.round(f.y + f.dx * o * .6 - f.dy * i * .8), 1, 1); return; } // 미끄러진 자국
+    if (f.type === 'ashwave') { const d = 140 * p, cx = f.x + Math.cos(f.a) * d, cy = f.y + Math.sin(f.a) * d; g.save(); g.translate(cx, cy); g.rotate(f.a); g.strokeStyle = `rgba(214,206,192,${.9 * (1 - p)})`; g.lineWidth = 3; g.beginPath(); g.arc(-6, 0, 10, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,90,60,${.5 * (1 - p)})`; g.lineWidth = 1; g.beginPath(); g.arc(-7, 0, 8, -1, 1); g.stroke(); g.restore(); } // 껍데기 잿빛 검기 (code)
     if (f.type === 'dust') { g.fillStyle = `rgba(200,180,140,${.6 * (1 - p)})`; for (let i = 0; i < 3; i++) { g.beginPath(); g.arc(f.x + (i - 1) * 5 * (1 + p), f.y - p * 4, 2 + p * 2, 0, TAU); g.fill(); } }
     if (f.type === 'debris') { g.fillStyle = `rgba(130,120,100,${1 - p})`; for (let i = 0; i < 6; i++) { const a = i * 1.05; g.fillRect(f.x + Math.cos(a) * p * 14, f.y + Math.sin(a) * p * 8 - Math.sin(p * 3) * 6, 3, 3); } }
     if (f.type === 'crystal') { g.globalAlpha = Math.max(0, 1 - p); drawSpr(g, 'crystal', f.x, f.y + 4, { scale: .6 + p * .3, alpha: Math.max(0, 1 - p) }); g.globalAlpha = 1; }

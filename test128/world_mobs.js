@@ -535,6 +535,41 @@
           if (pack.length < 2 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < 2) { const a = rnd(0, TAU), x = m.x + Math.cos(a) * 60, y = m.y + Math.sin(a) * 45; W.hazard({ shape: 'circle', x, y, r: 10, warn: .7, act: 0, dmg: 0, kind: 'web' });
             W.after(.7, () => { if (m.dead) return; W.fx('dust', x, y); const c = W.spawn('c1_unrotting_hound', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); } }
         up.call(this, m, W, dt); } }); }
+  // ------------------------------------------------ 1장 들판 정예 「방황하는 껍데기」 (새 정본 10-24 D1-1, 크레딧 0): the hero's own discarded shell from an earlier loop.
+  // Body = the hero's H8 atlas, ashen (world.js drawH8Mob). Role 「거울」: mimics the hero's 3-hit combo, sword wave and dodge-dash. Drop = [잿가루 낀 철환] (item id r_ash_iron).
+  const HUSK = { rest: { combo: 1.1, wave: .8, thrust: .9, burst: 1.2 }, name: { combo: '흉내 3연 베기', wave: '잿빛 검기', thrust: '껍데기 찌르기', burst: '잿가루 폭발' } };
+  def.c1_husk = { name: '방황하는 껍데기', title: '버려진 옛 루프의 나', elite: true, felt: true, h8: true, style: 'mirror', col: '#9a948c', aff: { weak: ['blunt'], resist: [] }, hp: 220, h: 34, r: 7, kb: 1, sp: 34, mat: 'r_ash_iron', matN: 1,
+    anim: { src: '', F: 0 }, melee: { range: 20, rad: 12, dmg: 6 }, init(m) { m.wp = 0; m.st = 'idle'; },
+    update(m, W, dt) { const h = W.hero, d = W.dist(m, h); m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? 1) - dt; m.dashCd = (m.dashCd || 0) - dt; m.waveCd = (m.waveCd ?? 1) - dt; // 검기는 3.5초에 한 번: 그 사이엔 걸어 붙어 3연 베기
+      m.losT = (m.losT || 0) - dt; if (m.losT <= 0) { m.losT = .25; m.sees = !W.los || W.los(m, h); } const look = () => { m.face = h.x >= m.x ? 1 : -1; };
+      const rest = k => { m.st = 'rest'; m.t = 0; m.restT = HUSK.rest[k] + (m.dazeT > 0 ? .3 : 0); m.dazeT = 0; m.anim = 'idle'; };
+      if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) { m.st = 'idle'; m.t = 0; } return; }
+      if (m.st === 'atk') { m.moving = false; if (m.t > m.end) rest(m.last); return; }
+      if (m.st === 'dash') { const k = Math.min(1, m.t / .22); W.moveCol(m, Math.cos(m.da) * 230 * dt * (1 - k * .6), Math.sin(m.da) * 230 * dt * (1 - k * .6), m.r); m.anim = 'dash'; // 껍데기 회피: backdash, then a thrust
+        if (m.t > .24) { look(); const a = ang(m, h.x, h.y), w = W.hazard({ shape: 'line', x: m.x, y: m.y - 4, x2: m.x + Math.cos(a) * 70, y2: m.y - 4 + Math.sin(a) * 70, width: 14, warn: .6, act: .05, dmg: 7, kind: 'swipe', owner: m }).warn;
+          m.st = 'atk'; m.t = 0; m.end = w + .15; m.last = 'thrust'; m.anim = 'hit2'; m.at = -w + .1; } return; }
+      if (!m.burst && m.hp < m.maxHp * .4) { m.burst = true; const z = W.hazard({ shape: 'ring', x: m.x, y: m.y, r0: 8, r: 42, warn: .8, act: .05, dmg: 8, kind: 'quake', owner: m }); // 40 %: the shell bursts into ash and slumps (big opening)
+        W.fx('text', m.x, m.y - 44, { text: HUSK.name.burst, life: .9, color: '#cfc8bc' }); m.st = 'atk'; m.t = 0; m.end = z.warn + .1; m.last = 'burst'; m.anim = 'hurt'; return; }
+      // walk: wander between 3 points round home until it sees the hero, then come straight in (never backs off)
+      const x0 = m.x, y0 = m.y; m.anim = 'walk';
+      if (m.sees && d < 170) { m.alerted = true; if (d > 34) toward(m, W, dt, this.sp, h.x, h.y); look(); }
+      else { const P = [[0, 0], [80, -30], [-60, 40]][m.wp % 3], tx = m.home[0] + P[0], ty = m.home[1] + P[1]; if (Math.hypot(tx - m.x, ty - m.y) < 6) m.wp++; else toward(m, W, dt, this.sp * .45, tx, ty); }
+      for (const o of W.mobs || []) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy), rr = m.r + o.r + 2; if (dd < rr && dd > 1e-3) W.moveCol(m, dx / dd * (rr - dd) * .25, dy / dd * (rr - dd) * .25, m.r); } // 서로 겹치지 않게 살짝 밀기
+      const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / 26; if (!m.moving) m.anim = 'idle';
+      if ((m.ash = (m.ash || 0) + mv) > 22) { m.ash = 0; W.fx('dust', m.x, m.y, { life: .4 }); } // ash falls as it walks
+      if (m.cd > 0 || !m.sees || d > 150) return;
+      const O = [['combo', d < 44 ? 3 : 0], ['wave', d >= 50 && m.waveCd <= 0 ? 2.4 : 0]]; for (const o of O) if (o[0] === m.last) o[1] *= .15; // never the same twice (almost)
+      let t = O.reduce((a, o) => a + o[1], 0) * Math.random(), k = O[0][0]; for (const o of O) { if (o[1] <= 0) continue; k = o[0]; t -= o[1]; if (t <= 0) break; } if (!O.some(o => o[1] > 0)) return;
+      m.last = k; m.cd = 1.2 / agg(W); look(); const a = ang(m, h.x, h.y); m.bid = m.bid || 0; const bid = m.bid;
+      if (k === 'combo') { let w = 0; [[.65, .55, 6], [.3, .9, 6], [.3, 1.3, 9]].forEach(([dw, rr, dmg], i) => { w += dw; const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * 22 * rr, y: m.y + Math.sin(a) * 18 * rr, r: i === 2 ? 17 : 14, warn: w, act: .05, dmg, kind: 'swipe', owner: m }); w = z.warn;
+          W.after(w - .05, () => { if (!m.dead && m.bid === bid) { m.anim = 'hit' + (i + 1); m.at = 0; } }); }); // 주인공 3연타와 같은 박자 (탁, 타, 탁)
+        m.st = 'atk'; m.t = 0; m.end = w + .15; m.anim = 'idle'; return; }
+      if (k === 'wave') { m.waveCd = 3.5; m.anim = 'idle'; const z = W.hazard({ shape: 'line', x: m.x, y: m.y - 6, x2: m.x + Math.cos(a) * 140, y2: m.y - 6 + Math.sin(a) * 140, width: 14, warn: .7, act: .05, dmg: 7, kind: 'swipe', owner: m });
+        W.after(z.warn - .05, () => { if (!m.dead && m.bid === bid) { m.anim = 'hit3'; m.at = 0; W.fx('ashwave', m.x, m.y - 10, { a, life: .3 }); } }); m.st = 'atk'; m.t = 0; m.end = z.warn + .15; return; }
+    },
+    onHit(m) { if (m.st !== 'idle' && m.st !== 'rest') return; if ((m.dashCd || 0) > 0 || Math.random() > .35 || m.hitK > 1) return; // hit by the hero's 1st / 2nd swing: 35 % it dodge-dashes back (the 3rd hit always lands)
+      m.dashCd = 3; m.st = 'dash'; m.t = 0; m.da = m.hitDir !== undefined ? m.hitDir : (m.face > 0 ? Math.PI : 0); },
+    onDeath(m, W) { W.fx('fluff', m.x, m.y - 16, { life: 1.1, col: '#8a847c', n: 22 }); W.fx('text', m.x, m.y - 40, { text: '…다음 루프에서 보자, 나.', life: 2.2, color: '#cfc8bc' }); } };
   // 1장 던전 placeholders (owner 10-23 「제1던전까지」) until the monster room's real champions / boss land under the same ids: bigger copies of the felt mobs
   for (const [id, base, name, title, hp, boss] of [['champ_c1_loom', 'c1_thread_puppet', '베틀 파수꾼', '실 공방의 우두머리', 260], ['champ_c1_cocoon', 'c1_needle_spider', '고치 어미', '고치 저장고의 우두머리', 240], ['champ_c1_hound', 'c1_unrotting_hound', '썩지 않는 사냥개 우두머리', '잿빛 들판의 우두머리', 180],
     ['arachne', 'c1_silmamul', '아라크네', '실타래의 재단사', 900, 1]]) if (!def[id]) { const B = def[base];
