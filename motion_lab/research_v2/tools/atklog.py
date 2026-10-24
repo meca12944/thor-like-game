@@ -1,7 +1,8 @@
 # 게임(들판)에서 주인공이 오른쪽·왼쪽을 보고 1·2·3타 연속 공격 -> 틱마다 화면 (때리기 몸동작 전·후 비교)
 import os,sys,json
 from playwright.sync_api import sync_playwright
-URL,FR=sys.argv[1],sys.argv[2];os.makedirs(FR,exist_ok=True)
+URL,FR=sys.argv[1],sys.argv[2];DIR=sys.argv[3] if len(sys.argv)>3 else 'side'  # side | dr | down | up | n
+os.makedirs(FR,exist_ok=True)
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path=os.environ['PW_CHROME']);pg=b.new_page(viewport={'width':1280,'height':720});errs=[]
     pg.on('pageerror',lambda e:errs.append(str(e)))
@@ -15,8 +16,10 @@ with sync_playwright() as p:
             q=pg.evaluate("()=>{const W=__world,S=W.S,v=S.view,h=W.hero,c=document.querySelector('canvas'),r=c.getBoundingClientRect(),s=r.width/c.width;return [r.left+(v.ox+(h.x-S.camI[0])*v.k)*s,r.top+(v.oy+(h.y-S.camI[1])*v.k)*s]}")
             x0=min(max(0,q[0]-160),1280-320);y0=min(max(0,q[1]-190),720-260)
             pg.screenshot(path=f'{FR}/{n:04d}.png',clip={'x':x0,'y':y0,'width':320,'height':260});n+=1
-    for face,key in [('right','ArrowRight'),('left','ArrowLeft')]:
-        pg.evaluate("(k)=>{__world.key(k,true);__world.advance(.1);__world.key(k,false);__world.advance(.3)}",key);shot(10)
+    R,Lf,U,D='ArrowRight','ArrowLeft','ArrowUp','ArrowDown'
+    SETS={'side':[[R],[Lf]],'dr':[[D,R],[D,Lf]],'down':[[D]],'up':[[U,R],[U,Lf]],'n':[[U]]}
+    for keys in SETS[DIR]:
+        pg.evaluate("(ks)=>{for(const k of ks)__world.key(k,true);__world.advance(.1);for(const k of ks)__world.key(k,false);__world.advance(.3)}",keys);shot(10)
         for hit in range(3):
             pg.evaluate("()=>__world.key('KeyJ',true)");shot(2);pg.evaluate("()=>__world.key('KeyJ',false)");shot(18 if hit<2 else 30)
         shot(15)

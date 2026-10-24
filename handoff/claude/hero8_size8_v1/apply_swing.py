@@ -3,7 +3,7 @@ import json,os,subprocess,sys
 from PIL import Image
 ROOT=os.path.abspath(os.path.join(os.path.dirname(__file__),'../../..'))
 SRC=ROOT+'/motion_lab/research_v1/hero8';HTML=ROOT+'/test128/index.html';SHEET='anim/hero8_swing.webp'
-C=json.load(open(SRC+'/clips.json'));CLIPS=['swing1_right','swing2_right','swing3_right']
+C=json.load(open(SRC+'/clips.json'));CLIPS=sorted(k for k in C if k.startswith('swing') and os.path.isdir(f'{SRC}/frames/{k}'))  # 옆(right) + 그린 방향(dr·down·up·n)
 s=open(HTML).read();i=s.index('/*H8*/const H8=');j=s.index('{',i);e=s.index(';/*/H8*/');A=json.loads(s[j:e])
 if SHEET in A['sheets']:si=A['sheets'].index(SHEET)
 else:A['sheets'].append(SHEET);A['cells'].append([]);si=len(A['sheets'])-1
@@ -20,6 +20,6 @@ A['cells'][si]=cells;n=0
 for k in CLIPS:
     m=C[k]['frames'];A['anims'][k]=[[si,n+q,C[k]['ticks'][q]] for q in range(m)];n+=m
     if k in A.get('_steady_src',{}):A['_steady_src'][k]=[list(f) for f in A['anims'][k]]
-A['_swing_note']='owner 10-24 motion lab: side attack bodies for hits 1-3 (pull -> swing -> finish), sheet anim/hero8_swing.webp; world.js plays them over the 검기 timing (side views only)'
+A['_swing_note']='owner 10-24 motion lab: side attack bodies for hits 1-3 (pull -> swing -> finish), sheet anim/hero8_swing.webp; world.js plays them over the 검기 timing (side + each direction drawn so far; mirrored for left)'
 s=s[:j]+json.dumps(A,separators=(',',':'),ensure_ascii=False)+s[e:];open(HTML,'w').write(s)
 print('sheet',sheet.size,len(cells))
