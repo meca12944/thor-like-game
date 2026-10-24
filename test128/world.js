@@ -53,7 +53,7 @@
   function atkTS(i) { const h = spOf(i); return { dur: h.dur / 60, a0: h.a0 / 60, a1: h.a1 / 60 }; }
   function arcW(i) { return i >= 3 ? (spOf(i).arc || 100) : i === 2 ? SWING.arc3 : SWING.arc; }
   function sfx(k, v, r) { try { if (window.SFX2 && SFX2.has(k)) return SFX2.play(k, v, r); const g = window.__game; if (g && g.SFX) g.SFX.play(k, v, r); } catch (e) { } } // SFX2 = code-made sounds (sfx_synth.js), else the town's recorded ones
-  const FADE = 0.35, CARD = 2.1;
+  const FADE = 0.35, CARD = 2.1, DOOR_FADE = 0.5;
   const Q = new URLSearchParams(location.search);
   const LS = 'thor.world.v1';
   const TAU = Math.PI * 2;
@@ -227,7 +227,7 @@
       for (const d of m.decos) { const vs = A[(j.ground[d.ty] || '')[d.tx]] || A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
         const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
         const jt = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: jt && f(2) < .5, dx: jt * Math.round((f(3) - .5) * 5), dy: jt * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
-    m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
+    m.fires = j.fires || null; m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -380,16 +380,16 @@
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
       if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); }
-      hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a); }
+      hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a, q.sway ? Math.sin(S.t * 1.1 + q.x * .9) * .018 * q.sway : 0); if (q.door) drawDoorHi(q, sx, sy, sc, ax, ay); }
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
       const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
       const behind = im.height / e.D > 28 && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; d._a = (d._a ?? 1) + ((behind ? .5 : 1) - (d._a ?? 1)) * .2;
       const [sx, sy] = W2S(fx, fy); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
-      hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a); } }
-  function hdBlit(im, sx, sy, ax, ay, sc, flip, a) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame)
+      hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a, e.v.sway ? (Math.sin(S.t * 1.2 + d.x * .045 + d.y * .02) + .4 * Math.sin(S.t * 2.9 + d.x * .1)) * .016 * e.v.sway : 0); } }
+  function hdBlit(im, sx, sy, ax, ay, sc, flip, a, sk) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame)
     ctx.imageSmoothingEnabled = false; ctx.globalAlpha = a ?? 1; const X = Math.round(sx), Y = Math.round(sy), w = Math.round(im.width * sc), h = Math.round(im.height * sc);
-    if (flip) { ctx.setTransform(-1, 0, 0, 1, X, Y); ctx.drawImage(im, -Math.round(ax), -Math.round(ay), w, h); ctx.setTransform(1, 0, 0, 1, 0, 0); } else ctx.drawImage(im, X - Math.round(ax), Y - Math.round(ay), w, h);
+    if (flip || sk) { ctx.setTransform(flip ? -1 : 1, 0, -(sk || 0), 1, X, Y); ctx.drawImage(im, -Math.round(ax), -Math.round(ay), w, h); ctx.setTransform(1, 0, 0, 1, 0, 0); } else ctx.drawImage(im, X - Math.round(ax), Y - Math.round(ay), w, h); // sk: sway (skew about the foot: the top moves, the roots stay)
     ctx.globalAlpha = 1; }
   // light pools are static: baked ONCE per map into the ground picture and into each prop's picture (lit copy) — no per-frame additive pass
   // (owner 10-23 「최적화」: the additive light pass was the costliest part of a town frame; characters keep the dusk grade only)
@@ -435,6 +435,78 @@
         ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       ctx.restore(); } }
+
+  // ---- 움직이는 배경 (option A 10-24 「분수·불·연기·풀·물·새·문」): all code-drawn per frame from the map data, only what is on screen, no new art ----
+  const hs2 = (a, b) => { const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return v - Math.floor(v); };
+  function drawTufts(k) { const m = M(); if (!m || !m.hds) return; const T = m.T, x0 = S.cam[0] / T - 2, x1 = x0 + EW / T + 4, y0 = S.cam[1] / T - 1, y1 = y0 + EH / T + 3; // 풀 (hd.tufts [x, y, v]): 3-5 blades swaying in the wind
+    ctx.lineWidth = Math.max(1, Math.round(k * .5));
+    for (const h of m.hds) { const C = h.tufts && h.fx && h.fx.tuft; if (!C) continue;
+      for (const t of h.tufts) { const tx = h.gx + t[0], ty = h.gy + t[1]; if (tx < x0 || tx > x1 || ty < y0 || ty > y1) continue;
+        const [sx, sy] = W2S(tx * T, ty * T), sw = (Math.sin(S.t * 1.6 + tx * .7 + ty * .3) + .5 * Math.sin(S.t * 3.1 + tx)) * k, n = t[2] === 3 ? 5 : 3 + t[2] % 2;
+        ctx.strokeStyle = C[t[2] % C.length]; ctx.beginPath();
+        for (let i = 0; i < n; i++) { const dx = (i - (n - 1) / 2) * 1.3 * k, hh = (3 + (i * 7 + t[2]) % 3) * k; ctx.moveTo(sx + dx, sy); ctx.quadraticCurveTo(sx + dx + sw * .3, sy - hh * .6, sx + dx * 1.4 + sw, sy - hh); }
+        ctx.stroke(); if (t[2] === 3) { ctx.fillStyle = 'rgba(206,196,170,.9)'; ctx.fillRect(Math.round(sx + sw), Math.round(sy - 5 * k), Math.round(k), Math.round(k)); } } } }
+  function drawFire(sx, sy, sz, k, kind, seed) { // 불꽃 (hd.fires / m.fires [x, y, size, kind]): flickering glow + tongues + sparks, screen px base
+    const t = S.t, fl = .82 + .14 * Math.sin(t * 13 + seed) + .08 * Math.sin(t * 23.7 + seed * 2), R = (kind === 'forge' ? 30 : 20) * sz * k * fl;
+    ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .75 * fl; ctx.drawImage(lightSprite(kind === 'forge' ? '#ff6a20' : '#ff9a40', 2.2, 32), sx - R, sy - R * .85, R * 2, R * 1.7); ctx.globalAlpha = 1;
+    if (kind !== 'embers') for (let i = 0; i < 3; i++) { const ph = t * (7 + i * 1.7) + seed + i * 2.1, hg = (5 + 2.5 * Math.sin(ph) + i * 1.2) * sz * k * (kind === 'forge' ? 1.2 : 1), wd = (2.3 - i * .55) * sz * k, dx = Math.sin(ph * .7) * .8 * sz * k + (1 - i) * .9 * sz * k;
+      ctx.fillStyle = i === 2 ? 'rgba(255,232,170,.8)' : i === 1 ? 'rgba(255,160,60,.7)' : 'rgba(220,80,30,.65)'; ctx.beginPath(); ctx.ellipse(sx + dx, sy - hg * .45, wd, hg * .55, 0, 0, TAU); ctx.fill(); }
+    const ns = kind === 'forge' ? 7 : kind === 'embers' ? 6 : 2; for (let i = 0; i < ns; i++) { const ph = (t * (.5 + hs2(i, seed) * .5) + hs2(seed, i)) % 1, z = Math.max(1, Math.round(k * .6));
+      ctx.fillStyle = `rgba(255,${180 - ph * 110 | 0},70,${(1 - ph).toFixed(2)})`; ctx.fillRect(Math.round(sx + Math.sin(ph * 6 + i) * 3 * sz * k + (hs2(i, seed) - .5) * 9 * sz * k), Math.round(sy - ph * 28 * sz * k), z, z); }
+    ctx.globalCompositeOperation = 'source-over'; }
+  function drawFountain(f, h, k, T) { // 분수 (hd.fountains): drops falling from the upper basin, splash rings + bouncing droplets, glints drifting on the pool
+    const s = k / f.D, [fx, fy] = W2S((h.gx + f.x) * T, (h.gy + f.y) * T), X = a => fx + (a - f.ax) * s, Y = b => fy + (b - f.ay) * s, t = S.t; if (!onView(X(0), Y(0), 300 * s, 320 * s)) return;
+    const [pcx, pcy, prx, pry] = f.pool; ctx.fillStyle = 'rgb(206,214,218)';
+    for (let i = 0; i < 16; i++) { const a = hs2(i, 3) * TAU + t * .12 * (i % 2 ? 1 : -1), r = .45 + .5 * hs2(i, 9), al = Math.sin(t * 2.2 + i * 1.7); if (al < .15) continue; ctx.globalAlpha = al * .5;
+      ctx.fillRect(Math.round(X(pcx + Math.cos(a) * prx * r)), Math.round(Y(pcy + Math.sin(a) * pry * r)), Math.round((3 + 4 * al) * s), Math.max(1, Math.round(s))); }
+    ctx.globalAlpha = 1;
+    for (const [i, [sx0, y0, y1]] of f.streams.entries()) { const side = sx0 < pcx ? -1 : 1;
+      ctx.fillStyle = 'rgba(218,226,230,.85)'; for (let j = 0; j < 5; j++) { const ph = (t * 1.5 + j / 5 + i * .17) % 1; ctx.fillRect(Math.round(X(sx0 + side * 5 * ph)), Math.round(Y(y0 + (y1 - y0) * ph * ph)), Math.max(1, Math.round(1.6 * s)), Math.max(2, Math.round(3.5 * s))); }
+      const ph = (t * 1.3 + i * .29) % 1, x = X(sx0 + side * 5), y = Y(y1); ctx.strokeStyle = `rgba(220,228,232,${(.75 * (1 - ph)).toFixed(2)})`; ctx.lineWidth = Math.max(1, s * .8); ctx.beginPath(); ctx.ellipse(x, y, (2 + 8 * ph) * s, (1 + 2.6 * ph) * s, 0, 0, TAU); ctx.stroke();
+      for (let j = 0; j < 2; j++) { const q = (t * 1.9 + j * .5 + i * .31) % 1; ctx.fillStyle = `rgba(222,230,234,${(1 - q).toFixed(2)})`; ctx.fillRect(Math.round(x + (j ? 1 : -1) * q * 7 * s), Math.round(y - Math.sin(q * Math.PI) * 7 * s), Math.max(1, Math.round(s)), Math.max(1, Math.round(s))); } } }
+  const PART = { ash: ['rgba(206,200,190,', 1.3, 7, 9, .55, 46], embers: ['rgba(255,140,50,', 1, -16, 5, .85, 30], snow: ['rgba(236,240,246,', 1.5, 16, 7, .85, 60], dust: ['rgba(214,194,150,', 1, 2, 34, .38, 40], motes: ['rgba(206,200,232,', 1, -5, 3, .6, 26] };
+  function drawParticles(kind, k) { const P = PART[kind]; if (!P) return; const v = S.view, t = S.t, W_ = EW + 40, H_ = EH + 40; // 재·불티·눈·먼지 (hd.fx.particles): world-anchored, wrap around the view
+    for (let i = 0; i < P[5]; i++) { const a = hs2(i, 1), b = hs2(i, 2), c = hs2(i, 3);
+      let x = a * W_ + t * P[3] * (.5 + b) + Math.sin(t * .7 + i) * 8 - S.cam[0], y = b * H_ + t * P[2] * (.5 + c) - S.cam[1]; x = ((x % W_) + W_) % W_ - 20; y = ((y % H_) + H_) % H_ - 20;
+      const al = P[4] * (.55 + .45 * Math.sin(t * 1.5 + i * 2.3)), z = Math.max(1, Math.round(P[1] * k * (.6 + c * .7))); ctx.fillStyle = P[0] + al.toFixed(2) + ')'; ctx.fillRect(Math.round(v.ox + x * k), Math.round(v.oy + y * k), z, z); } }
+  function drawBirds(n, k) { const v = S.view, t = S.t, Wd = EW + 200; // 새 (not spirits): small dark Vs crossing the sky now and then, a soft shadow far below
+    for (let i = 0; i < n; i++) { const sp = 20 + hs2(i, 7) * 12, ph = (t * sp + hs2(i, 5) * Wd * 3) % (Wd * 3); if (ph > Wd) continue; const x = i % 2 ? ph - 100 : EW + 100 - ph, y = 18 + hs2(i, 6) * (EH - 70) + Math.sin(t * .5 + i) * 8;
+      for (let j = 0; j < 3; j++) { const bx = v.ox + (x + (j ? -9 * (i % 2 ? 1 : -1) : 0)) * k, by = v.oy + (y + j * 6 - (j === 2 ? 12 : 0)) * k, fl = Math.sin(t * 9 + i * 2 + j * 1.3);
+        ctx.fillStyle = 'rgba(14,10,18,.16)'; ctx.beginPath(); ctx.ellipse(bx + 14 * k, by + 40 * k, 3 * k, 1.1 * k, 0, 0, TAU); ctx.fill();
+        ctx.strokeStyle = 'rgba(30,26,32,.9)'; ctx.lineWidth = Math.max(1, k * .7); ctx.beginPath(); ctx.moveTo(bx - 4 * k, by - fl * 2.4 * k); ctx.lineTo(bx, by); ctx.lineTo(bx + 4 * k, by - fl * 2.4 * k); ctx.stroke(); } } }
+  function drawButterflies(n, k) { const t = S.t, G = 220; // 나비: one per 220 px world block (hashed), fluttering around its home with a ground shadow
+    for (let gx = Math.floor(S.cam[0] / G) - 1; gx <= Math.floor((S.cam[0] + EW) / G) + 1; gx++) for (let gy = Math.floor(S.cam[1] / G) - 1; gy <= Math.floor((S.cam[1] + EH) / G) + 1; gy++) { if (hs2(gx, gy) > n * .22) continue; const i = gx * 7 + gy * 13;
+      const bx = (gx + .2 + .6 * hs2(gy, gx)) * G + Math.sin(t * .4 + i) * 40 + Math.sin(t * 1.3 + i * 3) * 8, by = (gy + .2 + .6 * hs2(gx + 1, gy)) * G + Math.cos(t * .33 + i * 2) * 24, hg = 10 + 4 * Math.sin(t * 2.1 + i), [sx, sy] = W2S(bx, by), fl = Math.abs(Math.sin(t * 14 + i));
+      ctx.fillStyle = 'rgba(14,10,18,.18)'; ctx.beginPath(); ctx.ellipse(sx, sy, 2 * k, .8 * k, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = hs2(i, 2) < .5 ? 'rgba(214,196,150,.95)' : 'rgba(196,188,206,.95)'; const yy = sy - hg * k, w = Math.max(1, Math.round(2.4 * k * (.25 + fl * .75))); ctx.fillRect(Math.round(sx - w), Math.round(yy - k), w, Math.round(2 * k)); ctx.fillRect(Math.round(sx), Math.round(yy - k), w, Math.round(2 * k)); } }
+  function drawAmbient(k) { const m = M(); if (!m || m.type === 'world') return; const T = m.T;
+    for (const [i, f] of (m.fires || []).entries()) { const [sx, sy] = W2S(f[0] * T, f[1] * T); drawFire(sx, sy, f[2], k, f[3], i * 3.7); } // interiors (bg maps): forge fire
+    for (const h of m.hds || []) { const fx = h.fx || {};
+      for (const [i, f] of (h.fires || []).entries()) { const [sx, sy] = W2S((h.gx + f[0]) * T, (h.gy + f[1]) * T); if (onView(sx - 40 * k, sy - 40 * k, 80 * k, 60 * k)) drawFire(sx, sy, f[2], k, f[3], i * 3.7); }
+      for (const f of h.fountains || []) if (f) drawFountain(f, h, k, T);
+      if (fx.particles) drawParticles(fx.particles, k); if (fx.birds) drawBirds(fx.birds, k); if (fx.butterflies) drawButterflies(fx.butterflies, k); } }
+  // 문 (owner 10-24 「문이 열리고 들어가면 실내로」): a building door (prop.door {id, cx, by, w, h, col} in art px) swings open in 4 frames as the hero walks up,
+  // closes again when he leaves; fully open + walking in = enter (fade to the interior). Interact on a closed door opens it first.
+  function drawDoorHi(q, sx, sy, sc, ax, ay) { const d = q.door, A = S.doorA && S.doorA[d.id] || 0, f = Math.round(A * 3); if (!f) return; const im = HDIMG[q.img];
+    const X = sx + (d.cx - ax) * sc - d.w * sc / 2, Y = sy + (d.by - ay) * sc - d.h * sc, w = d.w * sc, hh = d.h * sc, ix = Math.round(X + w * .1), iw = Math.round(w * .8), iy = Math.round(Y + hh * .12), ih = Math.round(hh * .88);
+    const gr = ctx.createLinearGradient(0, iy, 0, iy + ih); gr.addColorStop(0, 'rgb(10,6,6)'); gr.addColorStop(.55, 'rgb(34,20,12)'); gr.addColorStop(1, `rgb(${70 + 20 * f},${40 + 10 * f},${18 + 4 * f})`);
+    ctx.fillStyle = gr; ctx.fillRect(ix, iy, iw, ih); // the doorway: dark room, warm hearth light low down
+    const lw = Math.max(1, Math.round(iw * [1, .62, .34, .12][f])), sl = [0, .1, .2, .28][f], dk = [0, .25, .4, .55][f];
+    if (im) { const s0x = d.cx - d.w * .4, s0y = d.by - d.h * .88, sw = d.w * .8, sh = d.h * .88; // the leaf = the door's own painting, swung inward on its left hinge (narrower, far edge slanting down)
+      ctx.setTransform(lw / sw, sl * lw / sw, 0, ih / sh, ix, iy); ctx.drawImage(im, s0x, s0y, sw, sh, 0, 0, sw, sh); ctx.setTransform(1, 0, 0, 1, 0, 0); }
+    else { const [r, g, b] = d.col; ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fillRect(ix, iy, lw, ih); }
+    ctx.fillStyle = `rgba(8,4,2,${dk})`; ctx.beginPath(); ctx.moveTo(ix, iy); ctx.lineTo(ix + lw, iy + sl * lw); ctx.lineTo(ix + lw, iy + ih + sl * lw); ctx.lineTo(ix, iy + ih); ctx.fill(); // turning away from the street light
+    ctx.fillStyle = 'rgba(255,214,150,.35)'; ctx.fillRect(ix + lw - Math.max(1, Math.round(sc * .5)), Math.round(iy + sl * lw), Math.max(1, Math.round(sc * .5)), ih); // lit edge
+    if (f >= 2) { ctx.globalCompositeOperation = 'lighter'; const g2 = ctx.createLinearGradient(0, iy + ih, 0, iy + ih + 22 * sc); g2.addColorStop(0, `rgba(150,92,36,${.12 * (f - 1)})`); g2.addColorStop(1, 'rgba(150,92,36,0)'); ctx.fillStyle = g2;
+      ctx.beginPath(); ctx.moveTo(ix + lw, iy + ih); ctx.lineTo(ix + iw, iy + ih); ctx.lineTo(ix + iw * 1.3, iy + ih + 22 * sc); ctx.lineTo(ix + lw - iw * .3, iy + ih + 22 * sc); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; } } // light spilling out
+  function stepDoors(dt) { const m = M(); if (!m || !m.hds) return; S.doorA = S.doorA || {};
+    for (const h of m.hds) for (const q of h.props || []) { const d = q.door; if (!d) continue; if (q._o === undefined || q._om !== m) { q._om = m; q._o = m.objs.find(o => o.type === 'door' && o.id === d.id) || null; } const o = q._o; if (!o) continue;
+      const near = !!o.to && Math.abs(hero.x - o.x) < 24 && hero.y > o.y && hero.y - o.y < 44, want = near || S.doorForce === d.id ? 1 : 0, cur = S.doorA[d.id] || 0;
+      if (want && !cur) sfx('page', .35); S.doorA[d.id] = cur + Math.sign(want - cur) * Math.min(Math.abs(want - cur), dt * 4.2);
+      if (o.to && S.doorA[d.id] > .95 && !S.trans && !S.dialog && hero.face === 'up' && hero.moving && Math.abs(hero.x - o.x) < 10 && hero.y - o.y < 24) enterDoor(o); } }
+  function enterDoor(o) { if (S.trans || S.doorWait) return; const go2 = () => { S.doorWait = false; go(o.to, o.spawn || 'default', { fade: DOOR_FADE, card: false }); };
+    const hasArt = M().hds && M().hds.some(h => (h.props || []).some(q => q.door && q.door.id === o.id)); S.doorForce = o.id;
+    if (hasArt && (S.doorA && S.doorA[o.id] || 0) < .9) { S.doorWait = true; after(.3, go2); } else go2(); }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
     if (PET.A) for (const o of m.objs) { if (o.type !== 'npc' || o.art !== 'linette8' || (o.y > hero.y) !== !!front) continue; // 팀장 10-24: Felt's Linette = the same 8-way art as the companion (was the old tailor still)
       const moving = !!o.tgt, near = !moving && Math.hypot(hero.x - o.x, hero.y - o.y) < 60, dir = moving ? petDir(o.tgt[0] - o.x, o.tgt[1] - o.y, o.face || 'down') : near ? petDir(hero.x - o.x, hero.y - o.y, 'down') : 'down', L = PET.A.anims[(moving ? 'walk_' : 'idle_') + dir] || PET.A.anims['idle_' + dir] || PET.A.anims.idle_down || PET.A.anims.idle_right; if (!L) continue;
@@ -603,13 +675,13 @@
 
   // ---------------- scene manager ----------------
   // 세미 오픈월드 (owner 10-23): field01 (시작의 숲) now lives inside field00 at x+56 (tools/stitch_region01.py); old links keep working
-  const ALIAS = { field01: { to: 'field00', pre: 'f01_' }, dungeon01_b2: { to: 'dungeon01_b1', pre: 'b2_' }, felt: { to: 'ch1', pre: 'felt:' }, field_felt: { to: 'ch1', pre: 'field_felt:' } }; // 1장: 펠트 + 잿빛 들판 = maps/ch1.json (composeMap)
+  const ALIAS = { field01: { to: 'field00', pre: 'f01_' }, dungeon01_b2: { to: 'dungeon01_b1', pre: 'b2_' }, ch1: { to: 'felt', pre: '' } }; // 1장: 펠트와 잿빛 들판은 다시 따로 (option A 10-24: 문 = 페이드 전환), 옛 저장의 ch1 -> felt
   // a point given in a part map's own tiles (quest targets, ?at=) -> the composite map
   function aliasPt(t) { const A = ALIAS[t.map]; if (!A) return t; const m = MAPS[A.to], a = m && m.areas && m.areas.find(q => q.part === t.map); if (a) { t.x += a.x; t.y += a.y; } t.map = A.to; return t; } // + 신전 B2 at x+46 (tools/stitch_temple01.py)
   function go(to, spawnName, opt = {}) {
     if (S.trans) return false;
     const AL = ALIAS[to]; S.aliasFrom = AL ? to : null; if (AL) { to = AL.to; spawnName = AL.pre + (spawnName || 'default'); }
-    S.trans = { phase: 'out', t: 0, to, spawn: spawnName, card: opt.card, fromTown: S.scene === 'town' };
+    S.trans = { phase: 'out', t: 0, to, spawn: spawnName, card: opt.card, fromTown: S.scene === 'town', fade: opt.fade || (/_int_/.test(to + ' ' + ((S.map && S.map.id) || '')) ? DOOR_FADE : 0) }; // 실내 들고 날 때: 조금 긴 페이드
     if (S.trans.fromTown) { const g = window.__game; S.townPos = { x: g.hero.x, y: g.hero.y - 34 }; g.setManual(true); syncFromTown(); show(true); }
     return true;
   }
@@ -628,7 +700,7 @@
       if (!sp && m.type === 'world') { const n = (m.nodes || []).find(n => n.id === spawnName); if (n) sp = [n.x + .5, n.y + 2.2, 'down']; }
       sp = sp || (m.spawns && m.spawns.default) || [m.w / 2, m.h / 2];
       hero.x = sp[0] * m.T; hero.y = sp[1] * m.T; hero.face = sp[2] || 'down'; hero.safe = [hero.x, hero.y]; hero.atk = hero.roll = null; hero.inv = .5; hero.moving = false;
-      S.nodeArmed = false; S.nearNode = null;
+      S.nodeArmed = false; S.nearNode = null; S.doorA = {}; S.doorForce = null; if (spawnName && /_out$/.test(spawnName)) { const d0 = (m.objs || []).find(o => o.type === 'door' && o.out === spawnName); if (d0) S.doorA[d0.id] = 1; }
       for (const o of (m.objects || [])) {
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
         if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id, loot: o.loot }); // o.loot = the champion's drop (map data)
@@ -647,7 +719,7 @@
   }
   function stepTrans(dt) {
     const tr = S.trans; tr.t += dt;
-    if (tr.phase === 'out' && tr.t >= FADE) {
+    if (tr.phase === 'out' && tr.t >= (tr.fade || FADE)) {
       tr.phase = 'load'; tr.t = 0;
       const first = !SAVE.visited[tr.to];
       enterScene(tr.to, tr.spawn).then(() => {
@@ -660,7 +732,7 @@
       }).catch(e => { console.error(e); S.trans = null; msg('맵을 불러오지 못했다: ' + e.message); });
     }
     if (tr.phase === 'card') { if (tr.t > 0.6 && (takePress('attack') || takePress('interact'))) tr.t = Math.max(tr.t, CARD - .35); if (tr.t >= CARD) { tr.phase = 'in'; tr.t = 0; } }
-    if (tr.phase === 'in' && tr.t >= FADE) { S.trans = null; if (S.scene === 'town') show(false); queue.length = 0; }
+    if (tr.phase === 'in' && tr.t >= (tr.fade || FADE)) { S.trans = null; if (S.scene === 'town') show(false); queue.length = 0; }
   }
   function returnToTown() {
     const g = window.__game; if (!g) return;
@@ -759,7 +831,7 @@
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 1.4) { if (takePress('attack') || takePress('interact')) retry(S.snap ? 'snap' : 'way'); else if (queue.includes('KeyT')) retry('way'); } queue.length = 0; return; }
     if (S.scene !== 'world' && takePress('save')) saveHere('manual');
     if (hero.hp > 0 && S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150)) ultAdd('autoPerSec', dt); // 필살기 게이지: 싸우는 동안 저절로 (몹이 가까이 있을 때만, owner 10-23)
-    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
+    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(); if (S.map && !S.trans && S.deadT <= 0) { stepPet(dt); stepDoors(dt); } if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
     updateCam(dt);
   }
@@ -960,12 +1032,12 @@
         if ((o.shop || o.forge) && openTrade(o)) { S.door = o.id; return; }
         if (o.wish && g && g.INV) { // town H 소원 우물: 10G 동전 던지기 운세 (1/8 chance the well pays 40G back)
           if (g.INV.gold < 10) { S.dialog = { text: '동전이 모자란다. (10G 필요)', name: o.name }; return; }
-          g.INV.gold -= 10; const F = ['대길 — 오늘은 무엇을 해도 잘 풀린다.', '길 — 갱도에서 좋은 원석을 만날 운세.', '소길 — 작은 행운이 따른다.', '평 — 평범한 하루. 조심해서 나쁠 건 없다.', '흉 — 박쥐 떼를 조심하라.'];
+          g.INV.gold -= 10; const F = o.fortunes || ['대길 — 오늘은 무엇을 해도 잘 풀린다.', '길 — 갱도에서 좋은 원석을 만날 운세.', '소길 — 작은 행운이 따른다.', '평 — 평범한 하루. 조심해서 나쁠 건 없다.', '흉 — 박쥐 떼를 조심하라.'];
           const lucky = Math.random() < 1 / 8; if (lucky) g.addGold(40);
           S.wish = (S.wish || 0) + 1; S.dialog = { text: '동전을 던졌다… (-10G)\n' + F[Math.floor(Math.random() * F.length)] + (lucky ? '\n우물이 반짝이며 40G를 돌려주었다!' : ''), name: o.name }; S.door = o.id; return; }
         if (o.race) { S.dialog = { text: '광차 경주 트랙. 「바퀴」가 접수를 받는다.\n광차 경주 미니게임은 아직 준비 중이다. (stub)', name: o.name }; S.door = o.id; return; }
         if (o.heal) { abyssRest(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); }
-        if (o.to) { const sk = o.scene, t = sk && !Q.has('noscene') && DLGD && DLGD.scenes && DLGD.scenes[sk]; if (t && !SAVE.flags['scene_' + sk]) { SAVE.flags['scene_' + sk] = true; save(); playSeq(withArt(toSeq(t), sk), { then: () => go(o.to, o.spawn || 'default') }); return; } go(o.to, o.spawn || 'default'); return; } // o.scene plays once before the door opens // a door into another map (펠트 → 아라크네의 폐공방)
+        if (o.to) { const sk = o.scene, t = sk && !Q.has('noscene') && DLGD && DLGD.scenes && DLGD.scenes[sk]; if (t && !SAVE.flags['scene_' + sk]) { SAVE.flags['scene_' + sk] = true; save(); playSeq(withArt(toSeq(t), sk), { then: () => enterDoor(o) }); return; } enterDoor(o); return; } // o.scene plays once before the door opens // a door into another map (펠트 → 아라크네의 폐공방)
         S.dialog = { text: o.text || ('「' + (o.name || '건물') + '」'), name: o.name }; S.door = o.id; return; }
       if (o.type === 'waystone') { const first = !SAVE.waystones[o.id]; SAVE.waystones[o.id] = true; SAVE.lastWay = { map: m.id, id: o.id }; save(); abyssRest(); hero.hp = hero.maxHp; syncTownHp(); addFx('heal', hero.x, hero.y - 20); saveHere('way');
         S.dialog = { text: (first ? '비석에 손을 대자 빛이 깃들었다 — 「' + o.name + '」 등록!\n' : '「' + o.name + '」\n') + '체력 회복 · 저장 완료 · 쓰러지면 여기서 다시 시작\n지도 화면(' + 'M' + ')에서 등록한 비석으로 순간이동할 수 있다.' }; return; }
@@ -1024,7 +1096,7 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); if (!SLASH_BODY) gkFanDraw(kk, 0); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDraw(kk, 1); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
+      const bodies = kk => { drawTufts(kk); drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); if (!SLASH_BODY) gkFanDraw(kk, 0); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); drawAmbient(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDraw(kk, 1); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
       const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
@@ -1033,7 +1105,7 @@
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
-      if (tr.phase === 'out') a = Math.min(1, tr.t / FADE); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FADE);
+      const FD = tr.fade || FADE; if (tr.phase === 'out') a = Math.min(1, tr.t / FD); else if (tr.phase === 'in') a = 1 - Math.min(1, tr.t / FD);
       if (tr.phase === 'card' && tr.cardData) drawCard(tr, k); else { ctx.fillStyle = `rgba(0,0,0,${a})`; ctx.fillRect(0, 0, CW, CH); }
     }
   }
@@ -1530,7 +1602,7 @@
   const PET_MAPS = ['field00'];
   const petDir = (dx, dy, cur) => Math.abs(dx) > Math.abs(dy) * 1.4 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'down' : 'downl') : (dx > 0 || (!dx && !/l$|left/.test(cur)) ? 'up' : 'upl');
   const petTot = L => L.reduce((a, f) => a + f[2], 0);
-  const petOn = m => PET_MAPS.includes(m.id) || (!!SAVE.quests.q_felt_main && !(m.compose && (areaOf(m, hero.x, hero.y) || {}).town)); // 팀장 10-24: after her quest she follows in fields / the workshop / the boss room (not inside the town, where she stands as an NPC)
+  const petOn = m => PET_MAPS.includes(m.id) || (!!SAVE.quests.q_felt_main && m.id !== 'felt'); // 팀장 10-24: after her quest she follows in fields / the workshop / the boss room (not inside the town, where she stands as an NPC)
   function stepPet(dt) { const m = M(); if (!PET.A || !petOn(m)) { S.pet = null; return; }
     let P = S.pet; if (!P || P.map !== m) P = S.pet = { x: hero.x - 14, y: hero.y + 4, dir: 'right', t: 0, cd: 0, n: 0, map: m, moving: false, run: false };
     P.t += dt; P.cd -= dt; const x0 = P.x, y0 = P.y;
