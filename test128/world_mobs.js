@@ -41,7 +41,7 @@
     m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)) * (m.D.rec || 1); }
   const FELT_SPD = 1.4; // owner 10-22 "걷는속도 빠르게": move x1.4, walk cycle 5 ticks/frame (was 7)
   // 몹 공격 기준 (owner 10-23 "펠트 몹으로 기준을 잡자"; handoff/claude/MOBS_ROOM4_ko.md 기준표): seconds the mob stands still after each attack = the opening to slash
-  const FELT_STD = { restMelee: .55, restShoot: .35, restLunge: .8, restLeap: .7, backOff: 40 };
+  const FELT_STD = { restMelee: .65, restShoot: .5, restLunge: .9, restLeap: .85, backOff: 40 }; // 10-24 팀 기준(경고 0.6~0.8, 빈틈 0.8~1.2): strike -> moves again measured 0.73~0.82 s -> +0.1~0.15
   const FELT_SC = 1.35, FELT_CD = .6, FELT_REC = .7; // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function pickIntent(P, d, m) { // distance decides which move is likely; the same move never 3 times in a row
     const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], ['shoot', d >= 90 ? 3 : .6]] : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
@@ -71,7 +71,7 @@
       if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
         if (m.sub === 'aim') { if (m.t > m.warn) { m.sub = 'go'; m.t = 0; m.bit = false; } return; }
-        if (m.sub === 'go' && !m.bit && m.t > (m.second ? .25 : .38) && !m.second) { m.second = true; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; m.sub = 'aim'; m.t = 0; m.warn = lineTele(W, m, m.aim, 230 * .25, .35, m.r * 2 + 12); startAnim(m, 'attack', A.attack, A.attack.hit, m.warn); W.fx('dust', m.x, m.y); return; } // missed: one short follow-up lunge (new warning)
+        if (m.sub === 'go' && !m.bit && m.t > (m.second ? .25 : .38) && !m.second) { m.second = true; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; m.sub = 'aim'; m.t = 0; m.warn = lineTele(W, m, m.aim, 230 * .25, .6, m.r * 2 + 12); startAnim(m, 'attack', A.attack, A.attack.hit, m.warn); W.fx('dust', m.x, m.y); return; } // missed: one short follow-up lunge (new warning)
         if (m.sub === 'go') { if (!m.bit && Math.hypot(h.x - m.x, h.y - m.y) < m.r + 9) { m.bit = true; W.touch(m, m.r + 4, this.melee.dmg); W.fx('bite', h.x, h.y - 10, { life: .22 }); }
           const sp = 230 * dt; if (!W.moveCol(m, Math.cos(m.aim) * sp, Math.sin(m.aim) * sp, m.r) || m.t > (m.second ? .25 : .38)) { m.sub = 'rec'; m.t = 0; W.fx('dust', m.x, m.y); } return; }
         if (m.t > FELT_STD.restLunge) { set(m, 'idle'); m.sub = null; m.anim = 'walk'; } return; } // recovery = the punish window
@@ -105,7 +105,7 @@
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + 0.3); set(m, 'melee'); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       const packBusy = P === 'lunge' && W.mobs && W.mobs.some(o => o !== m && !o.dead && o.kind === m.kind && o.st === 'lunge' && o.sub !== 'rec'); // pack: one dog lunges at a time, the rest keep circling
       if (m.intent === 'lunge' && d < 95 && !packBusy && tok(m, W)) { m.intent = null; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1;
-        const w = lineTele(W, m, m.aim, 230 * .38, 0.45, m.r * 2 + 12); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
+        const w = lineTele(W, m, m.aim, 230 * .38, 0.6, m.r * 2 + 12); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'leap' && d < 85 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), L = Math.min(d, 60); m.face = Math.cos(a) >= 0 ? 1 : -1;
         let aa = a; for (let t = 0; t < 4 && W.mobs && W.mobs.some(o => o !== m && !o.dead && Math.hypot(o.x - (m.x + Math.cos(aa) * L), o.y - (m.y + Math.sin(aa) * L)) < o.r + m.r + 6); t++) aa = a + (t % 2 ? -1 : 1) * .45 * (1 + (t >> 1)); // don't land on a packmate
         m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(aa) * L; m.ty = m.y + Math.sin(aa) * L; // lands on the marked spot (where the hero stood)
@@ -116,7 +116,7 @@
         if (p.trap) { tw = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: p.trap.r, warn: 0.8, act: 0.05, dmg: p.trap.dmg, slow: p.trap.slow, kind: 'web', owner: m }).warn; } // thread trap under the hero
         else { const aim = ang(m, h.x, h.y - 8), dirs = p.spread ? p.spread.map(s => aim + s) : [0, 1, 2, 3, 4, 5, 6, 7].map(i => i * Math.PI / 4); // aimed fan (style mobs) or the old 8-way ring
           for (const a of dirs) tw = lineTele(W, m, a, Math.min(150, p.sp * 1.4), 0.6, 6);
-          for (const w of p.waves) W.after(tw + w, () => { if (m.dead) return; for (const a of dirs) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a, sp: p.sp, owner: m }, p.shot)); }); }
+          const bid = m.bid || 0; for (const w of p.waves) W.after(tw + w, () => { if (m.dead || (m.bid || 0) !== bid) return; /* a break (경직) cancels the volley */ for (const a of dirs) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a, sp: p.sp, owner: m }, p.shot)); }); }
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'shoot'); m.cd = 2.4 * FELT_CD * RG / agg(W); }
     }, onDeath(m, W) { W.fx('fluff', m.x, m.y - this.h * .5, { life: .9, col: this.col || '#b0a890', n: 14 }); } }, o); // felt-like death: fluff and thread bits burst out
   }
@@ -480,6 +480,9 @@
   function champSig(m, W, dt, cd, range, start) { if (m.st === 'sig') { m.t += dt; m.at = (m.at || 0) + dt; m.moving = false; if (m.t > m.sigEnd) { m.st = 'rest'; m.t = 0; m.restT = .8; m.anim = 'walk'; } return true; }
     m.sigCd = (m.sigCd ?? cd * .6) - dt; const d = W.dist(m, W.hero); if (m.sigCd > 0 || d > range || !(m.st === 'idle' || m.st === 'rest') || m.dazeT > 0) return false;
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
+  // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
+  for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
@@ -499,7 +502,7 @@
       init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }),
       update(m, W, dt) { // 사냥 3연 돌진 (고유): after each lunge recovers it lunges again, up to 3 in a row, then a long pant (1.4 s opening)
         if (m.st === 'lunge' && m.sub === 'rec' && m.t > .25 && (m.chain || 0) < 2 && W.dist(m, W.hero) < 130) { m.chain = (m.chain || 0) + 1; const h = W.hero; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; // the chain stays one attack (one lunge state)
-          m.sub = 'aim'; m.t = 0; m.second = true; m.warn = lineTele(W, m, m.aim, 230 * .38, .35, m.r * 2 + 12); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, m.warn); W.fx('dust', m.x, m.y); }
+          m.sub = 'aim'; m.t = 0; m.second = true; m.warn = lineTele(W, m, m.aim, 230 * .38, .6, m.r * 2 + 12); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, m.warn); W.fx('dust', m.x, m.y); }
         if (m.pst === 'lunge' && m.st === 'idle') { if ((m.chain || 0) >= 2) { m.st = 'rest'; m.t = 0; m.restT = 1.4; m.cd = Math.max(m.cd || 0, 1.5); W.fx('text', m.x, m.y - 40, { text: '헉헉', life: .9, color: '#cfc4b0' }); } m.chain = 0; } // the chain is one pick in pickIntent's history (never 3 lunges in a row)
         m.pst = m.st;
         m.howlT = (m.howlT ?? 5) - dt; const d = W.dist(m, W.hero);
