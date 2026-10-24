@@ -2,7 +2,7 @@
 #   python3 test128/tools/mob_check.py [base_url=http://127.0.0.1:8931] [out.png] [kind,kind,...]
 #   works for any mob kind (felt, s47 strips, area-1 mobs). Owner 10-23: run it on EVERY new or changed mob and report the table image.
 #   per mob, in the canonical 잿빛 들판 (field_felt -> ch1, open spot 28,17; the old field01 now aliases into 바람길 where Linette kills the test mob) with the hero standing still (no damage):
-#     1 mob, 60 s : attacks, longest run of the same attack, seconds standing still after attacks (the opening)
+#     1 mob, 60 s : attacks (a chain that restarts within 0.35 s = one combo), longest run of the same attack, seconds standing still after attacks (the opening)
 #     3 mobs, 20 s: % of walking time facing away from the hero, % of time two of them overlap
 import asyncio, json, sys, subprocess
 from playwright.async_api import async_playwright
@@ -12,7 +12,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
 KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
 SETUP = "()=>{const W=__world;W.setManual(true);(W.map.objects||[]).forEach(o=>{if(o.type==='spawn')o.respawn=1e9});}"
 ONE = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll(m=>!m.D.boss);W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
-  const seq=[];let prev='',still=0;for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.S.dialog=null;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.last||m.D.ai||'');if(s!==prev){if(!['idle','rest','hop','walk','stagger','stun','dormant','rise','aim','intro','phase'].includes(s))seq.push(s);prev=s;}
+  const seq=[];let prev='',still=0,endT=-9,endS='';const X=['idle','rest','hop','walk','stagger','stun','dormant','rise','aim','intro','phase'];for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.S.dialog=null;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.last||m.D.ai||'');if(s!==prev){if(!X.includes(prev)){endT=i/60;endS=prev;}if(!X.includes(s)&&!(s===endS&&i/60-endT<.35))seq.push(s);prev=s;}
    if(m.st==='rest'||(m.st==='lunge'&&m.sub==='rec'))still+=1/60;}
   let run=1,best=1;for(let i=1;i<seq.length;i++){run=seq[i]===seq[i-1]?run+1:1;best=Math.max(best,run);}return {name:m.D.name,attacks:seq.length,longestRepeat:best,openSec:+still.toFixed(1)}}"""
 PACK = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll(m=>!m.D.boss);W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;
