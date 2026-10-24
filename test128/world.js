@@ -183,7 +183,7 @@
     const c = document.createElement('canvas'); c.width = r[2]; c.height = r[3]; const g = c.getContext('2d');
     g.drawImage(IMG.spr, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]);
     if (mode === 'white') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = '#fff'; g.fillRect(0, 0, r[2], r[3]); }
-    if (mode === 'dodge') { const AI = (DG() && DG().afterimage) || {}; g.globalCompositeOperation = 'source-atop'; g.globalAlpha = AI.tintMix ?? .45; g.fillStyle = AI.tint || '#bff4ff'; g.fillRect(0, 0, r[2], r[3]); g.globalAlpha = 1; }
+    if (mode === 'dodge') { const AI = (DG() && DG().afterimage) || {}; if (AI.tint && AI.tintMix && AI.keepTint) { g.globalCompositeOperation = 'source-atop'; g.globalAlpha = AI.tintMix; g.fillStyle = AI.tint; g.fillRect(0, 0, r[2], r[3]); g.globalAlpha = 1; } } // 회피대시 잔상 = 주인공 모습 그대로 (주인 10-24 「푸른 잔상 → 주인공 모습 그대로」): 색 덮기 없음, 투명도만
     if (GRADE[mode]) gradeCanvas(c, mode);
     if (mode === 'rage') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,40,20,.35)'; g.fillRect(0, 0, r[2], r[3]); }
     if (mode === 'gray') { const d = g.getImageData(0, 0, r[2], r[3]); for (let i = 0; i < d.data.length; i += 4) { const v = (d.data[i] * .3 + d.data[i + 1] * .59 + d.data[i + 2] * .11) * .7; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; } g.putImageData(d, 0, 0); }
@@ -213,6 +213,7 @@
       m.cells.push({ ch, g: L.ground, deco: L.deco, obj: L.obj });
       let solid = solidChars.has(ch); if (L.solid !== undefined) solid = L.solid;
       if (ts.solidTiles && ts.solidTiles.includes(L.ground)) solid = true;
+      if (L.hop) { (m.hopG || (m.hopG = new Uint8Array(j.w * j.h)))[y * j.w + x] = 1; solid = true; } // 점프로만 넘는 칸 (울타리·개울·구멍; 3번방 약속 10-24)
       m.solidG[y * j.w + x] = solid ? 1 : 0;
       if (L.deco) m.decos.push({ x: (x + .5) * T, y: (y + 1) * T - 1, spr: L.deco, tx: x, ty: y, solid });
       if (L.obj) m.objs.push(mkObj(m, L.obj, x, y));
@@ -307,7 +308,7 @@
   const held = new Set(), queue = [];
   const PASS = new Set(['KeyB', 'KeyN', 'Minus', 'Equal', 'NumpadSubtract', 'NumpadAdd', 'F12']); // BGM keys keep working
   const DEFKEYS = { up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], attack: ['KeyJ', 'KeyZ'], dash: ['KeyK', 'KeyX'],
-    interact: ['KeyL', 'KeyC', 'Enter'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
+    interact: ['KeyL', 'KeyC', 'Enter'], dive: ['Space'], potion: ['KeyE'], ult: ['KeyR'], menu: ['Escape'], save: ['F5'] };
   function KM() { const g = window.__game; return (g && g.ctl && g.ctl.KEYMAP) || DEFKEYS; }
   const ARROW = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' }; // 방향키는 언제나 이동 (owner 10-23)
   function codesOf(a) { const l = (KM()[a] || DEFKEYS[a] || []).slice(); if (ARROW[a] && !l.includes(ARROW[a])) l.push(ARROW[a]); if (a === 'dash') l.push('ShiftLeft', 'ShiftRight'); if (a === 'menu' && !l.includes('Escape')) l.push('Escape'); return l; }
@@ -323,7 +324,7 @@
 
   // ---------------- 폰 터치 (사장님 10-23 "핸드폰으로 조작하게"): 마을 화면의 이동 패드·공격·대시·달리기 버튼을 게임 지도 위로 올리고,
   // 공격 버튼을 이쪽 공격 키(J)에 잇고, 지도에서 필요한 조사·물약·필살기·메뉴 버튼을 더함(키를 누른 것처럼 보냄). 키보드 조작은 그대로.
-  { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #jumpb,body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
+  { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
       + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
@@ -337,7 +338,7 @@
     const wire = (el, code) => { if (!el) return; const dn = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.add('on'); send(code, true); },
       up = e => { if (!active()) return; e.preventDefault(); e.stopImmediatePropagation(); el.classList.remove('on'); send(code, false); };
       el.addEventListener('touchstart', dn, { passive: false, capture: true }); el.addEventListener('touchend', up, { passive: false, capture: true }); el.addEventListener('touchcancel', up, { passive: false, capture: true }); };
-    wire(document.getElementById('atk'), 'KeyJ'); // town attack button -> this scene's attack key (hold = charge, same as the key)
+    wire(document.getElementById('atk'), 'KeyJ'); wire(document.getElementById('jumpb'), 'Space'); // 점프 버튼 (10-24) // town attack button -> this scene's attack key (hold = charge, same as the key)
     for (const [id, label, code] of [['wtb_ult', '필살기', 'KeyR'], ['wtb_act', '조사', 'KeyL'], ['wtb_pot', '물약', 'KeyE'], ['wtb_menu', '메뉴', 'Escape']]) { const el = document.createElement('div'); el.id = id; el.className = 'wtb'; el.textContent = label; ui.appendChild(el); wire(el, code); } }
 
   addEventListener('pointerdown', e => { if (S.dialog && e.target && e.target.tagName === 'CANVAS') S.dlgTap = true; }); // phone: tap the picture to go on
@@ -345,7 +346,7 @@
   const M = () => S.map;
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   function solidAt(px, py) { const m = M(); if (!m) return true; const x = Math.floor(px / m.T), y = Math.floor(py / m.T);
-    if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x]) return true;
+    if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x] && !(hopNow && m.hopG && m.hopG[y * m.w + x])) return true;
     for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true;
     for (const o of m.objs) if (o.wander && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
   let npcSelf = null;
@@ -438,13 +439,14 @@
     for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
+  let hopNow = false; // true only while the airborne hero moves: hop cells are open for him alone
   function moveCol(e, dx, dy, r, fly) {
-    const m = M(); let ok = true;
+    const m = M(); let ok = true; hopNow = e === hero && !!(hero.jump && hero.jump.air);
     const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
     const bl = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
     if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else ok = false; }
     if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else ok = false; }
-    return ok;
+    hopNow = false; return ok;
   }
   function msg(text, t = 2.2) { S.msg = { text, t }; }
   // ---- 보스전 연출 (2번방 10-24, 팀장 「재밌고 다크하고 웅장한 보스전」): 시네마 띠 + 등장 그림 · 2페이즈 글자 · 처치 슬로·번쩍 · 화면 번쩍
@@ -767,6 +769,14 @@
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
     if (takePress('ult') && !S.ultFx) castUlt();
+    // 점프 (사장님 10-24 「점프 모션 입력시켜」, 2번방): 마을과 같은 박자(웅크림 4틱 → 공중 0.5초 → 착지 8틱), 공중 높이 16px = 주인공 키의 반, 높이 뜬 동안 바닥 공격(원·줄 장판) 넘김
+    if (takePress('dive') && !hero.jump && !hero.roll && !hero.atk && !hero.charge && hero.hp > 0) { const run = hero.run && hero.moving; hero.jump = { t: 0, T: JUMP.T, pre: run ? 0 : JUMP.pre, land: JUMP.land, run }; addFx('dust', hero.x, hero.y, { life: .3 }); sfx('roll', .35, 1.5); }
+    if (hero.jump) { const J = hero.jump; J.t += dt; const ta = J.t - J.pre, p = Math.max(0, Math.min(1, ta / J.T)); J.air = ta > 0 && ta < J.T; hero.z = J.air ? 4 * p * (1 - p) * JUMP.h : 0;
+      if (J.air) for (const c of codesOf('dash').concat(codesOf('attack'))) { const qi = queue.indexOf(c); if (qi >= 0) queue.splice(qi, 1); } // no dash / swing in the air (same as the town)
+      if (ta >= J.T && !J.landed) { J.landed = true; const mm = M(), tx = Math.floor(hero.x / mm.T), ty = Math.floor(hero.y / mm.T);
+        if (mm.hopG && mm.hopG[ty * mm.w + tx]) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(3, null, true); hero.jump = null; hero.z = 0; } // landed in a gap / water: small hit, back to the last solid ground
+        else { addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); } }
+      if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     if (takePress('dash') && !hero.roll && hero.rollCd <= 0) { let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
@@ -815,8 +825,9 @@
     let onPit = false, onSpike = false;
     for (const o of m.objs) {
       const inside = o.tx === cx && o.ty === cy;
-      if (o.type === 'pit' && inside && !hero.roll) onPit = true;
-      if (o.type === 'spikes' && inside && spikeUp(o)) onSpike = true;
+      const air = !!(hero.jump && hero.jump.air); // 점프 공중: 구멍·가시 함정 위를 지나감 (3번방 10-24)
+      if (o.type === 'pit' && inside && !hero.roll && !air) onPit = true;
+      if (o.type === 'spikes' && inside && spikeUp(o) && !air) onSpike = true;
       if (o.type === 'key' && inside && !SAVE.keys[o.keyId]) { SAVE.keys[o.keyId] = true; save(); banner('열쇠를 얻었다!', 1.6); }
       if ((o.type === 'stairs_up' || o.type === 'stairs_down') && inside && m.links && m.links[o.type]) {
         if (m.boss && S.bossRef && !S.bossRef.dead) { hero.y = cy * m.T - 3; if (!S.msg) msg('봉인의 결계 — 보스를 쓰러뜨리기 전에는 나갈 수 없다', 1.6); continue; } // no fleeing mid-fight
@@ -829,7 +840,7 @@
     }
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
     if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
-    else if (!onSpike && !hero.roll && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
+    else if (!onSpike && !hero.roll && !hero.jump && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
@@ -846,7 +857,7 @@
     for (let i = S.hazards.length - 1; i >= 0; i--) { const h = S.hazards[i]; h.t += dt;
       if (h.owner && h.owner.dead && h.t < h.warn) { S.hazards.splice(i, 1); continue; }
       const live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
-      if (live && h.dmg && !h.hit && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
+      if (live && h.dmg && !h.hit && !(hero.z > JUMP.h * .45 && h.shape !== 'all') && inHaz(h, hero.x, hero.y - 4)) { if (hurt(h.dmg, h.shape === 'all' ? null : h, h.raw)) { h.hit = true; if (h.slow) hero.slowT = h.slow; } }
       if (live && h.zone && inHaz(h, hero.x, hero.y - 4)) hero.slowT = Math.max(hero.slowT, .15);
       if (h.t >= h.warn && !h.fired) { h.fired = true; if (h.onEnd) h.onEnd(h); hazardFx(h); }
       if (h.linger && h.t >= h.warn + (h.act || 0) && h.t < h.warn + h.act + h.linger && !h.hit && Math.hypot(hero.x - h.x, (hero.y - h.y) * 1.15) < h.r * .8) { if (hurt(1, h)) h.hit = true; }
@@ -1142,6 +1153,7 @@
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
+    else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
     else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
@@ -1197,6 +1209,7 @@
       if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+  const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const HITSTOP_HERO = [2 / 60, 3 / 60, 5 / 60, 5 / 60];
   // [검흔 어울림 연구 10-23 「맞는 곳 = 보이는 곳」] one arc placement for the drawing and the hit: the arc stops flying at its reach (GK_FLY)
   // and sits where it crosses a mob's body (side +27, up +60, down -75 atlas px); a mob is hit when a point of its body (feet..head x left/mid/right)
@@ -1244,11 +1257,11 @@
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
-    if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, 'dodge'); }
+    if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, null); } // 잔상 = 주인공 모습 그대로 (색 덮기 없음)
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
-    const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
+    ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
@@ -1264,7 +1277,7 @@
     const h = hero; if (h.inv > 0 && S.scene !== 'world' && Math.floor(h.inv * 20) % 2 && !h.roll) return;
     const d = h.face === 'left' ? 'right' : h.face; const fi = h.moving || h.roll ? Math.floor(h.walkT * 8) % 4 : 0;
     const name = 'hero_' + d + '_' + fi;
-    g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(h.x, h.y, 6 * zoom + 1, 2.5 * zoom + .5, 0, 0, TAU); g.fill();
+    { const zs = 1 - Math.min(.45, (h.z || 0) / 36); g.fillStyle = `rgba(0,0,0,${.28 * zs})`; g.beginPath(); g.ellipse(h.x, h.y, (6 * zoom + 1) * zs, (2.5 * zoom + .5) * zs, 0, 0, TAU); g.fill(); } // jump: the shadow stays on the ground and shrinks
     if (zoom === 1 && h128() && S.map && S.map.type !== 'world') return; // test128: body + trail + slash drawn by drawHeroHi
     if (S.trail) for (const a of S.trail) { const q = 1 - a.t / a.life; drawSpr(g, a.name, a.x, a.y, { flip: a.flip, alpha: q * q * a.a, mode: 'dodge' }); } // dash afterimages
     if (h.roll) { if (DG()) { drawSpr(g, heroFrameName(), h.x, h.y, { flip: h.face === 'left' }); if (h.roll.t < iframe()) { g.fillStyle = 'rgba(160,240,255,.22)'; g.beginPath(); g.ellipse(h.x, h.y - 9, 8, 10, 0, 0, TAU); g.fill(); } return; }
@@ -1427,6 +1440,7 @@
     else if (s.kind === 'shard') { g.fillStyle = '#8affb0'; g.beginPath(); g.moveTo(6, 0); g.lineTo(-4, -3); g.lineTo(-4, 3); g.fill(); g.fillStyle = '#e8fff0'; g.fillRect(-1, -1, 5, 2); }
     else { g.fillStyle = '#ffe070'; g.fillRect(-4, -1, 8, 2); g.fillStyle = '#3a2a10'; g.fillRect(3, -1, 2, 2); }
     g.restore(); }
+  function hazMute(r, g, b) { const y = .3 * r + .59 * g + .11 * b; return [Math.round(r * .78 + y * .22), Math.round(g * .78 + y * .22), Math.round(b * .78 + y * .22)]; } // 채도 낮춘 예고색
   function hazColor(h) { return ({ web: [225, 225, 240], poison: [170, 80, 255], root: [120, 220, 80], crystal: [90, 255, 160], cage: [90, 255, 160], summon: [255, 220, 60], acorn: [255, 160, 60] })[h.kind] || [255, 60, 50]; }
 
   // ---- 실 효과 (보스전 팀 10-24, 공격 검흔 담당; 이펙트는 코드로): 1장 펠트(실) 몹·아라크네의 겨냥 실 / 실 감옥 실 가닥 / 끊어질 때 파편 /
@@ -1450,7 +1464,7 @@
       threadLine(g, A.x, A.y - 18, B.x, B.y - 18, 1.2, S.t * 6 + A.x, red, al, 1); threadLine(g, A.x, A.y - 8, B.x, B.y - 8, 1, S.t * 5 + B.y, red, al * .8, 1); }
     if (red) for (const h of S.hazards) { if (!h.dmg || h.t >= h.warn || h.shape === 'all') continue; // 팀장 10-24: phase 2 reddens the room -> every damaging warning gets a dark rim + pale-gold edge, and the inside flickers white on the last third
       const p = h.t / (h.warn || 1e-3), fl = p > .66 && Math.floor(S.t * 12) % 2 === 0, path = () => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2;
-          g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } };
+          g.moveTo(h.x - uy * w, h.y + ux * w); g.lineTo(h.x2 - uy * w, h.y2 + ux * w); g.lineTo(h.x2 + uy * w, h.y2 - ux * w); g.lineTo(h.x + uy * w, h.y - ux * w); g.closePath(); } else { g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.shape === 'ring' && h.r0 > 0) { g.moveTo(h.x + h.r0, h.y); g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); } } };
       path(); if (fl) { g.fillStyle = 'rgba(255,248,225,.3)'; g.fill('evenodd'); }
       g.strokeStyle = 'rgba(8,2,6,.55)'; g.lineWidth = 4; g.stroke(); g.strokeStyle = `rgba(255,240,190,${.9 + .1 * hb})`; g.lineWidth = 2; g.stroke(); }
     if (red) for (const m of S.mobs) { if (m.dead || !m.D.boss || !m.D.felt) continue; // phase 2: red threads hang from the dark above her and throb
@@ -1466,20 +1480,23 @@
   function drawHazard(g, h, top) {
     if (h.shape === 'all') return;
     const [r, gg, b] = hazColor(h), warnP = Math.min(1, h.t / (h.warn || 1e-3)), live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
-    if (!top && h.t < h.warn) { // telegraph: outline + an inner fill that grows until impact (the timing cue for the roll)
-      const pulse = .5 + .5 * Math.sin(h.t * 22);
-      g.strokeStyle = `rgba(${r},${gg},${b},${.55 + .35 * pulse})`; g.fillStyle = `rgba(${r},${gg},${b},${.10 + .2 * warnP})`; g.lineWidth = 1;
-      if (h.shape === 'circle') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); g.fill(); g.stroke(); g.fillStyle = `rgba(${r},${gg},${b},.35)`; g.beginPath(); g.ellipse(h.x, h.y, h.r * warnP, h.r * warnP / 1.15, 0, 0, TAU); g.fill(); }
-      if (h.shape === 'ring') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); g.fill('evenodd'); g.stroke(); }
-      if (h.shape === 'line') { g.save(); g.translate(h.x, h.y); g.rotate(Math.atan2(h.y2 - h.y, h.x2 - h.x)); const L = Math.hypot(h.x2 - h.x, h.y2 - h.y);
-        g.fillRect(0, -h.width / 2, L, h.width); g.fillStyle = `rgba(${r},${gg},${b},.35)`; g.fillRect(0, -h.width / 2, L * warnP, h.width);
-        g.strokeRect(0, -h.width / 2, L, h.width); for (let i = 10; i < L; i += 14) { g.beginPath(); g.moveTo(i - 3, -2); g.lineTo(i + 1, 0); g.lineTo(i - 3, 2); g.stroke(); } g.restore(); }
+    if (!top && h.t < h.warn) { // telegraph (사장님 10-24 「촌스럽다, 깔끔하게」): faint fill + 1px dark rim + thin muted outline; a fill sweeps from the centre (circle) /
+      // the inner edge (ring) / the back (line) and reaches the outline on the hit = the time left; the outline flickers only in the last 0.15 s
+      const pulse = .5 + .5 * Math.sin(h.t * 22), [cr, cg, cb] = hazMute(r, gg, b), left = h.warn - h.t, flick = left < .15 && Math.floor(h.t * 30) % 2 === 0, e = 1 - Math.pow(1 - warnP, 1.6);
+      const path = (k0, k1) => { g.beginPath(); if (h.shape === 'line') { const L = Math.hypot(h.x2 - h.x, h.y2 - h.y), ux = (h.x2 - h.x) / (L || 1), uy = (h.y2 - h.y) / (L || 1), w = h.width / 2, a0 = L * k0, a1 = L * k1;
+          g.moveTo(h.x + ux * a0 - uy * w, h.y + uy * a0 + ux * w); g.lineTo(h.x + ux * a1 - uy * w, h.y + uy * a1 + ux * w); g.lineTo(h.x + ux * a1 + uy * w, h.y + uy * a1 - ux * w); g.lineTo(h.x + ux * a0 + uy * w, h.y + uy * a0 - ux * w); g.closePath(); }
+        else { const r0 = h.shape === 'ring' ? (h.r0 || 0) : 0, ra = r0 + (h.r - r0) * k0, rb = r0 + (h.r - r0) * k1; g.ellipse(h.x, h.y, rb, rb / 1.15, 0, 0, TAU); if (ra > .5) { g.moveTo(h.x + ra, h.y); g.ellipse(h.x, h.y, ra, ra / 1.15, 0, 0, TAU, true); } } }; // moveTo: no seam line between the two edges
+      if (h.shape === 'circle' || h.shape === 'ring' || h.shape === 'line') {
+        path(0, 1); g.fillStyle = `rgba(${cr},${cg},${cb},.06)`; g.fill('evenodd'); // the whole area, barely there
+        path(0, e); g.fillStyle = `rgba(${cr},${cg},${cb},${.1 + .08 * warnP})`; g.fill('evenodd'); // the sweep = the countdown
+        path(Math.max(0, e - .06), e); g.fillStyle = `rgba(${Math.min(255, cr + 50)},${Math.min(255, cg + 50)},${Math.min(255, cb + 50)},.7)`; g.fill('evenodd'); // its leading edge
+        path(0, 1); g.strokeStyle = 'rgba(8,4,6,.55)'; g.lineWidth = 3; g.stroke(); g.strokeStyle = flick ? 'rgba(255,246,236,.95)' : `rgba(${cr},${cg},${cb},.85)`; g.lineWidth = 1; g.stroke(); }
       if (h.kind === 'acorn' && h.from) { const p = warnP, x = h.from[0] + (h.x - h.from[0]) * p, y = h.from[1] + (h.y - h.from[1]) * p - Math.sin(p * Math.PI) * 30; g.fillStyle = '#8a5a2a'; g.beginPath(); g.arc(x, y, 2.5, 0, TAU); g.fill(); }
       if (h.kind === 'rock') { const p = warnP; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(h.x, h.y, h.r * p, h.r * p / 1.6, 0, 0, TAU); g.fill(); if (p > .6) { g.fillStyle = '#7a7060'; g.fillRect(h.x - 4, h.y - (1 - p) * 120 - 8, 8, 7); } }
       if (h.kind === 'cage') { g.globalAlpha = .35 + .3 * pulse; drawSpr(g, 'crystal', h.x, h.y + 5); g.globalAlpha = 1; }
     }
     if (top && live) {
-      g.fillStyle = `rgba(${Math.min(255, r + 60)},${Math.min(255, gg + 60)},${Math.min(255, b + 60)},.55)`;
+      const [mr, mg, mb] = hazMute(r, gg, b); g.fillStyle = `rgba(${Math.min(255, mr + 90)},${Math.min(255, mg + 90)},${Math.min(255, mb + 90)},.5)`; // the hit: one short bright flash of the area
       if (h.shape === 'circle') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); g.fill(); }
       if (h.shape === 'ring') { g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r / 1.15, 0, 0, TAU); if (h.r0 > 0) g.ellipse(h.x, h.y, h.r0, h.r0 / 1.15, 0, 0, TAU, true); g.fill('evenodd');
         for (let i = 0; i < 12; i++) { const a = i / 12 * TAU, rr = (h.r + h.r0) / 2; drawSpr(g, 'crystal', h.x + Math.cos(a) * rr, h.y + Math.sin(a) * rr / 1.15 + 4, { scale: .7 }); } }

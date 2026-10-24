@@ -24,7 +24,10 @@
   ",": "grass_tuft",
   "'": "grass_flowers",
   "=": "dirt",
-  "~": "water",
+  "~": {
+   "ground": "water",
+   "hop": true
+  },
   "b": "bridge_h",
   ":": "stones",
   "#": "cliff",
@@ -66,7 +69,8 @@
   },
   "f": {
    "ground": "grass",
-   "deco": "fence"
+   "deco": "fence",
+   "hop": true
   },
   "O": {
    "ground": "grass",

@@ -70,7 +70,7 @@
       if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
         if (m.sub === 'aim') { if (m.t > m.warn) { m.sub = 'go'; m.t = 0; m.bit = false; } return; }
-        if (m.sub === 'go' && !m.bit && m.t > (m.second ? .25 : .38) && !m.second) { m.second = true; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; m.sub = 'aim'; m.t = 0; m.warn = lineTele(W, m, m.aim, 230 * .25, .35, m.r * 2 + 8); startAnim(m, 'attack', A.attack, A.attack.hit, m.warn); W.fx('dust', m.x, m.y); return; } // missed: one short follow-up lunge (new warning)
+        if (m.sub === 'go' && !m.bit && m.t > (m.second ? .25 : .38) && !m.second) { m.second = true; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; m.sub = 'aim'; m.t = 0; m.warn = lineTele(W, m, m.aim, 230 * .25, .35, m.r * 2 + 12); startAnim(m, 'attack', A.attack, A.attack.hit, m.warn); W.fx('dust', m.x, m.y); return; } // missed: one short follow-up lunge (new warning)
         if (m.sub === 'go') { if (!m.bit && Math.hypot(h.x - m.x, h.y - m.y) < m.r + 9) { m.bit = true; W.touch(m, m.r + 4, this.melee.dmg); W.fx('bite', h.x, h.y - 10, { life: .22 }); }
           const sp = 230 * dt; if (!W.moveCol(m, Math.cos(m.aim) * sp, Math.sin(m.aim) * sp, m.r) || m.t > (m.second ? .25 : .38)) { m.sub = 'rec'; m.t = 0; W.fx('dust', m.x, m.y); } return; }
         if (m.t > FELT_STD.restLunge) { set(m, 'idle'); m.sub = null; m.anim = 'walk'; } return; } // recovery = the punish window
@@ -104,7 +104,7 @@
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + 0.3); set(m, 'melee'); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       const packBusy = P === 'lunge' && W.mobs && W.mobs.some(o => o !== m && !o.dead && o.kind === m.kind && o.st === 'lunge' && o.sub !== 'rec'); // pack: one dog lunges at a time, the rest keep circling
       if (m.intent === 'lunge' && d < 95 && !packBusy && tok(m, W)) { m.intent = null; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1;
-        const w = lineTele(W, m, m.aim, 230 * .38, 0.45, m.r * 2 + 8); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
+        const w = lineTele(W, m, m.aim, 230 * .38, 0.45, m.r * 2 + 12); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'leap' && d < 85 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), L = Math.min(d, 60); m.face = Math.cos(a) >= 0 ? 1 : -1;
         let aa = a; for (let t = 0; t < 4 && W.mobs && W.mobs.some(o => o !== m && !o.dead && Math.hypot(o.x - (m.x + Math.cos(aa) * L), o.y - (m.y + Math.sin(aa) * L)) < o.r + m.r + 6); t++) aa = a + (t % 2 ? -1 : 1) * .45 * (1 + (t >> 1)); // don't land on a packmate
         m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(aa) * L; m.ty = m.y + Math.sin(aa) * L; // lands on the marked spot (where the hero stood)
