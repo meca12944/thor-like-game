@@ -174,8 +174,8 @@
       g.fillStyle = gr; g.beginPath(); g.moveTo(x - 10, 0); g.lineTo(x + 14, 0); g.lineTo(x + 14 + EH * .45, EH); g.lineTo(x - 10 + EH * .45, EH); g.closePath(); g.fill(); }
     g.globalCompositeOperation = 'source-over';
     const vg = g.createRadialGradient(EW / 2, EH * .48, Math.min(EW, EH) * .38, EW / 2, EH * .48, Math.max(EW, EH) * .72); // edge darkness
-    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, p2 ? `rgba(40,0,8,${.62 + .08 * Math.sin(S.t * 3)})` : 'rgba(2,2,8,.55)'); g.fillStyle = vg; g.fillRect(0, 0, EW + 1, EH + 1);
-    if (p2) { g.fillStyle = `rgba(120,0,20,${.07 + .04 * Math.sin(S.t * 3)})`; g.fillRect(0, 0, EW + 1, EH + 1); } // phase 2: the lair breathes red
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, p2 ? `rgba(34,0,6,${.5 + .06 * Math.sin(S.t * 3)})` : 'rgba(2,2,8,.55)'); g.fillStyle = vg; g.fillRect(0, 0, EW + 1, EH + 1);
+    // (2페이즈 화면 전체 붉은 칠은 뺌: 지도 담당의 붉은 빛과 겹쳐 붉은 예고가 안 보였음 → 가장자리만 붉게)
     g.restore(); }
   function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
