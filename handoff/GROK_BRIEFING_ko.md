@@ -14,7 +14,7 @@
 - 주인공의 피하기 동작 이름은 **회피대시**(구르기 아님).
 
 ## 2. 세계관·스토리 (새 정본 요약 — 2026-10-24 마스터 플랜)
-> 최우선 정본: `docs_story/MASTER_PLAN_정본_20261024_ko.md` (사장님 10-24 「정본 전면 수정」, 0절 = 사장님 확정 사항). 드라이브 새 정본: https://docs.google.com/document/d/1pscARuYlP29Zana-CVkyQuo7uPKbPjVIyNzU_3BQ70U/edit. 인물 정리 `docs_story/CHARACTERS_정본_ko.md`, 지금 1장과 다른 점 `docs_story/MASTER_PLAN_CH1_DIFF_ko.md`.
+> 최우선 정본: `docs_story/MASTER_PLAN_정본_20261024_ko.md` (사장님 10-24 「정본 전면 수정」, 0절 = 사장님 확정 사항). 드라이브 새 정본: https://docs.google.com/document/d/1p8GN-pZEmoVZN0Ju_C_XuitqvJ2Zwp8wM94CPfBOGQ0/edit. 인물 정리 `docs_story/CHARACTERS_정본_ko.md`, 지금 1장과 다른 점 `docs_story/MASTER_PLAN_CH1_DIFF_ko.md`.
 - **맨 위 규칙 — 아동 절대 보호 법칙**: 아이(토비·펠릭스·이안 등)에게는 몸을 다치게 하는 일이나 죽음이 절대 닿지 않는다. 그림·이야기 모두.
 - 세계: **300년 전 루드비히 왕이 금술을 써서 왕도 전체가 시간 루프(같은 시간이 계속 되풀이됨)와 '잿빛 안개'에 갇혔다.** 안개를 오래 맞은 사람은 피부가 회백색으로 바래거나 몸이 석회처럼 굳는다.
 - 주인공(필멸자): 가슴에 **'사멸의 코어'**를 품고 300년 동안 수백 번 죽고 깨어났다. 왕의 그림자이자 루프를 지키려고 만들어진 살아 있는 코어의 그릇(7장에서 밝혀짐). 말투는 짧고 냉소적. 첫 대사 **"...또다시 이 무덤가인가. 몇 번째 반복인지 이제 세지도 않았다."**

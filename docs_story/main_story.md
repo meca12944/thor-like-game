@@ -1,7 +1,7 @@
 # 「사멸의 궤적」(게임 이름 「필멸자」) — 메인 스토리 줄거리
 
 > **최우선 정본: `MASTER_PLAN_정본_20261024_ko.md`** (사장님 2026-10-24 「정본 전면 수정」). 이 문서는 그 줄거리를 짧게 묶은 것이다. 어긋나면 마스터 플랜을 따른다.
-> 드라이브 새 정본: https://docs.google.com/document/d/1pscARuYlP29Zana-CVkyQuo7uPKbPjVIyNzU_3BQ70U/edit · 사장님 확정 사항 = 마스터 플랜 0절.
+> 드라이브 새 정본: https://docs.google.com/document/d/1p8GN-pZEmoVZN0Ju_C_XuitqvJ2Zwp8wM94CPfBOGQ0/edit · 사장님 확정 사항 = 마스터 플랜 0절.
 > 장별 자세한 내용은 `story_full.md`, 인물은 `CHARACTERS_정본_ko.md`, 지금 게임 1장과 다른 점은 `MASTER_PLAN_CH1_DIFF_ko.md`.
 
 ## 맨 위 규칙
