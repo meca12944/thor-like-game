@@ -102,7 +102,7 @@
       if (d < 200) { if (d > want + 6) steer(m, W, dt, spd, h, d < 140); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
         else if (P === 'lunge') { m.orb = m.orb || (Math.random() < .5 ? 1 : -1); const a = ang(m, h.x, h.y) + m.orb * Math.PI / 2, sp = this.sp * FELT_SPD * .6 * agg(W); // circle the hero like a dog pack
           m.orbCd = (m.orbCd || 0) - dt; if (!W.moveCol(m, Math.cos(a) * sp * dt, Math.sin(a) * sp * dt, m.r) && m.orbCd <= 0) { m.orb = -m.orb; m.orbCd = .8; } m.hd = a; m.face = h.x > m.x ? 1 : -1; } // flip the circling side at most every 0.8 s (was every blocked frame = shaking)
-        else { m.sideT = (m.sideT || 0) - dt; if (m.sideT <= 0) { const tg = m.sees ? fanOut(m, W, h) : 0; m.sideDir = Math.abs(tg) > .3 ? (tg > 0 ? 1 : -1) : 0; m.sideK = Math.abs(tg); m.sideT = .5; } // decide the side-step every 0.5 s (no flip-flop)
+        else { m.sideT = (m.sideT || 0) - dt; if (m.sideT <= 0) { const tg = m.sees && P !== 'skirm' ? fanOut(m, W, h) : 0; m.sideDir = Math.abs(tg) > .3 ? (tg > 0 ? 1 : -1) : 0; m.sideK = Math.abs(tg); m.sideT = .5; } // decide the side-step every 0.5 s (no flip-flop)
           if (m.sideDir) { const am = Math.atan2(m.y - h.y, m.x - h.x); glide(m, W, dt, am + m.sideDir * Math.PI / 2, this.sp * FELT_SPD * .6 * m.sideK); } m.face = h.x > m.x ? 1 : -1; } } // holding: side-step round the hero to fan out
       else if (m.mem > 0 && m.alerted) steer(m, W, dt, this.sp * FELT_SPD, h, false); // lost sight: hunts round the walls for 4.5 s
       else wander(m, W, dt, this.sp * FELT_SPD * .5);
