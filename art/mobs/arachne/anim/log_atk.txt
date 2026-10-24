@@ -1,0 +1,1 @@
+art/mobs/arachne/anim/arachne_attack status completed usage {'usd': 0.0, 'type': 'generations', 'generations': 8, 'cost_if_paid': 0.0324643261830012}

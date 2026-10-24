@@ -6,9 +6,10 @@
 (function () {
   'use strict';
   const OFF = new URLSearchParams(location.search).get('sfx2') === '0';
-  let ac = null, master = null, noiseBuf = null; const last = {};
+  let ac = null, master = null, noiseBuf = null, vol = 1; const last = {}; // vol = 효과음 크기 (설정 → 소리)
+  try { const v = localStorage.getItem('sfxVol'); if (v !== null) vol = Math.max(0, Math.min(1, +v)); } catch (e) { }
   const mkNoise = ctx => { const b = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return b; };
-  function init() { if (ac || OFF) return; try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = .45; master.connect(ac.destination); noiseBuf = mkNoise(ac); } catch (e) { ac = null; } }
+  function init() { if (ac || OFF) return; try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = .45 * vol; master.connect(ac.destination); noiseBuf = mkNoise(ac); } catch (e) { ac = null; } }
   addEventListener('keydown', init); addEventListener('pointerdown', init);
   // tone layer: wave type, f0 -> f1 Hz over dur, attack/decay volume envelope
   function tone(ctx, t0, o) { const os = ctx.createOscillator(), g = ctx.createGain(); os.type = o.type || 'square'; os.frequency.setValueAtTime(o.f0, t0); os.frequency.exponentialRampToValueAtTime(Math.max(20, o.f1), t0 + o.dur);
@@ -32,6 +33,8 @@
     heart:     [['t', { type: 'triangle', f0: 660, dur: .1, v: .2 }], ['t', { type: 'triangle', f0: 880, dur: .1, v: .2, d: .08 }], ['t', { type: 'triangle', f0: 1320, dur: .2, v: .2, d: .16 }]],
     thrust:    [['n', { f0: 1800, f1: 4200, dur: .09, v: .22, a: .01 }]],
     quaff:     [['t', { type: 'sine', f0: 420, f1: 780, dur: .12, v: .22 }], ['t', { type: 'triangle', f0: 880, f1: 1320, dur: .16, v: .14, d: .08 }]], // potion drunk: soft rising gulp + chime
+    page:      [['t', { type: 'triangle', f0: 1180, f1: 1240, dur: .045, v: .07 }]],                                      // dialog next page: tiny soft tick
+    talk:      [['t', { type: 'triangle', f0: 540, f1: 500, dur: .035, v: .07 }]],                                      // dialogue letter blip (soft, 2 letters per blip)
     deny:      [['t', { type: 'sine', f0: 240, f1: 200, dur: .07, v: .16 }]],                                            // item can't be used: one quiet low tick (no buzzer)                                                  // Linette's needle
     // sandbox-only stand-ins for the town's recorded swing / hit sounds (the game keeps the recordings)
     slash:     [['n', { f0: 1400, f1: 3800, dur: .11, v: .3, a: .015 }]],
@@ -46,5 +49,5 @@
     voice(ac, master, noiseBuf, k, vol, rate, now); }
   function render(list, secs) { const sr = 44100, oc = new OfflineAudioContext(1, Math.ceil(sr * secs), sr), m = oc.createGain(); m.gain.value = .45; m.connect(oc.destination); const nb = mkNoise(oc);
     for (const [k, t, v] of list) voice(oc, m, nb, k, v || 1, 1, t); return oc.startRendering().then(b => Array.from(b.getChannelData(0))); }
-  window.SFX2 = { play, render, has: k => !!DEF[k], names: Object.keys(DEF), get ready() { return !!ac; } };
+  window.SFX2 = { play, setVol(v) { vol = Math.max(0, Math.min(1, v)); if (master) master.gain.value = .45 * vol; }, get vol() { return vol; }, render, has: k => !!DEF[k], names: Object.keys(DEF), get ready() { return !!ac; } };
 })();
