@@ -544,13 +544,14 @@
   }
   function count(kind) { return S.mobs.filter(m => m.kind === kind && !m.dead).length; }
   function engage(m) { S.engaged = m; }
-  function hitMob(m, dmg, dir, melee) {
+  function hitMob(m, dmg, dir, melee, fin) { // fin = combo 3rd hit / special: a bigger body reaction (팀장 10-24 「때리는 모션 생동감」)
     if (m.dead || m.invuln || m.spawnT > 0) return;
     const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1; if (lastStandOn()) dmg *= LAST_STAND.atk;
     const AF = melee && window.GameAff ? window.GameAff.of(D) : null; if (AF) dmg *= AF.mul; // weapon damage type vs D.aff (weak x1.5 / resist x0.5)
-    m.hp -= dmg; m.hitT = .3; m.flash = .12; m.lagDelay = .35; if (D.onHit) D.onHit(m); sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8);
+    m.hp -= dmg; m.hitT = .3; m.hitK = fin ? 1.5 : 1; m.flash = fin ? .16 : .12; m.lagDelay = .35; if (D.onHit) D.onHit(m); sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8);
     const armored = D.felt && (m.st === 'melee' || m.st === 'shoot' || m.st === 'leap' || (m.st === 'lunge' && m.sub !== 'rec')); // felt mobs: no knockback while telegraphing / attacking (the warning stays on the body)
-    if (!D.boss && !armored) { const kb = D.champion ? 50 : 160; m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; }
+    if (!D.boss && !armored) { const kb = (D.champion ? 90 : 160) * (fin ? 1.6 : 1); m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; } // ≈ 26 px (champion 15), finisher x1.6
+    else { const pv = (D.boss ? 3 : 2) * (fin ? 1.7 : 1); m.pushX = Math.cos(dir) * pv; m.pushY = Math.sin(dir) * pv * .6; m.pushMax = Math.round(pv); m.shudT = .14; m.shudMax = 1; } // boss / mid-attack: the body only jolts (drawn), the warning stays put
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
     addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: .6, color: AF && AF.col ? AF.col : '#fff' });
     if (D.boss || D.champion) engage(m);
@@ -846,7 +847,7 @@
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
-      mm.spawnT = Math.max(0, mm.spawnT - dt); mm.hitT = Math.max(0, mm.hitT - dt); mm.flash = Math.max(0, mm.flash - dt);
+      mm.spawnT = Math.max(0, mm.spawnT - dt); mm.hitT = Math.max(0, mm.hitT - dt); mm.flash = Math.max(0, mm.flash - dt); if (mm.shudT > 0) mm.shudT -= dt; if (mm.pushX || mm.pushY) { const k = Math.pow(.0001, dt); mm.pushX *= k; mm.pushY *= k; if (Math.abs(mm.pushX) + Math.abs(mm.pushY) < .1) mm.pushX = mm.pushY = 0; }
       if (mm.lagDelay > 0) mm.lagDelay -= dt; else mm.hpLag = Math.max(mm.hp, mm.hpLag - dt * mm.maxHp * .8);
       if (mm.kx || mm.ky) { moveCol(mm, mm.kx * dt, mm.ky * dt, mm.r, mm.fly); mm.kx *= Math.pow(.002, dt); mm.ky *= Math.pow(.002, dt); if (Math.abs(mm.kx) + Math.abs(mm.ky) < 5) mm.kx = mm.ky = 0; }
       if (mm.abyStun > 0) { mm.abyStun -= dt; mm.shake = mm.abyStun > 0 ? .3 : 0; continue; } // 심연 기절: 생각·공격 멈춤
@@ -1216,7 +1217,7 @@
   function gkHits(f) { if (f.t * GK_STEP > GK_HITA) return;
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
       if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), seed: (Math.random() * 2147483646 | 0) + 1 });
-        hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
+        hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const FEEL2 = Q.get('feel') !== '0'; // 때리기·달리기 손맛 연구 (2번방 10-24) — ?feel=0 = 예전 값으로 비교
@@ -1370,7 +1371,8 @@
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
       const atkA = !!A[name] && (A[name].hit !== undefined || A[name].release !== undefined), tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
       if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
-      if (mm.hitT > .18) { bx *= 1.12; by *= .88; }
+      if (mm.hitT > .18) { const e = .3 - mm.hitT, hk = mm.hitK || 1, q = e < .034 ? 1 : Math.max(0, 1 - (e - .034) / .086); bx *= 1 + .2 * hk * q; by *= 1 - .17 * hk * q; } // squash: full for 2 ticks, eases back by 0.12 s (finisher x1.5)
+      if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
       if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
       const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
