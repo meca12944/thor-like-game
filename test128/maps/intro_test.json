@@ -14,7 +14,7 @@
   "sub": "불탄 왕도 외곽, 실에 얽힌 들"
  },
  "note": "?intro=1 시험용 임시 지도 (팀장 10-24 CH1_BUILD_PLAN: 그림이 오기 전 인트로 뼈대). 남쪽 끝 # = 외성벽 자리, 무덤가 → 북쪽 언덕 꼭대기 = 전망 ①. 새 1장이 지어지면 지운다.",
- "bgm": "area01_forest",
+ "bgm": null,
  "battleBgm": "battle_champion",
  "tileset": "field",
  "tile": 16,
@@ -130,7 +130,7 @@
    "dir": 270,
    "pan": 50,
    "name": "잿빛 들판",
-   "sub": "불탄 왕도 외곽, 실에 얽힌 들"
+   "sub": "재가 눈처럼 쌓인 왕도의 바깥 둘레"
   }
  ],
  "ground": [

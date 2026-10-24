@@ -1081,7 +1081,7 @@
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
   // [새 1장 인트로 뼈대] ?intro=1 only (팀장 10-24 CH1_BUILD_PLAN · LANDSCAPE_RESEARCH 6절 대본), test map maps/intro_test.json:
   // black + two heartbeats -> the core blinks blue on the chest -> 「...또다시 이 무덤가인가…」 -> control (pack remains nearby) -> hill = vista ①.
-  const INTRO = Q.get('intro') === '1' ? { map: 'intro_test', beats: [.5, 1.15], core: [1.5, 4.2], fade: [2.6, 4.4], say: 4.6,
+  const INTRO = Q.get('intro') === '1' ? { map: 'intro_test', beats: [.5, 1.15], core: [1.15, 4.2], /* 두 번째 심장 소리에 코어가 깜빡인다 (스토리 CH1_NEW_DIALOGUE 1절) */ fade: [2.6, 4.4], say: 4.6,
     line: '...또다시 이 무덤가인가. 몇 번째 반복인지 이제 세지도 않았다.', hint: '옆의 배낭 유해를 살펴보자 · 그다음 북쪽 언덕으로' } : null;
   function stepIntro(dt) { const m = M(); if (!m || m.id !== INTRO.map) return;
     if (!S.intro) S.intro = { t: 0, b: 0, said: false, ctl: false };
