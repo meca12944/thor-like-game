@@ -45,6 +45,7 @@
   function say(t) { toast.textContent = t; toast.style.opacity = 1; clearTimeout(toastT); toastT = setTimeout(() => toast.style.opacity = 0, 2200); }
   (document.body ? Promise.resolve() : new Promise(r => addEventListener('DOMContentLoaded', r))).then(() => document.body.appendChild(toast));
 
+  function cleanTitle(t) { return String(t || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim(); } // '1지역 필드 (사용자 제공곡 · Gemini)' -> '1지역 필드'
   function manifest() {
     if (!manP) manP = fetch(window.__v ? __v(BASE + 'bgm.json') : BASE + 'bgm.json').then(r => { if (!r.ok) throw new Error('bgm.json ' + r.status); return r.json(); })
       .then(j => (man = j)).catch(e => { failed = true; console.warn('[bgm] manifest unavailable:', e.message); return null; });
@@ -86,7 +87,7 @@
       src.start(t + 0.02);
       cur = { id, src, gain: g, oneShot: !info.loop };
       if (!info.loop) { jingleUntil = performance.now() + buf.duration * 1000; src.onended = () => { if (cur && cur.src === src) { cur = null; jingleUntil = 0; } }; }
-      if (!opt.quiet) say('♪ ' + info.title + (info.en ? '  · ' + info.en : ''));
+      if (!opt.quiet) say('♪ ' + cleanTitle(info.title)); // 점검 10-24: 화면엔 곡 이름만 (출처 괄호·영어 이름 빼기)
     }).catch(() => {});
   }
   function jingle(id) { play(id, { fade: 0.4, fadeIn: 0.02, restart: true }); }
@@ -155,7 +156,7 @@
     } else if (code === 'KeyN' && man) {
       const ids = Object.keys(man); jukebox = (jukebox + 1) % (ids.length + 1);
       if (jukebox === ids.length) { jukebox = -1; say('♪ 주크박스 끝 → 장면 음악'); cur && stopCur(0.6); }
-      else play(ids[jukebox], { restart: true }), setTimeout(() => say('♪ [' + (jukebox + 1) + '/' + ids.length + '] ' + man[ids[jukebox]].title + ' (N 다음)'), 50);
+      else play(ids[jukebox], { restart: true }), setTimeout(() => say('♪ [' + (jukebox + 1) + '/' + ids.length + '] ' + cleanTitle(man[ids[jukebox]].title) + ' (N 다음)'), 50);
     }
   });
 

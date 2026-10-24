@@ -159,7 +159,8 @@
    "name": "아라크네의 폐공방",
    "text": "거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.",
    "to": "arachne",
-   "spawn": "felt"
+   "spawn": "felt",
+   "scene": "door:arachne"
   },
   {
    "type": "mark",
@@ -381,10 +382,9 @@
    "role": "재봉사",
    "main": 1,
    "idle": "여긴 왕실 의상실이 있던 자리예요. 언젠가 여기서 영웅의 망토를 만들 거예요!",
-   "art": "a_tailor",
+   "art": "linette8",
    "quests": [
-    "q_felt_main",
-    "q_felt_cape"
+    "q_felt_main"
    ],
    "near": [
     "f_door_atelier",
@@ -621,12 +621,7 @@
     "y": 14.000000000000002,
     "ax": 105,
     "ay": 225,
-    "solid": [
-     15,
-     12,
-     19,
-     13
-    ],
+    "solid": [15, 9, 19, 13],
     "fade": 1,
     "shadow": 0,
     "D": 3
@@ -693,12 +688,7 @@
     "y": 29.19,
     "ax": 197,
     "ay": 306,
-    "solid": [
-     40,
-     27,
-     47,
-     29
-    ],
+    "solid": [40, 24, 47, 29],
     "fade": 1,
     "shadow": 0,
     "D": 3
@@ -771,7 +761,7 @@
      26,
      18
     ],
-    "fade": 0,
+    "fade": 1,
     "shadow": 1,
     "D": 3
    },

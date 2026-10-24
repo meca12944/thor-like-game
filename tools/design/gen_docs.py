@@ -566,7 +566,7 @@ E+=['',f"합계: 장비 {len(EQUIP_ITEMS)}종 → 레이어 스프라이트 {len
 E+=[f"| `{h['id']}` | {h['name']} | `{h['visual']['sprite']}` | {h['visual']['palette']} "+' '.join(f"`{c}`" for c in HIDDEN_PALETTES[h['visual']['palette']])+' | '+' '.join(f"`{c}`" for c in h['visual']['trail'])+f" | {h['visual']['look']} |" for h in HIDDEN_SWORDS]
 E+=['',f"아트: {HIDDEN_SWORD_RULE['art']}"]
 assert sum(len(v) for v in SP.values())==90
-_HM=['# 히로인과 동료 퀘스트','','> 데이터: `tools/design/heroines_data.py` → `data/towns.json` → `heroines`. 동료 퀘스트는 각 마을 `quests`에도 `companion` 필드와 함께 들어 있다. 모든 히로인은 성인이며 장면은 비노출이다.','','## 동료 시스템','']
+_HM=['# 히로인과 동료 퀘스트','','> 데이터: `tools/design/heroines_data.py` → `data/towns.json` → `heroines`. 동료 퀘스트는 각 마을 `quests`에도 `companion` 필드와 함께 들어 있다. 모든 히로인은 성인이며 장면은 노출 많고 섹시하되 노골적인 성 묘사는 없다.','','## 동료 시스템','']
 _HM+=[f"- **{k}**: {v}" for k,v in COMPANION_RULE.items() if k!='thresholds']
 _HM+=['','| 호감도 | 보상 |','|---|---|']+[f"| {k} | {v} |" for k,v in COMPANION_RULE['thresholds'].items()]
 for _h in HEROINES:
