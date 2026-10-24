@@ -27,7 +27,7 @@
   "%": "floor_crack",
   "o": {
    "ground": "floor",
-   "obj": "pit"
+   "hop": true
   },
   "U": {
    "ground": "floor",
