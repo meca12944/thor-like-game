@@ -561,7 +561,8 @@
     if (m.dead || m.invuln || m.spawnT > 0) return;
     const D = m.D; dmg *= D.dmgMul ? D.dmgMul(m) : 1; if (lastStandOn()) dmg *= LAST_STAND.atk;
     const AF = melee && window.GameAff ? window.GameAff.of(D) : null; if (AF) dmg *= AF.mul; // weapon damage type vs D.aff (weak x1.5 / resist x0.5)
-    m.hp -= dmg; m.hitT = .3; m.hitK = fin ? 1.5 : 1; m.flash = fin ? .16 : .12; m.lagDelay = .35; if (D.onHit) D.onHit(m); sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8);
+    m.hp -= dmg; m.hitT = .3; m.hitK = fin ? 1.5 : 1; m.flash = fin ? .16 : .12; m.lagDelay = .35; if (D.onHit) D.onHit(m);
+    { const ci = melee && hero.atk ? Math.min(2, hero.atk.i) : 0, rt = 1 + .03 * ci; sfx(melee && dmg >= 12 ? 'hit_heavy' : 'hit_light', .8, rt); if (melee && D.sfxMat) sfx('mat_' + D.sfxMat, .7, rt); if (melee && (fin || ci === 2)) sfx('hit_thud', .8); } // 타격음 3겹 (보고서 3-6): 타격 + 몹 재질, 콤보 1→2→3타 음높이 +3%씩, 3타 저음 쿵 — 멈춤이 걸리는 그 프레임에 바로 남
     const armored = D.felt && (m.st === 'melee' || m.st === 'shoot' || m.st === 'leap' || (m.st === 'lunge' && m.sub !== 'rec')); // felt mobs: no knockback while telegraphing / attacking (the warning stays on the body)
     if (!D.boss && !armored) { const kb = (D.champion ? 90 : 160) * (fin ? 1.6 : 1); m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; } // ≈ 26 px (champion 15), finisher x1.6
     else { const pv = (D.boss ? 3 : 2) * (fin ? 1.7 : 1); m.pushX = Math.cos(dir) * pv; m.pushY = Math.sin(dir) * pv * .6; m.pushMax = Math.round(pv); m.shudT = .14; m.shudMax = 1; } // boss / mid-attack: the body only jolts (drawn), the warning stays put
@@ -581,7 +582,7 @@
     play(seq[0]); if (seq[1]) setTimeout(() => play(seq[1]), seq[0].duration); }
   function killMob(m) {
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
-    { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } sfx('mob_die', .8); // 심연: pixel void burst instead of the white puff (the death sound used to sit inside this comment = silent)
+    { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } sfx('mob_die', .8); if (!D.boss && !D.champion && !m.summoned && !S.mobs.some(o => !o.dead && o !== m && Math.hypot(o.x - hero.x, o.y - hero.y) < 220)) after(.15, () => sfx('fight_end', .7)); // 근처 마지막 적 = 짧은 마무리 소리 // 심연: pixel void burst instead of the white puff (the death sound used to sit inside this comment = silent)
     if (D.onDeath) D.onDeath(m, W);
     if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) { sfx('coin', .6); } if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); } // shown in the pickup feed (right), not as text over the fight
