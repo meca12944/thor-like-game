@@ -230,3 +230,5 @@
 {"t": "2026-10-23 16:20:41", "name": "grok_d_cocoon_m_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 16:21:29", "name": "grok_d_cocoon_l_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
 {"t": "2026-10-23 16:21:53", "name": "grok_d_wall_strip_t", "endpoint": "/map-objects", "status": "completed", "usage": {"type": "generations", "generations": 1.0}, "n": 1.0}
+{"t": "2026-10-24 01:15:01", "name": "team_splash_0", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 01:19:34", "name": "team_splash_1", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
