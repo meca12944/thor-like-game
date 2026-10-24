@@ -1,17 +1,3 @@
-[2026-10-24 18:49:37] edit run_ne failed usage {'type': 'usd', 'usd': 0.0}
-Traceback (most recent call last):
-  File "/home/user/thor-like-game/motion_lab/grok_hero/se_test/tween.py", line 6, in <module>
-    body={'first_frame':b64(a),'last_frame':b64(b),'action':act,'frame_count':int(n),'seed':seed,'no_background':True}
-                        ~~~^^^
-  File "/home/user/thor-like-game/motion_lab/grok_hero/se_test/pl.py", line 27, in b64
-    def b64(path): return {'type':'base64','base64':base64.b64encode(open(path,'rb').read()).decode(),'format':'png'}
-                                                                     ~~~~^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: 'key_run_ne.png'
-Traceback (most recent call last):
-  File "/home/user/thor-like-game/motion_lab/grok_hero/se_test/gen5.py", line 18, in <module>
-    if not os.path.exists(f'tw8_{k}/008.png'): subprocess.run(['python3','tween.py',f'key_{k}.png',f'key_{k}.png',f'tw8_{k}','8',tp,'7'],check=True)
-                                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.13/subprocess.py", line 578, in run
-    raise CalledProcessError(retcode, process.args,
-                             output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['python3', 'tween.py', 'key_run_ne.png', 'key_run_ne.png', 'tw8_run_ne', '8', 'one complete natural human running cycle running diagonally away toward the top-right, STRICT three-quarter BACK view the whole time, his face is never visible, he never turns to a side view: the kicked-up heel swings through and that knee drives forward while the other leg pushes off and its heel kicks up showing the sole, brief moment with both feet off the ground, legs alternate cleanly, arms pump opposite to the legs, empty hands, ends back in this exact starting pose, no effects, no shadow', '7']' returned non-zero exit status 1.
+[2026-10-24 20:30:59] edit run_ne completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-24 20:33:17] tween tw8_run_ne completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+done run_ne
