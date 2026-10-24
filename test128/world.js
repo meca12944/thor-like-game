@@ -379,10 +379,12 @@
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
-      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
+      const Dq = q.D || h.D, sc = k / Dq, iw = q.strip ? im.width / q.strip[0] : im.width, ax = q.ax ?? iw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + iw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
       if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); }
+      if (q.strip) { const [n, ms, pp] = q.strip, fw = im.width / n, c = Math.floor(S.t * 1000 / ms) % (pp ? 2 * n - 2 : n), f = c < n ? c : 2 * n - 2 - c; // 그록 프롭 애니 (분수 물·빨래·리본·촛불): 가로 스트립, pp = 왕복
+        ctx.imageSmoothingEnabled = false; ctx.globalAlpha = q._a ?? 1; ctx.drawImage(im, f * fw, 0, fw, im.height, Math.round(sx) - Math.round(ax * sc), Math.round(sy) - Math.round(ay * sc), Math.round(fw * sc), Math.round(im.height * sc)); ctx.globalAlpha = 1; continue; }
       hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a); }
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
@@ -400,7 +402,7 @@
     const lm = document.createElement('canvas'); lm.width = Math.ceil(im.width / h.D / 2); lm.height = Math.ceil(im.height / h.D / 2); const g = lm.getContext('2d'); g.globalCompositeOperation = 'lighter';
     for (const [lx, ly, r, col, a] of h.lights) g.drawImage(lightSprite(col, a, Math.round(r / 2)), lx * T / 2 - r / 2, ly * T / 2 - r / 2 * .72, r, r * .72); // half world px: soft anyway
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const cg = c.getContext('2d'); cg.drawImage(im, 0, 0); cg.globalCompositeOperation = 'lighter'; cg.imageSmoothingEnabled = true; cg.drawImage(lm, 0, 0, lm.width * 2 * h.D, lm.height * 2 * h.D);
-    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
+    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under || q.strip) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
       const t = document.createElement('canvas'); t.width = pi.width; t.height = pi.height; const tg = t.getContext('2d'); tg.imageSmoothingEnabled = true; tg.drawImage(lm, wl / 2, wt / 2, pi.width / Dq / 2, pi.height / Dq / 2, 0, 0, pi.width, pi.height);
       tg.globalCompositeOperation = 'destination-in'; tg.drawImage(pi, 0, 0); const o = document.createElement('canvas'); o.width = pi.width; o.height = pi.height; const og = o.getContext('2d'); og.drawImage(pi, 0, 0); og.globalCompositeOperation = 'lighter'; og.drawImage(t, 0, 0);
       q._lit = o; }
@@ -412,7 +414,9 @@
   function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
     for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
       if (h.grade === 'dusk') { const ax = Math.max(ox, v.ox), ay = Math.max(oy, v.oy), bx = Math.min(ox + gw, v.ox + (EW + 1) * v.k), by = Math.min(oy + gh, v.oy + (EH + 1) * v.k);
-        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
+        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = h.gradeCol || 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
+      if (h.flick) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < h.flick.length; i++) { const [lx, ly, r, col, a] = h.flick[i], [fx, fy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R = r * k; if (fx < v.ox - R || fx > v.ox + (EW + 1) * v.k + R) continue; // 횃불·화덕·촛불 깜빡임 (그록 펠트 개선안 1단계): 몇 곳만 매 프레임 (나머지는 구워 둔 빛)
+          ctx.globalAlpha = Math.max(0, .35 + .25 * Math.sin(S.t * 9.1 + i * 1.7) + .15 * Math.sin(S.t * 23.3 + i * 4.1)); ctx.drawImage(lightSprite(col, a, Math.round(r)), fx - R, fy - R * .72, R * 2, R * 2 * .72); } ctx.restore(); }
       if (h.webs) { ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag, al] of h.webs) { // 거미줄 실 (breadcrumbs toward the Arachne gate), swaying a little
         const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
         ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
