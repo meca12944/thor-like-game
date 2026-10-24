@@ -1234,7 +1234,8 @@
   function feltFrame(m) { const a = m.D.anim[m.anim || 'walk'], i = feltFrame0(m); return a && a.map ? a.map[i] : i; } // optional frame remap per strip
   function feltFrame0(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
     if (a && a.once) { let t = m.at; for (let i = 0; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; } // one-shot strip (hurt)
-    if (m.anim === 'attack' || m.anim === 'shoot' || m.anim === 'pounce') { const key = m.anim === 'shoot' ? a.release : a.hit, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
+    if (a && a.loop) { const T = a.ticks.reduce((x, v) => x + v, 0) / 60; let t = (S.t + m.home[0]) % T, i = 0; for (; i < a.n - 1; i++) { t -= a.ticks[i] / 60; if (t < 0) break; } return i; } // looping stance (rage)
+    if (a && (a.hit !== undefined || a.release !== undefined)) { const key = a.release !== undefined ? a.release : a.hit, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
@@ -1243,7 +1244,7 @@
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
-      const atkA = name === 'attack' || name === 'shoot' || name === 'pounce', tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
+      const atkA = !!A[name] && (A[name].hit !== undefined || A[name].release !== undefined), tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
       if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
       if (mm.hitT > .18) { bx *= 1.12; by *= .88; }
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;

@@ -398,16 +398,18 @@
   const ARA = { rest: { chop: .35, bind: .7, clone: .6, pounce: 1.0, cage: .8, rain: .7, brood: .5, cocoon: .9 }, name: { chop: '가위 내려찍기', bind: '강철 실 봉인', clone: '실 분신 기습', pounce: '거미 덮치기', cage: '실 감옥', rain: '바늘 비', brood: '새끼 풀기', cocoon: '고치 비' }, broodMax: 6 };
   def.arachne = { name: '아라크네', title: '실타래의 재단사', boss: true, felt: true, style: 'boss', col: '#c8c2d0', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 1150, h: 60, r: 16, kb: 0, sp: 26, mat: 'm_a1_shared',
     anim: { src: 'assets/mobs_felt/c1_boss_arachne', F: 92, walk: { n: 8, ticks: [6, 6, 6, 6, 6, 6, 6, 6] }, attack: { n: 12, ticks: [6, 5, 5, 4, 4, 4, 9, 6, 8, 14, 6, 5], hit: 6 }, // 모션연구방 v1 (10-24): strike, then the scissors stuck in the floor + panting (the opening), pull out
-      pounce: { n: 13, ticks: [5, 5, 5, 5, 8, 4, 4, 4, 4, 4, 6, 6, 6], hit: 9, air: 5 }, hurt: { n: 6, ticks: [2, 3, 4, 6, 4, 4], once: true }, death: { n: 9, ticks: [6, 6, 6, 6, 5, 5, 4, 4, 30] }, shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4 } },
+      pounce: { n: 13, ticks: [5, 5, 5, 5, 8, 4, 4, 4, 4, 4, 6, 6, 6], hit: 9, air: 5 }, hurt: { n: 6, ticks: [2, 3, 4, 6, 4, 4], once: true }, death: { n: 13, ticks: [6, 6, 6, 6, 5, 5, 4, 4, 20, 8, 8, 10, 40] },
+      roar: { n: 10, ticks: [5, 5, 6, 6, 10, 40, 8, 8, 10, 10], release: 4 }, rage: { n: 4, ticks: [6, 6, 6, 6], loop: true }, ragewalk: { n: 8, ticks: [4, 4, 4, 4, 4, 4, 4, 4] }, // 모션 v2 (10-24)
+      prison: { n: 9, ticks: [5, 5, 6, 6, 12, 6, 6, 6, 6], release: 4 }, rain: { n: 9, ticks: [5, 5, 6, 6, 12, 6, 6, 6, 6], release: 4 }, shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4 } },
     init(m) { m.phase = 1; m.st = 'intro'; m.t = 0; m.anim = 'walk'; },
     update(m, W, dt) { const h = W.hero, A = this.anim, P2 = m.phase === 2, d = W.dist(m, h); m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? 1.2) - dt;
-      const look = () => { m.face = h.x >= m.x ? 1 : -1; }, rest = k => { set(m, 'rest'); m.restT = ARA.rest[k] + (m.dazeT > 0 ? .3 : 0); m.dazeT = 0; if (m.anim !== 'attack' && m.anim !== 'pounce') m.anim = 'walk'; m.moving = false; }; /* the chop's panting / the landing frames carry on into the opening */
-      if (m.phase === 1 && m.hp <= m.maxHp / 2 && m.st !== 'phase') { m.phase = 2; set(m, 'phase'); m.invuln = true; m.anim = 'shoot'; startAnim(m, 'shoot', A.shoot, A.shoot.release, .9);
+      const look = () => { m.face = h.x >= m.x ? 1 : -1; }, rest = k => { set(m, 'rest'); m.restT = ARA.rest[k] + (m.dazeT > 0 ? .3 : 0); m.dazeT = 0; if (m.anim !== 'attack' && m.anim !== 'pounce') m.anim = m.phase === 2 ? 'rage' : 'walk'; m.moving = false; }; /* the chop's panting / the landing frames carry on into the opening */
+      if (m.phase === 1 && m.hp <= m.maxHp / 2 && m.st !== 'phase') { m.phase = 2; set(m, 'phase'); m.invuln = true; startAnim(m, 'roar', A.roar, A.roar.release, A.roar.ticks.slice(0, 4).reduce((a, v) => a + v, 0) / 60);
         W.banner('「키아아아——!!」 재단사가 강철 실을 풀어 놓는다', 2.2); W.shake(6); W.fx('text', m.x, m.y - 70, { text: '!!', life: 1.4, color: '#ff4a3a' }); try { dispatchEvent(new CustomEvent('boss-phase', { detail: { kind: 'arachne', phase: 2, dur: 1.8 } })); } catch (e) { } /* 팀: UI·지도 담당이 받아 방을 어둡게 (roar, 1.8 s invulnerable) */ for (let i = 0; i < 12; i++) W.fx('text', m.x + Math.cos(i / 12 * TAU) * 34, m.y - 20 + Math.sin(i / 12 * TAU) * 20, { text: '✂', life: .7, color: '#d8d8e8' }); return; }
       switch (m.st) {
         case 'intro': m.moving = false; look(); if (m.t > Math.max(1.6, ((W.map && W.map.boss && W.map.boss.intro) || 0) + 1.6)) set(m, 'idle'); return; // waits out the camera intro + the boss_pre dialogue (shown 0.6s after it; the world is paused while it is open)
         case 'phase': m.moving = false; if (m.t > 1.8) { m.invuln = false; set(m, 'idle'); m.cd = .4; m.anim = 'walk'; } return;
-        case 'rest': m.moving = false; m.hurtCd = (m.hurtCd || 0) - dt; if (m.hitT > .1 && m.hurtCd <= 0 && m.anim !== 'hurt') { m.anim = 'hurt'; m.at = 0; m.hurtCd = 1.2; } if (m.anim === 'hurt' && m.at > .4) m.anim = 'walk'; // flinch when slashed in the opening
+        case 'rest': m.moving = false; m.hurtCd = (m.hurtCd || 0) - dt; if (m.hitT > .1 && m.hurtCd <= 0 && m.anim !== 'hurt') { m.anim = 'hurt'; m.at = 0; m.hurtCd = 1.2; } if (m.anim === 'hurt' && m.at > .4) m.anim = m.phase === 2 ? 'rage' : 'walk'; // flinch when slashed in the opening
           if (m.t > m.restT) set(m, 'idle'); return; // the opening: stands still, run in and slash
         case 'atk': if (m.at > m.dur && m.t > (m.hold || 0)) rest(m.last); return; // waiting for the strike / clones / volleys to finish
         case 'cage': { const c = m.cg; c.t += dt; m.moving = false; const k = Math.min(1, c.t / c.T), e = 1 - (1 - k) * (1 - k), R = c.R0 + (c.R1 - c.R0) * e, gw = Math.min(1.1, 34 / R), n = Math.ceil(TAU * R / 17);
@@ -418,9 +420,9 @@
           else { if (!m.landed) { m.landed = true; W.shake(3); W.fx('dust', m.x - 10, m.y); W.fx('dust', m.x + 10, m.y); } if (m.t > m.warn + .1) rest('pounce'); } return;
       }
       // idle: walk in, always facing her; never backs off
-      m.anim = 'walk'; const x0 = m.x, y0 = m.y; if (d > 62) toward(m, W, dt, this.sp * (P2 ? 1.2 : 1), h.x, h.y); look();
+      const x0 = m.x, y0 = m.y; if (d > 62) toward(m, W, dt, this.sp * (P2 ? 1.2 : 1), h.x, h.y); look();
       if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; if (dd < gap) W.moveCol(m, dx / dd * Math.min(gap - dd, 60 * dt), dy / dd * Math.min(gap - dd, 60 * dt), m.r); } // no stacking
-      const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side';
+      const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side'; m.anim = P2 ? (m.moving ? 'ragewalk' : 'rage') : 'walk'; // phase 2: angry stance / fast walk (모션 v2)
       m.shedT = (m.shedT ?? 3) - dt; if (m.shedT <= 0) { m.shedT = P2 ? 4.5 : 7; // 사장님 10-24 「몸통에서 새끼 거미가 계속 나와서」: while she walks, the spool-belly drops one spiderling (2번방 numbers)
         if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const bx = m.x - m.face * 20, by = m.y - 8; W.fx('fluff', bx, by, { life: .5, col: '#3a2a40', n: 7 }); if (W.sfx) W.sfx('deny', .6, .7);
           const c = W.spawn('c1_spiderling', bx, m.y + 4); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .6; c.spawnT = .25; } } }
@@ -454,13 +456,13 @@
         m.cg = { cx: h.x, cy: h.y, R0: R, R1: 24, t: 0, T: 2.6, gap: ang(m, h.x, h.y) + rnd(-1.2, 1.2) };
         const z = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: 34, warn: m.cg.T, act: .05, dmg: 12, kind: 'web', owner: m }); m.cg.T = z.warn;
         W.hazard({ shape: 'ring', x: h.x, y: h.y, r0: R - 4, r: R + 4, warn: .5, act: 0, dmg: 0, kind: 'web' }); // where the wall rises
-        startAnim(m, 'shoot', A.shoot, A.shoot.release, .6); set(m, 'cage'); return; }
+        startAnim(m, 'prison', A.prison, A.prison.release, .6); set(m, 'cage'); return; }
       if (k === 'cocoon') { const n = 5; // 고치 비 (팀장 10-24): cocoons drop from the ceiling onto where the hero is, shadow first; landed ones stay as obstacles, some hatch
         for (let i = 0; i < n; i++) W.after(i * .45, () => { if (m.dead) return; const H = W.hero, x = H.x, y = H.y;
           const z = W.hazard({ shape: 'circle', x, y, r: 15, warn: .9, act: .05, dmg: 8, kind: 'quake', owner: m }); W.fx('cocoonfall', x, y, { life: z.warn + .05, warn: z.warn });
           W.after(z.warn, () => { if (m.dead) return; W.shake(2); W.fx('fluff', x, y - 4, { life: .5, col: '#e8e2d4', n: 8 }); W.tempSolid(x, y, 7, 4, 'cocoon');
             if (Math.random() < .3 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const c = W.spawn('c1_spiderling', x, y + 8); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .8; c.spawnT = .25; } } }); });
-        startAnim(m, 'shoot', A.shoot, A.shoot.release, .6); set(m, 'atk'); m.hold = .45 * 4 + .9 + .1; return; }
+        startAnim(m, 'rain', A.rain, A.rain.release, .6); set(m, 'atk'); m.hold = .45 * 4 + .9 + .1; return; }
       if (k === 'rain') { let tw = .55; for (let w = 0; w < 3; w++) W.after(w * .5, () => { if (m.dead) return; const b = ang(m, W.hero.x, W.hero.y); // 3 aimed pin fans, each with its own line
           for (const s of [-.22, 0, .22]) lineTele(W, m, b + s, 150, tw, 5);
           W.after(tw, () => { if (m.dead) return; for (const s of [-.22, 0, .22]) W.shot({ x: m.x, y: m.y - 30, a: b + s, sp: 150, r: 2, dmg: 4, life: 1.3, kind: 'pin', owner: m }); }); });
