@@ -1,4 +1,5 @@
-"""Felt town rebuild (option A): standalone map (no ch1 compose), Dragon-Quest-scale wide layout, huge 3-part castle on the
+"""LEGACY (superseded by build_felt3.py; its ground2.png was removed - rerun regenerates it).
+Felt town rebuild (option A): standalone map (no ch1 compose), Dragon-Quest-scale wide layout, huge 3-part castle on the
 north edge behind a moat, natural forest edges (no fence ring), Wang ground (p_felt/w_felt), every door with an interior.
 Usage: python3 build_felt2.py   -> maps/felt.json, maps/felt_int_{weapon,tool,herb,forge}.json, assets/world/felt/castle_*.png"""
 import json, os, sys, math, random, copy

@@ -4,7 +4,7 @@
  "title": {
   "kicker": "CHAPTER 1",
   "name": "펠트",
-  "sub": "불탄 왕도 외곽의 빈민가"
+  "sub": "잿빛 왕성 아래의 마을"
  },
  "bgm": "town_ruin",
  "battleBgm": "field_battle",
@@ -12,9 +12,9 @@
  "tile": 16,
  "id": "felt",
  "name": "펠트",
- "region": "ch1",
- "w": 80,
- "h": 62,
+ "region": "felt",
+ "w": 88,
+ "h": 68,
  "legend": {
   ".": "dirt",
   "=": "dirt",
@@ -68,75 +68,81 @@
   "~"
  ],
  "ground": [
-  "######T#T#T#T#TT##CXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCTPTTT#TT##PTTTTP#",
-  "##T#TT#T#TTP#PTT##XCXXCXXCXXCXXCXXCXXCXXCXXCXXCXXCXXCXXCXXCXXCXT#TP#TTP##P#TT##T",
-  "TP#T#TTPTTP#TTT#T#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX#PT#TT#P##TTP#T##",
-  "#P##P##T#P#TP##PTTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX######T#PP#P##P##",
-  "#T##PPT#TTPTP##TT#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX######T#PT#P#TT##",
-  "##PTP#PT#T#T#TTTTTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXP#T##P#T#T##T#P##",
-  "#TP###TP#TT#P#T###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX###P#TTT#T#TT####",
-  "P#TT##PT##TP#T##T#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTT##P###TP#PTTP#",
-  "P#T#T#T#TPTPT#T#TPXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPT#T#PTPTP##P###T",
-  "####TTTT#TP#TT#T#PXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT###TTT##TPT##T##",
-  "#####TP#TT##TTPTP#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX##TTT#TTPT#P#PT#T",
-  "##TTP##T#T###TT#T#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPT##T#T###TPT###P",
-  "####T#TTTT##TT#T##XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTTP##P##T#TTTT##",
-  "###T#TPP#TTPTT###TTT############XXXXXXXXXXXXXXXX.............TTPT##T###TP#TPT###",
-  "#P#####PPTT####TPT#R############XXXXXXXXXXXXXXXX.............#####PTPT#P#P#T####",
-  "TT##TT#T####TP#TP#TTPT~~~~~~~~~~####HHHHHHHHH............ww..T~~~~~~~####TP#T##P",
-  "###PTT#T#######~~~~~~~~~~~~~~~~~~~~~~w.===........w...w.~~~~~~~~~~~~~#T#TT###PTP",
-  "#TT#P#T##TT#~~~~~~~~~~~~~w.w...~.w.~~..===..~~~~~~~~~~~~~~~~~~~~##TT~#TT#PT##T#T",
-  "TTTTPT#TTPT#~~~~~#TT#P..w..............===..~~~~~~~~~~~~~~..####T#T#T#TT#TTTPT#P",
-  "T#T#TTT##TRTRTP##TPT#P.................===.w...........w.w..#PTPPRTRPRTPP#RPT#PP",
-  "###TT................................H.===.H................................T##P",
-  "PTTTT....................s.............===....................s.....HHHH..HHTTTT",
-  "TT#TP.............u...........T........===................s....s....HHHH...HTR##",
-  "#####......HHHHHH....s............H....===....H...............s.....HHHH.....TT#",
-  "###TP.....sHHHHHH.........s............===.....s..uss................=..H....P##",
-  "###TP......HHHHHH........HHHH.........=====..........................=.......P##",
-  "P#TR.......HHHHHH........HHHH.......H========H......HHHHHHHH...HH.H..........TT#",
-  "#T##........s..=s......s.HHHH......===========......HHHHHHHH....H.......sHH.PTT#",
-  "P#T#.....H..s..=..........=.......H===========H.....HHHHHHHH............s..sPPTT",
-  "###T............H.....H...=.......=============.....HHHHHHHH..........s.....RT#T",
-  "TPPR......................s...H...===HHHHHH====....s...=..............s.....T#TP",
-  "PPPT..............................===HHHHHH====........=.......u....s.......T#T#",
-  "TTT#..............................===HHHHHH====....s.....H................s.R##T",
-  "TPTR..u.s....s....................=============............................T.T#T",
-  "TP....................s........H...H=========H....H..............HHHHHH......PTP",
-  "P.===============================================......=======...HHHHHH......P#T",
-  "#.===============================================================HHHHHH........P",
-  "T.===............====H======..........=====..===========================H=====.P",
-  "P#.............s...............H.......===.................s.H.===============.P",
-  "TRPP...................................===...........s............========.....P",
-  "P##T.................u...s.............===.....H.................s..==......TPP#",
-  "PT#Ts............................H.....===..s...HHHHHHHH............==.s...RPTPT",
-  "###T....T...............s..............===......HHHHHHHH..ss.........==....#TT#P",
-  "PT#P.....HHHHHHHH.......HHHH.s...ss.H..===.H....HHHHHHHH.............==....RP#P#",
-  "P##P.....HHHHHHHH......sHHHH........s..==.......HHHHHHHH.sHHHH.......==....PR##P",
-  "T#T#....sHHHHHHHH.......HHHH...........==.................HHHH........==....P#P#",
-  "##TP.....HHHHHHHH.....Hs.=.....s.......==.............................==..H.PPP#",
-  "#P##.......=...s.........=.......u.....==.....s.......s...........Hs..==....TTT#",
-  "T##T..s....=...........................==......T.......s..............==..s.T###",
-  "P###..s.........H.....s.s....H.........==............s.......T.....H.HHHH...T#PT",
-  "#PTP...................................===..................s........HHHH.H.PT#T",
-  "#TRP............s..s................sH.====H...........s.............HHHH...#TP#",
-  "##R........s............T..............====.....s.....................==...HR###",
-  "P#P.......................HHHHHH.......=====...............s..........==s...RPP#",
-  "P#T..s....HHHHHHHHs.......HHHHHH..T.s..======...............................RT#P",
-  "T#R.......HHHHHHHH.H......HHHHHH....s..===.==.HH.........u.............s..s.RT##",
-  "TTR.......HHHHHHHH........HHHHHH.......===..==HH............................PPT#",
-  "#TT.....H.HHHHHHHHH..........=.s.......===..==......................s.......TPPT",
-  "##TT.......=.TP####R#RPPTTPP.=........=====..==.T#T#TPT#TT#TRTTP#TT#PTP#TTTPTPPP",
-  "#TTTPTPP#T.=.P##T#T##T#P##TP...PTP#TTT=====T.s..R##T#TTTTT#T#TTPTPT######TT#TP##",
-  "#T#####PTT...TT#T#P##TT###TRTTTTP#PTPP=====PT..TP######T###T###TP#####PT#TTT#T##",
-  "TTTP##T#PRPRPR#T###P##TT###TPTPTT####P=====RRTR#TT##T######T##PT#P#TPPT#TTTTT##T"
+  "T#T###P#T##TTP#T#TTTPPTTTT#TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTT####P###T#TT##TTT#T#PT#TT#",
+  "TP#T#T##TTPTT#T#P#T##P#TP###XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT#TTT##TTTTTTTTPTPP##P####T#",
+  "#P####P###P####TPTT####TT#PPXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPT#TP#TPT##TP#PTT#T#PTT#T##T",
+  "P#TTTPTPT#TTT#PTT#T#T##TT##TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX##T#TTTT#T####PPP##T##TTP#PT",
+  "#T#P#TT#TTT#TPT#T#TTP#PTTPT#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX#TT#TP##TTPP###TTT#T#T#TPTPP",
+  "TT##TT##TP#T##T##TT#TTTTTPT#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPPTT#T#T#####T#TP###TTT#TT#T",
+  "#P#T#PP#TTPPTPP#TP####TP##T#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX#TPP##TPTTT#PT##TTP#TP#P##TP",
+  "T#TTPTTT#T#T#T#TTPTTT##P##TTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTP#T#TTT#TT#PTTT#TP#T##TTTTT",
+  "TTT###P##TPTT###T#T##P##T##TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTPTT##P###T###TTPPTTT##T#TTT",
+  "PPPPT####T###TT##T#T#TP#PPTTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXP###TPT#P##P#TT#TT##PP######",
+  "T#PTT#TTPTT#P#T#TT###T#P####XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTTPTT#P##TPPPTPP##T#P#TPT###",
+  "TP####TPT##T#TTP###T###PT#PTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTP#T#T####P#P#P#TTPP#TPTTT#T",
+  "###T#TP#PPT#TTTTP#T##P#T#TP#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXP#TT###PTT#T###P###TT##T#TT#",
+  "#TP######TTP#PTT##TTTTT#PTP#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT#P########T#TPTT##TT#P###TT",
+  "#TT##TPT#P#TTPP#PTTTT###T##TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX##TT##P##P###T###TT###P#PTP#",
+  "#T#P##T#TT#T##TTT#P######PT#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXT#T#PT##TPTPT#T##T#PP#TT#T##",
+  "PT###TPTTP##T##T#PTP#TTT#PP#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX######P##PTT##T##TTT###PT#P#",
+  "T####TT#T#T#TTTPP##P###P#P#TRT#PTPPTPRTTHTw===.PHT##TP#R#PRTTTPT#TTP###T###P##TT#P#PTT##",
+  "TTT#PT#TTTPP#P#TTT#P~~~~~~TT##############~===~~~~~~~########T##PTT###TTTPPT####T####T#T",
+  "#T##P##P###TT##PPTTT~~~~~~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~~~~~~~~~~~~~TT##T#TP##T##T#TTP",
+  "TTT#TTTTTTTPP###T#T#~~~~~~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~~~~~~~~~~~~~#TTP#PPTPTTPTT#T##",
+  "##TTTPTTPP#TP#TRTP#TR##PTT#P...~~~~~~......===.ww.......w.~~~~~~PT#TTTTPPPTRTPTTTT#PPT#T",
+  "##T............................w....ww.H...===...H.......w.....ww....................RT#",
+  "##T.u................H............H.H......===.....H...H..................HHHHHHH....##P",
+  "P#P...u...HHHHHHHH.......HHHHHH..........H.===.H.....H.....................HHHHHH...HTPT",
+  "P#P.....H.HHHHHHHH.....==HHHHHH..H.........===............HHHHHHHHHH.......HHHHHH....###",
+  "###.......HHHHHHHH...H==.HHHHHH.....u......===............HHHHHHHHHH..H...HHHHHHH....#P#",
+  "##T.......HHHHHHHH...==H.HHHHHH.H........=======..........HHHHHHHHHH.........=.....s.TTT",
+  "TTP.......HHHHHHHH...=.....=..........H.=========.H.......HHHHHHHHHH.H......==.......###",
+  "PTP.....H.......=...==H....=.....H.....=H========H......H.HHHHHHHHHH.H.....==........T##",
+  "PPP.......=======...=..=======......=================.........=.........=========.H..PTP",
+  "PPT....==================================================.....=...=============......TPP",
+  "T...======.....==========....=============================================..H........TTT",
+  "#.=====...........====..........=====H===HHHHHHH===H.===============.................T#T",
+  "T.==....s.............................===HHHHHHH===........=====.......s....u.....s..TTT",
+  "T...........................s.........===HHHHHHH===...H......................u.......TT#",
+  "##HP..............H..............H....=============.................H..........H.....TTP",
+  "#PT#...................................===========.....H...s......s....u..........H..P##",
+  "TTHP............H................H.H..H.==========H=.............u...H........s.H....TP#",
+  "TPTP.....................................=======.====.....u..........................T#P",
+  "##T#...................s..................====....====...............................#T#",
+  "P#TP..HHHHHHHHHH..........................====......===H...........H.................RTP",
+  "#T#T..HHHHHHHHHH..H....HHHHHH.........H...====....HHHH==HHHHHHHH......HHHHHH.........PP#",
+  "T#TR..HHHHHHHHHH.......HHHHHH....H........H==.....HHHH==HHHHHHHH......HHHHHH.........###",
+  "#TT#H.HHHHHHHHHH..H....HHHHHH.............===..........=HHHHHHHH...H..HHHHHH.........T#T",
+  "###T..HHHHHHHHHH.......HHHHHH.............===....H.....===............HHHHHH.H.......HPT",
+  "T##T.....=...........H..=.........H......===.===........===.............=.........H..TRP",
+  "##TTs....==...........H.=..==.......H....=========.....=======..........=H............P#",
+  "###T.....=======........=========......==========================....=========........P#",
+  "P#TP....=====================================..======H===...==================........P#",
+  "#TPTu..====...H==========.....===========.===..................===H===......==.......TT#",
+  "#TP...==......................==..........====H.....u........................==.H....T##",
+  "#PH...==......................==...........===..........................H....==.....TP#T",
+  "PT#...==........H....H.H......==.......H...===...............................==.....P##T",
+  "#TH...==..........s...........==.....H.....===............H..H...H...H........=....TTTTP",
+  "#PT...==........s.............==........H...===..H.H..........................==...TPTTP",
+  "TTT....==H................H...==............===.....................H.........==..H.T#TT",
+  "TPP....==..................HHHHHHHH.......H====...........H......H............==....T###",
+  "##T....HHHHHHHHHH....H.....HHHHHHHH........====...............H............H..==....P#T#",
+  "T#R....HHHHHHHHHH..........HHHHHHHH........=====....HH.......................HHHH.H.PTT#",
+  "#TT....HHHHHHHHHH..H.......HHHHHHHH.H......======...HH.....................H.HHHH...T##P",
+  "TPT.H..HHHHHHHHHH.....s....HHHHHHHH.......====..======......H................HHHH...PR##",
+  "TTT....HHHHHHHHHH.H...........==..........====....====....H..........H..H.....==...H.#P#",
+  "TPT.....====...................=...H......====.H............H.....s...........==.....P##",
+  "T#T.....==.=.s..u....TTTPPPH.....TT##HT...=====....u.................#TRTRP#T........TTT",
+  "###PTP#RTPP.TT#TTTPTRPHPTPPTTTP#TTTT#TRTP.=====TPTPT#TPPT#P#TTTP#T#TTRT#TP##TP###T#P.R##",
+  "#TT#T#T#P#RTTT#T###TP##PTP######PPPTPTPTP.=====.T#P#T#TTTT#PTTP#######P###PT#T#T#PTTP#T#",
+  "T#####P###TTP##PTPPTTPTT#P#####P#TT#T##TP.=====.P##T##TT##T##TTT#TPT#TP#PT#P#T###T#T#T#P"
  ],
  "objects": [
   {
    "type": "door",
    "id": "f_door_atelier",
-   "x": 15,
-   "y": 26,
+   "x": 16,
+   "y": 28,
    "name": "리네트의 공방",
    "to": "felt_int_atelier",
    "spawn": "door",
@@ -145,7 +151,7 @@
   {
    "type": "door",
    "id": "f_door_tool",
-   "x": 26,
+   "x": 27,
    "y": 27,
    "name": "잡화점",
    "to": "felt_int_tool",
@@ -154,38 +160,8 @@
   },
   {
    "type": "door",
-   "id": "f_door_weapon",
-   "x": 25,
-   "y": 45,
-   "name": "중고 무기점",
-   "to": "felt_int_weapon",
-   "spawn": "door",
-   "out": "weapon_out"
-  },
-  {
-   "type": "door",
-   "id": "f_door_chief",
-   "x": 11,
-   "y": 46,
-   "name": "이장 바르트의 집",
-   "to": "felt_int_chief",
-   "spawn": "door",
-   "out": "chief_out"
-  },
-  {
-   "type": "door",
-   "id": "f_door_smith",
-   "x": 11,
-   "y": 57,
-   "name": "롬의 대장간",
-   "to": "felt_int_forge",
-   "spawn": "door",
-   "out": "forge_out"
-  },
-  {
-   "type": "door",
    "id": "f_door_inn",
-   "x": 55,
+   "x": 62,
    "y": 29,
    "name": "마르타의 여관",
    "to": "felt_int_inn",
@@ -194,19 +170,9 @@
   },
   {
    "type": "door",
-   "id": "f_door_herb",
-   "x": 67,
-   "y": 36,
-   "name": "세라의 약초 오두막",
-   "to": "felt_int_herb",
-   "spawn": "door",
-   "out": "herb_out"
-  },
-  {
-   "type": "door",
    "id": "f_door_chapel",
-   "x": 69,
-   "y": 23,
+   "x": 77,
+   "y": 26,
    "name": "낡은 예배당",
    "to": "felt_int_chapel",
    "spawn": "door",
@@ -214,17 +180,57 @@
   },
   {
    "type": "door",
+   "id": "f_door_chief",
+   "x": 9,
+   "y": 45,
+   "name": "이장 바르트의 집",
+   "to": "felt_int_chief",
+   "spawn": "door",
+   "out": "chief_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_weapon",
+   "x": 24,
+   "y": 45,
+   "name": "중고 무기점",
+   "to": "felt_int_weapon",
+   "spawn": "door",
+   "out": "weapon_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_herb",
+   "x": 72,
+   "y": 45,
+   "name": "세라의 약초 오두막",
+   "to": "felt_int_herb",
+   "spawn": "door",
+   "out": "herb_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_smith",
+   "x": 8,
+   "y": 62,
+   "name": "롬의 대장간",
+   "to": "felt_int_forge",
+   "spawn": "door",
+   "out": "forge_out"
+  },
+  {
+   "type": "door",
    "id": "f_door_empty",
-   "x": 29,
-   "y": 56,
+   "x": 31,
+   "y": 61,
    "name": "빈집",
    "text": "판자로 막힌 빈집이다. 문틈으로 탄내가 새어 나온다.\n…안에는 아무도 없다."
   },
   {
    "type": "door",
    "id": "f_arachne_gate",
-   "x": 71,
-   "y": 51,
+   "x": 79,
+   "y": 61,
    "name": "아라크네의 폐공방",
    "text": "거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.",
    "to": "arachne",
@@ -234,15 +240,15 @@
   {
    "type": "door",
    "id": "f_door_guard",
-   "x": 47,
-   "y": 56,
+   "x": 53,
+   "y": 60,
    "name": "경비 초소",
    "text": "경비 초소와 감시탑. 안에서 주사위 구르는 소리가 난다. 문은 잠겨 있다."
   },
   {
    "type": "exit",
-   "x": 38,
-   "y": 61,
+   "x": 42,
+   "y": 67,
    "w": 5,
    "h": 1,
    "to": "field_felt",
@@ -252,8 +258,8 @@
   {
    "type": "npc",
    "id": "f_gas",
-   "x": 44,
-   "y": 54,
+   "x": 48,
+   "y": 58,
    "name": "가스",
    "role": "경비대장",
    "main": 0,
@@ -269,8 +275,8 @@
   {
    "type": "npc",
    "id": "f_toby",
-   "x": 45,
-   "y": 33,
+   "x": 48,
+   "y": 37,
    "name": "토비",
    "role": "아이",
    "main": 0,
@@ -286,8 +292,8 @@
   {
    "type": "npc",
    "id": "f_luca",
-   "x": 36,
-   "y": 33,
+   "x": 40,
+   "y": 37,
    "name": "루카",
    "role": "시인",
    "main": 0,
@@ -301,7 +307,7 @@
    "type": "npc",
    "id": "f_linette",
    "x": 18,
-   "y": 29,
+   "y": 31,
    "name": "리네트",
    "role": "재봉사",
    "main": 1,
@@ -316,7 +322,7 @@
   {
    "type": "npc",
    "id": "f_ben",
-   "x": 52,
+   "x": 60,
    "y": 47,
    "name": "벤",
    "role": "떠돌이 상인",
@@ -334,7 +340,7 @@
   {
    "type": "waystone",
    "id": "ws_felt_plaza",
-   "x": 47,
+   "x": 50,
    "y": 31,
    "name": "광장 분수",
    "walk": true
@@ -342,15 +348,15 @@
   {
    "type": "waystone",
    "id": "ws_arachne",
-   "x": 68,
-   "y": 54,
+   "x": 76,
+   "y": 63,
    "name": "폐공방 앞 비석"
   },
   {
    "type": "chest",
    "id": "f_chest_plaza",
-   "x": 29,
-   "y": 31,
+   "x": 35,
+   "y": 27,
    "loot": [
     [
      "potion",
@@ -362,8 +368,8 @@
   {
    "type": "clue",
    "id": "f_clue_bell",
-   "x": 66,
-   "y": 25,
+   "x": 76,
+   "y": 29,
    "name": "종탑 아래 뚜껑문",
    "flag": "felt_bell_open",
    "needFlags": [
@@ -382,8 +388,8 @@
   {
    "type": "hidden",
    "id": "f_hid_grave",
-   "x": 76,
-   "y": 26,
+   "x": 84,
+   "y": 28,
    "loot": [
     [
      "potion",
@@ -395,8 +401,8 @@
   {
    "type": "hidden",
    "id": "f_hid_cart",
-   "x": 32,
-   "y": 40,
+   "x": 33,
+   "y": 46,
    "loot": [
     [
      "riceball",
@@ -408,29 +414,29 @@
   {
    "type": "mark",
    "id": "f_mark_fountain",
-   "x": 40,
-   "y": 35,
+   "x": 44,
+   "y": 38,
    "name": "금 간 분수"
   },
   {
    "type": "mark",
    "id": "f_mark_stall",
-   "x": 52,
+   "x": 60,
    "y": 46,
    "name": "벤의 수레 노점"
   },
   {
    "type": "mark",
    "id": "f_mark_gate",
-   "x": 40,
-   "y": 59,
+   "x": 44,
+   "y": 64,
    "name": "남쪽 출구(잿빛 들판)"
   },
   {
    "type": "sign",
-   "x": 43,
-   "y": 58,
-   "text": "펠트\n↑ 광장 · 불탄 왕성   ← 무기점 · 잡화점 · 이장 집 · 대장간\n→ 여관 · 약초 오두막 · 예배당   ↘ 아라크네의 폐공방"
+   "x": 46,
+   "y": 63,
+   "text": "펠트\n↑ 광장 · 펠트 왕성   ← 잡화점 · 리네트 공방 · 무기점 · 이장 집 · 대장간(외곽)\n→ 여관 · 약초 오두막 · 예배당   ↘ 아라크네의 폐공방"
   },
   {
    "type": "door",
@@ -444,30 +450,28 @@
     "평 — 실 잣는 소리에 귀 기울이지 말 것.",
     "흉 — 해 지기 전에 돌아갈 것."
    ],
-   "x": 33,
-   "y": 41
+   "x": 38,
+   "y": 42
   },
   {
    "type": "sign",
-   "text": "〔펠트 게시판〕\n· 왕성 잔해 출입 금지 — 경비대장 가스\n· 해자 갈대 구함, 값 쳐 드림 — 약초꾼 세라\n· 밤에는 여관 문을 잠급니다 — 마르타\n· 들판의 굳은 사슴을 본 자는 경비 초소로",
-   "x": 50,
-   "y": 31
+   "text": "〔펠트 게시판〕\n· 왕성 출입은 허가받은 자만 — 근위대\n· 해자 갈대 구함, 값 쳐 드림 — 약초꾼 세라\n· 밤에는 여관 문을 잠급니다 — 마르타\n· 들판의 굳은 사슴을 본 자는 경비 초소로",
+   "x": 52,
+   "y": 35
   },
   {
    "type": "clue",
    "id": "f_clue_gate",
-   "x": 40,
-   "y": 17,
-   "name": "무너진 성문",
+   "name": "왕성 정문",
    "flag": "felt_look_gate",
-   "text": "불탄 왕성의 정문. 돌무더기와 숯이 된 들보가 문을 완전히 막았다.\n돌 틈에 낀 실 한 가닥이 바람에 떨린다. 안쪽에서 무언가가 당긴다.",
-   "textDone": "돌무더기에 막혀 들어갈 수 없다."
+   "text": "굳게 닫힌 펠트 왕성의 정문. 쇠창살 너머로 횃불이 흔들리고, 성벽 위로 근위병의 그림자가 오간다.\n「허가 없는 자, 들이지 말 것.」 문 옆 놋쇠판에 그렇게 새겨져 있다.",
+   "textDone": "정문은 굳게 닫혀 있다. 허가 없이는 들어갈 수 없다.",
+   "x": 44,
+   "y": 17
   },
   {
    "type": "clue",
    "id": "f_clue_moat",
-   "x": 25,
-   "y": 20,
    "name": "해자의 녹슨 투구",
    "flag": "felt_look_moat",
    "text": "해자 가장자리에 녹슨 근위대 투구가 걸려 있다. 안쪽에 이름이 긁혀 있다 — 「가스」.\n…경비대장의 옛 투구일까.",
@@ -477,7 +481,9 @@
      "potion",
      1
     ]
-   ]
+   ],
+   "x": 30,
+   "y": 22
   },
   {
    "type": "hidden",
@@ -489,8 +495,8 @@
     ]
    ],
    "find": "해자 갈대 사이에서 찾았다!",
-   "x": 56,
-   "y": 20
+   "x": 58,
+   "y": 22
   },
   {
    "type": "hidden",
@@ -502,8 +508,8 @@
     ]
    ],
    "find": "초소 뒤 돌 틈에서 찾았다!",
-   "x": 49,
-   "y": 57
+   "x": 55,
+   "y": 59
   },
   {
    "type": "hidden",
@@ -515,127 +521,117 @@
     ]
    ],
    "find": "장작더미 뒤에서 찾았다!",
-   "x": 7,
-   "y": 55
+   "x": 5,
+   "y": 60
   },
   {
    "type": "landmark",
    "id": "lm_felt_castle",
-   "name": "불탄 왕성",
-   "x": 40,
+   "name": "펠트 왕성",
+   "x": 44,
    "y": 19
   },
   {
    "type": "landmark",
    "id": "lm_felt_fountain",
-   "name": "금 간 분수",
-   "x": 40,
-   "y": 36
+   "name": "광장 분수",
+   "x": 44,
+   "y": 39
   },
   {
    "type": "landmark",
    "id": "lm_felt_grave",
    "name": "예배당 묘지",
-   "x": 74,
-   "y": 25
+   "x": 80,
+   "y": 29
   }
  ],
  "spawns": {
   "atelier_out": [
-   15.5,
-   27.9,
+   16.5,
+   29.9,
    "down"
   ],
   "tool_out": [
-   26.5,
+   27.5,
    28.9,
    "down"
   ],
-  "weapon_out": [
-   25.5,
-   46.9,
-   "down"
-  ],
-  "chief_out": [
-   11.5,
-   47.9,
-   "down"
-  ],
-  "forge_out": [
-   11.5,
-   58.9,
-   "down"
-  ],
   "inn_out": [
-   55.5,
+   62.5,
    30.9,
    "down"
   ],
-  "herb_out": [
-   67.5,
-   37.9,
+  "chapel_out": [
+   77.5,
+   27.9,
    "down"
   ],
-  "chapel_out": [
-   69.5,
-   24.9,
+  "chief_out": [
+   9.5,
+   46.9,
+   "down"
+  ],
+  "weapon_out": [
+   24.5,
+   46.9,
+   "down"
+  ],
+  "herb_out": [
+   72.5,
+   46.9,
+   "down"
+  ],
+  "forge_out": [
+   8.5,
+   63.9,
    "down"
   ],
   "arachne": [
-   71.5,
-   53.2,
+   79.5,
+   63.2,
    "down"
   ],
   "default": [
-   40.5,
-   50.5,
+   44.5,
+   52.5,
    "up"
   ],
   "world": [
-   40.5,
-   50.5,
+   44.5,
+   52.5,
    "up"
   ],
   "field": [
-   40.5,
-   59.5,
+   44.5,
+   65.5,
    "up"
   ]
  },
  "hd": {
   "D": 3,
-  "ground": "assets/world/felt/ground2.png",
+  "ground": "assets/world/felt/ground3.png",
   "props": [
    {
-    "id": "castle_l",
-    "img": "assets/world/felt/castle_l_cut.png",
-    "x": 27,
-    "y": 13,
-    "ax": 171,
-    "ay": 285,
-    "D": 1.5,
+    "id": "castle_grand",
+    "img": "assets/world/felt/castle_grand.png",
+    "x": 44.5,
+    "y": 17.6,
+    "ax": 336,
+    "ay": 379,
+    "D": 1.3,
     "fade": 0,
     "shadow": 0
    },
    {
-    "id": "castle_r",
-    "img": "assets/world/felt/castle_r_cut.png",
-    "x": 53,
-    "y": 13,
-    "ax": 171,
-    "ay": 285,
-    "D": 1.5,
-    "fade": 0,
-    "shadow": 0
-   },
-   {
-    "id": "castle_keep",
-    "img": "assets/world/felt/castle_keep.png",
-    "x": 40,
-    "y": 15,
-    "ax": 185,
-    "ay": 290,
-    "D": 1.5,
+    "id": "bridge",
+    "img": "assets/world/field_felt_hd/bridge_3.png",
+    "x": 44.5,
+    "y": 22.4,
+    "ax": 60,
+    "ay": 143,
+    "D": 2.4,
+    "under": 1,
     "fade": 0,
     "shadow": 0
    },
@@ -643,10 +639,10 @@
     "id": "linette",
     "img": "assets/world/felt/linette.png",
     "x": 14,
-    "y": 27,
+    "y": 29,
     "ax": 166,
     "ay": 275,
-    "D": 3,
+    "D": 2.25,
     "fade": 1,
     "shadow": 0,
     "door": {
@@ -665,11 +661,11 @@
    {
     "id": "bl_house",
     "img": "assets/world/felt/bl_house.png",
-    "x": 27,
+    "x": 28,
     "y": 28,
     "ax": 129,
     "ay": 230,
-    "D": 3,
+    "D": 2.25,
     "fade": 1,
     "shadow": 0,
     "door": {
@@ -686,82 +682,13 @@
     }
    },
    {
-    "id": "west_b",
-    "img": "assets/world/felt/west_b.png",
-    "x": 26,
-    "y": 46,
-    "ax": 133,
-    "ay": 390,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0,
-    "door": {
-     "id": "f_door_weapon",
-     "cx": 92,
-     "by": 388,
-     "w": 40,
-     "h": 72,
-     "col": [
-      62,
-      54,
-      39
-     ]
-    }
-   },
-   {
-    "id": "s_house",
-    "img": "assets/world/felt/s_house.png",
-    "x": 13,
-    "y": 47,
-    "ax": 197,
-    "ay": 333,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0,
-    "door": {
-     "id": "f_door_chief",
-     "cx": 136,
-     "by": 300,
-     "w": 54,
-     "h": 100,
-     "col": [
-      46,
-      35,
-      16
-     ]
-    }
-   },
-   {
-    "id": "se_house",
-    "img": "assets/world/felt/se_house.png",
-    "x": 14,
-    "y": 58,
-    "ax": 197,
-    "ay": 351,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0,
-    "door": {
-     "id": "f_door_smith",
-     "cx": 60,
-     "by": 300,
-     "w": 44,
-     "h": 82,
-     "col": [
-      14,
-      7,
-      3
-     ]
-    }
-   },
-   {
     "id": "inn",
     "img": "assets/world/felt/inn.png",
-    "x": 56,
+    "x": 63,
     "y": 30,
     "ax": 192,
     "ay": 395,
-    "D": 3,
+    "D": 2.25,
     "fade": 1,
     "shadow": 0,
     "door": {
@@ -778,36 +705,13 @@
     }
    },
    {
-    "id": "e_row",
-    "img": "assets/world/felt/e_row.png",
-    "x": 68,
-    "y": 37,
-    "ax": 136,
-    "ay": 381,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0,
-    "door": {
-     "id": "f_door_herb",
-     "cx": 110,
-     "by": 300,
-     "w": 44,
-     "h": 75,
-     "col": [
-      32,
-      24,
-      12
-     ]
-    }
-   },
-   {
     "id": "chapel",
     "img": "assets/world/felt/chapel.png",
-    "x": 70,
-    "y": 24,
+    "x": 78,
+    "y": 27,
     "ax": 65,
     "ay": 210,
-    "D": 1.5,
+    "D": 1.4,
     "fade": 1,
     "shadow": 0,
     "door": {
@@ -824,13 +728,127 @@
     }
    },
    {
+    "id": "s_house",
+    "img": "assets/world/felt/s_house.png",
+    "x": 11,
+    "y": 46,
+    "ax": 197,
+    "ay": 333,
+    "D": 2.25,
+    "fade": 1,
+    "shadow": 0,
+    "door": {
+     "id": "f_door_chief",
+     "cx": 136,
+     "by": 300,
+     "w": 54,
+     "h": 100,
+     "col": [
+      46,
+      35,
+      16
+     ]
+    }
+   },
+   {
+    "id": "west_b",
+    "img": "assets/world/felt/west_b.png",
+    "x": 26,
+    "y": 46,
+    "ax": 133,
+    "ay": 390,
+    "D": 2.25,
+    "fade": 1,
+    "shadow": 0,
+    "door": {
+     "id": "f_door_weapon",
+     "cx": 92,
+     "by": 388,
+     "w": 40,
+     "h": 72,
+     "col": [
+      62,
+      54,
+      39
+     ]
+    }
+   },
+   {
+    "id": "e_row",
+    "img": "assets/world/felt/e_row.png",
+    "x": 73,
+    "y": 46,
+    "ax": 136,
+    "ay": 381,
+    "D": 2.25,
+    "fade": 1,
+    "shadow": 0,
+    "door": {
+     "id": "f_door_herb",
+     "cx": 110,
+     "by": 300,
+     "w": 44,
+     "h": 75,
+     "col": [
+      32,
+      24,
+      12
+     ]
+    }
+   },
+   {
+    "id": "red_stall",
+    "img": "assets/world/felt/red_stall.png",
+    "x": 60,
+    "y": 45,
+    "ax": 197,
+    "ay": 306,
+    "D": 3,
+    "fade": 1,
+    "shadow": 0
+   },
+   {
+    "id": "stall_n",
+    "img": "assets/world/felt/stall_n.png",
+    "x": 52,
+    "y": 44,
+    "ax": 105,
+    "ay": 225,
+    "D": 3,
+    "fade": 1,
+    "shadow": 0
+   },
+   {
+    "id": "se_house",
+    "img": "assets/world/felt/se_house.png",
+    "x": 12,
+    "y": 63,
+    "ax": 197,
+    "ay": 351,
+    "D": 2.25,
+    "fade": 1,
+    "shadow": 0,
+    "door": {
+     "id": "f_door_smith",
+     "cx": 60,
+     "by": 300,
+     "w": 44,
+     "h": 82,
+     "col": [
+      14,
+      7,
+      3
+     ]
+    }
+   },
+   {
     "id": "sw_house",
     "img": "assets/world/felt/sw_house.png",
-    "x": 29,
-    "y": 57,
+    "x": 31,
+    "y": 62,
     "ax": 159,
     "ay": 395,
-    "D": 3,
+    "D": 2.25,
     "fade": 1,
     "shadow": 0,
     "door": {
@@ -847,21 +865,10 @@
     }
    },
    {
-    "id": "web_arch",
-    "img": "assets/world/felt/web_arch.png",
-    "x": 71,
-    "y": 52,
-    "ax": 97,
-    "ay": 394,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0
-   },
-   {
     "id": "watchtower",
     "img": "assets/world/felt/watchtower.png",
-    "x": 47,
-    "y": 57,
+    "x": 53,
+    "y": 61,
     "ax": 39,
     "ay": 225,
     "D": 1.5,
@@ -869,292 +876,290 @@
     "shadow": 0
    },
    {
-    "id": "red_stall",
-    "img": "assets/world/felt/red_stall.png",
-    "x": 52,
-    "y": 45,
-    "ax": 197,
-    "ay": 306,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0
-   },
-   {
-    "id": "stall_n",
-    "img": "assets/world/felt/stall_n.png",
-    "x": 60,
-    "y": 46,
-    "ax": 105,
-    "ay": 225,
-    "D": 3,
+    "id": "web_arch",
+    "img": "assets/world/felt/web_arch.png",
+    "x": 79,
+    "y": 62,
+    "ax": 97,
+    "ay": 394,
+    "D": 2.5,
     "fade": 1,
     "shadow": 0
    },
    {
     "id": "fountain",
     "img": "assets/world/felt/fountain.png",
-    "x": 40,
-    "y": 33,
+    "x": 44.5,
+    "y": 36,
     "ax": 146,
     "ay": 310,
-    "D": 3,
+    "D": 2.25,
     "fade": 1,
     "shadow": 0
    },
    {
-    "id": "ash_tree_a_c0",
-    "img": "assets/world/field_felt_hd/ash_tree_a.png",
-    "x": 19.2,
-    "y": 13.6,
-    "ax": 66,
-    "ay": 181,
-    "D": 3,
+    "id": "f3_banner_0_0",
+    "img": "assets/world/felt/f3_banner_0.png",
+    "x": 40.6,
+    "y": 17.7,
+    "ax": 25,
+    "ay": 152,
+    "D": 2.4,
     "fade": 0,
     "shadow": 1,
-    "sway": 1
+    "flip": false,
+    "sway": 0.6
    },
    {
-    "id": "burnt_pine_b_c1",
-    "img": "assets/world/field_felt_hd/burnt_pine_b.png",
-    "x": 17.6,
-    "y": 11.2,
-    "ax": 47,
-    "ay": 200,
-    "D": 3,
+    "id": "f3_banner_0_1",
+    "img": "assets/world/felt/f3_banner_0.png",
+    "x": 48.4,
+    "y": 17.7,
+    "ax": 25,
+    "ay": 152,
+    "D": 2.4,
     "fade": 0,
     "shadow": 1,
-    "sway": 1
+    "flip": false,
+    "sway": 0.6
    },
    {
-    "id": "dead_tree_c2",
-    "img": "assets/world/field_felt_hd/dead_tree.png",
-    "x": 20.6,
-    "y": 9.0,
-    "ax": 64,
-    "ay": 175,
-    "D": 3,
+    "id": "f3_banner_2_2",
+    "img": "assets/world/felt/f3_banner_2.png",
+    "x": 41.4,
+    "y": 25.3,
+    "ax": 24,
+    "ay": 155,
+    "D": 2.4,
     "fade": 0,
     "shadow": 1,
-    "sway": 1
+    "flip": false,
+    "sway": 0.6
    },
    {
-    "id": "ash_tree_b_c3",
-    "img": "assets/world/field_felt_hd/ash_tree_b.png",
-    "x": 60.8,
-    "y": 13.6,
-    "ax": 66,
-    "ay": 164,
-    "D": 3,
+    "id": "f3_banner_2_3",
+    "img": "assets/world/felt/f3_banner_2.png",
+    "x": 47.6,
+    "y": 25.3,
+    "ax": 24,
+    "ay": 155,
+    "D": 2.4,
     "fade": 0,
     "shadow": 1,
-    "sway": 1
+    "flip": false,
+    "sway": 0.6
    },
    {
-    "id": "burnt_pine_a_c4",
-    "img": "assets/world/field_felt_hd/burnt_pine_a.png",
-    "x": 62.4,
-    "y": 11.0,
-    "ax": 29,
-    "ay": 192,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "sway": 1
-   },
-   {
-    "id": "dead_tree_c5",
-    "img": "assets/world/field_felt_hd/dead_tree.png",
-    "x": 59.8,
-    "y": 8.6,
-    "ax": 64,
-    "ay": 175,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "sway": 1
-   },
-   {
-    "id": "burnt_pine_a_c6",
-    "img": "assets/world/field_felt_hd/burnt_pine_a.png",
-    "x": 33.6,
-    "y": 13.9,
-    "ax": 29,
-    "ay": 192,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "sway": 1
-   },
-   {
-    "id": "burnt_pine_b_c7",
-    "img": "assets/world/field_felt_hd/burnt_pine_b.png",
-    "x": 46.6,
-    "y": 13.8,
-    "ax": 47,
-    "ay": 200,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "sway": 1
-   },
-   {
-    "id": "pillar_34.2",
-    "img": "assets/world/field_felt_hd/ruin_pillar.png",
-    "x": 34.2,
-    "y": 24.4,
-    "ax": 38,
-    "ay": 143,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1
-   },
-   {
-    "id": "pillar_46.8",
-    "img": "assets/world/field_felt_hd/ruin_pillar.png",
-    "x": 46.8,
-    "y": 24.4,
-    "ax": 38,
-    "ay": 143,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1
-   },
-   {
-    "id": "stake_74.6",
-    "img": "assets/world/field_felt_hd/thread_stake.png",
-    "x": 74.6,
-    "y": 47.2,
-    "ax": 8,
-    "ay": 116,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1
-   },
-   {
-    "id": "stake_66.6",
-    "img": "assets/world/field_felt_hd/thread_stake.png",
-    "x": 66.6,
-    "y": 47.6,
-    "ax": 8,
-    "ay": 116,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1
-   },
-   {
-    "id": "stake_75.4",
-    "img": "assets/world/field_felt_hd/thread_stake.png",
-    "x": 75.4,
-    "y": 53.4,
-    "ax": 8,
-    "ay": 116,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1
-   },
-   {
-    "id": "ember_rubble_13",
-    "img": "assets/world/felt/ember_rubble.png",
-    "x": 40.5,
-    "y": 16.3,
-    "ax": 58,
-    "ay": 63,
+    "id": "brazier_4",
+    "img": "assets/world/felt/brazier.png",
+    "x": 39.6,
+    "y": 23.4,
+    "ax": 20,
+    "ay": 62,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "rubble_14",
-    "img": "assets/world/felt/rubble.png",
-    "x": 36.6,
-    "y": 15.8,
-    "ax": 27,
-    "ay": 32,
+    "id": "brazier_5",
+    "img": "assets/world/felt/brazier.png",
+    "x": 49.4,
+    "y": 23.4,
+    "ax": 20,
+    "ay": 62,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "rubble_15",
-    "img": "assets/world/felt/rubble.png",
-    "x": 44.3,
-    "y": 16.0,
-    "ax": 27,
-    "ay": 32,
+    "id": "brazier_6",
+    "img": "assets/world/felt/brazier.png",
+    "x": 38.6,
+    "y": 28.8,
+    "ax": 20,
+    "ay": 62,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "brazier_7",
+    "img": "assets/world/felt/brazier.png",
+    "x": 50.4,
+    "y": 28.8,
+    "ax": 20,
+    "ay": 62,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "brazier_8",
+    "img": "assets/world/felt/brazier.png",
+    "x": 38.6,
+    "y": 38.6,
+    "ax": 20,
+    "ay": 62,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "brazier_9",
+    "img": "assets/world/felt/brazier.png",
+    "x": 50.4,
+    "y": 38.6,
+    "ax": 20,
+    "ay": 62,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "bench_10",
+    "img": "assets/world/felt/bench.png",
+    "x": 40.0,
+    "y": 30.2,
+    "ax": 36,
+    "ay": 35,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "bench_11",
+    "img": "assets/world/felt/bench.png",
+    "x": 49.0,
+    "y": 30.2,
+    "ax": 36,
+    "ay": 35,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": true
    },
    {
-    "id": "brazier_16",
-    "img": "assets/world/felt/brazier.png",
-    "x": 37.2,
-    "y": 21.2,
-    "ax": 20,
-    "ay": 62,
+    "id": "f3_flowers_0_12",
+    "img": "assets/world/felt/f3_flowers_0.png",
+    "x": 37.6,
+    "y": 33.6,
+    "ax": 45,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_flowers_1_13",
+    "img": "assets/world/felt/f3_flowers_1.png",
+    "x": 51.4,
+    "y": 33.6,
+    "ax": 45,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_goods_0_14",
+    "img": "assets/world/felt/f3_goods_0.png",
+    "x": 55.6,
+    "y": 41.8,
+    "ax": 41,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_goods_2_15",
+    "img": "assets/world/felt/f3_goods_2.png",
+    "x": 63.6,
+    "y": 42.6,
+    "ax": 39,
+    "ay": 72,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_goods_3_16",
+    "img": "assets/world/felt/f3_goods_3.png",
+    "x": 49.6,
+    "y": 45.6,
+    "ax": 48,
+    "ay": 68,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "string_lights_17",
+    "img": "assets/world/felt/string_lights.png",
+    "x": 56.2,
+    "y": 39.6,
+    "ax": 100,
+    "ay": 121,
+    "D": 3,
+    "fade": 1,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "lamp_18",
+    "img": "assets/world/felt/lamp.png",
+    "x": 42.4,
+    "y": 44.5,
+    "ax": 14,
+    "ay": 79,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "brazier_17",
-    "img": "assets/world/felt/brazier.png",
-    "x": 43.8,
-    "y": 21.2,
-    "ax": 20,
-    "ay": 62,
+    "id": "lamp_19",
+    "img": "assets/world/felt/lamp.png",
+    "x": 46.8,
+    "y": 52.5,
+    "ax": 14,
+    "ay": 79,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "brazier_18",
-    "img": "assets/world/felt/brazier.png",
-    "x": 34.4,
-    "y": 29.4,
-    "ax": 20,
-    "ay": 62,
+    "id": "lamp_20",
+    "img": "assets/world/felt/lamp.png",
+    "x": 42.2,
+    "y": 58.5,
+    "ax": 14,
+    "ay": 79,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "brazier_19",
-    "img": "assets/world/felt/brazier.png",
-    "x": 46.6,
-    "y": 29.4,
-    "ax": 20,
-    "ay": 62,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "brazier_20",
-    "img": "assets/world/felt/brazier.png",
-    "x": 35.2,
-    "y": 35.4,
-    "ax": 20,
-    "ay": 62,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "brazier_21",
-    "img": "assets/world/felt/brazier.png",
-    "x": 45.8,
-    "y": 35.4,
-    "ax": 20,
-    "ay": 62,
+    "id": "lamp_21",
+    "img": "assets/world/felt/lamp.png",
+    "x": 47.0,
+    "y": 64.5,
+    "ax": 14,
+    "ay": 79,
     "D": 3,
     "fade": 0,
     "shadow": 1,
@@ -1163,8 +1168,8 @@
    {
     "id": "lamp_22",
     "img": "assets/world/felt/lamp.png",
-    "x": 36.9,
-    "y": 44.5,
+    "x": 33,
+    "y": 29.6,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1175,8 +1180,8 @@
    {
     "id": "lamp_23",
     "img": "assets/world/felt/lamp.png",
-    "x": 43.1,
-    "y": 44.5,
+    "x": 22,
+    "y": 29.9,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1187,8 +1192,8 @@
    {
     "id": "lamp_24",
     "img": "assets/world/felt/lamp.png",
-    "x": 37,
-    "y": 52.5,
+    "x": 8.5,
+    "y": 30.4,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1199,8 +1204,8 @@
    {
     "id": "lamp_25",
     "img": "assets/world/felt/lamp.png",
-    "x": 43.2,
-    "y": 52.5,
+    "x": 56,
+    "y": 29.9,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1211,8 +1216,8 @@
    {
     "id": "lamp_26",
     "img": "assets/world/felt/lamp.png",
-    "x": 21,
-    "y": 37.6,
+    "x": 69,
+    "y": 30.2,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1223,8 +1228,8 @@
    {
     "id": "lamp_27",
     "img": "assets/world/felt/lamp.png",
-    "x": 31,
-    "y": 34.6,
+    "x": 76.8,
+    "y": 33.0,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1235,8 +1240,8 @@
    {
     "id": "lamp_28",
     "img": "assets/world/felt/lamp.png",
-    "x": 50,
-    "y": 34.7,
+    "x": 36,
+    "y": 47.7,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1247,8 +1252,8 @@
    {
     "id": "lamp_29",
     "img": "assets/world/felt/lamp.png",
-    "x": 61,
-    "y": 39.3,
+    "x": 22,
+    "y": 47.8,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1259,8 +1264,8 @@
    {
     "id": "lamp_30",
     "img": "assets/world/felt/lamp.png",
-    "x": 16.4,
-    "y": 30.3,
+    "x": 14,
+    "y": 51.4,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1271,8 +1276,8 @@
    {
     "id": "lamp_31",
     "img": "assets/world/felt/lamp.png",
-    "x": 57.6,
-    "y": 33.3,
+    "x": 53,
+    "y": 50.5,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1283,8 +1288,8 @@
    {
     "id": "lamp_32",
     "img": "assets/world/felt/lamp.png",
-    "x": 66.5,
-    "y": 26.8,
+    "x": 66,
+    "y": 51.0,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1295,8 +1300,8 @@
    {
     "id": "lamp_33",
     "img": "assets/world/felt/lamp.png",
-    "x": 29.4,
-    "y": 49.6,
+    "x": 73,
+    "y": 47.9,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1307,8 +1312,8 @@
    {
     "id": "lamp_34",
     "img": "assets/world/felt/lamp.png",
-    "x": 16.4,
-    "y": 49.8,
+    "x": 80.6,
+    "y": 52.5,
     "ax": 14,
     "ay": 79,
     "D": 3,
@@ -1317,46 +1322,143 @@
     "flip": false
    },
    {
-    "id": "well_35",
-    "img": "assets/world/felt/well.png",
-    "x": 33.5,
-    "y": 42,
-    "ax": 37,
-    "ay": 92,
+    "id": "lamp_35",
+    "img": "assets/world/felt/lamp.png",
+    "x": 9.3,
+    "y": 57,
+    "ax": 14,
+    "ay": 79,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "bench_36",
-    "img": "assets/world/felt/bench.png",
-    "x": 36.2,
+    "id": "f3_garden_0_36",
+    "img": "assets/world/felt/f3_garden_0.png",
+    "x": 21.2,
+    "y": 24.2,
+    "ax": 55,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_1_37",
+    "img": "assets/world/felt/f3_garden_1.png",
+    "x": 21.6,
     "y": 26.6,
-    "ax": 36,
-    "ay": 35,
+    "ax": 54,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_laundry_line_38",
+    "img": "assets/world/felt/f3_laundry_line.png",
+    "x": 6.6,
+    "y": 27.8,
+    "ax": 53,
+    "ay": 78,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 0,
+    "flip": false,
+    "sway": 0.8
+   },
+   {
+    "id": "f3_flowers_2_39",
+    "img": "assets/world/felt/f3_flowers_2.png",
+    "x": 33.6,
+    "y": 26.2,
+    "ax": 53,
+    "ay": 68,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "barrels_40",
+    "img": "assets/world/felt/barrels.png",
+    "x": 32.8,
+    "y": 28.2,
+    "ax": 22,
+    "ay": 56,
     "D": 3,
     "fade": 0,
     "shadow": 1,
     "flip": false
    },
    {
-    "id": "bench_37",
-    "img": "assets/world/felt/bench.png",
-    "x": 45.0,
-    "y": 26.6,
-    "ax": 36,
-    "ay": 35,
+    "id": "crates_41",
+    "img": "assets/world/felt/crates.png",
+    "x": 23.6,
+    "y": 28.4,
+    "ax": 40,
+    "ay": 59,
     "D": 3,
     "fade": 0,
     "shadow": 1,
-    "flip": true
+    "flip": false
    },
    {
-    "id": "cart_38",
+    "id": "f3_hay_0_42",
+    "img": "assets/world/felt/f3_hay_0.png",
+    "x": 8.2,
+    "y": 25.6,
+    "ax": 43,
+    "ay": 62,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_sign_tool_hammer_bag_43",
+    "img": "assets/world/felt/f3_sign_tool_hammer_bag.png",
+    "x": 30.8,
+    "y": 23.6,
+    "ax": 43,
+    "ay": 55,
+    "D": 3,
+    "fade": 0,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_2_44",
+    "img": "assets/world/felt/f3_garden_2.png",
+    "x": 18.6,
+    "y": 42.6,
+    "ax": 57,
+    "ay": 64,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_flowers_3_45",
+    "img": "assets/world/felt/f3_flowers_3.png",
+    "x": 18.6,
+    "y": 45.4,
+    "ax": 27,
+    "ay": 65,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "cart_46",
     "img": "assets/world/felt/cart.png",
-    "x": 31.4,
-    "y": 38.9,
+    "x": 33.4,
+    "y": 44.4,
     "ax": 41,
     "ay": 74,
     "D": 3,
@@ -1365,10 +1467,22 @@
     "flip": false
    },
    {
-    "id": "barrels_39",
+    "id": "f3_hay_1_47",
+    "img": "assets/world/felt/f3_hay_1.png",
+    "x": 34.6,
+    "y": 47.2,
+    "ax": 48,
+    "ay": 65,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "barrels_48",
     "img": "assets/world/felt/barrels.png",
-    "x": 30.2,
-    "y": 31.2,
+    "x": 21.6,
+    "y": 47.4,
     "ax": 22,
     "ay": 56,
     "D": 3,
@@ -1377,58 +1491,10 @@
     "flip": false
    },
    {
-    "id": "crates_40",
-    "img": "assets/world/felt/crates.png",
-    "x": 22.5,
-    "y": 30.5,
-    "ax": 40,
-    "ay": 59,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "barrels_41",
-    "img": "assets/world/felt/barrels.png",
-    "x": 59.4,
-    "y": 30.4,
-    "ax": 22,
-    "ay": 56,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "crates_42",
-    "img": "assets/world/felt/crates.png",
-    "x": 47.3,
-    "y": 41.2,
-    "ax": 40,
-    "ay": 59,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "anvil_43",
-    "img": "assets/world/felt/anvil.png",
-    "x": 18.4,
-    "y": 58.5,
-    "ax": 24,
-    "ay": 34,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "woodpile_44",
+    "id": "woodpile_49",
     "img": "assets/world/felt/woodpile.png",
-    "x": 8.5,
-    "y": 57.6,
+    "x": 4.6,
+    "y": 44.6,
     "ax": 27,
     "ay": 52,
     "D": 3,
@@ -1437,10 +1503,22 @@
     "flip": false
    },
    {
-    "id": "barrels_45",
+    "id": "f3_sign_weapon_sword_50",
+    "img": "assets/world/felt/f3_sign_weapon_sword.png",
+    "x": 22.4,
+    "y": 44.0,
+    "ax": 36,
+    "ay": 60,
+    "D": 3,
+    "fade": 0,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "barrels_51",
     "img": "assets/world/felt/barrels.png",
-    "x": 19.6,
-    "y": 56.3,
+    "x": 56.6,
+    "y": 29.6,
     "ax": 22,
     "ay": 56,
     "D": 3,
@@ -1449,106 +1527,10 @@
     "flip": false
    },
    {
-    "id": "herb_rack_46",
-    "img": "assets/world/felt/herb_rack.png",
-    "x": 72.3,
-    "y": 38.0,
-    "ax": 44,
-    "ay": 89,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "string_lights_47",
-    "img": "assets/world/felt/string_lights.png",
-    "x": 56,
-    "y": 41.3,
-    "ax": 100,
-    "ay": 121,
-    "D": 3,
-    "fade": 1,
-    "shadow": 0,
-    "flip": false
-   },
-   {
-    "id": "candelabra_48",
-    "img": "assets/world/felt/candelabra.png",
-    "x": 72.6,
-    "y": 24.8,
-    "ax": 15,
-    "ay": 113,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "mausoleum_49",
-    "img": "assets/world/felt/mausoleum.png",
-    "x": 75.8,
-    "y": 22.6,
-    "ax": 47,
-    "ay": 141,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "tombs_50",
-    "img": "assets/world/felt/tombs.png",
-    "x": 74.9,
-    "y": 28.4,
-    "ax": 70,
-    "ay": 112,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "tombs_51",
-    "img": "assets/world/felt/tombs.png",
-    "x": 64.6,
-    "y": 27.8,
-    "ax": 70,
-    "ay": 112,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": true
-   },
-   {
-    "id": "cocoons_52",
-    "img": "assets/world/felt/cocoons.png",
-    "x": 74.4,
-    "y": 50.6,
-    "ax": 42,
-    "ay": 93,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": false
-   },
-   {
-    "id": "cocoons_53",
-    "img": "assets/world/felt/cocoons.png",
-    "x": 67.8,
-    "y": 49.8,
-    "ax": 42,
-    "ay": 93,
-    "D": 3,
-    "fade": 0,
-    "shadow": 1,
-    "flip": true
-   },
-   {
-    "id": "crates_54",
+    "id": "crates_52",
     "img": "assets/world/felt/crates.png",
-    "x": 9.2,
-    "y": 28.6,
+    "x": 69.4,
+    "y": 29.4,
     "ax": 40,
     "ay": 59,
     "D": 3,
@@ -1557,12 +1539,882 @@
     "flip": false
    },
    {
-    "id": "barrels_55",
+    "id": "f3_hay_3_53",
+    "img": "assets/world/felt/f3_hay_3.png",
+    "x": 70.4,
+    "y": 27.0,
+    "ax": 55,
+    "ay": 59,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "herb_rack_54",
+    "img": "assets/world/felt/herb_rack.png",
+    "x": 77.8,
+    "y": 46.4,
+    "ax": 44,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_3_55",
+    "img": "assets/world/felt/f3_garden_3.png",
+    "x": 67.6,
+    "y": 44.8,
+    "ax": 54,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_flowers_1_56",
+    "img": "assets/world/felt/f3_flowers_1.png",
+    "x": 67.2,
+    "y": 41.8,
+    "ax": 45,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_sign_herb_leaf_57",
+    "img": "assets/world/felt/f3_sign_herb_leaf.png",
+    "x": 69.6,
+    "y": 43.6,
+    "ax": 32,
+    "ay": 48,
+    "D": 3,
+    "fade": 0,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "candelabra_58",
+    "img": "assets/world/felt/candelabra.png",
+    "x": 74.6,
+    "y": 27.0,
+    "ax": 15,
+    "ay": 113,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "mausoleum_59",
+    "img": "assets/world/felt/mausoleum.png",
+    "x": 84.0,
+    "y": 25.4,
+    "ax": 47,
+    "ay": 141,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "tombs_60",
+    "img": "assets/world/felt/tombs.png",
+    "x": 82.6,
+    "y": 30.6,
+    "ax": 70,
+    "ay": 112,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "tombs_61",
+    "img": "assets/world/felt/tombs.png",
+    "x": 74.0,
+    "y": 24.0,
+    "ax": 70,
+    "ay": 112,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "anvil_62",
+    "img": "assets/world/felt/anvil.png",
+    "x": 18.6,
+    "y": 63.4,
+    "ax": 24,
+    "ay": 34,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "woodpile_63",
+    "img": "assets/world/felt/woodpile.png",
+    "x": 4.8,
+    "y": 62.2,
+    "ax": 27,
+    "ay": 52,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "barrels_64",
     "img": "assets/world/felt/barrels.png",
-    "x": 22.4,
-    "y": 46.6,
+    "x": 19.6,
+    "y": 61.0,
     "ax": 22,
     "ay": 56,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_hay_2_65",
+    "img": "assets/world/felt/f3_hay_2.png",
+    "x": 21.0,
+    "y": 58.8,
+    "ax": 44,
+    "ay": 75,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "crates_66",
+    "img": "assets/world/felt/crates.png",
+    "x": 36.4,
+    "y": 61.4,
+    "ax": 40,
+    "ay": 59,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "cart_67",
+    "img": "assets/world/felt/cart.png",
+    "x": 26.2,
+    "y": 57.2,
+    "ax": 41,
+    "ay": 74,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_0_68",
+    "img": "assets/world/felt/f3_garden_0.png",
+    "x": 58,
+    "y": 55.2,
+    "ax": 55,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_1_69",
+    "img": "assets/world/felt/f3_garden_1.png",
+    "x": 61.6,
+    "y": 55.4,
+    "ax": 54,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_2_70",
+    "img": "assets/world/felt/f3_garden_2.png",
+    "x": 65.2,
+    "y": 55.0,
+    "ax": 57,
+    "ay": 64,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_3_71",
+    "img": "assets/world/felt/f3_garden_3.png",
+    "x": 58.4,
+    "y": 58.4,
+    "ax": 54,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_0_72",
+    "img": "assets/world/felt/f3_garden_0.png",
+    "x": 62.0,
+    "y": 58.6,
+    "ax": 55,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_garden_1_73",
+    "img": "assets/world/felt/f3_garden_1.png",
+    "x": 65.6,
+    "y": 58.2,
+    "ax": 54,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "f3_hay_0_74",
+    "img": "assets/world/felt/f3_hay_0.png",
+    "x": 68.8,
+    "y": 57.0,
+    "ax": 43,
+    "ay": 62,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "thread_stake_75",
+    "img": "assets/world/field_felt_hd/thread_stake.png",
+    "x": 82.6,
+    "y": 57.2,
+    "ax": 8,
+    "ay": 116,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "thread_stake_76",
+    "img": "assets/world/field_felt_hd/thread_stake.png",
+    "x": 75.4,
+    "y": 58.6,
+    "ax": 8,
+    "ay": 116,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "thread_stake_77",
+    "img": "assets/world/field_felt_hd/thread_stake.png",
+    "x": 83.4,
+    "y": 62.6,
+    "ax": 8,
+    "ay": 116,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "cocoons_78",
+    "img": "assets/world/felt/cocoons.png",
+    "x": 82.4,
+    "y": 60.2,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "cocoons_79",
+    "img": "assets/world/felt/cocoons.png",
+    "x": 75.6,
+    "y": 61.4,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "oak1_0_80",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 36.15788081894943,
+    "y": 23.62392896735524,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_0_81",
+    "img": "assets/world/fields_hd/oak_0.png",
+    "x": 34.178167828232354,
+    "y": 23.770882023838126,
+    "ax": 57,
+    "ay": 144,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_82",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 51.525833256031724,
+    "y": 24.5577562572476,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_83",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 55.032883967013284,
+    "y": 23.81733735010623,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_84",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 53.8592996116041,
+    "y": 25.26423565589405,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_85",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 2.1025569773901864,
+    "y": 36.86206878904333,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak1_0_86",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 2.085999893150817,
+    "y": 38.6472461369945,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_87",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 18.416469061082747,
+    "y": 37.39686748986362,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_1_88",
+    "img": "assets/world/fields_hd/oak_1.png",
+    "x": 16.326823125029183,
+    "y": 39.23381598660906,
+    "ax": 55,
+    "ay": 138,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_1_89",
+    "img": "assets/world/fields_hd/oak_1.png",
+    "x": 33.97224917605072,
+    "y": 37.2109817694951,
+    "ax": 55,
+    "ay": 138,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_90",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 33.55074978560342,
+    "y": 39.16708543330417,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_91",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 35.68688883634265,
+    "y": 38.893983545940074,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_92",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 54.62730467573147,
+    "y": 36.10455926292855,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_93",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 55.291901384308126,
+    "y": 37.76867419147027,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_94",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 69.18185244035185,
+    "y": 38.67139729374036,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_95",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 68.0555068622092,
+    "y": 36.889903862388906,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_0_96",
+    "img": "assets/world/fields_hd/oak_0.png",
+    "x": 79.0963295097093,
+    "y": 37.18453691924926,
+    "ax": 57,
+    "ay": 144,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_2_97",
+    "img": "assets/world/fields_hd/oak_2.png",
+    "x": 82.6470624604448,
+    "y": 38.31939316580774,
+    "ax": 57,
+    "ay": 141,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_2_98",
+    "img": "assets/world/fields_hd/oak_2.png",
+    "x": 80.96824010882136,
+    "y": 38.64681117893118,
+    "ax": 57,
+    "ay": 141,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_99",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 37.65203776245636,
+    "y": 55.29438928871037,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_0_100",
+    "img": "assets/world/fields_hd/oak_0.png",
+    "x": 39.98176302870637,
+    "y": 54.57865505422653,
+    "ax": 57,
+    "ay": 144,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_101",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 40.7613566866901,
+    "y": 55.95321947638201,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_102",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 49.313630368697886,
+    "y": 56.40077267168,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_103",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 51.100618023254015,
+    "y": 55.9384916848632,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_104",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 23.263075679404285,
+    "y": 54.34230599291074,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_105",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 21.921214943118862,
+    "y": 53.75427444676746,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_106",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 2.4431669584730464,
+    "y": 54.914229339871085,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak1_0_107",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 2.3763289488415817,
+    "y": 52.63988022683709,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_1_108",
+    "img": "assets/world/fields_hd/oak_1.png",
+    "x": 69.41270320645542,
+    "y": 55.36233837933004,
+    "ax": 55,
+    "ay": 138,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_109",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 72.16019105151537,
+    "y": 53.51277006213532,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_110",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 82.37672417661533,
+    "y": 47.14804775768356,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_111",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 85.38620694263955,
+    "y": 46.04693034274697,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_112",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 58.46808009075693,
+    "y": 63.02953163424412,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak_1_113",
+    "img": "assets/world/fields_hd/oak_1.png",
+    "x": 60.47764041138666,
+    "y": 63.772909103614666,
+    "ax": 55,
+    "ay": 138,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_2_114",
+    "img": "assets/world/fields_hd/oak_2.png",
+    "x": 60.52404545240738,
+    "y": 61.93694251148501,
+    "ax": 57,
+    "ay": 141,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "oak1_0_115",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 37.135195961921994,
+    "y": 64.95096363869281,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak1_0_116",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 35.64174697710898,
+    "y": 63.71815690519162,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_3_117",
+    "img": "assets/world/fields_hd/oak_3.png",
+    "x": 22.922609336256755,
+    "y": 66.10323381837432,
+    "ax": 58,
+    "ay": 145,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak_2_118",
+    "img": "assets/world/fields_hd/oak_2.png",
+    "x": 27.082785107377422,
+    "y": 65.29718550916056,
+    "ax": 57,
+    "ay": 141,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "oak1_0_119",
+    "img": "assets/world/fields_hd/oak1_0.png",
+    "x": 16.146455925348352,
+    "y": 53.93850169048984,
+    "ax": 71,
+    "ay": 174,
+    "D": 2.25,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_b_120",
+    "img": "assets/world/field_felt_hd/ash_tree_b.png",
+    "x": 72.44559458853573,
+    "y": 62.826858423529536,
+    "ax": 66,
+    "ay": 164,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false,
+    "sway": 1
+   },
+   {
+    "id": "ash_tree_a_121",
+    "img": "assets/world/field_felt_hd/ash_tree_a.png",
+    "x": 69.19138951969146,
+    "y": 63.353079020857635,
+    "ax": 66,
+    "ay": 181,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true,
+    "sway": 1
+   },
+   {
+    "id": "well_122",
+    "img": "assets/world/felt/well.png",
+    "x": 38.5,
+    "y": 43.0,
+    "ax": 37,
+    "ay": 92,
     "D": 3,
     "fade": 0,
     "shadow": 1,
@@ -1584,9 +2436,31 @@
      "sway": 1
     },
     {
-     "img": "assets/world/field_felt_hd/dead_tree.png",
-     "ax": 64,
-     "ay": 175,
+     "img": "assets/world/fields_hd/oak_0.png",
+     "ax": 57,
+     "ay": 144,
+     "D": 2.25,
+     "sway": 1
+    },
+    {
+     "img": "assets/world/fields_hd/oak_1.png",
+     "ax": 55,
+     "ay": 138,
+     "D": 2.25,
+     "sway": 1
+    },
+    {
+     "img": "assets/world/fields_hd/oak_2.png",
+     "ax": 57,
+     "ay": 141,
+     "D": 2.25,
+     "sway": 1
+    },
+    {
+     "img": "assets/world/fields_hd/oak_3.png",
+     "ax": 58,
+     "ay": 145,
+     "D": 2.25,
      "sway": 1
     }
    ],
@@ -1640,6 +2514,16 @@
      "ay": 46
     },
     {
+     "img": "assets/world/field_felt_hd/stone_low.png",
+     "ax": 70,
+     "ay": 43
+    },
+    {
+     "img": "assets/world/field_felt_hd/stump.png",
+     "ax": 25,
+     "ay": 46
+    },
+    {
      "img": "assets/world/field_felt_hd/pale_mushrooms.png",
      "ax": 32,
      "ay": 55
@@ -1648,11 +2532,6 @@
      "img": "assets/world/field_felt_hd/stone_low.png",
      "ax": 70,
      "ay": 43
-    },
-    {
-     "img": "assets/world/field_felt_hd/pale_mushrooms.png",
-     "ax": 32,
-     "ay": 55
     }
    ],
    "C": [
@@ -1675,2530 +2554,5243 @@
   },
   "lights": [
    [
-    37.2,
-    20.3,
+    39.6,
+    22.5,
     62,
     "#ff8a3a",
     1
    ],
    [
-    43.8,
-    20.3,
+    49.4,
+    22.5,
     62,
     "#ff8a3a",
     1
    ],
    [
-    34.4,
-    28.5,
+    38.6,
+    27.900000000000002,
     62,
     "#ff8a3a",
     1
    ],
    [
-    46.6,
-    28.5,
+    50.4,
+    27.900000000000002,
     62,
     "#ff8a3a",
     1
    ],
    [
-    35.2,
-    34.5,
+    38.6,
+    37.7,
     62,
     "#ff8a3a",
     1
    ],
    [
-    45.8,
-    34.5,
+    50.4,
+    37.7,
     62,
     "#ff8a3a",
     1
    ],
    [
-    36.9,
+    42.4,
     43.3,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
-    43.1,
-    43.3,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
-    37,
-    51.3,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
-    43.2,
-    51.3,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
-    21,
-    36.4,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
-    31,
-    33.4,
-    46,
-    "#ffb060",
-    0.8
-   ],
-   [
     50,
-    33.5,
-    46,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    61,
-    38.099999999999994,
-    46,
+    46.8,
+    51.3,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    16.4,
-    29.1,
-    46,
+    42.2,
+    57.3,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    57.6,
-    32.099999999999994,
-    46,
+    47.0,
+    63.3,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    66.5,
-    25.6,
-    46,
+    33,
+    28.400000000000002,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    29.4,
-    48.4,
-    46,
+    22,
+    28.7,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    16.4,
-    48.599999999999994,
-    46,
+    8.5,
+    29.2,
+    50,
     "#ffb060",
-    0.8
+    0.85
    ],
    [
-    72.6,
-    23.2,
+    56,
+    28.7,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    69,
+    29.0,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    76.8,
+    31.8,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    36,
+    46.5,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    22,
+    46.599999999999994,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    14,
+    50.199999999999996,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    53,
+    49.3,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    66,
+    49.8,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    73,
+    46.699999999999996,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    80.6,
+    51.3,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    9.3,
+    55.8,
+    50,
+    "#ffb060",
+    0.85
+   ],
+   [
+    74.6,
+    25.4,
     30,
     "#ffc070",
     0.7
    ],
    [
-    14.270833333333334,
-    56.145833333333336,
-    70,
+    44.11,
+    7.67,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    30.16,
+    12.56,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    47.82,
+    12.49,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    42.72,
+    6.91,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    46.64,
+    7.87,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    47.78,
+    10.74,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    43.69,
+    4.7,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    45.31,
+    4.7,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    49.28,
+    7.83,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    44.89,
+    7.67,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    41.21,
+    12.49,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    58.85,
+    12.58,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    46.57,
+    2.58,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    39.45,
+    10.51,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    48.49,
+    7.67,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    50.05,
+    7.66,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    46.3,
+    9.09,
+    26,
+    "#ffb860",
+    0.75
+   ],
+   [
+    44.5,
+    16.8,
+    60,
+    "#ff9a40",
+    0.9
+   ],
+   [
+    61,
+    28,
+    64,
+    "#ffb060",
+    0.85
+   ],
+   [
+    12.36111111111111,
+    60.52777777777778,
+    80,
     "#ff7a2a",
     1
-   ],
-   [
-    54.5,
-    28.5,
-    54,
-    "#ffb060",
-    0.8
-   ],
-   [
-    40.5,
-    15.6,
-    50,
-    "#ff6a2a",
-    0.8
    ]
   ],
   "smoke": [
    [
-    28.9,
-    23.4,
+    30.53333333333333,
+    21.866666666666667,
     1
    ],
    [
-    12.8,
-    40.6,
+    65.93333333333334,
+    19.866666666666667,
     1
    ],
    [
-    12.4,
-    51.1,
+    10.733333333333333,
+    37.46666666666667,
     1
    ],
    [
-    58.2,
-    22.4,
+    9.866666666666667,
+    53.8,
     1
-   ],
-   [
-    30.5,
-    4.0,
-    1.8
-   ],
-   [
-    47.5,
-    3.5,
-    1.6
-   ],
-   [
-    61.0,
-    4.5,
-    1.5
    ]
   ],
   "grade": "dusk",
   "water": [
    [
-    15,
-    22,
-    31
+    18,
+    20,
+    25
    ],
    [
-    15,
-    62,
-    68
+    18,
+    42,
+    52
    ],
    [
-    16,
-    15,
-    36
+    19,
+    20,
+    69
    ],
    [
-    16,
-    56,
-    68
+    20,
+    20,
+    69
    ],
    [
-    17,
-    12,
-    24
-   ],
-   [
-    17,
+    21,
     31,
-    31
-   ],
-   [
-    17,
-    35,
     36
    ],
    [
-    17,
-    44,
+    21,
+    43,
+    45
+   ],
+   [
+    21,
+    58,
     63
    ],
    [
-    17,
-    68,
-    68
-   ],
-   [
-    18,
-    12,
-    16
-   ],
-   [
-    18,
-    44,
-    57
+    22,
+    43,
+    45
    ]
   ],
   "tufts": [
    [
-    58.57,
-    13.43,
-    2
-   ],
-   [
-    60.45,
-    13.46,
+    28.77,
+    21.81,
     0
    ],
    [
-    50.17,
-    14.84,
-    3
-   ],
-   [
-    52.55,
-    14.88,
+    37.21,
+    21.71,
     0
    ],
    [
-    57.34,
-    14.95,
-    2
-   ],
-   [
-    52.69,
-    15.43,
-    1
-   ],
-   [
-    54.9,
-    15.86,
-    2
-   ],
-   [
-    47.65,
-    16.93,
+    39.78,
+    21.44,
     0
    ],
    [
-    48.51,
-    16.38,
-    2
-   ],
-   [
-    52.66,
-    16.49,
-    1
-   ],
-   [
-    29.74,
-    17.79,
-    1
-   ],
-   [
-    42.97,
-    17.91,
-    2
-   ],
-   [
-    23.29,
-    18.52,
-    2
-   ],
-   [
-    34.09,
-    18.95,
-    2
-   ],
-   [
-    35.34,
-    18.71,
-    1
-   ],
-   [
-    36.71,
-    18.59,
+    42.77,
+    21.93,
     0
    ],
    [
-    37.49,
-    18.86,
+    46.91,
+    21.57,
+    0
+   ],
+   [
+    46.88,
+    21.96,
+    1
+   ],
+   [
+    52.07,
+    21.81,
+    0
+   ],
+   [
+    53.65,
+    21.9,
+    0
+   ],
+   [
+    4.5,
+    22.57,
     2
    ],
    [
-    59.26,
-    18.9,
+    4.99,
+    22.46,
     1
    ],
    [
-    28.9,
-    19.81,
+    6.74,
+    22.75,
+    0
+   ],
+   [
+    6.98,
+    22.86,
+    0
+   ],
+   [
+    7.4,
+    22.96,
+    0
+   ],
+   [
+    8.56,
+    22.7,
     1
    ],
    [
-    30.71,
-    19.67,
-    1
+    8.15,
+    22.31,
+    0
    ],
    [
-    32.15,
-    19.89,
+    10.14,
+    22.67,
     2
    ],
    [
-    37.01,
-    19.64,
+    10.11,
+    22.85,
     1
    ],
    [
-    42.47,
-    19.61,
-    1
-   ],
-   [
-    45.54,
-    19.51,
-    2
-   ],
-   [
-    46.5,
-    19.31,
-    1
-   ],
-   [
-    47.38,
-    19.45,
-    2
-   ],
-   [
-    53.31,
-    19.35,
-    1
-   ],
-   [
-    59.94,
-    19.68,
-    2
-   ],
-   [
-    8.11,
-    20.53,
+    11.85,
+    22.69,
     0
    ],
    [
-    12.17,
-    20.77,
-    0
-   ],
-   [
-    17.57,
-    20.38,
-    3
-   ],
-   [
-    21.03,
-    20.33,
-    2
-   ],
-   [
-    22.94,
-    20.72,
-    1
-   ],
-   [
-    27.55,
-    20.62,
-    1
-   ],
-   [
-    47.53,
-    20.35,
-    1
-   ],
-   [
-    48.55,
-    20.98,
-    0
-   ],
-   [
-    52.85,
-    20.91,
-    0
-   ],
-   [
-    54.63,
-    20.54,
-    0
-   ],
-   [
-    60.96,
-    20.52,
-    0
-   ],
-   [
-    63.34,
-    20.77,
-    0
-   ],
-   [
-    64.53,
-    20.94,
-    1
-   ],
-   [
-    5.83,
-    21.84,
-    0
-   ],
-   [
-    7.82,
-    21.33,
-    2
-   ],
-   [
-    10.59,
-    21.48,
-    0
-   ],
-   [
-    13.74,
-    21.61,
-    1
-   ],
-   [
-    15.02,
-    21.95,
-    0
-   ],
-   [
-    17.34,
-    21.41,
-    1
-   ],
-   [
-    19.58,
-    21.45,
-    2
-   ],
-   [
-    24.16,
-    21.99,
-    0
-   ],
-   [
-    31.91,
-    21.52,
-    1
-   ],
-   [
-    57.29,
-    21.68,
-    2
-   ],
-   [
-    61.57,
-    21.67,
-    1
-   ],
-   [
-    66.7,
-    21.35,
-    0
-   ],
-   [
-    6.32,
-    22.76,
-    1
-   ],
-   [
-    8.22,
+    12.62,
     22.72,
-    0
-   ],
-   [
-    19.55,
-    22.99,
-    0
-   ],
-   [
-    20.2,
-    22.55,
-    1
-   ],
-   [
-    33.8,
-    22.5,
-    0
-   ],
-   [
-    38.46,
-    22.84,
     2
    ],
    [
-    42.11,
-    22.6,
+    12.05,
+    22.68,
+    1
+   ],
+   [
+    13.67,
+    22.69,
     0
    ],
    [
-    49.38,
+    13.83,
+    22.87,
+    1
+   ],
+   [
+    14.71,
+    22.81,
+    2
+   ],
+   [
+    14.11,
+    22.98,
+    2
+   ],
+   [
+    15.68,
+    22.36,
+    0
+   ],
+   [
+    17.37,
+    22.51,
+    0
+   ],
+   [
+    19.19,
+    22.36,
+    0
+   ],
+   [
+    20.69,
+    22.72,
+    1
+   ],
+   [
+    26.02,
     22.34,
+    2
+   ],
+   [
+    27.68,
+    22.89,
+    1
+   ],
+   [
+    28.62,
+    22.51,
+    1
+   ],
+   [
+    29.3,
+    22.54,
+    1
+   ],
+   [
+    29.16,
+    22.41,
+    2
+   ],
+   [
+    38.8,
+    22.31,
+    2
+   ],
+   [
+    38.23,
+    22.92,
+    1
+   ],
+   [
+    40.77,
+    22.47,
+    0
+   ],
+   [
+    42.83,
+    22.52,
+    1
+   ],
+   [
+    46.12,
+    22.62,
     3
    ],
    [
-    54.2,
-    22.82,
-    0
-   ],
-   [
-    65.28,
-    22.71,
+    47.66,
+    22.47,
     1
    ],
    [
-    66.36,
-    22.58,
+    52.76,
+    22.92,
     2
    ],
    [
+    53.72,
     22.99,
-    23.55,
     0
    ],
    [
+    62.87,
+    22.75,
+    2
+   ],
+   [
+    68.06,
+    22.35,
+    0
+   ],
+   [
+    69.07,
+    22.69,
+    2
+   ],
+   [
+    69.97,
+    22.78,
+    1
+   ],
+   [
+    71.9,
+    22.48,
+    1
+   ],
+   [
+    71.69,
+    22.61,
+    2
+   ],
+   [
+    73.32,
+    22.44,
+    1
+   ],
+   [
+    74.86,
+    22.86,
+    2
+   ],
+   [
+    74.62,
+    22.89,
+    0
+   ],
+   [
+    81.1,
+    22.99,
+    1
+   ],
+   [
+    81.09,
+    22.71,
+    0
+   ],
+   [
+    82.01,
+    22.9,
+    0
+   ],
+   [
+    83.54,
+    22.42,
+    1
+   ],
+   [
+    84.37,
+    22.67,
+    0
+   ],
+   [
+    5.76,
+    23.95,
+    0
+   ],
+   [
+    5.19,
+    23.45,
+    1
+   ],
+   [
+    6.89,
+    23.48,
+    0
+   ],
+   [
+    7.66,
+    23.89,
+    3
+   ],
+   [
+    8.44,
+    23.38,
+    2
+   ],
+   [
+    15.19,
+    23.49,
+    0
+   ],
+   [
+    18.22,
+    23.82,
+    1
+   ],
+   [
+    19.94,
+    23.67,
+    0
+   ],
+   [
+    19.51,
+    23.52,
+    0
+   ],
+   [
+    20.27,
+    23.95,
+    1
+   ],
+   [
+    25.28,
+    23.85,
+    3
+   ],
+   [
+    37.65,
+    23.84,
+    0
+   ],
+   [
+    38.8,
+    23.96,
+    2
+   ],
+   [
+    39.86,
+    23.76,
+    2
+   ],
+   [
+    39.23,
+    23.72,
+    2
+   ],
+   [
+    40.22,
+    23.33,
+    0
+   ],
+   [
+    48.03,
+    23.42,
+    1
+   ],
+   [
+    60.0,
+    23.62,
+    0
+   ],
+   [
+    61.18,
+    23.59,
+    2
+   ],
+   [
+    65.61,
+    23.48,
+    2
+   ],
+   [
+    69.42,
+    23.94,
+    2
+   ],
+   [
+    70.32,
+    23.83,
+    0
+   ],
+   [
+    70.17,
     23.71,
-    23.44,
-    2
+    1
    ],
    [
-    26.53,
-    23.75,
-    2
-   ],
-   [
-    28.36,
-    23.56,
+    71.57,
+    23.46,
     0
    ],
    [
-    47.29,
-    23.37,
-    1
-   ],
-   [
-    48.34,
-    23.74,
-    1
-   ],
-   [
-    49.48,
-    23.4,
-    1
-   ],
-   [
-    61.05,
-    23.47,
+    72.94,
+    23.59,
     0
    ],
    [
-    65.28,
-    23.47,
+    73.82,
+    23.98,
     1
    ],
    [
-    67.5,
-    23.92,
-    2
+    73.75,
+    23.42,
+    0
    ],
    [
-    75.61,
+    82.85,
     23.86,
     2
    ],
    [
-    7.7,
-    24.89,
+    83.5,
+    23.67,
     2
    ],
    [
-    17.56,
-    24.52,
-    2
-   ],
-   [
-    18.97,
-    24.99,
-    3
-   ],
-   [
-    20.33,
-    24.79,
-    0
-   ],
-   [
-    24.31,
-    24.86,
-    0
-   ],
-   [
-    44.39,
-    24.5,
-    0
-   ],
-   [
-    64.2,
-    24.99,
-    1
-   ],
-   [
-    76.29,
+    4.08,
     24.93,
-    0
-   ],
-   [
-    6.89,
-    25.99,
-    1
-   ],
-   [
-    21.0,
-    25.93,
-    0
-   ],
-   [
-    30.26,
-    25.67,
     2
    ],
    [
-    36.71,
-    25.72,
+    4.86,
+    24.97,
     2
    ],
    [
-    37.63,
-    25.38,
+    5.37,
+    24.67,
     2
    ],
    [
-    44.35,
-    25.32,
+    8.68,
+    24.45,
     0
    ],
    [
-    50.65,
-    25.65,
+    20.32,
+    24.98,
     1
    ],
    [
-    52.87,
-    25.56,
+    21.97,
+    24.68,
     1
    ],
    [
-    57.44,
-    25.59,
+    22.74,
+    24.55,
     2
    ],
    [
-    64.05,
-    25.81,
-    1
-   ],
-   [
-    68.2,
-    25.77,
-    0
-   ],
-   [
-    74.42,
-    25.84,
+    34.51,
+    24.92,
     2
    ],
    [
-    76.9,
-    25.89,
-    0
+    35.58,
+    24.96,
+    1
    ],
    [
-    20.61,
-    26.96,
-    0
-   ],
-   [
-    21.82,
-    26.58,
+    37.81,
+    24.79,
     2
    ],
    [
-    23.94,
-    26.91,
+    38.37,
+    24.97,
     1
    ],
    [
-    32.05,
-    26.62,
-    2
-   ],
-   [
-    35.81,
-    26.35,
+    59.53,
+    24.81,
     1
    ],
    [
-    46.54,
-    26.95,
+    59.8,
+    24.89,
+    0
+   ],
+   [
+    61.23,
+    24.49,
+    0
+   ],
+   [
+    62.11,
+    24.95,
+    0
+   ],
+   [
+    64.35,
+    24.5,
     1
    ],
    [
-    48.47,
-    26.88,
-    2
-   ],
-   [
-    49.0,
-    26.51,
+    69.05,
+    24.98,
     0
    ],
    [
-    51.53,
-    26.63,
-    0
-   ],
-   [
-    67.51,
-    26.47,
-    2
-   ],
-   [
-    69.22,
-    26.53,
-    0
-   ],
-   [
-    71.12,
-    26.99,
-    0
-   ],
-   [
-    73.42,
-    26.85,
-    0
-   ],
-   [
-    5.32,
-    27.49,
-    2
-   ],
-   [
-    8.02,
-    27.35,
-    1
-   ],
-   [
-    10.87,
-    27.48,
-    1
-   ],
-   [
-    14.6,
-    27.82,
-    1
-   ],
-   [
-    18.92,
-    27.36,
-    2
-   ],
-   [
-    33.99,
-    27.34,
-    1
-   ],
-   [
-    60.33,
-    27.38,
-    0
-   ],
-   [
-    69.02,
-    27.55,
-    1
-   ],
-   [
-    70.12,
-    27.69,
-    1
-   ],
-   [
-    7.8,
-    28.75,
-    2
-   ],
-   [
-    10.67,
-    28.31,
-    0
-   ],
-   [
-    14.86,
-    28.81,
-    0
-   ],
-   [
-    19.51,
-    28.93,
-    2
-   ],
-   [
-    22.68,
-    28.95,
-    2
-   ],
-   [
-    23.21,
-    28.69,
-    2
-   ],
-   [
-    24.75,
-    28.84,
-    2
-   ],
-   [
-    25.25,
-    28.33,
-    1
-   ],
-   [
-    27.67,
-    28.68,
-    1
-   ],
-   [
-    28.8,
-    28.61,
-    2
-   ],
-   [
-    51.71,
-    28.73,
-    2
-   ],
-   [
-    64.97,
-    28.89,
-    0
-   ],
-   [
-    67.71,
-    28.84,
-    0
-   ],
-   [
-    73.9,
-    28.43,
-    0
-   ],
-   [
-    74.56,
-    28.9,
-    1
-   ],
-   [
-    10.27,
-    29.88,
-    0
-   ],
-   [
-    18.07,
-    29.69,
-    0
-   ],
-   [
-    29.22,
-    29.44,
-    1
-   ],
-   [
-    33.5,
-    29.53,
-    3
-   ],
-   [
-    63.56,
-    29.9,
-    0
-   ],
-   [
-    64.65,
-    29.48,
-    1
-   ],
-   [
-    65.97,
-    29.45,
+    70.49,
+    24.43,
     2
    ],
    [
     72.3,
-    29.41,
+    24.31,
+    1
+   ],
+   [
+    74.59,
+    24.43,
+    2
+   ],
+   [
+    74.47,
+    24.87,
+    2
+   ],
+   [
+    81.66,
+    24.7,
+    3
+   ],
+   [
+    82.58,
+    24.38,
+    2
+   ],
+   [
+    82.75,
+    24.65,
+    2
+   ],
+   [
+    3.72,
+    25.45,
     1
    ],
    [
     4.72,
-    30.39,
-    2
-   ],
-   [
-    6.6,
-    30.74,
+    25.62,
     0
    ],
    [
-    7.2,
-    30.3,
+    5.31,
+    25.76,
     1
    ],
    [
-    19.5,
-    30.64,
+    5.06,
+    25.62,
+    1
+   ],
+   [
+    19.72,
+    25.34,
+    2
+   ],
+   [
+    19.29,
+    25.53,
+    0
+   ],
+   [
+    20.93,
+    25.91,
+    1
+   ],
+   [
+    20.32,
+    25.85,
+    2
+   ],
+   [
+    21.36,
+    25.8,
+    2
+   ],
+   [
+    21.07,
+    25.76,
+    2
+   ],
+   [
+    37.71,
+    25.84,
+    1
+   ],
+   [
+    37.78,
+    25.81,
+    1
+   ],
+   [
+    38.46,
+    25.75,
+    1
+   ],
+   [
+    39.86,
+    25.96,
+    2
+   ],
+   [
+    39.47,
+    25.73,
+    1
+   ],
+   [
+    52.91,
+    25.77,
+    2
+   ],
+   [
+    53.16,
+    25.67,
+    0
+   ],
+   [
+    72.94,
+    25.96,
+    2
+   ],
+   [
+    73.96,
+    25.72,
+    1
+   ],
+   [
+    74.2,
+    25.85,
+    2
+   ],
+   [
+    74.96,
+    25.37,
+    2
+   ],
+   [
+    3.85,
+    26.52,
+    0
+   ],
+   [
+    6.0,
+    26.46,
+    1
+   ],
+   [
+    20.37,
+    26.56,
+    1
+   ],
+   [
+    33.68,
+    26.83,
+    2
+   ],
+   [
+    55.94,
+    26.82,
+    2
+   ],
+   [
+    55.91,
+    26.86,
+    2
+   ],
+   [
+    72.06,
+    26.38,
+    0
+   ],
+   [
+    81.37,
+    26.73,
+    0
+   ],
+   [
+    83.4,
+    26.86,
+    1
+   ],
+   [
+    83.63,
+    26.93,
+    1
+   ],
+   [
+    84.34,
+    26.89,
+    2
+   ],
+   [
+    3.59,
+    27.88,
+    2
+   ],
+   [
+    4.45,
+    27.31,
+    2
+   ],
+   [
+    4.21,
+    27.68,
+    2
+   ],
+   [
+    5.91,
+    27.32,
+    2
+   ],
+   [
+    6.13,
+    28.0,
+    0
+   ],
+   [
+    37.3,
+    27.53,
+    2
+   ],
+   [
+    38.75,
+    27.31,
+    0
+   ],
+   [
+    39.83,
+    27.93,
+    0
+   ],
+   [
+    40.91,
+    27.69,
+    0
+   ],
+   [
+    51.5,
+    27.93,
+    0
+   ],
+   [
+    54.63,
+    27.86,
+    1
+   ],
+   [
+    54.69,
+    27.72,
+    0
+   ],
+   [
+    55.51,
+    27.63,
+    0
+   ],
+   [
+    78.46,
+    27.72,
     3
    ],
    [
-    22.42,
-    30.71,
+    84.87,
+    27.91,
     2
    ],
    [
-    47.88,
-    30.34,
+    3.46,
+    28.75,
+    2
+   ],
+   [
+    3.77,
+    28.47,
+    0
+   ],
+   [
+    4.87,
+    28.55,
     1
    ],
    [
-    50.19,
-    30.78,
+    4.16,
+    28.45,
     0
    ],
    [
-    53.21,
-    30.48,
-    2
-   ],
-   [
-    58.04,
-    30.73,
-    2
-   ],
-   [
-    64.35,
-    30.54,
+    5.59,
+    28.39,
     1
    ],
    [
-    74.62,
-    30.81,
+    5.48,
+    28.61,
+    2
+   ],
+   [
+    20.07,
+    28.79,
     0
    ],
    [
-    9.29,
-    31.77,
-    2
-   ],
-   [
-    48.33,
-    31.46,
-    2
-   ],
-   [
-    59.0,
-    31.99,
-    2
-   ],
-   [
-    66.62,
-    31.37,
-    0
-   ],
-   [
-    67.85,
-    31.3,
+    20.35,
+    28.6,
     1
    ],
    [
-    72.02,
-    31.42,
+    29.78,
+    28.63,
     2
    ],
    [
-    73.68,
-    31.91,
-    0
-   ],
-   [
-    5.03,
-    32.64,
-    0
-   ],
-   [
-    8.0,
-    32.51,
-    0
-   ],
-   [
-    14.04,
-    32.94,
-    0
-   ],
-   [
-    15.24,
-    32.35,
+    39.37,
+    28.9,
     1
    ],
    [
-    27.19,
-    32.99,
+    54.18,
+    28.38,
     0
    ],
    [
-    30.6,
-    32.84,
+    70.55,
+    28.85,
+    1
+   ],
+   [
+    71.25,
+    28.73,
+    1
+   ],
+   [
+    72.8,
+    28.35,
     2
    ],
    [
-    47.96,
-    32.5,
+    81.19,
+    28.34,
+    0
+   ],
+   [
+    84.12,
+    28.98,
+    0
+   ],
+   [
+    4.93,
+    29.6,
+    0
+   ],
+   [
+    4.5,
+    29.81,
     1
    ],
    [
-    49.53,
-    32.4,
+    5.87,
+    29.83,
     1
    ],
    [
-    53.63,
-    32.45,
+    6.06,
+    29.39,
+    3
+   ],
+   [
+    10.16,
+    29.43,
     2
    ],
    [
-    62.44,
-    32.96,
+    23.67,
+    29.93,
+    3
+   ],
+   [
+    36.44,
+    29.32,
+    2
+   ],
+   [
+    68.8,
+    29.85,
+    0
+   ],
+   [
+    84.99,
+    29.45,
+    2
+   ],
+   [
+    22.93,
+    30.83,
+    3
+   ],
+   [
+    53.78,
+    30.37,
+    3
+   ],
+   [
+    54.87,
+    30.61,
     1
    ],
    [
-    68.43,
+    55.45,
+    30.56,
+    3
+   ],
+   [
+    58.26,
+    30.85,
+    3
+   ],
+   [
+    81.84,
+    30.87,
+    3
+   ],
+   [
+    60.08,
+    31.85,
+    0
+   ],
+   [
+    80.14,
+    31.87,
+    0
+   ],
+   [
+    82.16,
+    31.93,
+    0
+   ],
+   [
+    82.79,
+    31.48,
+    0
+   ],
+   [
+    83.91,
+    31.73,
+    0
+   ],
+   [
+    84.85,
+    31.61,
+    0
+   ],
+   [
+    84.47,
+    31.52,
+    0
+   ],
+   [
+    11.68,
+    32.69,
+    1
+   ],
+   [
+    28.5,
+    32.98,
+    1
+   ],
+   [
+    81.55,
+    32.52,
+    0
+   ],
+   [
+    81.46,
+    32.97,
+    1
+   ],
+   [
+    84.95,
     32.74,
     2
    ],
    [
-    71.84,
-    32.89,
+    9.29,
+    33.8,
     2
    ],
    [
-    14.77,
-    33.9,
+    10.01,
+    33.69,
     0
    ],
    [
-    18.53,
-    33.9,
+    10.66,
+    33.83,
     0
    ],
    [
-    20.52,
-    33.47,
+    14.05,
+    33.6,
     1
    ],
    [
-    21.13,
-    33.96,
+    73.6,
+    33.79,
     2
    ],
    [
-    24.13,
-    33.43,
-    0
-   ],
-   [
-    57.54,
-    33.88,
+    78.03,
+    33.34,
     1
    ],
    [
-    60.26,
-    33.99,
+    79.73,
+    33.69,
+    1
+   ],
+   [
+    80.54,
+    33.41,
     0
    ],
    [
-    66.83,
+    81.59,
+    33.86,
+    0
+   ],
+   [
+    81.57,
+    33.37,
+    1
+   ],
+   [
+    82.54,
+    33.31,
+    0
+   ],
+   [
+    82.14,
     33.95,
-    1
-   ],
-   [
-    72.43,
-    33.66,
     0
    ],
    [
-    2.3,
-    34.9,
+    83.82,
+    33.47,
+    0
+   ],
+   [
+    84.48,
+    33.33,
+    2
+   ],
+   [
+    4.99,
+    34.47,
     3
    ],
    [
-    10.43,
-    34.64,
-    2
-   ],
-   [
-    12.71,
-    34.62,
-    2
-   ],
-   [
-    17.49,
-    34.68,
-    2
-   ],
-   [
-    23.15,
-    34.93,
+    10.08,
+    34.83,
     0
    ],
    [
-    30.83,
-    34.41,
-    1
-   ],
-   [
-    46.46,
-    34.75,
+    10.94,
+    34.47,
     0
    ],
    [
-    48.05,
-    34.79,
-    2
-   ],
-   [
-    55.7,
-    34.72,
+    11.43,
+    34.95,
     0
    ],
    [
-    60.95,
-    34.79,
+    12.17,
+    34.33,
     0
    ],
    [
-    74.57,
-    34.89,
+    17.05,
+    34.66,
     0
    ],
    [
-    75.15,
-    34.56,
-    2
-   ],
-   [
-    76.73,
-    34.71,
-    1
-   ],
-   [
-    1.15,
-    36.31,
-    1
-   ],
-   [
-    9.71,
-    37.67,
-    0
-   ],
-   [
-    10.79,
-    37.67,
-    1
-   ],
-   [
-    13.33,
-    37.47,
-    0
-   ],
-   [
-    29.9,
-    37.32,
-    2
-   ],
-   [
-    36.22,
-    37.73,
-    1
-   ],
-   [
-    43.91,
-    37.37,
-    0
-   ],
-   [
-    7.18,
-    38.7,
-    0
-   ],
-   [
-    8.63,
-    38.64,
-    1
-   ],
-   [
-    16.32,
-    38.96,
-    1
-   ],
-   [
-    17.74,
-    38.7,
-    2
-   ],
-   [
-    23.51,
-    38.8,
-    1
-   ],
-   [
-    25.69,
-    38.74,
-    1
-   ],
-   [
-    28.98,
-    38.56,
-    1
-   ],
-   [
-    30.54,
-    38.37,
-    2
-   ],
-   [
-    44.71,
-    38.61,
-    1
-   ],
-   [
-    47.97,
-    38.45,
-    2
-   ],
-   [
-    49.32,
-    38.73,
-    2
-   ],
-   [
-    53.23,
-    38.55,
-    2
-   ],
-   [
-    55.86,
-    38.99,
-    1
-   ],
-   [
-    6.33,
-    39.8,
-    0
-   ],
-   [
-    8.18,
-    39.69,
-    2
-   ],
-   [
-    12.51,
-    39.32,
-    2
-   ],
-   [
-    14.33,
-    39.9,
-    0
-   ],
-   [
-    21.09,
-    39.7,
-    2
-   ],
-   [
-    23.19,
-    39.65,
-    1
-   ],
-   [
-    24.82,
-    39.5,
-    2
-   ],
-   [
-    26.25,
-    39.41,
-    1
-   ],
-   [
-    30.83,
-    39.58,
-    1
-   ],
-   [
-    38.11,
-    39.76,
-    1
-   ],
-   [
-    42.79,
-    39.9,
-    0
-   ],
-   [
-    44.08,
-    39.38,
-    0
-   ],
-   [
-    46.98,
-    39.78,
-    2
-   ],
-   [
-    56.87,
-    39.87,
-    0
-   ],
-   [
-    58.6,
-    39.34,
-    1
-   ],
-   [
-    77.9,
-    39.43,
-    1
-   ],
-   [
-    78.92,
-    39.67,
-    0
-   ],
-   [
-    10.07,
-    40.76,
-    0
-   ],
-   [
-    14.87,
-    40.62,
-    2
-   ],
-   [
-    15.37,
-    40.43,
-    2
-   ],
-   [
-    19.64,
-    40.37,
-    2
-   ],
-   [
-    26.99,
-    40.47,
-    2
-   ],
-   [
-    27.56,
-    40.78,
-    1
-   ],
-   [
-    30.96,
-    40.52,
-    0
-   ],
-   [
-    53.79,
-    40.77,
-    0
-   ],
-   [
-    58.81,
-    40.49,
-    1
-   ],
-   [
-    62.01,
-    40.32,
-    0
-   ],
-   [
-    64.94,
-    40.5,
-    1
-   ],
-   [
-    6.98,
-    41.45,
-    2
-   ],
-   [
-    7.93,
-    41.59,
-    1
-   ],
-   [
-    18.47,
-    41.93,
-    0
-   ],
-   [
-    29.38,
-    41.92,
-    2
-   ],
-   [
-    42.99,
-    41.33,
-    1
-   ],
-   [
-    59.31,
-    41.43,
-    1
-   ],
-   [
-    61.67,
-    41.55,
-    2
-   ],
-   [
-    74.38,
-    41.86,
-    0
-   ],
-   [
-    11.55,
-    42.53,
-    0
-   ],
-   [
-    13.7,
-    42.56,
-    1
-   ],
-   [
-    17.07,
-    42.72,
-    0
-   ],
-   [
-    21.47,
-    42.61,
-    2
-   ],
-   [
-    22.88,
-    42.6,
-    2
-   ],
-   [
-    26.11,
-    42.51,
-    1
-   ],
-   [
-    31.21,
-    42.62,
+    23.9,
+    34.3,
     3
    ],
    [
-    35.77,
-    42.88,
-    2
-   ],
-   [
-    46.97,
-    42.4,
-    0
-   ],
-   [
-    56.75,
-    42.93,
-    0
-   ],
-   [
-    62.32,
-    42.59,
-    0
-   ],
-   [
-    63.92,
-    42.8,
-    0
-   ],
-   [
-    67.58,
-    42.81,
-    0
-   ],
-   [
-    20.56,
-    43.48,
-    0
-   ],
-   [
-    38.15,
-    43.54,
-    0
-   ],
-   [
-    56.06,
-    43.48,
+    26.69,
+    35.0,
     1
    ],
    [
-    57.83,
-    43.96,
+    27.04,
+    34.59,
     1
    ],
    [
-    61.34,
-    43.97,
-    2
+    28.08,
+    34.34,
+    3
    ],
    [
-    63.55,
-    44.0,
-    1
-   ],
-   [
-    18.05,
-    44.41,
-    2
-   ],
-   [
-    20.98,
-    44.91,
-    1
-   ],
-   [
-    37.16,
-    44.36,
-    1
-   ],
-   [
-    42.71,
-    44.73,
+    31.68,
+    34.48,
     0
    ],
    [
-    62.29,
-    44.85,
-    2
+    58.72,
+    34.86,
+    3
    ],
    [
-    74.97,
-    44.99,
-    2
-   ],
-   [
-    4.02,
-    45.57,
-    2
-   ],
-   [
-    19.44,
-    45.55,
-    2
-   ],
-   [
-    29.02,
-    45.87,
-    2
-   ],
-   [
-    34.06,
-    45.38,
-    2
-   ],
-   [
-    48.52,
-    45.64,
-    1
-   ],
-   [
-    51.77,
-    45.31,
-    0
-   ],
-   [
-    54.99,
-    45.57,
-    0
-   ],
-   [
-    57.56,
-    45.36,
+    65.58,
+    34.81,
     2
    ],
    [
     69.44,
-    45.95,
-    2
-   ],
-   [
-    73.92,
-    45.84,
-    2
-   ],
-   [
-    75.36,
-    45.77,
-    2
-   ],
-   [
-    5.5,
-    46.75,
-    2
-   ],
-   [
-    21.65,
-    46.33,
-    1
-   ],
-   [
-    27.22,
-    46.69,
-    2
-   ],
-   [
-    34.62,
-    46.7,
+    34.43,
     0
    ],
    [
-    47.14,
-    46.41,
+    69.73,
+    34.91,
     2
    ],
    [
-    52.06,
-    46.32,
-    2
-   ],
-   [
-    57.69,
-    46.49,
-    1
-   ],
-   [
-    60.44,
-    46.36,
-    1
-   ],
-   [
-    12.11,
-    47.99,
-    0
-   ],
-   [
-    16.85,
-    47.96,
-    0
-   ],
-   [
-    30.37,
-    47.64,
-    0
-   ],
-   [
-    35.87,
-    47.61,
-    1
-   ],
-   [
-    36.24,
-    47.46,
-    0
-   ],
-   [
-    37.46,
-    47.94,
-    1
-   ],
-   [
-    43.34,
-    47.98,
-    1
-   ],
-   [
-    48.09,
-    47.64,
-    1
-   ],
-   [
-    49.7,
-    47.72,
-    0
-   ],
-   [
-    50.2,
-    47.34,
-    1
-   ],
-   [
-    59.54,
-    47.94,
-    1
-   ],
-   [
-    65.77,
-    47.66,
-    0
-   ],
-   [
-    4.2,
-    48.74,
-    0
-   ],
-   [
-    5.52,
-    48.81,
-    2
-   ],
-   [
-    12.81,
-    48.51,
-    0
-   ],
-   [
-    21.99,
-    48.54,
-    0
-   ],
-   [
-    30.32,
-    48.59,
-    1
-   ],
-   [
-    33.44,
-    48.76,
-    2
-   ],
-   [
-    37.27,
-    48.58,
-    2
-   ],
-   [
-    53.94,
-    48.78,
-    0
-   ],
-   [
-    57.21,
-    48.43,
-    2
-   ],
-   [
-    63.41,
-    48.66,
-    1
-   ],
-   [
-    65.28,
-    48.37,
-    1
-   ],
-   [
-    4.26,
-    49.61,
-    1
-   ],
-   [
-    13.43,
-    49.41,
-    2
-   ],
-   [
-    17.68,
-    49.75,
-    2
-   ],
-   [
-    26.73,
-    49.91,
-    0
-   ],
-   [
-    34.02,
-    49.52,
-    2
-   ],
-   [
-    36.34,
-    49.47,
-    0
-   ],
-   [
-    52.14,
-    49.35,
-    0
-   ],
-   [
-    57.72,
-    49.63,
-    2
-   ],
-   [
-    58.4,
-    49.36,
-    2
-   ],
-   [
-    64.77,
-    49.5,
-    0
-   ],
-   [
-    75.16,
-    49.91,
-    1
-   ],
-   [
-    4.01,
-    50.68,
-    0
-   ],
-   [
-    5.13,
-    50.33,
-    2
-   ],
-   [
-    8.97,
-    50.87,
-    2
-   ],
-   [
-    31.49,
-    50.56,
-    1
-   ],
-   [
-    48.67,
-    50.35,
-    1
-   ],
-   [
-    49.79,
-    50.39,
-    0
-   ],
-   [
-    55.76,
-    50.73,
+    73.81,
+    34.36,
     3
    ],
    [
-    61.99,
-    50.32,
+    77.31,
+    34.71,
     2
+   ],
+   [
+    83.52,
+    34.64,
+    1
+   ],
+   [
+    84.35,
+    34.69,
+    0
+   ],
+   [
+    3.43,
+    35.72,
+    3
+   ],
+   [
+    5.63,
+    35.61,
+    1
+   ],
+   [
+    6.93,
+    35.66,
+    1
+   ],
+   [
+    6.29,
+    35.88,
+    0
+   ],
+   [
+    7.73,
+    35.45,
+    1
+   ],
+   [
+    9.09,
+    35.55,
+    2
+   ],
+   [
+    9.23,
+    35.85,
+    2
+   ],
+   [
+    10.37,
+    35.31,
+    2
+   ],
+   [
+    11.36,
+    35.32,
+    2
+   ],
+   [
+    11.67,
+    35.98,
+    0
+   ],
+   [
+    12.47,
+    35.8,
+    2
+   ],
+   [
+    13.37,
+    35.49,
+    1
+   ],
+   [
+    13.13,
+    35.54,
+    1
+   ],
+   [
+    21.92,
+    35.9,
+    1
+   ],
+   [
+    21.17,
+    35.34,
+    1
+   ],
+   [
+    22.77,
+    35.56,
+    0
+   ],
+   [
+    22.27,
+    35.66,
+    2
+   ],
+   [
+    24.19,
+    35.85,
+    2
+   ],
+   [
+    24.76,
+    35.53,
+    2
+   ],
+   [
+    25.72,
+    35.44,
+    2
+   ],
+   [
+    26.2,
+    35.9,
+    0
+   ],
+   [
+    27.59,
+    35.7,
+    1
+   ],
+   [
+    27.57,
+    35.66,
+    2
+   ],
+   [
+    29.46,
+    35.47,
+    1
+   ],
+   [
+    29.42,
+    35.55,
+    0
+   ],
+   [
+    30.99,
+    35.47,
+    1
+   ],
+   [
+    30.59,
+    35.56,
+    0
+   ],
+   [
+    31.55,
+    35.51,
+    1
+   ],
+   [
+    32.99,
+    35.34,
+    1
+   ],
+   [
+    32.6,
+    35.42,
+    2
+   ],
+   [
+    37.26,
+    35.83,
+    0
+   ],
+   [
+    55.9,
+    35.43,
+    3
+   ],
+   [
+    58.37,
+    35.8,
+    0
+   ],
+   [
+    59.49,
+    35.56,
+    2
+   ],
+   [
+    59.88,
+    35.55,
+    1
+   ],
+   [
+    61.76,
+    35.73,
+    2
+   ],
+   [
+    61.11,
+    35.76,
+    2
+   ],
+   [
+    65.16,
+    35.32,
+    1
+   ],
+   [
+    65.0,
+    36.0,
+    0
+   ],
+   [
+    66.41,
+    35.46,
+    2
+   ],
+   [
+    67.83,
+    35.56,
+    2
+   ],
+   [
+    67.38,
+    35.92,
+    1
+   ],
+   [
+    69.47,
+    35.44,
+    0
+   ],
+   [
+    69.17,
+    35.43,
+    2
+   ],
+   [
+    70.7,
+    35.84,
+    2
+   ],
+   [
+    70.31,
+    35.69,
+    0
+   ],
+   [
+    72.27,
+    35.51,
+    0
+   ],
+   [
+    72.62,
+    35.85,
+    2
+   ],
+   [
+    75.13,
+    35.9,
+    1
+   ],
+   [
+    76.97,
+    35.88,
+    2
+   ],
+   [
+    78.62,
+    35.71,
+    2
+   ],
+   [
+    81.83,
+    35.66,
+    0
+   ],
+   [
+    82.09,
+    35.88,
+    1
+   ],
+   [
+    5.03,
+    36.54,
+    0
+   ],
+   [
+    6.72,
+    36.34,
+    2
+   ],
+   [
+    7.28,
+    36.94,
+    0
+   ],
+   [
+    8.8,
+    36.5,
+    0
+   ],
+   [
+    10.09,
+    36.95,
+    2
+   ],
+   [
+    10.6,
+    36.92,
+    1
+   ],
+   [
+    11.79,
+    36.62,
+    0
+   ],
+   [
+    12.27,
+    36.97,
+    2
+   ],
+   [
+    13.7,
+    36.58,
+    0
+   ],
+   [
+    13.44,
+    36.85,
+    1
+   ],
+   [
+    16.75,
+    36.82,
+    1
+   ],
+   [
+    22.76,
+    36.6,
+    0
+   ],
+   [
+    22.51,
+    36.85,
+    0
+   ],
+   [
+    23.57,
+    36.93,
+    1
+   ],
+   [
+    24.64,
+    36.64,
+    1
+   ],
+   [
+    25.81,
+    36.91,
+    1
+   ],
+   [
+    26.83,
+    36.69,
+    2
+   ],
+   [
+    28.67,
+    36.37,
+    2
+   ],
+   [
+    28.47,
+    36.88,
+    2
+   ],
+   [
+    29.1,
+    36.59,
+    2
+   ],
+   [
+    30.64,
+    36.6,
+    1
+   ],
+   [
+    31.18,
+    36.7,
+    0
+   ],
+   [
+    31.59,
+    36.44,
+    2
+   ],
+   [
+    35.93,
+    36.44,
+    3
+   ],
+   [
+    58.48,
+    36.35,
+    2
+   ],
+   [
+    59.31,
+    36.48,
+    2
+   ],
+   [
+    60.57,
+    36.93,
+    0
+   ],
+   [
+    60.08,
+    36.48,
+    0
+   ],
+   [
+    61.18,
+    36.3,
+    1
+   ],
+   [
+    61.24,
+    36.91,
+    1
+   ],
+   [
+    62.22,
+    36.31,
+    1
+   ],
+   [
+    64.02,
+    36.46,
+    1
+   ],
+   [
+    64.76,
+    36.59,
+    2
+   ],
+   [
+    65.31,
+    36.35,
+    2
+   ],
+   [
+    67.76,
+    36.49,
+    1
+   ],
+   [
+    70.05,
+    36.45,
+    2
+   ],
+   [
+    71.12,
+    36.78,
+    1
+   ],
+   [
+    72.63,
+    36.74,
+    0
+   ],
+   [
+    73.13,
+    36.51,
+    2
+   ],
+   [
+    74.39,
+    36.3,
+    1
+   ],
+   [
+    75.44,
+    36.53,
+    2
+   ],
+   [
+    75.07,
+    36.33,
+    0
+   ],
+   [
+    76.79,
+    36.51,
+    2
+   ],
+   [
+    78.64,
+    37.0,
+    3
+   ],
+   [
+    5.46,
+    37.64,
+    1
+   ],
+   [
+    5.44,
+    37.46,
+    0
+   ],
+   [
+    6.65,
+    37.88,
+    1
+   ],
+   [
+    6.56,
+    37.88,
+    2
+   ],
+   [
+    7.45,
+    37.91,
+    0
+   ],
+   [
+    7.39,
+    37.73,
+    1
+   ],
+   [
+    8.52,
+    37.6,
+    1
+   ],
+   [
+    9.56,
+    37.59,
+    0
+   ],
+   [
+    11.76,
+    37.37,
+    0
+   ],
+   [
+    12.51,
+    37.87,
+    1
+   ],
+   [
+    12.8,
+    37.36,
+    0
+   ],
+   [
+    13.22,
+    37.36,
+    0
+   ],
+   [
+    15.29,
+    37.98,
+    2
+   ],
+   [
+    18.74,
+    37.37,
+    1
+   ],
+   [
+    20.11,
+    37.6,
+    0
+   ],
+   [
+    22.5,
+    37.43,
+    1
+   ],
+   [
+    22.46,
+    37.53,
+    2
+   ],
+   [
+    23.64,
+    37.36,
+    2
+   ],
+   [
+    23.23,
+    37.38,
+    2
+   ],
+   [
+    24.31,
+    37.47,
+    2
+   ],
+   [
+    25.98,
+    37.92,
+    1
+   ],
+   [
+    26.81,
+    37.73,
+    0
+   ],
+   [
+    26.55,
+    37.39,
+    2
+   ],
+   [
+    27.26,
+    37.79,
+    1
+   ],
+   [
+    27.62,
+    37.44,
+    1
+   ],
+   [
+    28.65,
+    37.51,
+    0
+   ],
+   [
+    28.64,
+    37.67,
+    1
+   ],
+   [
+    29.19,
+    37.97,
+    1
+   ],
+   [
+    30.67,
+    37.69,
+    2
+   ],
+   [
+    30.66,
+    37.58,
+    1
+   ],
+   [
+    31.95,
+    37.98,
+    1
+   ],
+   [
+    60.16,
+    37.7,
+    0
+   ],
+   [
+    61.86,
+    37.67,
+    0
+   ],
+   [
+    62.85,
+    37.53,
+    1
+   ],
+   [
+    62.27,
+    37.58,
+    0
    ],
    [
     63.47,
-    50.62,
+    37.61,
+    2
+   ],
+   [
+    64.0,
+    37.97,
+    0
+   ],
+   [
+    64.24,
+    37.72,
     1
    ],
    [
-    75.52,
-    50.3,
-    2
-   ],
-   [
-    4.11,
-    51.35,
+    67.25,
+    37.5,
     0
    ],
    [
-    5.83,
-    51.31,
+    67.99,
+    37.92,
+    0
+   ],
+   [
+    73.15,
+    37.58,
+    2
+   ],
+   [
+    73.35,
+    37.41,
+    0
+   ],
+   [
+    83.33,
+    37.79,
+    2
+   ],
+   [
+    4.43,
+    38.67,
     1
    ],
    [
-    10.08,
-    51.8,
+    4.76,
+    38.52,
+    0
+   ],
+   [
+    5.11,
+    38.82,
     2
    ],
    [
-    11.11,
-    51.71,
-    2
-   ],
-   [
-    12.6,
-    51.64,
-    2
-   ],
-   [
-    20.22,
-    51.67,
+    7.14,
+    38.65,
     1
    ],
    [
-    27.02,
-    51.8,
+    7.33,
+    38.81,
+    1
+   ],
+   [
+    9.97,
+    38.42,
     0
    ],
    [
-    32.66,
-    51.73,
+    9.03,
+    38.92,
+    2
+   ],
+   [
+    10.95,
+    38.59,
     0
    ],
    [
-    47.71,
-    51.57,
-    2
+    11.3,
+    38.64,
+    1
    ],
    [
-    56.4,
-    51.65,
+    12.88,
+    38.31,
     0
    ],
    [
-    60.2,
-    51.89,
+    13.34,
+    38.31,
+    0
+   ],
+   [
+    20.38,
+    38.52,
     2
    ],
    [
-    62.15,
-    51.59,
+    21.62,
+    38.35,
     2
    ],
    [
-    74.71,
-    51.43,
+    21.1,
+    38.37,
+    2
+   ],
+   [
+    22.73,
+    38.86,
+    2
+   ],
+   [
+    22.73,
+    38.63,
+    1
+   ],
+   [
+    23.88,
+    38.77,
+    1
+   ],
+   [
+    24.47,
+    38.93,
+    1
+   ],
+   [
+    25.3,
+    38.83,
+    2
+   ],
+   [
+    25.31,
+    38.46,
+    2
+   ],
+   [
+    26.89,
+    38.86,
+    2
+   ],
+   [
+    26.46,
+    38.69,
+    2
+   ],
+   [
+    27.73,
+    38.51,
+    2
+   ],
+   [
+    28.29,
+    38.77,
+    0
+   ],
+   [
+    28.88,
+    38.34,
+    0
+   ],
+   [
+    29.65,
+    38.86,
+    0
+   ],
+   [
+    53.44,
+    38.92,
+    0
+   ],
+   [
+    58.27,
+    38.65,
+    0
+   ],
+   [
+    59.84,
+    38.58,
+    2
+   ],
+   [
+    60.07,
+    38.57,
+    1
+   ],
+   [
+    61.04,
+    38.91,
+    1
+   ],
+   [
+    61.14,
+    38.87,
+    0
+   ],
+   [
+    62.94,
+    38.87,
+    0
+   ],
+   [
+    63.91,
+    38.48,
+    0
+   ],
+   [
+    66.83,
+    38.94,
+    1
+   ],
+   [
+    67.15,
+    38.77,
+    1
+   ],
+   [
+    70.54,
+    38.39,
+    1
+   ],
+   [
+    71.7,
+    38.77,
+    0
+   ],
+   [
+    71.31,
+    38.3,
+    1
+   ],
+   [
+    72.28,
+    38.84,
+    1
+   ],
+   [
+    73.44,
+    38.37,
+    1
+   ],
+   [
+    75.75,
+    38.36,
+    2
+   ],
+   [
+    75.13,
+    38.62,
+    0
+   ],
+   [
+    76.45,
+    38.32,
+    1
+   ],
+   [
+    77.59,
+    38.6,
+    1
+   ],
+   [
+    84.28,
+    38.82,
+    0
+   ],
+   [
+    84.44,
+    38.43,
+    2
+   ],
+   [
+    4.62,
+    39.36,
+    0
+   ],
+   [
+    5.57,
+    39.9,
+    1
+   ],
+   [
+    5.4,
+    39.46,
+    2
+   ],
+   [
+    10.38,
+    39.89,
+    1
+   ],
+   [
+    10.12,
+    39.75,
+    2
+   ],
+   [
+    11.39,
+    39.41,
+    1
+   ],
+   [
+    11.29,
+    39.61,
+    1
+   ],
+   [
+    12.87,
+    39.84,
+    2
+   ],
+   [
+    12.96,
+    39.4,
+    1
+   ],
+   [
+    14.99,
+    39.32,
+    2
+   ],
+   [
+    21.8,
+    39.81,
+    0
+   ],
+   [
+    23.2,
+    39.56,
+    2
+   ],
+   [
+    25.11,
+    39.35,
+    2
+   ],
+   [
+    25.75,
+    39.83,
+    1
+   ],
+   [
+    27.63,
+    39.66,
+    1
+   ],
+   [
+    28.39,
+    40.0,
+    2
+   ],
+   [
+    28.98,
+    39.69,
+    0
+   ],
+   [
+    30.3,
+    39.36,
+    0
+   ],
+   [
+    30.78,
+    39.61,
+    2
+   ],
+   [
+    31.08,
+    39.81,
+    0
+   ],
+   [
+    37.55,
+    39.76,
+    0
+   ],
+   [
+    37.08,
+    39.53,
+    2
+   ],
+   [
+    38.73,
+    39.56,
+    0
+   ],
+   [
+    38.47,
+    39.41,
+    1
+   ],
+   [
+    56.3,
+    39.55,
+    3
+   ],
+   [
+    60.62,
+    39.52,
+    0
+   ],
+   [
+    60.87,
+    39.85,
+    2
+   ],
+   [
+    61.5,
+    39.7,
+    0
+   ],
+   [
+    61.72,
+    39.54,
+    1
+   ],
+   [
+    63.99,
+    39.31,
+    0
+   ],
+   [
+    66.44,
+    39.75,
+    2
+   ],
+   [
+    67.04,
+    39.84,
+    0
+   ],
+   [
+    67.78,
+    39.79,
+    1
+   ],
+   [
+    69.73,
+    39.77,
+    0
+   ],
+   [
+    70.49,
+    39.43,
+    0
+   ],
+   [
+    71.02,
+    39.51,
+    2
+   ],
+   [
+    71.15,
+    39.59,
+    1
+   ],
+   [
+    72.75,
+    39.4,
+    0
+   ],
+   [
+    72.76,
+    39.59,
+    2
+   ],
+   [
+    81.33,
+    39.52,
+    3
+   ],
+   [
+    82.9,
+    39.32,
+    2
+   ],
+   [
+    82.01,
+    39.93,
+    1
+   ],
+   [
+    83.37,
+    39.75,
+    1
+   ],
+   [
+    83.18,
+    39.48,
+    2
+   ],
+   [
+    84.37,
+    39.66,
+    2
+   ],
+   [
+    4.42,
+    40.74,
+    1
+   ],
+   [
+    10.93,
+    40.92,
+    3
+   ],
+   [
+    25.27,
+    40.38,
+    3
+   ],
+   [
+    26.17,
+    40.86,
+    0
+   ],
+   [
+    26.15,
+    40.56,
+    1
+   ],
+   [
+    28.93,
+    40.54,
+    1
+   ],
+   [
+    29.77,
+    40.31,
+    1
+   ],
+   [
+    30.55,
+    40.96,
+    0
+   ],
+   [
+    31.97,
+    40.46,
+    0
+   ],
+   [
+    31.15,
+    40.43,
+    2
+   ],
+   [
+    32.68,
+    40.59,
+    2
+   ],
+   [
+    33.93,
+    40.57,
+    1
+   ],
+   [
+    33.81,
+    40.51,
+    2
+   ],
+   [
+    37.34,
+    40.71,
+    0
+   ],
+   [
+    39.7,
+    40.81,
+    2
+   ],
+   [
+    58.46,
+    40.45,
+    0
+   ],
+   [
+    58.03,
+    40.75,
+    2
+   ],
+   [
+    59.41,
+    40.96,
+    0
+   ],
+   [
+    60.7,
+    40.65,
+    0
+   ],
+   [
+    60.58,
+    40.89,
+    0
+   ],
+   [
+    61.14,
+    40.84,
+    0
+   ],
+   [
+    61.51,
+    40.86,
+    0
+   ],
+   [
+    62.93,
+    40.49,
+    0
+   ],
+   [
+    62.46,
+    40.75,
+    2
+   ],
+   [
+    63.85,
+    40.67,
+    3
+   ],
+   [
+    66.23,
+    40.46,
+    3
+   ],
+   [
+    68.48,
+    40.91,
+    2
+   ],
+   [
+    70.75,
+    40.74,
+    0
+   ],
+   [
+    78.21,
+    40.37,
+    2
+   ],
+   [
+    82.68,
+    40.33,
+    1
+   ],
+   [
+    83.76,
+    40.7,
+    0
+   ],
+   [
+    83.63,
+    40.35,
+    0
+   ],
+   [
+    84.39,
+    40.6,
+    1
+   ],
+   [
+    4.61,
+    41.61,
+    1
+   ],
+   [
+    20.87,
+    41.96,
+    3
+   ],
+   [
+    23.89,
+    41.89,
+    3
+   ],
+   [
+    31.59,
+    41.99,
+    2
+   ],
+   [
+    33.22,
+    41.81,
+    1
+   ],
+   [
+    34.89,
+    41.95,
+    2
+   ],
+   [
+    35.7,
+    41.31,
+    1
+   ],
+   [
+    35.93,
+    41.81,
+    0
+   ],
+   [
+    36.22,
+    41.93,
+    0
+   ],
+   [
+    37.81,
+    41.43,
+    2
+   ],
+   [
+    37.97,
+    41.81,
+    0
+   ],
+   [
+    40.41,
+    41.74,
+    1
+   ],
+   [
+    59.73,
+    41.51,
+    2
+   ],
+   [
+    60.91,
+    41.42,
+    0
+   ],
+   [
+    60.88,
+    41.81,
+    0
+   ],
+   [
+    78.7,
+    41.62,
+    2
+   ],
+   [
+    79.64,
+    41.99,
+    2
+   ],
+   [
+    80.67,
+    41.82,
+    0
+   ],
+   [
+    80.26,
+    41.45,
+    1
+   ],
+   [
+    81.25,
+    41.5,
+    1
+   ],
+   [
+    83.75,
+    41.7,
+    2
+   ],
+   [
+    84.04,
+    41.42,
+    1
+   ],
+   [
+    4.63,
+    42.91,
     0
    ],
    [
     4.98,
-    52.82,
+    42.83,
     1
    ],
    [
-    10.46,
-    52.54,
-    2
-   ],
-   [
-    14.77,
-    52.65,
-    2
-   ],
-   [
-    16.34,
-    52.67,
+    33.27,
+    42.73,
     0
    ],
    [
-    22.86,
-    52.41,
+    35.61,
+    42.54,
     0
    ],
    [
-    30.62,
-    52.96,
+    36.27,
+    42.74,
     2
    ],
    [
-    45.01,
-    52.72,
+    37.3,
+    42.7,
+    0
+   ],
+   [
+    39.37,
+    42.66,
+    3
+   ],
+   [
+    49.65,
+    42.89,
+    3
+   ],
+   [
+    64.18,
+    42.51,
+    2
+   ],
+   [
+    78.45,
+    42.61,
+    0
+   ],
+   [
+    78.39,
+    42.69,
+    2
+   ],
+   [
+    79.37,
+    42.85,
+    2
+   ],
+   [
+    79.93,
+    42.91,
+    0
+   ],
+   [
+    80.79,
+    42.7,
+    0
+   ],
+   [
+    82.33,
+    42.9,
+    0
+   ],
+   [
+    82.1,
+    42.79,
     1
    ],
    [
-    50.39,
-    52.49,
+    84.15,
+    42.83,
     2
    ],
    [
-    51.25,
-    52.49,
+    84.35,
+    42.76,
     1
    ],
    [
-    52.86,
-    52.87,
+    36.08,
+    43.44,
+    1
+   ],
+   [
+    37.81,
+    43.67,
+    2
+   ],
+   [
+    38.91,
+    43.68,
     0
    ],
    [
-    53.06,
+    39.14,
+    43.77,
+    2
+   ],
+   [
+    40.24,
+    43.46,
+    0
+   ],
+   [
+    67.84,
+    43.46,
+    2
+   ],
+   [
+    79.56,
+    43.86,
+    2
+   ],
+   [
+    80.65,
+    43.8,
+    2
+   ],
+   [
+    82.48,
+    43.88,
+    1
+   ],
+   [
+    82.99,
+    43.75,
+    0
+   ],
+   [
+    83.09,
+    43.58,
+    0
+   ],
+   [
+    84.45,
+    43.35,
+    2
+   ],
+   [
+    31.12,
+    44.54,
+    3
+   ],
+   [
+    36.22,
+    44.32,
+    1
+   ],
+   [
+    36.02,
+    44.59,
+    2
+   ],
+   [
+    37.73,
+    44.83,
+    2
+   ],
+   [
+    39.46,
+    44.5,
+    0
+   ],
+   [
+    39.95,
+    44.53,
+    2
+   ],
+   [
+    52.01,
+    44.55,
+    1
+   ],
+   [
+    52.75,
+    44.96,
+    1
+   ],
+   [
+    53.72,
+    44.87,
+    0
+   ],
+   [
+    53.97,
+    44.71,
+    0
+   ],
+   [
+    69.22,
+    44.59,
+    3
+   ],
+   [
+    78.53,
+    44.79,
+    0
+   ],
+   [
+    83.42,
+    44.96,
+    1
+   ],
+   [
+    83.05,
+    44.34,
+    2
+   ],
+   [
+    5.92,
+    45.35,
+    1
+   ],
+   [
+    16.96,
+    45.82,
+    1
+   ],
+   [
+    16.24,
+    45.43,
+    2
+   ],
+   [
+    17.27,
+    45.66,
+    2
+   ],
+   [
+    17.78,
+    45.48,
+    2
+   ],
+   [
+    21.54,
+    45.7,
+    3
+   ],
+   [
+    34.09,
+    45.8,
+    3
+   ],
+   [
+    37.01,
+    45.83,
+    2
+   ],
+   [
+    38.06,
+    45.48,
+    0
+   ],
+   [
+    41.69,
+    45.38,
+    3
+   ],
+   [
+    50.16,
+    45.58,
+    2
+   ],
+   [
+    50.38,
+    45.61,
+    2
+   ],
+   [
+    51.63,
+    45.62,
+    1
+   ],
+   [
+    51.75,
+    45.77,
+    1
+   ],
+   [
+    52.68,
+    45.59,
+    1
+   ],
+   [
+    53.14,
+    45.91,
+    1
+   ],
+   [
+    53.46,
+    45.68,
+    2
+   ],
+   [
+    78.35,
+    45.99,
+    0
+   ],
+   [
+    78.12,
+    45.43,
+    1
+   ],
+   [
+    80.07,
+    45.33,
+    1
+   ],
+   [
+    4.33,
+    46.45,
+    2
+   ],
+   [
+    10.25,
+    46.52,
+    2
+   ],
+   [
+    11.67,
+    46.31,
+    0
+   ],
+   [
+    12.96,
+    46.98,
+    2
+   ],
+   [
+    17.04,
+    46.88,
+    2
+   ],
+   [
+    18.57,
+    46.84,
+    2
+   ],
+   [
+    19.29,
+    46.92,
+    0
+   ],
+   [
+    19.98,
+    46.93,
+    0
+   ],
+   [
+    27.88,
+    46.49,
+    2
+   ],
+   [
+    35.98,
+    46.59,
+    2
+   ],
+   [
+    39.75,
+    46.46,
+    1
+   ],
+   [
+    49.83,
+    46.44,
+    1
+   ],
+   [
+    50.77,
+    46.54,
+    1
+   ],
+   [
+    50.45,
+    46.96,
+    0
+   ],
+   [
+    51.85,
+    46.82,
+    2
+   ],
+   [
+    51.93,
+    46.57,
+    0
+   ],
+   [
+    52.31,
+    46.39,
+    0
+   ],
+   [
+    53.69,
+    46.32,
+    0
+   ],
+   [
+    70.3,
+    46.68,
+    2
+   ],
+   [
+    77.73,
+    46.35,
+    0
+   ],
+   [
+    79.16,
+    46.68,
+    1
+   ],
+   [
+    79.21,
+    46.3,
+    1
+   ],
+   [
+    13.47,
+    47.76,
+    1
+   ],
+   [
+    17.32,
+    47.73,
+    2
+   ],
+   [
+    18.6,
+    47.87,
+    2
+   ],
+   [
+    18.02,
+    47.89,
+    1
+   ],
+   [
+    19.77,
+    47.42,
+    1
+   ],
+   [
+    19.56,
+    47.98,
+    1
+   ],
+   [
+    25.42,
+    47.48,
+    1
+   ],
+   [
+    52.35,
+    47.92,
+    2
+   ],
+   [
+    53.93,
+    47.31,
+    2
+   ],
+   [
+    54.57,
+    47.72,
+    3
+   ],
+   [
+    79.57,
+    47.61,
+    0
+   ],
+   [
+    80.47,
+    47.81,
+    0
+   ],
+   [
+    80.43,
+    47.79,
+    2
+   ],
+   [
+    5.5,
+    48.65,
+    0
+   ],
+   [
+    8.48,
+    48.35,
+    3
+   ],
+   [
+    22.56,
+    48.98,
+    3
+   ],
+   [
+    37.13,
+    48.44,
+    1
+   ],
+   [
+    78.59,
+    48.89,
+    3
+   ],
+   [
+    81.0,
+    48.7,
+    2
+   ],
+   [
+    80.42,
+    48.64,
+    1
+   ],
+   [
+    4.49,
+    49.99,
+    0
+   ],
+   [
+    58.77,
+    49.37,
+    0
+   ],
+   [
+    83.16,
+    49.91,
+    2
+   ],
+   [
+    84.48,
+    49.63,
+    0
+   ],
+   [
+    84.72,
+    49.81,
+    0
+   ],
+   [
+    85.61,
+    49.9,
+    1
+   ],
+   [
+    5.87,
+    50.42,
+    3
+   ],
+   [
+    11.58,
+    50.62,
+    1
+   ],
+   [
+    11.21,
+    50.85,
+    1
+   ],
+   [
+    28.39,
+    50.61,
+    3
+   ],
+   [
+    50.46,
+    50.66,
+    0
+   ],
+   [
+    53.77,
+    50.64,
+    0
+   ],
+   [
+    59.09,
+    50.35,
+    2
+   ],
+   [
+    62.52,
+    50.68,
+    3
+   ],
+   [
+    78.05,
+    50.48,
+    0
+   ],
+   [
+    85.0,
+    50.72,
+    0
+   ],
+   [
+    84.69,
+    50.3,
+    0
+   ],
+   [
+    5.01,
+    51.98,
+    3
+   ],
+   [
+    10.79,
+    51.93,
+    2
+   ],
+   [
+    11.2,
+    51.59,
+    2
+   ],
+   [
+    12.11,
+    51.46,
+    2
+   ],
+   [
+    12.74,
+    51.5,
+    2
+   ],
+   [
+    33.51,
+    51.52,
+    1
+   ],
+   [
+    35.11,
+    51.39,
+    3
+   ],
+   [
+    54.88,
+    51.51,
+    1
+   ],
+   [
+    61.22,
+    51.48,
+    3
+   ],
+   [
+    73.35,
+    51.44,
+    2
+   ],
+   [
+    84.62,
+    51.33,
+    2
+   ],
+   [
+    5.12,
     52.93,
     0
    ],
    [
-    66.36,
-    52.94,
+    12.96,
+    52.59,
     2
    ],
    [
-    67.53,
-    52.69,
+    12.87,
+    52.79,
+    0
+   ],
+   [
+    13.94,
+    52.89,
     1
    ],
    [
-    68.6,
-    52.32,
+    15.58,
+    52.43,
     0
    ],
    [
-    69.15,
-    52.95,
+    22.79,
+    52.71,
     1
    ],
    [
-    3.48,
-    53.47,
+    24.7,
+    52.42,
+    2
+   ],
+   [
+    25.54,
+    52.48,
     1
    ],
    [
-    10.41,
-    53.67,
-    0
-   ],
-   [
-    12.58,
-    53.96,
-    0
-   ],
-   [
-    15.1,
-    53.35,
+    26.28,
+    52.59,
     2
    ],
    [
-    23.94,
-    53.79,
-    2
-   ],
-   [
-    25.87,
-    53.91,
+    27.16,
+    52.51,
     1
    ],
    [
-    44.14,
-    53.43,
-    2
+    28.27,
+    52.98,
+    3
    ],
    [
-    46.98,
-    53.99,
+    33.49,
+    52.91,
     0
    ],
    [
-    48.34,
-    53.74,
+    35.8,
+    52.45,
     2
    ],
    [
-    49.83,
-    53.5,
+    35.7,
+    52.39,
+    1
+   ],
+   [
+    36.11,
+    52.87,
     2
    ],
    [
-    50.92,
-    53.76,
+    36.13,
+    52.96,
     2
    ],
    [
-    62.14,
-    53.63,
+    37.35,
+    52.33,
+    2
+   ],
+   [
+    57.88,
+    52.78,
+    2
+   ],
+   [
+    60.07,
+    52.4,
+    3
+   ],
+   [
+    64.02,
+    52.74,
+    1
+   ],
+   [
+    67.36,
+    52.35,
+    1
+   ],
+   [
+    73.85,
+    52.9,
+    3
+   ],
+   [
+    4.78,
+    53.75,
     0
    ],
    [
-    64.48,
+    11.0,
+    53.31,
+    2
+   ],
+   [
+    11.56,
     53.82,
+    0
+   ],
+   [
+    11.87,
+    53.56,
+    0
+   ],
+   [
+    13.82,
+    53.86,
     2
    ],
    [
-    69.58,
-    53.7,
+    17.48,
+    53.82,
+    3
+   ],
+   [
+    20.46,
+    53.81,
     0
    ],
    [
-    7.17,
-    54.85,
-    0
-   ],
-   [
-    8.02,
-    54.53,
-    0
-   ],
-   [
-    20.54,
-    54.88,
+    25.63,
+    53.61,
     1
    ],
    [
-    21.61,
-    54.68,
+    33.41,
+    53.33,
     0
    ],
    [
-    38.09,
-    54.46,
+    35.85,
+    53.65,
     0
    ],
    [
-    47.86,
-    54.84,
-    1
-   ],
-   [
-    49.3,
-    54.46,
-    1
-   ],
-   [
-    50.78,
-    54.92,
-    0
-   ],
-   [
-    65.85,
-    54.41,
-    0
-   ],
-   [
-    66.28,
-    54.33,
+    36.42,
+    53.58,
     2
    ],
    [
-    72.75,
-    54.8,
-    2
-   ],
-   [
-    75.72,
-    54.79,
-    0
-   ],
-   [
-    7.75,
-    55.96,
+    38.51,
+    53.79,
     1
    ],
    [
-    20.07,
-    55.48,
+    54.64,
+    53.53,
     0
    ],
    [
-    25.17,
-    55.9,
-    0
-   ],
-   [
-    53.13,
-    55.87,
+    54.56,
+    53.8,
     2
    ],
    [
+    63.84,
+    53.86,
+    0
+   ],
+   [
+    63.7,
+    53.82,
+    1
+   ],
+   [
+    64.07,
+    53.65,
+    2
+   ],
+   [
+    70.07,
+    53.58,
+    3
+   ],
+   [
+    75.86,
+    53.35,
+    0
+   ],
+   [
+    83.13,
+    53.98,
+    2
+   ],
+   [
+    9.2,
+    54.5,
+    1
+   ],
+   [
+    11.58,
     54.49,
-    55.9,
-    2
-   ],
-   [
-    58.42,
-    55.79,
-    1
-   ],
-   [
-    68.49,
-    55.62,
-    2
-   ],
-   [
-    70.83,
-    55.99,
-    1
-   ],
-   [
-    72.06,
-    55.68,
-    2
-   ],
-   [
-    5.05,
-    56.94,
-    1
-   ],
-   [
-    7.86,
-    56.56,
-    2
-   ],
-   [
-    9.83,
-    56.67,
-    2
-   ],
-   [
-    19.83,
-    56.4,
-    2
-   ],
-   [
-    37.92,
-    56.66,
     0
    ],
    [
-    38.59,
-    56.94,
+    11.65,
+    54.69,
+    1
+   ],
+   [
+    12.16,
+    54.95,
+    2
+   ],
+   [
+    12.19,
+    54.51,
     0
    ],
    [
-    63.58,
-    56.94,
-    2
-   ],
-   [
-    66.85,
-    56.88,
-    1
-   ],
-   [
-    68.95,
-    56.48,
-    2
-   ],
-   [
-    71.2,
-    56.68,
-    2
-   ],
-   [
-    3.35,
-    57.31,
-    2
-   ],
-   [
-    5.59,
-    57.7,
-    2
-   ],
-   [
-    27.91,
-    57.74,
-    1
-   ],
-   [
-    28.63,
-    57.31,
+    13.63,
+    54.32,
     0
    ],
    [
-    32.52,
-    57.8,
+    21.69,
+    54.69,
+    2
+   ],
+   [
+    25.93,
+    54.89,
     1
+   ],
+   [
+    26.67,
+    54.68,
+    3
    ],
    [
     34.97,
-    57.43,
-    1
-   ],
-   [
-    52.71,
-    57.93,
+    54.38,
     2
    ],
    [
-    53.34,
-    57.89,
+    35.01,
+    54.97,
+    1
+   ],
+   [
+    40.12,
+    54.86,
+    1
+   ],
+   [
+    63.82,
+    54.78,
+    2
+   ],
+   [
+    72.01,
+    54.63,
+    3
+   ],
+   [
+    74.88,
+    54.46,
+    3
+   ],
+   [
+    8.69,
+    55.95,
     0
    ],
    [
-    67.62,
-    57.36,
+    9.35,
+    55.37,
     0
    ],
    [
-    69.84,
+    9.75,
+    55.79,
+    2
+   ],
+   [
+    10.75,
+    55.87,
+    1
+   ],
+   [
+    10.47,
+    55.44,
+    2
+   ],
+   [
+    11.73,
+    55.61,
+    1
+   ],
+   [
+    12.01,
+    55.58,
+    1
+   ],
+   [
+    12.47,
+    55.9,
+    2
+   ],
+   [
+    13.01,
+    55.97,
+    1
+   ],
+   [
+    18.36,
+    55.95,
+    3
+   ],
+   [
+    22.66,
+    55.43,
+    1
+   ],
+   [
+    23.66,
+    55.31,
+    2
+   ],
+   [
+    24.55,
+    55.52,
+    2
+   ],
+   [
+    29.74,
+    55.41,
+    0
+   ],
+   [
+    39.47,
+    55.67,
+    2
+   ],
+   [
+    47.73,
+    55.81,
+    2
+   ],
+   [
+    48.96,
+    55.44,
+    3
+   ],
+   [
+    54.12,
+    55.55,
+    0
+   ],
+   [
+    54.13,
+    55.61,
+    0
+   ],
+   [
+    55.97,
+    55.89,
+    0
+   ],
+   [
+    55.06,
+    55.46,
+    2
+   ],
+   [
+    65.85,
+    55.66,
+    0
+   ],
+   [
+    76.01,
+    55.66,
+    0
+   ],
+   [
+    10.97,
+    56.49,
+    0
+   ],
+   [
+    22.11,
+    56.58,
+    0
+   ],
+   [
+    22.84,
+    56.47,
+    2
+   ],
+   [
+    23.9,
+    56.86,
+    1
+   ],
+   [
+    37.57,
+    56.77,
+    0
+   ],
+   [
+    38.44,
+    56.55,
+    0
+   ],
+   [
+    39.25,
+    56.88,
+    0
+   ],
+   [
+    39.6,
+    56.59,
+    0
+   ],
+   [
+    50.0,
+    56.49,
+    3
+   ],
+   [
+    54.71,
+    56.52,
+    2
+   ],
+   [
+    55.09,
+    56.47,
+    1
+   ],
+   [
+    61.92,
+    56.36,
+    0
+   ],
+   [
+    63.89,
+    56.39,
+    2
+   ],
+   [
+    66.54,
+    56.66,
+    1
+   ],
+   [
+    71.65,
+    56.92,
+    2
+   ],
+   [
+    71.69,
+    56.95,
+    2
+   ],
+   [
+    72.85,
+    56.38,
+    2
+   ],
+   [
+    72.73,
+    56.55,
+    0
+   ],
+   [
+    73.88,
+    56.7,
+    1
+   ],
+   [
+    73.13,
+    56.87,
+    2
+   ],
+   [
+    80.85,
+    56.94,
+    3
+   ],
+   [
+    5.07,
+    57.47,
+    2
+   ],
+   [
+    22.4,
+    57.63,
+    0
+   ],
+   [
+    23.92,
+    57.83,
+    0
+   ],
+   [
+    24.79,
+    57.83,
+    1
+   ],
+   [
+    25.48,
+    57.45,
+    2
+   ],
+   [
+    37.62,
+    57.98,
+    0
+   ],
+   [
+    38.76,
+    57.67,
+    1
+   ],
+   [
+    38.81,
     57.62,
-    2
-   ],
-   [
-    70.88,
-    57.99,
-    2
-   ],
-   [
-    72.27,
-    57.9,
     1
    ],
    [
-    6.86,
+    39.87,
+    57.8,
+    0
+   ],
+   [
+    39.7,
+    57.8,
+    0
+   ],
+   [
+    49.78,
+    57.78,
+    0
+   ],
+   [
+    50.29,
+    57.45,
+    1
+   ],
+   [
+    50.25,
+    57.52,
+    2
+   ],
+   [
+    52.63,
+    57.97,
+    1
+   ],
+   [
+    52.11,
+    57.89,
+    2
+   ],
+   [
+    53.81,
+    57.59,
+    1
+   ],
+   [
+    53.76,
+    57.59,
+    1
+   ],
+   [
+    55.37,
+    57.3,
+    0
+   ],
+   [
+    55.91,
+    57.77,
+    1
+   ],
+   [
+    63.84,
+    57.83,
+    1
+   ],
+   [
+    68.89,
+    57.31,
+    3
+   ],
+   [
+    69.87,
+    57.74,
+    2
+   ],
+   [
+    71.97,
+    57.82,
+    2
+   ],
+   [
+    71.25,
+    57.35,
+    2
+   ],
+   [
+    72.85,
+    57.33,
+    0
+   ],
+   [
+    73.97,
+    57.41,
+    0
+   ],
+   [
+    73.62,
+    57.51,
+    0
+   ],
+   [
+    77.1,
+    57.81,
+    0
+   ],
+   [
+    3.13,
+    58.84,
+    2
+   ],
+   [
+    3.26,
+    58.84,
+    2
+   ],
+   [
+    4.25,
+    58.63,
+    1
+   ],
+   [
+    5.84,
+    58.93,
+    1
+   ],
+   [
+    24.5,
+    58.45,
+    1
+   ],
+   [
+    24.86,
+    58.86,
+    0
+   ],
+   [
+    25.85,
     58.39,
+    2
+   ],
+   [
+    35.9,
+    58.62,
+    2
+   ],
+   [
+    37.11,
+    58.7,
     1
    ],
    [
-    7.49,
-    58.98,
+    38.15,
+    58.69,
+    2
+   ],
+   [
+    40.0,
+    58.71,
+    2
+   ],
+   [
+    40.93,
+    58.49,
+    2
+   ],
+   [
+    49.96,
+    58.51,
+    0
+   ],
+   [
+    49.63,
+    58.67,
+    0
+   ],
+   [
+    50.72,
+    58.36,
+    0
+   ],
+   [
+    53.53,
+    58.86,
+    0
+   ],
+   [
+    54.42,
+    58.79,
+    2
+   ],
+   [
+    54.38,
+    58.81,
+    0
+   ],
+   [
+    55.06,
+    58.38,
+    0
+   ],
+   [
+    56.3,
+    58.67,
+    0
+   ],
+   [
+    60.58,
+    58.8,
+    0
+   ],
+   [
+    63.59,
+    58.69,
+    3
+   ],
+   [
+    66.93,
+    58.48,
+    0
+   ],
+   [
+    67.44,
+    58.67,
     1
    ],
    [
-    12.86,
-    58.37,
+    67.39,
+    58.88,
     0
    ],
    [
-    37.85,
-    58.87,
+    68.51,
+    58.83,
     1
    ],
    [
-    47.37,
-    58.66,
+    69.71,
+    58.44,
+    2
+   ],
+   [
+    70.57,
+    58.97,
+    1
+   ],
+   [
+    70.74,
+    58.31,
     0
    ],
    [
-    46.84,
-    59.93,
+    71.35,
+    58.97,
     0
    ],
    [
-    47.18,
-    59.59,
+    72.86,
+    58.32,
+    2
+   ],
+   [
+    76.52,
+    58.72,
+    0
+   ],
+   [
+    5.57,
+    59.85,
+    1
+   ],
+   [
+    22.24,
+    59.69,
+    1
+   ],
+   [
+    22.86,
+    59.58,
+    1
+   ],
+   [
+    23.74,
+    59.4,
+    2
+   ],
+   [
+    23.96,
+    59.97,
+    2
+   ],
+   [
+    24.95,
+    59.85,
+    1
+   ],
+   [
+    39.18,
+    59.99,
+    1
+   ],
+   [
+    40.82,
+    59.48,
+    2
+   ],
+   [
+    49.72,
+    59.71,
+    1
+   ],
+   [
+    50.7,
+    59.58,
+    1
+   ],
+   [
+    50.99,
+    59.54,
+    0
+   ],
+   [
+    58.22,
+    59.31,
+    1
+   ],
+   [
+    63.7,
+    59.55,
+    2
+   ],
+   [
+    64.19,
+    59.63,
+    0
+   ],
+   [
+    65.27,
+    59.85,
+    1
+   ],
+   [
+    66.98,
+    59.36,
+    2
+   ],
+   [
+    67.67,
+    59.92,
+    0
+   ],
+   [
+    68.48,
+    59.45,
+    0
+   ],
+   [
+    68.42,
+    59.89,
+    2
+   ],
+   [
+    69.29,
+    59.35,
+    1
+   ],
+   [
+    69.15,
+    59.61,
+    2
+   ],
+   [
+    70.19,
+    59.74,
+    2
+   ],
+   [
+    71.05,
+    59.96,
+    0
+   ],
+   [
+    72.49,
+    59.4,
+    2
+   ],
+   [
+    72.02,
+    59.34,
+    1
+   ],
+   [
+    3.92,
+    60.34,
+    0
+   ],
+   [
+    21.74,
+    60.62,
+    0
+   ],
+   [
+    21.11,
+    60.62,
+    1
+   ],
+   [
+    24.45,
+    60.6,
+    1
+   ],
+   [
+    24.06,
+    60.57,
+    2
+   ],
+   [
+    25.17,
+    60.49,
+    0
+   ],
+   [
+    50.53,
+    60.67,
+    1
+   ],
+   [
+    50.76,
+    60.69,
+    2
+   ],
+   [
+    51.89,
+    60.61,
+    0
+   ],
+   [
+    51.02,
+    60.69,
+    2
+   ],
+   [
+    63.23,
+    60.86,
+    0
+   ],
+   [
+    64.82,
+    60.52,
+    1
+   ],
+   [
+    66.52,
+    60.85,
+    0
+   ],
+   [
+    67.73,
+    60.32,
+    1
+   ],
+   [
+    68.3,
+    60.78,
+    0
+   ],
+   [
+    69.53,
+    60.64,
+    1
+   ],
+   [
+    70.62,
+    60.63,
+    1
+   ],
+   [
+    71.73,
+    60.59,
+    0
+   ],
+   [
+    71.64,
+    60.87,
+    1
+   ],
+   [
+    76.25,
+    60.54,
+    0
+   ],
+   [
+    20.31,
+    61.57,
+    2
+   ],
+   [
+    21.65,
+    61.3,
+    0
+   ],
+   [
+    23.45,
+    61.65,
+    1
+   ],
+   [
+    23.46,
+    61.45,
+    1
+   ],
+   [
+    24.27,
+    61.95,
+    1
+   ],
+   [
+    24.07,
+    61.33,
+    2
+   ],
+   [
+    46.03,
+    61.38,
+    0
+   ],
+   [
+    58.7,
+    61.96,
+    0
+   ],
+   [
+    62.17,
+    61.93,
+    2
+   ],
+   [
+    62.86,
+    61.82,
+    1
+   ],
+   [
+    63.74,
+    61.86,
+    1
+   ],
+   [
+    63.29,
+    61.37,
+    2
+   ],
+   [
+    64.33,
+    61.87,
+    1
+   ],
+   [
+    65.22,
+    62.0,
+    1
+   ],
+   [
+    66.81,
+    61.41,
+    1
+   ],
+   [
+    66.1,
+    61.48,
+    2
+   ],
+   [
+    71.39,
+    61.3,
+    2
+   ],
+   [
+    75.46,
+    61.5,
+    0
+   ],
+   [
+    83.83,
+    61.83,
+    2
+   ],
+   [
+    20.58,
+    62.45,
+    2
+   ],
+   [
+    21.9,
+    62.96,
+    0
+   ],
+   [
+    21.35,
+    62.6,
+    2
+   ],
+   [
+    23.52,
+    62.95,
+    2
+   ],
+   [
+    23.36,
+    62.58,
+    0
+   ],
+   [
+    24.12,
+    62.9,
+    0
+   ],
+   [
+    61.9,
+    62.67,
+    2
+   ],
+   [
+    62.99,
+    62.57,
+    2
+   ],
+   [
+    63.81,
+    62.5,
+    1
+   ],
+   [
+    63.2,
+    62.77,
+    0
+   ],
+   [
+    66.76,
+    62.91,
+    1
+   ],
+   [
+    77.05,
+    62.34,
+    2
+   ],
+   [
+    5.84,
+    63.69,
+    2
+   ],
+   [
+    21.0,
+    63.85,
+    0
+   ],
+   [
+    21.21,
+    63.44,
+    0
+   ],
+   [
+    21.11,
+    63.49,
+    2
+   ],
+   [
+    24.08,
+    63.52,
+    2
+   ],
+   [
+    26.58,
+    63.81,
+    3
+   ],
+   [
+    27.67,
+    63.35,
+    2
+   ],
+   [
+    28.4,
+    63.8,
+    0
+   ],
+   [
+    29.94,
+    63.98,
+    1
+   ],
+   [
+    55.58,
+    63.84,
+    0
+   ],
+   [
+    56.63,
+    63.89,
+    1
+   ],
+   [
+    63.46,
+    63.44,
+    1
+   ],
+   [
+    64.78,
+    63.67,
+    2
+   ],
+   [
+    65.49,
+    63.34,
+    2
+   ],
+   [
+    67.98,
+    63.65,
+    1
+   ],
+   [
+    67.28,
+    63.82,
+    2
+   ],
+   [
+    68.87,
+    63.94,
+    2
+   ],
+   [
+    69.6,
+    63.97,
+    1
+   ],
+   [
+    75.82,
+    63.79,
+    2
+   ],
+   [
+    76.5,
+    63.68,
+    2
+   ],
+   [
+    77.19,
+    63.87,
+    0
+   ],
+   [
+    83.33,
+    63.41,
+    0
+   ],
+   [
+    84.86,
+    63.98,
+    1
+   ],
+   [
+    3.46,
+    64.31,
+    2
+   ],
+   [
+    4.82,
+    64.3,
+    1
+   ],
+   [
+    6.51,
+    65.0,
+    0
+   ],
+   [
+    17.33,
+    64.9,
+    3
+   ],
+   [
+    19.05,
+    64.37,
+    1
+   ],
+   [
+    19.14,
+    64.95,
+    1
+   ],
+   [
+    20.66,
+    64.46,
+    0
+   ],
+   [
+    20.11,
+    64.56,
+    1
+   ],
+   [
+    29.92,
+    64.65,
+    2
+   ],
+   [
+    29.9,
+    64.35,
+    0
+   ],
+   [
+    49.69,
+    64.81,
+    2
+   ],
+   [
+    55.31,
+    64.89,
+    1
+   ],
+   [
+    57.0,
+    64.81,
+    1
+   ],
+   [
+    56.91,
+    64.95,
+    2
+   ],
+   [
+    58.02,
+    64.77,
+    2
+   ],
+   [
+    58.65,
+    64.96,
+    0
+   ],
+   [
+    63.17,
+    64.75,
+    1
+   ],
+   [
+    64.59,
+    64.62,
+    0
+   ],
+   [
+    65.89,
+    64.81,
+    2
+   ],
+   [
+    66.2,
+    64.68,
+    0
+   ],
+   [
+    67.43,
+    64.41,
+    1
+   ],
+   [
+    67.01,
+    64.58,
+    2
+   ],
+   [
+    68.51,
+    64.38,
+    2
+   ],
+   [
+    77.9,
+    64.33,
+    0
+   ],
+   [
+    78.75,
+    64.62,
+    0
+   ],
+   [
+    82.82,
+    64.96,
+    2
+   ],
+   [
+    83.41,
+    64.39,
+    0
+   ],
+   [
+    84.46,
+    64.4,
+    1
+   ],
+   [
+    84.33,
+    64.33,
+    1
+   ],
+   [
+    41.63,
+    65.75,
+    3
+   ],
+   [
+    84.62,
+    65.43,
     1
    ]
   ],
   "fires": [
    [
-    37.2,
-    20.15,
+    39.6,
+    22.349999999999998,
     1.0
    ],
    [
-    43.8,
-    20.15,
+    49.4,
+    22.349999999999998,
     1.0
    ],
    [
-    34.4,
-    28.349999999999998,
+    38.6,
+    27.75,
     1.0
    ],
    [
-    46.6,
-    28.349999999999998,
+    50.4,
+    27.75,
     1.0
    ],
    [
-    35.2,
-    34.35,
+    38.6,
+    37.550000000000004,
     1.0
    ],
    [
-    45.8,
-    34.35,
+    50.4,
+    37.550000000000004,
     1.0
    ],
    [
-    36.9,
+    42.4,
     43.25,
     0.45
    ],
    [
-    43.1,
-    43.25,
-    0.45
-   ],
-   [
-    37,
+    46.8,
     51.25,
     0.45
    ],
    [
-    43.2,
+    42.2,
+    57.25,
+    0.45
+   ],
+   [
+    47.0,
+    63.25,
+    0.45
+   ],
+   [
+    33,
+    28.35,
+    0.45
+   ],
+   [
+    22,
+    28.65,
+    0.45
+   ],
+   [
+    8.5,
+    29.15,
+    0.45
+   ],
+   [
+    56,
+    28.65,
+    0.45
+   ],
+   [
+    69,
+    28.95,
+    0.45
+   ],
+   [
+    76.8,
+    31.75,
+    0.45
+   ],
+   [
+    36,
+    46.45,
+    0.45
+   ],
+   [
+    22,
+    46.55,
+    0.45
+   ],
+   [
+    14,
+    50.15,
+    0.45
+   ],
+   [
+    53,
+    49.25,
+    0.45
+   ],
+   [
+    66,
+    49.75,
+    0.45
+   ],
+   [
+    73,
+    46.65,
+    0.45
+   ],
+   [
+    80.6,
     51.25,
     0.45
    ],
    [
-    21,
-    36.35,
+    9.3,
+    55.75,
     0.45
    ],
    [
-    31,
-    33.35,
-    0.45
-   ],
-   [
-    50,
-    33.45,
-    0.45
-   ],
-   [
-    61,
-    38.05,
-    0.45
-   ],
-   [
-    16.4,
-    29.05,
-    0.45
-   ],
-   [
-    57.6,
-    32.05,
-    0.45
-   ],
-   [
-    66.5,
-    25.55,
-    0.45
-   ],
-   [
-    29.4,
-    48.35,
-    0.45
-   ],
-   [
-    16.4,
-    48.55,
-    0.45
-   ],
-   [
-    72.6,
-    22.75,
+    74.6,
+    24.95,
     0.3
    ],
    [
-    14.270833333333334,
-    56.145833333333336,
-    1.3,
+    12.36111111111111,
+    60.52777777777778,
+    1.5,
     "forge"
-   ],
-   [
-    40.5,
-    15.9,
-    0.6,
-    "embers"
    ]
   ],
   "fountains": [
    {
-    "x": 40,
-    "y": 33,
+    "x": 44.5,
+    "y": 36,
     "ax": 146,
     "ay": 310,
-    "D": 3,
+    "D": 2.25,
     "streams": [
      [
       86,
@@ -4247,43 +7839,43 @@
   ],
   "fx": {
    "particles": "ash",
-   "birds": 2,
-   "butterflies": 2,
+   "birds": 3,
+   "butterflies": 3,
    "tuft": [
-    "#5b5646",
-    "#6b6450",
-    "#4a473b"
+    "#5b5a44",
+    "#6a6a4c",
+    "#4a4b38"
    ],
    "water": "moat"
   },
   "webs": [
    [
-    70.2,
-    47.6,
-    72.6,
-    49.2,
+    78.2,
+    57.6,
+    80.6,
+    59.2,
     0.5,
     0.3
    ],
    [
-    69.0,
-    49.5,
-    71.5,
-    50.2,
+    77.0,
+    59.5,
+    79.5,
+    60.2,
     0.6,
     0.3
    ],
    [
-    72.0,
-    46.5,
-    73.8,
-    48.6,
+    80.0,
+    56.5,
+    81.8,
+    58.6,
     0.4,
     0.25
    ]
   ]
  },
- "note": "GENERATED by tools/hd/fields/build_felt2.py (standalone town: castle north, moat, wide DQ layout, every door has an interior) - do not hand-edit",
+ "note": "GENERATED by tools/hd/fields/build_felt3.py (organic village v3: castle north, moat + bridge, clustered rows, round plaza) - do not hand-edit",
  "mapPos": [
   0,
   0
