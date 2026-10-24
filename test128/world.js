@@ -758,7 +758,7 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { if (S.vfx && S.vfx.t < VISTA.lock) return [0, 0]; return rawDir(); }
+  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl)) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
@@ -781,6 +781,7 @@
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
+    if (INTRO) stepIntro(dt);
     if (S.dialog) { stepDialog(dt); queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (S.t < (S.dlgGuard || 0)) takePress('menu'); // the Esc that closed a dialog must not also open the pause menu
@@ -1076,8 +1077,25 @@
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
-    const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
-    if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
+    const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
+  // [새 1장 인트로 뼈대] ?intro=1 only (팀장 10-24 CH1_BUILD_PLAN · LANDSCAPE_RESEARCH 6절 대본), test map maps/intro_test.json:
+  // black + two heartbeats -> the core blinks blue on the chest -> 「...또다시 이 무덤가인가…」 -> control (pack remains nearby) -> hill = vista ①.
+  const INTRO = Q.get('intro') === '1' ? { map: 'intro_test', beats: [.5, 1.15], core: [1.5, 4.2], fade: [2.6, 4.4], say: 4.6,
+    line: '...또다시 이 무덤가인가. 몇 번째 반복인지 이제 세지도 않았다.', hint: '옆의 배낭 유해를 살펴보자 · 그다음 북쪽 언덕으로' } : null;
+  function stepIntro(dt) { const m = M(); if (!m || m.id !== INTRO.map) return;
+    if (!S.intro) S.intro = { t: 0, b: 0, said: false, ctl: false };
+    const I = S.intro; if (I.ctl) return; if (!S.dialog) I.t += dt;
+    while (I.b < INTRO.beats.length && I.t >= INTRO.beats[I.b]) { sfx('hit_thud', I.b ? .55 : .45); I.b++; } // 심장 소리 2번
+    if (!I.said && I.t >= INTRO.say) { I.said = true; S.dialog = { name: '필멸자', text: INTRO.line }; return; }
+    if (I.said && !S.dialog) { I.ctl = true; msg(INTRO.hint, 3.2); } else if (!S.dialog) queue.length = 0; } /* presses before the line are dropped; the dialog keeps its own */
+  function introDark() { const I = S.intro; if (!INTRO || !I || I.ctl) return 0; const [a, b] = INTRO.fade; return I.t <= a ? 1 : Math.max(0, 1 - (I.t - a) / (b - a)); }
+  function drawIntro(ox, oy, SW, SH) { const I = S.intro, d = introDark(); if (!I || I.ctl) return;
+    if (d > 0) { ctx.fillStyle = `rgba(0,0,0,${d})`; ctx.fillRect(ox, oy, SW, SH); }
+    const [c0, c1] = INTRO.core; if (I.t < c0 || I.t > c1) return; // 가슴의 코어가 푸르게 깜빡임 (코드로 그린 빛)
+    const k = (I.t - c0) / (c1 - c0), puls = .55 + .45 * Math.sin((I.t - c0) * 9), a = Math.min(1, k * 4, (1 - k) * 3) * puls, [sx, sy] = W2S(hero.x, hero.y - 15), r = SH * .05 * (1 + .4 * puls);
+    const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3); gr.addColorStop(0, `rgba(180,230,255,${a})`); gr.addColorStop(.25, `rgba(80,170,255,${a * .7})`); gr.addColorStop(1, 'rgba(40,90,255,0)');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && S.vfx ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
@@ -1945,6 +1963,7 @@
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
+    if (S.intro) drawIntro(ox, oy, SW, SH);
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
@@ -2154,8 +2173,8 @@
     interact, LAST_STAND, castAbyss, castUlt, get ultFx() { return S.ultFx; }, get hazards() { return S.hazards; }, get boss() { return S.bossRef; }, get objs() { return S.map && S.map.objs; },
   };
   // ?go=world | field00..field09 | dungeon01_b1 ... : start straight in that scene instead of the town (owner 10-22 "실행할수 있게")
-  const GO = new URLSearchParams(location.search).get('go');
-  if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default'); }, 100); });
+  const GO = new URLSearchParams(location.search).get('go') || (INTRO ? INTRO.map : null);
+  if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default', { card: !INTRO }); }, 100); });
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
   const START = GO ? null : Q.get('start') || (Q.has('old') ? null : 'felt'); /* ?go= (샌드박스·시험) wins over the Felt start */ // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
   if (START) { cv.style.background = '#000'; show(true); } // 새 판 starts in the world: black behind the world canvas from boot, so the old town demo never shows through the fade (owner 10-23 「옛날버전 화면이 잠깐」)
