@@ -1307,7 +1307,7 @@
         ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
     ctx.restore(); }
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
-  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC()) return; const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
+  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC() || (comboBlade() && f.i === hero.atk.i)) return; // 콤보 중에는 heroBlade 가 그림 (당김~끝 이어서) const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
     const gx = hx + gx0 * sc, gy = hy + gy0 * sc, [tx, ty] = gkFanPt(F, f.dir, F.R, hd), ex = hx + tx * k, ey = hy + ty * k, L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
     ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(ex, ey); ctx.stroke(); };
     seg('#0d0f13', 3.2 * sc, 0); seg('#9aa3ad', 1.8 * sc, 2 * sc); seg('#cfd5db', .7 * sc, 4 * sc); // outline / steel / edge light (the shared steel colours)
@@ -1329,14 +1329,29 @@
   // 칼 없는 사본이 없는 시트(회피대시·점프 등)는 칼 그대로 → 칼날도 안 그림(칼 두 자루가 되지 않음). 돌진·차지(i≥3)는 칼 그대로.
   const NS_IMG = [];
   function nsSrc(i) { const H = h128() && h128().H8; return H && H.nsSheets && H.nsSheets[i] || null; }
+  function nsPreload() { const H = h128() && h128().H8; if (H && H.nsSheets && !nsPreload.done) { nsPreload.done = 1; for (const i in H.nsSheets) nsImg(+i); } } // 첫 공격에 그림이 덜 와서 그림 칼이 보이던 것 막기
   function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
-  function swordC() { const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
-  function swordHidden() { return !!gkFanSwing() && swordC(); }
-  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1]]; } }
-    return [dir[0] * 14, -58 + dir[1] * 12]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
-  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
+  function swordC() { nsPreload(); const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
+  // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
+  const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && hero.hp > 0);
+  function swordHidden() { return !!(gkFanSwing() || comboBlade()) && swordC(); } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
+  function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼 (효과 담당 gkFanBlade 와 같은 모양): 손(grip) -> 부채꼴 앞끝.
+    // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
+    const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
+    const hd = tk < F.t0 ? 0 : tk > F.t1 ? 1 : Math.max(0, gkFanHead(F, tk)), [tx, ty] = gkFanPt(F, dir, F.R, hd); let ex = tx * A, ey = ty * A;
+    if (tk < F.t0) { const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + G.cells[c.h8].indexOf(c)] : null;
+      if (g0) { const q = tk / F.t0, e = q * q * (3 - 2 * q), d = (c.fl ? 180 - g0[2] : g0[2]) * Math.PI / 180, L = Math.hypot(ex - gx, ey - gy); ex = gx + (Math.cos(d) * L) * (1 - e) + (ex - gx) * e; ey = gy + (Math.sin(d) * L) * (1 - e) + (ey - gy) * e; } }
+    const L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
+    ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
+    seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#b8902e'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); }
+  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return gripKick((fl ? -g[0] : g[0]) + (c.ox || 0), g[1]); } }
+    return gripKick(dir[0] * 14, -58 + dir[1] * 12); }
+  function gripKick(gx, gy) { const a = hero.atk; if (!a || SLASH_BODY) return [gx, gy]; const K = gkKick(a), v = FACEV[hero.face] || [1, 0]; // 손도 몸 반동(기울기·내딛기·찌그러짐)을 따라감 = drawHeroHi 와 같은 식 (모션연구방 10-24)
+    gy *= K.sq; return [gx * (1 + (1 - K.sq) * .6) - v[0] * K.lean * gy / 117 + v[0] * K.step, gy + v[1] * K.step * .5]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
+  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC())) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
+    if (comboBlade() && swordC()) heroBlade(ctx); // 콤보 당김·끝에 멈춤 동안 코드 칼 (모션연구방 10-24 「칼이 안사라지는데?」)
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
@@ -1398,7 +1413,7 @@
     if (h.brake) { h.brake = 0; h.lnV = (h.lnV || 0) + BRAKE_KICK; } // reversal: the body keeps going the old way for a moment (lnDir = old heading)
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
-  function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero;
+  function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero; nsPreload();
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, null); } // 잔상 = 주인공 모습 그대로 (색 덮기 없음)
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
