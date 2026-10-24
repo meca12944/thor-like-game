@@ -1,0 +1,22 @@
+{
+ "usage": {
+  "type": "usd",
+  "usd": 0.0
+ },
+ "id": "f6b5ce88-794c-4145-a342-eb943dd0e246",
+ "status": "failed",
+ "created_at": "2026-10-24T17:56:07.886827+00:00",
+ "last_response": {
+  "type": "error",
+  "error": "Generation timed out",
+  "action": "Correcting pixels",
+  "detail": "Generation stalled and was automatically failed. Please try again.",
+  "status": "failed",
+  "progress": 0.5680000000000001,
+  "reap_reason": "no-progress",
+  "queue_position": 7,
+  "generation_mode": "edit_images",
+  "generation_started_at": "2026-10-24T17:56:14.547866+00:00",
+  "estimated_wait_seconds": 700
+ }
+}
