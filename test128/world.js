@@ -786,7 +786,7 @@
         if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); S.shots.splice(i, 1); continue; }
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { if (s.zone) hazard({ shape: 'circle', x: s.x, y: s.y + 6, r: 12, warn: 0, act: 2, dmg: 0, kind: 'web', zone: true }); // slowing web patch
         addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
-    for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) S.temp.splice(i, 1);
+    for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) { const t = S.temp[i]; if (t.kind === 'thread') addFx('tsnap', t.x, t.y - 10, { life: .55, red: threadRed(), seed: (Math.random() * 2147483646 | 0) + 1 }); S.temp.splice(i, 1); }
     for (let i = S.fx.length - 1; i >= 0; i--) { const f = S.fx[i]; f.t += dt;
       if (f.type === 'heart' && Math.hypot(hero.x - f.x, hero.y - f.y) < 10) { const hv = Math.ceil(hero.maxHp * POT.heartPct / 100); hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('text', f.x, f.y - 20, { text: '+' + hv, life: .7, color: '#ff8aa0' }); sfx('heart', .7); S.fx.splice(i, 1); continue; }
       if (f.t > f.life) S.fx.splice(i, 1); }
@@ -986,6 +986,7 @@
       for (const mm of S.mobs) if (mm.D.boss) light(mm.x, mm.y - 30, 70);
       g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(D, 0, 0); g.translate(-cx, -cy);
       g.globalCompositeOperation = 'lighter'; for (const o of m.objs) if (o.type === 'torch') { g.fillStyle = `rgba(255,140,40,${.12 + Math.sin(S.t * 11 + o.x) * .03})`; g.beginPath(); g.arc(o.x, o.y + 6, 15, 0, TAU); g.fill(); } g.globalCompositeOperation = 'source-over'; }
+    drawThreadGlow(g); // 실 효과: after the darkness so the aimed thread reads in the dark boss room
     if (S.ult) drawUlt(g, S.ult);
     g.setTransform(1, 0, 0, 1, 0, 0);
   }
@@ -1109,7 +1110,7 @@
     S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
   function gkHits(f) { if (f.t * GK_STEP > GK_HITA) return;
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-      if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2 });
+      if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const HITSTOP_HERO = [2 / 60, 3 / 60, 5 / 60, 5 / 60];
@@ -1140,7 +1141,8 @@
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = 1 - a / 10; if (al <= 0) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
-      if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); } ctx.restore(); } }
+      if (a < 4) { const L = (m.big ? 18 : 12) * (1 - a / 5); ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(-L, -1, 2 * L, 2); ctx.fillRect(-1, -L, 2, 2 * L); }
+      if (m.thread) threadSpray(ctx, m, al); ctx.restore(); } }
   function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
     const AT = atkT(a.i), u = a.t, big = a.i === 2;
@@ -1341,6 +1343,36 @@
     else { g.fillStyle = '#ffe070'; g.fillRect(-4, -1, 8, 2); g.fillStyle = '#3a2a10'; g.fillRect(3, -1, 2, 2); }
     g.restore(); }
   function hazColor(h) { return ({ web: [225, 225, 240], poison: [170, 80, 255], root: [120, 220, 80], crystal: [90, 255, 160], cage: [90, 255, 160], summon: [255, 220, 60], acorn: [255, 160, 60] })[h.kind] || [255, 60, 50]; }
+
+  // ---- 실 효과 (보스전 팀 10-24, 공격 검흔 담당; 이펙트는 코드로): 1장 펠트(실) 몹·아라크네의 겨냥 실 / 실 감옥 실 가닥 / 끊어질 때 파편 /
+  // 2페이즈 붉은 실 맥박 / 주인공 검기가 실 몹을 벨 때 튀는 실. Drawn after the dungeon darkness (emissive) so the warnings read in the dark boss room.
+  const THR = { core: [236, 232, 248], glow: [150, 135, 215], rcore: [255, 214, 216], rglow: [205, 18, 40] };
+  function threadRed() { for (const m of S.mobs) if (!m.dead && m.D.boss && m.D.felt && m.phase === 2) return true; return false; }
+  function heartbeat() { const c = S.t % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)); return Math.min(1, b(c, .07) + .7 * b(c - .24, .07)); } // lub-dub, 1.1 s
+  function thrCol(red, part, a) { const c = red ? (part ? THR.rglow : THR.rcore) : (part ? THR.glow : THR.core); return `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0, Math.min(1, a))})`; }
+  function isThreadHaz(h) { return h.shape === 'line' && h.t < h.warn && h.owner && h.owner.D && h.owner.D.felt; }
+  function threadLine(g, x0, y0, x1, y1, amp, ph, red, al, w) { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(L / 3)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1);
+    g.beginPath(); for (let i = 0; i <= n; i++) { const u = i / n, o = Math.sin(u * Math.PI) * Math.sin(u * 9 + ph) * amp; const x = x0 + (x1 - x0) * u + nx * o, y = y0 + (y1 - y0) * u + ny * o; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.strokeStyle = `rgba(6,4,12,${Math.min(1, al) * .6})`; g.lineWidth = w + 4; g.stroke(); /* dark rim: reads on any floor (검흔 연구와 같은 수) */
+    g.strokeStyle = thrCol(red, 1, al * .7); g.lineWidth = w + 2; g.stroke(); g.strokeStyle = thrCol(red, 0, al); g.lineWidth = w; g.stroke(); }
+  function drawThreadGlow(g) { const red = threadRed(), hb = red ? heartbeat() : 0; g.save(); g.lineCap = 'round';
+    for (const h of S.hazards) { if (!isThreadHaz(h)) continue; const p = Math.min(1, h.t / (h.warn || 1e-3)), pluck = h.warn - h.t < .1; // aimed thread: slack + trembling -> pulled taut on the beat
+      threadLine(g, h.x, h.y - 2, h.x2, h.y2, 3.5 * Math.pow(1 - p, 1.5), S.t * 40, red, (pluck ? 1 : .45 + .45 * p) + hb * .3, pluck ? 2 : 1);
+      const bx = h.x + (h.x2 - h.x) * p, by = h.y + (h.y2 - h.y) * p; g.fillStyle = thrCol(red, 0, .9); g.fillRect(Math.round(bx) - 1, Math.round(by) - 1, 3, 3); } // a bead runs up the thread = the countdown
+    const posts = S.temp.filter(t => t.kind === 'thread'); // 실 감옥: glowing strands between neighbouring posts (the gap has none)
+    for (let i = 0; i < posts.length; i++) for (let j = i + 1; j < posts.length; j++) { const A = posts[i], B = posts[j], d = Math.hypot(A.x - B.x, A.y - B.y); if (d > 34) continue;
+      const al = Math.min(1, Math.min(A.life, B.life) * 3) * (.75 + .15 * Math.sin(S.t * 7 + A.x) + hb * .3);
+      threadLine(g, A.x, A.y - 18, B.x, B.y - 18, 1.2, S.t * 6 + A.x, red, al, 1); threadLine(g, A.x, A.y - 8, B.x, B.y - 8, 1, S.t * 5 + B.y, red, al * .8, 1); }
+    if (red) for (const m of S.mobs) { if (m.dead || !m.D.boss || !m.D.felt) continue; // phase 2: red threads hang from the dark above her and throb
+      for (let k = 0; k < 6; k++) { const ox = (k - 2.5) * 9, sw = Math.sin(S.t * 1.7 + k * 1.3) * 4; threadLine(g, m.x + ox, m.y - 34, m.x + ox * 1.8 + sw, m.y - 150, 1.5, S.t * 3 + k, true, .25 + .55 * hb, 1); }
+      g.fillStyle = thrCol(true, 1, .10 + .22 * hb); g.beginPath(); g.ellipse(m.x, m.y, 30 + hb * 6, 12 + hb * 2, 0, 0, TAU); g.fill(); }
+    g.restore(); }
+  function threadSpray(ctx, m, al) { const red = threadRed(); let sd = m.seed || 1; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, n = m.big ? 9 : 5, t = m.t; // cut threads fly off the hit
+    ctx.lineCap = 'round'; for (let i = 0; i < n; i++) { const b = m.a + (rnd() - .5) * 1.6, sp = 4 + rnd() * 4, L = 10 + rnd() * 14, r0 = t * sp, cv = (rnd() - .5) * 1.4, fall = t * t * .25;
+      const x0 = Math.cos(b) * r0, y0 = Math.sin(b) * r0 + fall, x1 = Math.cos(b + cv) * (r0 + L), y1 = Math.sin(b + cv) * (r0 + L) + fall * 1.3;
+      ctx.strokeStyle = thrCol(red, 1, al * .6); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo((x0 + x1) / 2 + cv * 6, (y0 + y1) / 2, x1, y1); ctx.stroke();
+      ctx.strokeStyle = thrCol(red, 0, al); ctx.lineWidth = 1.2; ctx.stroke(); }
+    if (m.big && t < 6) { ctx.fillStyle = `rgba(255,236,190,${1 - t / 6})`; for (let i = 0; i < 10; i++) { const b = m.a + (rnd() - .5) * 2.4, r = t * (6 + rnd() * 6); ctx.fillRect(Math.round(Math.cos(b) * r) - 1, Math.round(Math.sin(b) * r) - 1, 3, 3); } } } // 3타: sparks
   function drawHazard(g, h, top) {
     if (h.shape === 'all') return;
     const [r, gg, b] = hazColor(h), warnP = Math.min(1, h.t / (h.warn || 1e-3)), live = h.t >= h.warn && h.t < h.warn + (h.act || 0);
@@ -1390,6 +1422,10 @@
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
     if (f.type === 'strip') { const im = feltImg(f.src); let t = f.t, i = 0; for (; i < f.ticks.length - 1; i++) { t -= f.ticks[i] / 60; if (t < 0) break; } // a one-shot body strip left in the world (boss death: legs fold, she slumps)
       if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(1, (f.life - f.t) * 1.5)); g.translate(Math.round(f.x), Math.round(f.y)); if (f.face < 0) g.scale(-1, 1); g.drawImage(im, i * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
+    if (f.type === 'tsnap') { let sd = f.seed || 1; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; g.save(); g.lineCap = 'round'; // 실 감옥 post snaps: short thread shards whip out and drop
+      for (let i = 0; i < 8; i++) { const b = rnd() * TAU, v = 30 + rnd() * 40, x = f.x + Math.cos(b) * v * f.t, y = f.y + Math.sin(b) * v * .7 * f.t + 60 * f.t * f.t, L = 3 + rnd() * 4, r = b + f.t * (rnd() * 20 - 10);
+        g.strokeStyle = thrCol(f.red, 0, 1 - p); g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(r) * L, y + Math.sin(r) * L); g.stroke(); }
+      if (f.t < .08) { g.fillStyle = thrCol(f.red, 0, 1); g.fillRect(Math.round(f.x) - 2, Math.round(f.y) - 2, 5, 5); } g.restore(); return; }
     if (f.type === 'tclone') { const tt = f.t, k = tt < f.warn ? 0 : Math.min(1, (tt - f.warn) / f.dash), x = f.x + (f.x1 - f.x) * k, y = f.y + (f.y1 - f.y) * k, im = feltImg(f.src + '_attack'); // 실 분신: pale thread copy of the boss, dashes on the beat
       if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(.85, tt * 3, (f.life - tt) * 3)); g.filter = 'grayscale(1) brightness(1.5) contrast(1.3)'; g.translate(Math.round(x), Math.round(y)); if (f.face < 0) g.scale(-1, 1);
         g.drawImage(im, (tt < f.warn ? 2 : 6) * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
@@ -1677,7 +1713,7 @@
     requestAnimationFrame(frame);
   }
   window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, aliasPt, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
-  const W_API = window.__world = { replayScene: (k, d) => { delete SAVE.flags["scene_" + k]; playScene(k, d || 0); }, /* test: replay a 1장 scene */
+  const W_API = window.__world = { mobApi: W, /* test: the helper object mobs get (force a boss move) */ replayScene: (k, d) => { delete SAVE.flags["scene_" + k]; playScene(k, d || 0); }, /* test: replay a 1장 scene */
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
     go, dirTap, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
