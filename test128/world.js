@@ -411,6 +411,39 @@
     return ok;
   }
   function msg(text, t = 2.2) { S.msg = { text, t }; }
+  // ---- 보스전 연출 (2번방 10-24, 팀장 「재밌고 다크하고 웅장한 보스전」): 시네마 띠 + 등장 그림 · 2페이즈 글자 · 처치 슬로·번쩍 · 화면 번쩍
+  const SPLASH = {}; function splashImg(src) { if (!src) return null; if (!SPLASH[src]) { const im = new Image(); im.src = V(src); SPLASH[src] = im; } const im = SPLASH[src]; return im.complete && im.naturalWidth ? im : null; }
+  function flash(t, rgb, a) { S.flashT = t; S.flashMax = t; S.flashRGB = rgb || '255,255,255'; S.flashA = a ?? .8; }
+  function josa(w, a, b) { const c = (w || '').charCodeAt(w.length - 1) - 0xac00; return c >= 0 && c <= 11171 && c % 28 ? a : b; } // 을/를
+  function bossCineIntro(B, b) { if (B.splash) splashImg(B.splash); S.cine = { kind: 'intro', t: 0, dur: B.splash ? 2.3 : .6, hold: true, img: B.splash, name: B.name || b.D.name, title: b.D.title || '', sub: B.sub || '' }; sfx('impact', .5, .6); }
+  function bossCinePhase(b) { S.cine = { kind: 'phase', t: 0, dur: 2.0, text: b.D.phaseLine || '실이 끊어진다', sub: '— 2페이즈 —' }; flash(.18, '160,10,20', .45); shake(3); S.banner = null; }
+  function bossCineKill(B, m) { S.killSlow = 1.3; S.cine = { kind: 'kill', t: 0, dur: 4.2, text: (m.D.title || B.name) + josa(m.D.title || B.name, '을', '를') + ' 쓰러뜨렸다', sub: m.D.title ? B.name : '' }; after(.35, () => flash(.35, '255,255,255', .9)); }
+  function cineBars(ox, oy, SW, SH, u, k) { const bh = Math.round(SH * .11 * k); if (bh < 1) return; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh); ctx.fillStyle = 'rgba(140,20,30,.55)'; ctx.fillRect(ox, oy + bh - Math.max(1, u), SW, Math.max(1, u)); ctx.fillRect(ox, oy + SH - bh, SW, Math.max(1, u)); }
+  function drawBossCine(ox, oy, SW, SH, u) { const C = S.cine, b = S.bossRef;
+    const want = C ? 1 : (S.introT > 0 || (S.dialog && b && !b.dead && b.st === 'intro')) ? 1 : 0; S.barK = (S.barK || 0) + (want - (S.barK || 0)) * .18; cineBars(ox, oy, SW, SH, u, S.barK);
+    if (C && C.kind === 'intro' && C.img) { const im = splashImg(C.img), t = C.t, a = Math.min(1, Math.max(0, (t - .25) / .3)) * (t > 2.0 ? Math.max(0, 1 - (t - 2.0) / .3) : 1);
+      if (im && a > 0) { const sc = 1 + .04 * Math.min(1, t / 2.0), w = SW * sc, h = SH * sc; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, SH); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(im, ox + (SW - w) / 2, oy + (SH - h) / 2, w, h); const pa = Math.min(1, Math.max(0, (t - .6) / .35)); ctx.globalAlpha = a * pa; const px = ox + SW * .04, py = oy + SH * .78;
+        textOut('「' + C.title + '」', px, py - 18 * u, 11 * u, '#c9b8a8', '#000', 'left'); textOut(C.name, px, py + 6 * u, 26 * u, '#f1e6d6', '#3a0008', 'left'); ctx.fillStyle = '#8a1020'; ctx.fillRect(px, py + 12 * u, 150 * u * pa, 2 * u);
+        if (C.sub) textOut(C.sub, px, py + 26 * u, 10 * u, '#a08f80', '#000', 'left'); ctx.restore(); }
+      if (t > 1.95 && t < 2.15) { ctx.fillStyle = `rgba(255,255,255,${(1 - Math.abs(t - 2.03) / .12) * .85})`; ctx.fillRect(ox, oy, SW, SH); } }
+    if (C && (C.kind === 'phase' || C.kind === 'kill')) { const t = C.t, a = Math.min(1, t / .25, (C.dur - t) / .4), cy = oy + SH * (C.kind === 'kill' ? .45 : .3);
+      if (C.kind === 'phase') { ctx.fillStyle = `rgba(90,0,10,${.18 * (1 + Math.sin(t * 9)) * a})`; ctx.fillRect(ox, oy, SW, SH); }
+      if (C.kind === 'kill' && t > .45) { const k2 = Math.min(1, (t - .45) / .5) * a; ctx.globalAlpha = k2; ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(ox, cy - 26 * u, SW, 44 * u); ctx.fillStyle = '#7a1020'; ctx.fillRect(ox + SW * .2, cy - 26 * u, SW * .6, Math.max(1, u)); ctx.fillRect(ox + SW * .2, cy + 18 * u, SW * .6, Math.max(1, u));
+        textOut(C.text, ox + SW / 2, cy + 4 * u, 19 * u, '#f3e9d8', '#2a0006'); if (C.sub) textOut(C.sub, ox + SW / 2, cy - 12 * u, 10 * u, '#b8a898', '#000'); ctx.globalAlpha = 1; }
+      if (C.kind === 'phase') { const sp = 1 + Math.max(0, .25 - t) * 2; ctx.globalAlpha = a; textOut(C.text, ox + SW / 2, cy, 20 * u * sp, '#ff5a4a', '#1a0004'); textOut(C.sub, ox + SW / 2, cy + 16 * u, 10 * u, '#e8b0a0', '#000'); ctx.globalAlpha = 1; } }
+    if (S.flashT > 0) { ctx.fillStyle = `rgba(${S.flashRGB},${S.flashA * S.flashT / S.flashMax})`; ctx.fillRect(ox, oy, SW, SH); } }
+  function drawBossBar(b, cxs, oy, SH, u) { // 웅장한 보스 체력바: 이름·칭호, 2페이즈 눈금(50%), 깎인 자리 하얀 잔상(hpLag), 2페이즈는 붉게 맥박
+    const w = Math.round(300 * u), h = Math.round(8 * u), x = Math.round(cxs - w / 2), y = Math.round(oy + SH - 22 * u), fr = Math.max(0, b.hp / b.maxHp), lg = Math.max(fr, (b.hpLag ?? b.hp) / b.maxHp), P2 = b.phase === 2, pul = P2 ? .5 + .5 * Math.sin(S.t * 6) : 0;
+    ctx.fillStyle = 'rgba(4,2,8,.9)'; ctx.fillRect(x - 3 * u, y - 3 * u, w + 6 * u, h + 6 * u); ctx.strokeStyle = P2 ? `rgb(${120 + 60 * pul},30,36)` : '#6a5640'; ctx.lineWidth = Math.max(1, u); ctx.strokeRect(x - 2.5 * u, y - 2.5 * u, w + 5 * u, h + 5 * u);
+    for (const ex of [x - 6 * u, x + w + 6 * u]) { ctx.fillStyle = P2 ? '#8a1020' : '#7a6448'; ctx.beginPath(); ctx.moveTo(ex, y + h / 2 - 5 * u); ctx.lineTo(ex + 4 * u, y + h / 2); ctx.lineTo(ex, y + h / 2 + 5 * u); ctx.lineTo(ex - 4 * u, y + h / 2); ctx.fill(); }
+    ctx.fillStyle = '#16080c'; ctx.fillRect(x, y, w, h);
+    if (lg > fr) { ctx.fillStyle = 'rgba(255,248,236,.85)'; ctx.fillRect(x + w * fr, y, w * (lg - fr), h); }
+    const g = ctx.createLinearGradient(0, y, 0, y + h); if (P2) { g.addColorStop(0, `rgb(${200 + 40 * pul},40,46)`); g.addColorStop(1, '#5a0a12'); } else { g.addColorStop(0, '#d9cfbd'); g.addColorStop(1, '#7d6f5e'); }
+    ctx.fillStyle = b.hitT > .15 ? '#fff' : g; ctx.fillRect(x, y, w * fr, h);
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x + w / 2 - Math.max(1, u), y - 2 * u, 2 * Math.max(1, u), h + 4 * u); ctx.fillStyle = P2 ? '#ff6a5a' : '#b8a488'; ctx.fillRect(x + w / 2 - .5 * u, y - 3 * u, Math.max(1, u), 2 * u); // 2페이즈 눈금
+    textOut(b.D.name, x, y - 7 * u, 14 * u, P2 ? '#ffb0a0' : '#efe4d2', '#000', 'left'); if (b.D.title) { ctx.font = font(14 * u); textOut('「' + b.D.title + '」', x + ctx.measureText(b.D.name).width + 6 * u, y - 7 * u, 10 * u, '#9a8a7a', '#000', 'left'); }
+    if (P2) textOut('2페이즈', x + w, y - 7 * u, 10 * u, '#ff7a6a', '#000', 'right'); }
   function banner(text, t = 1.6, small) { S.banner = { text, t, max: t, small }; }
   function after(t, f) { S.timers.push({ t, f }); }
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
@@ -442,7 +475,7 @@
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 회피대시 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
       if (just) { const ow = src && (src.owner || (src.D ? src : null)); if (ow && ow.D && ow.D.felt) { ow.dazeT = .6; addFx('text', ow.x, ow.y - (ow.D.h || 20) - 8, { text: '?', life: .6, color: '#cfe6ff' }); } // the attacker is caught off guard
-        hero.roll.just = true; S.slowmo = .3; addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
+        hero.roll.just = true; S.slowmo = .3; flash(.14, '170,230,255', .28); addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
     if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = .07; ultAdd('gainHit', 1);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); if (!hero.atk) setFace(-Math.cos(a), -Math.sin(a)); hero.kb = { x: Math.cos(a) * 3.3, y: Math.sin(a) * 3.3, n: 0 }; } // turn to the attacker (the recoil pose leans away from it) and slide ~8px over 7 ticks instead of a 1-tick teleport (motion lab 10-23)
@@ -500,10 +533,10 @@
     if (S.engaged === m) S.engaged = null;
   }
   function bossDefeated(m) {
-    const B = M().boss; SAVE.flags[B.flag] = true; save(); playScene('boss_post:' + (B.id || B.kind), 1.2);
+    const B = M().boss; SAVE.flags[B.flag] = true; save(); playScene('boss_post:' + (B.id || B.kind), 3.4); bossCineKill(B, m);
     S.hazards.length = 0; S.shots.length = 0; S.temp.length = 0; S.ult = null;
     S.mobs.forEach(o => { if (o !== m && !o.dead) killMob(o); });
-    shake(5); jingle(); banner(B.name + ' 격파!', 3);
+    shake(4); jingle();
     after(1.6, () => { const l = giveLoot(B.reward || []); msg('능력 흡수: ' + B.absorb + (l ? '  ·  획득: ' + l : ''), 5); });
     after(3.2, () => { addWarp(M()); msg('빛의 문이 열렸다 — 들어가면 신전 입구로 돌아간다', 4); });
   }
@@ -548,7 +581,7 @@
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
         if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id });
       }
-      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
+      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; bossCineIntro(m.boss, b); playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
@@ -659,6 +692,8 @@
     if (takePress('menu')) { const g = window.__game; if (g && g.ctl && !S.pause) { g.ctl.openUI('menu'); queue.length = 0; return; } S.pause = !S.pause; } // Esc = the shared pause menu (설정 · 귀환 inside)
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
+    if (S.cine) { S.cine.t += dt; if (S.cine.t >= S.cine.dur) S.cine = null; else if (S.cine.hold) { queue.length = 0; return; } } // 보스 연출 (2번방 10-24): intro = world waits
+    if (S.flashT > 0) S.flashT -= dt; if (S.killSlow > 0) { S.killSlow -= dt; dt *= .25; } { const b = S.bossRef; if (b && !b.dead && b.phase === 2 && !b.cineP2) { b.cineP2 = true; bossCinePhase(b); } }
     if (S.freezeT > 0) { S.freezeT -= dt; updateCam(dt); return; } // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
@@ -1473,16 +1508,15 @@
       { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
-      const b = S.bossRef; if (b && !b.dead) { const w = 260 * u, y = oy + SH - 20 * u; hpBar(b, cxs, y, w, 7 * u);
-        textOut(b.D.name + (b.phase === 2 ? '  — 2페이즈' : ''), cxs, y - 5 * u, 12 * u, b.phase === 2 ? '#ff9a7a' : '#fff');
-        ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(Math.round(cxs) - 1, y - 2 * u, 2, 11 * u); }
+      const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
-      if (!S.dialog) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 38 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
+      if (!S.dialog && !(b && !b.dead)) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 48 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
+    if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
