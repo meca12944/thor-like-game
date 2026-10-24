@@ -1320,7 +1320,7 @@
   window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
 
   // ---- C안 (사장님 10-24 「C안으로 가자」, 들고 있는 칼끝이 베는 방향과 50°+ 어긋나는 자세가 12세트 중 8세트였음): 평소엔 칼 든 그림,
-  // 콤보 부채꼴이 휘둘리는 틱(gkFanSwing: t0-1 ~ t1+2)만 같은 칸의 칼 없는 몸(H8.nsSheets = 칸 배치 같은 사본, 모션연구방) + 코드 칼날(gkFanBlade)이 손(H8.grip["시트:칸"])에서 부채꼴 앞끝으로.
+  // 콤보 부채꼴이 휘둘리는 틱(gkFanSwing: t0-1 ~ t1+2)만 같은 칸의 칼 없는 몸(H8.nsSheets = 칸 배치 같은 사본, 모션연구방) + 코드 칼날(heroBlade)이 손(H8.grip["시트:칸"])에서 부채꼴 앞끝으로.
   // 칼 없는 사본이 없는 시트(회피대시·점프 등)는 칼 그대로 → 칼날도 안 그림(칼 두 자루가 되지 않음). 돌진·차지(i≥3)는 칼 그대로.
   const NS_IMG = [];
   function nsSrc(i) { const H = h128() && h128().H8; return H && H.nsSheets && H.nsSheets[i] || null; }
@@ -1330,7 +1330,7 @@
   // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
   const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && hero.hp > 0);
   function swordHidden() { return !!(gkFanSwing() || comboBlade()) && swordC(); } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
-  function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼 (효과 담당 gkFanBlade 와 같은 모양): 손(grip) -> 부채꼴 앞끝.
+  function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 부채꼴 앞끝.
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
     const hd = tk < F.t0 ? 0 : tk > F.t1 ? 1 : Math.max(0, gkFanHead(F, tk)), [tx, ty] = gkFanPt(F, dir, F.R, hd); let ex = tx * A, ey = ty * A;
