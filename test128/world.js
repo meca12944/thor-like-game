@@ -330,6 +330,7 @@
   { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
+      + 'body.wvista #atk,body.wvista #dashb,body.wvista #runb,body.wvista #stick,body.wvista .wtb{opacity:.25!important;transition:opacity .4s}'
       + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
       + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
       + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
@@ -744,7 +745,8 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
+  function dirInput() { if (S.vfx && S.vfx.t < VISTA.lock) return [0, 0]; return rawDir(); }
+  function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
@@ -1051,8 +1053,20 @@
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1]; return [clampC(fx - EW / 2, m.pw - EW), clampC(fy - EH / 2, m.ph - EH)]; } // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { if (M()) S.cam = camTarget(); }
-  function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
-  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+  // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
+  // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
+  // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
+  const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
+  function vistaNow() { const m = M(); if (!m || m.type === 'world' || S.dialog || S.engaged || (S.bossRef && !S.bossRef.dead) || hero.hp <= 0) return null; const T = m.T;
+    const V = (m.objects || []).find(o => o.type === 'vista' && Math.hypot(hero.x / T - o.x - .5, hero.y / T - o.y - .5) < (o.r || 3)); if (!V) return null;
+    return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
+  function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
+    if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
+    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || S.engaged || S.dialog) S.vfx = null; }
+    const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
+  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && S.vfx ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
@@ -1872,6 +1886,10 @@
       ctx.fillStyle = on ? 'rgba(60,18,22,.95)' : 'rgba(10,8,14,.9)'; ctx.fillRect(cx, cy, cw, 19 * u); ctx.strokeStyle = on ? '#b04a3a' : '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(cx, cy, cw, 19 * u); textOut((on ? '▶ ' : '   ') + c.t, cx + 9 * u, cy + 14 * u, 12 * u, on ? '#ffe2c8' : '#a99c8c', '#000', 'left'); });
     if (done && !(d.choices && d.pi === P.length - 1)) { const bob = Math.round(Math.sin(d.t * 6) * 1.5 * u); textOut(d.pi < P.length - 1 ? '▼' : '■', x + w - 16 * u, y + h - 10 * u + bob, Math.max(10 * u, fs * .7), '#b04a3a', '#000', 'right'); }
     if (P.length > 1) textOut((d.pi + 1) + '/' + P.length, x + w - 18 * u - fs * .8, y + h - 10 * u, Math.max(9 * u, fs * .6), '#6e6458', '#000', 'right'); }
+  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, a = Math.max(0, Math.min(1, f.t / .4, (VISTA.fx - f.t) / .4)), bh = Math.round(SH * .06 * a);
+    ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh);
+    const ta = Math.max(0, Math.min(1, (f.t - .3) / .5, (VISTA.fx - f.t) / .4)); if (ta <= 0) return; ctx.globalAlpha = ta;
+    const n1 = Math.max(24 * u, SH * .09), n2 = Math.max(12 * u, SH * .042); textOut(V.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (V.sub) textOut(V.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.2, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
   function keyHint(a) { const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
     const u = k / 3, m = M(), SW = LW * k, SH = LH * k, cxs = ox + SW / 2;
@@ -1888,25 +1906,26 @@
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); const pk = f.pop ? 1 + (DMGPOP.from - 1) * Math.max(0, 1 - f.t * 60 / DMGPOP.ticks) : 1; textOut(f.text, sx, sy, Math.round(12 * u * (f.sz || 1) * pk), f.color || '#fff'); ctx.globalAlpha = 1; }
-      const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
+      const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; const hudA = S.hudA == null ? 1 : S.hudA; ctx.globalAlpha = hudA; /* 전망 자리: HUD fades */ // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
       if (window.HUD && HUD.drawQuick) { const Q = S.qs || {}; hb = HUD.drawQuick(ctx, { x: ox + 12 * hu, y: hb - 6 * hu, u: hu, n: g ? g.potions : 0, cap: DIFF().potion_cap || 5, cd: g ? g.potionCd : 0, cdMax: POT.cd, key: keyHint('potion'), low: hero.hp > 0 && hero.hp < hero.maxHp * .35, flash: Q.flash || 0, shake: Q.shake || 0, note: Q.noteT > 0 ? Q.note : '' }) + 4 * hu; if (S.hudY) S.hudY = hb; }
       else textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
       { const pb = document.getElementById('wtb_pot'); if (pb && g) { const n = g.potions || 0, cf = g.potionCd > 0 ? g.potionCd / POT.cd : 0, sig = n + '|' + Math.round(cf * 40); if (pb._sig !== sig) { pb._sig = sig; pb.innerHTML = '물약<b class="pc">' + n + '</b>'; pb.style.setProperty('--cd', (cf * 100).toFixed(1) + '%'); pb.classList.toggle('zero', !n); } } } // touch button = same count / cooldown as the HUD slot
-      if (window.HUD && HUD.drawFeed && S.feed && S.feed.length) HUD.drawFeed(ctx, { x: ox + SW - 12 * hu, y: oy + SH - 40 * hu, u: hu, items: S.feed });
+      if (window.HUD && HUD.drawFeed && S.feed && S.feed.length && hudA > .9) HUD.drawFeed(ctx, { x: ox + SW - 12 * hu, y: oy + SH - 40 * hu, u: hu, items: S.feed });
       if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초 · 저스트 회피 → 반격 「사멸의 궤적」`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
       const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }
       { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
+      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u);
       const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
       if (!S.dialog && !(b && !b.dead) && !TOUCH()) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 점프 ${keyHint('dive') || 'Space'} · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 48 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
-    if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
+    if (NAV() && m.type !== 'world') { ctx.globalAlpha = S.hudA == null ? 1 : S.hudA; NAV().drawHud(k, ox, oy, u); ctx.globalAlpha = 1; }
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
