@@ -391,10 +391,78 @@
     a9_07_gargoyle_statue: s47({ name: '가고일 석상', area: 9, h: 50, ai: 'melee' }),
     a9_08_cursed_doll: s47({ name: '저주 인형', area: 9, h: 41, ai: 'shoot', fx: 'orb', pat: 'fan' }),
   };
+  // ------------------------------------------------ 1장 보스: 『실타래의 재단사』 아라크네 (owner 10-23 「제1던전까지」, 몬스터 교본 1부; 정본: 강철 실로 이동 봉인, 실 분신 기습)
+  // 3 rules (CLAUDE.md 게임 핵심): every move aims at the hero with a warning that ends on one beat (just-dodge) -> a clear standing opening after it -> she never runs away
+  // (walks in to ~60px, the pounce closes long gaps). Phase 2 (HP 50%): + 실 감옥 / 바늘 비, 3 clones, 5 threads. Body = PixelLab strips drawn by drawFeltHi (felt: true).
+  const ARA = { rest: { chop: .9, bind: .7, clone: .6, pounce: 1.0, cage: .8, rain: .7 }, name: { chop: '가위 내려찍기', bind: '강철 실 봉인', clone: '실 분신 기습', pounce: '거미 덮치기', cage: '실 감옥', rain: '바늘 비' } };
+  def.arachne = { name: '아라크네', title: '실타래의 재단사', boss: true, felt: true, style: 'boss', col: '#c8c2d0', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 1150, h: 60, r: 16, kb: 0, sp: 26, mat: 'm_a1_shared',
+    anim: { src: 'assets/mobs_felt/c1_boss_arachne', F: 92, walk: { n: 8, ticks: [6, 6, 6, 6, 6, 6, 6, 6] }, attack: { n: 9, ticks: [6, 5, 5, 4, 4, 4, 9, 6, 5], hit: 6 }, shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4 } },
+    init(m) { m.phase = 1; m.st = 'intro'; m.t = 0; m.anim = 'walk'; },
+    update(m, W, dt) { const h = W.hero, A = this.anim, P2 = m.phase === 2, d = W.dist(m, h); m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? 1.2) - dt;
+      const look = () => { m.face = h.x >= m.x ? 1 : -1; }, rest = k => { set(m, 'rest'); m.restT = ARA.rest[k] + (m.dazeT > 0 ? .3 : 0); m.dazeT = 0; m.anim = 'walk'; m.moving = false; };
+      if (m.phase === 1 && m.hp <= m.maxHp / 2 && m.st !== 'phase') { m.phase = 2; set(m, 'phase'); m.invuln = true; m.anim = 'shoot'; startAnim(m, 'shoot', A.shoot, A.shoot.release, .9);
+        W.banner('2페이즈 — 재단사가 강철 실을 풀어 놓는다!', 2); W.shake(4); for (let i = 0; i < 12; i++) W.fx('text', m.x + Math.cos(i / 12 * TAU) * 34, m.y - 20 + Math.sin(i / 12 * TAU) * 20, { text: '✂', life: .7, color: '#d8d8e8' }); return; }
+      switch (m.st) {
+        case 'intro': m.moving = false; look(); if (m.t > 1.6) set(m, 'idle'); return;
+        case 'phase': m.moving = false; if (m.t > 1.8) { m.invuln = false; set(m, 'idle'); m.cd = .4; m.anim = 'walk'; } return;
+        case 'rest': m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; // the opening: stands still, run in and slash
+        case 'atk': if (m.at > m.dur && m.t > (m.hold || 0)) rest(m.last); return; // waiting for the strike / clones / volleys to finish
+        case 'pounce': if (m.t < m.warn) { const k = Math.min(1, m.t / m.warn), e = k * k * (3 - 2 * k); W.moveCol(m, m.sx + (m.tx - m.sx) * e - m.x, m.sy + (m.ty - m.sy) * e - m.y, m.r); }
+          else { if (!m.landed) { m.landed = true; W.shake(3); W.fx('dust', m.x - 10, m.y); W.fx('dust', m.x + 10, m.y); } if (m.t > m.warn + .1) rest('pounce'); } return;
+      }
+      // idle: walk in, always facing her; never backs off
+      m.anim = 'walk'; const x0 = m.x, y0 = m.y; if (d > 62) toward(m, W, dt, this.sp * (P2 ? 1.2 : 1), h.x, h.y); look();
+      if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; if (dd < gap) W.moveCol(m, dx / dd * Math.min(gap - dd, 60 * dt), dy / dd * Math.min(gap - dd, 60 * dt), m.r); } // no stacking
+      const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side';
+      if (m.cd > 0) return;
+      const O = [['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 90 ? 3 : d >= 55 ? 1 : 0]].concat(P2 ? [['cage', 1.4], ['rain', d >= 60 ? 1.6 : .7]] : []);
+      for (const o of O) if (o[0] === m.last) o[1] = 0; // never the same move twice in a row
+      let t = O.reduce((a, o) => a + o[1], 0) * Math.random(), k = O[0][0]; for (const o of O) { if (o[1] <= 0) continue; k = o[0]; t -= o[1]; if (t <= 0) break; }
+      m.last = k; m.cd = (P2 ? 1.0 : 1.3) / agg(W); W.banner(ARA.name[k], .9, true); const a = ang(m, h.x, h.y); look(); m.hold = 0;
+      if (k === 'chop') { const reach = 30, z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: 24, warn: .6, act: .05, dmg: 9, kind: 'swipe', owner: m });
+        if (P2) W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach * 1.9, y: m.y + Math.sin(a) * reach * 1.5, r: 20, warn: z.warn + .35, act: .05, dmg: 9, kind: 'swipe', owner: m }); // phase 2: a second, longer snip
+        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + (P2 ? .35 : 0)); set(m, 'atk'); return; }
+      if (k === 'bind') { const n = P2 ? 5 : 3, sp = .3, dirs = Array.from({ length: n }, (_, i) => a + (i - (n - 1) / 2) * sp); let tw = .6;
+        for (const b of dirs) tw = lineTele(W, m, b, 170, .6, 6);
+        W.after(tw, () => { if (m.dead) return; for (const b of dirs) W.shot({ x: m.x, y: m.y - 30, a: b, sp: 125, r: 4, dmg: 5, life: 1.6, slow: 1.2, pull: 14, kind: 'threadball', owner: m }); });
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); return; }
+      if (k === 'clone') { const n = P2 ? 3 : 2, gap = .45; let last = 0; // thread clones appear beside the hero and dash through it one after another; she stands channelling (the big opening)
+        for (let i = 0; i < n; i++) { const ca = a + Math.PI / 2 * (i % 2 ? -1 : 1) + (i === 2 ? Math.PI / 2 : 0), R = 78, cx = h.x + Math.cos(ca) * R, cy = h.y + Math.sin(ca) * R * .8,
+            da = Math.atan2(h.y - cy, h.x - cx), L = R * 2, x1 = cx + Math.cos(da) * L, y1 = cy + Math.sin(da) * L, w = .55 + i * gap;
+          const z = W.hazard({ shape: 'line', x: cx, y: cy, x2: x1, y2: y1, width: 16, warn: w, act: .05, dmg: 7, kind: 'swipe', owner: m });
+          W.fx('tclone', cx, cy, { x1, y1, warn: z.warn, dash: .16, life: z.warn + .5, src: A.src, F: A.F * .85, face: x1 > cx ? 1 : -1 }); last = z.warn; }
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, .5); set(m, 'atk'); m.hold = last + .2; return; }
+      if (k === 'pounce') { const L = Math.min(d, 120); m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * L; m.ty = m.y + Math.sin(a) * L; m.landed = false; // lands on the marked spot
+        const z = W.hazard({ shape: 'circle', x: m.tx, y: m.ty, r: 26, warn: .85, act: .05, dmg: 10, kind: 'quake', owner: m }); m.warn = z.warn;
+        startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'pounce'); return; }
+      if (k === 'cage') { const hx = h.x, hy = h.y, g0 = Math.floor(rnd(0, 10)); // ring of thread posts with a gap (boss-only ring), the slam inside: leave by the gap or dodge on the beat
+        for (let i = 0; i < 10; i++) { if (i === g0 || i === (g0 + 1) % 10) continue; const b = i * TAU / 10;
+          W.hazard({ shape: 'circle', x: hx + Math.cos(b) * 40, y: hy + Math.sin(b) * 30, r: 6, warn: .6, act: 0, dmg: 0, kind: 'web', onEnd: z => W.tempSolid(z.x, z.y, 7, 2.4, 'thread') }); }
+        const z = W.hazard({ shape: 'circle', x: hx, y: hy, r: 32, warn: 1.6, act: .05, dmg: 11, kind: 'web', owner: m });
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, .6); set(m, 'atk'); m.hold = z.warn + .1; return; }
+      if (k === 'rain') { let tw = .55; for (let w = 0; w < 3; w++) W.after(w * .5, () => { if (m.dead) return; const b = ang(m, W.hero.x, W.hero.y); // 3 aimed pin fans, each with its own line
+          for (const s of [-.22, 0, .22]) lineTele(W, m, b + s, 150, tw, 5);
+          W.after(tw, () => { if (m.dead) return; for (const s of [-.22, 0, .22]) W.shot({ x: m.x, y: m.y - 30, a: b + s, sp: 150, r: 2, dmg: 4, life: 1.3, kind: 'pin', owner: m }); }); });
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); m.hold = 1.0 + tw + .1; return; }
+    },
+    onDeath(m, W) { W.fx('fluff', m.x, m.y - 30, { life: 1.2, col: '#c8c2d0', n: 26 }); W.shake(5); } };
+  // 1장 던전 챔피언 (owner 10-23 「챔피언 2종」, 크레딧 0: 펠트 그림을 키우고 색을 바꿈). champion = the base mob's role + one extra rule, red glow (always angry)
+  { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
+      if (extra) { const up = B.update; def[id].update = function (m, W, dt) { extra.call(this, m, W, dt); up.call(this, m, W, dt); }; } };
+    mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)' }); // 꼭두각시 + always the 3-snip combo (rage)
+    mk('champ_c1_cocoon', 'c1_needle_spider', { name: '고치 어미', title: '고치 저장고의 우두머리', hp: 250, h: 28, r: 11, tint: 'hue-rotate(40deg) saturate(1.3)' }, function (m, W, dt) { // 소환 role: a marked cocoon bursts into a spiderling (max 2)
+      m.sumT = (m.sumT ?? 4) - dt; if (m.sumT > 0 || W.dist(m, W.hero) > 170) return; m.sumT = 9;
+      if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= 2) return;
+      const a = rnd(0, TAU), x = m.x + Math.cos(a) * 36, y = m.y + Math.sin(a) * 26; W.hazard({ shape: 'circle', x, y, r: 9, warn: .8, act: 0, dmg: 0, kind: 'web' });
+      W.after(.8, () => { if (m.dead) return; W.fx('fluff', x, y - 6, { life: .6, col: '#e8e0d0', n: 10 }); const c = W.spawn('c1_needle_spider', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; } }); }); }
+  // 1장 던전 placeholders (owner 10-23 「제1던전까지」) until the monster room's real champions / boss land under the same ids: bigger copies of the felt mobs
+  for (const [id, base, name, title, hp, boss] of [['champ_c1_loom', 'c1_thread_puppet', '베틀 파수꾼', '실 공방의 우두머리', 260], ['champ_c1_cocoon', 'c1_needle_spider', '고치 어미', '고치 저장고의 우두머리', 240],
+    ['arachne', 'c1_silmamul', '아라크네', '실타래의 재단사', 900, 1]]) if (!def[id]) { const B = def[base];
+    def[id] = Object.assign({}, B, { name, title, hp, champion: !boss, boss: !!boss, stub: true, h: Math.round(B.h * (boss ? 1.8 : 1.4)), r: Math.round(B.r * 1.4), anim: Object.assign({}, B.anim, { F: B.anim.F * (boss ? 1.8 : 1.4) }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3 }) }); }
   for (const k in def) if (def[k].s47 === undefined && def[k].ai) def[k].s47 = k;
   // area-1 regulars keep their AI and get the room-3 hi-res strips (body height x1.3)
   for (const [k, id] of Object.entries({ mushroom: 'field_mushroom', rabbit: 'field_horned_rabbit', wasp: 'field_wasp', boar: 'field_boar', scarecrow: 'field_scarecrow', slime: 'a1_06_forest_slime', squirrel: 'a1_07_acorn_squirrel', sprout: 'a1_08_spirit_sprout' })) { def[k].s47 = id; def[k].h = Math.round(def[k].h * 1.3); }
-  for (const k in def) { const D = def[k]; if (!D.felt) continue; // 8-way shots (owner 10-22 "4방향 -> 8방향"), bigger, faster attacks
+  for (const k in def) { const D = def[k]; if (!D.felt || D.style === 'boss') continue; // 8-way shots (owner 10-22 "4방향 -> 8방향"), bigger, faster attacks
     D.anim.F *= FELT_SC; D.h = Math.round(D.h * FELT_SC); D.r = Math.round(D.r * 1.2); D.melee.range *= 1.15; D.melee.rad *= 1.15; D.rec = FELT_REC; }
   window.WorldMobs = { def };
 })();

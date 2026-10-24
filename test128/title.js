@@ -17,7 +17,7 @@
 
   const css = document.createElement('style');
   css.textContent = `
-#ttl{position:fixed;inset:0;z-index:40;background:radial-gradient(ellipse at 50% 40%,#1b1630 0%,#08070f 70%,#000 100%);
+#ttl{position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at 50% 40%,#1b1630 0%,#08070f 70%,#000 100%);
  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8d6b0;font-family:sans-serif;user-select:none;
  transition:opacity .9s ease;}
 #ttl.out{opacity:0;pointer-events:none}
