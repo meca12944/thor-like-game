@@ -1024,7 +1024,7 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) gkDraw(kk); }; // hi-res bodies (검기 above the mobs it hits)
+      const bodies = kk => { drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
       const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
@@ -1232,10 +1232,10 @@
   const GK_REACH = [32, 30, 37], GK_ARC = [130, 143, 156]; // field px per combo hit 1-3 (specials 3+ keep hbR), degrees
   function gkSpawn(i) { const v = gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = i <= 2 ? GK_REACH[i] : hbR(i);
     const sp = Math.max(Y.v, (reach / GK_K - Y.fwd - Y.R * (1 + .025 * GK_FLY)) / GK_FLY);
-    S.gk = S.gk || []; S.gk.push({ n, i, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
-  function gkHits(f) { if (f.t * GK_STEP > GK_HITA) return;
+    S.gk = S.gk || []; S.gk.push({ n, i, at0: hero.atk ? Math.round(hero.atk.t * 60) : 0, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
+  function gkHits(f) { const fan = f.i <= 2 ? GK_FAN[f.i] : null, head = fan ? gkFanHead(fan, gkFanT(f)) : 0; if (fan ? head < 0 : f.t * GK_STEP > GK_HITA) return; // combo 1-3: body fan (active ticks), specials: flying band
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-      if (gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
+      if (fan ? gkFanTouch(fan, f, head, mm, mh) : gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
         if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
@@ -1257,7 +1257,26 @@
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) { const e = sField(P.R, P.Y.span, P.T, gkQ(P.head), gkQ(P.tail), ca, sa, P.Y.rev, P.Y.sq, P.fl, (mm.x + ex - hero.x) / GK_K - P.ox, (mm.y - mh * j / 4 - hero.y) / GK_K - P.oy);
       if (e && (GK_SWEEP ? e[2] < e[1] / 2 + 6 : Math.abs(e[2]) < e[1] / 2 + 6)) return true; } // sweep: everything inside the swept sector is cut
     return false; }
-  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 14); } }
+  // [히트박스 v3 10-24, owner 「0.7배로 두고 판정도 줄여」] combo hits 1-3 hit with a body-centred fan = the drawn slash area (slash_dark_designs/v3_hitbox/hitbox_spec.json):
+  // R = GK_REACH x .7, centre = feet + c, +x = facing (mirrored for left); p is in <=> after un-rotating by rot and y / .8: r <= R and the angle is in the swept part
+  // (sweep fraction a0 -> a1 <= head(t), head = 1-(1-clamp((t-t0+1)/sw))^2, t = 60fps tick from the attack start, live only t0..t1). Up/down/diagonal: the side fan turned in the ground plane.
+  const GK_SQ = .8, GK_FAN = [{ c: [0, -13], R: GK_REACH[0] * .7, rot: 0, a0: -70, a1: 70, t0: 3, t1: 10, sw: 4.2 }, { c: [0, -13], R: GK_REACH[1] * .7, rot: -15, a0: 70, a1: -70, t0: 3, t1: 10, sw: 4.2 }, { c: [2, -16], R: GK_REACH[2] * .7, rot: 0, a0: -100, a1: 70, t0: 4, t1: 14, sw: 6 }];
+  const gkFanT = f => (f.at0 || 0) + f.t - 1; // f.t is 1 on the spawn tick (gkTick runs after the spawn)
+  function gkFanHead(F, t) { if (t < F.t0 || t > F.t1) return -1; const x = Math.min(1, Math.max(0, (t - F.t0 + 1) / F.sw)); return 1 - (1 - x) * (1 - x); }
+  function gkFanIn(F, dir, head, px, py) { let dx = dir[0], dy = dir[1]; if (dx < 0) { px = -px; dx = -dx; } // px, py: field px from the hero's feet
+    const ph = Math.atan2(dy, dx), cp = Math.cos(ph), sp = Math.sin(ph), gx = px - F.c[0] * cp, gy = (py - F.c[1] - F.c[0] * sp * GK_SQ) / GK_SQ; // ground plane, from the fan centre
+    const fx = gx * cp + gy * sp, fy = (-gx * sp + gy * cp) * GK_SQ, t = F.rot * Math.PI / 180, ct = Math.cos(t), st = Math.sin(t); // facing frame (= the spec's east frame), back to screen y
+    const qx = fx * ct + fy * st, qy = (-fx * st + fy * ct) / GK_SQ; if (Math.hypot(qx, qy) > F.R) return false;
+    const u = (Math.atan2(qy, qx) * 180 / Math.PI - F.a0) / (F.a1 - F.a0); return u >= 0 && u <= 1 && u <= head; }
+  function gkFanTouch(F, f, head, mm, mh) { const r = mm.r || 6; // same mob body points as gkTouch (feet..head x left/mid/right)
+    for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) if (gkFanIn(F, f.dir, head, mm.x + ex - hero.x, mm.y - mh * j / 4 - hero.y)) return true;
+    return false; }
+  const HITDBG = Q.get('hitdebug') === '1'; // ?hitdebug=1: draw the combo fan (yellow = whole fan, red = live part on active ticks)
+  function gkFanDbg(k) { if (!HITDBG || !S.gk) return; for (const f of S.gk) { const F = f.i <= 2 ? GK_FAN[f.i] : null; if (!F) continue; const hd = gkFanHead(F, gkFanT(f)), [hx, hy] = W2S(hero.x, hero.y);
+      for (let y = -45; y <= 20; y += .5) for (let x = -40; x <= 40; x += .5) { if (!gkFanIn(F, f.dir, 1, x, y)) continue; ctx.fillStyle = hd >= 0 && gkFanIn(F, f.dir, hd, x, y) ? 'rgba(255,40,40,.45)' : 'rgba(255,220,40,.22)'; ctx.fillRect(Math.round(hx + x * k), Math.round(hy + y * k), Math.ceil(k / 2), Math.ceil(k / 2)); }
+      ctx.fillStyle = '#fff'; ctx.fillRect(Math.round(hx + (f.dir[0] < 0 ? -1 : 1) * F.c[0] * k) - 1, Math.round(hy + F.c[1] * k) - 1, 3, 3); } }
+  window.__gkFan = { FAN: GK_FAN, inFan: gkFanIn, head: gkFanHead }; // test hook (numeric checks)
+  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
       if (P.tail < P.head) { const im = sArc(P.R, Y.span, P.T, gkQ(P.head), gkQ(P.tail), P.rot, Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
