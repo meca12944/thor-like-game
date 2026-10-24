@@ -5,7 +5,7 @@
 
 | 날짜 | 주제 | 글 | 그림·영상 |
 |---|---|---|---|
-| 2026-10-24 | 그록 부채꼴 검흔을 코드로(그림 = 판정) + 6색 + C안 칼날 | [README](2026-10-24_fan_slash/README.md) | [방향별 영상](2026-10-24_fan_slash/fan_slash_v1.mp4) · [6색 영상](2026-10-24_fan_slash/fan_styles6_v1.mp4) |
+| 2026-10-24 | 그록 부채꼴 검흔(파쇄 강철)을 코드로(그림 = 판정) + C안 칼날 | [README](2026-10-24_fan_slash/README.md) | [영상](2026-10-24_fan_slash/fan_steel_v2.mp4) · [그림](2026-10-24_fan_slash/chk3.png) |
 | 2026-10-24 | 주인공이 칼을 든 채 vs 없음 vs 벨 때만 칼날 | [README](2026-10-24_sword_hold/README.md) | [그림](2026-10-24_sword_hold/sword_hold_still.png) · [영상](2026-10-24_sword_hold/sword_hold_v1.mp4) |
 | 2026-10-24 | 타격감(맞을 때 불꽃·별빛·파편) + 어두운 방 경고 테두리 빛 | [README](2026-10-24_hitfeel_darkwarn/README.md) | [확대](2026-10-24_hitfeel_darkwarn/hitzoom.png) · [영상](2026-10-24_hitfeel_darkwarn/hitfeel_darkwarn_v1.mp4) |
 | 2026-10-24 | 주인공 검기 각도·비율·모양 (봇 13가지 측정) | [README](2026-10-24_slash_shape/README.md) | [표](2026-10-24_slash_shape/slash_sweep_chart.png) · [영상](2026-10-24_slash_shape/slash_shape_v1.mp4) |
