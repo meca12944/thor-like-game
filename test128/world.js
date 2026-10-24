@@ -1307,7 +1307,7 @@
         ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
     ctx.restore(); }
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
-  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC() || (comboBlade() && f.i === hero.atk.i)) return; // 콤보 중에는 heroBlade 가 그림 (당김~끝 이어서) const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
+  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC() || (comboBlade() && f.i === hero.atk.i)) return; /* 콤보 중에는 heroBlade 가 그림 (당김~끝 이어서) */ const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
     const gx = hx + gx0 * sc, gy = hy + gy0 * sc, [tx, ty] = gkFanPt(F, f.dir, F.R, hd), ex = hx + tx * k, ey = hy + ty * k, L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
     ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(ex, ey); ctx.stroke(); };
     seg('#0d0f13', 3.2 * sc, 0); seg('#9aa3ad', 1.8 * sc, 2 * sc); seg('#cfd5db', .7 * sc, 4 * sc); // outline / steel / edge light (the shared steel colours)
