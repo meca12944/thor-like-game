@@ -153,6 +153,30 @@
     return c; }
   function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
       const x = ((Math.abs(h1) * EW + Math.sin(S.t * .6 + i) * 6) % EW + EW) % EW, y = ((Math.abs(h2) * EH + S.t * sp) % (EH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+  // 던전 분위기 층 (팀장 마을배경방, 주인 10-24 「다크한 설정이 잘 나오게 · 웅장한 보스전」): m.dark 지도 전부 — 떠도는 먼지(어둠 아래라 빛 근처만 보임),
+  // 천장에서 늘어진 실 가닥(월드에 붙어 흔들림), 위에서 비스듬히 내려오는 희미한 빛줄기, 가장자리 어둠. 보스 2페이즈면 붉게 맥박친다.
+  const hsh = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  function lairP2() { for (const mm of S.mobs) if (mm.D && mm.D.boss && mm.phase === 2 && mm.hp > 0) return true; return false; }
+  function drawLairBelow(g, m, cx, cy) { if (!m.dark) return; const p2 = lairP2();
+    for (let i = 0; i < 44; i++) { const a = hsh(i), b = hsh(i + 50), sp = 2 + b * 3; // dust motes
+      const x = ((a * EW + S.t * sp + Math.sin(S.t * .4 + i) * 5) % EW + EW) % EW, y = ((b * EH - S.t * (1 + a) + Math.sin(S.t * .7 + i * 2) * 3) % EH + EH) % EH;
+      g.fillStyle = p2 && i % 3 === 0 ? 'rgba(255,90,90,.55)' : 'rgba(214,206,226,.45)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); }
+    const step = 29, x0 = Math.floor(cx / step) * step; g.save(); g.lineWidth = 1; // thread strands hanging into view from above
+    for (let wx = x0; wx < cx + EW + step; wx += step) { const k = Math.floor(wx / step), r = hsh(k); if (r < .45) continue;
+      const len = 14 + hsh(k + 9) * 46, sw = Math.sin(S.t * (.8 + r) + k) * (2 + r * 3), top = cy - 2, ex = wx + sw, ey = top + len;
+      g.strokeStyle = p2 ? `rgba(220,60,70,${.28 + .12 * Math.sin(S.t * 4 + k)})` : 'rgba(226,220,236,.22)';
+      g.beginPath(); g.moveTo(wx, top); g.quadraticCurveTo(wx + sw * .3, top + len * .6, ex, ey); g.stroke();
+      if (r > .8) { g.fillStyle = p2 ? 'rgba(200,50,60,.5)' : 'rgba(230,226,240,.35)'; g.fillRect(Math.round(ex) - 1, Math.round(ey), 2, 3); } } // a tiny cocoon bead
+    g.restore(); }
+  function drawLairAbove(g, m) { if (!m.dark) return; const p2 = lairP2(); g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const br = .035 + .02 * Math.sin(S.t * .5 + i * 2), x = EW * (.18 + i * .32); // faint light shafts from cracks above
+      const gr = g.createLinearGradient(x, 0, x + EH * .45, EH); gr.addColorStop(0, `rgba(${p2 ? '200,90,110' : '170,165,210'},${br})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.beginPath(); g.moveTo(x - 10, 0); g.lineTo(x + 14, 0); g.lineTo(x + 14 + EH * .45, EH); g.lineTo(x - 10 + EH * .45, EH); g.closePath(); g.fill(); }
+    g.globalCompositeOperation = 'source-over';
+    const vg = g.createRadialGradient(EW / 2, EH * .48, Math.min(EW, EH) * .38, EW / 2, EH * .48, Math.max(EW, EH) * .72); // edge darkness
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, p2 ? `rgba(40,0,8,${.62 + .08 * Math.sin(S.t * 3)})` : 'rgba(2,2,8,.55)'); g.fillStyle = vg; g.fillRect(0, 0, EW + 1, EH + 1);
+    if (p2) { g.fillStyle = `rgba(120,0,20,${.07 + .04 * Math.sin(S.t * 3)})`; g.fillRect(0, 0, EW + 1, EH + 1); } // phase 2: the lair breathes red
+    g.restore(); }
   function sprCanvas(name, mode) { // mode: 'white' flash | 'rage' red | 'gray' | a GRADE name
     const key = name + '|' + mode; if (tintCache[key]) return tintCache[key];
     const r = ATLAS.sprites.rects[name]; if (!r) return null;
@@ -976,9 +1000,10 @@
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
     drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
+    drawLairBelow(g, m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
-      d.fillStyle = `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, EW + 1, EH + 1); d.globalCompositeOperation = 'destination-out';
+      d.fillStyle = lairP2() ? `rgba(14,2,6,${m.dark})` : `rgba(4,6,12,${m.dark})`; d.fillRect(0, 0, EW + 1, EH + 1); d.globalCompositeOperation = 'destination-out';
       const light = (x, y, r) => { const gr = d.createRadialGradient(x - cx, y - cy, 0, x - cx, y - cy, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.6, 'rgba(0,0,0,.7)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - cx - r, y - cy - r, r * 2, r * 2); };
       light(hero.x, hero.y - 10, 100);
       for (const o of m.objs) if (o.type === 'torch') light(o.x, o.y + 8, 50 + Math.sin(S.t * 9 + o.x) * 3);
@@ -986,6 +1011,7 @@
       for (const mm of S.mobs) if (mm.D.boss) light(mm.x, mm.y - 30, 70);
       g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(D, 0, 0); g.translate(-cx, -cy);
       g.globalCompositeOperation = 'lighter'; for (const o of m.objs) if (o.type === 'torch') { g.fillStyle = `rgba(255,140,40,${.12 + Math.sin(S.t * 11 + o.x) * .03})`; g.beginPath(); g.arc(o.x, o.y + 6, 15, 0, TAU); g.fill(); } g.globalCompositeOperation = 'source-over'; }
+    drawLairAbove(g, m);
     if (S.ult) drawUlt(g, S.ult);
     g.setTransform(1, 0, 0, 1, 0, 0);
   }
