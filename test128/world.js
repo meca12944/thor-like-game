@@ -986,8 +986,9 @@
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - (o.h || 26)) - 4, 2, 2); } } });
       if (o.type === 'waystone' && o.art !== 'hd') list.push({ y: o.y + 6, f: () => drawWaystone(g, o) }); // art:'hd' = the map's hd part is the stone
     }
-    for (const t of S.temp) list.push({ y: t.y + 3, f: () => { if (t.kind !== 'thread') return drawSpr(g, 'crystal', t.x, t.y + 5, { alpha: Math.min(1, t.life * 3) });
-      const x = Math.round(t.x), y = Math.round(t.y); g.globalAlpha = Math.min(1, t.life * 3); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x - 5, y + 2, 10, 3); // 실 감옥 기둥 (아라크네): a steel-thread spool post, code-drawn
+    for (const t of S.temp) list.push({ y: t.y + 3, f: () => { if (t.kind === 'cocoon') { const x = Math.round(t.x), y = Math.round(t.y); g.globalAlpha = Math.min(1, t.life * 2); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x - 6, y + 1, 12, 3); g.fillStyle = '#e8e2d4'; g.beginPath(); g.ellipse(x, y - 6, 6, 8, .2, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,110,100,.8)'; g.lineWidth = 1; for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(x - 6, y - 6 + i * 4); g.lineTo(x + 6, y - 4 + i * 4); g.stroke(); } g.globalAlpha = 1; return; } // 고치 비: landed cocoon (obstacle)
+      if (t.kind !== 'thread' && t.kind !== 'threadwall') return drawSpr(g, 'crystal', t.x, t.y + 5, { alpha: Math.min(1, t.life * 3) });
+      const x = Math.round(t.x), y = Math.round(t.y); g.globalAlpha = t.kind === 'threadwall' ? 1 : Math.min(1, t.life * 3); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x - 5, y + 2, 10, 3); // 실 감옥 기둥 (아라크네): a steel-thread spool post, code-drawn
         g.fillStyle = '#5a3a22'; g.fillRect(x - 5, y - 13, 10, 3); g.fillRect(x - 5, y, 10, 3); g.fillStyle = '#9aa0ae'; g.fillRect(x - 4, y - 10, 8, 10); g.fillStyle = '#d8dce6'; for (let i = 0; i < 4; i++) g.fillRect(x - 4, y - 9 + i * 3, 8, 1);
         g.fillStyle = 'rgba(230,232,245,.55)'; g.fillRect(x, y - 22, 1, 9); g.globalAlpha = 1; } });
     for (const mm of S.mobs) if (!mm.dead) list.push({ y: mm.y + (mm.D.hover ? 8 : 0), f: () => drawMob(g, mm) });
@@ -1414,6 +1415,13 @@
     if (f.type === 'heal') { g.fillStyle = `rgba(120,255,140,${1 - p})`; g.fillRect(f.x - 1, f.y - p * 14 - 3, 2, 6); g.fillRect(f.x - 3, f.y - p * 14 - 1, 6, 2); }
     if (f.type === 'stars') { g.fillStyle = '#ffe060'; for (let i = 0; i < 3; i++) { const a = S.t * 6 + i * 2.1; g.fillRect(f.x + Math.cos(a) * 6, f.y + Math.sin(a) * 2, 2, 2); } }
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
+    if (f.type === 'tring') { g.strokeStyle = 'rgba(225,228,240,.75)'; g.lineWidth = 1; for (const dy of [-12, -6]) { g.beginPath(); g.ellipse(f.x, f.y + dy, f.R, f.R * .8, 0, f.gap + f.gw / 2, f.gap - f.gw / 2 + TAU); g.stroke(); } } // 실 감옥: two strands of steel thread between the posts
+    if (f.type === 'cocoonfall') { const k = Math.min(1, f.t / f.warn), x = Math.round(f.x), y = Math.round(f.y); // 고치 비: shadow grows, the cocoon drops in the last 40 %
+      g.fillStyle = `rgba(0,0,0,${.15 + .35 * k})`; g.beginPath(); g.ellipse(x, y + 2, 4 + 10 * k, 2 + 4 * k, 0, 0, TAU); g.fill();
+      const q = Math.max(0, (k - .6) / .4), cy = y - 140 * (1 - q * q); if (k > .6) { g.fillStyle = '#e8e2d4'; g.beginPath(); g.ellipse(x, cy - 8, 5, 9, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,110,100,.8)'; g.lineWidth = 1;
+        for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(x - 5, cy - 8 + i * 4); g.lineTo(x + 5, cy - 6 + i * 4); g.stroke(); } g.strokeStyle = 'rgba(230,230,240,.5)'; g.beginPath(); g.moveTo(x, cy - 17); g.lineTo(x, cy - 60); g.stroke(); } }
+    if (f.type === 'unravel') { const n = f.n || 20; g.lineWidth = 1; for (let i = 0; i < n; i++) { const a = i * 2.39996, L = 10 + p * (40 + (i * 37 % 30)), w = Math.sin(p * 6 + i) * 6; // boss death: her threads come loose and fly out
+        g.strokeStyle = `rgba(${i % 3 ? '220,220,235' : '160,40,40'},${Math.max(0, 1 - p)})`; g.beginPath(); g.moveTo(f.x, f.y); g.quadraticCurveTo(f.x + Math.cos(a) * L * .5 - Math.sin(a) * w, f.y + Math.sin(a) * L * .4 + Math.cos(a) * w, f.x + Math.cos(a) * L, f.y + Math.sin(a) * L * .7 + p * 20); g.stroke(); } }
     if (f.type === 'strip') { const im = feltImg(f.src); let t = f.t, i = 0; for (; i < f.ticks.length - 1; i++) { t -= f.ticks[i] / 60; if (t < 0) break; } // a one-shot body strip left in the world (boss death: legs fold, she slumps)
       if (im.complete && im.naturalWidth) { g.save(); g.globalAlpha = Math.max(0, Math.min(1, (f.life - f.t) * 1.5)); g.translate(Math.round(f.x), Math.round(f.y)); if (f.face < 0) g.scale(-1, 1); g.drawImage(im, i * 256, 0, 256, 256, -f.F / 2, -f.F * 250 / 256, f.F, f.F); g.restore(); } }
     if (f.type === 'tclone') { const tt = f.t, k = tt < f.warn ? 0 : Math.min(1, (tt - f.warn) / f.dash), x = f.x + (f.x1 - f.x) * k, y = f.y + (f.y1 - f.y) * k, im = feltImg(f.src + '_attack'); // 실 분신: pale thread copy of the boss, dashes on the beat
