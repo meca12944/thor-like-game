@@ -13,7 +13,7 @@ OUT = os.path.join(ROOT, 'assets', 'world', 'arachne'); os.makedirs(OUT, exist_o
 PJ = json.load(open(os.path.join(SRC, 'parts.json')))['parts']
 PAL = json.load(open(os.path.join(SRC, '..', '..', 'felt_grok_layout', 'palette.json')))
 T, D, GD = 16, 3, 3
-LEG = {'#': 'wall', '.': 'floor', ',': 'floor_moss', '%': 'floor_crack', 'o': {'ground': 'floor', 'obj': 'pit'}, 'U': {'ground': 'floor', 'obj': 'stairs_up'},
+LEG = {'#': 'wall', '.': 'floor', ',': 'floor_moss', '%': 'floor_crack', 'o': {'ground': 'floor', 'hop': True}, 'U': {'ground': 'floor', 'obj': 'stairs_up'},
        'B': {'ground': 'floor', 'obj': 'boss_door'}, 'C': {'ground': 'floor', 'obj': 'chest'}, 'p': {'ground': 'floor', 'deco': 'pillar', 'solid': True}}
 
 class Grid:
