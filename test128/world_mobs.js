@@ -394,7 +394,12 @@
   // ------------------------------------------------ 1장 보스: 『실타래의 재단사』 아라크네 (owner 10-23 「제1던전까지」, 몬스터 교본 1부; 정본: 강철 실로 이동 봉인, 실 분신 기습)
   // 3 rules (CLAUDE.md 게임 핵심): every move aims at the hero with a warning that ends on one beat (just-dodge) -> a clear standing opening after it -> she never runs away
   // (walks in to ~60px, the pounce closes long gaps). Phase 2 (HP 50%): + 실 감옥 / 바늘 비, 3 clones, 5 threads. Body = PixelLab strips drawn by drawFeltHi (felt: true).
-  const ARA = { rest: { chop: .9, bind: .7, clone: .6, pounce: 1.0, cage: .8, rain: .7 }, name: { chop: '가위 내려찍기', bind: '강철 실 봉인', clone: '실 분신 기습', pounce: '거미 덮치기', cage: '실 감옥', rain: '바늘 비' } };
+  const ARA = { rest: { chop: .9, bind: .7, clone: .6, pounce: 1.0, cage: .8, rain: .7, brood: .9 }, name: { chop: '가위 내려찍기', bind: '강철 실 봉인', clone: '실 분신 기습', pounce: '거미 덮치기', cage: '실 감옥', rain: '바늘 비', brood: '새끼 거미 쏟기' },
+    brood: { max: 6, n1: 3, n2: 4, drip1: 7, drip2: 4.5 } }; // 새끼 거미 (owner 10-24 「몸통에서 새끼 거미가 계속 나와서 주인공을 공격하도록」): 큰 쏟기(패턴) + 걷는 동안 한 마리씩 흘리기(drip 초)
+  function broodOut(m, W, n) { // spiderlings burst from her abdomen (behind the woman torso = opposite her facing), hop outward, then hunt the hero
+    const bx = m.x - (m.face || 1) * 20, by = m.y - 8; W.fx('fluff', bx, by - 6, { life: .5, col: '#2a1f2e', n: 8 + n * 3 });
+    for (let i = 0; i < n; i++) { if ((W.mobs || []).filter(o => !o.dead && o.kind === 'c1_spiderling').length >= ARA.brood.max) return;
+      const s = W.spawn('c1_spiderling', bx, by + 4); if (!s) return; const a = rnd(0, TAU); s.st = 'hop'; s.t = 0; s.sx = bx; s.sy = by + 4; s.tx = bx + Math.cos(a) * rnd(18, 34); s.ty = by + 4 + Math.sin(a) * rnd(12, 24); s.noDrop = true; s.summoned = true; s.alerted = true; } }
   def.arachne = { name: '아라크네', title: '실타래의 재단사', boss: true, felt: true, style: 'boss', col: '#c8c2d0', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 1150, h: 60, r: 16, kb: 0, sp: 26, mat: 'm_a1_shared',
     anim: { src: 'assets/mobs_felt/c1_boss_arachne', F: 92, walk: { n: 8, ticks: [6, 6, 6, 6, 6, 6, 6, 6] }, attack: { n: 9, ticks: [6, 5, 5, 4, 4, 4, 9, 6, 5], hit: 6 }, shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4 } },
     init(m) { m.phase = 1; m.st = 'intro'; m.t = 0; m.anim = 'walk'; },
@@ -414,8 +419,10 @@
       m.anim = 'walk'; const x0 = m.x, y0 = m.y; if (d > 62) toward(m, W, dt, this.sp * (P2 ? 1.2 : 1), h.x, h.y); look();
       if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; if (dd < gap) W.moveCol(m, dx / dd * Math.min(gap - dd, 60 * dt), dy / dd * Math.min(gap - dd, 60 * dt), m.r); } // no stacking
       const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side';
+      m.dripT = (m.dripT ?? ARA.brood.drip1 * .6) - dt; if (m.dripT <= 0) { m.dripT = P2 ? ARA.brood.drip2 : ARA.brood.drip1; broodOut(m, W, 1); W.sfx && W.sfx('mob_die', .25, 2.2); } // 걷는 동안에도 배에서 한 마리씩
       if (m.cd > 0) return;
-      const O = [['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 90 ? 3 : d >= 55 ? 1 : 0]].concat(P2 ? [['cage', 1.4], ['rain', d >= 60 ? 1.6 : .7]] : []);
+      const nb = (W.mobs || []).filter(o => !o.dead && o.kind === 'c1_spiderling').length;
+      const O = [['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 90 ? 3 : d >= 55 ? 1 : 0], ['brood', nb < 3 ? (P2 ? 1.8 : 1.2) : 0]].concat(P2 ? [['cage', 1.4], ['rain', d >= 60 ? 1.6 : .7]] : []);
       for (const o of O) if (o[0] === m.last) o[1] = 0; // never the same move twice in a row
       let t = O.reduce((a, o) => a + o[1], 0) * Math.random(), k = O[0][0]; for (const o of O) { if (o[1] <= 0) continue; k = o[0]; t -= o[1]; if (t <= 0) break; }
       m.last = k; m.cd = (P2 ? 1.0 : 1.3) / agg(W); W.banner(ARA.name[k], .9, true); const a = ang(m, h.x, h.y); look(); m.hold = 0;
@@ -435,6 +442,10 @@
       if (k === 'pounce') { const L = Math.min(d, 120); m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * L; m.ty = m.y + Math.sin(a) * L; m.landed = false; // lands on the marked spot
         const z = W.hazard({ shape: 'circle', x: m.tx, y: m.ty, r: 26, warn: .85, act: .05, dmg: 10, kind: 'quake', owner: m }); m.warn = z.warn;
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'pounce'); return; }
+      if (k === 'brood') { const bx = m.x - (m.face || 1) * 20, by = m.y - 8; // 배가 부풀어 오름(경고 0.7초, 피해 없음) → 터지며 새끼 거미 3~4마리. 그동안 그녀는 서 있음 = 큰 빈틈
+        W.hazard({ shape: 'circle', x: bx, y: by + 6, r: 15, warn: .7, act: 0, dmg: 0, kind: 'web' }); W.shake(1);
+        W.after(.7, () => { if (m.dead) return; W.shake(2); broodOut(m, W, P2 ? ARA.brood.n2 : ARA.brood.n1); });
+        startAnim(m, 'shoot', A.shoot, A.shoot.release, .7); set(m, 'atk'); m.hold = 1.0; return; }
       if (k === 'cage') { const hx = h.x, hy = h.y, g0 = Math.floor(rnd(0, 10)); // ring of thread posts with a gap (boss-only ring), the slam inside: leave by the gap or dodge on the beat
         for (let i = 0; i < 10; i++) { if (i === g0 || i === (g0 + 1) % 10) continue; const b = i * TAU / 10;
           W.hazard({ shape: 'circle', x: hx + Math.cos(b) * 40, y: hy + Math.sin(b) * 30, r: 6, warn: .6, act: 0, dmg: 0, kind: 'web', onEnd: z => W.tempSolid(z.x, z.y, 7, 2.4, 'thread') }); }
@@ -455,6 +466,19 @@
       if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= 2) return;
       const a = rnd(0, TAU), x = m.x + Math.cos(a) * 36, y = m.y + Math.sin(a) * 26; W.hazard({ shape: 'circle', x, y, r: 9, warn: .8, act: 0, dmg: 0, kind: 'web' });
       W.after(.8, () => { if (m.dead) return; W.fx('fluff', x, y - 6, { life: .6, col: '#e8e0d0', n: 10 }); const c = W.spawn('c1_needle_spider', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; } }); }); }
+  // 새끼 거미 (2번방 10-24, 아라크네 몸통에서 나옴): 바늘 거미 그림을 반으로(크레딧 0). 빨리 달려와 → 짧은 경고(0.45) → 한 박자 물기 → 0.55초 빈틈. 한 대면 죽고, 10초 뒤엔 실로 풀려 사라짐(쌓이지 않게)
+  def.c1_spiderling = Object.assign({}, def.c1_needle_spider, { name: '새끼 거미', hp: 8, h: 11, r: 5, sp: 64, kb: 1, shots: [], noDrop: true, melee: { range: 14, rad: 11, dmg: 3 },
+    anim: Object.assign({}, def.c1_needle_spider.anim, { F: 21 }), tint: 'grayscale(.6) brightness(1.7) contrast(1.1)', // 창백한 새끼 (어두운 바닥에서 보이게)
+    init(m) { m.st = 'run'; m.t = 0; m.life = 10; m.noDrop = true; },
+    update(m, W, dt) { const h = W.hero, A = this.anim, d = W.dist(m, h); m.t += dt; m.at = (m.at || 0) + dt; m.life -= dt; m.anim = 'walk';
+      if (m.life <= 0 && m.st !== 'bite') { W.fx('fluff', m.x, m.y - 4, { life: .4, col: '#d8d0c0', n: 6 }); m.dead = true; return; }
+      if (m.st === 'hop') { const k = Math.min(1, m.t / .28), e = k * (2 - k); W.moveCol(m, m.sx + (m.tx - m.sx) * e - m.x, m.sy + (m.ty - m.sy) * e - m.y, m.r); m.moving = true; if (m.t > .35) set(m, 'run'); return; }
+      if (m.st === 'bite') { m.moving = false; if (m.t > m.warn + .55) set(m, 'run'); return; }
+      const x0 = m.x, y0 = m.y; if (d > 16) toward(m, W, dt, this.sp, h.x, h.y); m.face = h.x >= m.x ? 1 : -1;
+      if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead || o.kind !== 'c1_spiderling') continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01; if (dd < 11) W.moveCol(m, dx / dd * 30 * dt, dy / dd * 30 * dt, m.r); } // spread out around the hero
+      const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / 20; m.wdir = 'side';
+      if (d < 26 && m.t > .8) { const a = ang(m, h.x, h.y), z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * 10, y: m.y + Math.sin(a) * 8, r: 11, warn: .45, act: .05, dmg: 3, kind: 'swipe', owner: m });
+        m.warn = z.warn; startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'bite'); } } });
   // 1장 던전 placeholders (owner 10-23 「제1던전까지」) until the monster room's real champions / boss land under the same ids: bigger copies of the felt mobs
   for (const [id, base, name, title, hp, boss] of [['champ_c1_loom', 'c1_thread_puppet', '베틀 파수꾼', '실 공방의 우두머리', 260], ['champ_c1_cocoon', 'c1_needle_spider', '고치 어미', '고치 저장고의 우두머리', 240],
     ['arachne', 'c1_silmamul', '아라크네', '실타래의 재단사', 900, 1]]) if (!def[id]) { const B = def[base];
