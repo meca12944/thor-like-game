@@ -623,7 +623,7 @@
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
       updateGate(m, true);
-      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; playScene('area:' + (ar0 ? ar0.id : m.id), 1.2);
+      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; playAreaScenes(ar0 ? ar0.id : m.id, 1.2);
       if (S.pendingMsg) { msg(S.pendingMsg, 2.2); S.pendingMsg = null; }
       if (S.pendingHp) { hero.hp = Math.max(1, Math.min(hero.maxHp, S.pendingHp)); S.pendingHp = 0; syncTownHp(); }
       snapCam();
@@ -684,7 +684,7 @@
     S.calmT = f ? 0 : (S.calmT || 0) + dt; if (S.calmT > 2.5) S.snap = null; if (!f) { hero.px = hero.x; hero.py = hero.y; }
     // seamless area change: name card only, first visit auto-saves
     const ar = areaAt(m, hero.x, hero.y); if (ar && ar.id !== S.area) { S.area = ar.id; S.areaCard = { a: ar, t: 2.4 }; sfx('page', .4);
-      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } playScene('area:' + ar.id, .9); }
+      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } playAreaScenes(ar.id, .9); }
     if (S.areaCard && (S.areaCard.t -= dt) <= 0) S.areaCard = null; if (S.saved && (S.saved.t -= dt) <= 0) S.saved = null; }
   function drawLock(g) { const L = S.lock; if (!L) return; const k = Math.min(1, L.t / .35), n = 56;
     for (let i = 0; i < n; i++) { const a = i / n * TAU, x = L.x + Math.cos(a) * LOCK_R, y = L.y + Math.sin(a) * LOCK_R * LOCK_SQ, h = (7 + (i % 3) * 3 + Math.sin(S.t * 4 + i) * 1) * k;
@@ -890,6 +890,7 @@
   function dlgPages(d) { if (!d.pages) { const P = []; if (d.wrapF) ctx.font = d.wrapF; for (const pg of String(d.text || '…').split(/\n{2,}/)) { const L = [].concat(...pg.split('\n').map(l => dlgWrap(l, d.wrapW))); for (let i = 0; i < L.length; i += DLG.lines) P.push(L.slice(i, i + DLG.lines).join('\n')); }
       d.pages = P.length ? P : ['…']; d.pi = 0; d.ch = 0; d.sel = 0; d.t = 0; } return d.pages; }
   function stepDialog(dt) { const d = S.dialog, P = dlgPages(d), pg = P[d.pi], full = pg.length, last = d.pi === P.length - 1, b4 = Math.floor(d.ch); d.t += dt;
+    if (d.cg && (!S.cgL || S.cgL.src !== d.cg || S.t - S.cgL.since < .6)) { S.dlgTap = false; return; } // new story picture: 0.6 s of picture alone first
     d.ch = Math.min(full, d.ch + dt * DLG.cps); const n = Math.floor(d.ch); if (n > b4 && n % 2 === 0 && !/\s/.test(pg[n - 1] || ' ')) sfx('talk', .5, d.pitch || 1);
     if (last && d.choices && d.ch >= full) { if (takePress('up')) d.sel = (d.sel + d.choices.length - 1) % d.choices.length; if (takePress('down')) d.sel = (d.sel + 1) % d.choices.length; }
     const adv = takePress('interact') || takePress('attack') || queue.includes('Space') || queue.includes('Enter') || S.dlgTap; S.dlgTap = false; // phone: tap the picture (UI_GUIDE 10)
@@ -906,15 +907,16 @@
         if (!it || it.who !== who) { it = { who, lines: [] }; out.push(it); } it.lines.push(t); if (who && who.narr) { it = null; } } }
     return out; }
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
-    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
-  function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
+    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, cgDx: h.cgDx, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
+  function talkAs(o, text, last, artKey) { const sq = toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }); playSeq(artKey ? withArt(sq, artKey) : sq, last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
   addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); const sq = withArt(toSeq(t), key); if (!S.dialog) playSeq(sq); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(sq); }; } }); }
-  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) seq.forEach((it, i) => { for (const [src, from] of A) if (i >= from) it.cg = src; }); return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
+  function playAreaScenes(id, delay) { playScene('area:' + id, delay); const F = SAVE.flags; if (DLGD && DLGD.scenes) for (const k in DLGD.scenes) { const m = k.match(/^area:([^@]+)@(.+)$/); if (m && m[1] === id && F[m[2]]) playScene(k, delay); } } // 'area:felt@boss_arachne' = Felt again after the boss
+  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) seq.forEach((it, i) => { for (const [src, from, dx] of A) if (i >= from) { it.cg = src; it.cgDx = dx || 0; } }); return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -922,6 +924,7 @@
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
       if (o.type === 'npc') { let text = (o.quests && NAV()) ? NAV().talk(o) : (o.idle || '…'); S.talked = o.id; const plain = text === (o.idle || '…'); if (plain) text = npcLine(o);
         if ((o.shop || o.forge) && plain && window.__game && (window.__game.openForge || window.__game.openShop)) { talkAs(o, text, { choices: [{ t: o.forge ? '강화·제작' : '물건을 본다', f: () => openTrade(o) }, { t: '그만둔다' }] }); return; } // 대사 먼저, 고르면 가게 // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
+        const mk = 'meet:' + o.id, mArt = DLGD && DLGD.sceneArt && DLGD.sceneArt[mk] && !SAVE.flags['cg_' + mk]; if (mArt) { SAVE.flags['cg_' + mk] = true; save(); talkAs(o, text, null, mk); return; } // first talk with story art (리네트 첫 만남)
         if (!o.anim && o.main && !/^[^\s:()「」]{1,8}: /m.test(text)) { S.dialog = { text, name: o.name, role: o.role, por: o.portrait || o.art || o.id }; return; } talkAs(o, text); return; }
       if (o.type === 'clue') { clue(o); return; }
       if (o.type === 'secret_wall') { if (!SAVE.flags[o.flag]) { SAVE.flags[o.flag] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; shake(4); sfx('impact', .8); for (let i = 0; i < 14; i++) addFx('dust', o.x + (Math.random() - .5) * 16, o.y + (Math.random() - .5) * 10, { life: .6 }); banner(o.name || '숨겨진 길이 드러났다', 2); } else S.dialog = { text: o.textDone || '무너진 벽 너머로 좁은 방이 보인다.' }; return; }
@@ -958,7 +961,7 @@
     if (o.needQuest && !questOn(o.needQuest)) { S.dialog = { text: o.textIdle || o.textLocked || '…', name: o.name }; return; }
     if (!(o.needFlags || []).every(f => SAVE.flags[f])) { S.dialog = { text: o.textLocked || '지금은 할 수 있는 게 없다.', name: o.name }; return; }
     SAVE.flags[o.flag] = true; save(); const got = o.loot ? giveLoot(o.loot) : '';
-    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
+    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg, cgDx: o.cgDx || 0 }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
     if (!keyId) { if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
@@ -1555,13 +1558,17 @@
     const A = d.anim && npcAnim(d.anim); if (!A) return false; const seq = A.J.anims.idle_south || A.J.anims.idle_down; if (!seq) return false; const t = Math.floor(d.t * 60) % seq.reduce((a, q) => a + q[2], 0); let q = seq[0], acc = 0; for (const e of seq) { acc += e[2]; if (t < acc) { q = e; break; } }
     const c = A.J.cells[q[0]][q[1]], [cx, cy, cw, ch] = c, top = cy + Math.max(0, c[5] - 124), bh = 64, bw = 64, bx = cx + c[4] - 32; // head + shoulders: top 64 px of a ~124 px figure, centred on the feet anchor
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, sz, sz); ctx.clip(); ctx.imageSmoothingEnabled = false; const sc = sz / bw, s0 = Math.max(cx, bx), s1 = Math.min(cx + cw, bx + bw), t1 = Math.min(cy + ch, top + bh); if (s1 > s0 && t1 > top) ctx.drawImage(A.ims[q[0]], s0, top, s1 - s0, t1 - top, Math.round(x + (s0 - bx) * sc), Math.round(y + 2 * sc), Math.round((s1 - s0) * sc), Math.round((t1 - top) * sc)); /* only this cell's pixels (atlas neighbours stay out) */ ctx.restore(); return true; }
+  function drawCg(L, e, fade, ox, oy, SW, SH) { // story picture (CG_MEETING 결론): darken, 0.4 s fade in, 1.00 -> 1.03 push-in + 5 px drift toward the gaze over 9 s, pixel-crisp
+    const im = splashImg('assets/' + L.src), k = Math.min(1, e / 9), a = Math.min(1, e / .4) * fade; ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25) * fade})`; ctx.fillRect(ox, oy, SW, SH);
+    if (im) { const sc = 1 + .03 * k, iw = SW * sc, ih = SH * sc, px = (L.dx || 0) * 5 * (SW / LW) * k; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(ox + (SW - iw) / 2 + px), Math.round(oy + (SH - ih) / 2), Math.round(iw), Math.round(ih)); } ctx.restore(); }
+  function drawCgOut(ox, oy, SW, SH) { if (!S.dialog && S.cgL) { S.cgOut = Object.assign({ until: S.t + .4, e: S.t - S.cgL.since }, S.cgL); S.cgL = null; } const O = S.cgOut; if (!O) return; const f = (O.until - S.t) / .4; if (f <= 0 || S.dialog) { S.cgOut = null; return; } drawCg(O, O.e, f, ox, oy, SW, SH); } // 0.4 s fade out after the last line
   function drawDialog(ox, oy, SW, SH, u) { const d0 = S.dialog, ts = (window.__game && window.__game.textScale) || 1, dpr = ctx.canvas.width / Math.max(1, innerWidth), fs = Math.round(Math.max(13 * u, 15 * dpr) * ts), lh = Math.round(fs * 1.6), psz = Math.round(Math.min(Math.max(92 * u, lh * 3 + 30 * u) - 16 * u, Math.max(76 * u, lh * 2.6))), nf = Math.round(Math.max(12 * u, fs * .8)); // 글자: 폰에서도 15px 이상 + 설정 → 화면 → 글자 크기 (UI_GUIDE 8)
-    { const wF = font(fs), wW = Math.round(Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)) - 18 * u - (d0.anim || d0.por ? psz + 14 * u : 0) - 24 * u); if (d0.wrapW !== wW || d0.wrapF !== wF) { const keep = d0.pages ? d0.pi : 0; d0.wrapW = wW; d0.wrapF = wF; d0.pages = null; dlgPages(d0); d0.pi = Math.min(keep, d0.pages.length - 1); d0.ch = keep ? 0 : d0.ch; } }
+    { const wF = font(fs), wW = Math.round(Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)) - 18 * u - (!d0.cg && (d0.anim || d0.por) ? psz + 14 * u : 0) - 24 * u); if (d0.wrapW !== wW || d0.wrapF !== wF) { const keep = d0.pages ? d0.pi : 0; d0.wrapW = wW; d0.wrapF = wF; d0.pages = null; dlgPages(d0); d0.pi = Math.min(keep, d0.pages.length - 1); d0.ch = keep ? 0 : d0.ch; } }
     const d = S.dialog, P = dlgPages(d), pg = P[d.pi], shown = pg.slice(0, Math.floor(d.ch)), done = d.ch >= pg.length;
-    if (d.cg) { const now = performance.now(); if (!S.cgL || S.cgL.src !== d.cg) S.cgL = { src: d.cg, since: now }; const im = splashImg('assets/' + d.cg), e = (now - S.cgL.since) / 1000, a = Math.min(1, e / .4); // story art behind the box: darken, 0.4 s fade, very slow 1.00 -> 1.03 push-in
-      ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25)})`; ctx.fillRect(ox, oy, SW, SH); if (im) { const sc = 1 + .03 * Math.min(1, e / 9), iw = SW * sc, ih = SH * sc; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, ox + (SW - iw) / 2, oy + (SH - ih) / 2, iw, ih); } ctx.restore(); } else S.cgL = null;
+    if (d.cg) { if (!S.cgL || S.cgL.src !== d.cg) { S.cgL = { src: d.cg, since: S.t, dx: d.cgDx || 0 }; const sn = SAVE.cgSeen || (SAVE.cgSeen = {}); if (!sn[d.cg]) { sn[d.cg] = true; save(); } } // seen list = 기억 조각 (2차 메뉴)
+      drawCg(S.cgL, S.t - S.cgL.since, 1, ox, oy, SW, SH); if (S.t - S.cgL.since < .6) return; } else S.cgL = null;
     const g0 = ctx.createLinearGradient(0, oy + SH * .45, 0, oy + SH); g0.addColorStop(0, 'rgba(6,4,10,0)'); g0.addColorStop(1, 'rgba(6,4,10,.55)'); ctx.fillStyle = g0; ctx.fillRect(ox, oy + SH * .45, SW, SH * .55); // dusk under the box
-    const w = Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)), x = Math.round(ox + (SW - w) / 2), h = Math.max(92 * u, lh * 3 + 30 * u), y = Math.round(oy + SH - h - 16 * u), sz = psz, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = hasB || hasP;
+    const w = Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)), x = Math.round(ox + (SW - w) / 2), h = Math.max(92 * u, lh * 3 + 30 * u), y = Math.round(oy + SH - h - 16 * u), sz = psz, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = !d.cg && (hasB || hasP); /* picture scenes: name tag only */
     ctx.fillStyle = 'rgba(10,8,14,.92)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(x + u, y + u, w - 2 * u, h - 2 * u); ctx.strokeStyle = 'rgba(150,120,90,.25)'; ctx.lineWidth = u; ctx.strokeRect(x + 5 * u, y + 5 * u, w - 10 * u, h - 10 * u);
     ctx.fillStyle = '#8a2a2a'; for (let i = 0; i < w - 24 * u; i += 3 * u) if ((i / u | 0) % 7 !== 3) ctx.fillRect(x + 12 * u + i, y + 3 * u + Math.round(Math.sin(i / (14 * u) + d.t * .6) * u), 2 * u, Math.max(1, u)); // 붉은 실 한 가닥 (1장 = 아라크네의 실)
     for (const [cx, cy] of [[x, y], [x + w, y], [x, y + h], [x + w, y + h]]) { ctx.fillStyle = '#7a6448'; ctx.fillRect(cx - 3 * u, cy - 3 * u, 6 * u, 6 * u); ctx.fillStyle = '#1a1420'; ctx.fillRect(cx - u, cy - u, 2 * u, 2 * u); }
@@ -1614,6 +1621,7 @@
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
+    drawCgOut(ox, oy, SW, SH);
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
