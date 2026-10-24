@@ -1,9 +1,19 @@
 {
  "_doc": "1장 대사 (2번방, 사장님 10-23 '추천대로': 사람마다 짧게 3번 = meet 처음 / mid 그 뒤 / after 아라크네를 벤 뒤). 줄 앞 '이름: ' = 그 사람이 말함, '( … )' 줄 = 해설, 빈 줄 = 쪽 나눔. 퀘스트 대사는 quests.json 이 먼저. scenes = 지역 첫 방문(area:<지역 id>) · 보스 앞(boss_pre:<보스 id>) · 보스 뒤(boss_post:<보스 id>).",
  "speakers": {
-  "필멸자": { "anim": "anim/hero8", "role": "" },
-  "리네트": { "anim": "anim/linette8", "role": "재봉사" },
-  "아라크네": { "role": "실타래의 재단사" }
+  "필멸자": {
+   "anim": "anim/hero8",
+   "role": ""
+  },
+  "리네트": {
+   "anim": "anim/linette8",
+   "role": "재봉사"
+  },
+  "아라크네": {
+   "role": "실타래의 재단사",
+   "por": "c1_arachne",
+   "creep": true
+  }
  },
  "npc": {
   "f_bart": {
