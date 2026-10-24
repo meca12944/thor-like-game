@@ -67,7 +67,7 @@
    "x": 4,
    "y": 12,
    "name": "경비 초소",
-   "text": "경비 초소와 감시탑 — 실내는 준비 중이다. (placeholder)"
+   "text": "경비 초소와 감시탑. 안에서 주사위 구르는 소리가 난다. 문은 잠겨 있다."
   },
   {
    "type": "door",
@@ -84,7 +84,9 @@
    "x": 28,
    "y": 12,
    "name": "이장 바르트의 집",
-   "text": "이장 바르트의 집 — 실내는 준비 중이다. (placeholder)"
+   "to": "felt_int_chief",
+   "spawn": "door",
+   "out": "chief_out"
   },
   {
    "type": "door",
@@ -92,7 +94,9 @@
    "x": 39,
    "y": 12,
    "name": "낡은 예배당",
-   "text": "낡은 예배당 — 기도회는 밤에만 열린다. 종탑 쪽 바닥에서 찬 바람이 올라온다."
+   "to": "felt_int_chapel",
+   "spawn": "door",
+   "out": "chapel_out"
   },
   {
    "type": "door",
@@ -117,6 +121,9 @@
    "y": 24,
    "name": "마르타의 여관",
    "heal": 1,
+   "to": "felt_int_inn",
+   "spawn": "door",
+   "out": "inn_out",
    "text": "마르타의 여관 — 하룻밤 쉬었다. 체력이 모두 회복됐다."
   },
   {
@@ -134,7 +141,9 @@
    "x": 36,
    "y": 34,
    "name": "리네트의 공방",
-   "text": "리네트의 공방 (왕실 의상실 폐허) — 실내는 준비 중이다. (placeholder)"
+   "to": "felt_int_atelier",
+   "spawn": "door",
+   "out": "atelier_out"
   },
   {
    "type": "door",
@@ -368,11 +377,14 @@
    "quests": [
     "q_felt_main"
    ],
+   "anim": "anim/linette8",
+   "wander": 1.2,
    "near": [
     "f_door_atelier",
     -3,
     1
-   ]
+   ],
+   "face0": "down"
   },
   {
    "type": "clue",
@@ -396,7 +408,31 @@
    "needFlags": [
     "felt_chapel_secret"
    ],
-   "textLocked": "종탑 아래 바닥에 지하로 내려가는 뚜껑문이 있다. 굳게 잠겨 있다.\n오스왈드가 밤마다 이 근처에서 기도한다."
+   "textLocked": "종탑 아래 뚜껑문. 아직 열 때가 아니오. 아래에서 찬 바람만 샌다."
+  },
+  {
+   "type": "chest",
+   "id": "f_chest_plaza",
+   "x": 21,
+   "y": 14,
+   "loot": [["potion", 1]],
+   "note": "moved onto a free tile beside the west crates by build_felt.py"
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_grave",
+   "x": 47,
+   "y": 10,
+   "loot": [["potion", 1]],
+   "find": "묘지 풀밭에서 찾았다!"
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_cart",
+   "x": 29,
+   "y": 15,
+   "loot": [["riceball", 1]],
+   "find": "수레 밑에서 찾았다!"
   }
  ],
  "ground": [
