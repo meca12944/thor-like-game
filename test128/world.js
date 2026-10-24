@@ -480,7 +480,7 @@
     const g = ctx.createLinearGradient(0, y, 0, y + h); if (P2) { g.addColorStop(0, `rgb(${200 + 40 * pul},40,46)`); g.addColorStop(1, '#5a0a12'); } else { g.addColorStop(0, '#d9cfbd'); g.addColorStop(1, '#7d6f5e'); }
     ctx.fillStyle = b.hitT > .15 ? '#fff' : g; ctx.fillRect(x, y, w * fr, h);
     ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x + w / 2 - Math.max(1, u), y - 2 * u, 2 * Math.max(1, u), h + 4 * u); ctx.fillStyle = P2 ? '#ff6a5a' : '#b8a488'; ctx.fillRect(x + w / 2 - .5 * u, y - 3 * u, Math.max(1, u), 2 * u); // 2페이즈 눈금
-    textOut(b.D.name, x, y - 7 * u, 14 * u, P2 ? '#ffb0a0' : '#efe4d2', '#000', 'left'); if (b.D.title) { ctx.font = font(14 * u); textOut('「' + b.D.title + '」', x + ctx.measureText(b.D.name).width + 6 * u, y - 7 * u, 10 * u, '#9a8a7a', '#000', 'left'); }
+    textOut(b.D.name, x, y - 7 * u, 14 * u, P2 ? '#ffb0a0' : '#efe4d2', '#000', 'left'); if (b.D.title) { const nw = ctx.measureText(b.D.name).width; /* textOut left ctx.font at the size it really drew (phones draw bigger) */ textOut('「' + b.D.title + '」', x + nw + 6 * u, y - 7 * u, 10 * u, '#9a8a7a', '#000', 'left'); }
     if (P2) textOut('2페이즈', x + w, y - 7 * u, 10 * u, '#ff7a6a', '#000', 'right'); }
   function banner(text, t = 1.6, small) { S.banner = { text, t, max: t, small }; }
   function after(t, f) { S.timers.push({ t, f }); }
@@ -729,6 +729,7 @@
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
     if (S.dialog) { stepDialog(dt); queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
+    if (S.t < (S.dlgGuard || 0)) takePress('menu'); // the Esc that closed a dialog must not also open the pause menu
     if (takePress('menu')) { const g = window.__game; if (g && g.ctl && !S.pause) { g.ctl.openUI('menu'); queue.length = 0; return; } S.pause = !S.pause; } // Esc = the shared pause menu (설정 · 귀환 inside)
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
@@ -790,7 +791,7 @@
     if (hero.charge) { const C = hero.charge, CF = spW().charge; C.t += dt; C.flash = Math.max(0, C.flash - dt); const lv = C.t >= CF.t2 ? 2 : C.t >= CF.t1 ? 1 : 0;
       if (lv > C.lv) { C.lv = lv; C.flash = .25; sfx(lv > 1 ? 'ult_cutin' : 'hit_crit', lv > 1 ? .4 : .5, lv > 1 ? 1.9 : 1.7); addFx('spark', hero.x, hero.y - 12, { life: .3 }); }
       if (!hero.holdOk || hero.roll || hero.atk || hero.hp <= 0) { const rel = !hero.holdOk && !hero.roll && !hero.atk && hero.hp > 0 && C.lv > 0; hero.charge = null; if (rel) { hero.atk = { t: 0, hit: new Set(), i: 3 + C.lv }; sfx('swing_heavy', 1); } } }
-    if (takePress('interact')) interact();
+    if (takePress('interact') && !(S.t < (S.dlgGuard || 0))) interact();
     tickTrail(dt);
     if (hero.roll) { const r = hero.roll, D = DG(), RD = rollDur(); const p0 = Math.min(1, r.t / RD); r.t += dt; const p = Math.min(1, r.t / RD);
       if (D && D.burstTicks) { const TB = D.burstTicks / 60, q0 = Math.min(1, (r.t - dt) / TB), q1 = Math.min(1, r.t / TB), E2 = q => 1 - Math.pow(1 - q, 2.6), st = fieldDash(D) * (E2(q1) - E2(q0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5);
@@ -897,7 +898,7 @@
     addFx('text', hero.x, hero.y - 32, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
   function feedAdd(name, n, col) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
   // 대화창 v2 (2번방 10-23, 1장 어두운 톤): pages ('\n\n' or 3 lines), typewriter DLG.cps with a soft blip, skip = show the page, choices [{t, f}] picked with up/down
-  const DLG = { cps: 38, lines: 3 };
+  const DLG = { cps: 60, lines: 3, guard: .45 }; // 점검 10-24: 글자 38→60자/초, 닫힌 뒤 0.45초는 조사 키·Esc 무시 (같은 키로 바로 다시 열리던 것)
   function dlgWrap(line, W) { if (!W) return [line]; const out = []; let cur = ''; // fit one line to the box (UI_GUIDE 8): break at a space when it is past half, else at any letter
     for (const ch of line) { if (cur && ctx.measureText(cur + ch).width > W) { const sp = cur.lastIndexOf(' '); if (sp > cur.length * .5) { out.push(cur.slice(0, sp)); cur = cur.slice(sp + 1) + ch; } else { out.push(cur); cur = ch; } } else cur += ch; }
     out.push(cur); return out; }
@@ -908,8 +909,8 @@
     d.ch = Math.min(full, d.ch + dt * DLG.cps); const n = Math.floor(d.ch); if (n > b4 && n % 2 === 0 && !/\s/.test(pg[n - 1] || ' ')) sfx('talk', .5, d.pitch || 1);
     if (last && d.choices && d.ch >= full) { if (takePress('up')) d.sel = (d.sel + d.choices.length - 1) % d.choices.length; if (takePress('down')) d.sel = (d.sel + 1) % d.choices.length; }
     const adv = takePress('interact') || takePress('attack') || queue.includes('Space') || queue.includes('Enter') || S.dlgTap; S.dlgTap = false; // phone: tap the picture (UI_GUIDE 10)
-    if (adv && d.t > .12) { if (d.ch < full) d.ch = full; else if (!last) { d.pi++; d.ch = 0; sfx('page'); } else { const c = d.choices && d.choices[d.sel]; S.dialog = null; if (c && c.f) c.f(); else if (d.then) d.then(); } }
-    else if (takePress('menu') && !d.choices) S.dialog = null; }
+    if (adv && d.t > .12) { if (d.ch < full) d.ch = full; else if (!last) { d.pi++; d.ch = 0; sfx('page'); } else { const c = d.choices && d.choices[d.sel]; S.dialog = null; S.dlgGuard = S.t + DLG.guard; if (c && c.f) c.f(); else if (d.then) d.then(); } }
+    else if (takePress('menu') && !d.choices) { S.dialog = null; S.dlgGuard = S.t + DLG.guard; } }
   // 1장 대사 (maps/dialog_ch1.json): '이름: 대사' lines switch the speaker (portrait + name tag), '( … )' lines are narration, blank line = new page.
   // NPC lines by stage: meet (first talk) / mid / after (boss_arachne). Scenes play once: area:<id> first visit, boss_pre:<id>, boss_post:<id>.
   let DLGD = null; getJSON('maps/dialog_ch1.json').then(j => { DLGD = j; }).catch(() => {});
@@ -1599,7 +1600,8 @@
   // display-resolution text: names, HP bars, CHAMPION labels, HUD, dialogs (crisp at any integer scale)
   function W2S(x, y) { const v = S.view, f = S.camF || [0, 0]; return [v.ox + (x - S.camI[0] - Math.round(f[0] * v.k) / v.k) * v.k, v.oy + (y - S.camI[1] - Math.round(f[1] * v.k) / v.k) * v.k]; } // same screen-pixel shift as the ground
   function font(px) { return 'bold ' + Math.max(8, Math.round(px)) + 'px "Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif'; }
-  function textOut(t, x, y, px, fill, stroke = '#000', align = 'center') { ctx.font = font(px); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, px / 5); ctx.strokeStyle = stroke; ctx.strokeText(t, x, y); ctx.fillStyle = fill; ctx.fillText(t, x, y); }
+  const TOUCH = () => document.body.classList.contains('touch'); // phone: HUD text never below 12 CSS px (점검 10-24 「폰에서 글자가 너무 작아요」)
+  function textOut(t, x, y, px, fill, stroke = '#000', align = 'center') { if (TOUCH()) px = Math.max(px, 12 * ctx.canvas.width / Math.max(1, innerWidth)); ctx.font = font(px); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, px / 5); ctx.strokeStyle = stroke; ctx.strokeText(t, x, y); ctx.fillStyle = fill; ctx.fillText(t, x, y); }
   function panel(x, y, w, h) { ctx.fillStyle = 'rgba(12,18,44,.78)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#e2c27a'; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, w - 2, h - 2); ctx.strokeStyle = 'rgba(226,194,122,.4)'; ctx.lineWidth = 1; ctx.strokeRect(x + 5, y + 5, w - 10, h - 10); }
   function dlgBust(d, x, y, sz) { // portrait = the NPC's own in-game pixel sprite, head + shoulders, nearest-scaled (0 credits, always matches the map)
     const A = d.anim && npcAnim(d.anim); if (!A) return false; const seq = A.J.anims.idle_south || A.J.anims.idle_down; if (!seq) return false; const t = Math.floor(d.t * 60) % seq.reduce((a, q) => a + q[2], 0); let q = seq[0], acc = 0; for (const e of seq) { acc += e[2]; if (t < acc) { q = e; break; } }
@@ -1689,10 +1691,10 @@
       const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
-      if (!S.dialog && !(b && !b.dead)) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 48 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
+      if (!S.dialog && !(b && !b.dead) && !TOUCH()) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 점프 ${keyHint('dive') || 'Space'} · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 48 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
     if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
-    if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, (bn.small ? 14 : 19) * u, bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
+    if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
