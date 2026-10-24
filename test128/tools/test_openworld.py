@@ -11,7 +11,7 @@ def check(name, cond, info=None):
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=os.environ.get('PW_CHROME') or None); pg = b.new_page(viewport={'width': 1280, 'height': 720}); errs = []
     pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto(B + '?worldreset&nosave'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
+    pg.goto(B + '?worldreset&nosave&noscene'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
     ev = pg.evaluate; adv = lambda s: ev(f'()=>__world.advance({s})')
     def settle():  # the map load is async (fetch): advance in separate evaluates so the promise can resolve
         for _ in range(80):
@@ -36,7 +36,7 @@ with sync_playwright() as p:
     check('F5 saves when calm', bool(r2['resume']), r2)
     # waystone (신전 앞 비석 at 98,9): register = respawn point
     ev("()=>{__world.setHeroTile(98,10,'up')}"); ev("()=>__world.tap('KeyL')"); adv(.05)
-    r3 = ev("()=>__world.SAVE.lastWay"); ev("()=>__world.tap('KeyL')"); adv(.05)
+    r3 = ev("()=>__world.SAVE.lastWay"); ev("()=>{for(let i=0;i<30&&__world.S.dialog;i++){__world.advance(.15);__world.tap('KeyL');__world.advance(.02);}}")   # close the dialog (it types out, ignores presses in its first 0.12 s, may have pages)
     check('waystone = respawn point', r3 and r3['id'] == 'ws_temple', r3)
     # champion ring: walk up to 돌엄니 (49+56, 26)
     ev("()=>{__world.killAll(m=>!m.D.champion);const c=__world.mobs.find(m=>m.kind==='champ_boar');__world.hero.x=c.x-70;__world.hero.y=c.y;__world.hero.hp=__world.hero.maxHp}"); adv(.1)
@@ -76,7 +76,7 @@ with sync_playwright() as p:
     check('field_felt alias', ff['map'] == 'ch1' and abs(ff['t'][1] - 37) <= 1, ff)
     # resume after a reload: last save = here
     ev("()=>{__world.killAll();__world.tap('F5')}"); adv(.1); sv = ev("()=>__world.SAVE.resume")
-    pg.goto(B); pg.wait_for_function('window.__world&&__world.ready&&__world.scene!=="town"&&!__world.trans', timeout=30000); pg.wait_for_timeout(600)
+    pg.goto(B + '?noscene'); pg.wait_for_function('window.__world&&__world.ready&&__world.scene!=="town"&&!__world.trans', timeout=30000); pg.wait_for_timeout(600)
     rs = ev("()=>({scene:__world.scene,map:__world.map&&__world.map.id,t:__world.tile()})"); pg.screenshot(path=O + '/8_resume.png')
     check('resume after reload', rs['map'] == sv['map'] and abs(rs['t'][0] - sv['x']) < 2, {'saved': sv, 'got': rs})
     check('no page errors', not errs, errs[:5])
