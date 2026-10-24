@@ -1,4 +1,4 @@
-# 7장 지도 데이터 만들기 (모션연구방 10-24) — python3 docs_maps/ch7/make_ch7.py → ch7_map.json
+# 7장 지도 데이터 만들기 (모션연구방 10-24) — python3 docs_maps/ch7/build_ch7.py → ch7_map.json
 import json,os
 D=os.path.dirname(os.path.abspath(__file__))
 Z=[dict(id='rampart',name='왕도 상층 성벽길',kind='field',x=10,y=290,w=230,h=160,note='6장 시계탑에서 올라오는 길. 잿빛 모래 바람, 무너진 성벽 위'),

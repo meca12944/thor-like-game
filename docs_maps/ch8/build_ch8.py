@@ -1,4 +1,4 @@
-# 8장 지도 데이터 만들기 (모션연구방 10-24) — python3 docs_maps/ch8/make_ch8.py → ch8_map.json
+# 8장 지도 데이터 만들기 (모션연구방 10-24) — python3 docs_maps/ch8/build_ch8.py → ch8_map.json
 # 결전장이라 400보다 작아도 됨 (팀장 10-24). 정본에 8장 잡몹 없음 → 몹 무리 없음.
 import json,os
 D=os.path.dirname(os.path.abspath(__file__))
