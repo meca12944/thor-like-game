@@ -1168,29 +1168,24 @@
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
     const fc = H.diag && h.vd != null ? (f8.includes('down') ? 'down' : f8.includes('up') ? 'up' : f8) : /^(right|left|up|down)$/.test(h.face) ? h.face : 'down', vert = !!H.diag && (fc === 'down' || fc === 'up'), hl = vert ? (f8.includes('left') || (!f8.includes('right') && h.hz === 'left')) : fc === 'left';
     const sd = vert ? (hl ? 'left' : 'right') : fc, L8 = H.left && sd === 'left'; let fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd;
-    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3|swing1|swing2|swing3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc === 'up' && f8 === 'up' && H.anims[k + '_n'] ? 'n' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), ↑ = *_n straight back (never mirrored), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = dk === 'n' ? false : hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
+    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc === 'up' && f8 === 'up' && H.anims[k + '_n'] ? 'n' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), ↑ = *_n straight back (never mirrored), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = dk === 'n' ? false : hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
     let LL = null; const A = k => (LL = pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')]), /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     // 출발·멈춤 (모션연구방 10-23, 걷기 박자 연구): 서 있다 출발하면 다리 모인 장(한 바퀴의 0.28)부터, 멈추면 다음 다리 모인 장까지 빠르게 마저 디딘 뒤 서기
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
-    else if (h.atk && SWING_ART && !SLASH_BODY && h.atk.i <= 2 && H.anims['swing' + (h.atk.i + 1) + '_right'] && A('swing' + (h.atk.i + 1)) && (!vert || !/^(right|left)$/.test(d))) { // 때리기 몸동작 (모션연구방 10-24, 사장님 「가안」→「8방향 시작해」): 당김 → 휘두름(검기 나오는 박자 a0~a1) → 마무리. 그림 있는 방향만(옆·↘·↓·↗·↑ 하나씩 추가), 없는 방향은 몸 기울이기 그대로
-      const AT = atkT(h.atk.i), L = LL, t = h.atk.t, n = L.length, sw = n - 2; let fi;
-      if (t < AT.a0) fi = 0; else if (t < AT.a1) fi = 1 + Math.min(sw - 1, Math.floor((t - AT.a0) / Math.max(1e-3, AT.a1 - AT.a0) * sw)); else fi = n - 1; e = L[fi]; }
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
-    else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
+    else if (h.moving) { const L = A(h.run && !(fc === 'up' && f8 !== 'up' && h.atk && swordHidden()) ? 'run' : 'walk'); /* ↗↖ 달리기 그림은 칼 쥔 손이 몸 뒤라 코드 칼날이 몸을 가로지름 → 칼 숨긴 4.5틱만 걷기 그림(손이 앞) (모션연구방 10-24) */ e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
     else if (h.stopT != null && S.t - h.stopT < .2 && !h.atk && !h.roll && !h.charge) { const dd = ((.28 - (h.gp || 0)) % .5 + .5) % .5, adv = Math.min(dd, Math.max(0, S.t - (h.stopU ?? S.t)) * 3); h.stopU = S.t; h.gp = ((h.gp || 0) + adv) % 1;
       if (dd - adv < .01) { h.stopT = null; const L = A('idle'); e = H.v4 ? seq(L, (S.t * 60) % tot(L)) : L[0]; } else { const L = A(h.stopRun ? 'run' : 'walk'); e = L[Math.floor(h.gp * L.length) % L.length]; } } // finish the step onto the legs-together frame
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
     h.gaitK = h8GaitK(H, LL); // per-clip leg speed (H8.gaitMul): clips drawn with a shorter stride step a little faster so the planted foot slides less (motion lab 10-24)
-    h.grip = null; if (e && LL && H.grip && gkFanSwing()) { if (!H._an) H._an = new Map(Object.entries(H.anims).map(([k, v]) => [v, k])); const nm = H._an.get(LL), ix = LL.indexOf(e), NS = nm && H.anims[nm + '_ns'], gp = nm && H.grip[nm] && H.grip[nm][ix];
-      if (NS && NS[ix] && gp) { e = NS[ix]; h.grip = [fl ? -gp[0] : gp[0], gp[1]]; } } // C안: same frame of the sword-less body; no art for this clip (e.g. dash, hurt) = keep the sword, no code blade
-    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; c.ox = h8Pop(h, c, LL, fl); if (h.grip) h.grip[0] += c.ox || 0; return c; }
+    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; c.ox = h8Pop(h, c, LL, fl); return c; }
   function h8GaitK(H, L) { if (!H.gaitMul || !L) return 1; if (!H._gk) { H._gk = new Map(); for (const k in H.gaitMul) if (H.anims[k]) H._gk.set(H.anims[k], H.gaitMul[k]); } return H._gk.get(L) || 1; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
@@ -1202,14 +1197,13 @@
     const L = H.anims[an + '_' + dir] || H.anims[an + '_down'], n = L.length;
     let f = p != null ? Math.min(n - 1, Math.floor(p * n)) : (an === 'idle' ? Math.floor(tick) % n : (an === 'walk' || an === 'run') ? 1 + Math.floor(tick) % (n - 1) : Math.min(n - 1, Math.floor(tick)));
     return H.cells[L[f]]; }
-  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, Object.assign([0, 0, c[2], c[3], c[4], c[5]], { ox: c.ox }), x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
+  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = (swordHidden() && nsImg(c.h8)) || G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, Object.assign([0, 0, c[2], c[3], c[4], c[5]], { ox: c.ox }), x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
   function drawH128Raw(im, c, x, y, k, alpha, fl) { const sc = k * H128FIG / 117, [sx0, sy] = W2S(x, y), sx = sx0 + (c.ox || 0) * sc;
     ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; if (fl) { ctx.translate(Math.round(sx), 0); ctx.scale(-1, 1); ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); } else ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
   // ---- 검기 (owner 10-22 "검 베는 모션은 안쓰려구" / "최종 샌드박스 검기만 나가고 있어"): the attack no longer plays the slash body clips;
   // the hero keeps the idle/walk pose with a small code-made kick (lean back -> snap forward + squash), and the sword energy arcs of the
   // 주인공 / 몬스터 샌드박스 (hero_slash_a v1) fly out. Arc art is generated in code (sArc), in atlas px, drawn at the hero's hi-res scale.
   const SLASH_BODY = false; // true = old slash clips (hit1-3)
-  const SWING_ART = Q.get('swing') === '1'; // 때리기 그림(옆·↘, 모션연구방 10-24) — 사장님 「공격 모션은 너무 어렵다, 검흔만으로 손맛」 → 기본 끔, ?swing=1 로 비교만
   const GK = [{ R: 52, span: 140, T: 18, rot: 0, y: 78, fwd: 22, v: 4, rev: 0, sq: .5 }, { R: 54, span: 140, T: 18, rot: 35, y: 90, fwd: 22, v: 4, rev: 1, sq: .75 }, { R: 72, span: 170, T: 26, rot: 0, y: 74, fwd: 22, v: 3, rev: 0, sq: 1 }];
   const GK_LIFE = 13, GK_STEP = .8, sCache = new Map();
   function sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y) { if (flip) x = -x; const xr = x * ca + y * sa, yr = (-x * sa + y * ca) / sq, r = Math.hypot(xr, yr); let u = (Math.atan2(yr, xr) * 180 / Math.PI + span / 2) / span; if (rev) u = 1 - u;
@@ -1283,21 +1277,13 @@
   // ---- 콤보 1~3타 검흔 = 판정 부채꼴(GK_FAN)을 그대로 그림 (그록 다크 검흔 v3, 「보이는 곳 = 맞는 곳」, 효과는 코드로). 1 그림px = 필드 1px.
   // 같은 gkFanPolar 로 화소마다 계산: 열림 = gkFanHead(t)(판정 틱 t0~t1), 판정 끝 뒤 GK_FADE 틱 동안 면이 안쪽부터 접혀 테두리로 모였다가 꺼짐.
   // 면(어두운 3단 + 1px 선)은 주인공 뒤, 테두리 날(칼끝 쪽으로 굵고 밝아짐)·칼끝 반짝임·스타일 조각은 앞. 8방향 = 판정과 같은 땅 평면 회전.
-  // 색 = GK_STYLE (사장님 고르기 전: 기본 4 파쇄 강철, ?gkstyle=1~6 로 바꿔 보기). 고르시면 기본값만 바꾸고 ?gkstyle 은 지운다.
-  const GK_FADE = 10, GK_STYLES = { // fan0-2 / fanline / outline, rim shadow / body / hi / glint, two particle colours + how they move
-    1: { name: '잿빛 초승달', fan: ['#1f1c1e', '#252121', '#2d2826'], line: '#0e0d10', ol: '#0a090c', rim: ['#7f7768', '#b8b09b', '#e3ddcc', '#f6f1e4'], part: ['#cf5f1d', '#f19a3c'], move: 'rise' },
-    2: { name: '심연 균열', fan: ['#0f0b18', '#130d20', '#191029'], line: '#07050c', ol: '#120c26', rim: ['#2b1d63', '#5d3ba3', '#9a6fe6', '#c9adff'], part: ['#9a6fe6', '#c9adff'], move: 'drift' },
-    3: { name: '혈묵', fan: ['#1f1015', '#251217', '#2c1419'], line: '#0f0508', ol: '#1c0408', rim: ['#420810', '#6b0e16', '#93202a', '#b8434c'], part: ['#6b0e16', '#93202a'], move: 'splat' },
-    4: { name: '파쇄 강철', fan: ['#1a1f27', '#1d232c', '#222933'], line: '#0b0e12', ol: '#0f1318', rim: ['#45515e', '#6d7d8d', '#a8b5c1', '#dce3ea'], part: ['#a8b5c1', '#dce3ea'], move: 'fall' },
-    5: { name: '망령 연기', fan: ['#1d1f26', '#21242c', '#262a33'], line: '#0e0f13', ol: '#0a0b0f', rim: ['#3e4353', '#8b96a6', '#d6dee8', '#f2f5f9'], part: ['#2c303c', '#3e4353'], move: 'smoke' },
-    6: { name: '황혼 금선', fan: ['#1c1c1d', '#201f1d', '#26231d'], line: '#0e0d0b', ol: '#1c170c', rim: ['#6b5a2e', '#8a7340', '#a08a55', '#c2a96e'], part: ['#b8682a', '#7e786d'], move: 'rise' } };
-  const GK_STYLE = GK_STYLES[+Q.get('gkstyle')] ? +Q.get('gkstyle') : 4;
-  const hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-  const GKC = {}; for (const k in GK_STYLES) { const S0 = GK_STYLES[k]; GKC[k] = { fan: S0.fan.map(hexRGB), line: hexRGB(S0.line), ol: hexRGB(S0.ol), rim: S0.rim.map(hexRGB), part: S0.part, move: S0.move }; }
+  // 색 = 파쇄 강철 (사장님 10-24 그록 6종 중 「4 파쇄 강철」): 가는 강철 선이 판정이 끝나면 금 가며 각진 조각으로 떨어짐.
+  const GK_FADE = 10, hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const GKC = { fan: ['#1a1f27', '#1d232c', '#222933'].map(hexRGB), line: hexRGB('#0b0e12'), ol: hexRGB('#0f1318'), rim: ['#45515e', '#6d7d8d', '#a8b5c1', '#dce3ea'].map(hexRGB), part: ['#a8b5c1', '#dce3ea'] }; // fan 3 tones / edge / outline, rim shadow-body-hi-glint, shards
   const FAN_W = 100, FAN_H = 84, FAN_X0 = -50, FAN_Y0 = -60; let _fanC = null;
   function gkFanState(f) { const F = GK_FAN[f.i], t = gkFanT(f); if (t < F.t0) return null; const open = t <= F.t1; return { F, t, open, head: open ? gkFanHead(F, t) : 1, k: open ? 0 : (t - F.t1) / GK_FADE }; }
   function gkFanImg(f, St, layer) { // the fan as a field-px image (layer 0 = body behind the hero, 1 = rim in front)
-    const C = GKC[GK_STYLE], { F, head, k, open } = St; if (!_fanC) { _fanC = document.createElement('canvas'); _fanC.width = FAN_W; _fanC.height = FAN_H; }
+    const C = GKC, { F, head, k, open } = St; if (!_fanC) { _fanC = document.createElement('canvas'); _fanC.width = FAN_W; _fanC.height = FAN_H; }
     const g = _fanC.getContext('2d'), id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R, arc = Math.abs(F.a1 - F.a0) * Math.PI / 180 * R; // arc length in px (for the 1px edge on the swept ends)
     const put = (i, c, a) => { d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = a; };
     for (let y = 0; y < FAN_H; y++) for (let x = 0; x < FAN_W; x++) { const [r, u] = gkFanPolar(F, f.dir, FAN_X0 + x + .5, FAN_Y0 + y + .5), i = (y * FAN_W + x) * 4;
@@ -1305,6 +1291,7 @@
       if (layer === 0) { if (r > R || rn < k) continue; const edge = r > R - 1 || u * arc < 1 || (head - u) * arc < 1 || rn < k + 1 / R; // fill collapses outward on the fade
         if (edge) put(i, C.line, 235 * (1 - k * .5)); else put(i, rn < .55 ? C.fan[0] : rn < .82 ? C.fan[1] : C.fan[2], 205 * (1 - k * .6)); continue; }
       const w = (open ? 1 + 3.2 * Math.pow(v, 1.4) : (1 + 2 * v) * (1 - k)) * (u < .04 ? u / .04 : 1), rr = R - r; // rim trail: thicker and brighter toward the tip, thins out on the fade
+      if (!open && ((Math.floor(u * 15) * 7919) % 97) / 97 < k * 1.25) continue; // crack: the rim splits into ~15 angular pieces that go out one by one
       if (rr >= 0 && rr < w) { const c = v > .9 && rr < w * .6 ? C.rim[3] : v > .6 ? (rr < w * .5 ? C.rim[2] : C.rim[1]) : v > .25 ? C.rim[1] : C.rim[0]; put(i, c, 255 * (open ? 1 : Math.sqrt(1 - k))); }
       else if (rr < 0 && rr > -1.2 && v > .12 && w > .6) put(i, C.ol, 230 * (open ? 1 : 1 - k)); } // 1px dark outline outside the rim (reads on light floors)
     g.putImageData(id, 0, 0); return _fanC; }
@@ -1312,20 +1299,15 @@
     for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const St = gkFanState(f); if (!St) continue;
       const im = gkFanImg(f, St, layer); ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(hx + FAN_X0 * k), Math.round(hy + FAN_Y0 * k), FAN_W * k, FAN_H * k); ctx.restore();
       if (layer === 1) { gkFanBlade(k, f, St, hx, hy); gkFanBits(k, f, St, hx, hy); } } }
-  function gkFanBits(k, f, St, hx, hy) { const { F, head, open, t } = St, C = GKC[GK_STYLE], P = (r, u) => { const [x, y] = gkFanPt(F, f.dir, r, u); return [hx + x * k, hy + y * k]; }; ctx.save();
-    if (open && head < 1) { const [sx, sy] = P(F.R - .5, head), L = 2.5 * k; ctx.fillStyle = GK_STYLES[GK_STYLE].rim[3]; ctx.fillRect(Math.round(sx - L), Math.round(sy - k / 2), Math.round(2 * L), Math.round(k)); ctx.fillRect(Math.round(sx - k / 2), Math.round(sy - L), Math.round(k), Math.round(2 * L)); } // tip sparkle
+  function gkFanBits(k, f, St, hx, hy) { const { F, head, open, t } = St, C = GKC, P = (r, u) => { const [x, y] = gkFanPt(F, f.dir, r, u); return [hx + x * k, hy + y * k]; }; ctx.save();
+    if (open && head < 1) { const [sx, sy] = P(F.R - .5, head), L = 2.5 * k; ctx.fillStyle = '#dce3ea'; ctx.fillRect(Math.round(sx - L), Math.round(sy - k / 2), Math.round(2 * L), Math.round(k)); ctx.fillRect(Math.round(sx - k / 2), Math.round(sy - L), Math.round(k), Math.round(2 * L)); } // tip sparkle
     const age = t - (F.t1 - 3); if (age > 0 && age < GK_FADE + 4) { let sd = (f.seed || 1) + 5; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, q = age / (GK_FADE + 4); // style bits shed off the rim
       for (let n = 0; n < 9; n++) { const u = .25 + rnd() * .75, [x0, y0] = P(F.R - .5, u), a = rnd() * TAU, s = rnd(); let x = x0, y = y0, sz = k;
-        if (C.move === 'fall') { x += Math.cos(a) * age * .4 * k; y += (age * age * .06 + s) * k; sz = k * (s > .5 ? 2 : 1); } // shards drop
-        else if (C.move === 'rise') { x += Math.sin(age * .5 + n) * k; y -= age * (.5 + s * .5) * k; } // embers / ash drift up
-        else if (C.move === 'smoke') { x += Math.sin(age * .3 + n) * 1.5 * k; y -= age * .35 * k; sz = k * (1 + Math.floor(age / 5)); } // smoke curls up and swells
-        else if (C.move === 'splat') { const [ox, oy] = P(0, u); x += (x0 - ox) / F.R * age * .9 + Math.cos(a) * .3 * k; y += (y0 - oy) / F.R * age * .9 + age * age * .03 * k; sz = k * (s > .6 ? 2 : 1); } // drops flung outward
-        else { x += Math.cos(a) * age * .5 * k; y += Math.sin(a) * age * .5 * k; } // void shards drift
-        ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); } }
+        x += Math.cos(a) * age * .4 * k; y += (age * age * .06 + s) * k; sz = k * (s > .5 ? 2 : 1); // angular shards drop
+        ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
     ctx.restore(); }
-  // C안 (사장님 10-24 「C안으로 가자」): 판정 틱(t0-1 ~ t1+2) 동안 칼 없는 몸(모션연구방 H8.anims '<이름>_ns') + 코드 칼날이 손(H8.grip)에서 부채꼴 앞끝(head)으로 함께 휘둘러짐
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
-  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !hero.grip) return; const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = hero.grip;
+  function gkFanBlade(k, f, St, hx, hy) { const { F, t } = St; if (t < F.t0 - 1 || t > F.t1 + 2 || !swordC()) return; const hd = Math.max(0, gkFanHead(F, Math.min(t, F.t1))), sc = k * H128FIG / 117, [gx0, gy0] = gkGrip(f.dir);
     const gx = hx + gx0 * sc, gy = hy + gy0 * sc, [tx, ty] = gkFanPt(F, f.dir, F.R, hd), ex = hx + tx * k, ey = hy + ty * k, L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
     ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(ex, ey); ctx.stroke(); };
     seg('#0d0f13', 3.2 * sc, 0); seg('#9aa3ad', 1.8 * sc, 2 * sc); seg('#cfd5db', .7 * sc, 4 * sc); // outline / steel / edge light (the shared steel colours)
@@ -1341,6 +1323,17 @@
       if (a <= 3) { const L = (big ? 10 : 7) * (1 - a / 4) + 3, al = 1 - a / 4; ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(Math.round(tx - L), Math.round(ty) - 1, Math.round(2 * L), 2); ctx.fillRect(Math.round(tx), Math.round(ty - L * .6), 1, Math.round(L * 1.2)); ctx.fillStyle = `rgba(220,245,255,${al})`; ctx.beginPath(); ctx.arc(tx, ty, 3, 0, TAU); ctx.fill(); }
       if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
   window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
+
+  // ---- C안 (사장님 10-24 「C안으로 가자」, 들고 있는 칼끝이 베는 방향과 50°+ 어긋나는 자세가 12세트 중 8세트였음): 평소엔 칼 든 그림,
+  // 콤보 부채꼴이 휘둘리는 틱(gkFanSwing: t0-1 ~ t1+2)만 같은 칸의 칼 없는 몸(H8.nsSheets = 칸 배치 같은 사본, 모션연구방) + 코드 칼날(gkFanBlade)이 손(H8.grip["시트:칸"])에서 부채꼴 앞끝으로.
+  // 칼 없는 사본이 없는 시트(회피대시·점프 등)는 칼 그대로 → 칼날도 안 그림(칼 두 자루가 되지 않음). 돌진·차지(i≥3)는 칼 그대로.
+  const NS_IMG = [];
+  function nsSrc(i) { const H = h128() && h128().H8; return H && H.nsSheets && H.nsSheets[i] || null; }
+  function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
+  function swordC() { const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
+  function swordHidden() { return !!gkFanSwing() && swordC(); }
+  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1]]; } }
+    return [dir[0] * 14, -58 + dir[1] * 12]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
   function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
@@ -1371,12 +1364,16 @@
     ctx.restore(); }
   function gkKick(a) { // body recoil for a 검기 swing, feet planted (motion lab 10-23): wind-up = lean back + crouch, release = lean forward + stretch,
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
-    // [모션연구방 10-24, 사장님 「검흔만으로 손맛」] 1→2→3타 점점 세게 (KICK3: 몸 기울기·내딛기 배율, 3타 약 2배), ?gk=sweep 이면 몸이 튀어 나가는 순간 = 검흔이 칼에서 뻗는 순간(a0 - 2틱)
-    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = AT.a0;
-    if (u < rel) { const q = u / Math.max(rel, 1e-3), e = q * q * (3 - 2 * q); return { lean: -3 * R * e, step: 0, sq: 1 - Math.min(.08, .04 * R) * e }; }
-    const t = u - rel, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), sp = Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
-    const L0 = (big ? 9 : 6) * R, st = (big ? 5 : 1.5) * R * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
-    return { lean: L0 * sp, step: st, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40), t };
+    // [모션연구방 10-24] 1→2→3타 점점 세게 (KICK3, 3타 약 2배). 몸이 앞으로 튀어 나가는 순간(rel) = 몸 중심 부채꼴 판정이 열리는 틱(GK_FAN t0: 1·2타 3틱, 3타 4틱)
+    // 3타 = 내려베기: 들어 올림(키 늘고 뒤로 젖힘) → 판정 열리고 2틱 더 머리 위 → 내려꽂으며 납작(찌그러짐 최대 = 칼이 앞 아래로 오는 틱 t0+4) + 앞으로 크게 기울고 내딛기
+    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0;
+    if (u < rel) { const q = u / Math.max(rel, 1e-3), e = q * q * (3 - 2 * q); return big ? { lean: -4 * R * e, step: 0, sq: 1 + .05 * e } : { lean: -3 * R * e, step: 0, sq: 1 - Math.min(.08, .04 * R) * e }; }
+    const t = u - rel, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), spr = t => Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
+    if (big) { const x = t * 60, hold = 2 / 60, L0 = 9 * R; // 머리 위 2틱 더 → 내려꽂기
+      const lean = t < hold ? -4 * R : L0 * spr(t - hold), sq = 1 + .05 * Math.max(0, 1 - x / 3) - .11 * Math.exp(-(((x - 4) / 2.2) ** 2)), st = 5 * R * (1 - Math.exp(-Math.max(0, t - hold) * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35)));
+      return { lean, step: st, sq, t }; }
+    const L0 = 6 * R, st = 1.5 * R * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
+    return { lean: L0 * spr(t), step: st, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40), t };
   }
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
   // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
@@ -1406,7 +1403,7 @@
     if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     { const LN = h8Lean(h); if (LN) { const f = H128FIG / 117; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
-    if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; if (K.t != null && K.t < GHOST3.life) { const q = 1 - K.t / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
+    if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / 117; const gt = K.t != null ? K.t - 2 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > .8 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .5, 'white'); ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); } // hero8 attack frames carry their own painted slash trail
