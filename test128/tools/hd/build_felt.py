@@ -76,13 +76,14 @@ def place(pid, gx, gy, n=''):
     if pid in ('lamp', 'sign_post', 'brazier', 'candelabra'): sx0 = sx1 = int(wx // T); sy0 = sy1 = int((wy - 1) // T)
     if pid == 'string_lights': sx0, sx1 = int((wx - 30) // T), int((wx + 30) // T); sy0 = sy1 = -9              # walk under the lanterns (posts only)
     if pid == 'south_gate': sy0 = sy1 = int((wy - 3) // T); sx0, sx1 = int((wx - 53) // T), int((wx + 53) // T)  # posts + side fences; the opening is cut below
+    if pid in ('stall_n', 'red_stall'): sy0 -= 3  # stall roof blocks the path (1장 점검, kept from main)
     for y in range(max(0, sy0), min(H, sy1 + 1)):
         for x in range(max(0, sx0), min(W, sx1 + 1)): solid[y][x] = not (pid == 'south_gate' and abs((x + .5) * T - wx) < 24)
     if pid == 'string_lights':
         for x in (sx0, sx1): solid[int((wy - 1) // T)][x] = True
     big = kind == 'building' and pid != 'fountain'
     props.append({'id': pid + n, 'role': p.get('role', ''), 'img': f'assets/world/felt/{p["img"]}', 'x': wx / T, 'y': wy / T, 'ax': p['ax'], 'ay': p['ay'],
-                  'solid': None if pid in ('south_gate', 'string_lights') else [sx0, sy0, sx1, sy1], 'fade': 1 if big or pid in ('watchtower', 'mausoleum', 'south_gate', 'string_lights') else 0, 'shadow': 0 if big else 1})
+                  'solid': None if pid in ('south_gate', 'string_lights') else [sx0, sy0, sx1, sy1], 'fade': 1 if big or pid in ('watchtower', 'mausoleum', 'south_gate', 'string_lights', 'fountain') else 0, 'shadow': 0 if big else 1})
 for pid, p in PJ.items():
     if 'grok_foot' in p: place(pid, *p['grok_foot'])
 ss = PJ['shop_sign']; place('well', ss['grok_foot'][0] - 92 / D / S, ss['grok_foot'][1] + 4, '_shop')   # covers the villager baked into the store art
