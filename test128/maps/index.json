@@ -2,6 +2,8 @@
  "note": "Navigation / map-screen manifest (world_nav.js). Every map that the route finder and the map screen should know about. See WORLD.md.",
  "maps": [
   "ch1",
+  "arachne",
+  "arachne_boss",
   "field00",
   "dungeon01_b1",
   "boss01",

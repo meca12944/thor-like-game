@@ -443,10 +443,18 @@
   function moveCol(e, dx, dy, r, fly) {
     const m = M(); let ok = true; hopNow = e === hero && !!(hero.jump && hero.jump.air);
     const b0 = fly ? (x, y) => x < 6 || y < 10 || x > m.pw - 6 || y > m.ph - 4 : (x, y) => blocked(x, y, r);
-    const bl = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
-    if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else ok = false; }
-    if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else ok = false; }
+    const bl1 = e !== hero && m.compose ? (x, y) => b0(x, y) || !!(areaOf(m, x, y) || {}).town : b0; // mobs never enter a town part (마을 = 전투 없음)
+    const B = e === hero && !hero.dash && S.bossRef && !S.bossRef.dead && S.bossRef.hp > 0 ? S.bossRef : null, BR = B ? (B.D.r || 16) + 5 : 0; // boss body blocks the hero (팀장 10-24 「보스 몸속에 서서 연타」); a dodge-dash passes through
+    const bl = B ? (x, y) => bl1(x, y) || (Math.hypot(x - B.x, y - B.y) < BR && Math.hypot(x - B.x, y - B.y) < Math.hypot(e.x - B.x, e.y - B.y)) : bl1;
+    if (dx) { if (!bl(e.x + dx, e.y)) e.x += dx; else { ok = false; if (e === hero && !dy) slide(e, bl, dx, 0); } }
+    if (dy) { if (!bl(e.x, e.y + dy)) e.y += dy; else { ok = false; if (e === hero && !dx) slide(e, bl, 0, dy); } }
     hopNow = false; return ok;
+  }
+  // corner slide (owner 10-24 「방향키 하나로 가면 집·분수에 걸린다」): pushing straight into a corner that is open a few px to the side nudges the hero around it (Zelda-style)
+  const SLIDE_PX = 7;
+  function slide(e, bl, dx, dy) { const v = Math.abs(dx || dy);
+    for (let s = 1; s <= SLIDE_PX; s++) for (const g of [1, -1]) { const ox = dy ? g * s : 0, oy = dx ? g * s : 0;
+      if (!bl(e.x + ox, e.y + oy) && !bl(e.x + ox + dx, e.y + oy + dy)) { const st = Math.min(v, s); if (!bl(e.x + Math.sign(ox) * st, e.y + Math.sign(oy) * st)) { e.x += Math.sign(ox) * st; e.y += Math.sign(oy) * st; } return; } }
   }
   function msg(text, t = 2.2) { S.msg = { text, t }; }
   // ---- 보스전 연출 (2번방 10-24, 팀장 「재밌고 다크하고 웅장한 보스전」): 시네마 띠 + 등장 그림 · 2페이즈 글자 · 처치 슬로·번쩍 · 화면 번쩍

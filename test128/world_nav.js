@@ -60,7 +60,7 @@
       let p = null;
       if (o.type === 'exit') p = { x: o.tx + Math.floor((o.w || 1) / 2), y: o.ty + Math.floor((o.h || 1) / 2), to: o.to, spawn: o.spawn, label: o.label };
       if ((o.type === 'stairs_up' || o.type === 'stairs_down') && m.links && m.links[o.type]) p = { x: o.tx, y: o.ty, to: m.links[o.type].to, spawn: m.links[o.type].spawn, label: o.type === 'stairs_up' ? '위층' : '아래층' };
-      if (o.type === 'boss_door' && m.links && m.links.boss_door) p = { x: o.tx, y: o.ty, to: m.links.boss_door.to, spawn: m.links.boss_door.spawn, label: '골렘의 방' };
+      if (o.type === 'boss_door' && m.links && m.links.boss_door) p = { x: o.tx, y: o.ty, to: m.links.boss_door.to, spawn: m.links.boss_door.spawn, label: m.links.boss_door.label || '보스의 방' }; // label per dungeon (폐공방: 재단사의 방)
       if (p) { d.portals.push(p); d.markers.push({ kind: p.to === 'town' ? 'town' : (/^dungeon|^boss/.test(p.to) && m.type === 'field' ? 'dungeon' : (o.type === 'boss_door' ? 'boss' : 'exit')), x: p.x, y: p.y, label: p.label || p.to, portal: p }); }
       if (o.type === 'waystone') d.markers.push({ kind: 'waystone', x: o.tx, y: o.ty, label: o.name, id: o.id });
       if (o.type === 'npc') d.markers.push({ kind: 'npc', x: o.tx, y: o.ty, label: o.name, id: o.id, npc: o });
@@ -131,7 +131,7 @@
     if (!q || qs(q.id) === 'done') return null;
     if (!qs(q.id) || flagsOk(q)) { const n = findNpc(q.giver); return n && Object.assign(n, { label: (flagsOk(q) && qs(q.id) ? '보고: ' : '') + n.label, quest: q }); }
     const S = H().SAVE;
-    for (const t of q.targets || []) { if (t.untilFlag && S.flags[t.untilFlag]) continue; if (t.untilMapVisited && S.visited[t.untilMapVisited]) continue; return { map: t.map, x: t.x, y: t.y, label: t.label, quest: q }; }
+    const here = H().M() && H().M().id; for (const t of q.targets || []) { if (t.untilFlag && S.flags[t.untilFlag]) continue; if (t.whenIn && t.whenIn.indexOf(here) < 0) continue; /* dungeon-only steps (champions → boss door → boss) */ if (t.untilMapVisited && S.visited[t.untilMapVisited]) continue; return { map: t.map, x: t.x, y: t.y, label: t.label, quest: q }; }
     return null;
   }
   function talk(o) {
@@ -174,8 +174,8 @@
       if (n.map === dest.map) { const c = n.cost + Math.hypot(n.x - dest.x, n.y - dest.y); if (!best || c < best.cost) best = { cost: c, first: n.first, firstCost: n.firstCost }; continue; }
       if (done[n.map]) continue; done[n.map] = 1;
       const d = NM[n.map], M2 = H().MAPS; if (!d) continue;
-      for (const p of d.portals) { const tm = M2[p.to]; if (!tm) continue; const sp = (tm.spawns && (tm.spawns[p.spawn] || tm.spawns.default)) || [tm.w / 2, tm.h / 2];
-        const c = n.cost + Math.hypot(n.x - p.x, n.y - p.y) + 2; front.push({ map: p.to, x: sp[0], y: sp[1], cost: c, first: n.first || p, firstCost: n.first ? n.firstCost : c }); }
+      for (const p of d.portals) { const al = H().aliasPt ? H().aliasPt({ map: p.to, x: 0, y: 0 }) : { map: p.to }, to = al.map, tm = M2[to]; if (!tm) continue; const sp = (tm.spawns && (tm.spawns[p.spawn] || (to !== p.to && tm.spawns[p.to + ':' + (p.spawn || 'default')]) || tm.spawns.default)) || [tm.w / 2, tm.h / 2]; /* part maps (felt) live inside ch1: spawn 'felt:arachne' */
+        const c = n.cost + Math.hypot(n.x - p.x, n.y - p.y) + 2; front.push({ map: to, x: sp[0], y: sp[1], cost: c, first: n.first || p, firstCost: n.first ? n.firstCost : c }); }
     }
     return best;
   }
