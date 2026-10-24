@@ -14,3 +14,5 @@
 [2026-10-24 20:31:12] edit run_n completed usage {'type': 'generations', 'generations': 10.0}
 [2026-10-24 20:33:17] tween tw8_run_ne completed frames 9 usage {'type': 'generations', 'generations': 8.0}
 [2026-10-24 20:33:39] tween tw8_run_n completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+[2026-10-24 23:56:03] edit walk_r2 completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-24 23:56:05] edit run_se2 completed usage {'type': 'generations', 'generations': 10.0}
