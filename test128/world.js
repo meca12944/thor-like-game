@@ -815,7 +815,9 @@
       hero.runStartT = Math.max(0, (hero.runStartT || 0) - dt);
       const rk = hero.run ? RUN.mul + (RUN.startMul - RUN.mul) * hero.runStartT / RUN.startT : 1;
       const sp = HERO_SPEED * rk * (hero.charge ? (spW().charge.moveMul || .4) : 1) * (hero.slowT > 0 ? .45 : 1) * (onTile('tallgrass') ? .8 : 1); hero.moving = mv;
-      if (hero.moving) { if (!hero.charge) setFace(ix, iy); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
+      if (hero.moving && hero.run && hero.lastMv && ix * hero.lastMv[0] + iy * hero.lastMv[1] < -.5 && !(hero.pivotT > 0)) { hero.pivotT = PIVOT.t; addFx('dust', hero.x + hero.lastMv[0] * 4, hero.y, { life: .3 }); addFx('dust', hero.x, hero.y, { life: .25 }); } // 달리다 반대로 꺾기 = 짧은 디딤(조작감 연구 10-24, ?pivot=0 끔)
+      if (hero.moving) hero.lastMv = [ix, iy]; const pv = hero.pivotT > 0 && PIVOT.on ? PIVOT.lo + (1 - PIVOT.lo) * (1 - hero.pivotT / PIVOT.t) : 1; hero.pivotT = Math.max(0, (hero.pivotT || 0) - dt);
+      if (hero.moving) { if (!hero.charge) setFace(ix, iy); moveCol(hero, ix * sp * pv * dt, iy * sp * pv * dt, 5); const w0 = hero.walkT; hero.walkT += dt * (hero.run ? rk * RUN.cadence : 1); if (hero.run && Math.floor(hero.walkT * 4) !== Math.floor(w0 * 4)) addFx('dust', hero.x - ix * 3, hero.y, { life: .25 }); } // footfall dust
       else if (hero.skidT > 0) { hero.skidT -= dt; const k = hero.skidT / RUN.skidT; moveCol(hero, hero.skidV[0] * HERO_SPEED * 1.2 * k * dt, hero.skidV[1] * HERO_SPEED * 1.2 * k * dt, 5); } } // short skid
     stepHW(dt);
     stepOpen(m, dt);
@@ -1124,6 +1126,7 @@
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   // ---- 자연스러운 방향 전환 (모션연구방 10-23, 사장님 "누가 봐도 자연스러운 방향전환"): 그림 방향은 45°씩 돌아감(90° 이상 꺾으면 사이 방향을 0.04초씩 거침,
   // 뒤로 돌 때는 화면 쪽(↓)으로 돎) + 동작이 바뀌는 순간 머리가 순간이동하지 않게 그 차이를 0.06초에 걸쳐 풀어 줌(H8POP). 그림만 바뀌고 이동·공격 방향은 그대로.
+  const PIVOT = { on: Q.get('pivot') !== '0', t: .08, lo: .35 }; // run reversal: 0.08 s plant, speed 35% -> 100% (input / facing / attack direction stay instant)
   const TURN_STEP = .04, POP_TAU = .06, H8HX = new Map(); let h8HXcv = null;
   function h8Turn(h, f8) { const T = DIR8.indexOf(f8), now = S.t; if (T < 0) return f8;
     if (h.vd == null || S.deadT > 0 || h.roll || now < (h.vdT ?? now)) { h.vd = T; h.vdTg = T; h.vdT = now; h.vdAcc = 0; return f8; }
