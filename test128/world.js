@@ -256,8 +256,28 @@
     return o;
   }
   // pre-render the static ground to a canvas (with soft autotile edges)
-  function renderGround(m) {
-    const c = document.createElement('canvas'); c.width = m.pw; c.height = m.ph; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+  // 큰 지도 땅 조각 (팀장 10-24, 새 1장 640x470 = 10240x7520px → 한 장 캔버스는 폰에서 안 됨)
+  const BIG_GROUND = 4096 * 4096, GCH = 32, GCH_MAX = 64;
+  function chunkGround(m, cx, cy) { const T = m.T, R = { x: cx * GCH, y: cy * GCH, w: GCH, h: GCH }, c = renderGround(m, R), g = c.getContext('2d');
+    g.setTransform(1, 0, 0, 1, -R.x * T, -R.y * T);
+    const hit = (x, y, w, h) => x < R.x + R.w && x + w > R.x && y < R.y + R.h && y + h > R.y;
+    if (m.compose) for (const a of m.areas || []) if (a.bg && BGIMG[a.bg] && hit(a.x, a.y, a.w, a.h)) { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(BGIMG[a.bg], a.x * T, a.y * T, a.w * T, a.h * T); g.imageSmoothingEnabled = false; }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    const grades = m.compose ? (m.areas || []).filter(a => a.grade && hit(a.x, a.y, a.w, a.h)) : m.grade ? [{ x: R.x, y: R.y, w: R.w, h: R.h, grade: m.grade }] : []; // 색 보정은 조각마다 (그을린 자국은 큰 지도에서는 생략)
+    for (const a of grades) { const x0 = Math.max(a.x, R.x), y0 = Math.max(a.y, R.y), x1 = Math.min(a.x + a.w, R.x + R.w), y1 = Math.min(a.y + a.h, R.y + R.h);
+      const sub = document.createElement('canvas'); sub.width = (x1 - x0) * T; sub.height = (y1 - y0) * T; sub.getContext('2d').drawImage(c, (x0 - R.x) * T, (y0 - R.y) * T, sub.width, sub.height, 0, 0, sub.width, sub.height);
+      gradeCanvas(sub, a.grade); g.clearRect((x0 - R.x) * T, (y0 - R.y) * T, sub.width, sub.height); g.drawImage(sub, (x0 - R.x) * T, (y0 - R.y) * T); }
+    g.setTransform(1, 0, 0, 1, -R.x * T, -R.y * T);
+    for (const h of m.hds || []) { const im = HDIMG[h.ground]; if (im) g.clearRect(h.gx * T, h.gy * T, im.width / h.D, im.height / h.D); }
+    g.setTransform(1, 0, 0, 1, 0, 0); return c; }
+  function drawGround(g, m, cx, cy) { if (m.groundC) { g.drawImage(m.groundC, -cx, -cy); return; }
+    const P = GCH * m.T, nx = Math.ceil(m.w / GCH), ny = Math.ceil(m.h / GCH); let budget = m.gchWarm ? 99 : 2; m.gchWarm = false; // 한 장면에 새 조각은 2개까지 (끊김 방지), 들어올 때는 화면 전부
+    for (let y = Math.max(0, Math.floor(cy / P)); y < ny && y * P < cy + EH + 1; y++) for (let x = Math.max(0, Math.floor(cx / P)); x < nx && x * P < cx + EW + 1; x++) {
+      const k = x + y * nx; let c = m.gch.get(k);
+      if (c) { m.gch.delete(k); m.gch.set(k, c); } else if (budget-- > 0) { c = chunkGround(m, x, y); m.gch.set(k, c); if (m.gch.size > GCH_MAX) m.gch.delete(m.gch.keys().next().value); }
+      if (c) g.drawImage(c, x * P - cx, y * P - cy); } }
+  function renderGround(m, R) { // R = {x,y,w,h} 타일 사각형만 (큰 지도 조각 그리기)
+    const c = document.createElement('canvas'); c.width = R ? R.w * m.T : m.pw; c.height = R ? R.h * m.T : m.ph; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; if (R) g.translate(-R.x * m.T, -R.y * m.T);
     if (m.bg && BGIMG[m.bg]) { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(BGIMG[m.bg], 0, 0, m.pw, m.ph); return c; }
     const T = m.T, W = m.w, H = m.h, sheet = m.tileset || 'field';
     const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? null : m.cells[y * W + x];
@@ -269,7 +289,8 @@
     const VAR = (TILESETS && TILESETS.variants) || {};
     const groundName = (cell, x, y) => { const v = VAR[cell.g]; return v ? v[hash(x, y) % v.length] : cell.g; };
     const isG = (x, y, set) => { const c2 = at(x, y); return c2 ? set.includes(c2.g) : true; };
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const X0 = R ? Math.max(0, R.x) : 0, Y0 = R ? Math.max(0, R.y) : 0, X1 = R ? Math.min(W, R.x + R.w) : W, Y1 = R ? Math.min(H, R.y + R.h) : H;
+    for (let y = Y0; y < Y1; y++) for (let x = X0; x < X1; x++) {
       const cell = at(x, y); let n = groundName(cell, x, y);
       if (sheet === 'dungeon' && cell.g.startsWith('wall')) { // 3/4 walls: face where the floor is below, dark top elsewhere
         const below = at(x, y + 1); const face = below && !below.g.startsWith('wall');
@@ -680,7 +701,8 @@
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
-      if (!m.groundC) { m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
+      if (!m.groundC && !m.gch && m.pw * m.ph > BIG_GROUND) { m.gch = new Map(); m.gchWarm = true; } // 큰 지도: 땅 그림을 32x32타일 조각으로 그때그때 (한 장이면 폰 캔버스 한계·메모리 초과)
+      if (!m.groundC && !m.gch) { m.groundC = m.compose ? composeGround(m) : m.grade ? scarGround(m, gradeCanvas(renderGround(m), m.grade)) : renderGround(m);
         if (m.pitG) { const g = m.groundC.getContext('2d'); for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (m.pitG[y * m.w + x]) { const d = (m.pitG[(y - 1) * m.w + x] ? 0 : 1); g.fillStyle = d ? '#1a1418' : '#050407'; g.fillRect(x * m.T, y * m.T, m.T, m.T); } } // 꺼진 지반: 검은 바닥 (윗줄은 벼랑 끝)
         for (const h of m.hds || []) { const im = HDIMG[h.ground]; if (im) m.groundC.getContext('2d').clearRect(h.gx * m.T, h.gy * m.T, im.width / h.D, im.height / h.D); } }
       let sp = m.spawns && m.spawns[spawnName];
@@ -1171,7 +1193,7 @@
     if (S.kick && S.kick.t > 0) { const q = S.kick.t / .12; cx += Math.round(S.kick.x * q); cy += Math.round(S.kick.y * q); } // directional hit kick (decays while the world runs, holds during the hit-stop)
     S.camI = [cx, cy];
     g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = m.type === 'world' ? '#0b2a5a' : '#06070a'; if (low.width !== EW + 1 || low.height !== EH + 1) { low.width = EW + 1; low.height = EH + 1; } if (m.hds) g.clearRect(0, 0, EW + 1, EH + 1); else g.fillRect(0, 0, EW + 1, EH + 1);
-    if (m.hiG) hiDrawGround(g, m, cx, cy); else g.drawImage(m.groundC, -cx, -cy);
+    if (m.hiG) hiDrawGround(g, m, cx, cy); else drawGround(g, m, cx, cy);
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
     for (const o of m.objs) drawObjTile(g, m, o);
