@@ -236,5 +236,33 @@
    3,
    4
   ]
+ },
+ "swing1_right": {
+  "frames": 5,
+  "ticks": [
+   3,
+   3,
+   3,
+   3,
+   3
+  ]
+ },
+ "swing2_right": {
+  "frames": 3,
+  "ticks": [
+   3,
+   3,
+   3
+  ]
+ },
+ "swing3_right": {
+  "frames": 5,
+  "ticks": [
+   3,
+   3,
+   3,
+   3,
+   3
+  ]
  }
 }

@@ -1159,6 +1159,9 @@
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
+    else if (h.atk && !SLASH_BODY && h.atk.i <= 2 && !vert && H.anims['swing' + (h.atk.i + 1) + '_right']) { // 때리기 몸동작 (모션연구방 10-24, 사장님 「가안」): 당김 → 휘두름(검기 나오는 박자 a0~a1) → 마무리. 옆모습만, 다른 방향은 몸 기울이기 그대로
+      const AT = atkT(h.atk.i), L = A('swing' + (h.atk.i + 1)), t = h.atk.t, n = L.length, sw = n - 2; let fi;
+      if (t < AT.a0) fi = 0; else if (t < AT.a1) fi = 1 + Math.min(sw - 1, Math.floor((t - AT.a0) / Math.max(1e-3, AT.a1 - AT.a0) * sw)); else fi = n - 1; e = L[fi]; }
     else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
