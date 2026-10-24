@@ -825,8 +825,9 @@
     let onPit = false, onSpike = false;
     for (const o of m.objs) {
       const inside = o.tx === cx && o.ty === cy;
-      if (o.type === 'pit' && inside && !hero.roll) onPit = true;
-      if (o.type === 'spikes' && inside && spikeUp(o)) onSpike = true;
+      const air = !!(hero.jump && hero.jump.air); // 점프 공중: 구멍·가시 함정 위를 지나감 (3번방 10-24)
+      if (o.type === 'pit' && inside && !hero.roll && !air) onPit = true;
+      if (o.type === 'spikes' && inside && spikeUp(o) && !air) onSpike = true;
       if (o.type === 'key' && inside && !SAVE.keys[o.keyId]) { SAVE.keys[o.keyId] = true; save(); banner('열쇠를 얻었다!', 1.6); }
       if ((o.type === 'stairs_up' || o.type === 'stairs_down') && inside && m.links && m.links[o.type]) {
         if (m.boss && S.bossRef && !S.bossRef.dead) { hero.y = cy * m.T - 3; if (!S.msg) msg('봉인의 결계 — 보스를 쓰러뜨리기 전에는 나갈 수 없다', 1.6); continue; } // no fleeing mid-fight
