@@ -19,6 +19,7 @@ def mobs(zid, kinds=(), step=50, skip=()):  # 몹 무리: step 타일 격자마�
             markers.append(dict(type='mob', name=k[0], zone=zid, x=min(z['x'] + z['w'] - 2, max(z['x'] + 1, gx + j)), y=min(z['y'] + z['h'] - 2, max(z['y'] + 1, gy - j)), ref='팀 제안', note=k[1]))
 
 
+W, H = 760, 460
 # ---------- 구역 (팀 제안: 크기·자리). 층마다 따로 구역 (README: 던전 층 = 구역 하나) ----------
 zone('lobby', '대서고 1층 로비', 'dungeon', 0, 0, 250, 230, '무너진 대리석 기둥·책장 — 헬레나')
 zone('f2', '대서고 2층 중앙 열람실', 'dungeon', 260, 0, 250, 230, '사슬 금서 보관함, 깨진 스테인드글라스 천장')
@@ -48,15 +49,15 @@ paths = [
     dict(kind='corridor', w=2, pts=[[40, 225], [40, 330], [240, 340]]),
 ]
 links = [
-    dict(**{'from': 'ch2', 'to': 'lobby', 'kind': 'gate', 'at': [1, 210], 'label': '← 2장 왕도 성문'}),
+    dict(**{'from': 'ch7', 'to': 'lobby', 'kind': 'gate', 'at': [1, 210], 'label': '→ 7장 왕성 내성 길 (2장 내성문에서 옴)'}),
     dict(**{'from': 'lobby', 'to': 'f2', 'kind': 'stairs', 'at': [248, 60], 'label': '중앙 계단'}),
     dict(**{'from': 'f2', 'to': 'f3', 'kind': 'stairs', 'at': [508, 200], 'label': '나선 계단'}),
     dict(**{'from': 'f3', 'to': 'boss', 'kind': 'door', 'at': [690, 228], 'label': '보스 문'}),
     dict(**{'from': 'lobby', 'to': 'b1', 'kind': 'stairs', 'at': [40, 228], 'label': '지하 계단'}),
     dict(**{'from': 'b1', 'to': 'secret', 'kind': 'secret', 'at': [252, 340], 'label': '비밀방 (암호 금서 주문)'}),
     dict(**{'from': 'f3', 'to': 'lobby', 'kind': 'shortcut', 'at': [600, 228], 'label': '무너진 책장 사다리 (3층→1층, 안에서 내림)'}),
-    dict(**{'from': 'b1', 'to': 'ch2', 'kind': 'shortcut', 'at': [5, 440], 'label': '배수 통로 → 2장 하수도 (안에서 엶)'}),
-    dict(**{'from': 'boss', 'to': 'ch4', 'kind': 'gate', 'at': [728, 330], 'label': '→ 4장'}),
+    dict(**{'from': 'b1', 'to': 'ch2', 'kind': 'shortcut', 'at': [40, 449], 'label': '↓ 배수 통로 → 2장 하수도 (안에서 엶)'}),
+    dict(**{'from': 'boss', 'to': 'ch7', 'kind': 'gate', 'at': [728, 330], 'label': '← 보스 뒤 문 → 7장 내성 길'}),
 ]
 mk('save', '쉼터: 로비 입구', 'lobby', .06, .85, '팀 제안')
 mk('save', '쉼터: 열람실 계단참', 'f2', .08, .3, '팀 제안')
@@ -81,7 +82,7 @@ mk('chest', '비밀방 서가', 'secret', .6, .4, '공허의 소용돌이 반지
 mk('landmark', '연금술 화로', 'b1', .78, .66, '정본 6장 6장 히든 무기 연계', '6장 클로비스 태엽 핵(진짜 심장)을 여기서 녹이면 초침을 부수는 대검')
 mk('quest', '태엽 핵 소각 → 초침을 부수는 대검', 'b1', .7, .78, '초침을 부수는 대검', '6장 뒤 다시 찾아옴 (2장 그레이 해체 공구 필요)')
 mk('shortcut', '책장 사다리 레버', 'f3', .45, .97, '팀 제안')
-mk('shortcut', '배수 통로 철창', 'b1', .03, .95, '팀 제안', '2장 하수도와 이어짐')
+mk('shortcut', '배수 통로 철창', 'b1', .16, .97, '팀 제안', '2장 하수도와 이어짐')
 
 # ---------- 몹 무리 (팀 제안 — 정본: 「소리 내는 자를 사냥하는 눈먼 사서들과 검은 잉크 괴물들」) ----------
 K = [('눈먼 사서', '소리에 달려드는 사서 2'), ('검은 잉크 괴물', '잉크 덩어리 3'), ('눈먼 사서', '사서 3 + 잉크 1')]
@@ -91,7 +92,7 @@ mobs('f3', K, step=50, skip=[(.05, .85), (.65, .95), (.9, .8), (.3, .2), (.4, .6
 mobs('b1', K, step=55, skip=[(.15, .3), (.78, .66), (.7, .78)])
 
 grok = [
-    dict(kind='bg', name='대서고 바닥·서가 타일', size='16px 타일 세트', desc='먼지 낀 대리석 바닥, 끝없는 책장, 바닥에 흘러 굳은 검은 잉크'),
+    dict(kind='bg', name='대서고 바닥·서가 타일', size='16px 타일 세트', desc='먼지 낀 대리석 바닥, 끝없는 책장, 바닥에 흘러 굳은 검은 잉크. 거대한 성 안 서쪽 구역 — 높은 창 너머 동쪽 멀리 왕성 탑이 보임'),
     dict(kind='bg', name='지하 금지된 서고 타일', size='16px 타일 세트', desc='사슬로 묶인 금서, 촛불, 어두운 석조'),
     dict(kind='prop', name='무너진 대리석 기둥 + 책장 더미', size='약 6x5 타일', desc='헬레나가 깔린 자리'),
     dict(kind='prop', name='사슬 금서 보관함', size='약 3x3 타일', desc='사슬 감긴 철제 함, 안에 잉크 굳은 검'),
@@ -105,7 +106,16 @@ grok = [
     dict(kind='npc', name='헬레나', size='주인공 크기', desc='하반신이 기둥·책장에 깔림, 상반신은 거의 하얀 뼈, 쥔 창과 근위대 투구는 원형'),
     dict(kind='boss', name='맹목의 셀레네', size='주인공 3배', desc='불탄 금서·양피지·굳은 잉크가 소용돌이친 짐승, 얼굴 자리는 텅 빈 공백 / 2페이즈 불타는 금서 날개'),
 ]
-m = dict(chapter='ch3', title='침묵의 대서고 (눈먼 지식의 감옥)', w=760, h=460, zones=zones, areas=areas, paths=paths, links=links, markers=markers, grok=grok)
+# 가장자리 = 성 안 건물 벽 (바깥 세상 없음)
+areas += [dict(kind='wall', poly=[[0, 452], [760, 452], [760, 460], [0, 460]]), dict(kind='wall', poly=[[752, 0], [760, 0], [760, 460], [752, 460]])]
+# 세계 지도: 3장 = 왕성 서쪽 → 입구(로비)가 동쪽을 보게 좌우를 뒤집음
+for z in zones: z['x'] = W - z['x'] - z['w']
+for k in markers: k['x'] = W - 1 - k['x']
+for a in areas: a['poly'] = [[W - x, y] for x, y in a['poly']]
+for p in paths: p['pts'] = [[W - x, y] for x, y in p['pts']]
+for l in links: l['at'] = [min(W - 1, W - l['at'][0]), l['at'][1]]
+for l in links: l['label'] = l['label'].replace('← 보스 뒤 문', '보스 뒤 문')
+m = dict(chapter='ch3', title='침묵의 대서고 (눈먼 지식의 감옥)', w=W, h=H, zones=zones, areas=areas, paths=paths, links=links, markers=markers, grok=grok)
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ch3_map.json')
 json.dump(m, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print(out, len(markers), 'markers')
