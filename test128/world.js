@@ -183,7 +183,7 @@
     const c = document.createElement('canvas'); c.width = r[2]; c.height = r[3]; const g = c.getContext('2d');
     g.drawImage(IMG.spr, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]);
     if (mode === 'white') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = '#fff'; g.fillRect(0, 0, r[2], r[3]); }
-    if (mode === 'dodge') { const AI = (DG() && DG().afterimage) || {}; g.globalCompositeOperation = 'source-atop'; g.globalAlpha = AI.tintMix ?? .45; g.fillStyle = AI.tint || '#bff4ff'; g.fillRect(0, 0, r[2], r[3]); g.globalAlpha = 1; }
+    if (mode === 'dodge') { const AI = (DG() && DG().afterimage) || {}; if (AI.tint && AI.tintMix && AI.keepTint) { g.globalCompositeOperation = 'source-atop'; g.globalAlpha = AI.tintMix; g.fillStyle = AI.tint; g.fillRect(0, 0, r[2], r[3]); g.globalAlpha = 1; } } // 회피대시 잔상 = 주인공 모습 그대로 (주인 10-24 「푸른 잔상 → 주인공 모습 그대로」): 색 덮기 없음, 투명도만
     if (GRADE[mode]) gradeCanvas(c, mode);
     if (mode === 'rage') { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,40,20,.35)'; g.fillRect(0, 0, r[2], r[3]); }
     if (mode === 'gray') { const d = g.getImageData(0, 0, r[2], r[3]); for (let i = 0; i < d.data.length; i += 4) { const v = (d.data[i] * .3 + d.data[i + 1] * .59 + d.data[i + 2] * .11) * .7; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; } g.putImageData(d, 0, 0); }
