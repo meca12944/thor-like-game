@@ -527,7 +527,7 @@
       if (just) { const ow = src && (src.owner || (src.D ? src : null)); if (ow && ow.D && ow.D.felt) { ow.dazeT = .6; addFx('text', ow.x, ow.y - (ow.D.h || 20) - 8, { text: '?', life: .6, color: '#cfe6ff' }); } // the attacker is caught off guard
         hero.roll.just = true; S.slowmo = .3; flash(.14, '170,230,255', .28); addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
-    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = .07; ultAdd('gainHit', 1);
+    if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); S.freezeT = FEEL2 ? 2 / 60 : .07; S.stopEnd = S.t + S.freezeT; ultAdd('gainHit', 1);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); if (!hero.atk) setFace(-Math.cos(a), -Math.sin(a)); hero.kb = { x: Math.cos(a) * 3.3, y: Math.sin(a) * 3.3, n: 0 }; } // turn to the attacker (the recoil pose leans away from it) and slide ~8px over 7 ticks instead of a 1-tick teleport (motion lab 10-23)
     addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp(); checkLastStand();
@@ -1233,10 +1233,11 @@
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
       if (fan ? gkFanTouch(fan, f, head, mm, mh) : gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
-        if (!f.stopped) { f.stopped = true; S.freezeT = Math.max(S.freezeT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+        if (!f.stopped) { f.stopped = true; if (f.i >= 2 || !FEEL2 || S.t - (S.stopEnd ?? -9) > STOP_GAP) { const hs = HITSTOP_HERO[Math.min(3, f.i)]; if (hs) { S.freezeT = Math.max(S.freezeT || 0, hs); S.stopEnd = S.t + S.freezeT; } } if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const FEEL2 = Q.get('feel') !== '0'; // 때리기·달리기 손맛 연구 (2번방 10-24) — ?feel=0 = 예전 값으로 비교
-  const HITSTOP_HERO = FEEL2 ? [3 / 60, 4 / 60, 7 / 60, 7 / 60] : [2 / 60, 3 / 60, 5 / 60, 5 / 60]; // 1·2·3타 멈춤: 3·4·7틱 (Hades 2~4, Dead Cells 3~6, 막타는 더 길게)
+  const HITSTOP_HERO = FEEL2 ? [0, 1 / 60, 4 / 60, 4 / 60] : [2 / 60, 3 / 60, 5 / 60, 5 / 60]; // 사장님 10-24 「밖에서 전투하면 자꾸 멈춘다」: 1타 0 · 2타 1틱 · 막타만 4틱 (+ STOP_GAP) — 1타 손맛은 화면 밀기·몹 반응으로
+  const STOP_GAP = .3; // 1·2타 멈춤은 앞 멈춤이 끝나고 0.3초 안이면 건너뜀 (짧은 멈춤이 줄줄이 이어져 끊겨 보이던 것); 막타·맞음은 항상 // 1·2·3타 멈춤: 3·4·7틱 (Hades 2~4, Dead Cells 3~6, 막타는 더 길게)
   const KICK = [1, 1.5, 3, 3]; // 친 쪽으로 화면 밀기(px): 1·2·3타 — 무작위 흔들림 대신 방향 있는 한 번 밀고 0.12초에 돌아옴
   const LOOK = { walk: 6, run: 14, k: 3 }; // 달릴 때 카메라가 가는 쪽으로 14px 앞서감 (HLD·Hades 방식, 너무 멀면 멀미)
   // [검흔 어울림 연구 10-23 「맞는 곳 = 보이는 곳」] one arc placement for the drawing and the hit: the arc stops flying at its reach (GK_FLY)
