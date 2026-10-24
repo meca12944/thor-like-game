@@ -1200,7 +1200,7 @@
     const L = H.anims[an + '_' + dir] || H.anims[an + '_down'], n = L.length;
     let f = p != null ? Math.min(n - 1, Math.floor(p * n)) : (an === 'idle' ? Math.floor(tick) % n : (an === 'walk' || an === 'run') ? 1 + Math.floor(tick) % (n - 1) : Math.min(n - 1, Math.floor(tick)));
     return H.cells[L[f]]; }
-  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, Object.assign([0, 0, c[2], c[3], c[4], c[5]], { ox: c.ox }), x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
+  function drawH128(c, x, y, k, alpha, tint) { const G = h128(); let im = tint ? (G.H128tint || {})[tint] : G.H128img; if (c.h8 !== undefined) { im = (swordHidden() && nsImg(c.h8)) || G.H8img(c.h8); if (im && tint) { const t = G.h8tinted(im, c, tint); return drawH128Raw(t, Object.assign([0, 0, c[2], c[3], c[4], c[5]], { ox: c.ox }), x, y, k, alpha, c.fl); } } if (!im) return; return drawH128Raw(im, c, x, y, k, alpha, c.fl); }
   function drawH128Raw(im, c, x, y, k, alpha, fl) { const sc = k * H128FIG / 117, [sx0, sy] = W2S(x, y), sx = sx0 + (c.ox || 0) * sc;
     ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = sc < 1; if (fl) { ctx.translate(Math.round(sx), 0); ctx.scale(-1, 1); ctx.drawImage(im, c[0], c[1], c[2], c[3], -Math.round(c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); } else ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
   // ---- 검기 (owner 10-22 "검 베는 모션은 안쓰려구" / "최종 샌드박스 검기만 나가고 있어"): the attack no longer plays the slash body clips;
@@ -1289,9 +1289,27 @@
       if (a <= 3) { const L = (big ? 10 : 7) * (1 - a / 4) + 3, al = 1 - a / 4; ctx.fillStyle = `rgba(255,255,255,${al})`; ctx.fillRect(Math.round(tx - L), Math.round(ty) - 1, Math.round(2 * L), 2); ctx.fillRect(Math.round(tx), Math.round(ty - L * .6), 1, Math.round(L * 1.2)); ctx.fillStyle = `rgba(220,245,255,${al})`; ctx.beginPath(); ctx.arc(tx, ty, 3, 0, TAU); ctx.fill(); }
       if (a >= 1) { ctx.fillStyle = `rgba(220,250,255,${Math.max(0, 1 - a * 28 / 255)})`; const ba = Math.atan2(dy, dx); for (let i = 0; i < (big ? 14 : 8); i++) { const g = ba + rnd() * 2.6 - 1.3, L = a * (2 + rnd() * 3); ctx.fillRect(Math.round(tx + Math.cos(g) * L), Math.round(ty + Math.sin(g) * L), 2, 2); } } }
   window.GKART = { GK, STEP: GK_STEP, LIFE: GK_LIFE, FLY: GK_FLY, K: GK_K, REACH: GK_REACH, ARC: GK_ARC, draw: gkArcDraw };
+
+  // ---- C안 (사장님 10-24 「C안으로 가자」): 평소엔 칼 든 그림, 벨 때(검기가 열리는 0~4.5틱)만 칼 없는 몸 그림 + 코드 칼날이 손에서 검기 앞쪽 끝으로 함께 휘둘러짐
+  // (들고 있는 칼끝이 베는 방향과 50°+ 어긋나는 자세가 12세트 중 8세트였음). 그림: H8.nsSheets {시트 번호: 칼 없는 사본(칸 배치 같음)}, 손: H8.grip["시트:칸"] = [dx, dy, deg] (앵커 기준 그림px).
+  // ?sword=mock = 모션 그림 오기 전 시험(칼만 자동으로 지운 anim/ns_mock/), ?sword=off = 끔. 칼 없는 그림이 없으면(기본) 칼 숨김·코드 칼날 모두 꺼짐 → 칼 두 자루가 되지 않음.
+  const SWORD_Q = Q.get('sword'), NS_IMG = [];
+  function nsSrc(i) { const H = h128() && h128().H8; if (!H || SWORD_Q === 'off') return null; if (H.nsSheets && H.nsSheets[i]) return H.nsSheets[i]; return SWORD_Q === 'mock' ? H.sheets[i].replace('anim/', 'anim/ns_mock/') : null; }
+  function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
+  function swordC() { const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
+  function swordHidden() { return !!(S.gk && S.gk.some(f => f.map === S.map && f.t * GK_STEP <= 4.5) && swordC()); }
+  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = hero.face === 'left' || (dir[0] < 0 && H.left === 'mirror'); return [fl ? -g[0] : g[0], g[1]]; } }
+    return [dir[0] * 14, -58 + dir[1] * 12]; } // no grip table yet: chest height, a little toward the swing
+  function gkBlade(ctx, f) { // the sword itself, drawn in code: grip -> toward the arc's leading edge, one sword long, while the arc opens
+    const P = gkPose(f); if (P.a > 4.5) return; const al = P.a < 3 ? 1 : 1 - (P.a - 3) / 1.5, Y = P.Y, u = Y.rev ? 1 - P.head : P.head, th = (u * Y.span - Y.span / 2) * Math.PI / 180, an = P.rot * Math.PI / 180;
+    const xr = (P.R + P.T * .6) * Math.cos(th), yr = (P.R + P.T * .6) * Math.sin(th) * Y.sq; let X = xr * Math.cos(an) - yr * Math.sin(an); const Y2 = xr * Math.sin(an) + yr * Math.cos(an); if (P.fl) X = -X;
+    const [gx, gy] = gkGrip(f.dir), px = P.ox + X, py = P.oy + Y2, d = Math.hypot(px - gx, py - gy) || 1, ux = (px - gx) / d, uy = (py - gy) / d, BL = 74, x0 = gx + ux * 6, y0 = gy + uy * 6, x1 = gx + ux * BL, y1 = gy + uy * BL;
+    ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${al})`; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); // navy rim (same as the arc)
+    ctx.strokeStyle = `rgba(214,222,236,${al})`; ctx.lineWidth = 5.5; ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0 + ux * 8, y0 + uy * 8); ctx.lineTo(x1, y1); ctx.stroke(); // steel + edge light
+    ctx.strokeStyle = `rgba(200,150,60,${al})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0 - uy * 7, y0 + ux * 7); ctx.lineTo(x0 + uy * 7, y0 - ux * 7); ctx.stroke(); ctx.restore(); } // gold guard
   function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length)) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
-    for (const f of S.gk || []) gkArcDraw(ctx, f);
+    const SC = swordC(); for (const f of S.gk || []) { gkArcDraw(ctx, f); if (SC) gkBlade(ctx, f); }
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
