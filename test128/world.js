@@ -584,6 +584,7 @@
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
     { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } sfx('mob_die', .8); if (!D.boss && !D.champion && !m.summoned && !S.mobs.some(o => !o.dead && o !== m && Math.hypot(o.x - hero.x, o.y - hero.y) < 220)) after(.15, () => sfx('fight_end', .7)); // 근처 마지막 적 = 짧은 마무리 소리 // 심연: pixel void burst instead of the white puff (the death sound used to sit inside this comment = silent)
     if (D.onDeath) D.onDeath(m, W);
+    if (!D.boss && !S.mobs.some(o => o !== m && !o.dead && Math.hypot(o.x - hero.x, o.y - hero.y) < 220)) S.lastKillT = .15; // 처치 강조 (팀장 10-24, 보고서): 그 자리 마지막 적만 0.15초 0.5배 느리게
     if (!m.noDrop && !m.summoned && window.__game && window.__game.addGold) { const gv = window.__game.addGold(window.__game.goldFor(D.boss ? 'boss' : D.champion ? 'champion' : 'mob', D.area || 1)); if (gv) { sfx('coin', .6); } if (gv) addFx('text', m.x + 8, m.y - (D.h || 20) - 12, { text: '+' + gv + 'G', life: .9, color: '#ffd84a' }); } // gold curve: data/economy.json
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); } // shown in the pickup feed (right), not as text over the fight
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
@@ -757,7 +758,7 @@
     if (S.pause) { if (queue.includes('KeyT')) { queue.length = 0; S.pause = false; if (Q.has('old')) go('town', null, { card: false }); else go('felt', 'default', { card: false }); } queue.length = 0; return; }
     if (S.ultFx) { const f = S.ultFx; if (f.t > f.fz + .15 && f.t < f.fz + f.ci && (takePress('attack') || takePress('interact'))) f.t = f.fz + f.ci; stepUlt(dt); queue.length = 0; updateCam(dt); return; } // skip the cut-in (retries) // 필살기: world frozen (timers, mobs, hazards, shots)
     if (S.cine) { S.cine.t += dt; if (S.cine.t >= S.cine.dur) S.cine = null; else if (S.cine.hold) { queue.length = 0; return; } } // 보스 연출 (2번방 10-24): intro = world waits
-    if (S.flashT > 0) S.flashT -= dt; if (S.killSlow > 0) { S.killSlow -= dt; dt *= .25; } { const b = S.bossRef; if (b && !b.dead && b.phase === 2 && !b.cineP2) { b.cineP2 = true; bossCinePhase(b); } }
+    if (S.flashT > 0) S.flashT -= dt; if (S.killSlow > 0) { S.killSlow -= dt; dt *= .25; } else if (S.lastKillT > 0) { S.lastKillT -= dt; dt *= .5; } { const b = S.bossRef; if (b && !b.dead && b.phase === 2 && !b.cineP2) { b.cineP2 = true; bossCinePhase(b); } }
     if (S.freezeT > 0 && !(hero.hp > 0 && !hero.roll && !(hero.rollCd > 0) && codesOf('dash').some(c => queue.includes(c)))) { S.freezeT -= dt; updateCam(dt); return; } if (S.freezeT > 0) S.freezeT = 0; // 회피대시는 멈춤(히트스톱) 중에도 바로 (보고서 3-9 「맞은 직후부터 언제든」, 모션연구방 10-24) // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
@@ -770,7 +771,7 @@
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 1.4) { if (takePress('attack') || takePress('interact')) retry(S.snap ? 'snap' : 'way'); else if (queue.includes('KeyT')) retry('way'); } queue.length = 0; return; }
     if (S.scene !== 'world' && takePress('save')) saveHere('manual');
     if (hero.hp > 0 && S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150)) ultAdd('autoPerSec', dt); // 필살기 게이지: 싸우는 동안 저절로 (몹이 가까이 있을 때만, owner 10-23)
-    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
+    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(S.heroStopT > 0); if (S.map && !S.trans && S.deadT <= 0) stepPet(dt); if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
     updateCam(dt);
   }
@@ -808,7 +809,7 @@
     if (takePress('attack')) hero.atkBuf = .18;
     if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
       if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = prevAtk && prevAtk.i < 2 ? prevAtk.i + 1 : (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; /* [combat research] a press during the swing continues the combo (was: back to hit 1) */ sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) { setFace(ix, iy); aimAssist(hero.combo, AIM_HELD); } else aimAssist(hero.combo); } }
-    hero.atkBuf = Math.max(0, (hero.atkBuf || 0) - dt);
+    if (!(S.heroStopT > 0)) hero.atkBuf = Math.max(0, (hero.atkBuf || 0) - dt); // 멈춘 동안 누른 공격은 그대로 기억
     if (isHeld('attack') && hero.holdOk) hero.holdT += dt; else hero.holdOk = false; // charge (모으기): keep holding attack -> lv1 t1 / lv2 t2, release = charged slash; a hit / dodge cancels
     if (!hero.charge && hero.holdOk && hero.holdT > .14 && !hero.atk && !hero.roll && hero.hp > 0) { hero.charge = { t: hero.holdT, lv: 0, flash: 0 }; hero.run = false; }
     if (hero.charge) { const C = hero.charge, CF = spW().charge; C.t += dt; C.flash = Math.max(0, C.flash - dt); const lv = C.t >= CF.t2 ? 2 : C.t >= CF.t1 ? 1 : 0;
@@ -816,7 +817,9 @@
       if (!hero.holdOk || hero.roll || hero.atk || hero.hp <= 0) { const rel = !hero.holdOk && !hero.roll && !hero.atk && hero.hp > 0 && C.lv > 0; hero.charge = null; if (rel) { hero.atk = { t: 0, hit: new Set(), i: 3 + C.lv }; sfx('swing_heavy', 1); } } }
     if (takePress('interact') && !(S.t < (S.dlgGuard || 0))) interact();
     tickTrail(dt);
-    if (hero.roll) { const r = hero.roll, D = DG(), RD = rollDur(); const p0 = Math.min(1, r.t / RD); r.t += dt; const p = Math.min(1, r.t / RD);
+    const hStop = S.heroStopT > 0 && !hero.roll; if (hStop) S.heroStopT -= dt; else S.heroStopT = 0; // 국소 히트스톱: 주인공의 휘두름·이동·검흔만 멈춤 (회피대시는 바로 끊고 나감)
+    if (hStop) { hero.moving = false; }
+    else if (hero.roll) { const r = hero.roll, D = DG(), RD = rollDur(); const p0 = Math.min(1, r.t / RD); r.t += dt; const p = Math.min(1, r.t / RD);
       if (D && D.burstTicks) { const TB = D.burstTicks / 60, q0 = Math.min(1, (r.t - dt) / TB), q1 = Math.min(1, r.t / TB), E2 = q => 1 - Math.pow(1 - q, 2.6), st = fieldDash(D) * (E2(q1) - E2(q0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5);
         const tt = Math.round((r.t - dt) * 60); if (tt % 2 === 0 && tt < D.burstTicks && h128()) { S.trail = S.trail || []; S.trail.push({ c128: h128Cell(), x: hero.x, y: hero.y, t: 0, life: (D.durTicks - tt) / 60 + .05, a: .8 * Math.pow(.8, S.trail.length) }); } }
       else if (D) { const E = EASE[D.ease] || EASE.outCubic, st = D.tiles * 16 * (E(p) - E(p0)), n = Math.max(1, Math.ceil(st / 3)); for (let i = 0; i < n; i++) moveCol(hero, r.dx * st / n, r.dy * st / n, 5); // dash: fixed distance, ease-out
@@ -871,6 +874,7 @@
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
+      if (mm.stopT > 0) { mm.stopT -= dt; continue; } // 국소 히트스톱: 맞은 몹만 멈춤 (생각·이동·밀려남·번쩍임 모두 그 자리)
       mm.spawnT = Math.max(0, mm.spawnT - dt); mm.hitT = Math.max(0, mm.hitT - dt); mm.flash = Math.max(0, mm.flash - dt); if (mm.shudT > 0) mm.shudT -= dt; if (mm.pushX || mm.pushY) { const k = Math.pow(.0001, dt); mm.pushX *= k; mm.pushY *= k; if (Math.abs(mm.pushX) + Math.abs(mm.pushY) < .1) mm.pushX = mm.pushY = 0; }
       if (mm.lagDelay > 0) mm.lagDelay -= dt; else mm.hpLag = Math.max(mm.hp, mm.hpLag - dt * mm.maxHp * .8);
       if (mm.kx || mm.ky) { moveCol(mm, mm.kx * dt, mm.ky * dt, mm.r, mm.fly); mm.kx *= Math.pow(.002, dt); mm.ky *= Math.pow(.002, dt); if (Math.abs(mm.kx) + Math.abs(mm.ky) < 5) mm.kx = mm.ky = 0; }
@@ -1020,7 +1024,7 @@
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1]; return [clampC(fx - EW / 2, m.pw - EW), clampC(fy - EH / 2, m.ph - EH)]; } // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { if (M()) S.cam = camTarget(); }
   function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
-  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
@@ -1245,14 +1249,18 @@
     S.gk = S.gk || []; S.gk.push({ n, i, at0: hero.atk ? Math.round(hero.atk.t * 60) : 0, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
   function gkHits(f) { const fan = f.i <= 2 ? GK_FAN[f.i] : null, head = fan ? gkFanHead(fan, gkFanT(f)) : 0; if (fan ? head < 0 : f.t * GK_STEP > GK_HITA) return; // combo 1-3: body fan (active ticks), specials: flying band
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
-      if (fan ? gkFanTouch(fan, f, head, mm, mh) : gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
+      if (fan ? gkFanTouch(fan, f, head, mm, mh) : gkTouch(f, mm, mh)) { f.hit.add(mm); const cp = fan ? gkFanContact(fan, f, head, mm, mh) : [mm.x, mm.y - mh * .45]; S.gkImp = S.gkImp || []; S.gkImp.push({ x: cp[0], y: cp[1], t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
-        if (!f.stopped) { f.stopped = true; hitStop(HITSTOP_HERO[Math.min(3, f.i)], f.i >= 2); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)] * shakeMul(); S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+        localStop(mm, HITSTOP_HERO[Math.min(3, f.i)]); if (!f.stopped) { f.stopped = true; S.heroStopT = Math.max(S.heroStopT || 0, HITSTOP_HERO[Math.min(3, f.i)]); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)] * shakeMul(); S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const FEEL2 = Q.get('feel') !== '0'; // 때리기·달리기 손맛 연구 (2번방 10-24) — ?feel=0 = 예전 값으로 비교
-  const HITSTOP_HERO = FEEL2 ? [1 / 60, 1 / 60, 3 / 60, 3 / 60] : [2 / 60, 3 / 60, 5 / 60, 5 / 60]; // 사장님 10-24 「밖에서 싸우면 자꾸 멈춘다」: 1·2타 3·4 -> 1틱, 3타 7 -> 3틱 (연타 싸움 중 멈춤 30% -> 목표 5% 안팎)
-  // hit-stop gate: a small stop (1·2타) needs 0.3 s since the last stop started, so a crowd fight is not a stutter; big ones (3타, the hero hurt) always stop
-  function hitStop(sec, big) { if (!big && S.t - (S.lastStop ?? -9) < .3) return; S.freezeT = Math.max(S.freezeT || 0, sec); S.lastStop = S.t; } // 1·2·3타 멈춤: 3·4·7틱 (Hades 2~4, Dead Cells 3~6, 막타는 더 길게)
+  // 국소 히트스톱 (팀장 10-24, 타격감 연구보고서 3-1 사쿠라이): 내가 때린 손맛 멈춤은 세상 전체(S.freezeT)가 아니라 맞은 몹(mm.stopT)과 주인공(S.heroStopT)만 1·2·3타 3·4·7틱.
+  // 다른 몹·투사체·장판·화면은 계속 움직임 -> 사장님 10-24 「자꾸 멈춘다」(화면 전체 멈춤) 없이 손맛은 묵직. 맞은 몹 그림만 ±2 -> ±1 -> 0px 떨림 (판정 위치는 그대로). 주인공이 맞을 때 2틱(hitStop)·보스 연출은 그대로 세상 전체.
+  const HITSTOP_HERO = [3 / 60, 4 / 60, 7 / 60, 7 / 60];
+  function localStop(m, sec) { if (m.dead || m.hp <= 0) return; if (!(m.stopT > 0)) m.stop0 = 0; m.stopT = Math.max(m.stopT || 0, sec); m.stop0 = Math.max(m.stop0, m.stopT); }
+  const stopJit = m => m.stopT > 0 ? (Math.floor(S.t * 60) % 2 ? 1 : -1) * (m.stopT > m.stop0 * 2 / 3 ? 2 : m.stopT > m.stop0 / 3 ? 1 : 0) : 0; // drawn shake only
+  // 세상 전체 멈춤 = 주인공이 맞을 때(2틱)만. gate: a small stop needs 0.3 s since the last stop started; big ones always stop
+  function hitStop(sec, big) { if (!big && S.t - (S.lastStop ?? -9) < .3) return; S.freezeT = Math.max(S.freezeT || 0, sec); S.lastStop = S.t; }
   const KICK = [1, 1.5, 3, 3]; // 친 쪽으로 화면 밀기(px): 1·2·3타 — 무작위 흔들림 대신 방향 있는 한 번 밀고 0.12초에 돌아옴
   const LOOK = { walk: 6, run: 14, k: 3 }; // 달릴 때 카메라가 가는 쪽으로 14px 앞서감 (HLD·Hades 방식, 너무 멀면 멀미)
   // [검흔 어울림 연구 10-23 「맞는 곳 = 보이는 곳」] one arc placement for the drawing and the hit: the arc stops flying at its reach (GK_FLY)
@@ -1284,6 +1292,9 @@
   function gkFanTouch(F, f, head, mm, mh) { const r = mm.r || 6; // same mob body points as gkTouch (feet..head x left/mid/right)
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) if (gkFanIn(F, f.dir, head, mm.x + ex - hero.x, mm.y - mh * j / 4 - hero.y)) return true;
     return false; }
+  function gkFanContact(F, f, head, mm, mh) { const r = mm.r || 6; let sx = 0, sy = 0, n = 0; // 접점 (보고서 3-4): 부채꼴 안에 든 몸 점들의 가운데 = 검흔과 몸이 겹친 곳
+    for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) { const x = mm.x + ex, y = mm.y - mh * j / 4; if (gkFanIn(F, f.dir, head, x - hero.x, y - hero.y)) { sx += x; sy += y; n++; } }
+    return n ? [sx / n, sy / n] : [mm.x, mm.y - mh * .45]; }
   const HITDBG = Q.get('hitdebug') === '1'; // ?hitdebug=1: draw the combo fan (yellow = whole fan, red = live part on active ticks)
   function gkFanDbg(k) { if (!HITDBG || !S.gk) return; for (const f of S.gk) { const F = f.i <= 2 ? GK_FAN[f.i] : null; if (!F) continue; const hd = gkFanHead(F, gkFanT(f)), [hx, hy] = W2S(hero.x, hero.y);
       for (let y = -45; y <= 20; y += .5) for (let x = -40; x <= 40; x += .5) { if (!gkFanIn(F, f.dir, 1, x, y)) continue; ctx.fillStyle = hd >= 0 && gkFanIn(F, f.dir, hd, x, y) ? 'rgba(255,40,40,.45)' : 'rgba(255,220,40,.22)'; ctx.fillRect(Math.round(hx + x * k), Math.round(hy + y * k), Math.ceil(k / 2), Math.ceil(k / 2)); }
@@ -1334,7 +1345,7 @@
         ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
     ctx.restore(); }
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
-  function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  function gkTick(held) { if (S.gk && !held) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
     if (f.i !== undefined && f.i <= 2 && S.gk && S.gk.includes(f)) return; // field combo 1-3 = the body fan (gkFanDraw); dashes / charges keep the flying arc
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
@@ -1356,7 +1367,8 @@
   function swordC() { nsPreload(); const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
   // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
   const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && !ATK_BODY && hero.hp > 0);
-  function swordHidden() { return !ATK_BODY && !!(gkFanSwing() || comboBlade()) && swordC(); } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
+  let _swIn = false; // h8Cell(달리기 ↗↖ + 공격) -> swordHidden -> swordC -> h128Cell -> h8Cell ... 끝없는 되부름(Maximum call stack, 챔피언전 멈춤 원인) 막기: 안쪽 호출은 '안 숨김'으로 보고 그때의 칸(run)을 검사
+  function swordHidden() { if (_swIn || ATK_BODY) return false; _swIn = true; try { return !!(gkFanSwing() || comboBlade()) && swordC(); } finally { _swIn = false; } } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
   function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 부채꼴 앞끝.
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
@@ -1499,7 +1511,7 @@
     const hover = D.hover ? D.hover + Math.sin(S.t * 6 + m.x) * 2 : 0;
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(m.x, m.y, (m.r + 2) * sc, (m.r * .45 + 1) * sc, 0, 0, TAU); g.fill();
     if (D.felt || (D.s47 && M47 && M47[D.s47])) return; // body: drawFeltHi / drawS47 (hi-res pass)
-    const sx = m.shake ? (Math.random() - .5) * 2 : 0;
+    const sx = (m.shake ? (Math.random() - .5) * 2 : 0) + stopJit(m);
     const mode = m.flash > 0 ? 'white' : (m.tint === 'rage' ? 'rage' : null);
     let sy = 1; if (m.squash) sy = 1 - m.squash * .3; if (m.st === 'pC') sy = .86;
     if (D.boss && m.charge) { g.fillStyle = `rgba(255,${80 + 100 * Math.sin(S.t * 20)},60,${.25 + m.charge * .4})`; g.beginPath(); g.ellipse(m.x, m.y - 32, 30 + m.charge * 10, 40 + m.charge * 10, 0, 0, TAU); g.fill(); }
@@ -1528,7 +1540,7 @@
       if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
       if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
-      const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y);
+      const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0) + stopJit(mm), mm.y);
       if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry
       ctx.save(); ctx.translate(Math.round(x + ox), Math.round(y + oy)); if (mm.face < 0 && wd !== 's' && wd !== 'n') ctx.scale(-1, 1); if (rot) ctx.rotate(rot); ctx.scale(bx, by);
       if (mm.flash > 0) ctx.filter = 'brightness(3)'; else if (mm.D.tint) ctx.filter = mm.D.tint; // champions: recoloured felt art
@@ -1596,7 +1608,7 @@
     const fi = useAtk ? f : Math.floor(S.t * 8 + ph) % J.idle.n, dx = f >= 0 && !useAtk ? LUNGE[f] : 0;
     const hop = mm.moving && !D.fly ? Math.abs(Math.sin(S.t * 11 + ph)) * 1.5 : 0, lift = (mm.hz || 0) + (mm.hop || 0) + hop + (D.hover ? D.hover + Math.sin(S.t * 6 + mm.x) * 2 : 0);
     let sy = 1; if (mm.squash) sy = 1 - mm.squash * .3; if (mm.st === 'pC') sy = .86;
-    const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0), mm.y - lift);
+    const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0) + stopJit(mm), mm.y - lift);
     ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (mm.face < 0) ctx.scale(-1, 1); if (mm.lean) ctx.rotate(mm.lean * .9); ctx.scale(1, sy);
     if (mm.flash > 0) ctx.filter = 'brightness(3)'; else if (mm.tint === 'rage') ctx.filter = 'sepia(1) saturate(4) hue-rotate(-30deg)';
     blitFrame(im, fi, C.w, C.h, s, Math.round((-C.w / 2 + dx) * s), Math.round(-C.foot * s)); ctx.restore(); }
