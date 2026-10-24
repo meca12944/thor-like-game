@@ -4,7 +4,8 @@
 import os,json,numpy as np
 from PIL import Image
 from scipy import ndimage
-R=os.path.dirname(os.path.abspath(__file__));SRC=os.path.join(R,'../../docs_art/grok_hero_20261024')
+import sys
+R=os.path.dirname(os.path.abspath(__file__));SRC=sys.argv[1] if len(sys.argv)>1 and __name__=='__main__' else os.path.join(R,'../../docs_art/grok_hero_20261024')   # 새 그림이 오면: python3 cut.py <그림 폴더>
 DIRS=['down','right','up','left']
 def plane(c):  # 가장자리 픽셀로 배경 기울기(평면) 맞추기
     h,w=c.shape[:2];ys,xs=np.mgrid[:h,:w];b=np.zeros((h,w),bool);b[:4]=b[-4:]=True;b[:,:4]=b[:,-4:]=True

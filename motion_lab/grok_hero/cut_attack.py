@@ -3,7 +3,8 @@ import os,numpy as np
 from PIL import Image
 from scipy import ndimage
 from cut import bgimage,cut
-R=os.path.dirname(os.path.abspath(__file__));SRC=os.path.join(R,'../../docs_art/grok_hero_20261024/hero_attack3_4dir.jpg')
+import sys
+R=os.path.dirname(os.path.abspath(__file__));SRC=os.path.join(sys.argv[1] if len(sys.argv)>1 else os.path.join(R,'../../docs_art/grok_hero_20261024'),'hero_attack3_4dir.jpg')
 a=np.array(Image.open(SRC).convert('RGB')).astype(int);H,W=a.shape[:2]
 r,g,b=a[...,0],a[...,1],a[...,2];blue=(b>r+35)&(g>r+15)&(a.mean(2)>90)   # 청백 검기
 blue=ndimage.binary_dilation(blue,iterations=2);blue|=(a.mean(2)>170)&ndimage.binary_dilation(blue,iterations=8)   # 검기 흰 심지까지
