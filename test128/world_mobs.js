@@ -417,6 +417,9 @@
       m.anim = 'walk'; const x0 = m.x, y0 = m.y; if (d > 62) toward(m, W, dt, this.sp * (P2 ? 1.2 : 1), h.x, h.y); look();
       if (W.mobs) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r + 8; if (dd < gap) W.moveCol(m, dx / dd * Math.min(gap - dd, 60 * dt), dy / dd * Math.min(gap - dd, 60 * dt), m.r); } // no stacking
       const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side';
+      m.shedT = (m.shedT ?? 3) - dt; if (m.shedT <= 0) { m.shedT = P2 ? 4.5 : 7; // 사장님 10-24 「몸통에서 새끼 거미가 계속 나와서」: while she walks, the spool-belly drops one spiderling (2번방 numbers)
+        if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const bx = m.x - m.face * 20, by = m.y - 8; W.fx('fluff', bx, by, { life: .5, col: '#3a2a40', n: 7 }); if (W.sfx) W.sfx('deny', .6, .7);
+          const c = W.spawn('c1_spiderling', bx, m.y + 4); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .6; c.spawnT = .25; } } }
       if (m.cd > 0) return;
       const O = [['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 90 ? 3 : d >= 55 ? 1 : 0], ['brood', (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax - 1 ? (P2 ? 2 : 1.1) : 0]].concat(P2 ? [['cage', 1.4], ['rain', d >= 60 ? 1.6 : .7]] : []);
       for (const o of O) if (o[0] === m.last) o[1] = 0; // never the same move twice in a row
