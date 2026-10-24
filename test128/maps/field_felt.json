@@ -138,16 +138,16 @@
   },
   {
    "type": "chest",
-   "id": "ff_chest_hill",
-   "x": 6,
-   "y": 8,
+   "id": "ff_chest_stream",
+   "x": 51,
+   "y": 32,
    "loot": [
     [
      "potion",
-     1
+     2
     ],
     [
-     "m_hardwood",
+     "bomb",
      1
     ]
    ]

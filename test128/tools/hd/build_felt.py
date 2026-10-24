@@ -89,6 +89,9 @@ for pid, p in PJ.items():
 ss = PJ['shop_sign']; place('well', ss['grok_foot'][0] - 92 / D / S, ss['grok_foot'][1] + 4, '_shop')   # covers the villager baked into the store art
 for i, (pid, gx, gy) in enumerate(EXTRA): place(pid, gx, gy, f'_{i}')
 P = {q['id']: q for q in props}
+# hand fixes from play testing (afe948a9 「좌판 지붕 막기 · 분수 비치기」), kept here so a rebuild never undoes them
+for pid, sol in (('stall_n', [15, 9, 19, 13]), ('red_stall', [40, 24, 47, 29])): P[pid]['solid'] = sol   # stall roofs block (whole stall)
+P['fountain']['fade'] = 1                                                                            # the hero shows through the statue fountain
 for f in os.listdir(OUT):                                           # the folder holds exactly the pictures this map uses
     if f != 'ground.png': os.remove(os.path.join(OUT, f))
 for pid, im in IM.items():
