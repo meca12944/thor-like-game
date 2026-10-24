@@ -1076,6 +1076,42 @@
       if (tr.phase === 'card' && tr.cardData) drawCard(tr, k); else { ctx.fillStyle = `rgba(0,0,0,${a})`; ctx.fillRect(0, 0, CW, CH); }
     }
   }
+  // 펠트 실내 불꽃 (maps/felt_int_lights.json). 그림 픽셀 → 방 크기에 맞춰 환산. 사람·상자보다 먼저 그려 가리지 않는다.
+  // 빛무리는 크기별로 한 번만 만들어 두고 갖다 붙인다. 불마다 박자가 달라 같이 깜빡이지 않는다.
+  let FELT_FLAMES = null;
+  getJSON('maps/felt_int_lights.json').then(j => { FELT_FLAMES = j; }).catch(() => {});
+  const FLAME_GLOW = {};
+  function flameGlow(R) {
+    let c = FLAME_GLOW[R]; if (c) return c;
+    c = FLAME_GLOW[R] = document.createElement('canvas'); c.width = c.height = R * 2;
+    const g = c.getContext('2d'), gr = g.createRadialGradient(R, R * .85, 0, R, R * .85, R);
+    gr.addColorStop(0, 'rgba(255,186,70,.7)'); gr.addColorStop(.4, 'rgba(255,120,28,.28)'); gr.addColorStop(1, 'rgba(255,70,10,0)');
+    g.fillStyle = gr; g.beginPath(); g.ellipse(R, R * .85, R, R * .72, 0, 0, TAU); g.fill();
+    return c;
+  }
+  function drawFeltFlames(g, m) {
+    if (!FELT_FLAMES || !m.bg) return;
+    const room = FELT_FLAMES[m.bg.split('/').pop().replace(/\.png$/, '')]; if (!room || !room.flames) return;
+    const sx = m.pw / room.size[0], sy = m.ph / room.size[1], cam = S.camI || [0, 0];
+    const KIND = { candle: [5, .20, 1], sconce: [8, .26, 2], lantern: [8, .26, 2], hearth: [12, .24, 2] }; // 반지름(칸 픽셀), 빛 세기, 불꽃 굵기. 촛불은 더 작고 약하다
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const f of room.flames) {
+      const x = f.x * sx, y = f.y * sy;
+      if (x < cam[0] - 20 || y < cam[1] - 20 || x > cam[0] + EW + 20 || y > cam[1] + EH + 20) continue;
+      let h = 0; const id = f.id || ''; for (let i = 0; i < id.length; i++) h = (h * 33 + id.charCodeAt(i)) >>> 0;
+      const ph = (h % 628) / 100, sp = 4.2 + (h % 6) * .48;
+      const pulse = 1 + .12 * Math.sin(S.t * sp + ph); // 밝기 ±12%. 은은하게
+      const spec = KIND[f.type] || KIND.candle, R = spec[0], a = spec[1], core = spec[2];
+      g.globalAlpha = a * pulse; g.drawImage(flameGlow(R), Math.round(x - R), Math.round(y - R * .7));
+      const fr = Math.floor(S.t * (7 + (h % 3)) + ph) % 3, sway = fr === 1 ? 1 : fr === 2 ? -1 : 0;
+      const X = Math.round(x + sway), Y = Math.round(y);
+      g.globalAlpha = .62;
+      g.fillStyle = '#ff8a20'; g.fillRect(X, Y, core, core);
+      g.fillStyle = fr === 1 ? '#fff4c8' : '#ffd060'; g.fillRect(X, Y - core - (fr === 0 ? 1 : 0), core, core);
+      if (core > 1 && fr !== 2) { g.fillStyle = '#ffe090'; g.fillRect(X + (fr === 1 ? 1 : 0), Y - 1, 1, 1); }
+    }
+    g.restore();
+  }
   function drawLow() {
     const g = lx, m = M();
     // smooth pixel camera: the low canvas is drawn at the whole-pixel camera, the leftover fraction shifts the upscaled image on screen.
@@ -1092,6 +1128,7 @@
     if (NAV()) NAV().drawGround(g, cx, cy);                  // guide route breadcrumbs
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
+    drawFeltFlames(g, m);                                    // interior flames, under people and chests
     const list = [];                                         // y-sorted sprites
     for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
