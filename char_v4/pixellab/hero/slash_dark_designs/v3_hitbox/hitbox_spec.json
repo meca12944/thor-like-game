@@ -1,0 +1,287 @@
+{
+ "_doc": "Hitbox spec for the v3 slash trail designs. All lengths in field (logical) px of the 384x216 screen; x3 display = 1 px -> 3 screen px. Origin = hero feet (hero.x, hero.y); +x = facing direction (east; mirror x for west), +y = screen down. Active ticks are 60fps game ticks from attack start. The trail body is clipped to the hitbox: filled fan/band = hit area; bright rim = outer reach. Live hit area at tick t (active) = part of the shape with sweep fraction <= head(t), head(t) = 1-(1-clamp((t-a0+1)/sweep_ticks))^2.",
+ "source": "main clone /tmp/tlg_main (github main @9bd16684, 2026-10-24 16:46:59 KST)",
+ "game_numbers_found": {
+  "screen": {
+   "logical": [
+    384,
+    216
+   ],
+   "scale": "integer k = floor(min(CW/384, CH/216)) (world.js L1006); x3 = 1152x648",
+   "src": "test128/world.js L17, L1006"
+  },
+  "hero_display": {
+   "H128FIG_field_px": 30,
+   "atlas_fig_px": 117,
+   "draw_scale": "k*30/117 (k=3 -> 0.769)",
+   "atlas_figH": 124,
+   "displayed_fig_px": 31.8,
+   "src": "test128/world.js L1128, L1187; assets/anim/hero8.json figH"
+  },
+  "hero_hurt": {
+   "melee_touch": "hypot(hero-mob) < r + 5 (feet, no y-squash)",
+   "shots": "hypot(hero.x-s.x, hero.y-8-s.y) < s.r + 5",
+   "hazards": "probe point (hero.x, hero.y-4) (inHaz)",
+   "collision": "moveCol radius 5",
+   "note": "no rectangle hurtbox exists in code; the hero is a 5 px circle at the feet (+ the y-8 circle for shots)",
+   "src": "test128/world.js L526, L871, L863, L499, L726/L804"
+  },
+  "attack_reach_field_px": {
+   "GK_REACH": [
+    32,
+    30,
+    37
+   ],
+   "GK_ARC_deg_code": [
+    130,
+    143,
+    156
+   ],
+   "GK_span_deg_art": [
+    140,
+    140,
+    170
+   ],
+   "GK_atlas_px": "R 52/54/72, T 18/18/26, sq .5/.75/1, rot 0/35/0, fwd 22, y 78/90/74; GK_K = 30/117",
+   "hit_rule_now": "gkTouch: mob body points (feet..head x left/mid/right) inside the flying arc band |dd| < T/2 + 6 atlas px",
+   "src": "test128/world.js L1193, L1206, L1214, L1216-1217, L1231, L1235-1237"
+  },
+  "attack_timing": {
+   "ATK": ".26 s, active .05-.16 s (ticks 3-10)",
+   "ATK3": ".38 s, active .07-.24 s (ticks 4-14)",
+   "src": "test128/world.js L45-46"
+  },
+  "town_demo_build_differs": {
+   "SWING": "range 29 px, arc 150, hit3 arc 100 x1.15 (33.4 px)",
+   "ATK": "same timings",
+   "src": "/workspace/town-demo/world.js L21, L39-40 (older field build, no GK)"
+  },
+  "town_hit_table": {
+   "H8HB": "r right 190/148/174 town px, arcs 150/170/160 (town index.html L1790; x0.3 LSC -> ~57/44/52 logical)"
+  },
+  "research": {
+   "recommendation": "body-centred sweep, radius = reach x 0.7 (hit rate 29% -> 69%), filled fan = hit area",
+   "src": "share/2026-10-24_slash_shape/README.md"
+  }
+ },
+ "used": {
+  "radius": "R = GK_REACH x 0.7 = 22.4 / 21.0 / 25.9 px (hit1/2/3). Code has no sweep radius (it flies a small arc out to the reach), so the research recommendation was applied.",
+  "origin": "body centre = feet + (0, -13): GK side origin (-78+27 atlas px) x 30/117 = -13.1",
+  "squash": "ground-plane y squash 0.8 (world.js L809 hit test ddy/.8)",
+  "arcs": "140 / 140 / 170 deg (research & GK art span); code GK_ARC 130/143/156 is stored but not used by gkTouch",
+  "hero": "in-game hero8 atlas (PixelLab v3 char fb140a07), hit1/2/3_right frames, drawn at 30/117 (x3 -> 0.769, smoothed, alpha cut 110); baked white crescents of hit3 frames stripped; hit1/hit2 frames 7_182, 7_183 (baked grey/white smear) replaced by pose 7_181. dark_v3prop (east 124 px fig) is the same character but not the in-game frame set."
+ },
+ "hits": {
+  "H1": {
+   "label": "1타 가로베기 (가로)",
+   "direction": "horizontal",
+   "hit": 1,
+   "strokes": [
+    {
+     "shape": "elliptic_fan",
+     "origin_from_feet": [
+      0.0,
+      -13.0
+     ],
+     "radius_R": 22.4,
+     "rx": 22.4,
+     "ry": 17.92,
+     "squash_y": 0.8,
+     "rot_deg": 0.0,
+     "angle_from_deg": -70.0,
+     "angle_to_deg": 70.0,
+     "arc_deg": 140.0,
+     "filled_from_r": 0,
+     "rim_at_r": 22.4,
+     "rule": "p in hitbox <=> r(p) <= R and angle(p) in sweep; r,angle measured after un-rotating by rot and dividing y by squash",
+     "active_ticks": [
+      3,
+      10
+     ],
+     "sweep_ticks": 4.2,
+     "visual_fade_ticks": [
+      11,
+      20
+     ],
+     "preview_frames": "1 GIF frame = 2 ticks; frame index = tick // 2",
+     "native_bbox_from_feet": [
+      0.0,
+      -30.0,
+      22.0,
+      4.0
+     ],
+     "area_px": 486
+    }
+   ]
+  },
+  "H2": {
+   "label": "2타 되베기 (가로·역)",
+   "direction": "horizontal (reverse)",
+   "hit": 2,
+   "strokes": [
+    {
+     "shape": "elliptic_fan",
+     "origin_from_feet": [
+      0.0,
+      -13.0
+     ],
+     "radius_R": 21.0,
+     "rx": 21.0,
+     "ry": 16.8,
+     "squash_y": 0.8,
+     "rot_deg": -15.0,
+     "angle_from_deg": 70.0,
+     "angle_to_deg": -70.0,
+     "arc_deg": 140.0,
+     "filled_from_r": 0,
+     "rim_at_r": 21.0,
+     "rule": "p in hitbox <=> r(p) <= R and angle(p) in sweep; r,angle measured after un-rotating by rot and dividing y by squash",
+     "active_ticks": [
+      3,
+      10
+     ],
+     "sweep_ticks": 4.2,
+     "visual_fade_ticks": [
+      11,
+      20
+     ],
+     "preview_frames": "1 GIF frame = 2 ticks; frame index = tick // 2",
+     "native_bbox_from_feet": [
+      0.0,
+      -30.0,
+      21.0,
+      0.0
+     ],
+     "area_px": 434
+    }
+   ]
+  },
+  "V": {
+   "label": "3타 내려베기 (세로)",
+   "direction": "vertical",
+   "hit": 3,
+   "strokes": [
+    {
+     "shape": "elliptic_fan",
+     "origin_from_feet": [
+      2.0,
+      -16.0
+     ],
+     "radius_R": 25.9,
+     "rx": 25.9,
+     "ry": 20.72,
+     "squash_y": 0.8,
+     "rot_deg": 0.0,
+     "angle_from_deg": -100.0,
+     "angle_to_deg": 70.0,
+     "arc_deg": 170.0,
+     "filled_from_r": 0,
+     "rim_at_r": 25.9,
+     "rule": "p in hitbox <=> r(p) <= R and angle(p) in sweep; r,angle measured after un-rotating by rot and dividing y by squash",
+     "active_ticks": [
+      4,
+      14
+     ],
+     "sweep_ticks": 6.0,
+     "visual_fade_ticks": [
+      15,
+      24
+     ],
+     "preview_frames": "1 GIF frame = 2 ticks; frame index = tick // 2",
+     "native_bbox_from_feet": [
+      -2.0,
+      -37.0,
+      28.0,
+      3.0
+     ],
+     "area_px": 804
+    }
+   ]
+  },
+  "X": {
+   "label": "X 교차베기 (제안)",
+   "direction": "X (two diagonals)",
+   "hit": "X",
+   "strokes": [
+    {
+     "shape": "band",
+     "p_start_from_feet": [
+      20.96,
+      -25.79
+     ],
+     "p_end_from_feet": [
+      3.04,
+      -0.21
+     ],
+     "length": 31.23,
+     "width": 6.0,
+     "dir_deg": 125.0,
+     "rule": "p in hitbox <=> 0 <= along <= length and |across| <= width/2 (along measured from p_start)",
+     "active_ticks": [
+      3,
+      10
+     ],
+     "sweep_ticks": 4.2,
+     "visual_fade_ticks": [
+      11,
+      20
+     ],
+     "preview_frames": "1 GIF frame = 2 ticks; frame index = tick // 2",
+     "native_bbox_from_feet": [
+      1.0,
+      -28.0,
+      23.0,
+      2.0
+     ],
+     "area_px": 190
+    },
+    {
+     "shape": "band",
+     "p_start_from_feet": [
+      3.04,
+      -25.79
+     ],
+     "p_end_from_feet": [
+      20.96,
+      -0.21
+     ],
+     "length": 31.23,
+     "width": 6.0,
+     "dir_deg": 55.0,
+     "rule": "p in hitbox <=> 0 <= along <= length and |across| <= width/2 (along measured from p_start)",
+     "active_ticks": [
+      10,
+      17
+     ],
+     "sweep_ticks": 4.2,
+     "visual_fade_ticks": [
+      18,
+      27
+     ],
+     "preview_frames": "1 GIF frame = 2 ticks; frame index = tick // 2",
+     "native_bbox_from_feet": [
+      1.0,
+      -28.0,
+      23.0,
+      2.0
+     ],
+     "area_px": 190
+    }
+   ],
+   "union": {
+    "reach_from_body_centre": 25.27,
+    "reach_limit": 25.9,
+    "band_width": 6.0,
+    "band_length": 31.23,
+    "cross_point_from_feet": [
+     12.0,
+     -13.0
+    ],
+    "tilt_from_vertical_deg": 35,
+    "forward_reach_from_feet": 23.0,
+    "area_px": 340,
+    "note": "X is a design proposal (no X attack in code); uses the hit3 reach 37 -> R 25.9"
+   }
+  }
+ }
+}
