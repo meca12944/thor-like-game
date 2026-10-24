@@ -1243,17 +1243,23 @@
   // and sits where it crosses a mob's body (side +27, up +60, down -75 atlas px); a mob is hit when a point of its body (feet..head x left/mid/right)
   // is inside the drawn band. Measured with 1132 dummy mobs x 3 directions: hit-but-not-touched 25% -> 3%, touched-but-missed 35% -> 20%, reach same.
   const GK_DY = { side: 27, up: 60, down: -75 }, GK_HITA = 11, gkQ = v => Math.round(v * 4) / 4;
-  function gkPose(f) { const a = f.t * GK_STEP, Y = GK[f.n], [dx, dy] = f.dir, fl = dx < 0, tr = Math.min(a, GK_FLY), ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI;
-    return { a, Y, fl, head: Math.min(1, (a + 1) / 2.5), tail: a < 4 ? 0 : Math.min(1, (a - 4) / 7), ox: f.rx + dx * tr * f.v, oy: f.ry + dy * tr * f.v + (Math.abs(dx) < .1 ? (dy < 0 ? GK_DY.up : GK_DY.down) : GK_DY.side),
+  // [검흔 손맛 연구 10-24, 사장님 「공격 모션 없이 검흔만으로 사실적으로」] ?gk=sweep: the arc does not fly out like a beam — it is already at its reach and
+  // leaves the blade and snaps out to its reach in 3 frames (ease-out, hit lands 2-3 frames after the press, was 6) while it sweeps open along the blade's path, the whole swept sector cuts, a white blade streak leads the sweep
+  const GK_SWEEP = Q.get('gk') === 'sweep';
+  function gkPose(f) { const a = f.t * GK_STEP, Y = GK[f.n], [dx, dy] = f.dir, fl = dx < 0, tr = GK_SWEEP ? GK_FLY * (1 - Math.pow(1 - Math.min(1, a / 2.6), 2)) : Math.min(a, GK_FLY), ang = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI;
+    return { a, Y, fl, head: GK_SWEEP ? Math.min(1, (a + .3) / 2) : Math.min(1, (a + 1) / 2.5), tail: GK_SWEEP ? (a < 3 ? 0 : Math.min(1, (a - 3) / 7)) : a < 4 ? 0 : Math.min(1, (a - 4) / 7), ox: f.rx + dx * tr * f.v, oy: f.ry + dy * tr * f.v + (Math.abs(dx) < .1 ? (dy < 0 ? GK_DY.up : GK_DY.down) : GK_DY.side),
       R: Y.R * (1 + .025 * gkQ(a)), T: Y.T * (a < 6 ? 1 : Math.max(.35, 1 - (a - 6) / 7)), rot: Y.rot + ang * (fl ? -1 : 1) }; }
   function gkTouch(f, mm, mh) { const P = gkPose(f); if (!(P.tail < P.head)) return false; const an = P.rot * Math.PI / 180, ca = Math.cos(an), sa = Math.sin(an), r = mm.r || 6;
     for (let j = 0; j <= 4; j++) for (const ex of [-r, 0, r]) { const e = sField(P.R, P.Y.span, P.T, gkQ(P.head), gkQ(P.tail), ca, sa, P.Y.rev, P.Y.sq, P.fl, (mm.x + ex - hero.x) / GK_K - P.ox, (mm.y - mh * j / 4 - hero.y) / GK_K - P.oy);
-      if (e && Math.abs(e[2]) < e[1] / 2 + 6) return true; }
+      if (e && (GK_SWEEP ? e[2] < e[1] / 2 + 6 : Math.abs(e[2]) < e[1] / 2 + 6)) return true; } // sweep: everything inside the swept sector is cut
     return false; }
   function gkTick() { if (S.gk) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => f.t * GK_STEP <= GK_LIFE + 3 && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 14); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
       if (P.tail < P.head) { const im = sArc(P.R, Y.span, P.T, gkQ(P.head), gkQ(P.tail), P.rot, Y.rev, Y.sq, fl); ctx.drawImage(im, Math.round(ox - im.width / 2), Math.round(oy - im.height / 2)); }
+      if (GK_SWEEP && a < 3.2) { const u = Y.rev ? 1 - P.head : P.head, th = (u * Y.span - Y.span / 2) * Math.PI / 180, an = P.rot * Math.PI / 180, al = 1 - a / 3.2; // blade streak at the sweep's leading edge (the sword itself)
+        const pt = r => { const xr = r * Math.cos(th), yr = r * Math.sin(th) * Y.sq; let x = xr * Math.cos(an) - yr * Math.sin(an); const y = xr * Math.sin(an) + yr * Math.cos(an); if (fl) x = -x; return [ox + x, oy + y]; };
+        const [x0, y0] = pt(P.R * .45), [x1, y1] = pt(P.R + P.T * .6); ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = `rgba(16,28,72,${.6 * al})`; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.strokeStyle = `rgba(255,255,255,${al})`; ctx.lineWidth = 3.5; ctx.stroke(); ctx.restore(); }
       const nx = -dy, ny = dx, big = f.n === 2; let sd = f.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
       const la = Math.max(0, 1 - a / 8); if (la > 0) { ctx.fillStyle = `rgba(200,240,255,${.86 * la})`; for (let i = 0; i < (big ? 7 : 4); i++) { const o = rnd() * 60 - 30, L = 14 + rnd() * 20, b = Y.R * .4 - rnd() * 30 + a * 5; for (let j = 0; j < L; j++) ctx.fillRect(Math.round(ox + dx * (b + j) + nx * o), Math.round(oy + dy * (b + j) + ny * o), 1, 1); } } // speed lines
       const tx = ox + dx * Y.R * .95, ty = oy + dy * Y.R * .95;
