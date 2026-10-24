@@ -906,7 +906,7 @@
         if (!it || it.who !== who) { it = { who, lines: [] }; out.push(it); } it.lines.push(t); if (who && who.narr) { it = null; } } }
     return out; }
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
-    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
+    S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, cgLast: !!h.cgLast, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
   function talkAs(o, text, last) { playSeq(toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }), last); }
   function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
@@ -914,7 +914,7 @@
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
   addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); const sq = withArt(toSeq(t), key); if (!S.dialog) playSeq(sq); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(sq); }; } }); }
-  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) seq.forEach((it, i) => { for (const [src, from] of A) if (i >= from) it.cg = src; }); return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
+  function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) { seq.forEach((it, i) => { for (const [src, from] of A) if (i >= from) it.cg = src; }); seq.forEach((it, i) => { if (it.cg && (!seq[i + 1] || seq[i + 1].cg !== it.cg)) it.cgLast = true; }); } return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
@@ -1555,11 +1555,38 @@
     const A = d.anim && npcAnim(d.anim); if (!A) return false; const seq = A.J.anims.idle_south || A.J.anims.idle_down; if (!seq) return false; const t = Math.floor(d.t * 60) % seq.reduce((a, q) => a + q[2], 0); let q = seq[0], acc = 0; for (const e of seq) { acc += e[2]; if (t < acc) { q = e; break; } }
     const c = A.J.cells[q[0]][q[1]], [cx, cy, cw, ch] = c, top = cy + Math.max(0, c[5] - 124), bh = 64, bw = 64, bx = cx + c[4] - 32; // head + shoulders: top 64 px of a ~124 px figure, centred on the feet anchor
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, sz, sz); ctx.clip(); ctx.imageSmoothingEnabled = false; const sc = sz / bw, s0 = Math.max(cx, bx), s1 = Math.min(cx + cw, bx + bw), t1 = Math.min(cy + ch, top + bh); if (s1 > s0 && t1 > top) ctx.drawImage(A.ims[q[0]], s0, top, s1 - s0, t1 - top, Math.round(x + (s0 - bx) * sc), Math.round(y + 2 * sc), Math.round((s1 - s0) * sc), Math.round((t1 - top) * sc)); /* only this cell's pixels (atlas neighbours stay out) */ ctx.restore(); return true; }
+
+  // ---- 이야기 그림 위 효과 (CG 회의 10-24, 이펙트 담당; 코드로): 정지 그림을 살짝 살림. 그림당 1종, 1~2px, 얼굴 위 금지, 처음 0.4초 정지.
+  // 좌표 = 그림 픽셀(384x216). ember = 재·불씨 떠오름, dust = 빛줄기 먼지, thread = 붉은 실 흔들림 + 쿵-쿵 맥박, snap = 그 그림 마지막 말에서 실이 팽팽해지며 번쩍.
+  const SCENE_FX = {
+    cg_felt_arrival: { kind: 'ember', box: [130, 95, 384, 216], n: 22 },
+    cg_memory_fire: { kind: 'ember', box: [0, 70, 384, 216], n: 26, snap: { from: [151, 102], to: [[40, 165], [70, 122], [236, 92], [262, 176], [204, 212]] } },
+    cg_arachne_end: { kind: 'thread', lines: [[150, 138, 122, 192], [186, 150, 232, 200], [84, 118, 40, 92], [112, 98, 96, 42], [60, 150, 34, 196]] },
+    cg_linette_meet: { kind: 'dust', box: [30, 14, 196, 206], n: 24 },
+    cg_arachne_past: { kind: 'dust', c: [161, 104], r: 48, n: 16, warm: true },
+    cg_felix_scarf: { kind: 'dust', box: [90, 40, 300, 196], n: 12 } };
+  function sceneThread(g, x0, y0, x1, y1, amp, ph, al, w) { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(L / 3)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1); // a hair-thin red thread for the art (no dark rim: the art is already dark)
+    g.beginPath(); for (let i = 0; i <= n; i++) { const u = i / n, o = Math.sin(u * Math.PI) * Math.sin(u * 7 + ph) * amp; const x = x0 + (x1 - x0) * u + nx * o, y = y0 + (y1 - y0) * u + ny * o; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.strokeStyle = thrCol(true, 1, al * .45); g.lineWidth = w * 2.2; g.stroke(); g.strokeStyle = thrCol(true, 0, al); g.lineWidth = w; g.stroke(); }
+  function drawSceneFx(g, d, e, ix, iy, s) { const name = (d.cg || '').replace(/^.*\//, '').replace(/\.\w+$/, ''), F = SCENE_FX[name]; if (!F || e < .4) return;
+    const k = Math.min(1, (e - .4) / .8), t = e - .4, h = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }; // fade in after the still beat; h = fixed per-mote random
+    g.save(); g.translate(ix, iy); g.scale(s, s); g.imageSmoothingEnabled = false;
+    if (F.kind === 'ember') { const [x0, y0, x1, y1] = F.box, H = y1 - y0; for (let i = 0; i < F.n; i++) { const v = 5 + h(i) * 7, y = y1 - ((t * v + h(i + 9) * H) % H), x = x0 + h(i + 3) * (x1 - x0) + Math.sin(t * .7 + i) * 2, life = (y1 - y) / H, fl = .55 + .45 * Math.sin(t * 5 + i * 2.3);
+        g.fillStyle = `rgba(255,${120 + (h(i + 5) * 70 | 0)},${50 + (h(i + 7) * 30 | 0)},${k * fl * Math.min(1, life * 4) * (1 - life * .7)})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
+    if (F.kind === 'dust') { for (let i = 0; i < F.n; i++) { let x, y; if (F.c) { const a = h(i) * TAU + t * .08 * (h(i + 2) - .5), r = F.r * Math.sqrt(h(i + 4)); x = F.c[0] + Math.cos(a) * r; y = F.c[1] + Math.sin(a) * r * .8 - ((t * 1.5 + h(i + 6) * 10) % 10); }
+        else { const [x0, y0, x1, y1] = F.box; x = x0 + ((h(i) * (x1 - x0) + t * (1.2 + h(i + 1) * 1.5)) % (x1 - x0)); y = y0 + ((h(i + 2) * (y1 - y0) + t * (2 + h(i + 3) * 2)) % (y1 - y0)); x += Math.sin(t * .5 + i) * 1.5; }
+        const tw = .35 + .35 * Math.sin(t * 1.3 + i * 1.7); g.fillStyle = F.warm ? `rgba(255,214,150,${k * tw})` : `rgba(220,214,200,${k * tw * .8})`; g.fillRect(Math.round(x), Math.round(y), 1, 1); } }
+    if (F.kind === 'thread') { const c = e % 1.1, b = (u, w) => Math.exp(-(u * u) / (w * w)), hb = Math.min(1, b(c, .07) + .7 * b(c - .24, .07)); g.lineCap = 'round'; // same lub-dub as the phase-2 threads
+      F.lines.forEach((L, i) => sceneThread(g, L[0], L[1], L[2], L[3], 1.5, t * 1.2 + i, k * (.35 + .5 * hb), .6)); }
+    if (F.snap && d.cgLast && d.t > .3) { const u = Math.min(1, (d.t - .3) / .25), [fx, fy] = F.snap.from; g.lineCap = 'round'; // the memory's last line: the threads in her chest pull taut and flash
+      for (const [tx, ty] of F.snap.to) sceneThread(g, fx, fy, tx, ty, 4 * (1 - u), t * 30, .45 + .45 * u, .6);
+      const fl = d.t - .55; if (fl > 0 && fl < .35) { const a2 = 1 - fl / .35; g.fillStyle = `rgba(255,236,236,${a2})`; g.beginPath(); g.arc(fx, fy, 3 + fl * 20, 0, TAU); g.fill(); g.fillStyle = `rgba(255,40,60,${a2 * .18})`; g.fillRect(0, 0, 384, 216); } }
+    g.restore(); }
   function drawDialog(ox, oy, SW, SH, u) { const d0 = S.dialog, ts = (window.__game && window.__game.textScale) || 1, dpr = ctx.canvas.width / Math.max(1, innerWidth), fs = Math.round(Math.max(13 * u, 15 * dpr) * ts), lh = Math.round(fs * 1.6), psz = Math.round(Math.min(Math.max(92 * u, lh * 3 + 30 * u) - 16 * u, Math.max(76 * u, lh * 2.6))), nf = Math.round(Math.max(12 * u, fs * .8)); // 글자: 폰에서도 15px 이상 + 설정 → 화면 → 글자 크기 (UI_GUIDE 8)
     { const wF = font(fs), wW = Math.round(Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)) - 18 * u - (d0.anim || d0.por ? psz + 14 * u : 0) - 24 * u); if (d0.wrapW !== wW || d0.wrapF !== wF) { const keep = d0.pages ? d0.pi : 0; d0.wrapW = wW; d0.wrapF = wF; d0.pages = null; dlgPages(d0); d0.pi = Math.min(keep, d0.pages.length - 1); d0.ch = keep ? 0 : d0.ch; } }
     const d = S.dialog, P = dlgPages(d), pg = P[d.pi], shown = pg.slice(0, Math.floor(d.ch)), done = d.ch >= pg.length;
     if (d.cg) { const now = performance.now(); if (!S.cgL || S.cgL.src !== d.cg) S.cgL = { src: d.cg, since: now }; const im = splashImg('assets/' + d.cg), e = (now - S.cgL.since) / 1000, a = Math.min(1, e / .4); // story art behind the box: darken, 0.4 s fade, very slow 1.00 -> 1.03 push-in
-      ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25)})`; ctx.fillRect(ox, oy, SW, SH); if (im) { const sc = 1 + .03 * Math.min(1, e / 9), iw = SW * sc, ih = SH * sc; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, ox + (SW - iw) / 2, oy + (SH - ih) / 2, iw, ih); } ctx.restore(); } else S.cgL = null;
+      ctx.save(); ctx.fillStyle = `rgba(0,0,0,${.88 * Math.min(1, e / .25)})`; ctx.fillRect(ox, oy, SW, SH); if (im) { const sc = 1 + .03 * Math.min(1, e / 9), iw = SW * sc, ih = SH * sc; ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(im, ox + (SW - iw) / 2, oy + (SH - ih) / 2, iw, ih); ctx.globalAlpha = a; drawSceneFx(ctx, d, e, ox + (SW - iw) / 2, oy + (SH - ih) / 2, iw / (im.naturalWidth || im.width || 384)); } ctx.restore(); } else S.cgL = null;
     const g0 = ctx.createLinearGradient(0, oy + SH * .45, 0, oy + SH); g0.addColorStop(0, 'rgba(6,4,10,0)'); g0.addColorStop(1, 'rgba(6,4,10,.55)'); ctx.fillStyle = g0; ctx.fillRect(ox, oy + SH * .45, SW, SH * .55); // dusk under the box
     const w = Math.min(SW - 40 * u, Math.max(560 * u, fs * 34)), x = Math.round(ox + (SW - w) / 2), h = Math.max(92 * u, lh * 3 + 30 * u), y = Math.round(oy + SH - h - 16 * u), sz = psz, hasB = d.anim && npcAnim(d.anim), pi = !hasB && d.por && porImg(d.por), hasP = pi && pi.complete && pi.naturalWidth, port = hasB || hasP;
     ctx.fillStyle = 'rgba(10,8,14,.92)'; ctx.fillRect(x, y, w, h); ctx.strokeStyle = '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(x + u, y + u, w - 2 * u, h - 2 * u); ctx.strokeStyle = 'rgba(150,120,90,.25)'; ctx.lineWidth = u; ctx.strokeRect(x + 5 * u, y + 5 * u, w - 10 * u, h - 10 * u);
