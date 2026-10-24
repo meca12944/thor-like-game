@@ -53,11 +53,11 @@ paths = [
     dict(kind='corridor', w=2, pts=[[610, 470], [680, 420], [740, 500], [690, 570]]),
 ]
 links = [
-    dict(**{'from': 'ch1', 'to': 'road_w', 'kind': 'gate', 'at': [1, 160], 'label': '← 1장 잿빛 들판 정문 (베르디)'}),
+    dict(**{'from': 'ch1', 'to': 'road_w', 'kind': 'gate', 'at': [1, 160], 'label': '← 1장 동쪽 끝 (1장 좌표 629,76) · 정문 베르디'}),
     dict(**{'from': 'road_w', 'to': 'road_m', 'kind': 'gate', 'at': [250, 160], 'label': '무너진 초소'}),
     dict(**{'from': 'road_m', 'to': 'gate', 'kind': 'gate', 'at': [500, 160], 'label': '보스 문'}),
     dict(**{'from': 'road_m', 'to': 'forge', 'kind': 'door', 'at': [330, 268], 'label': '공방 길'}),
-    dict(**{'from': 'forge', 'to': 'ch1', 'kind': 'shortcut', 'at': [385, 300], 'label': '1↔2장 리프트 (카일라)'}),
+    dict(**{'from': 'forge', 'to': 'ch1', 'kind': 'shortcut', 'at': [385, 300], 'label': '1↔2장 리프트 (카일라) = 1장 (600,280)'}),
     dict(**{'from': 'road_m', 'to': 'armory', 'kind': 'secret', 'at': [490, 62], 'label': '무기고 문 (바르바라)'}),
     dict(**{'from': 'armory', 'to': 'gate', 'kind': 'shortcut', 'at': [600, 79], 'label': '성문 우회로'}),
     dict(**{'from': 'gate', 'to': 'ch3', 'kind': 'gate', 'at': [639, 160], 'label': '왕도 성문 → 3장 (성문 기어 손잡이)'}),
