@@ -1,10 +1,14 @@
 /* [title] Title screen "C" (docs_art/title_screen, 고성으로 향하는 외길) — self-contained, never touches game logic.
- *   Owner 10-24 「메인 타이틀 서있는 장면도 움직여야지 너무 멈춰있다」 (replaces the earlier frozen idle):
- *     idle   : the bg loop (title_c_bg.mp4, muted, seamless 9.04 s) plays on repeat under the logo + live menu
- *              새 게임 / 이어하기 / 설정. The still (= frame 0) shows only until the video is really playing, and stays
- *              as the fallback when the video fails or autoplay is blocked (then playback is retried on the first input).
- *     start  : 새 게임 or 이어하기 -> logo + menu fade out while the video keeps playing (not restarted),
- *              after TITLE_INTRO_SEC the screen fades to black and the game appears.
+ *   Owner 10-24 「대기 화면에선 주인공은 서 있고 배경만 움직이게, 걷는 건 시작을 누른 뒤에만」:
+ *     idle   : the idle loop (title_c_idle.mp4, muted, seamless 9.0 s, fixed camera: the hero stands still, only clouds /
+ *              smoke / grass / ash / embers / crows move) plays on repeat under the logo + live menu 새 게임 / 이어하기 / 설정.
+ *              The still (= frame 0) shows only until the video is really playing, and stays as the fallback when the
+ *              video fails or autoplay is blocked (then playback is retried on the first input).
+ *              The walk video (title_c_bg.mp4) is preloaded meanwhile (hidden, paused at frame 0) so Start is instant.
+ *     start  : 새 게임 or 이어하기 -> the walk video starts from frame 0; once it is really playing it crossfades over the
+ *              idle loop in WALK_XFADE_SEC (the hero is identical in both, but the clouds may be off by up to ~22 px mid-loop,
+ *              hence the crossfade instead of a cut). Logo + menu fade out; after TITLE_INTRO_SEC the screen fades to black
+ *              and the game appears. If the walk video fails, the idle loop (or the still) simply stays.
  *   Layers: bg (still/video) covers the whole screen (object-fit: cover, like the game canvas which fills the window);
  *   the logo is drawn in a 1920x1080 stage scaled to fit (contain) so it is never cropped; the menu is live DOM text
  *   placed at the README coordinates (row, centre x 1360, y 962 @1920x1080, 나눔명조, #F0E4C8 / #C8BA9E, red diamond #B04034).
@@ -24,9 +28,10 @@
   const OVERLAY_FADE_SEC = 0.7;   // logo + menu fade-out right after Start
   const BLACK_FADE_SEC = 0.9;     // fade to black at the end of the intro (part of TITLE_INTRO_SEC)
   const REVEAL_SEC = 0.8;         // black -> game fade-in
-  const LOOP_SEC = 217 / 24;      // title_c_bg.mp4 length (9.04 s)
+  const WALK_XFADE_SEC = 0.25;    // idle -> walk crossfade once the walk video is playing
+  const LOOP_SEC = 217 / 24;      // title_c_bg.mp4 (walk) length (9.04 s)
   const A = 'assets/title/';
-  const STILL = A + 'title_c_still.jpg', VIDEO = A + 'title_c_bg.mp4', LOGO = A + 'title_c_logo.png';
+  const STILL = A + 'title_c_still.jpg', IDLE = A + 'title_c_idle.mp4', WALK = A + 'title_c_bg.mp4', LOGO = A + 'title_c_logo.png';
 
   const Q = new URLSearchParams(location.search);
   const force = Q.get('titlescreen') === '1';
@@ -54,6 +59,7 @@
 #ttl .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 #ttl video.bg{opacity:0}
 #ttl video.bg.on{opacity:1}
+#ttl video.walk{transition:opacity ${WALK_XFADE_SEC}s linear}
 #ttl .shade{position:absolute;left:0;right:0;bottom:0;height:28%;pointer-events:none;
  background:linear-gradient(to bottom,rgba(18,10,6,0) 0%,rgba(18,10,6,.07) 25%,rgba(18,10,6,.25) 50%,rgba(18,10,6,.45) 75%,rgba(18,10,6,.67) 100%)}
 #ttl .fadeable{transition:opacity ${OVERLAY_FADE_SEC}s ease}
@@ -74,25 +80,37 @@
 #ttl.end .black{opacity:1}
 #ttl.out{opacity:0;pointer-events:none;transition:opacity ${REVEAL_SEC}s ease}`;
   const el = document.createElement('div'); el.id = 'ttl';
-  el.innerHTML = `<img class="bg still" alt="" src="${STILL}"><video class="bg" muted playsinline preload="auto" disablepictureinpicture></video>` +
+  el.innerHTML = `<img class="bg still" alt="" src="${STILL}"><video class="bg idle" muted playsinline preload="auto" disablepictureinpicture></video>` +
+    `<video class="bg walk" muted playsinline preload="auto" disablepictureinpicture></video>` +
     `<div class="shade fadeable"></div><div class="stage fadeable"><img alt="Trail of Extinction · 사멸의 궤적" src="${LOGO}"></div>` +
     `<ul class="fadeable"></ul><div class="set fadeable" hidden></div><div class="foot fadeable">←→ / ↑↓ 선택 · Enter 결정</div><div class="black"></div>`;
   const ul = el.querySelector('ul'), set = el.querySelector('.set'), stage = el.querySelector('.stage');
-  const still = el.querySelector('img.still'), video = el.querySelector('video');
-  video.muted = true; video.defaultMuted = true; video.setAttribute('muted', ''); video.playsInline = true;
-  let videoOk = true;
+  const still = el.querySelector('img.still'), video = el.querySelector('video.idle'), walk = el.querySelector('video.walk');
+  for (const v of [video, walk]) { v.muted = true; v.defaultMuted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true; }
+  let videoOk = true, walkOk = true;
   video.addEventListener('error', () => { videoOk = false; TS.videoFailed = true; }, true);
-  video.loop = true;               // the clip is a seamless loop; idle plays it on repeat
-  video.autoplay = true;
-  video.src = VIDEO;
+  walk.addEventListener('error', () => { walkOk = false; TS.walkFailed = true; }, true);
+  video.autoplay = true;           // idle: seamless loop on repeat
+  video.src = IDLE;
+  walk.src = WALK;                 // walk: preloaded (paused at frame 0) so Start can switch at once
+  try { walk.load(); } catch (e) {}
   // frame 0 == the still, so the video is only revealed once it is really playing (no flash); until then / on failure the still stays
   const reveal = () => { if (!videoOk || video.classList.contains('on')) return; video.classList.add('on'); TS.videoPlaying = true; TS.videoFailed = false; };
   video.addEventListener('playing', () => { if (video.readyState >= 2) reveal(); });
   video.addEventListener('timeupdate', () => { if (!video.paused && video.currentTime > 0) reveal(); });
   // fallback seek-to-0 in case the loop attribute is ignored (some embedded webviews fire 'ended' instead of looping)
-  video.addEventListener('ended', () => { if (TS.active) { try { video.currentTime = 0; } catch (e) {} tryPlay(); } });
+  video.addEventListener('ended', () => { if (TS.active && TS.stage !== 'intro') { try { video.currentTime = 0; } catch (e) {} tryPlay(); } });
+  walk.addEventListener('ended', () => { if (TS.active && TS.stage === 'intro') { try { walk.currentTime = 0; walk.play(); } catch (e) {} } });
+  // walk: crossfade in only once it is really playing (frame 0 of walk == idle hero, so the hero does not jump)
+  const walkIn = () => {
+    if (!walkOk || TS.stage !== 'intro' || walk.classList.contains('on')) return;
+    walk.classList.add('on'); TS.walkPlaying = true; TS.walkT = performance.now();
+    setTimeout(() => { if (walk.classList.contains('on')) try { video.pause(); } catch (e) {} }, WALK_XFADE_SEC * 1000 + 150);
+  };
+  walk.addEventListener('playing', () => { if (walk.readyState >= 2) walkIn(); });
+  walk.addEventListener('timeupdate', () => { if (!walk.paused && walk.currentTime > 0) walkIn(); });
   function tryPlay() {
-    if (!videoOk || !TS.active) return;
+    if (!videoOk || !TS.active || TS.stage === 'intro') return;
     let p; try { p = video.play(); } catch (e) { TS.autoplayBlocked = true; return; }
     if (p && p.catch) p.then(() => { TS.autoplayBlocked = false; }).catch(() => { TS.autoplayBlocked = true; });
   }
@@ -137,13 +155,16 @@
   }
   draw();
 
-  // ---- Start: overlay fades while the idle loop keeps playing, then black, then the game ----
+  // ---- Start: walk video from frame 0 crossfades over the idle loop, overlay fades, then black, then the game ----
   function startGame(choice) {
     if (TS.stage === 'intro') return;
     TS.choice = choice; TS.stage = 'intro'; TS.introT0 = performance.now();
     el.classList.add('go');
-    // the video is NOT restarted: it just keeps looping (if it was blocked until now, this input starts it)
-    if (videoOk) { if (video.paused) tryPlay(); } else TS.videoFailed = true;
+    if (walkOk) {
+      try { if (walk.currentTime > 0) walk.currentTime = 0; } catch (e) {}
+      let p; try { p = walk.play(); } catch (e) { TS.walkFailed = true; }
+      if (p && p.catch) p.catch(() => { TS.walkFailed = true; });
+    } else TS.walkFailed = true;
     const blackAt = Math.max(0.3, introSec - BLACK_FADE_SEC);
     setTimeout(() => el.classList.add('end'), blackAt * 1000);
     setTimeout(() => enterGame(choice), introSec * 1000);
@@ -156,9 +177,9 @@
       location.search = q.toString().replace(/=(&|$)/g, '$1'); return;
     }
     TS.stage = 'out'; TS.active = false;
-    try { video.pause(); } catch (e) {}
+    try { video.pause(); walk.pause(); } catch (e) {}
     el.classList.add('out');
-    setTimeout(() => { el.remove(); try { video.removeAttribute('src'); video.load(); } catch (e) {} }, REVEAL_SEC * 1000 + 100);
+    setTimeout(() => { el.remove(); for (const v of [video, walk]) try { v.removeAttribute('src'); v.load(); } catch (e) {} }, REVEAL_SEC * 1000 + 100);
   }
   function choose(i) {
     const it = ITEMS[i]; if (!it || !it.ok) return;
