@@ -159,7 +159,7 @@ objs = []
 for o in F['objects']:
     o = copy.deepcopy(o); t, i = o['type'], o.get('id')
     if t == 'door' and i in DOOR: o['x'], o['y'] = foot(DOOR[i])
-    if i == 'f_arachne_gate': o.update(to='arachne', spawn='felt', text='거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.')   # 제1던전
+    if i == 'f_arachne_gate': o.update(to='arachne', spawn='felt', scene='door:arachne', text='거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.')   # 제1던전
     elif t == 'exit': o.update(x=EX[0] - 1, y=EX[1], w=3, h=1)
     elif t == 'waystone': o['x'], o['y'] = foot('web_arch', -4, 1)                        # 폐공방 앞 비석
     elif t == 'clue' and i == 'f_clue_felix': o['x'], o['y'] = foot('web_arch', -2, 2)
