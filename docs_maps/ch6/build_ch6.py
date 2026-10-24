@@ -7,7 +7,7 @@
 import json, os
 R6 = '정본 6장'; RI = '아이템배치 3절 6장'
 Z = [  # id, 이름, 종류, x, y, w, h, 메모
- ('pipe',     '대성당 연결 파이프 굴', 'dungeon', 10, 430, 70, 110, '5장 대성당 지하 기계와 이어진 굵은 파이프 속 (클로비스의 파이프, 정본 3절)'),
+ ('pipe',     '증기 관문 (4장 귀족가에서)', 'dungeon', 10, 430, 70, 110, '북쪽 4장 귀족가에서 내려오는 굵은 증기관 통로 (세계 지도 4장→6장 문)'),
  ('junk',     '기계 쓰레기장',         'field',   90, 370, 205, 215, '심장부 외곽. 버려진 톱니·보일러 더미, 자드가 파이프와 붙은 채 버려진 곳'),
  ('steam',    '증기 파이프 회랑',      'dungeon', 305, 400, 140, 140, '즉사 함정(증기 분사·압착 피스톤) 회랑. 자드에게 끄는 법을 들으면 꺼짐'),
  ('refinery', '중앙 수은 정제소',      'dungeon', 455, 350, 225, 235, '푸른 수은 저수조와 메인 추출기(나선 열쇠로 엶)'),
@@ -23,7 +23,7 @@ M = []  # markers
 def mk(t, name, zone, x, y, ref='', note=''):
     M.append(dict(type=t, name=name, zone=zone, x=x, y=y, ref=ref, note=note))
 # ---- 시작 · 인물 · 아이템 (정본)
-mk('start', '6장 시작 (5장에서 파이프로)', 'pipe', 30, 500, R6, '팀 제안: 5장 대성당 지하 기계실의 파이프를 타고 들어옴')
+mk('start', '6장 시작 (4장에서)', 'pipe', 30, 500, R6, '팀 제안: 세계 지도대로 북쪽 4장 귀족가에서 증기 관문으로 들어옴')
 mk('npc', '자드', 'junk', 255, 470, R6 + ' 자드', '수석 연금술사. 하반신이 파이프와 붙은 노인. 함정 끄는 법 + 아래 두 아이템')
 mk('item', '부서진 톱니 반지', 'junk', 262, 478, '부서진 톱니 반지', '자드가 줌 (기계 쓰레기장 자드 근처)')
 mk('quest', '잊혀진 나선 열쇠', 'junk', 248, 478, '잊혀진 나선 열쇠', '자드가 줌 → 정제소 메인 추출기를 엶')
@@ -101,7 +101,7 @@ P = [
 ]
 paths = [dict(kind=k, w=w, pts=[list(p) for p in pts]) for k, w, pts in P]
 L = [
- dict(**{'from': 'ch5', 'to': 'pipe', 'kind': 'gate', 'at': [12, 500], 'label': '5장 대성당 지하에서'}),
+ dict(**{'from': 'ch4', 'to': 'pipe', 'kind': 'gate', 'at': [45, 540], 'label': '4장 귀족가에서 (북문)'}),
  dict(**{'from': 'pipe', 'to': 'junk', 'kind': 'door', 'at': [82, 470], 'label': '파이프 출구'}),
  dict(**{'from': 'junk', 'to': 'steam', 'kind': 'door', 'at': [298, 470], 'label': '회랑 입구'}),
  dict(**{'from': 'steam', 'to': 'refinery', 'kind': 'door', 'at': [450, 470], 'label': '정제소 문'}),
@@ -118,11 +118,11 @@ L = [
  dict(**{'from': 'refinery', 'to': 'ch2', 'kind': 'oneway', 'at': [675, 405], 'label': '수은 필터 → 2장 로크 (백트래킹)'}),
 ]
 G = [  # 그록에게 부탁할 그림
- dict(kind='bg', name='기계 쓰레기장 바닥', size='타일 16px 세트', desc='녹슨 톱니·볼트가 박힌 검은 기름땅, 군데군데 푸른 수은 웅덩이, 잿빛 안개'),
+ dict(kind='bg', name='기계 쓰레기장 바닥', size='타일 16px 세트', desc='녹슨 톱니·볼트가 박힌 검은 기름땅, 군데군데 푸른 수은 웅덩이, 잿빛 안개. 가장자리는 왕도 내성벽, 서북쪽 멀리 왕성 탑이 보임'),
  dict(kind='bg', name='증기 파이프 회랑 벽·바닥', size='타일 16px 세트', desc='황동 파이프가 벽을 덮은 좁은 회랑, 철판 바닥 틈에서 증기'),
  dict(kind='bg', name='수은 정제소 바닥·저수조', size='타일 16px 세트', desc='석회가 낀 타일 바닥, 푸른 수은 저수조(물 대신 무거운 금속 액체), 유리관'),
  dict(kind='bg', name='연금술 실험실 바닥', size='타일 16px 세트', desc='깨진 대리석·석회 얼룩, 엎어진 플라스크, 독 웅덩이'),
- dict(kind='bg', name='시계탑 내부 바닥', size='타일 16px 세트', desc='맞물린 황동 톱니 바닥, 벽에 거대한 진자, 바닥 사이로 아래층이 보이는 틈'),
+ dict(kind='bg', name='시계탑 내부 바닥', size='타일 16px 세트', desc='맞물린 황동 톱니 바닥, 벽에 거대한 진자, 바닥 사이로 아래층이 보이는 틈. 창밖 서북쪽에 왕성 탑'),
  dict(kind='prop', name='거대 고철 더미 / 보일러', size='3x3~6x4 타일', desc='부서진 증기 보일러와 톱니 산'),
  dict(kind='prop', name='메인 추출기', size='6x5 타일', desc='유리 원통 속 푸른 수은이 도는 거대한 기계, 나선 열쇠 구멍'),
  dict(kind='prop', name='파이프 밸브', size='2x2 타일', desc='돌리는 붉은 핸들이 달린 굵은 관'),
@@ -136,6 +136,25 @@ G = [  # 그록에게 부탁할 그림
  dict(kind='npc', name='자드', size='2x2 타일', desc='하반신이 황동 톱니·증기 파이프, 척추에 푸른 수은관, 얼굴 반쪽 금속판 (정본 2절)'),
  dict(kind='boss', name='클로비스', size='6x6 타일 이상', desc='몸 절반이 거대한 황동 톱니바퀴·증기 기관인 반인반기계 괴수, 굵은 파이프로 기계와 연결 (정본 3절)'),
 ]
+# ---- 세계 지도 방향 (팀장 10-24, world_map.json): 6장 = 동남 내성. 북쪽 = 4장 귀족가(들어옴), 서쪽·서북 = 7장 왕성(나감)·3장, 서남 땅 밑 = 2장 하수도.
+# 위 좌표는 「땅이 아래, 탑이 위」로 적었으므로 위아래를 뒤집어 북쪽(위)에 들어오는 문, 서쪽에 왕성 문이 오게 한다.
+H = 600
+fy = lambda y: H - y
+for z in zones: z['y'] = H - z['y'] - z['h']
+for k in M: k['y'] = fy(k['y'])
+for a in areas: a['poly'] = [[x, fy(y)] for x, y in a['poly']]
+for p in paths: p['pts'] = [[x, fy(y)] for x, y in p['pts']]
+for l in L: l['at'] = [l['at'][0], fy(l['at'][1])]
+zb['pipe'].update(y=8, h=162)  # 관문을 지도 북쪽 끝(성벽)까지
+paths.append(dict(kind='corridor', w=3, pts=[[45, 10], [45, 60], [30, 100]]))
+for l in L:
+    if l['from'] == 'ch4': l['at'] = [45, 10]
+    if l['to'] == 'ch7': l.update(at=[16, 500], label='7장 왕성 (서쪽, 왕가의 열쇠)')
+    if l['to'] == 'ch3': l.update(at=[16, 455], label='태엽 핵 → 3장 화로 (서쪽, 백트래킹)')
+    if l['to'] == 'ch2': l.update(**{'from': 'pipe', 'at': [8, 150], 'label': '수은 필터 → 2장 로크 (서남 땅 밑 하수도, 백트래킹)'})
+# 가장자리 = 성벽·건물 벽·꺼진 지반 (사장님 10-24 「거대한 성 안 왕도」: 바깥 세상·지평선 없음)
+areas += [dict(kind='wall', poly=[[0, 0], [700, 0], [700, 4], [0, 4]]), dict(kind='wall', poly=[[696, 0], [700, 0], [700, 600], [696, 600]]),
+          dict(kind='wall', poly=[[0, 596], [700, 596], [700, 600], [0, 600]]), dict(kind='wall', poly=[[0, 0], [4, 0], [4, 600], [0, 600]])]
 m = dict(chapter='ch6', title='연금술 심장부 & 시계탑 (시간을 묶은 태엽)', w=700, h=600, zones=zones, areas=areas, paths=paths, links=L, markers=M, grok=G)
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ch6_map.json')
 with open(out, 'w', encoding='utf-8') as f: json.dump(m, f, ensure_ascii=False, indent=1)
