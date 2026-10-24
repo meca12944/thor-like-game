@@ -1280,13 +1280,24 @@
   // 색 = 파쇄 강철 (사장님 10-24 그록 6종 중 「4 파쇄 강철」): 가는 강철 선이 판정이 끝나면 금 가며 각진 조각으로 떨어짐.
   const GK_FADE = 10, hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   const GKC = { fan: ['#1a1f27', '#1d232c', '#222933'].map(hexRGB), line: hexRGB('#0b0e12'), ol: hexRGB('#0f1318'), rim: ['#45515e', '#6d7d8d', '#a8b5c1', '#dce3ea'].map(hexRGB), part: ['#a8b5c1', '#dce3ea'] }; // fan 3 tones / edge / outline, rim shadow-body-hi-glint, shards
-  const FAN_W = 100, FAN_H = 84, FAN_X0 = -50, FAN_Y0 = -60; let _fanC = null;
+  const FAN_W = 100, FAN_H = 84, FAN_X0 = -50, FAN_Y0 = -60;
+  // 성능 (팀장 10-24 「챔피언전 멈춤」): 화소마다 gkFanPolar 를 매 프레임 다시 하던 것을 (타, 방향) 표로 한 번만 계산(gkFanTab) + 완성 그림을 (타, 방향, 틱, 층) 으로 보관(gkFanImg, 최대 FAN_CMAX장).
+  // 그림은 i·dir·t·layer 만으로 정해짐 (조각·반짝임 같은 seed 쪽은 gkFanBits 가 매번 그림). 방향은 8개뿐 (gkDir) -> 표는 맵과 상관없어서 시작할 때 gkFanWarm 이 쉬는 틈에 하나씩 미리 만듦 (첫 휘두름도 안 끊기게).
+  const _fanTab = new Map(), _fanImg = new Map(), FAN_CMAX = 240, fanDirKey = d => Math.round(d[0] * 1000) + ',' + Math.round(d[1] * 1000);
+  function gkFanTab(i, dir) { const key = i + '|' + fanDirKey(dir); let T = _fanTab.get(key); if (T) return T; const F = GK_FAN[i], n = FAN_W * FAN_H, r = new Float64Array(n), u = new Float64Array(n);
+    for (let y = 0; y < FAN_H; y++) for (let x = 0; x < FAN_W; x++) { const q = gkFanPolar(F, dir, FAN_X0 + x + .5, FAN_Y0 + y + .5), j = y * FAN_W + x; r[j] = q[0]; u[j] = q[1]; }
+    T = { r, u }; if (_fanTab.size >= 48) _fanTab.delete(_fanTab.keys().next().value); _fanTab.set(key, T); return T; }
+  function gkFanWarm() { const todo = []; for (let i = 0; i <= 2; i++) for (let a = 0; a < 8; a++) { const an = a * Math.PI / 4, c = Math.cos(an), s = Math.sin(an); todo.push([i, [Math.abs(c) < 1e-9 ? 0 : c, Math.abs(s) < 1e-9 ? 0 : s]]); }
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 30)), step = () => { const q = todo.shift(); if (!q) return; gkFanTab(q[0], q[1]); idle(step); }; idle(step); } // one table per idle slice
+  gkFanWarm();
   function gkFanState(f) { const F = GK_FAN[f.i], t = gkFanT(f); if (t < F.t0) return null; const open = t <= F.t1; return { F, t, open, head: open ? gkFanHead(F, t) : 1, k: open ? 0 : (t - F.t1) / GK_FADE }; }
-  function gkFanImg(f, St, layer) { // the fan as a field-px image (layer 0 = body behind the hero, 1 = rim in front)
-    const C = GKC, { F, head, k, open } = St; if (!_fanC) { _fanC = document.createElement('canvas'); _fanC.width = FAN_W; _fanC.height = FAN_H; }
-    const g = _fanC.getContext('2d'), id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R, arc = Math.abs(F.a1 - F.a0) * Math.PI / 180 * R; // arc length in px (for the 1px edge on the swept ends)
+  function gkFanImg(f, St, layer) { // the fan as a field-px image (layer 0 = body behind the hero, 1 = rim in front), cached per (hit, dir, tick, layer)
+    const key = f.i + '|' + fanDirKey(f.dir) + '|' + St.t + '|' + layer; let cv = _fanImg.get(key); if (cv) return cv;
+    cv = document.createElement('canvas'); cv.width = FAN_W; cv.height = FAN_H;
+    const C = GKC, { F, head, k, open } = St, T = gkFanTab(f.i, f.dir), TR = T.r, TU = T.u;
+    const g = cv.getContext('2d'), id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R, arc = Math.abs(F.a1 - F.a0) * Math.PI / 180 * R; // arc length in px (for the 1px edge on the swept ends)
     const put = (i, c, a) => { d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = a; };
-    for (let y = 0; y < FAN_H; y++) for (let x = 0; x < FAN_W; x++) { const [r, u] = gkFanPolar(F, f.dir, FAN_X0 + x + .5, FAN_Y0 + y + .5), i = (y * FAN_W + x) * 4;
+    for (let j = 0, n = FAN_W * FAN_H; j < n; j++) { const r = TR[j], u = TU[j], i = j * 4;
       if (u < 0 || u > head || u > 1) continue; const v = head > 0 ? u / head : 0, rn = r / R; // v: 0 at the start of the swing, 1 at the blade (tip)
       if (layer === 0) { if (r > R || rn < k) continue; const edge = r > R - 1 || u * arc < 1 || (head - u) * arc < 1 || rn < k + 1 / R; // fill collapses outward on the fade
         if (edge) put(i, C.line, 235 * (1 - k * .5)); else put(i, rn < .55 ? C.fan[0] : rn < .82 ? C.fan[1] : C.fan[2], 205 * (1 - k * .6)); continue; }
@@ -1294,7 +1305,7 @@
       if (!open && ((Math.floor(u * 15) * 7919) % 97) / 97 < k * 1.25) continue; // crack: the rim splits into ~15 angular pieces that go out one by one
       if (rr >= 0 && rr < w) { const c = v > .9 && rr < w * .6 ? C.rim[3] : v > .6 ? (rr < w * .5 ? C.rim[2] : C.rim[1]) : v > .25 ? C.rim[1] : C.rim[0]; put(i, c, 255 * (open ? 1 : Math.sqrt(1 - k))); }
       else if (rr < 0 && rr > -1.2 && v > .12 && w > .6) put(i, C.ol, 230 * (open ? 1 : 1 - k)); } // 1px dark outline outside the rim (reads on light floors)
-    g.putImageData(id, 0, 0); return _fanC; }
+    g.putImageData(id, 0, 0); if (_fanImg.size >= FAN_CMAX) _fanImg.delete(_fanImg.keys().next().value); _fanImg.set(key, cv); return cv; }
   function gkFanDraw(k, layer) { if (!S.gk) return; const [hx, hy] = W2S(hero.x, hero.y);
     for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const St = gkFanState(f); if (!St) continue;
       const im = gkFanImg(f, St, layer); ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(hx + FAN_X0 * k), Math.round(hy + FAN_Y0 * k), FAN_W * k, FAN_H * k); ctx.restore();
