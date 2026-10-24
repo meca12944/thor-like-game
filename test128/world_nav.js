@@ -276,7 +276,7 @@
     else { s = Math.min((W - 8) / m.w, (Hh - 8) / m.h); mx = x0 + (W - m.w * s) / 2; my = y0 + (Hh - m.h * s) / 2; }
     drawMapLayer(c, m, d, mx, my, s, { route: true, big: !cfg.tile });
     c.restore(); c.save(); c.globalAlpha = Math.min(1, uiAlpha() + .3); c.strokeStyle = '#e2c27a'; c.lineWidth = 2; c.strokeRect(x0 + 1, y0 + 1, W - 2, Hh - 2); c.restore();
-    h.textOut('V ' + ['작게', '크게'][st.miniMode] + ' · M 지도', x0 + W - 4 * u, y0 + Hh + 11 * u, 8 * u, 'rgba(230,230,240,.85)', '#000', 'right');
+    if (!document.body.classList.contains('touch')) h.textOut('V ' + ['작게', '크게'][st.miniMode] + ' · M 지도', x0 + W - 4 * u, y0 + Hh + 11 * u, 8 * u, 'rgba(230,230,240,.85)', '#000', 'right');
   }
   function drawGuide(k, ox, oy, u) {
     const h = H(), m = h.M(), c = h.ctx, SW = h.LW * k, SH = h.LH * k;
