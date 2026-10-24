@@ -1174,7 +1174,7 @@
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
-    else if (h.atk && SLASH_BODY) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
+    else if (h.atk && (SLASH_BODY || (ATK_BODY && h.atk.i <= 2))) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
@@ -1204,6 +1204,7 @@
   // the hero keeps the idle/walk pose with a small code-made kick (lean back -> snap forward + squash), and the sword energy arcs of the
   // 주인공 / 몬스터 샌드박스 (hero_slash_a v1) fly out. Arc art is generated in code (sArc), in atlas px, drawn at the hero's hi-res scale.
   const SLASH_BODY = false; // true = old slash clips (hit1-3)
+  const ATK_BODY = Q.get('atkbody') === '1'; // [연구 10-24 사장님 「그록 공격모션 검흔 현실감」] 시험: 콤보 1~3타에 아틀라스 공격 몸(hit1~3, 칼 든 자세) + 부채꼴 검흔·판정 그대로, 코드 칼·칼 숨김 없음
   const GK = [{ R: 52, span: 140, T: 18, rot: 0, y: 78, fwd: 22, v: 4, rev: 0, sq: .5 }, { R: 54, span: 140, T: 18, rot: 35, y: 90, fwd: 22, v: 4, rev: 1, sq: .75 }, { R: 72, span: 170, T: 26, rot: 0, y: 74, fwd: 22, v: 3, rev: 0, sq: 1 }];
   const GK_LIFE = 13, GK_STEP = .8, sCache = new Map();
   function sField(R, span, T, head, tail, ca, sa, rev, sq, flip, x, y) { if (flip) x = -x; const xr = x * ca + y * sa, yr = (-x * sa + y * ca) / sq, r = Math.hypot(xr, yr); let u = (Math.atan2(yr, xr) * 180 / Math.PI + span / 2) / span; if (rev) u = 1 - u;
@@ -1341,8 +1342,8 @@
   function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
   function swordC() { nsPreload(); const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
   // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
-  const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && hero.hp > 0);
-  function swordHidden() { return !!(gkFanSwing() || comboBlade()) && swordC(); } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
+  const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && !ATK_BODY && hero.hp > 0);
+  function swordHidden() { return !ATK_BODY && !!(gkFanSwing() || comboBlade()) && swordC(); } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
   function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 부채꼴 앞끝.
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
