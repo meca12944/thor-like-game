@@ -56,7 +56,8 @@
     //   skirm = 바늘 거미 (pounce onto a marked spot + aimed spit) / lunge = 들개 (crouch -> straight dash bite -> 0.8s opening, circles the hero) /
     //   duel = 실 꼭두각시 (scissor 2-hit combo + aimed blade boomerang / pin burst).
     return Object.assign({ felt: true, update(m, W, dt) {
-      const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; const d = W.dist(m, h);
+      const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; m.losT = (m.losT || 0) - dt; if (m.losT <= 0) { m.losT = .25; m.sees = !W.los || W.los(m, h); }
+      const d = m.sees || m.st !== 'idle' ? W.dist(m, h) : 999; // 팀장 10-24: behind a wall the hero counts as far away (no alert, no shots, just wanders)
       m.burstT = (m.burstT || 0) - dt; m.burstCd = (m.burstCd || 0) - dt; m.hopCd = (m.hopCd || 0) - dt; const RG = m.rage ? .8 : 1; // RG: angry = shorter cooldowns
       if (!m.alerted && d < 160) { m.alerted = true; m.alertT = .45; W.fx('text', m.x, m.y - this.h * FELT_SC - 6, { text: '!', life: .7, color: '#ffd84a' }); if (W.sfx) W.sfx('tele', .6); m.cd = Math.max(m.cd, .5); } // first sight: "!" + a hop (drawn)
       if (m.alertT > 0) { m.alertT -= dt; m.anim = 'walk'; m.moving = false; return; }

@@ -382,7 +382,7 @@
    "role": "재봉사",
    "main": 1,
    "idle": "여긴 왕실 의상실이 있던 자리예요. 언젠가 여기서 영웅의 망토를 만들 거예요!",
-   "art": "a_tailor",
+   "art": "linette8",
    "quests": [
     "q_felt_main"
    ],
