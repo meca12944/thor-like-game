@@ -32,6 +32,7 @@
     heart:     [['t', { type: 'triangle', f0: 660, dur: .1, v: .2 }], ['t', { type: 'triangle', f0: 880, dur: .1, v: .2, d: .08 }], ['t', { type: 'triangle', f0: 1320, dur: .2, v: .2, d: .16 }]],
     thrust:    [['n', { f0: 1800, f1: 4200, dur: .09, v: .22, a: .01 }]],
     quaff:     [['t', { type: 'sine', f0: 420, f1: 780, dur: .12, v: .22 }], ['t', { type: 'triangle', f0: 880, f1: 1320, dur: .16, v: .14, d: .08 }]], // potion drunk: soft rising gulp + chime
+    talk:      [['t', { type: 'triangle', f0: 540, f1: 500, dur: .035, v: .07 }]],                                      // dialogue letter blip (soft, 2 letters per blip)
     deny:      [['t', { type: 'sine', f0: 240, f1: 200, dur: .07, v: .16 }]],                                            // item can't be used: one quiet low tick (no buzzer)                                                  // Linette's needle
     // sandbox-only stand-ins for the town's recorded swing / hit sounds (the game keeps the recordings)
     slash:     [['n', { f0: 1400, f1: 3800, dur: .11, v: .3, a: .015 }]],
