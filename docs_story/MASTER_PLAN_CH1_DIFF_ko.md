@@ -1,6 +1,6 @@
 # 새 정본(2026-10-24 마스터 플랜) ↔ 지금 게임 1장: 다른 점
 
-정본 원문: `MASTER_PLAN_정본_20261024_ko.md` (0절 = 사장님 확정 사항). 드라이브 새 정본: https://docs.google.com/document/d/1pscARuYlP29Zana-CVkyQuo7uPKbPjVIyNzU_3BQ70U/edit 아래는 지금 test128 1장(펠트·잿빛 들판·폐공방)이 새 정본과 어긋나는 곳이다. 작성: 팀장 (2026-10-24).
+정본 원문: `MASTER_PLAN_정본_20261024_ko.md` (0절 = 사장님 확정 사항). 드라이브 새 정본: https://docs.google.com/document/d/1p8GN-pZEmoVZN0Ju_C_XuitqvJ2Zwp8wM94CPfBOGQ0/edit 아래는 지금 test128 1장(펠트·잿빛 들판·폐공방)이 새 정본과 어긋나는 곳이다. 작성: 팀장 (2026-10-24).
 
 ## A. 이야기·퀘스트 (스토리 담당)
 | # | 새 정본 | 지금 게임 | 할 일 |
