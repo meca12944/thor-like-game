@@ -90,7 +90,7 @@ def check(m):
         if len(mobs) < need: bad.append(f"필드 {z['id']} 몹 무리 {len(mobs)}개 < 권장 {need}개 (50x50마다 1무리)")
     return bad
 
-def draw(m, out, zone=None, maxpx=3000):
+def draw(m, out, zone=None, maxpx=3000, grok=False):  # grok=True: 그록에게 줄 그림 (몹 무리·작은 표시 빼고 경관·장소만)
     X0, Y0, W, H = 0, 0, m['w'], m['h']
     if zone:
         z = next(z for z in m['zones'] if z['id'] == zone)
@@ -133,6 +133,7 @@ def draw(m, out, zone=None, maxpx=3000):
         d.rectangle([x - r, y - r, x + r, y + r], outline=LINK_COL.get(l['kind'], (255, 255, 255)), width=3)
         if l.get('label'): d.text((x + r + 3, y - r), l['label'], fill=LINK_COL.get(l['kind'], (255, 255, 255)), font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
     for i, k in enumerate(m.get('markers', []), 1):
+        if grok and k['type'] in ('mob', 'trap'): continue
         col, shp, ch = MARK.get(k['type'], ((255, 255, 255), 'circle', '?'))
         x, y = P(k['x'], k['y']); r = max(6, int(s * 1.4)) * (2 if k['type'] in ('boss', 'midboss') else 1)
         if shp == 'circle': d.ellipse([x - r, y - r, x + r, y + r], fill=col, outline=(0, 0, 0), width=2)
@@ -179,6 +180,8 @@ if __name__ == '__main__':
     for b in bad: print('⚠', b)
     if '--check' in a: sys.exit(1 if bad else 0)
     base = os.path.join(os.path.dirname(p), m['chapter'])
+    if '--grok' in a:
+        print(draw(m, f"{base}_for_grok.png", grok=True)); sys.exit(0)
     if '--zone' in a:
         zid = a[a.index('--zone') + 1]
         print(draw(m, f"{base}_zone_{zid}.png", zone=zid))
