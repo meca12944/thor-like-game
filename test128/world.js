@@ -497,6 +497,7 @@
   function banner(text, t = 1.6, small) { S.banner = { text, t, max: t, small }; }
   function after(t, f) { S.timers.push({ t, f }); }
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
+  function shakeMul() { const g = window.__game, v = g && g.shakeMul; return typeof v === 'number' ? v : 1; } // '화면 흔들림' 끔/약/보통 = 0 / .67 / 1 — also scales the directional hit kick (보고서 3-3)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
   const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
     m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재', m_leather_strap: '질긴 가죽끈', riceball: '주먹밥' };
@@ -565,10 +566,19 @@
     if (!D.boss && !armored) { const kb = (D.champion ? 90 : 160) * (fin ? 1.6 : 1); m.kx = Math.cos(dir) * kb; m.ky = Math.sin(dir) * kb; } // ≈ 26 px (champion 15), finisher x1.6
     else { const pv = (D.boss ? 3 : 2) * (fin ? 1.7 : 1); m.pushX = Math.cos(dir) * pv; m.pushY = Math.sin(dir) * pv * .6; m.pushMax = Math.round(pv); m.shudT = .14; m.shudMax = 1; } // boss / mid-attack: the body only jolts (drawn), the warning stays put
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
-    addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: .6, color: AF && AF.col ? AF.col : '#fff' });
+    { const kill = m.hp <= 0, sz = (fin ? DMGPOP.fin : 1) * (kill ? DMGPOP.kill : 1); addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: fin || kill ? .75 : .6, color: AF && AF.col ? AF.col : fin ? DMGPOP.finCol : '#fff', sz, pop: 1 }); if (melee) rumble(kill ? 'kill' : fin ? 'fin' : 'hit'); } // [손맛 3-8] number pops 1.4->1, 3rd hit bigger + gold, killing hit one step bigger
     if (D.boss || D.champion) engage(m);
     if (m.hp <= 0) killMob(m);
   }
+  const DMGPOP = { from: 1.4, ticks: 6, fin: 1.7, kill: 1.25, finCol: '#ffc14a' }; // 데미지 숫자 팝 (보고서 3-8)
+  // [손맛 3-11] pad rumble (only when the pad supports it; option '패드 진동', default on). One per frame: the strongest wins.
+  const RUMBLE = { hit: [{ duration: 50, weakMagnitude: .35, strongMagnitude: .1 }], fin: [{ duration: 90, weakMagnitude: .5, strongMagnitude: .5 }, { duration: 120, weakMagnitude: .3, strongMagnitude: 0 }], kill: [{ duration: 120, weakMagnitude: 0, strongMagnitude: .6 }] }, RUMBLE_RANK = { hit: 1, fin: 2, kill: 3 };
+  let rumbleQ = null;
+  function rumble(kind) { if (!rumbleQ || RUMBLE_RANK[kind] > RUMBLE_RANK[rumbleQ]) rumbleQ = kind; }
+  function flushRumble() { const k = rumbleQ; rumbleQ = null; if (!k) return; const g = window.__game; if (g && g.padRumble === false) return; S.lastRumble = k; if (!navigator.getGamepads) return;
+    let gp = null; try { gp = [...navigator.getGamepads()].find(p => p && p.connected && p.vibrationActuator); } catch (e) { } if (!gp) return; const A = gp.vibrationActuator, seq = RUMBLE[k];
+    const play = e => { try { const r = A.playEffect('dual-rumble', Object.assign({ startDelay: 0 }, e)); if (r && r.catch) r.catch(() => { }); } catch (er) { } };
+    play(seq[0]); if (seq[1]) setTimeout(() => play(seq[1]), seq[0].duration); }
   function killMob(m) {
     if (m.dead) return; m.dead = true; m.hp = 0; const D = m.D;
     { const uf = S.ultFx; if (uf && uf.U.whole && uf.fx && uf.fx !== 'pillar' && fxQ() >= 3) addFx('voidpop', m.x, m.y - 6, { life: .45, big: D.boss || D.champion }); else addFx('poof', m.x, m.y - 8, { life: .5, big: D.boss || D.champion }); } sfx('mob_die', .8); // 심연: pixel void burst instead of the white puff (the death sound used to sit inside this comment = silent)
@@ -796,7 +806,7 @@
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
     if (takePress('attack')) hero.atkBuf = .18;
     if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1)) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
-      if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = prevAtk && prevAtk.i < 2 ? prevAtk.i + 1 : (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; /* [combat research] a press during the swing continues the combo (was: back to hit 1) */ sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) setFace(ix, iy); else aimAssist(hero.combo); } }
+      if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = prevAtk && prevAtk.i < 2 ? prevAtk.i + 1 : (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; /* [combat research] a press during the swing continues the combo (was: back to hit 1) */ sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) { setFace(ix, iy); aimAssist(hero.combo, AIM_HELD); } else aimAssist(hero.combo); } }
     hero.atkBuf = Math.max(0, (hero.atkBuf || 0) - dt);
     if (isHeld('attack') && hero.holdOk) hero.holdT += dt; else hero.holdOk = false; // charge (모으기): keep holding attack -> lv1 t1 / lv2 t2, release = charged slash; a hit / dodge cancels
     if (!hero.charge && hero.holdOk && hero.holdT > .14 && !hero.atk && !hero.roll && hero.hp > 0) { hero.charge = { t: hero.holdT, lv: 0, flash: 0 }; hero.run = false; }
@@ -868,7 +878,7 @@
     }
     for (const o of (m.objects || [])) if (o.type === 'spawn' && o.respawn > 0 && o.mob && o.mob.dead) { o.timer -= dt; // respawn out of sight
       const px = (o.x + .5) * m.T, py = (o.y + .5) * m.T; if (o.timer <= 0 && Math.hypot(hero.x - px, hero.y - py) > 200) { const mm = spawn(o.mob.kind, px, py); mm.spawnRef = o; o.mob = mm; } }
-    S.mobs = S.mobs.filter(mm => !mm.dead);
+    S.mobs = S.mobs.filter(mm => !mm.dead); flushRumble();
     // hazards
     for (let i = S.hazards.length - 1; i >= 0; i--) { const h = S.hazards[i]; h.t += dt;
       if (h.owner && h.owner.dead && h.t < h.warn) { S.hazards.splice(i, 1); continue; }
@@ -1219,21 +1229,23 @@
   // Now each arc flies out to the hit range (hbR) in GK_FLY steps and hits a mob only when its front passes it; diagonal input = 45° arc.
   const GK_FLY = 8, GK_K = H128FIG / 117; // arc steps to reach the hit range; atlas px -> field px
   // [combat research] no stick held at the press: turn to the nearest mob within reach + 30px and 70° of the facing (8 directions)
-  function aimAssist(i) { const v = gkDir(), reach = (i <= 2 ? GK_REACH[i] : hbR(i)) + 30; let best = null, bd = 1e9;
-    for (const mm of S.mobs) { if (mm.dead) continue; const dx = mm.x - hero.x, dy = (mm.y - hero.y) / .8, d = Math.hypot(dx, dy); if (d > reach || d < 1) continue; if ((dx * v[0] + dy * v[1]) / d < Math.cos(70 * Math.PI / 180)) continue; if (d < bd) { bd = d; best = [dx, dy]; } }
-    if (best) setFace(best[0], best[1]); }
+  // [손맛 3-9] stick held: only a mob within ±25° of the stick turns the swing (the arc aims straight at it, the body takes its 8-way facing)
+  const AIM_HELD = 25;
+  function aimAssist(i, cone = 70) { const v = gkDir(), reach = (i <= 2 ? GK_REACH[i] : hbR(i)) + 30; let best = null, bd = 1e9;
+    for (const mm of S.mobs) { if (mm.dead) continue; const dx = mm.x - hero.x, dy = (mm.y - hero.y) / .8, d = Math.hypot(dx, dy); if (d > reach || d < 1) continue; if ((dx * v[0] + dy * v[1]) / d < Math.cos(cone * Math.PI / 180)) continue; if (d < bd) { bd = d; best = [dx, dy]; } }
+    if (best) { setFace(best[0], best[1]); if (hero.atk) { const wy = best[1] * .8, l = Math.hypot(best[0], wy); hero.atk.aim = [best[0] / l, wy / l]; } } }
   function gkDir() { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null; if (f8 && f8 !== hero.face) { const a = DIR8.indexOf(f8) * Math.PI / 4; return [Math.cos(a), Math.sin(a)]; } return FACEV[hero.face] || [1, 0]; }
   // owner 10-23 "게임을 좀 어렵게 / 검기 판정 줄여": the hit reaches about as far as the drawn arc (was 67 / 49 / 62 px, 150-170°) and only in front
   // [검기 난이도 연구 10-23] reach x0.8 (≈ the chapter-1 felt mobs' melee reach 34-46px with the body pad) so a hit means stepping into danger, arc x1.3 so aiming stays forgiving
   const GK_REACH = [32, 30, 37], GK_ARC = [130, 143, 156]; // field px per combo hit 1-3 (specials 3+ keep hbR), degrees
-  function gkSpawn(i) { const v = gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = i <= 2 ? GK_REACH[i] : hbR(i);
+  function gkSpawn(i) { const v = hero.atk && hero.atk.aim || gkDir(), l = Math.hypot(v[0], v[1]) || 1, dx = v[0] / l, dy = v[1] / l, n = Math.min(2, i), Y = GK[n], reach = i <= 2 ? GK_REACH[i] : hbR(i);
     const sp = Math.max(Y.v, (reach / GK_K - Y.fwd - Y.R * (1 + .025 * GK_FLY)) / GK_FLY);
     S.gk = S.gk || []; S.gk.push({ n, i, at0: hero.atk ? Math.round(hero.atk.t * 60) : 0, dir: [dx, dy], v: sp, reach, cosA: Math.cos((i <= 2 ? GK_ARC[i] : hbA(i)) / 2 * Math.PI / 180), hit: new Set(), rx: dx * Y.fwd, ry: Math.abs(dx) < .1 ? -44 + dy * (Y.fwd + 20) : -Y.y + dy * 20, t: 0, seed: (Math.random() * 2147483646 | 0) + 1, map: S.map }); }
   function gkHits(f) { const fan = f.i <= 2 ? GK_FAN[f.i] : null, head = fan ? gkFanHead(fan, gkFanT(f)) : 0; if (fan ? head < 0 : f.t * GK_STEP > GK_HITA) return; // combo 1-3: body fan (active ticks), specials: flying band
     for (const mm of S.mobs) { if (mm.dead || f.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
       if (fan ? gkFanTouch(fan, f, head, mm, mh) : gkTouch(f, mm, mh)) { f.hit.add(mm); S.gkImp = S.gkImp || []; S.gkImp.push({ x: mm.x, y: mm.y - mh * .45, t: 0, big: f.i >= 2, thread: !!mm.D.felt, a: Math.atan2(mm.y - hero.y, mm.x - hero.x), sw: (GK[f.n].rev ? -1 : 1) * (f.dir[0] < 0 ? -1 : 1), seed: (Math.random() * 2147483646 | 0) + 1 });
         hitMob(mm, f.i >= 3 ? ATK_DMG[0] * (spOf(f.i).dmgMul || 1) : ATK_DMG[Math.min(2, f.i)], Math.atan2(mm.y - hero.y, mm.x - hero.x), true, f.i >= 2); if (f.i >= 3) sfx(f.i === 5 ? 'hit_crit' : 'hit_heavy', .8);
-        if (!f.stopped) { f.stopped = true; hitStop(HITSTOP_HERO[Math.min(3, f.i)], f.i >= 2); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)]; S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
+        if (!f.stopped) { f.stopped = true; hitStop(HITSTOP_HERO[Math.min(3, f.i)], f.i >= 2); if (FEEL2) { const ka = Math.atan2(mm.y - hero.y, mm.x - hero.x), K = KICK[Math.min(3, f.i)] * shakeMul(); S.kick = { x: Math.cos(ka) * K, y: Math.sin(ka) * K * .8, t: .12 }; if (f.i >= 2) shake(1); } else if (f.i >= 2) shake(1.5); } } } } // [combat research] hit-stop on the hero's own hits (was none in the field)
   const JUMP = { T: .5, pre: 4 / 60, land: 8 / 60, h: 16 }; // field jump (town FEEL.jumpTicks 30 / jumpPreTicks 4 / jumpLandTicks 8)
   const FEEL2 = Q.get('feel') !== '0'; // 때리기·달리기 손맛 연구 (2번방 10-24) — ?feel=0 = 예전 값으로 비교
   const HITSTOP_HERO = FEEL2 ? [1 / 60, 1 / 60, 3 / 60, 3 / 60] : [2 / 60, 3 / 60, 5 / 60, 5 / 60]; // 사장님 10-24 「밖에서 싸우면 자꾸 멈춘다」: 1·2타 3·4 -> 1틱, 3타 7 -> 3틱 (연타 싸움 중 멈춤 30% -> 목표 5% 안팎)
@@ -1830,7 +1842,7 @@
       for (const mm of S.mobs) { if (mm.dead || mm.spawnT > 0 || mm.D.boss || mm.noBar) continue; if (mm.hp >= mm.maxHp && !mm.D.champion) continue;
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
-      for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); textOut(f.text, sx, sy, 12 * u, f.color || '#fff'); ctx.globalAlpha = 1; }
+      for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); const pk = f.pop ? 1 + (DMGPOP.from - 1) * Math.max(0, 1 - f.t * 60 / DMGPOP.ticks) : 1; textOut(f.text, sx, sy, Math.round(12 * u * (f.sz || 1) * pk), f.color || '#fff'); ctx.globalAlpha = 1; }
       const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
