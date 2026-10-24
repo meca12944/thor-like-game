@@ -568,9 +568,17 @@
     else { const pv = (D.boss ? 3 : 2) * (fin ? 1.7 : 1); m.pushX = Math.cos(dir) * pv; m.pushY = Math.sin(dir) * pv * .6; m.pushMax = Math.round(pv); m.shudT = .14; m.shudMax = 1; } // boss / mid-attack: the body only jolts (drawn), the warning stays put
     addFx('spark', m.x + Math.cos(dir) * 4, m.y - (D.h || 20) / 2, { life: .25 });
     { const kill = m.hp <= 0, sz = (fin ? DMGPOP.fin : 1) * (kill ? DMGPOP.kill : 1); addFx('text', m.x, m.y - (D.h || 20) - 4, { text: String(Math.round(dmg)) + (AF && AF.label ? ' ' + AF.label : ''), life: fin || kill ? .75 : .6, color: AF && AF.col ? AF.col : fin ? DMGPOP.finCol : '#fff', sz, pop: 1 }); if (melee) rumble(kill ? 'kill' : fin ? 'fin' : 'hit'); } // [손맛 3-8] number pops 1.4->1, 3rd hit bigger + gold, killing hit one step bigger
+    m.hitDir = dir; // 피격 기울기 (보고서 3-2): drawn as a -8 deg lean away from the blow
+    if (D.felt && !D.boss && m.hp > 0) { const now = S.t; m.dmgWin = (m.dmgWin && now - m.dmgWin.t < 2 ? m.dmgWin : { t: now, v: 0 }); m.dmgWin.v += dmg; // 경직 (브레이크): a finisher, or 35 % of max HP taken within 2 s
+      if ((fin || m.dmgWin.v >= m.maxHp * .35) && !(m.brkCd > S.t)) { m.dmgWin = null; breakMob(m, D.champion ? .3 : .45); } }
     if (D.boss || D.champion) engage(m);
     if (m.hp <= 0) killMob(m);
   }
+  function breakMob(m, sec) { // the mob is knocked out of what it was doing: telegraph cancelled (its warnings vanish, a scheduled volley never fires), stands dazed
+    const tele = m.st === 'melee' || m.st === 'shoot' || m.st === 'leap' || m.st === 'sig' || (m.st === 'lunge' && m.sub !== 'rec');
+    for (let i = S.hazards.length - 1; i >= 0; i--) { const z = S.hazards[i]; if (z.owner === m && z.t < z.warn) S.hazards.splice(i, 1); }
+    m.bid = (m.bid || 0) + 1; m.st = 'rest'; m.t = 0; m.restT = sec; m.sub = null; m.intent = null; m.anim = 'walk'; m.cd = Math.max(m.cd || 0, sec + .3); m.brkT = sec; m.brkCd = S.t + 1.2;
+    addFx('text', m.x, m.y - (m.D.h || 20) - 12, { text: tele ? '끊김!' : '휘청', life: .6, color: tele ? '#ffd84a' : '#e8e0d0' }); if (tele) addFx('stars', m.x, m.y - (m.D.h || 20) - 4, { life: sec }); }
   const DMGPOP = { from: 1.4, ticks: 6, fin: 1.7, kill: 1.25, finCol: '#ffc14a' }; // 데미지 숫자 팝 (보고서 3-8)
   // [손맛 3-11] pad rumble (only when the pad supports it; option '패드 진동', default on). One per frame: the strongest wins.
   const RUMBLE = { hit: [{ duration: 50, weakMagnitude: .35, strongMagnitude: .1 }], fin: [{ duration: 90, weakMagnitude: .5, strongMagnitude: .5 }, { duration: 120, weakMagnitude: .3, strongMagnitude: 0 }], kill: [{ duration: 120, weakMagnitude: 0, strongMagnitude: .6 }] }, RUMBLE_RANK = { hit: 1, fin: 2, kill: 3 };
@@ -1536,6 +1544,8 @@
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
       const atkA = !!A[name] && (A[name].hit !== undefined || A[name].release !== undefined), tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
       if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
+      if (mm.hitT > .18 && !mm.D.boss) { const e2 = .3 - mm.hitT, q2 = e2 < .05 ? 1 : Math.max(0, 1 - (e2 - .05) / .07), lean = (Math.cos(mm.hitDir || 0) >= 0 ? 1 : -1) * (mm.face < 0 ? -1 : 1); rot += lean * .14 * (mm.hitK || 1) * q2; } // 피격 기울기 ≈ 8 deg away from the blow (finisher 12)
+      if (mm.brkT > 0) { mm.brkT -= 1 / 60; ox += Math.sin(S.t * 40) * 1.2 * k; } // 경직: a quick shiver while dazed
       if (mm.hitT > .18) { const e = .3 - mm.hitT, hk = mm.hitK || 1, q = e < .034 ? 1 : Math.max(0, 1 - (e - .034) / .086); bx *= 1 + .2 * hk * q; by *= 1 - .17 * hk * q; } // squash: full for 2 ticks, eases back by 0.12 s (finisher x1.5)
       if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
