@@ -498,8 +498,10 @@
   { const B = def.c1_unrotting_hound, up = B.update; def.champ_c1_hound = Object.assign({}, B, { champion: true, name: '썩지 않는 사냥개 우두머리', title: '잿빛 들판의 우두머리', hp: 180, deco: 'eyes', h: 30, r: 11, tint: 'saturate(.6) brightness(1.25) contrast(1.15)',
       init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }),
       update(m, W, dt) { // 사냥 3연 돌진 (고유): after each lunge recovers it lunges again, up to 3 in a row, then a long pant (1.4 s opening)
-        if (m.pst === 'lunge' && m.st === 'idle') { m.chain = (m.chain || 0) + 1; if (m.chain < 3) { m.cd = .15; m.intent = 'lunge'; } else { m.chain = 0; m.st = 'rest'; m.t = 0; m.restT = 1.4; m.intent = 'shoot'; m.cd = 1.5; m.hist = ['lunge', 'lunge']; W.fx('text', m.x, m.y - 40, { text: '헉헉', life: .9, color: '#cfc4b0' }); } }
-        if (m.st === 'idle' && m.pst !== 'lunge' && m.intent !== 'lunge' && m.cd <= 0) m.chain = 0; m.pst = m.st;
+        if (m.st === 'lunge' && m.sub === 'rec' && m.t > .25 && (m.chain || 0) < 2 && W.dist(m, W.hero) < 130) { m.chain = (m.chain || 0) + 1; const h = W.hero; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; // the chain stays one attack (one lunge state)
+          m.sub = 'aim'; m.t = 0; m.second = true; m.warn = lineTele(W, m, m.aim, 230 * .38, .35, m.r * 2 + 12); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, m.warn); W.fx('dust', m.x, m.y); }
+        if (m.pst === 'lunge' && m.st === 'idle') { if ((m.chain || 0) >= 2) { m.st = 'rest'; m.t = 0; m.restT = 1.4; m.cd = Math.max(m.cd || 0, 1.5); W.fx('text', m.x, m.y - 40, { text: '헉헉', life: .9, color: '#cfc4b0' }); } m.chain = 0; } // the chain is one pick in pickIntent's history (never 3 lunges in a row)
+        m.pst = m.st;
         m.howlT = (m.howlT ?? 5) - dt; const d = W.dist(m, W.hero);
         if (m.howlT <= 0 && d < 170 && (m.st === 'idle' || m.st === 'rest')) { m.howlT = 12; W.fx('text', m.x, m.y - 44, { text: '아우우——!', life: 1.1, color: '#e8d8c0' }); W.shake(2); if (W.sfx) W.sfx('tele', .8, .6);
           const pack = (W.mobs || []).filter(o => !o.dead && o !== m && o.kind === 'c1_unrotting_hound' && W.dist(o, m) < 220); for (const o of pack) { o.alerted = true; o.cd = Math.min(o.cd || 0, .3); o.intent = 'lunge'; }
