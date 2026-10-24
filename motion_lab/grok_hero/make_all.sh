@@ -8,4 +8,5 @@ cd "$D"
 python3 cut.py "$SRC"
 python3 cut_attack.py "$SRC"
 python3 assemble.py --height "$H"
+python3 assemble_attack.py > /dev/null
 python3 audit.py > /dev/null && echo "audit.json 완료"
