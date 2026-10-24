@@ -22,7 +22,11 @@ AREA_COL = {  # 지형 덩어리
     'water': (44, 70, 92), 'poison': (60, 92, 48), 'mercury': (130, 140, 150), 'cliff': (30, 28, 28),
     'forest': (44, 62, 40), 'ruin': (96, 92, 86), 'ash': (120, 116, 108), 'fire': (150, 60, 30),
     'web': (150, 40, 50), 'wall': (20, 18, 18), 'pit': (10, 10, 12), 'building': (110, 96, 80),
-    'grave': (80, 80, 84), 'citywall': (170, 158, 130), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
+    'grave': (80, 80, 84), 'citywall': (170, 158, 130),
+    # 경관 (사장님 10-24 「엘든링처럼 웅장하게」)
+    'plateau': (104, 100, 86), 'chasm': (8, 6, 8), 'dune': (140, 132, 118), 'petrified': (96, 94, 90),
+    'aqueduct': (156, 146, 124), 'colossus': (132, 126, 118), 'threads': (170, 30, 40), 'blacklake': (16, 20, 30),
+    'oldwall': (124, 114, 98), 'sword': (170, 170, 176), 'gear': (140, 110, 50), 'books': (90, 70, 50), 'void': (90, 20, 34)}
 PATH_COL = {'road': (176, 156, 120), 'river': (60, 96, 130), 'wall': (16, 14, 14), 'cliff': (24, 20, 20),
             'bridge': (150, 110, 70), 'corridor': (128, 118, 110), 'sewer': (70, 96, 60), 'rail': (110, 100, 90)}
 KO = {'start': '시작', 'save': '모닥불(쉼터)', 'npc': '인물', 'item': '아이템', 'chest': '상자', 'mob': '몹 무리',
@@ -37,11 +41,14 @@ MARK = {  # type: (색, 모양, 글자)
     'quest': ((120, 255, 160), 'circle', '!'), 'landmark': ((220, 220, 220), 'square', ''),
     'shortcut': ((80, 230, 120), 'diamond', '⇄'), 'trap': ((255, 90, 160), 'tri', '!'),
     'shop': ((90, 170, 255), 'square', '$')}
+KO['vista'] = '전망(카메라 물러남)'
 LINK_COL = {'gate': (240, 240, 240), 'door': (220, 200, 160), 'stairs': (200, 200, 255), 'lift': (120, 230, 140),
             'shortcut': (80, 230, 120), 'secret': (255, 120, 200), 'oneway': (255, 170, 80)}
 
 def load(p):
     with open(p, encoding='utf-8') as f: return json.load(f)
+
+NOWALK = ('cliff', 'wall', 'pit', 'water', 'blacklake', 'chasm', 'petrified', 'aqueduct', 'colossus', 'sword', 'citywall', 'building', 'ruin')
 
 def check(m):
     """규칙 검사. 반환: 문제 목록."""
@@ -75,7 +82,11 @@ def check(m):
     for z in m['zones']:
         if z.get('kind') != 'field': continue
         mobs = [k for k in m.get('markers', []) if k.get('zone') == z['id'] and k['type'] in ('mob', 'elite', 'hidden_elite')]
-        need = max(1, (z['w'] * z['h']) // 2500)  # 50x50 타일(달리기 10초)마다 1무리
+        def parea(p): return abs(sum(p[i][0] * p[(i + 1) % len(p)][1] - p[(i + 1) % len(p)][0] * p[i][1] for i in range(len(p)))) / 2
+        def inz(p): cx = sum(q[0] for q in p) / len(p); cy = sum(q[1] for q in p) / len(p); return z['x'] <= cx < z['x'] + z['w'] and z['y'] <= cy < z['y'] + z['h']
+        blocked = sum(parea(a['poly']) for a in m.get('areas', []) + m.get('scenery', []) if a['kind'] in NOWALK and inz(a['poly']))
+        blocked += sum(3.14 * v.get('clear', 30) ** 2 for v in m.get('vistas', []) if z['x'] <= v['x'] < z['x'] + z['w'] and z['y'] <= v['y'] < z['y'] + z['h'])
+        need = max(1, int(z['w'] * z['h'] - blocked) // 2500)  # 걸을 수 있는 50x50 타일(달리기 10초)마다 1무리 (물·구덩이·벽·전망 빈터는 뺌)
         if len(mobs) < need: bad.append(f"필드 {z['id']} 몹 무리 {len(mobs)}개 < 권장 {need}개 (50x50마다 1무리)")
     return bad
 
@@ -97,6 +108,10 @@ def draw(m, out, zone=None, maxpx=3000):
     for ar in m.get('areas', []):
         pts = [P(x, y) for x, y in ar['poly']]
         d.polygon(pts, fill=AREA_COL.get(ar['kind'], (100, 100, 100)))
+    # 경관: 큰 지형·거대 구조물 (높이 h 타일, far=멀리서도 보임) — 굵은 테두리 + 이름
+    for sc in m.get('scenery', []):
+        pts = [P(x, y) for x, y in sc['poly']]
+        d.polygon(pts, fill=AREA_COL.get(sc['kind'], (120, 120, 120)), outline=(255, 240, 200) if sc.get('far') else (200, 190, 170), width=4 if sc.get('far') else 2)
     for p in m.get('paths', []):
         pts = [P(x, y) for x, y in p['pts']]
         d.line(pts, fill=PATH_COL.get(p['kind'], (150, 150, 150)), width=max(2, int(p.get('w', 2) * s)), joint='curve')
@@ -132,6 +147,20 @@ def draw(m, out, zone=None, maxpx=3000):
         k['_n'] = i
         if zone or k['type'] != 'mob':  # 전체 지도에서는 몹 무리 글자를 빼서 안 겹치게 (구역 그림에서 보임)
             d.text((x + r + 2, y - r), f"{i}.{k['name']}", fill=col, font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
+    ov = Image.new('RGBA', im.size, (0, 0, 0, 0)); od = ImageDraw.Draw(ov)
+    for v in m.get('vistas', []):   # 전망 자리: 카메라가 물러나며 경관을 보여 주는 곳 (부채꼴 = 보이는 쪽)
+        x, y = P(v['x'], v['y']); R = v.get('range', 120) * s; a0 = v['dir'] - v.get('fov', 70) / 2
+        od.pieslice([x - R, y - R, x + R, y + R], a0, a0 + v.get('fov', 70), fill=(255, 230, 140, 46), outline=(255, 230, 140, 140))
+    im.paste(Image.alpha_composite(im.convert('RGBA'), ov).convert('RGB')); d = ImageDraw.Draw(im)
+    for v in m.get('vistas', []):
+        x, y = P(v['x'], v['y']); r = max(8, s * 2)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 230, 140), outline=(0, 0, 0), width=2)
+        d.text((x + r + 3, y - r), f"전망 {v['name']} (×{v.get('zoom', .7)}{', 밀기 ' + str(v['pan']) if v.get('pan') else ''}) → {v.get('show', '')}", fill=(255, 230, 140), font=f2, stroke_width=2, stroke_fill=(0, 0, 0))
+    for sc in m.get('scenery', []):
+        xs = [p[0] for p in sc['poly']]; ys = [p[1] for p in sc['poly']]
+        x, y = P(sum(xs) / len(xs), sum(ys) / len(ys))
+        t = sc['name'] + (f" (높이 {sc['h']})" if sc.get('h') else '') + (' ★멀리서 보임' if sc.get('far') else '')
+        d.text((x - len(t) * s * .45, y), t, fill=(255, 250, 235), font=f1 if sc.get('far') else f2, stroke_width=3, stroke_fill=(0, 0, 0))
     d.text((10, 10), f"{m['chapter']} {m['title']}   전체 {m['w']}x{m['h']} 타일 (1타일=16px, 달리기 약 5타일/초 → 가로 {m['w'] / 5:.0f}초)",
            fill=(255, 230, 200), font=f3)
     # 범례
