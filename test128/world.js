@@ -197,6 +197,7 @@
     for (const o of (j.objects || [])) if (o.near && byId[o.near[0]]) { const r = byId[o.near[0]]; o.x = r.x + o.near[1]; o.y = r.y + o.near[2]; }
     for (const o of (j.objects || [])) if (!['spawn', 'champion', 'mark'].includes(o.type)) m.objs.push(Object.assign({}, o, { tx: o.x, ty: o.y, x: (o.x + .5) * T, y: (o.y + .5) * T }));
     for (const o of m.objs) if (['chest', 'sign', 'heal', 'waystone', 'npc', 'door'].includes(o.type) && !o.walk && !o.wander) m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = 1;
+    for (const o of m.objs) if (o.type === 'secret_wall') m.solidG[Math.floor(o.ty) * j.w + Math.floor(o.tx)] = SAVE.flags[o.flag] ? 0 : 1; // 숨은 방: a cracked wall tile
     for (const h of j.hds || []) { const im = HDIMG[h.ground], A = h.decoArt; if (!A || !im) continue; const hw = im.width / h.D / T, hh = im.height / h.D / T; // hd deco art (decoArt {legend char or deco name: [{img, ax, ay, flip}]}):
       for (const d of m.decos) { const vs = A[(j.ground[d.ty] || '')[d.tx]] || A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
         const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
@@ -393,6 +394,14 @@
           for (let x = x0; x <= x1; x++) for (let j = 0; j < 2; j++) { const hsh = Math.sin((x * 12.9 + y * 78.2 + j * 37.7)) * 43758.5, f = hsh - Math.floor(hsh), u = (f * T + ph * (1 + f)) % T, a = Math.sin(S.t * 1.7 + f * 6.3);
             if (a < .2) continue; const [sx, sy2] = W2S((h.gx + x) * T + u, (h.gy + y) * T + 3 + j * 8 + f * 3); ctx.fillRect(Math.round(sx), Math.round(sy2), Math.round((2 + 3 * a) * k), Math.max(1, Math.round(k * .5))); } }
         ctx.restore(); }
+      if (h.phase2) { const b = S.bossRef, on = b && !b.dead && b.phase === 2 ? 1 : 0; h._p2 = (h._p2 || 0) + (on - (h._p2 || 0)) * .025; const p = h._p2; // 보스 2페이즈: the room turns (red threads close in, light goes red, cocoons sway overhead)
+        if (p > .01) { const P = h.phase2; ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(255,${Math.round(255 - 120 * p)},${Math.round(255 - 110 * p)},1)`; ctx.fillRect(v.ox, v.oy, (EW + 1) * v.k, (EH + 1) * v.k); ctx.restore();
+          ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag] of P.threads || []) { const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 2 + x1) * k;
+            ctx.strokeStyle = `rgba(220,40,60,${.75 * p})`; ctx.lineWidth = Math.max(1, k * .5); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
+          for (const [x, y] of P.cocoons || []) { const [sx, sy] = W2S((h.gx + x) * T, (h.gy + y) * T), sw = Math.sin(S.t * 1.7 + x * 3) * 2 * k, top = sy - 60 * k * p; // hanging cocoons drop into view
+            ctx.strokeStyle = `rgba(230,220,230,${.6 * p})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(sx, v.oy); ctx.lineTo(sx + sw, top); ctx.stroke();
+            ctx.fillStyle = `rgba(214,200,190,${p})`; ctx.beginPath(); ctx.ellipse(sx + sw, top + 9 * k, 5 * k, 10 * k, 0, 0, TAU); ctx.fill(); ctx.fillStyle = `rgba(150,30,45,${.5 * p})`; ctx.fillRect(sx + sw - k, top + 4 * k, 2 * k, 12 * k); }
+          ctx.restore(); } }
       for (const [x0, y0, sz] of h.smoke || []) for (let i = 0; i < 9; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade
         const ph = (S.t * .16 + i / 9 + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz, [sx, sy] = W2S(wx, wy);
         ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
@@ -415,7 +424,7 @@
   function after(t, f) { S.timers.push({ t, f }); }
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
-  const NAMES = { potion: '물약', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
+  const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
     m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재' };
   const itemName = id => NAMES[id] || id;
   function giveLoot(list) { const g = window.__game; const names = [];
@@ -493,6 +502,7 @@
     if (!m.noDrop && D.mat && (D.champion || D.boss || Math.random() < .45)) { const n = D.matN || 1; giveLoot([[D.mat, n]]); } // shown in the pickup feed (right), not as text over the fight
     if (!D.boss && !D.champion && !m.noDrop && Math.random() < POT.heartDrop) S.fx.push({ type: 'heart', x: m.x, y: m.y, t: 0, life: 8 });
     if (m.flag) { SAVE.flags[m.flag] = true; save(); }
+    if (m.loot && !m.noDrop) { const got = giveLoot(m.loot); if (got) banner('얻었다: ' + got, 2); }
     if (D.champion) { banner('챔피언 격파 — ' + D.name + '!', 2.2); jingle(); const L = (M().links || {}).boss_door || {}, left = (L.needFlags || ['champ_boar', 'champ_wasp']).filter(f => !SAVE.flags[f]).length;
       after(2.3, () => msg(left ? '남은 챔피언: ' + left + ' — 모두 쓰러뜨리면 ' + (L.openText || '골렘의 방이 열린다') : (L.doneText || '숲의 두 우두머리를 쓰러뜨렸다! 신전 B2의 봉인된 문이 열린다.'), 3.5)); } // per-dungeon text (links.boss_door)
     if (D.boss) bossDefeated(m);
@@ -546,7 +556,7 @@
       S.nodeArmed = false; S.nearNode = null;
       for (const o of (m.objects || [])) {
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
-        if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id });
+        if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id, loot: o.loot }); // o.loot = the champion's drop (map data)
       }
       if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
@@ -848,6 +858,7 @@
         if ((o.shop || o.forge) && plain && window.__game && (window.__game.openForge || window.__game.openShop)) { talkAs(o, text, { choices: [{ t: o.forge ? '강화·제작' : '물건을 본다', f: () => openTrade(o) }, { t: '그만둔다' }] }); return; } // 대사 먼저, 고르면 가게 // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
         if (!o.anim && o.main && !/^[^\s:()「」]{1,8}: /m.test(text)) { S.dialog = { text, name: o.name, role: o.role, por: o.portrait || o.art || o.id }; return; } talkAs(o, text); return; }
       if (o.type === 'clue') { clue(o); return; }
+      if (o.type === 'secret_wall') { if (!SAVE.flags[o.flag]) { SAVE.flags[o.flag] = true; save(); m.solidG[o.ty * m.w + o.tx] = 0; shake(4); sfx('impact', .8); for (let i = 0; i < 14; i++) addFx('dust', o.x + (Math.random() - .5) * 16, o.y + (Math.random() - .5) * 10, { life: .6 }); banner(o.name || '숨겨진 길이 드러났다', 2); } else S.dialog = { text: o.textDone || '무너진 벽 너머로 좁은 방이 보인다.' }; return; }
       if (o.type === 'door') { // town B building doors: shops open the shop UI, the inn heals, others show their sign
         const g = window.__game;
         if ((o.shop || o.forge) && openTrade(o)) { S.door = o.id; return; }
@@ -948,6 +959,7 @@
     for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
+      if (o.type === 'secret_wall' && SAVE.flags[o.flag]) list.push({ y: o.y - 9, f: () => { g.fillStyle = '#0b0806'; g.fillRect(o.x - 7, o.y - 9, 14, 17); g.fillStyle = '#3e362e'; for (const [dx, dy] of [[-7, 6], [-3, 7], [4, 6], [6, 7], [0, 8]]) g.fillRect(o.x + dx, o.y + dy, 2, 1); } }); // the broken wall: a dark gap + rubble
       if (o.type === 'sign') list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
       if (o.type === 'heal') list.push({ y: o.y + 6, f: () => drawBench(g, o) });
       if (o.type === 'door_deco') list.push({ y: o.y - 8, f: () => drawSpr(g, o.sprite, o.x, o.y + 8) });

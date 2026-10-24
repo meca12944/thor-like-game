@@ -45,6 +45,10 @@ G.room(10, 46, 2, 2); G.room(35, 46, 2, 2)                              # → �
 G.room(3, 48, 15, 9)                                                    # 실패 탑 방
 G.room(27, 48, 17, 10)                                                  # 보스 앞방 (비석)
 G.put(35, 57, 'B')                                                      # 봉인된 문 → 재단사의 방
+G.room(33, 3, 4, 5)                                                     # 숨은 방 (재단실 동쪽 벽 뒤): 금 간 벽 (31,5)을 조사하면 무너진다
+G.put(32, 5, '.')
+SECRET = [(31, 5)]
+G.put(35, 6, 'C'); chests['35,6'] = {'id': 'ar_secret', 'loot': [['heart_piece', 1], ['potion', 1]]}
 for x, y in ((16, 38), (24, 38), (32, 38), (16, 42), (24, 42), (32, 42)): G.put(x, y, 'p')   # 고치 홀 기둥 (막힘, 필살기 그늘 X — 보스방만)
 for x in range(19, 30): G.put(x, 40, 'o') if x not in (24,) else None                       # 갈라진 바닥 틈 (구멍), 가운데 한 칸 다리
 G.put(4, 7, 'C'); chests['4,7'] = {'id': 'ar_c1', 'loot': [['potion', 1]]}
@@ -63,10 +67,23 @@ P('d_waystone', 31.5, 52.95); P('d_door_arch', 35.5, 57.95); P('d_cocoon_s', 42,
 # objects
 objs += [{'type': 'waystone', 'id': 'ws_arachne_in', 'x': 9, 'y': 6, 'name': '폐공방 입구 비석', 'art': 'hd'},
          {'type': 'waystone', 'id': 'ws_arachne_boss', 'x': 31, 'y': 52, 'name': '재단사의 방 앞 비석', 'art': 'hd'},
-         {'type': 'champion', 'id': 'champ_c1_loom', 'mob': 'champ_c1_loom', 'x': 24, 'y': 18},
-         {'type': 'champion', 'id': 'champ_c1_cocoon', 'mob': 'champ_c1_cocoon', 'x': 24, 'y': 44},
+         {'type': 'champion', 'id': 'champ_c1_loom', 'mob': 'champ_c1_loom', 'x': 24, 'y': 18, 'loot': [['potion', 2], ['bomb', 2]]},
+         {'type': 'champion', 'id': 'champ_c1_cocoon', 'mob': 'champ_c1_cocoon', 'x': 24, 'y': 44, 'loot': [['potion', 2], ['antidote', 1]]},
+         {'type': 'secret_wall', 'id': 'ar_secret_wall', 'x': 31, 'y': 5, 'flag': 'arachne_secret', 'name': '금 간 벽이 무너졌다 — 숨겨진 방!', 'textDone': '무너진 벽 너머로 좁은 방이 보인다.'},
          {'type': 'sign', 'x': 10, 'y': 3, 'walk': True, 'text': '폐공방 지하 1층 「실 공방」.\n안쪽 베틀방에서 실 끊기는 소리가 난다.'},
          {'type': 'sign', 'x': 42, 'y': 30, 'walk': True, 'text': '실 커튼 너머로 내려가는 비탈길.\n아래층은 고치 저장고다.'},
+         {'type': 'clue', 'id': 'ar_note_order', 'x': 20, 'y': 8, 'name': '주문 장부', 'flag': 'ar_note_order', 'textIdle': '재단대 밑에 두꺼운 장부가 떨어져 있다.',
+          'text': '왕실 의상실 주문 장부. 마지막 장:\n「왕도 화재의 밤 — 수의 열두 벌. 치수: 사람이 아님.」\n주문자 서명란에 낯익은 문양이 찍혀 있다.\n필멸자: (무심코 가슴께를 누른다) ……', 'textDone': '불탄 밤의 주문 장부. 서명란의 문양이 마음에 걸린다.'},
+         {'type': 'clue', 'id': 'ar_note_cloth', 'x': 17, 'y': 17, 'name': '베틀에 걸린 천', 'flag': 'ar_note_cloth', 'textIdle': '베틀에 짜다 만 천이 걸려 있다.',
+          'text': '천을 짜던 실이 아니다. 사람 머리카락이다.\n무늬 사이로 누군가의 얼굴이 입을 벌리고 있다.\n필멸자: ……여기서 짠 건 옷이 아니었군.', 'textDone': '머리카락으로 짠 천. 얼굴 무늬가 아직 입을 벌리고 있다.'},
+         {'type': 'clue', 'id': 'ar_note_mannequin', 'x': 4, 'y': 16, 'name': '꿰맨 마네킹', 'flag': 'ar_note_mannequin', 'textIdle': '이 마네킹만 유난히 사람 같다.',
+          'text': '마네킹의 이음매에서 미지근한 것이 배어 나온다.\n안에 든 건 짚이 아니다.\n필멸자: ……보지 마라. 다음으로 간다.', 'textDone': '꿰맨 자리가 아직 미지근하다.'},
+         {'type': 'clue', 'id': 'ar_note_cocoon', 'x': 7, 'y': 36, 'name': '작은 고치', 'flag': 'ar_note_cocoon', 'textIdle': '바닥에 떨어진 고치가 꿈틀댄다.',
+          'text': '고치 속에서 손톱으로 긁는 소리가 난다.\n칼끝을 대자 소리가 뚝 멈춘다.\n필멸자: ……늦었다.', 'textDone': '이제 아무 소리도 나지 않는다.'},
+         {'type': 'clue', 'id': 'ar_note_wall', 'x': 41, 'y': 50, 'name': '벽에 새긴 글', 'flag': 'ar_note_wall', 'textIdle': '벽에 무언가 빽빽하게 긁혀 있다.',
+          'text': '「영혼은 실이다. 끊기면 다시 꿰매면 된다.」\n그 아래 수십 번 덧새긴 이름 하나: 「아라크네」.\n자기 이름을 잊지 않으려 한 것처럼.', 'textDone': '덧새긴 이름 「아라크네」.'},
+         {'type': 'clue', 'id': 'ar_note_last', 'x': 34, 'y': 4, 'name': '아라크네의 마지막 기록', 'flag': 'ar_note_last', 'textIdle': '수놓인 천 조각이 벽에 걸려 있다.',
+          'text': '「왕도가 불탄다. 공주님의 드레스를 오늘 밤 안에 끝내야 하는데.\n손이 모자라. 다리가 더 있었으면.」\n마지막 줄만 실로 수놓여 있다: 「다 끝내면, 쉬어도 되겠지.」', 'textDone': '「다 끝내면, 쉬어도 되겠지.」'},
          {'type': 'clue', 'id': 'ar_clue_felix', 'x': 12, 'y': 54, 'name': '실에 감긴 공', 'flag': 'felt_felix_items', 'textIdle': '고치 사이에 무언가 굴러다닌다.',
           'text': '실에 칭칭 감긴 작은 공과, 찢어진 아이 목도리.\n목도리 끝에 「펠릭스」라고 서툰 글씨가 수놓여 있다.\n필멸자: ……(말없이 챙긴다)', 'textDone': '펠릭스의 공과 목도리를 챙겼다.'}]   # 토비 퀘스트 「사라진 아이의 실타래」
 for m, x, y in (('c1_thread_puppet', 21, 6), ('c1_thread_puppet', 28, 7), ('c1_needle_spider', 6, 19), ('c1_thread_puppet', 8, 22), ('c1_needle_spider', 41, 20),
@@ -119,6 +136,10 @@ def paint(rows, name, seed):
     course = front & ((fy2 % 5) < .7); img[front] = hx('#312b26') * (.8 + .4 * n3[front][:, None]); img[course] = hx('#201810')
     lipw = front & (fy2 < 1.4); img[lipw] = hx('#4b4138')
     strand = front & ((np.floor(wx * GD) % 23) == (np.floor(n1 * 40) % 23)) & (fy2 > 2); img[strand] = hx('#c0a98d') * .7
+    for (cx, cy) in (SECRET if name == 'arachne' else []):                          # 숨은 방 힌트: the wall face is cracked (zigzag), a draught of dust at its foot
+        X0, Y0 = cx * T, cy * T; zz = (np.abs(wx - (X0 + 8 + 3 * np.sin((wy - Y0) * .8))) < .7) & (wy > Y0 + 2) & (wy < Y0 + T) & (wx > X0) & (wx < X0 + T)
+        img[zz] = hx('#0e0703'); img[(np.abs(wx - (X0 + 5 + 2 * np.sin((wy - Y0) * 1.3))) < .5) & (wy > Y0 + 7) & (wy < Y0 + T) & (wx > X0)] = hx('#17110c')
+        dust = (wy > Y0 + T) & (wy < Y0 + T + 3) & (wx > X0 + 2) & (wx < X0 + T - 2) & (vn(1, seed + 9) > .6); img[dust] = hx('#877360')
     # floor shade under the wall face (contact shadow)
     above_front = np.vstack([np.zeros((1, w), bool), front_t[:-1]])[np.clip((wy // T).astype(int), 0, h - 1), np.clip((wx // T).astype(int), 0, w - 1)]
     sh2 = floor & above_front & ((wy % T) < 5); img[sh2] *= .6
@@ -165,7 +186,10 @@ b = {'id': 'arachne_boss', 'type': 'boss', 'region': 'ch1', 'area': 1, 'mapPos':
      'tileset': 'dungeon', 'tile': T, 'w': 28, 'h': 20, 'legend': LEG, 'solid': ['#'], 'ground': BG.rows(), 'spawns': {'default': [14.5, 15.5, 'up']},
      'links': {'stairs_up': {'to': 'arachne', 'spawn': 'boss'}},
      'boss': {'id': 'arachne', 'kind': 'arachne', 'name': '아라크네', 'x': 14.5, 'y': 9, 'flag': 'boss_arachne', 'intro': 1.8, 'reward': [['heart_piece', 1]], 'exit': {'to': 'felt', 'spawn': 'arachne'}},
-     'objects': [], 'hd': {'D': GD, 'ground': 'assets/world/arachne/arachne_boss_ground.png', 'props': hdprops(BPROPS), 'decoArt': PILLAR, 'lights': [[14, 6, 90, '#b080ff', .6], [14, 14, 70, '#c8d8ff', .35]]},
+     'objects': [], 'hd': {'D': GD, 'ground': 'assets/world/arachne/arachne_boss_ground.png', 'props': hdprops(BPROPS), 'decoArt': PILLAR,
+            'phase2': {'threads': [[3, 4, 8.5, 7.5, 1.2], [24.5, 4, 19.5, 7.5, 1.2], [3, 16.5, 8.5, 14.5, 1], [24.5, 16.5, 19.5, 14.5, 1], [8.5, 7.5, 19.5, 7.5, 2], [8.5, 14.5, 19.5, 14.5, 2],
+                                   [8.5, 7.5, 8.5, 14.5, 1.5], [19.5, 7.5, 19.5, 14.5, 1.5], [3, 10, 8.5, 11, 1], [24.5, 10, 19.5, 11, 1]],
+                       'cocoons': [[6, 9], [11, 7], [17, 7], [22, 9], [10.5, 12.5], [17.5, 12.5]]}, 'lights': [[14, 6, 90, '#b080ff', .6], [14, 14, 70, '#c8d8ff', .35]]},
      'note': 'GENERATED by tools/hd/build_arachne.py — edit the script'}
 json.dump(b, open(os.path.join(ROOT, 'maps', 'arachne_boss.json'), 'w'), ensure_ascii=False, indent=1)
 for f in os.listdir(OUT):
