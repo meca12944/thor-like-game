@@ -1314,7 +1314,8 @@
   function feltFrame(m) { const a = m.D.anim[m.anim || 'walk'], i = feltFrame0(m); return a && a.map ? a.map[i] : i; } // optional frame remap per strip
   function feltFrame0(m) { const A = m.D.anim, a = A[m.anim || 'walk'];
     if (a && a.once) { let t = m.at; for (let i = 0; i < a.n; i++) { t -= a.ticks[i] / 60; if (t < 0) return i; } return a.n - 1; } // one-shot strip (hurt)
-    if (m.anim === 'attack' || m.anim === 'shoot' || m.anim === 'pounce') { const key = m.anim === 'shoot' ? a.release : a.hit, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
+    if (a && a.loop) { const T = a.ticks.reduce((x, v) => x + v, 0) / 60; let t = (S.t + m.home[0]) % T, i = 0; for (; i < a.n - 1; i++) { t -= a.ticks[i] / 60; if (t < 0) break; } return i; } // looping stance (rage)
+    if (a && (a.hit !== undefined || a.release !== undefined)) { const key = a.release !== undefined ? a.release : a.hit, sc = m.preT > 0 ? m.keyT / m.preT : 1; let t = m.at, i = 0;
       if (t < m.keyT) { for (; i < key; i++) { t -= a.ticks[i] / 60 * sc; if (t < 0) return i; } return key; }
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
@@ -1323,7 +1324,7 @@
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
-      const atkA = name === 'attack' || name === 'shoot' || name === 'pounce', tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
+      const atkA = !!A[name] && (A[name].hit !== undefined || A[name].release !== undefined), tele = atkA && mm.at < mm.keyT, q = tele ? mm.at / mm.keyT : 0; let bx = 1, by = 1, ox = 0, oy = 0, rot = 0;
       if (tele) { bx = 1 + .1 * q; by = 1 - .12 * q; if (q > .7) ox = (Math.random() - .5) * 2 * k; } else if (atkA && mm.at < mm.keyT + .1) { bx = .92; by = 1.1; }
       if (mm.hitT > .18) { bx *= 1.12; by *= .88; }
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
@@ -1507,7 +1508,7 @@
     if (f.type === 'tring') { g.strokeStyle = 'rgba(225,228,240,.75)'; g.lineWidth = 1; for (const dy of [-12, -6]) { g.beginPath(); g.ellipse(f.x, f.y + dy, f.R, f.R * .8, 0, f.gap + f.gw / 2, f.gap - f.gw / 2 + TAU); g.stroke(); } } // 실 감옥: two strands of steel thread between the posts
     if (f.type === 'cocoonfall') { const k = Math.min(1, f.t / f.warn), x = Math.round(f.x), y = Math.round(f.y); // 고치 비: shadow grows, the cocoon drops in the last 40 %
       g.fillStyle = `rgba(0,0,0,${.15 + .35 * k})`; g.beginPath(); g.ellipse(x, y + 2, 4 + 10 * k, 2 + 4 * k, 0, 0, TAU); g.fill();
-      const q = Math.max(0, (k - .6) / .4), cy = y - 140 * (1 - q * q); if (k > .6) { g.fillStyle = '#e8e2d4'; g.beginPath(); g.ellipse(x, cy - 8, 5, 9, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,110,100,.8)'; g.lineWidth = 1;
+      const q = Math.max(0, (k - .6) / .4), sx = f.fx !== undefined ? Math.round(f.fx + (x - f.fx) * q) : x, cy = (f.fy !== undefined ? f.fy - 30 + (y - f.fy + 30) * q * q : y - 140 * (1 - q * q)); if (k > .6) { const x = sx; // from the ceiling cocoon (3번방) toward the marked spot g.fillStyle = '#e8e2d4'; g.beginPath(); g.ellipse(x, cy - 8, 5, 9, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,110,100,.8)'; g.lineWidth = 1;
         for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(x - 5, cy - 8 + i * 4); g.lineTo(x + 5, cy - 6 + i * 4); g.stroke(); } g.strokeStyle = 'rgba(230,230,240,.5)'; g.beginPath(); g.moveTo(x, cy - 17); g.lineTo(x, cy - 60); g.stroke(); } }
     if (f.type === 'unravel') { const n = f.n || 20; g.lineWidth = 1; for (let i = 0; i < n; i++) { const a = i * 2.39996, L = 10 + p * (40 + (i * 37 % 30)), w = Math.sin(p * 6 + i) * 6; // boss death: her threads come loose and fly out
         g.strokeStyle = `rgba(${i % 3 ? '220,220,235' : '160,40,40'},${Math.max(0, 1 - p)})`; g.beginPath(); g.moveTo(f.x, f.y); g.quadraticCurveTo(f.x + Math.cos(a) * L * .5 - Math.sin(a) * w, f.y + Math.sin(a) * L * .4 + Math.cos(a) * w, f.x + Math.cos(a) * L, f.y + Math.sin(a) * L * .7 + p * 20); g.stroke(); } }
