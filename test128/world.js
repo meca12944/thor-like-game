@@ -1389,6 +1389,7 @@
     if (f.type === 'heal') { g.fillStyle = `rgba(120,255,140,${1 - p})`; g.fillRect(f.x - 1, f.y - p * 14 - 3, 2, 6); g.fillRect(f.x - 3, f.y - p * 14 - 1, 6, 2); }
     if (f.type === 'stars') { g.fillStyle = '#ffe060'; for (let i = 0; i < 3; i++) { const a = S.t * 6 + i * 2.1; g.fillRect(f.x + Math.cos(a) * 6, f.y + Math.sin(a) * 2, 2, 2); } }
     if (f.type === 'sparkle') { g.fillStyle = `rgba(255,250,180,${1 - p})`; for (let i = 0; i < 5; i++) { const a = i * 1.26 + p; g.fillRect(f.x + Math.cos(a) * p * 12, f.y + Math.sin(a) * p * 12 - p * 6, 2, 2); } }
+    if (f.type === 'tring') { g.strokeStyle = 'rgba(225,228,240,.75)'; g.lineWidth = 1; for (const dy of [-12, -6]) { g.beginPath(); g.ellipse(f.x, f.y + dy, f.R, f.R * .8, 0, f.gap + f.gw / 2, f.gap - f.gw / 2 + TAU); g.stroke(); } } // 실 감옥: two strands of steel thread between the posts
     if (f.type === 'cocoonfall') { const k = Math.min(1, f.t / f.warn), x = Math.round(f.x), y = Math.round(f.y); // 고치 비: shadow grows, the cocoon drops in the last 40 %
       g.fillStyle = `rgba(0,0,0,${.15 + .35 * k})`; g.beginPath(); g.ellipse(x, y + 2, 4 + 10 * k, 2 + 4 * k, 0, 0, TAU); g.fill();
       const q = Math.max(0, (k - .6) / .4), cy = y - 140 * (1 - q * q); if (k > .6) { g.fillStyle = '#e8e2d4'; g.beginPath(); g.ellipse(x, cy - 8, 5, 9, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,110,100,.8)'; g.lineWidth = 1;

@@ -412,6 +412,7 @@
         case 'atk': if (m.at > m.dur && m.t > (m.hold || 0)) rest(m.last); return; // waiting for the strike / clones / volleys to finish
         case 'cage': { const c = m.cg; c.t += dt; m.moving = false; const k = Math.min(1, c.t / c.T), e = 1 - (1 - k) * (1 - k), R = c.R0 + (c.R1 - c.R0) * e, gw = Math.min(1.1, 34 / R), n = Math.ceil(TAU * R / 17);
           if (k < 1) for (let i = 0; i < n; i++) { const b = i * TAU / n, dg = Math.atan2(Math.sin(b - c.gap), Math.cos(b - c.gap)); if (Math.abs(dg) < gw / 2) continue; W.tempSolid(c.cx + Math.cos(b) * R, c.cy + Math.sin(b) * R * .8, 6, .05, 'threadwall'); } // the wall: thread posts, re-placed every frame a little further in
+          if (k < 1) W.fx('tring', c.cx, c.cy, { R, gap: c.gap, gw, life: .035 }); // strands between the posts
           if (m.t > c.T + .1) rest('cage'); return; }
         case 'pounce': if (m.t < m.warn) { const P = A.pounce, f0 = P.ticks.slice(0, P.air).reduce((a, v) => a + v, 0) / P.ticks.slice(0, P.hit).reduce((a, v) => a + v, 0), k = Math.max(0, Math.min(1, (m.t / m.warn - f0) / (1 - f0))), e = k * k * (3 - 2 * k); /* crouch in place, travel only while airborne */ W.moveCol(m, m.sx + (m.tx - m.sx) * e - m.x, m.sy + (m.ty - m.sy) * e - m.y, m.r); }
           else { if (!m.landed) { m.landed = true; W.shake(3); W.fx('dust', m.x - 10, m.y); W.fx('dust', m.x + 10, m.y); } if (m.t > m.warn + .1) rest('pounce'); } return;
