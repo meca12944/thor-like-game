@@ -312,6 +312,31 @@ if props_named('crates'):
     cq = min(props_named('crates'), key=lambda q: q['x']); SPOT['f_chest_plaza'] = nearest_floor(int(cq['x']) + 1, int(cq['y']) + 1, npc_tiles)
 for o in objs:
     if o.get('id') in SPOT: o['x'], o['y'] = SPOT[o['id']]
+# ---------- story time of day (owner 10-24 펠트 업그레이드 3단계): maps/src/felt_story.json -> extras / buttons / threads / gate / dice / board / memorial (logic = felt_live.js) ----------
+ST = json.load(open(os.path.join(ROOT, 'maps', 'src', 'felt_story.json')))
+taken = set(npc_tiles)
+def stand(x, y):
+    p = [x, y] if not solid[y][x] and (x, y) not in taken else nearest_floor(x, y, taken)
+    taken.add(tuple(p)); return p
+def rel(p, q): return {k: [v[0] - p[0], v[1] - p[1]] for k, v in q.items()}   # pos as a delta: still right inside ch1's composed map
+for e in ST['extras']:
+    x, y = stand(e['x'], e['y']); q = {'type': 'npc', 'id': e['id'], 'x': x, 'y': y, 'name': e['name'], 'art': e['art'], 'hi': 1, 'h': 30, 'wander': .5, 'idle': e['idle'], 'after': e['after'], 'extra': 1}
+    if e.get('pos'): q['pos'] = rel([x, y], {k: stand(*v) for k, v in e['pos'].items()})
+    objs.append(q)
+for o in objs:
+    if o.get('id') in ST['npc_pos']: o['pos'] = rel([o['x'], o['y']], {k: stand(*v) for k, v in ST['npc_pos'][o['id']].items()})
+for b in ST['buttons']:
+    if b.get('map'): continue                                                     # interiors: hand-edited felt_int_*.json
+    x, y = stand(b['x'], b['y']); objs.append({'type': 'felt', 'id': 'f_btn_%d' % b['n'], 'felt': 'btn', 'n': b['n'], 'x': x, 'y': y, 'text': b['text']})
+for n, x, y in ST['threads']:
+    tx, ty = stand(int(x), int(y) + 1); objs.append({'type': 'felt', 'id': 'f_thread_%d' % n, 'felt': 'thread', 'n': n, 'x': tx, 'y': ty})
+G_ = ST['gate']; objs.append({'type': 'felt', 'id': 'f_gate', 'felt': 'gate', 'x': G_['x'], 'y': G_['y'], 'dxs': [v - G_['x'] for v in G_['xs']], 'drows': [v - G_['y'] for v in G_['rows']], 'text': G_['night']})
+objs.append(dict({'type': 'felt', 'id': 'f_dice', 'felt': 'dice'}, **ST['dice']))
+objs.append(dict({'type': 'felt', 'id': 'f_board', 'felt': 'board'}, **ST['board']))
+objs.append(dict({'type': 'felt', 'id': 'f_memorial', 'felt': 'memorial'}, **ST['memorial']))
+objs.append(dict({'type': 'felt', 'id': 'f_ration', 'felt': 'ration'}, **ST['ration']))
+LIVE['story'] = {'buttons': len(ST['buttons']), 'done': ST['buttons_done']}
+import shutil; shutil.copy(os.path.join(ART, 'ash_button_glint_strip.png'), os.path.join(SLOT_OUT, 'ash_button_glint_strip.png'))
 SPAWNS = {'default': [EX[0] + .5, EX[1] - 7.5, 'up'], 'world': [EX[0] + .5, EX[1] - 7.5, 'up'], 'field': [EX[0] + .5, EX[1] - 1.5, 'up'], 'arachne': [foot('web_arch')[0] + .5, foot('web_arch')[1] + 1.6, 'down']}
 for o in objs:
     if o.get('type') == 'door' and o.get('out'): SPAWNS[o['out']] = [o['x'] + .5, o['y'] + 1.5, 'up']  # step back out on the tile in front of that door

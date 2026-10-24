@@ -710,6 +710,7 @@ function goldFor(kind,area=1){const r=ECON&&ECON.areas[Math.max(1,Math.min(ECON.
 let goldEarned=0;
 function addGold(n,x,y){n=Math.round(n)||0;if(n<=0)return 0;INV.gold+=n;goldEarned+=n;try{if(x!==undefined)dnum(x,y,n,false,'#ffd84a','G');}catch(e){}return n;}
 const IT=ITEMS?ITEMS.items:{};
+if(!IT.acc_guard_button)IT.acc_guard_button={n:'근위의 단추',s:'necklace',t:1,df:1,fx:'방어 1',p:0,ic:65,r:'uncommon',sell:10,src:'펠트: 잿빛 단추 6개를 모아 리네트에게 (felt_live.js)'}; // STORY_ANSWERS 5 장신구 (펠트 업그레이드 10-24): kept out of the generated ITEMS line so tools/icons.py can rewrite it
 // RARITY_STARS: number of small pixel stars drawn in an icon's corner, per rarity (the one config to tweak)
 const RARITY_STARS={common:0,uncommon:1,rare:2,epic:3,legendary:4,unique:4,corrupt:3,legend:5};
 const RARITY={common:['#9aa0a8','일반'],uncommon:['#5ac85a','고급'],rare:['#3a8ef0','희귀'],epic:['#b050f0','영웅'],legendary:['#ffb020','전설'],unique:['#ff5a3a','유일'],corrupt:['#8a2ae0','타락'],legend:['#ff4fd8','레전드']};

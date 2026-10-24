@@ -144,6 +144,15 @@
    "anim": "felt_bart",
    "wander": 0.8,
    "face0": "down"
+  },
+  {
+   "type": "felt",
+   "id": "f_btn_5",
+   "felt": "btn",
+   "n": 5,
+   "x": 3,
+   "y": 10,
+   "text": "잿빛 단추. 명부와 같은 상자에 들어 있었다."
   }
  ],
  "ground": [

@@ -348,7 +348,7 @@
   function solidAt(px, py) { const m = M(); if (!m) return true; const x = Math.floor(px / m.T), y = Math.floor(py / m.T);
     if (x < 0 || y < 0 || x >= m.w || y >= m.h) return true; if (m.solidG[y * m.w + x] && !(hopNow && m.hopG && m.hopG[y * m.w + x])) return true;
     for (const t of S.temp) if (Math.hypot(px - t.x, py - t.y) < t.r) return true;
-    for (const o of m.objs) if (o.wander && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
+    for (const o of m.objs) if (o.wander && !o.hide && o !== npcSelf && Math.abs(px - o.x) < 5 && py > o.y + 2 && py < o.y + 9) return true; return false; }
   let npcSelf = null;
   // Felt NPC wander: idle 2-5 s, then walk to a random free spot within o.wander tiles of the home spot; stop and face the hero when he comes close
   function stepNpcs(dt) { const m = M();
@@ -373,7 +373,7 @@
       if (x1 > x0 && y1 > y0) ctx.drawImage(im, x0, y0, x1 - x0, y1 - y0, Math.round(sx + x0 * sc), Math.round(sy + y0 * sc), Math.round((x1 - x0) * sc), Math.round((y1 - y0) * sc)); // the visible part only
       for (const q of h.props || []) { if (!q.under) continue; const pi = HDIMG[q.img]; if (!pi) continue; const Dq = q.D || h.D, s2 = k / Dq, [px, py] = W2S((h.gx + q.x) * m.T, (h.gy + q.y) * m.T); // under: walked on (bridge planks)
         ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
-  function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
+  function drawPropsHi(k, front) { const m = M(); if (m && FL() && FL().objs) FL().objs(k, front, m); if (!m || !m.hds) return; const T = m.T; // felt_live.js: its own objects (ash buttons, scarf, ribbon), interiors too
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
       if (q.show && !(FL() && FL().show(q.show))) continue; // felt_live.js: story variants (memorial wall day / night, thread clump / cut)
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
@@ -443,11 +443,11 @@
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       ctx.restore(); } }
   function drawNpcHi(k, front) { const m = M(); if (!m || m.type === 'world') return;
-    if (PET.A) for (const o of m.objs) { if (o.type !== 'npc' || o.art !== 'linette8' || (o.y > hero.y) !== !!front) continue; // 팀장 10-24: Felt's Linette = the same 8-way art as the companion (was the old tailor still)
+    if (PET.A) for (const o of m.objs) { if (o.type !== 'npc' || o.art !== 'linette8' || o.hide || (o.y > hero.y) !== !!front) continue; // 팀장 10-24: Felt's Linette = the same 8-way art as the companion (was the old tailor still)
       const moving = !!o.tgt, near = !moving && Math.hypot(hero.x - o.x, hero.y - o.y) < 60, dir = moving ? petDir(o.tgt[0] - o.x, o.tgt[1] - o.y, o.face || 'down') : near ? petDir(hero.x - o.x, hero.y - o.y, 'down') : 'down', L = PET.A.anims[(moving ? 'walk_' : 'idle_') + dir] || PET.A.anims['idle_' + dir] || PET.A.anims.idle_down || PET.A.anims.idle_right; if (!L) continue;
       let t = ((moving ? (o.at || 0) : S.t) * 60 + o.x) % petTot(L), i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } const e = L[i], im = PET.IM[e[0]], c = PET.A.cells[e[0]][e[1]]; if (!im || !im.complete) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7); ctx.save(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, c[0], c[1], c[2], c[3], Math.round(sx - c[4] * sc), Math.round(sy - c[5] * sc), Math.round(c[2] * sc), Math.round(c[3] * sc)); ctx.restore(); }
-    for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
+    for (const o of m.objs) { if (o.type !== 'npc' || !o.anim || o.hide || (o.y > hero.y) !== !!front) continue; const c = npcCell(o); if (!c) continue;
       const sc = k * H128FIG / 117, [sx, sy] = W2S(o.x, o.y + 7), [im, r] = c, v = S.view; ctx.save(); ctx.beginPath(); ctx.rect(v.ox, v.oy, EW * v.k, EH * v.k); ctx.clip(); ctx.imageSmoothingEnabled = sc < 1; ctx.drawImage(im, r[0], r[1], r[2], r[3], Math.round(sx - r[4] * sc), Math.round(sy - r[5] * sc), Math.round(r[2] * sc), Math.round(r[3] * sc)); ctx.restore(); } }
   function blocked(x, y, r) { return solidAt(x, y) || solidAt(x - r, y) || solidAt(x + r, y) || solidAt(x, y - r * .6) || solidAt(x, y + r * .4); }
   let hopNow = false; // true only while the airborne hero moves: hop cells are open for him alone
@@ -507,7 +507,7 @@
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
   const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
     m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재', m_leather_strap: '질긴 가죽끈', riceball: '주먹밥' };
-  const itemName = id => NAMES[id] || id;
+  const itemName = id => NAMES[id] || (typeof IT !== 'undefined' && IT[id] && IT[id].n) || id; // IT = the town's item table (index.html)
   function giveLoot(list) { const g = window.__game; const names = [];
     for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff'); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
       names.push(itemName(id) + (n > 1 ? ' ×' + n : '')); }
@@ -943,7 +943,7 @@
   function playSeq(seq, last) { if (!seq.length) return; const [h, ...rest] = seq, w = h.who || {};
     S.dialog = Object.assign({ text: h.lines.join('\n'), name: w.name || '', role: w.role, anim: w.anim, por: w.por, cg: h.cg, cgDx: h.cgDx, cgLast: !!h.cgLast, creep: !!w.creep, narr: !!w.narr, pitch: w.pitch || 1 }, rest.length ? { then: () => playSeq(rest, last) } : (last || {})); }
   function talkAs(o, text, last, artKey) { const sq = toSeq(text, { name: o.name, role: o.role, anim: o.anim, pitch: o.voice || 1 }); playSeq(artKey ? withArt(sq, artKey) : sq, last); }
-  function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return o.idle || '…';
+  function npcLine(o) { const D = DLGD && DLGD.npc && DLGD.npc[o.id], F = SAVE.flags; if (!D) return (F.boss_arachne && o.after) || o.idle || '…'; // o.after: map-side line after the boss (Felt extras)
     if (F.boss_arachne && D.after) return D.after; if (D.meet && !F['met_' + o.id]) { F['met_' + o.id] = true; save(); return D.meet; } return D.mid || o.idle || '…'; }
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
@@ -954,7 +954,8 @@
   function interact() {
     const m = M(); const dv = FACEV[hero.face]; const fx = Math.floor((hero.x + dv[0] * 12) / m.T), fy = Math.floor((hero.y - 3 + dv[1] * 12) / m.T);
     for (const o of m.objs) {
-      if (!((o.tx === fx && o.ty === fy) || Math.hypot(o.x - hero.x, o.y - hero.y) < 15)) continue;
+      if (o.hide || !((o.tx === fx && o.ty === fy) || Math.hypot(o.x - hero.x, o.y - hero.y) < 15)) continue;
+      if (FL() && FL().interact && FL().interact(o)) return; // felt_live.js: Felt's story objects (buttons, threads, dice, gate, memorial, inn rest)
       if (o.type === 'sign') { S.dialog = { text: o.text }; return; }
       if (o.type === 'npc') { let text = (o.quests && NAV()) ? NAV().talk(o) : (o.idle || '…'); S.talked = o.id; const plain = text === (o.idle || '…'); if (plain) text = npcLine(o);
         if ((o.shop || o.forge) && plain && window.__game && (window.__game.openForge || window.__game.openShop)) { talkAs(o, text, { choices: [{ t: o.forge ? '강화·제작' : '물건을 본다', f: () => openTrade(o) }, { t: '그만둔다' }] }); return; } // 대사 먼저, 고르면 가게 // Felt: 롬 = 대장간(강화·제작), 세라·벤 = 상점 — quest talk comes first
@@ -1062,7 +1063,7 @@
     drawLock(g);
     const list = [];                                         // y-sorted sprites
     for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
-    for (const o of m.objs) {
+    for (const o of m.objs) { if (o.hide) continue; // o.hide: felt_live.js story time of day (who is out when)
       if (o.type === 'chest') list.push({ y: o.y + 6, f: () => drawSpr(g, SAVE.chests[o.id] ? 'chest_open' : 'chest', o.x, o.y + 7) });
       if (o.type === 'secret_wall' && SAVE.flags[o.flag]) list.push({ y: o.y - 9, f: () => { g.fillStyle = '#0b0806'; g.fillRect(o.x - 7, o.y - 9, 14, 17); g.fillStyle = '#3e362e'; for (const [dx, dy] of [[-7, 6], [-3, 7], [4, 6], [6, 7], [0, 8]]) g.fillRect(o.x + dx, o.y + dy, 2, 1); } }); // the broken wall: a dark gap + rubble
       if (o.type === 'sign' && !o.live) list.push({ y: o.y + 6, f: () => drawSpr(g, 'sign', o.x, o.y + 8) });
@@ -1074,6 +1075,7 @@
       if (o.type === 'npc' && o.anim && npcAnim(o.anim)) list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill();
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } });
       else if (o.type === 'npc' && o.art === 'linette8') list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill(); if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } }); // body = Linette's 8-way atlas (drawNpcHi)
+      else if (o.type === 'npc' && o.hi) list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill(); } }); // o.hi: body drawn hi-res by felt_live.js (Felt extras)
       else if (o.type === 'npc') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art);
         if (im && im.complete && im.naturalWidth) { const h = o.h || 26, w = im.naturalWidth * h / im.naturalHeight; g.drawImage(im, Math.round(o.x - w / 2), Math.round(o.y + 7 - h), w, h); }
         else drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7);
@@ -2054,7 +2056,7 @@
     publish();
     requestAnimationFrame(frame);
   }
-  window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, aliasPt, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
+  window.__worldHooks = { hudY: () => S.hudY, S, M, MAPS, loadMap, aliasPt, renderGround, hero, get SAVE() { return SAVE; }, save, go, takePress, isHeld, held, queue, codesOf, keyHint, textOut, panel, font, W2S, ctx, cv, drawSpr, msg, banner, giveLoot, addFx, syncTownHp, talkAs, sfx, shake: n => shake(n), LW, LH, TAU, get IMG() { return IMG; }, get ATLAS() { return ATLAS; }, ready };
   const W_API = window.__world = { mobApi: W, /* test: the helper object mobs get (force a boss move) */ replayScene: (k, d) => { delete SAVE.flags["scene_" + k]; playScene(k, d || 0); }, /* test: replay a 1장 scene */
     WORLD_ZOOM, LW, LH, ROLL, ready: false, hero, S, get SAVE() { return SAVE; }, get scene() { return S.scene; }, get map() { return S.map; }, get mobs() { return S.mobs; }, get trans() { return S.trans; },
     go, dirTap, hitMob, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },

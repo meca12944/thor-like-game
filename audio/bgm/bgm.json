@@ -750,5 +750,22 @@
   "bytes": 587379,
   "version": 2,
   "note": "자작 대체곡. 메인은 사용자 제공곡 battle_champion_user01.ogg"
+ },
+ "town_felt_bright": {
+  "id": "town_felt_bright",
+  "file": "../../test128/assets/bgm/felt_bright.ogg",
+  "title": "잿더미 위의 별",
+  "en": "Stars over the Ashes (Felt, after the boss)",
+  "bpm": 75,
+  "key": "E major",
+  "loop": true,
+  "loopStart": 0.0,
+  "loopEnd": 51.2,
+  "duration": 51.2,
+  "lufs": -13.9,
+  "truePeak": -2.0,
+  "bytes": 868918,
+  "version": 2,
+  "note": "펠트 보스 처치 후 (town_ruin 장조판). 파일은 test128/assets/bgm/ (음악 담당 10-24)"
  }
 }

@@ -137,6 +137,28 @@
    "anim": "felt_oswald",
    "wander": 0.6,
    "face0": "up"
+  },
+  {
+   "type": "felt",
+   "id": "f_btn_6",
+   "felt": "btn",
+   "n": 6,
+   "x": 4,
+   "y": 10,
+   "text": "잿빛 단추. 문양이 이상하게 낯익다."
+  },
+  {
+   "type": "npc",
+   "id": "f_x11",
+   "x": 9,
+   "y": 9,
+   "name": "기도하는 여인",
+   "art": "g_oracle",
+   "hi": 1,
+   "h": 30,
+   "idle": "오스왈드 님 말로는 기도는 공짜래요.",
+   "after": "오늘은 감사 기도를 드렸어요. 오래 안 해서 어색하네요.",
+   "extra": 1
   }
  ],
  "ground": [
