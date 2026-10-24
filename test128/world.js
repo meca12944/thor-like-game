@@ -988,7 +988,7 @@
     if (o.needQuest && !questOn(o.needQuest)) { S.dialog = { text: o.textIdle || o.textLocked || '…', name: o.name }; return; }
     if (!(o.needFlags || []).every(f => SAVE.flags[f])) { S.dialog = { text: o.textLocked || '지금은 할 수 있는 게 없다.', name: o.name }; return; }
     SAVE.flags[o.flag] = true; save(); const got = o.loot ? giveLoot(o.loot) : '';
-    const more = (o.textMore || []).filter(([c]) => c.startsWith('quest:') ? SAVE.quests[c.slice(6)] === 'done' : SAVE.flags[c]).map(([, t]) => '\n\n' + t).join(''); // textMore: lines that only make sense after something else (제미나이 1장 연결)
+    const more = (o.textMore || []).filter(([c]) => c.startsWith('quest:') ? !!SAVE.quests[c.slice(6)] : SAVE.flags[c]).map(([, t]) => '\n\n' + t).join(''); // textMore: lines that only make sense after something else ('quest:<id>' = that quest taken; 제미나이 1장 연결)
     S.dialog = { text: o.text + more + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg, cgDx: o.cgDx || 0 }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
