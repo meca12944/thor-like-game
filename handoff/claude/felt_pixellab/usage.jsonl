@@ -236,3 +236,7 @@
 {"t": "2026-10-24 01:38:00", "name": "team_cg_arachne_end", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0, "note": "다시 적음 (기록 파일 되돌림으로 빠짐)"}
 {"t": "2026-10-24 01:41:00", "name": "team_cg_linette_join", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0, "note": "다시 적음 (기록 파일 되돌림으로 빠짐)"}
 {"t": "2026-10-24 01:45:59", "name": "team_cg_felt_arrival", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 04:31:09", "name": "team_cg_memory_fire", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 04:31:38", "name": "team_cg_arachne_past", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 04:33:30", "name": "team_cg_felix_scarf", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}
+{"t": "2026-10-24 04:33:41", "name": "team_cg_linette_meet", "endpoint": "/generate-image-v2", "status": "completed", "usage": {"type": "generations", "generations": 15.0}, "n": 15.0}

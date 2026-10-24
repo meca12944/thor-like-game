@@ -15,6 +15,10 @@ CG = {
  'cg_felt_arrival': ('the swordsman seen from behind standing on a hill of ash at dusk, looking down at a ruined slum village under a huge burned royal castle with smoke rising, embers floating', [HERO, FELT], 5),
  'cg_lair_gate': ('the swordsman and the young seamstress standing before a dark ruined workshop entrance covered in thick white spider webs and hanging cocoons, a faint red glow inside, ominous', [HERO, LIN], 7),
  'cg_arachne_end': ('the spider tailor Arachne collapsing, her threads unravelling into falling ash and white silk, her face peaceful and sad, the swordsman standing with his sword lowered in a dark red-lit lair', [ARA, HERO], 9),
+ 'cg_memory_fire': ('the swordsman standing alone in the middle of a burning royal capital at night, flames and collapsing towers all around, glowing red threads spreading from his chest outward into the burning city, his face hidden in shadow, ominous, memory flashback', [HERO], 13),
+ 'cg_linette_meet': ('the young blonde seamstress in a ruined royal tailor shop, startled, turning around holding two long needles, torn gowns on mannequins and faded drapes around her, dusty light through a broken window', [LIN], 15),
+ 'cg_arachne_past': ('a sad young woman tailor thirty years ago sitting alone at a sewing table at night in a royal workshop, sewing a garment by candlelight, seen from behind, piles of finished cloaks around her, red thread on the table, quiet and melancholy', [ARA], 17),
+ 'cg_felix_scarf': ('a small child-sized white silk cocoon lying on a dark stone floor, a little red knitted scarf and a worn leather ball dropped next to it, threads trailing into darkness, no people, quiet horror', [], 19),
  'cg_linette_join': ('the young seamstress walking beside the swordsman out of the dark workshop into grey dawn light over the ash village, she looks up at him hopefully, he looks ahead', [HERO, LIN], 11),
 }
 for cid in sys.argv[1:]:
