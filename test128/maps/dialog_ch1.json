@@ -77,6 +77,18 @@
     "cg/cg_linette_join.png",
     5
    ]
+  ],
+  "area:felt": [
+   [
+    "cg/cg_felt_arrival.png",
+    0
+   ]
+  ],
+  "area:ar_b1": [
+   [
+    "cg/cg_lair_gate.png",
+    0
+   ]
   ]
  }
 }
