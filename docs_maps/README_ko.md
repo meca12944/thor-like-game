@@ -66,7 +66,7 @@
 - `paths.kind`: road / river / wall / cliff / bridge / corridor / sewer / rail
 - `links.kind`: gate / door / stairs / lift / shortcut / secret / oneway. 다른 챕터로 가는 길은 `"to":"ch2"` 로 쓴다.
 - `markers.type`: start / save / npc / shop / item / chest / mob / elite / hidden_elite / midboss / boss / quest / landmark / shortcut / trap
-  - mob은 `"note":"껍데기 4"` 처럼 무리의 몹 종류와 수를 적는다.
+  - mob은 **종류를 적지 않는다** (사장님 10-24: 마물은 앞으로 다시 기획). 이름은 무리 크기만 적는다: `몹 무리 작은 2~3` / `보통 3~4` / `큰 5~6`. 정본에 이름이 나온 정예·중간 보스·보스만 그 이름을 쓴다.
   - item·chest는 `ref` 에 정본 아이템 이름을 그대로 쓴다.
 
 ## 순서
