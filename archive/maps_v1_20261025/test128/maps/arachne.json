@@ -1,0 +1,949 @@
+{
+ "id": "arachne",
+ "type": "dungeon",
+ "region": "ch1",
+ "area": 1,
+ "mapPos": [
+  0,
+  0
+ ],
+ "name": "아라크네의 폐공방",
+ "title": {
+  "kicker": "1장 · 던전",
+  "name": "아라크네의 폐공방",
+  "sub": "실과 고치의 지하"
+ },
+ "bgm": "area01_temple_user01",
+ "battleBgm": "battle_champion",
+ "tileset": "dungeon",
+ "tile": 16,
+ "dark": 0.55,
+ "w": 48,
+ "h": 60,
+ "legend": {
+  "#": "wall",
+  ".": "floor",
+  ",": "floor_moss",
+  "%": "floor_crack",
+  "o": {
+   "ground": "floor",
+   "hop": true
+  },
+  "U": {
+   "ground": "floor",
+   "obj": "stairs_up"
+  },
+  "B": {
+   "ground": "floor",
+   "obj": "boss_door"
+  },
+  "C": {
+   "ground": "floor",
+   "obj": "chest"
+  },
+  "p": {
+   "ground": "floor",
+   "deco": "pillar",
+   "solid": true
+  }
+ },
+ "solid": [
+  "#"
+ ],
+ "ground": [
+  "################################################",
+  "################################################",
+  "##..........######.............#################",
+  "##....U.....######...........####....###########",
+  "##..........######..###...###..##....###########",
+  "##.............................#.....###########",
+  "##.............................##..C.###########",
+  "##..C.......######.............##....###########",
+  "##..........######.............#################",
+  "##################.............#################",
+  "#######################..#######################",
+  "#######################..#######################",
+  "#######################..#############........##",
+  "##..........#.......................##........##",
+  "##...#####..#.........#####.........##........##",
+  "##..........#.#####...........#####.##........##",
+  "##..........#.......................##........##",
+  "##............................................##",
+  "##............................................##",
+  "##..........#.......................##........##",
+  "##..........#.......................##........##",
+  "##..........#.#...................#.##........##",
+  "##..........#.......................##........##",
+  "##..........##########################........##",
+  "##.C........##########################........##",
+  "##..........##########################........##",
+  "######################################........##",
+  "######################################........##",
+  "#########################################...####",
+  "#########################################...####",
+  "#########################################...####",
+  "#########################################...####",
+  "#########################################...####",
+  "#########################################...####",
+  "####........................................####",
+  "####........................................####",
+  "####.....................................#######",
+  "####........................................####",
+  "####............p.......p.......p...........####",
+  "####........................................####",
+  "####...............ooooo.ooooo..............####",
+  "####........................................####",
+  "####............p.......p.......p...........####",
+  "####.###....................................####",
+  "####........................................####",
+  "####........................................####",
+  "##########..#######################..###########",
+  "##########..#######################..###########",
+  "###...............#########.................####",
+  "###...............#########.................####",
+  "###...............#########.................####",
+  "###......###......#########.................####",
+  "###...............#########.................####",
+  "###...............#########.................####",
+  "###...........###.#########.................####",
+  "###.C.............#########.................####",
+  "###...............#########.................####",
+  "###########################........B........####",
+  "################################################",
+  "################################################"
+ ],
+ "spawns": {
+  "default": [
+   6.5,
+   5.5,
+   "down"
+  ],
+  "felt": [
+   6.5,
+   5.5,
+   "down"
+  ],
+  "boss": [
+   35.5,
+   55.5,
+   "up"
+  ]
+ },
+ "links": {
+  "stairs_up": {
+   "to": "felt",
+   "spawn": "arachne"
+  },
+  "boss_door": {
+   "to": "arachne_boss",
+   "spawn": "default",
+   "needFlags": [
+    "champ_c1_loom",
+    "champ_c1_cocoon"
+   ],
+   "lockedText": "실로 꿰매 봉인된 문. 「베틀방과 고치 홀의 두 파수꾼을 쓰러뜨려라.」",
+   "openText": "재단사의 방 봉인이 풀린다",
+   "doneText": "두 파수꾼을 쓰러뜨렸다! 지하 2층 끝, 실로 꿰맨 문이 풀린다."
+  }
+ },
+ "chests": {
+  "35,6": {
+   "id": "ar_secret",
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ],
+    [
+     "potion",
+     1
+    ]
+   ]
+  },
+  "4,7": {
+   "id": "ar_c1",
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ]
+  },
+  "3,24": {
+   "id": "ar_c2",
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "bomb",
+     1
+    ]
+   ]
+  },
+  "4,55": {
+   "id": "ar_c3",
+   "loot": [
+    [
+     "potion",
+     2
+    ]
+   ]
+  }
+ },
+ "areas": [
+  {
+   "id": "ar_b1",
+   "name": "아라크네의 폐공방 · 지하 1층",
+   "sub": "실 공방",
+   "x": 0,
+   "y": 0,
+   "w": 48,
+   "h": 30
+  },
+  {
+   "id": "ar_b2",
+   "name": "아라크네의 폐공방 · 지하 2층",
+   "sub": "고치 저장고",
+   "x": 0,
+   "y": 30,
+   "w": 48,
+   "h": 30
+  }
+ ],
+ "objects": [
+  {
+   "type": "waystone",
+   "id": "ws_arachne_in",
+   "x": 9,
+   "y": 6,
+   "name": "폐공방 입구 비석",
+   "art": "hd"
+  },
+  {
+   "type": "waystone",
+   "id": "ws_arachne_boss",
+   "x": 31,
+   "y": 52,
+   "name": "재단사의 방 앞 비석",
+   "art": "hd"
+  },
+  {
+   "type": "champion",
+   "id": "champ_c1_loom",
+   "mob": "champ_c1_loom",
+   "x": 24,
+   "y": 18,
+   "loot": [
+    [
+     "potion",
+     2
+    ],
+    [
+     "bomb",
+     2
+    ]
+   ]
+  },
+  {
+   "type": "champion",
+   "id": "champ_c1_cocoon",
+   "mob": "champ_c1_cocoon",
+   "x": 24,
+   "y": 44,
+   "loot": [
+    [
+     "potion",
+     2
+    ],
+    [
+     "antidote",
+     1
+    ]
+   ]
+  },
+  {
+   "type": "secret_wall",
+   "id": "ar_secret_wall",
+   "x": 31,
+   "y": 5,
+   "flag": "arachne_secret",
+   "name": "금 간 벽이 무너졌다 — 숨겨진 방!",
+   "textDone": "무너진 벽 너머로 좁은 방이 보인다."
+  },
+  {
+   "type": "sign",
+   "x": 10,
+   "y": 3,
+   "walk": true,
+   "text": "폐공방 지하 1층 「실 공방」.\n안쪽 베틀방에서 실 끊기는 소리가 난다."
+  },
+  {
+   "type": "sign",
+   "x": 42,
+   "y": 30,
+   "walk": true,
+   "text": "실 커튼 너머로 내려가는 비탈길.\n아래층은 고치 저장고다."
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_order",
+   "x": 20,
+   "y": 8,
+   "name": "주문 장부",
+   "flag": "ar_note_order",
+   "textIdle": "재단대 밑에 두꺼운 장부가 떨어져 있다.",
+   "text": "왕실 의상실 주문 장부. 마지막 장:\n「왕도 화재의 밤 — 수의 열두 벌. 치수: 사람이 아님.」\n주문자 서명란에 낯익은 문양이 찍혀 있다.\n필멸자: (무심코 가슴께를 누른다) ……",
+   "textDone": "불탄 밤의 주문 장부. 서명란의 문양이 마음에 걸린다.",
+   "textMore": [
+    [
+     "quest:q_felt_ledger",
+     "(벤의 장부에서 찢겨 나간 그 장이다.)\n필멸자: 서명란의 문양… 내 가슴의 것과 똑같다.\n필멸자: 30년 전 왕도가 불타던 그 밤, 내가 여기 있었다는 건가."
+    ]
+   ]
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_cloth",
+   "x": 17,
+   "y": 17,
+   "name": "베틀에 걸린 천",
+   "flag": "ar_note_cloth",
+   "textIdle": "베틀에 짜다 만 천이 걸려 있다.",
+   "text": "천을 짜던 실이 아니다. 사람 머리카락이다.\n무늬 사이로 누군가의 얼굴이 입을 벌리고 있다.\n필멸자: ……여기서 짠 건 옷이 아니었군.",
+   "textDone": "머리카락으로 짠 천. 얼굴 무늬가 아직 입을 벌리고 있다."
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_mannequin",
+   "x": 4,
+   "y": 16,
+   "name": "꿰맨 마네킹",
+   "flag": "ar_note_mannequin",
+   "textIdle": "이 마네킹만 유난히 사람 같다.",
+   "text": "마네킹의 이음매에서 미지근한 것이 배어 나온다.\n안에 든 건 짚이 아니다.\n필멸자: ……보지 마라. 다음으로 간다.",
+   "textDone": "꿰맨 자리가 아직 미지근하다."
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_cocoon",
+   "x": 7,
+   "y": 36,
+   "name": "작은 고치",
+   "flag": "ar_note_cocoon",
+   "textIdle": "바닥에 떨어진 고치가 꿈틀댄다.",
+   "text": "고치 속에서 손톱으로 긁는 소리가 난다.\n칼끝을 대자 소리가 뚝 멈춘다.\n필멸자: ……늦었다.",
+   "textDone": "이제 아무 소리도 나지 않는다."
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_wall",
+   "x": 41,
+   "y": 50,
+   "name": "벽에 새긴 글",
+   "flag": "ar_note_wall",
+   "textIdle": "벽에 무언가 빽빽하게 긁혀 있다.",
+   "text": "「영혼은 실이다. 끊기면 다시 꿰매면 된다.」\n그 아래 수십 번 덧새긴 이름 하나: 「아라크네」.\n자기 이름을 잊지 않으려 한 것처럼.",
+   "textDone": "덧새긴 이름 「아라크네」."
+  },
+  {
+   "type": "clue",
+   "id": "ar_note_last",
+   "x": 34,
+   "y": 4,
+   "name": "아라크네의 마지막 기록",
+   "flag": "ar_note_last",
+   "textIdle": "수놓인 천 조각이 벽에 걸려 있다.",
+   "cg": "cg/cg_arachne_past.png",
+   "text": "「다 끝내면, 쉬어도 되겠지.」",
+   "textDone": "「다 끝내면, 쉬어도 되겠지.」"
+  },
+  {
+   "type": "clue",
+   "id": "ar_clue_felix",
+   "x": 12,
+   "y": 54,
+   "name": "펠릭스의 목도리",
+   "flag": "felt_felix_items",
+   "textIdle": "고치 사이에 무언가 굴러다닌다.",
+   "cg": "cg/cg_felix_scarf.png",
+   "text": "……(말없이 챙긴다)",
+   "textDone": "펠릭스의 공과 목도리를 챙겼다."
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 21,
+   "y": 6,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 28,
+   "y": 7,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 6,
+   "y": 19,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 8,
+   "y": 22,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 41,
+   "y": 20,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 18,
+   "y": 19,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 30,
+   "y": 20,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 10,
+   "y": 37,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 36,
+   "y": 37,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 14,
+   "y": 44,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_silmamul",
+   "x": 40,
+   "y": 43,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_thread_puppet",
+   "x": 8,
+   "y": 52,
+   "respawn": 0
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_needle_spider",
+   "x": 14,
+   "y": 51,
+   "respawn": 0
+  }
+ ],
+ "hd": {
+  "D": 3,
+  "ground": "assets/world/arachne/arachne_ground.png",
+  "props": [
+   {
+    "id": "d_stair_arch_0",
+    "img": "assets/world/arachne/d_stair_arch.png",
+    "x": 6.5,
+    "y": 3.4,
+    "ax": 25,
+    "ay": 79,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_waystone_1",
+    "img": "assets/world/arachne/d_waystone.png",
+    "x": 9.5,
+    "y": 6.95,
+    "ax": 38,
+    "ay": 128,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cut_table_2",
+    "img": "assets/world/arachne/d_cut_table.png",
+    "x": 21.5,
+    "y": 5,
+    "ax": 54,
+    "ay": 94,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cut_table_3",
+    "img": "assets/world/arachne/d_cut_table.png",
+    "x": 27.5,
+    "y": 5,
+    "ax": 54,
+    "ay": 94,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_wardrobe_4",
+    "img": "assets/world/arachne/d_wardrobe.png",
+    "x": 30,
+    "y": 3.2,
+    "ax": 52,
+    "ay": 136,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_mannequin_5",
+    "img": "assets/world/arachne/d_mannequin.png",
+    "x": 19,
+    "y": 3.2,
+    "ax": 22,
+    "ay": 126,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_mannequin_6",
+    "img": "assets/world/arachne/d_mannequin.png",
+    "x": 29,
+    "y": 8.5,
+    "ax": 22,
+    "ay": 126,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_7",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 25,
+    "y": 2.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_loom_a_8",
+    "img": "assets/world/arachne/d_loom_a.png",
+    "x": 16.5,
+    "y": 15.5,
+    "ax": 68,
+    "ay": 159,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_loom_b_9",
+    "img": "assets/world/arachne/d_loom_b.png",
+    "x": 32.5,
+    "y": 15.5,
+    "ax": 70,
+    "ay": 136,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_spool_rack_10",
+    "img": "assets/world/arachne/d_spool_rack.png",
+    "x": 24,
+    "y": 14.2,
+    "ax": 75,
+    "ay": 131,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_thread_pillar_11",
+    "img": "assets/world/arachne/d_thread_pillar.png",
+    "x": 14.5,
+    "y": 21.5,
+    "ax": 26,
+    "ay": 181,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_thread_pillar_12",
+    "img": "assets/world/arachne/d_thread_pillar.png",
+    "x": 34.5,
+    "y": 21.5,
+    "ax": 26,
+    "ay": 181,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_13",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 20,
+    "y": 21,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_mannequins_14",
+    "img": "assets/world/arachne/d_mannequins.png",
+    "x": 7,
+    "y": 15,
+    "ax": 89,
+    "ay": 165,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_mannequin_15",
+    "img": "assets/world/arachne/d_mannequin.png",
+    "x": 3.5,
+    "y": 20,
+    "ax": 22,
+    "ay": 126,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_mannequin_16",
+    "img": "assets/world/arachne/d_mannequin.png",
+    "x": 10,
+    "y": 23,
+    "ax": 22,
+    "ay": 126,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_17",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 7,
+    "y": 25,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_18",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 11,
+    "y": 13.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_19",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 45,
+    "y": 12.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_20",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 39.5,
+    "y": 26,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_wall_21",
+    "img": "assets/world/arachne/d_cocoon_wall.png",
+    "x": 10,
+    "y": 34.9,
+    "ax": 112,
+    "ay": 223,
+    "D": 3,
+    "fade": 1,
+    "shadow": 0
+   },
+   {
+    "id": "d_cocoon_wall_22",
+    "img": "assets/world/arachne/d_cocoon_wall.png",
+    "x": 38,
+    "y": 34.9,
+    "ax": 112,
+    "ay": 223,
+    "D": 3,
+    "fade": 1,
+    "shadow": 0
+   },
+   {
+    "id": "d_cocoon_l_23",
+    "img": "assets/world/arachne/d_cocoon_l.png",
+    "x": 6,
+    "y": 44,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_l_24",
+    "img": "assets/world/arachne/d_cocoon_l.png",
+    "x": 42,
+    "y": 37,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_m_25",
+    "img": "assets/world/arachne/d_cocoon_m.png",
+    "x": 20,
+    "y": 36.5,
+    "ax": 15,
+    "ay": 103,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_m_26",
+    "img": "assets/world/arachne/d_cocoon_m.png",
+    "x": 28,
+    "y": 37.5,
+    "ax": 15,
+    "ay": 103,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_27",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 12,
+    "y": 41,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_28",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 36,
+    "y": 44,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_m_29",
+    "img": "assets/world/arachne/d_cocoon_m.png",
+    "x": 30,
+    "y": 44.5,
+    "ax": 15,
+    "ay": 103,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_30",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 9,
+    "y": 38,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_spool_tower_31",
+    "img": "assets/world/arachne/d_spool_tower.png",
+    "x": 10.5,
+    "y": 52,
+    "ax": 57,
+    "ay": 242,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_32",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 4.5,
+    "y": 50,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_l_33",
+    "img": "assets/world/arachne/d_cocoon_l.png",
+    "x": 15.5,
+    "y": 55,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_34",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 16,
+    "y": 48.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_waystone_35",
+    "img": "assets/world/arachne/d_waystone.png",
+    "x": 31.5,
+    "y": 52.95,
+    "ax": 38,
+    "ay": 128,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_door_arch_36",
+    "img": "assets/world/arachne/d_door_arch.png",
+    "x": 35.5,
+    "y": 57.95,
+    "ax": 61,
+    "ay": 157,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_37",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 42,
+    "y": 50,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_38",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 41,
+    "y": 56,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   }
+  ],
+  "lights": [
+   [
+    9,
+    6.5,
+    40,
+    "#c8d8ff",
+    0.7
+   ],
+   [
+    24,
+    16,
+    60,
+    "#ffb070",
+    0.5
+   ],
+   [
+    31,
+    52.5,
+    46,
+    "#c8d8ff",
+    0.8
+   ],
+   [
+    24,
+    40,
+    70,
+    "#b080ff",
+    0.45
+   ],
+   [
+    42,
+    30,
+    40,
+    "#cfe0d8",
+    0.5
+   ]
+  ],
+  "decoArt": {
+   "p": [
+    {
+     "img": "assets/world/arachne/d_thread_pillar.png",
+     "ax": 26,
+     "ay": 181,
+     "flip": false
+    }
+   ]
+  }
+ },
+ "note": "GENERATED by tools/hd/build_arachne.py — edit the script"
+}

@@ -1,0 +1,399 @@
+{
+"tile": 16,
+"sheets": {
+"field": {
+"src": "world/tiles_field.png",
+"cols": 8,
+"index": {
+"grass": 0,
+"grass_flowers": 1,
+"grass_tuft": 2,
+"grass_tuft2": 3,
+"grass_dark": 4,
+"dirt": 5,
+"dirt_pebble": 6,
+"dirt2": 7,
+"dirt3": 8,
+"water": 9,
+"water2": 10,
+"water3": 11,
+"water4": 12,
+"cliff": 13,
+"cliff_rock": 14,
+"cliff2": 15,
+"stones": 16,
+"stones2": 17,
+"tallgrass": 18,
+"tallgrass2": 19,
+"bush_t": 20,
+"bush_flower_t": 21,
+"paving": 22,
+"paving2": 23,
+"sand": 24,
+"sand2": 25,
+"mud": 26,
+"soil": 27,
+"forest_floor": 28,
+"forest_floor2": 29,
+"bridge_h": 30,
+"bridge_h2": 31,
+"water_shore_n": 32,
+"water_shore_s": 33,
+"water_shore_w": 34,
+"water_shore_e": 35,
+"snow": 36,
+"grass_cursed": 37,
+"desert": 38,
+"ash": 39,
+"water_deep": 40,
+"water_shallow": 41
+}
+},
+"dungeon": {
+"src": "world/tiles_dungeon.png",
+"cols": 8,
+"index": {
+"floor": 0,
+"floor_crack": 1,
+"floor_moss": 2,
+"floor_moss2": 3,
+"floor_crystal": 4,
+"floor2": 5,
+"wall": 6,
+"wall_moss": 7,
+"wall_vine": 8,
+"wall_vine2": 9,
+"wall_crack": 10,
+"wall_crack2": 11,
+"wall_moss2": 12,
+"walltop": 13,
+"walltop2": 14,
+"walltop3": 15,
+"walltop4": 16,
+"door": 17,
+"gate": 18,
+"doorway": 19,
+"stairs_down": 20,
+"stairs_up": 21,
+"plate_up": 22,
+"plate_down": 23,
+"spikes": 24,
+"torch": 25,
+"torch_off": 26,
+"pit": 27,
+"key_floor": 28,
+"carpet": 29,
+"channel": 30,
+"rune": 31,
+"grate": 32,
+"walltop_dark": 33,
+"void": 34
+}
+}
+},
+"sprites": {
+"src": "world/sprites.png",
+"rects": {
+"tree": [
+0,
+0,
+52,
+56
+],
+"pine": [
+53,
+0,
+42,
+58
+],
+"stump": [
+96,
+0,
+25,
+20
+],
+"boulder": [
+122,
+0,
+31,
+28
+],
+"rocks": [
+154,
+0,
+24,
+16
+],
+"bush": [
+179,
+0,
+25,
+20
+],
+"sign": [
+205,
+0,
+18,
+20
+],
+"chest": [
+224,
+0,
+19,
+16
+],
+"chest_open": [
+244,
+0,
+15,
+16
+],
+"fence": [
+260,
+0,
+22,
+16
+],
+"mushrooms": [
+283,
+0,
+21,
+18
+],
+"rail": [
+305,
+0,
+32,
+22
+],
+"crystal": [
+338,
+0,
+22,
+22
+],
+"pillar": [
+361,
+0,
+27,
+30
+],
+"rubble": [
+389,
+0,
+16,
+16
+],
+"tablet": [
+406,
+0,
+20,
+20
+],
+"door_big": [
+427,
+0,
+32,
+36
+],
+"gate_big": [
+460,
+0,
+32,
+36
+],
+"doorway_big": [
+0,
+59,
+32,
+36
+],
+"mushroom": [
+33,
+59,
+16,
+20
+],
+"rabbit": [
+50,
+59,
+14,
+22
+],
+"wasp": [
+65,
+59,
+20,
+20
+],
+"boar": [
+86,
+59,
+14,
+20
+],
+"scarecrow": [
+101,
+59,
+32,
+30
+],
+"slime": [
+134,
+59,
+17,
+18
+],
+"slime_atk": [
+152,
+59,
+27,
+18
+],
+"squirrel": [
+180,
+59,
+19,
+22
+],
+"squirrel_atk": [
+200,
+59,
+22,
+22
+],
+"sprout": [
+223,
+59,
+15,
+22
+],
+"sprout_atk": [
+239,
+59,
+27,
+22
+],
+"champ_boar": [
+267,
+59,
+47,
+38
+],
+"champ_boar_run": [
+315,
+59,
+58,
+38
+],
+"champ_boar_rage": [
+374,
+59,
+53,
+40
+],
+"champ_wasp": [
+428,
+59,
+36,
+40
+],
+"champ_wasp_atk": [
+465,
+59,
+38,
+40
+],
+"golem": [
+0,
+100,
+63,
+72
+],
+"hero_down_0": [
+64,
+100,
+18,
+27
+],
+"hero_down_1": [
+83,
+100,
+18,
+27
+],
+"hero_down_2": [
+102,
+100,
+18,
+27
+],
+"hero_down_3": [
+121,
+100,
+18,
+27
+],
+"hero_up_0": [
+140,
+100,
+18,
+27
+],
+"hero_up_1": [
+159,
+100,
+18,
+27
+],
+"hero_up_2": [
+178,
+100,
+18,
+27
+],
+"hero_up_3": [
+197,
+100,
+18,
+27
+],
+"hero_right_0": [
+216,
+100,
+19,
+27
+],
+"hero_right_1": [
+236,
+100,
+19,
+27
+],
+"hero_right_2": [
+256,
+100,
+19,
+27
+],
+"hero_right_3": [
+276,
+100,
+19,
+27
+],
+"npc_bard": [
+296,
+100,
+16,
+26
+],
+"npc_old": [
+313,
+100,
+17,
+26
+]
+}
+}
+}

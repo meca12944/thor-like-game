@@ -1,0 +1,404 @@
+{
+ "id": "field01",
+ "type": "field",
+ "area": 1,
+ "region": "area1",
+ "mapPos": [
+  56,
+  0
+ ],
+ "name": "시작의 숲 — 던전 가는 길",
+ "title": {
+  "kicker": "1지역 · AREA 1",
+  "name": "시작의 숲",
+  "sub": "던전 가는 길"
+ },
+ "bgm": "area01_forest",
+ "battleBgm": "battle_champion",
+ "tileset": "field",
+ "tile": 16,
+ "w": 64,
+ "h": 40,
+ "legend": {
+  ".": "grass",
+  ",": "grass_tuft",
+  "'": "grass_flowers",
+  "=": "dirt",
+  "~": "water",
+  "b": "bridge_h",
+  ":": "stones",
+  "#": "cliff",
+  "\"": "tallgrass",
+  "_": "sand",
+  "T": {
+   "ground": "grass",
+   "deco": "tree"
+  },
+  "P": {
+   "ground": "grass",
+   "deco": "pine"
+  },
+  "Y": {
+   "ground": "grass",
+   "deco": "tree",
+   "solid": false
+  },
+  "R": {
+   "ground": "grass",
+   "deco": "boulder"
+  },
+  "r": {
+   "ground": "grass",
+   "deco": "rocks"
+  },
+  "u": {
+   "ground": "grass",
+   "deco": "bush"
+  },
+  "s": {
+   "ground": "grass",
+   "deco": "stump"
+  },
+  "m": {
+   "ground": "grass",
+   "deco": "mushrooms",
+   "solid": false
+  },
+  "f": {
+   "ground": "grass",
+   "deco": "fence"
+  }
+ },
+ "solid": [
+  "~",
+  "#",
+  "T",
+  "P",
+  "R",
+  "r",
+  "u",
+  "s",
+  "f"
+ ],
+ "spawns": {
+  "default": [
+   2.5,
+   19.5,
+   "right"
+  ],
+  "west": [
+   2.5,
+   19.5,
+   "right"
+  ],
+  "world": [
+   2.5,
+   19.5,
+   "right"
+  ],
+  "dungeon": [
+   46.5,
+   7,
+   "down"
+  ]
+ },
+ "objects": [
+  {
+   "type": "exit",
+   "x": 0,
+   "y": 17,
+   "w": 1,
+   "h": 5,
+   "to": "field00",
+   "spawn": "east",
+   "label": "바람길 (시작 마을)"
+  },
+  {
+   "type": "waystone",
+   "id": "ws_temple",
+   "x": 42,
+   "y": 9,
+   "name": "신전 앞 비석"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_bridge01",
+   "x": 32,
+   "y": 14,
+   "name": "쉼터 다리"
+  },
+  {
+   "type": "exit",
+   "x": 45,
+   "y": 4,
+   "w": 3,
+   "h": 1,
+   "to": "dungeon01_b1",
+   "spawn": "default",
+   "label": "고대 숲 신전"
+  },
+  {
+   "type": "door_deco",
+   "x": 46,
+   "y": 4.6,
+   "sprite": "doorway_big"
+  },
+  {
+   "type": "sign",
+   "x": 4,
+   "y": 18,
+   "text": "← 바람길 · 시작 마을   /   시작의 숲 · 고대 숲 신전 →\n(Shift: 회피대시 — 대시하는 동안은 무적)"
+  },
+  {
+   "type": "sign",
+   "x": 27,
+   "y": 12,
+   "text": "쉼터 다리. 개울 아래쪽 웅덩이 가운데 작은 섬이 보인다…"
+  },
+  {
+   "type": "sign",
+   "x": 43,
+   "y": 8,
+   "text": "고대 숲 신전.\n「숲의 두 우두머리가 쓰러질 때, 골렘의 방이 열리리라.」"
+  },
+  {
+   "type": "sign",
+   "x": 42,
+   "y": 22,
+   "text": "경고: 이 앞 공터에 거대 왕멧돼지 「돌엄니」 출몰!"
+  },
+  {
+   "type": "chest",
+   "id": "f01_chest_glade",
+   "x": 9,
+   "y": 31,
+   "loot": [
+    [
+     "potion",
+     2
+    ],
+    [
+     "m_hardwood",
+     2
+    ]
+   ],
+   "note": "secret: walk through the odd tree (Y) at the top of the glade"
+  },
+  {
+   "type": "chest",
+   "id": "f01_chest_island",
+   "x": 32,
+   "y": 31,
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ]
+   ],
+   "note": "secret: stepping stones (:) from the west bank"
+  },
+  {
+   "type": "chest",
+   "id": "f01_chest_cliff",
+   "x": 59,
+   "y": 7,
+   "loot": [
+    [
+     "potion",
+     1
+    ],
+    [
+     "m_a1_shared",
+     3
+    ]
+   ]
+  },
+  {
+   "type": "hidden",
+   "id": "f01_grass_item",
+   "x": 56,
+   "y": 14,
+   "loot": [
+    [
+     "spirit_drop",
+     1
+    ]
+   ],
+   "note": "interact in the tall grass where it glints"
+  },
+  {
+   "type": "heal",
+   "x": 29,
+   "y": 16,
+   "note": "bench/rest spot: interact to restore HP"
+  },
+  {
+   "type": "champion",
+   "id": "champ_boar",
+   "mob": "champ_boar",
+   "x": 49,
+   "y": 26
+  },
+  {
+   "type": "champion",
+   "id": "champ_wasp",
+   "mob": "champ_wasp",
+   "x": 15,
+   "y": 7
+  },
+  {
+   "type": "spawn",
+   "mob": "rabbit",
+   "x": 8,
+   "y": 21,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "mushroom",
+   "x": 12,
+   "y": 23,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "rabbit",
+   "x": 17,
+   "y": 18,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "mushroom",
+   "x": 6,
+   "y": 12,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "wasp",
+   "x": 22,
+   "y": 11,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "squirrel",
+   "x": 24,
+   "y": 16,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "slime",
+   "x": 20,
+   "y": 27,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "slime",
+   "x": 35,
+   "y": 9,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "wasp",
+   "x": 37,
+   "y": 17,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "squirrel",
+   "x": 38,
+   "y": 12,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "boar",
+   "x": 52,
+   "y": 16,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "scarecrow",
+   "x": 56,
+   "y": 18,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "sprout",
+   "x": 44,
+   "y": 19,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "boar",
+   "x": 57,
+   "y": 31,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "sprout",
+   "x": 36,
+   "y": 27,
+   "respawn": 25
+  },
+  {
+   "type": "spawn",
+   "mob": "scarecrow",
+   "x": 30,
+   "y": 37,
+   "respawn": 25
+  }
+ ],
+ "ground": [
+  "PTTTTPTTTTTTPTPTTTTPTTTTTTTTTT~~~TTTTTTTTTTTTPTTTPTTTTTTTTPTTTTT",
+  "PTTPPTPTTPTPPTPPTPTTTTPTTTTTTT~~~PTTPPTPTTTPTTPPTTTPTTTTPTTTTTTT",
+  "TT,.......,..,...'......',,...,~~~..##########################PT",
+  "TT,.,........,.................~~~..##########################TT",
+  "TT..........,.........\"\"\"\"\".'..~~~..#########===##############TP",
+  "TP''..T..TP,..........\"\"\"\"\".....~~~.#########===##############TP",
+  "PT,.'T.PTPPT.'........\"\"\"\"\"....'~~~,...'..,..===.....,,P...'..TT",
+  "TT,..TTTTTTT.........,\"\"\"\"\"P....~~~..........===,.....TP......TT",
+  "TT..TT,P.,TTP......,..,.TPPT.,..~~~......,.,'===.,..,PTPPT....TP",
+  "TT...T.TTPTT........,..TTTTT.T..~~~.,,...,.,,===......T,......PT",
+  "PT...T.T,TP,.....,..,...P'TT.,..~~~...r......===..........,...TP",
+  "PP..,,TTTT'.............TPTTP...~~~......'..====..,.,...,...,,TT",
+  "TT......T.......u...,.....T...,~~~..''.....=====,...,.\"\"\"\"\"...TT",
+  "TT....'...,.R...,.=============bbb=============..,',..\"\"\"\"\".''PT",
+  "TT.......,......===============bbb=============...'.'.\"\"\"\"\"...TP",
+  "TP....u,,.....================bbb=============........\"\"\"\"\"...TP",
+  "TTfffffff..,=========.,.'..,..~~~....,,.==............\"\"\"\"\".,,TT",
+  "...'...,..=========.......,..~~~....,...==...,................TP",
+  "=================..',..r..,..~~~'.,R....==..'...,.R..,...'..,.PT",
+  "===============...,..,.......~~~........==.....,...,.......'..PP",
+  "============='.,...'m...'..R~~~....,,...==.........,u.,...TPT.TT",
+  ".,..'....,..,.,...T.,.......~~~.........==.,'....'....,..T.TT.TT",
+  "TT.......s'......T.T...',,,.~~~...m,....==............'PT.T,TPTT",
+  "TT....,.,,...'.,TTPPT.......~~~'.,...TPT==..===========.TPT.T.TP",
+  "TT..\"\"\"\"\"\",.,,.TTTT..P......~~~,.....TP.==..===========.TTPTT.TT",
+  "TT..\"\"\"\"\"\"......P.P.T..'....~~~...,..TPT==..===========...T.'.TT",
+  "TT..\"\"\"\"\"\"......TPTPT.......~~~,,...,.T.==,.===========....'..TP",
+  "TP........'.................~~~~~~~~.......'===========.......TT",
+  "TT..TTTTTYTTTT,.......'..,..~~~~~~~~,...,...===========..r....TP",
+  "PT..T........T'.,,....,.,.,.~~~~~~~~........===========.....,.PT",
+  "PT..T........T..\"\"\"\"\"\",.T...~~~___~~.,...,..===========T.,,...PT",
+  "TT..T........T..\"\"\"\"\"\"P.TTT.:::___~~........,.....TTT.TTT,..,.TT",
+  "TP..T........T..\"\"\"\"\"\"TTPTTT~~~___~~............T.PT.TPTP.....PT",
+  "TT.,T........TP.\"\"\"\"\"\"T.P..T~~~~~~~~........,......,PTTTT.,,..TP",
+  "TT,,T........TP......PPTT.TP~~~~~~~~....,......PTPT'TTTTTT....TT",
+  "TT.'TTTTTTTTTTP......'TTT.T,..'~~~...,.,........T..PTTP.P,..,.TT",
+  "TT......,.TP.........P..TTT.....~~~..'..,.......TT..TTTT.....,PT",
+  "TT........T..TT.......PTT.T...,.~~~...,.,.......PTTTTTPTP.....TP",
+  "TPTTTPTPPTTTTTTTTTTTTTTTTPTPTTTT~~~TPTTTTTTTTTPPTTTTTPTTPPPTTTTT",
+  "TPTPTTPTTTTTPPTTTTPTTTTTPTTPPTPT~~~TTTTTTTTTTPTTTPPPTTTPTTTTTTTT"
+ ]
+}

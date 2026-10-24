@@ -1,0 +1,122 @@
+{
+ "id": "felt_int_chief_inner",
+ "type": "town",
+ "area": 1,
+ "region": "felt",
+ "name": "이장 바르트의 집",
+ "title": {
+  "kicker": "펠트",
+  "name": "이장 바르트의 집",
+  "sub": "안채 침실·서고"
+ },
+ "bgm": "town_ruin",
+ "tileset": "field",
+ "tile": 16,
+ "w": 20,
+ "h": 11,
+ "bg": "assets/world/interiors/felt_int_v3_chief_2_bedroom_library.png",
+ "artPx": [
+  2816,
+  1584
+ ],
+ "note": "한 칸 = 그림 약 140px. 주인공이 더 크게 보이게 방 그림을 한 번 더 줄였다. 그림은 어둡고 바랜 색에, 불빛만 따뜻하게 남겼다.",
+ "legend": {
+  ".": "dirt",
+  "#": {
+   "ground": "dirt",
+   "solid": true
+  }
+ },
+ "solid": [
+  "#"
+ ],
+ "spawns": {
+  "default": [
+   10.5,
+   8.5,
+   "up"
+  ],
+  "door": [
+   10.5,
+   8.5,
+   "up"
+  ],
+  "from_cellar": [
+   10.22,
+   7.26,
+   "down"
+  ]
+ },
+ "objects": [
+  {
+   "type": "door",
+   "id": "fi_chief_inner_door",
+   "x": 10,
+   "y": 9,
+   "name": "집무실",
+   "to": "felt_int_chief",
+   "spawn": "from_inner"
+  },
+  {
+   "type": "door",
+   "id": "fi_chief_trap",
+   "x": 10,
+   "y": 6,
+   "name": "지하",
+   "to": "felt_int_chief_cellar",
+   "spawn": "door"
+  },
+  {
+   "type": "clue",
+   "id": "fi_chief_candle",
+   "x": 15,
+   "y": 5,
+   "name": "촛대",
+   "flag": "felt_look_fi_chief_candle",
+   "text": "심지가 아주 짧다. 매일 밤 같은 시각까지만 켜 두는 모양이다.",
+   "textDone": "심지가 아주 짧다. 매일 밤 같은 시각까지만 켜 두는 모양이다."
+  },
+  {
+   "type": "clue",
+   "id": "fi_chief_chair",
+   "x": 4,
+   "y": 7,
+   "name": "흔들의자",
+   "flag": "felt_look_fi_chief_chair",
+   "text": "앉은 자국이 깊다. 30년 동안 같은 창밖을 본 의자.",
+   "textDone": "앉은 자국이 깊다. 30년 동안 같은 창밖을 본 의자."
+  },
+  {
+   "type": "chest",
+   "id": "fi_chief_chest",
+   "x": 17,
+   "y": 7,
+   "loot": [
+    [
+     "heart_piece",
+     1
+    ]
+   ]
+  },
+  {
+   "type": "mark",
+   "id": "fi_todo_chief_books",
+   "x": 2,
+   "y": 4,
+   "todo": "TODO 이야기: 안채 서고. 살필 대사가 아직 없다."
+  }
+ ],
+ "ground": [
+  "##................##",
+  "....................",
+  ".###................",
+  ".###................",
+  ".###.............#..",
+  ".###..........####..",
+  "#...................",
+  "....................",
+  "....................",
+  "....................",
+  "..................##"
+ ]
+}

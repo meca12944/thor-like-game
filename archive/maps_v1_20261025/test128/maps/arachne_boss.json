@@ -1,0 +1,375 @@
+{
+ "id": "arachne_boss",
+ "type": "boss",
+ "region": "ch1",
+ "area": 1,
+ "mapPos": [
+  0,
+  0
+ ],
+ "name": "재단사의 방",
+ "title": {
+  "kicker": "BOSS",
+  "name": "실타래의 재단사 아라크네",
+  "sub": "영혼을 실에 꿰매는 자"
+ },
+ "bgm": "battle_boss",
+ "bgm2": "battle_boss_phase2",
+ "dark": 0.4,
+ "tileset": "dungeon",
+ "tile": 16,
+ "w": 28,
+ "h": 20,
+ "legend": {
+  "#": "wall",
+  ".": "floor",
+  ",": "floor_moss",
+  "%": "floor_crack",
+  "o": {
+   "ground": "floor",
+   "hop": true
+  },
+  "U": {
+   "ground": "floor",
+   "obj": "stairs_up"
+  },
+  "B": {
+   "ground": "floor",
+   "obj": "boss_door"
+  },
+  "C": {
+   "ground": "floor",
+   "obj": "chest"
+  },
+  "p": {
+   "ground": "floor",
+   "deco": "pillar",
+   "solid": true
+  }
+ },
+ "solid": [
+  "#"
+ ],
+ "ground": [
+  "############################",
+  "############################",
+  "############################",
+  "#####..................#####",
+  "####......#########.....####",
+  "###.###...............######",
+  "###........#######.......###",
+  "###.....p..........p.....###",
+  "###......................###",
+  "###......................###",
+  "###......................###",
+  "###......................###",
+  "###......................###",
+  "###......................###",
+  "###.....p..........p.....###",
+  "###......................###",
+  "####....................####",
+  "#####.........U........#####",
+  "############################",
+  "############################"
+ ],
+ "spawns": {
+  "default": [
+   14.5,
+   15.5,
+   "up"
+  ]
+ },
+ "links": {
+  "stairs_up": {
+   "to": "arachne",
+   "spawn": "boss"
+  }
+ },
+ "boss": {
+  "id": "arachne",
+  "kind": "arachne",
+  "name": "아라크네",
+  "x": 14.5,
+  "y": 9,
+  "flag": "boss_arachne",
+  "intro": 1.8,
+  "reward": [
+   [
+    "heart_piece",
+    1
+   ]
+  ],
+  "exit": {
+   "to": "felt",
+   "spawn": "arachne"
+  },
+  "splash": "assets/boss/arachne_splash.png",
+  "sub": "영혼을 실에 꿰매는 자"
+ },
+ "objects": [],
+ "hd": {
+  "D": 3,
+  "ground": "assets/world/arachne/arachne_boss_ground.png",
+  "props": [
+   {
+    "id": "d_boss_loom_0",
+    "img": "assets/world/arachne/d_boss_loom.png",
+    "x": 14,
+    "y": 4.2,
+    "ax": 153,
+    "ay": 279,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_throne_1",
+    "img": "assets/world/arachne/d_cocoon_throne.png",
+    "x": 14,
+    "y": 6.5,
+    "ax": 100,
+    "ay": 224,
+    "D": 3,
+    "fade": 1,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_l_2",
+    "img": "assets/world/arachne/d_cocoon_l.png",
+    "x": 5,
+    "y": 6,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_l_3",
+    "img": "assets/world/arachne/d_cocoon_l.png",
+    "x": 23,
+    "y": 6,
+    "ax": 42,
+    "ay": 93,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_4",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 6,
+    "y": 15,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_5",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 22,
+    "y": 15.5,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_6",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 11,
+    "y": 11,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_bones_7",
+    "img": "assets/world/arachne/d_bones.png",
+    "x": 17.5,
+    "y": 12.5,
+    "ax": 36,
+    "ay": 41,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_8",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 10,
+    "y": 5.5,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_cocoon_s_9",
+    "img": "assets/world/arachne/d_cocoon_s.png",
+    "x": 18.5,
+    "y": 5.5,
+    "ax": 21,
+    "ay": 89,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_10",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 5.5,
+    "y": 4.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "d_web_sheet_11",
+    "img": "assets/world/arachne/d_web_sheet.png",
+    "x": 22.5,
+    "y": 4.9,
+    "ax": 41,
+    "ay": 106,
+    "D": 3,
+    "fade": 0,
+    "shadow": 1
+   }
+  ],
+  "decoArt": {
+   "p": [
+    {
+     "img": "assets/world/arachne/d_thread_pillar.png",
+     "ax": 26,
+     "ay": 181,
+     "flip": false
+    }
+   ]
+  },
+  "phase2": {
+   "threads": [
+    [
+     3,
+     4,
+     8.5,
+     7.5,
+     1.2
+    ],
+    [
+     24.5,
+     4,
+     19.5,
+     7.5,
+     1.2
+    ],
+    [
+     3,
+     16.5,
+     8.5,
+     14.5,
+     1
+    ],
+    [
+     24.5,
+     16.5,
+     19.5,
+     14.5,
+     1
+    ],
+    [
+     8.5,
+     7.5,
+     19.5,
+     7.5,
+     2
+    ],
+    [
+     8.5,
+     14.5,
+     19.5,
+     14.5,
+     2
+    ],
+    [
+     8.5,
+     7.5,
+     8.5,
+     14.5,
+     1.5
+    ],
+    [
+     19.5,
+     7.5,
+     19.5,
+     14.5,
+     1.5
+    ],
+    [
+     3,
+     10,
+     8.5,
+     11,
+     1
+    ],
+    [
+     24.5,
+     10,
+     19.5,
+     11,
+     1
+    ]
+   ],
+   "cocoons": [
+    [
+     6,
+     9
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     22,
+     9
+    ],
+    [
+     10.5,
+     12.5
+    ],
+    [
+     17.5,
+     12.5
+    ]
+   ]
+  },
+  "lights": [
+   [
+    14,
+    6,
+    90,
+    "#b080ff",
+    0.6
+   ],
+   [
+    14,
+    14,
+    70,
+    "#c8d8ff",
+    0.35
+   ]
+  ]
+ },
+ "note": "GENERATED by tools/hd/build_arachne.py — edit the script"
+}
