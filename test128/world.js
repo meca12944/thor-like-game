@@ -623,7 +623,7 @@
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
       updateGate(m, true);
-      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; playScene('area:' + (ar0 ? ar0.id : m.id), 1.2);
+      S.lock = null; S.snap = null; S.calmT = 0; const ar0 = areaAt(m, hero.x, hero.y); S.area = ar0 ? ar0.id : null; S.areaCard = null; areaScene(ar0 ? ar0.id : m.id, 1.2);
       if (S.pendingMsg) { msg(S.pendingMsg, 2.2); S.pendingMsg = null; }
       if (S.pendingHp) { hero.hp = Math.max(1, Math.min(hero.maxHp, S.pendingHp)); S.pendingHp = 0; syncTownHp(); }
       snapCam();
@@ -684,7 +684,7 @@
     S.calmT = f ? 0 : (S.calmT || 0) + dt; if (S.calmT > 2.5) S.snap = null; if (!f) { hero.px = hero.x; hero.py = hero.y; }
     // seamless area change: name card only, first visit auto-saves
     const ar = areaAt(m, hero.x, hero.y); if (ar && ar.id !== S.area) { S.area = ar.id; S.areaCard = { a: ar, t: 2.4 }; sfx('page', .4);
-      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } playScene('area:' + ar.id, .9); }
+      const k = 'area:' + ar.id; if (!SAVE.visited[k]) { SAVE.visited[k] = true; save(); if (!f) saveHere('auto'); } areaScene(ar.id, .9); }
     if (S.areaCard && (S.areaCard.t -= dt) <= 0) S.areaCard = null; if (S.saved && (S.saved.t -= dt) <= 0) S.saved = null; }
   function drawLock(g) { const L = S.lock; if (!L) return; const k = Math.min(1, L.t / .35), n = 56;
     for (let i = 0; i < n; i++) { const a = i / n * TAU, x = L.x + Math.cos(a) * LOCK_R, y = L.y + Math.sin(a) * LOCK_R * LOCK_SQ, h = (7 + (i % 3) * 3 + Math.sin(S.t * 4 + i) * 1) * k;
@@ -913,6 +913,7 @@
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
   addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
+  function areaScene(id, delay) { playScene('area:' + id, delay); if (SAVE.flags.boss_arachne) playScene('area:' + id + ':after', delay + .3); } // ':after' = first visit after the chapter boss (펠트 재방문 → 리네트 동행)
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); const sq = withArt(toSeq(t), key); if (!S.dialog) playSeq(sq); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(sq); }; } }); }
   function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) seq.forEach((it, i) => { for (const [src, from] of A) if (i >= from) it.cg = src; }); return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터]]
   function interact() {
@@ -958,7 +959,7 @@
     if (o.needQuest && !questOn(o.needQuest)) { S.dialog = { text: o.textIdle || o.textLocked || '…', name: o.name }; return; }
     if (!(o.needFlags || []).every(f => SAVE.flags[f])) { S.dialog = { text: o.textLocked || '지금은 할 수 있는 게 없다.', name: o.name }; return; }
     SAVE.flags[o.flag] = true; save(); const got = o.loot ? giveLoot(o.loot) : '';
-    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); }
+    S.dialog = { text: o.text + (got ? '\n얻었다: ' + got : ''), name: o.name, cg: o.cg }; addFx('sparkle', o.x, o.y - 10, { life: .8 }); } // o.cg = a story picture behind the text (assets/<cg>)
   function tryDoor(o) { const m = M(); if (o.open) return;
     const keyId = Object.keys(SAVE.keys).find(k => SAVE.keys[k] === true && !k.endsWith(':used') && !SAVE.keys[k + ':used']);
     if (!keyId) { if (!S.msg) msg('잠겨 있다. 열쇠가 필요하다'); return; }
