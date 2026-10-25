@@ -70,7 +70,7 @@
         if (P === 'skirm' && m.hopCd <= 0) { const a = ang(m, h.x, h.y) + Math.PI; m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * 40; m.ty = m.y + Math.sin(a) * 40; m.hopCd = 3; set(m, 'hop'); m.anim = 'walk'; return; }
         m.anim = 'walk'; m.moving = false; return; }
       if (m.dazeT > 0 && (m.st === 'idle' || m.st === 'rest')) { m.dazeT -= dt; m.anim = 'walk'; m.moving = false; return; } // the hero just-dodged its attack: stunned for a moment
-      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? FELT_STD.restMelee : FELT_STD.restShoot; set(m, 'rest'); m.restT = r; m.anim = 'walk'; } return; }
+      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? FELT_STD.restMelee : (this.restShoot || FELT_STD.restShoot); set(m, 'rest'); m.restT = r; m.anim = 'walk'; } return; }
       if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
         if (m.sub === 'aim') { if (m.t > m.warn) { m.sub = 'go'; m.t = 0; m.bit = false; } return; }
@@ -82,7 +82,7 @@
         else if (m.t > m.warn + FELT_STD.restLeap) { set(m, 'idle'); m.anim = 'walk'; } return; }
       m.anim = 'walk'; const x0 = m.x, y0 = m.y;
       if (m.cd <= 0 && !m.intent) m.intent = pickIntent(P, d, m); // each cooldown: pick one move (distance-weighted, never 3 in a row)
-      const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? 70 : 52; // hold ~52px between attacks
+      const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? (this.keep || 70) : 52; // hold ~52px between attacks (저격수 keep: 멀리서 쏨)
       if ((P === 'bind' || P === 'duel') && (m.intent === 'melee' || m.intent === 'combo') && d > this.melee.range + 20 && d < 110 && m.burstCd <= 0) { m.burstT = .3; m.burstCd = 2.5; W.fx('dust', m.x, m.y); } // quick scuttle / step-in before a close attack
       const spd = this.sp * FELT_SPD * (m.burstT > 0 ? 3 : 1) * (m.rage ? 1.25 : 1);
       if (d < 200) { if (d > want + 6) toward(m, W, dt, spd, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
@@ -118,7 +118,7 @@
         let tw = 0.6;
         if (p.trap) { tw = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: p.trap.r, warn: 0.8, act: 0.05, dmg: p.trap.dmg, slow: p.trap.slow, kind: 'web', owner: m }).warn; } // thread trap under the hero
         else { const aim = ang(m, h.x, h.y - 8), dirs = p.spread ? p.spread.map(s => aim + s) : [0, 1, 2, 3, 4, 5, 6, 7].map(i => i * Math.PI / 4); // aimed fan (style mobs) or the old 8-way ring
-          for (const a of dirs) tw = lineTele(W, m, a, Math.min(150, p.sp * 1.4), 0.6, 6);
+          for (const a of dirs) tw = lineTele(W, m, a, p.len || Math.min(150, p.sp * 1.4), p.warn || 0.6, p.w || 6);
           const bid = m.bid || 0; for (const w of p.waves) W.after(tw + w, () => { if (m.dead || (m.bid || 0) !== bid) return; /* a break (경직) cancels the volley */ for (const a of dirs) W.shot(Object.assign({ x: m.x, y: m.y - this.h * .45, a, sp: p.sp, owner: m }, p.shot)); }); }
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'shoot'); m.cd = 2.4 * FELT_CD * RG / agg(W); }
     }, onDeath(m, W) { W.fx('fluff', m.x, m.y - this.h * .5, { life: .9, col: this.col || '#b0a890', n: 14 }); } }, o); // felt-like death: fluff and thread bits burst out
@@ -350,6 +350,12 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 바늘 사수 (그록 10-25 「1장 마물」 03, handoff/claude/ch1_mobs_v1/03_marksman): 저격 역할(새). 멀리(keep 110) 서서 긴 줄 0.8초 겨냥 → 빠른 바늘 1발 → 장전 빈틈 0.9초(조준 자세 붙잡기). 붙으면 쇠뇌로 밀치기. 걷기 = PixelLab 8장.
+    c1_needle_marksman: felt({ name: '바늘 사수', style: 'snipe', col: '#bdb6a6', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 40, h: 28, r: 6, sp: 22, keep: 110, restShoot: .9,
+      melee: { range: 22, rad: 13, dmg: 5 },
+      shots: [{ name: '바늘 화살', sp: 520, waves: [0], spread: [0], warn: .8, len: 200, w: 5, shot: { kind: 'pin', r: 3, dmg: 8, life: .45 } }],
+      anim: { src: 'assets/mobs_felt/c1_needle_marksman', F: 57.8, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 0] },
+        shoot: { n: 9, ticks: [5, 5, 5, 5, 6, 5, 8, 8, 8], release: 4, map: [0, 1, 1, 1, 2, 2, 1, 1, 1] } } }),
     // 핀이빨 솜뭉치 (그록 10-25 「1장 마물」 08, handoff/claude/ch1_mobs_v1/0807_stuffing_cocoon, 크레딧 0): 작은 떼(소환물, 새끼 거미 자리). 아라크네·고치 어미가 부름. 걷기 그림 없음 → 통통 튀기는 코드(walk.bob.hop), 물기 = 서기 → 입 벌림(map). 짧은 일직선 물기, 9초 뒤 터져 사라짐.
     c1_pin_stuffing: (() => { const D = felt({ name: '핀이빨 솜뭉치', summoned: true, style: 'lunge', col: '#e4dccc', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 8, h: 15, r: 4, sp: 44,
       melee: { range: 16, rad: 8, dmg: 3 }, shots: [],
@@ -540,7 +546,7 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', c1_needle_marksman: 'bone', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
