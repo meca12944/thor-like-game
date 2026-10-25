@@ -401,6 +401,15 @@
   let _bdFog = null; function bdFogTex() { if (_bdFog) return _bdFog; const c = document.createElement('canvas'); c.width = 512; c.height = 96; const g = c.getContext('2d'); let sd = 7; const rn = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
     for (let i = 0; i < 70; i++) { const x = rn() * 512, y = 30 + rn() * 36, rx = 30 + rn() * 70, ry = 8 + rn() * 16; for (const ox of [-512, 0, 512]) { g.save(); g.translate(x + ox, y); g.scale(1, ry / rx); const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, 'rgba(204,194,178,.30)'); gr.addColorStop(1, 'rgba(204,194,178,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore(); } }
     return (_bdFog = c); }
+  // alive {core [x, y, color, r], torch [[x0, x1, speed, phase, wy?]...] + ty + torchCol, bell [x, y, color, r, period s]} (사장님 10-25 「성이 살아 있게」): code-only life on the far castle,
+  // no new picture — the spire-top core beats like a heart (its light washes the keep), ash-grey torches of the petrified knights walk the walls, a distant bell tolls with a ring of light. Positions are source px (iw space).
+  const _bdGlow = {}; function bdGlowTex(col) { if (_bdGlow[col]) return _bdGlow[col]; const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, col); gr.addColorStop(.25, col + '88'); gr.addColorStop(1, col + '00'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return (_bdGlow[col] = c); }
+  const _bdTint = new Map(); function bdTint(im, col) { let c = _bdTint.get(im); if (c && c._col === col) return c; c = document.createElement('canvas'); c.width = im.width >> 1; c.height = im.height >> 1; c._col = col; const g = c.getContext('2d'); // the castle in the core's colour (half size: it is only a soft wash)
+    g.drawImage(im, 0, 0, c.width, c.height); g.globalCompositeOperation = 'multiply'; g.fillStyle = col; g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'destination-in'; g.drawImage(im, 0, 0, c.width, c.height); _bdTint.set(im, c); return c; }
+  const bdHash = i => { const v = Math.sin(i * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+  function bdBell(t, per) { const n = Math.floor(t / per), w = t - n * per, k = Math.floor(w / 2.4); return k < 3 ? { k: n * 3 + k, u: (w - k * 2.4) / 2.4 } : { k: -1, u: 0 }; } // a toll of 3 strokes, 2.4 s apart, every per seconds
   function drawBackdrop(k) { const m = M(); if (!m || !m.hds) return; const b = m.hds[0].backdrop; if (!b) return; const im = HDIMG[b.img]; if (!im) return; const T = m.T, IW = b.iw || im.width, ih0 = b.ih || im.height;
     let s = 1; if (b.grow) { const [x0, x1, s0, s1] = b.grow; let t = Math.min(1, Math.max(0, (hero.x / T - x0) / (x1 - x0))); t = t * t * (3 - 2 * t); s = s0 + (s1 - s0) * t; } if (S.vista && b.vs) s = b.vs; b._s = b._s == null || b._m !== m.id ? s : b._s + (s - b._s) * .05; b._m = m.id; s = b._s; // vs: scale while standing in a vista
     let sc = k / b.D * s; const camC = S.cam[0] + EW / 2, wx = b.x * T + (camC - b.x * T) * (b.px || 0), [ax] = W2S(wx, 0), [, top] = W2S(0, S.cam[1]), cy = W2S(0, (b.clipY ?? 1e3) * T)[1];
@@ -410,19 +419,37 @@
       const want = baseY - tipY; sc = Math.max(fmn * VH, Math.min(hi, want)) / ch; dy = want > hi ? baseY - b.ay * sc : tipY - b.cy0 * sc;
       if (fnl && want < fmn * VH) dy -= fnl * Math.min(1, (fmn * VH - want) / (fmn * VH)) * ch * sc; } // fnl: up close to the wall (normal view) the castle sinks so its towers, not just the spire tip, show through the breaches
     const dx = ax - b.ax * sc, iw = IW * sc, ih = ih0 * sc, W_ = cv.width, Hc = Math.min(cy, cv.height), r = IW / im.width;
+    b._geo = [dx, dy, sc, Hc]; // last placement (screen = dx + src * sc), read by tests / tools
+    const t = S.t || 0, AL = b.alive;
+    const ph = (t / 1.8) % 1, p = AL && AL.core ? Math.exp(-(((ph - .05) / .05) ** 2)) + .6 * Math.exp(-(((ph - .25) / .06) ** 2)) : 0; // the core's heartbeat: lub-dub every 1.8 s (UI 10-25: ≥ 1.6 s, apart from the low-HP pulse) (stone wash + spire glow)
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W_, Hc); ctx.clip();
     if (b.fit) { ctx.fillStyle = b.sky; ctx.fillRect(0, 0, W_, Hc); } // fit: one flat dark tone behind the whole silhouette (no sky; the ground picture must not show through)
     else { if (dy > 0) { ctx.fillStyle = b.sky || '#5a524c'; ctx.fillRect(0, 0, W_, Math.ceil(dy) + 1); } if (dy + ih < Hc) { ctx.fillStyle = b.floor || '#bcb2a4'; ctx.fillRect(0, Math.floor(dy + ih) - 1, W_, Hc - dy - ih + 2); }
       if (dx > 0) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(0, dy, Math.ceil(dx) + 1, ih); } if (dx + iw < W_) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(Math.floor(dx + iw) - 1, dy, W_ - dx - iw + 2, ih); } }
     const x0 = Math.max(0, Math.floor(-dx / sc / r)), y0 = Math.max(0, Math.floor(-dy / sc / r)), x1 = Math.min(im.width, Math.ceil((W_ - dx) / sc / r)), y1 = Math.min(im.height, Math.ceil((Hc - dy) / sc / r)), q = sc * r;
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; if (x1 > x0 && y1 > y0) { const dr = () => ctx.drawImage(im, x0, y0, x1 - x0, y1 - y0, dx + x0 * q, dy + y0 * q, (x1 - x0) * q, (y1 - y0) * q); dr();
-      if (b.lift) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = b.lift; dr(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } } // lift: brighten the picture under a dark map light (무명 무덤가) without ctx.filter (Safari)
-    const t = S.t || 0;
+      if (b.lift) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = b.lift; dr(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } // lift: brighten the picture under a dark map light (무명 무덤가) without ctx.filter (Safari)
+      const wa = AL && AL.core ? .22 * p : 0; // the core's heartbeat washes the stone in its colour from the top of the screen down (≤ +22 %, UI 10-25 ≤ +35 %): the spire is above the view, its light falls from there
+      if (wa > .02) { const tc = bdTint(im, AL.core[2]), N = 6; ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < N; i++) { const s0 = Hc * .7 * i / N, s1 = Hc * .7 * (i + 1) / N, r0 = Math.max(y0, (s0 - dy) / q), r1 = Math.min(y1, (s1 - dy) / q); if (r1 <= r0) continue; // 6 bands fading down; only on the beat (a full-screen 'lighter' pass is the costly part)
+        ctx.globalAlpha = wa * (1 - i / N); ctx.drawImage(tc, x0 / 2, r0 / 2, (x1 - x0) / 2, (r1 - r0) / 2, dx + x0 * q, dy + r0 * q, (x1 - x0) * q, (r1 - r0) * q); } ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } }
     if (b.anim) { const A = b.anim, f = Math.floor(t * A.fps) % A.n; // the illustrator's loop, 8 fps (lit windows flicker, smoke / ash rise, crows fly off)
       for (const L of A.layers) { const li = HDIMG[L.img]; if (!li) continue; const lx = dx + L.sx * sc, ly = dy + L.sy * sc, lw = L.sw * sc, lh = L.sh * sc; if (ly > Hc || ly + lh < 0 || lx > W_ || lx + lw < 0) continue;
         ctx.drawImage(li, (f % L.cols) * L.cw, Math.floor(f / L.cols) * L.ch, L.cw, L.ch, lx, ly, lw, lh); } }
+    if (AL && AL.core) { const [cx_, cy_, col, cr] = AL.core;
+      const gx = dx + cx_ * sc, gy = dy + cy_ * sc, gt = bdGlowTex(col); if (gy < Hc) { ctx.globalCompositeOperation = 'lighter';
+        for (const [rr, aa] of [[cr * (1 + .25 * p), .22 + .45 * p], [cr * .3, .55 + .45 * p]]) { const R = Math.max(2, rr * sc); ctx.globalAlpha = Math.min(1, aa); ctx.drawImage(gt, gx - R, gy - R, 2 * R, 2 * R); }
+        ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } }
+    if (AL && AL.bell) { const [bx, by, col, br, per] = AL.bell, bt = bdBell(t, per); if (bt.k >= 0) { const gx = dx + bx * sc, gy = dy + by * sc, gt = bdGlowTex(col), u = bt.u; // distant bell: each stroke a soft bloom on the tower + a ring of light that spreads and fades
+        if (bt.k !== AL._bk && u < .3 && !S.engaged) sfx('bell_far', .9); AL._bk = bt.k; ctx.globalCompositeOperation = 'lighter';
+        const a = Math.exp(-u * 1.6), R = br * sc * (.5 + .5 * Math.min(1, u * 3)); ctx.globalAlpha = .55 * a; ctx.drawImage(gt, gx - R, gy - R, 2 * R, 2 * R);
+        const rr = br * sc * (1 + u * 3.5); ctx.globalAlpha = .28 * a; ctx.strokeStyle = col; ctx.lineWidth = Math.max(1, br * sc * .18 * (1 - u * .5)); ctx.beginPath(); ctx.ellipse(gx, gy, rr, rr * .55, 0, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } else AL._bk = -1; }
     for (const F of [].concat(b.front || [])) { const fi = HDIMG[F.img]; if (fi) { /* front: one band or a list (펠트 마을 띠 — 사장님 10-25 「펠트 마을도 앞에」) */ const [fax] = W2S(b.x * T + (camC - b.x * T) * ((b.px || 0) - (F.px || 0)), 0), fdx = fax - b.ax * sc, fy = dy + F.y * sc, fq = IW / fi.width * sc; // micro parallax: the outer wall band slides a little against the keep
-      if (fy < Hc) { ctx.drawImage(fi, fdx, fy, fi.width * fq, fi.height * fq); if (b.lift) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = b.lift; ctx.drawImage(fi, fdx, fy, fi.width * fq, fi.height * fq); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } } } }
+      if (fy < Hc) { ctx.drawImage(fi, fdx, fy, fi.width * fq, fi.height * fq); if (b.lift) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = b.lift; ctx.drawImage(fi, fdx, fy, fi.width * fq, fi.height * fq); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } }
+      if (F === [].concat(b.front)[0] && AL && AL.torch) { const gt = bdGlowTex(AL.torchCol || '#ddd3c0'), ty0 = dy + (AL.ty || F.y + 6) * sc; ctx.globalCompositeOperation = 'lighter'; // patrol: 굳은 기사의 잿빛 횃불 (스토리 10-25) walk the outer wall top (or an inner rampart at source y wy), same path same pace, a halt now and then
+        AL.torch.forEach(([x0, x1, v, ph, wy], i) => { const L = x1 - x0, tt = t + 2.4 * Math.sin(t * .42 + i * 1.7), u = ((tt * v + ph * L) % (2 * L) + 2 * L) % (2 * L), x = (wy ? dx : fdx) + (x0 + (u < L ? u : 2 * L - u)) * sc, ty = wy ? dy + wy * sc : ty0, fl = .8 + .2 * Math.sin(t * 9 + i * 2.1) * Math.sin(t * 5.3 + i);
+          if (ty > Hc || ty < Hc * .12) return; for (const [rr, aa] of [[28, .45], [7, .95]]) { const R = Math.max(1.2, rr * sc); ctx.globalAlpha = aa * fl; ctx.drawImage(gt, x - R, ty - R, 2 * R, 2 * R); } }); // UI 10-25: not inside the top 12 % (HUD)
+        ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } } }
     const ft = bdFogTex(); for (const [fy, fh, fa, fs] of b.fog || []) { const h = fh * sc, y = dy + fy * sc, w = h / 96 * 512 * 3, off = (((t * (fs || 6) * sc) % w) + w) % w; if (y > Hc || y + h < 0) continue; ctx.globalAlpha = fa; for (let x = dx - w + off; x < W_; x += w) ctx.drawImage(ft, x, y, w, h); ctx.globalAlpha = 1; }
     if (b.edge) { const ew = b.edge * iw, ex0 = dx + (b.ax - b.bw / 2) * sc, ex1 = ex0 + b.bw * sc; // no tiling: the castle's left / right ends melt into the dark tone (wide screens); narrow screens just crop
       for (const [e0, e1] of [[ex0 - 2, ex0 + ew], [ex1 + 2, ex1 - ew]]) { if (Math.max(e0, e1) < 0 || Math.min(e0, e1) > W_) continue; const gr = ctx.createLinearGradient(e0, 0, e1, 0); gr.addColorStop(0, b.sky); gr.addColorStop(1, b.sky + '00'); ctx.fillStyle = gr; ctx.fillRect(Math.min(e0, e1), 0, Math.abs(e1 - e0), Hc); }
