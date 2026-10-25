@@ -27,8 +27,8 @@ P = [
  ('12b', '12b 창 꽂힌 옛 싸움터', 'field_c', 362, 256, 30, 21, '뒤+앞', 'OK', ''),
  ('12c', '12c 석화 숲 ×2', 'field_s', 188, 338, 60, 50, '뒤+앞', 'FIX', '나무를 하나씩 잘라 발 y로 정렬 (그록 약점: 한 줄로 나눠 가림이 틀림)'),
  ('12d', '12d 잿더미 언덕', 'field_s', 350, 350, 28, 16, '뒤', 'OK', '들판 중앙 큰 잿더미 두 곳에도 하나씩 (field_c 220,160 / 350,240)'),
- ('13', '13 부서진 마차', 'field_c', 344, 206, 8, 5, '뒤', 'FIX', '짐칸 상자처럼 보임 → 2배 원본 사용, 떠 있는 바퀴는 지움'),
- ('14', '14 탈영병 유해 ×3', 'field_c', 378, 268, 4, 2, '바닥', 'FIX', '2x1은 안 보임 → 4배 원본을 2배(4x2 타일)로. 남쪽(성 밖)을 향해 놓기. 핏방울 판 = 380,270 (공허의 핏방울)'),
+ ('13', '13 부서진 마차', 'field_c', 344, 206, 8, 5, '뒤', 'REPL', '뺌 (팀장 10-25 「상자처럼 보임」) → 마차 모닥불 표지는 12d 잿더미 + 부러진 바퀴(코드 소품)로 대체, 다시 그린 마차가 오면 그 자리'),
+ ('14', '14 탈영병 유해 ×3', 'field_c', 378, 268, 4, 2, '바닥', 'REPL', '대체 (팀장 10-25 「너무 작고 거의 같음」) → 그록에 4x2타일·3종 다른 자세로 다시 부탁. 그때까지 자리만 표시(조사 반짝이) + 공허의 핏방울은 아이템 그림. 남쪽(성 밖)을 향해 쓰러진 모양'),
  ('16', '16 베르디만 잘라 씀', 'field_e', 518, 334, 3, 3, '인물', 'FIX', '정문 그림은 펠트 v5 성문(코드)과 겹침 → 문은 안 쓰고 베르디만 4배 원본에서 잘라 정문 밖에'),
  ('17a', '17a 밧줄 다리 ×4 겹침', 'cliff_n', 432, 64, 12, 10, '높은 길', 'FIX', '한 칸 그림 → 여러 장 겹쳐 놓기. 지름길③'),
  ('17b', '17b 승강기', 'field_e', 598, 276, 4, 5, '뒤', 'OK', '1~2장 리프트. 공방 밖이라 밝기 문제 없음'),
@@ -48,15 +48,15 @@ IN = [  # 폐공방 안 (구역 안 좌표가 아니라 설계도 전체 좌표)
 if __name__ == '__main__':  # usage: assembly_overlay.py <겹친그림.png> <표조각.md>
     im = Image.open(R + 'docs_maps/ch1/ch1_overview.png').convert('RGB'); d = ImageDraw.Draw(im, 'RGBA'); S = 4
     F = ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont_jp.otf', 26)
-    col = {'OK': (60, 200, 90), 'FIX': (240, 170, 40), 'WAIT': (220, 60, 60)}
+    col = {'OK': (60, 200, 90), 'FIX': (240, 170, 40), 'REPL': (230, 70, 70)}
     for p in P + IN:
         n, _, z, x, y, w, h, lay, st, _ = p
         if p[1].startswith('01') or p[1].startswith('18'): d.rectangle([x*S, y*S+70, (x+w)*S, (y+h)*S+70], outline=col[st] + (160,), width=2); continue
         d.rectangle([x*S, y*S+70, (x+w)*S, (y+h)*S+70], outline=col[st] + (255,), width=4, fill=col[st] + (40,))
         tx, ty = x*S + 4, y*S + 72; d.rectangle([tx-2, ty, tx + 14*len(n) + 6, ty + 28], fill=(0, 0, 0, 200)); d.text((tx, ty), n, fill=col[st], font=F)
-    d.rectangle([1560, 0, 2560, 40], fill=(0, 0, 0, 230)); d.text((1568, 6), '초록 = 그대로 씀   주황 = 손보고 씀   번호 = 조립표', fill=(255, 255, 255), font=F)
+    d.rectangle([1560, 0, 2560, 40], fill=(0, 0, 0, 230)); d.text((1568, 6), '초록 = 그대로   주황 = 손보고   빨강 = 대체/뺌', fill=(255, 255, 255), font=F)
     im.save(sys.argv[1])
     def row(p):
         n, nm, z, x, y, w, h, lay, st, fix = p; zz = Z[z]
-        return f"| {n} | {nm} | {zz['name']} | {x},{y} ({x-zz['x']},{y-zz['y']}) | {w}×{h} | {lay} | {'그대로' if st=='OK' else '손봄'} | {fix} |"
+        return f"| {n} | {nm} | {zz['name']} | {x},{y} ({x-zz['x']},{y-zz['y']}) | {w}×{h} | {lay} | {dict(OK='그대로', FIX='손봄', REPL='**대체/뺌**')[st]} | {fix} |"
     open(sys.argv[2], 'w').write('\n'.join(row(p) for p in P) + '\n@@\n' + '\n'.join(row(p) for p in IN) + '\n')
