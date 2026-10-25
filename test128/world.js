@@ -15,14 +15,14 @@
   // ---------------- tweakables ----------------
   const WORLD_ZOOM = 0.5;          // overworld scale vs field (0.5 => 8px tiles, ~13px hero). Try 0.75 / 1.
   const LW = 384, LH = 216;        // logical screen (DQ6 SFC-like 16:9), integer-scaled to the window
-  // ?pace=souls (주인 10-24 「너무 스피디, 2D 엘든링 느낌」 회의 시험판): 걷기 72 · 전력질주 1.5배 · 스태미나 · 제자리 베기(시작 5틱 더, 뒤 빈틈) · 회피대시 1.6키 · 가벼운 타 멈춤 1틱. 기본 게임은 그대로
-  const SOULS = /[?&]pace=souls/.test(location.search), SW8 = SOULS ? 5 : 0;
+  // 속도 = 엘든링식 기본 (사장님 10-24 「너무 스피디, 2D 엘든링 느낌」 → 10-25 세 가지 비교 영상 보고 「엘든링식이 제일 좋다」): 걷기 72 · 질주 1.5배 · 스태미나 · 제자리 베기(시작 5틱 더, 뒤 빈틈) · 회피대시 1.6키. 옛 빠른 속도는 git 기록에만
+  const SW8 = 5; // 베기 시작을 5틱 늦춤 (칼자국 GK_FAN 도 같이)
   const STAM = { max: 100, hit: [14, 14, 20], dash: 18, charge: 20, dodge: 18, run: 10, regen: 45, delay: .5, exDelay: 1, exRegen: 30, exEnd: 30, floor: -20 }; // 엘든링·다크소울3 비율을 100으로 줄임 (구르기 ~16, 회복 ~45/초, 0.5초 쉼)
-  const HERO_SPEED = SOULS ? 72 : 82, WORLD_SPEED = 46;
-  const RUN = Object.assign({ mul: 1.9, startMul: 2.3, startT: 0.17, skidT: 0.2, dblTap: 0.25, cadence: .9 }, SOULS ? { mul: 1.5, startMul: 1.5, skidT: .28 } : {}); // run: 1.9x walk, no MP/stamina; anim cadence = speed x .9 (no foot sliding)
+  const HERO_SPEED = 72, WORLD_SPEED = 46;
+  const RUN = { mul: 1.5, startMul: 1.5, startT: 0.17, skidT: .28, dblTap: 0.25, cadence: .9 }; // run: 1.5x walk (질주는 몹 근처에서 스태미나를 씀), no start burst; anim cadence = speed x .9 (no foot sliding)
   // swing hitbox = forward sector (tile 16): sword 29px = 1.8 tiles, 150 deg; other weapons scale with the town range table (__game.swingRange)
   const SWING = { range: 29, arc: 150, arc3: 100, r3: 1.15 }; // hit 3 = finishing slash: 100 deg forward, reach x1.15 (longer swing timing ATK3 kept)
-  const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => { const D = (window.__game && window.__game.DODGE) || null; if (!D || !SOULS) return D; if (!DG.c || DG.c.src !== D) DG.c = { src: D, v: Object.assign({}, D, { durTicks: 20, iframeTicks: 13, cdTicks: 6, tiles: D.tiles * 1.35 }, D.travel ? { travel: D.travel * 1.35 } : {}, D.burstTicks ? { burstTicks: 16 } : {}) }; return DG.c.v; }; // souls: 0.33s, 무적 13틱, 쿨 6틱(스태미나가 대신), 거리 x1.35 // dodge dash config (ANIM.dodge); ROLL kept as fallback
+  const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => { const D = (window.__game && window.__game.DODGE) || null; if (!D) return D; /* 엘든링식: 0.33초 · 무적 13틱 · 쿨 6틱(스태미나가 대신) · 거리 x1.35 */ if (!DG.c || DG.c.src !== D) DG.c = { src: D, v: Object.assign({}, D, { durTicks: 20, iframeTicks: 13, cdTicks: 6, tiles: D.tiles * 1.35 }, D.travel ? { travel: D.travel * 1.35 } : {}, D.burstTicks ? { burstTicks: 16 } : {}) }; return DG.c.v; }; // souls: 0.33s, 무적 13틱, 쿨 6틱(스태미나가 대신), 거리 x1.35 // dodge dash config (ANIM.dodge); ROLL kept as fallback
   const EASE = { outCubic: p => 1 - (1 - p) ** 3, outQuad: p => 1 - (1 - p) ** 2, linear: p => p };
   const BUILD_V = (Date.parse(document.lastModified) || 0).toString(36); // deploy stamp (see index.html): new deploy -> new asset URLs
   const V = u => (window.__v ? __v(u) : u); // 지도·그림 주소에 배포 시각 붙이기 (index.html __v)
@@ -31,7 +31,7 @@
   // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
   const ATK_DMG = [10, 10, 20]; // [combat research] hit 3 14 -> 20 so the full combo out-damages hit-1 spam
-  const ATK_MOVE = SOULS ? 0 : 0.7; // [combat research] move speed kept while a basic swing plays (stick held)
+  const ATK_MOVE = 0; // 제자리 베기 (엘든링식): 휘두르는 동안 이동 없음
   const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
   // 심연의 힘 (주인 10-23, 벌칙 없는 역전 장치 · 가슴 속 사멸의 코어가 새어 나옴): 맞아서 체력이 25% 이하가 되면 8초 동안 공격·검기 x1.8, 45초마다 한 번
   const LAST_STAND = { hpPct: 0.25, dur: 8, cd: 20, atk: 1.8, flag: 'abyss_awake' }; // cd: 초필살기를 아직 안 썼으면 20초 뒤 다시 켜질 수 있음 (쓰고 나면 쉼터에서 쉴 때까지 끝) // 중반 해금: 5장 보스 발바도스를 베면 flag (폭주의 기억). 시험용 ?abyss=1
@@ -45,8 +45,8 @@
   function token(m, ranged) { if (m.D.boss || m.D.champion) return true; const now = S.t, d = DIFF(); S.tokens = (S.tokens || []).filter(t => t.until > now && !t.m.dead);
     if (S.tokens.some(t => t.m === m)) return true; const lim = ranged ? 1 : (d.tokens || 2); if (S.tokens.filter(t => !!t.r === !!ranged).length >= lim) return false;
     S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
-  const ATK = SOULS ? { dur: 0.50, a0: 0.05 + SW8 / 60, a1: 0.16 + SW8 / 60, chain: 0.40, reach: 15, r: 13 } : { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
-  const ATK3 = Object.assign({}, ATK, SOULS ? { dur: 0.75, a0: 0.07 + SW8 / 60, a1: 0.24 + SW8 / 60 } : { dur: 0.413, a0: 0.103, a1: 0.273 }); // hit 3: longer active window + follow-through; 모션연구방 10-24 「탁, 타탁」: 3타만 예비동작 +2틱 (GK_FAN 3타 t0 6)
+  const ATK = { dur: 0.50, a0: 0.05 + SW8 / 60, a1: 0.16 + SW8 / 60, chain: 0.40, reach: 15, r: 13 };
+  const ATK3 = Object.assign({}, ATK, { dur: 0.75, a0: 0.103 + SW8 / 60, a1: 0.273 + SW8 / 60 }); // hit 3: longer active window + follow-through; 모션연구방 10-24 「탁, 타탁」: 3타만 예비동작 +2틱 (GK_FAN 3타 t0 6), 그 위에 SW8
   const atkT = i => i >= 3 ? atkTS(i) : i === 2 ? ATK3 : ATK;
   // dash attack (run + attack, i 3) / charge attack lv1 / lv2 (hold attack, i 4 / 5): same data as the town (__game.ANIM.special), town px x .3, ticks / 60
   const SPW_DEF = { dash: { dur: 26, a0: 4, a1: 12, lunge: 90, rangeMul: 1, arc: 100, dmgMul: 1.3, cool: .3 }, charge: { t1: .6, t2: 1.2, moveMul: .4,
@@ -819,7 +819,7 @@
       if (n.scene === 'town') go('town', null, { card: false }); else go(n.scene, 'world');
     }
   }
-  // ---- 스태미나 (?pace=souls): 마지막 행동은 0 아래(-20)까지 허용, 0 이하 = 지침(회복 1초 뒤 30/초, 30까지 질주 불가), 질주는 몹 가까이(150px)일 때만 닳음
+  // ---- 스태미나 (엘든링식 기본, 사장님 10-25): 마지막 행동은 0 아래(-20)까지 허용, 0 이하 = 지침(회복 1초 뒤 30/초, 30까지 질주 불가), 질주는 몹 가까이(150px)일 때만 닳음
   function stOk() { if (hero.st == null) hero.st = STAM.max; if (hero.st > 0) return true; hero.stFlash = .4; return false; }
   function stSpend(c) { if (hero.st == null) hero.st = STAM.max; hero.st = Math.max(STAM.floor, hero.st - c); hero.stLast = S.t; if (hero.st <= 0) hero.stEx = true; }
   function stTick(dt) { if (hero.st == null || hero.hp <= 0) { hero.st = STAM.max; hero.stEx = false; } hero.stFlash = Math.max(0, (hero.stFlash || 0) - dt);
@@ -827,11 +827,11 @@
     if (spr) { hero.st -= STAM.run * dt; hero.stLast = S.t; if (hero.st <= 0) { hero.stEx = true; hero.run = false; hero.stFlash = .4; } }
     else if (S.t - (hero.stLast || 0) > (hero.stEx ? STAM.exDelay : STAM.delay) && !hero.roll && !(hero.atk && hero.atk.t < atkT(hero.atk.i).dur)) hero.st = Math.min(STAM.max, hero.st + (hero.stEx ? STAM.exRegen : STAM.regen) * dt);
     if (hero.stEx && hero.st >= STAM.exEnd) hero.stEx = false; if (hero.st < STAM.max) hero.stFullT = 0; else hero.stFullT = (hero.stFullT || 0) + dt; }
-  function drawStam(k) { if (!SOULS || hero.st == null || S.ultFx) return; const a = hero.st < STAM.max ? 1 : Math.max(0, 1 - (hero.stFullT || 0) / .6); if (a <= 0 && !(hero.stFlash > 0)) return; // 발밑 작은 막대 (폰: 눈은 주인공에), 가득 차면 0.6초 뒤 사라짐
+  function drawStam(k) { if (hero.st == null || S.ultFx) return; const a = hero.st < STAM.max ? 1 : Math.max(0, 1 - (hero.stFullT || 0) / .6); if (a <= 0 && !(hero.stFlash > 0)) return; // 발밑 작은 막대 (폰: 눈은 주인공에), 가득 차면 0.6초 뒤 사라짐
     const [x, y] = W2S(hero.x, hero.y + 5), w = Math.round(24 * k), h = Math.max(2, Math.round(2 * k)), x0 = Math.round(x - w / 2), y0 = Math.round(y), f = Math.max(0, hero.st) / STAM.max, red = hero.stEx || hero.stFlash > 0;
     ctx.save(); ctx.globalAlpha = Math.max(a, hero.stFlash > 0 ? 1 : 0); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x0 - 1, y0 - 1, w + 2, h + 2); ctx.fillStyle = red ? (Math.floor(S.t * 10) % 2 ? '#ff5050' : '#a02020') : '#7fdc6a'; ctx.fillRect(x0, y0, Math.round(w * f), h); ctx.restore(); }
   function stepMap(dt) {
-    const m = M(); stepLastStand(dt); stepNpcs(dt); if (SOULS) stTick(dt);
+    const m = M(); stepLastStand(dt); stepNpcs(dt); stTick(dt);
     hero.inv = Math.max(0, hero.inv - dt); hero.rollCd = Math.max(0, hero.rollCd - dt); hero.slowT = Math.max(0, hero.slowT - dt); hero.dodgeT = Math.max(0, hero.dodgeT - dt); hero.atkCd = Math.max(0, (hero.atkCd || 0) - dt);
     const [ix, iy] = dirInput();
     if (takePress('potion')) usePotion();
@@ -844,15 +844,15 @@
         if (mm.hopG && mm.hopG[ty * mm.w + tx]) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(3, null, true); hero.jump = null; hero.z = 0; } // landed in a gap / water: small hit, back to the last solid ground
         else { addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); } }
       if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
-    const dashP = takePress('dash'); if (SOULS) { if (dashP) hero.dashBuf = .2; hero.dashBuf = Math.max(0, (hero.dashBuf || 0) - dt); } // souls: 회피 누름 0.2초 보관
-    if ((SOULS ? hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() : dashP) && !hero.roll && hero.rollCd <= 0) { if (SOULS) { hero.dashBuf = 0; stSpend(STAM.dodge); } let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
+    const dashP = takePress('dash'); if (dashP) hero.dashBuf = .2; hero.dashBuf = Math.max(0, (hero.dashBuf || 0) - dt); // 회피 누름 0.2초 보관
+    if (hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() && !hero.roll && hero.rollCd <= 0) { hero.dashBuf = 0; stSpend(STAM.dodge); let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
-    if (takePress('attack')) hero.atkBuf = SOULS ? .25 : .18;
-    if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1 + (SOULS ? .1 : 0)) && (!SOULS || stOk())) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
+    if (takePress('attack')) hero.atkBuf = .25;
+    if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1 + .1) && stOk()) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
       if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = prevAtk && prevAtk.i < 2 ? prevAtk.i + 1 : (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; /* [combat research] a press during the swing continues the combo (was: back to hit 1) */ sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) { setFace(ix, iy); aimAssist(hero.combo, AIM_HELD); } else aimAssist(hero.combo); } }
     if (!(S.heroStopT > 0)) hero.atkBuf = Math.max(0, (hero.atkBuf || 0) - dt); // 멈춘 동안 누른 공격은 그대로 기억
-    if (SOULS && hero.atk && !hero.atk.paid) { hero.atk.paid = true; stSpend(hero.atk.i === 3 ? STAM.dash : hero.atk.i > 3 ? STAM.charge : STAM.hit[hero.atk.i]); }
+    if (hero.atk && !hero.atk.paid) { hero.atk.paid = true; stSpend(hero.atk.i === 3 ? STAM.dash : hero.atk.i > 3 ? STAM.charge : STAM.hit[hero.atk.i]); }
     if (isHeld('attack') && hero.holdOk) hero.holdT += dt; else hero.holdOk = false; // charge (모으기): keep holding attack -> lv1 t1 / lv2 t2, release = charged slash; a hit / dodge cancels
     if (!hero.charge && hero.holdOk && hero.holdT > .14 && !hero.atk && !hero.roll && hero.hp > 0) { hero.charge = { t: hero.holdT, lv: 0, flash: 0 }; hero.run = false; }
     if (hero.charge) { const C = hero.charge, CF = spW().charge; C.t += dt; C.flash = Math.max(0, C.flash - dt); const lv = C.t >= CF.t2 ? 2 : C.t >= CF.t1 ? 1 : 0;
@@ -881,7 +881,7 @@
       if (a.i === 5 && !a.waved && a.t >= AT.a0) { a.waved = true; spawnHW(Math.atan2(dv[1], dv[0])); shake(1); } // charge lv2: forward sword wave (1px shake only)
       if (a.t >= AT.dur) { hero.atk = null; hero.comboT = a.i >= 3 ? 0 : ATK.chain; if (a.i >= 3) hero.atkCd = spOf(a.i).cool || .2; } }
     else { const g = window.__game, mv = !!(ix || iy);
-      if (mv && !hero.run && !hero.charge && !(SOULS && hero.stEx) && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
+      if (mv && !hero.run && !hero.charge && !hero.stEx && (hero.runReq || (g && g.alwaysRun))) { hero.run = true; hero.runStartT = RUN.startT; addFx('dust', hero.x - ix * 4, hero.y, { life: .35 }); } // dash start + dust kick-up
       hero.runReq = false; if (!mv && hero.run) { hero.run = false; hero.skidT = RUN.skidT; hero.skidV = [FACEV[hero.face][0], FACEV[hero.face][1]]; addFx('dust', hero.x, hero.y, { life: .3 }); }
       hero.runStartT = Math.max(0, (hero.runStartT || 0) - dt);
       const rk = hero.run ? RUN.mul + (RUN.startMul - RUN.mul) * hero.runStartT / RUN.startT : 1;
@@ -1333,7 +1333,7 @@
   // R = GK_REACH x .7, centre = feet + c, +x = facing (mirrored for left); p is in <=> after un-rotating by rot and y / .8: r <= R and the angle is in the swept part
   // (sweep fraction a0 -> a1 <= head(t), head = 1-(1-clamp((t-t0+1)/sw))^2, t = 60fps tick from the attack start, live only t0..t1). Up/down/diagonal: the side fan turned in the ground plane.
   const GK_SQ = .8, GK_FAN = [{ c: [0, -13], R: GK_REACH[0] * .7, rot: 0, a0: -70, a1: 70, t0: 3, t1: 10, sw: 4.2 }, { c: [0, -13], R: GK_REACH[1] * .7, rot: -15, a0: 70, a1: -70, t0: 3, t1: 10, sw: 4.2 }, { c: [2, -16], R: GK_REACH[2] * .7, rot: 0, a0: -100, a1: 70, t0: 6, t1: 16, sw: 6 }];
-  if (SOULS) GK_FAN.forEach(F => { F.t0 += SW8; F.t1 += SW8; }); // souls: 칼자국도 늦어진 시작에 맞춤
+  GK_FAN.forEach(F => { F.t0 += SW8; F.t1 += SW8; }); // 칼자국도 늦어진 베기 시작에 맞춤
   const gkFanT = f => (f.at0 || 0) + f.t - 1; // f.t is 1 on the spawn tick (gkTick runs after the spawn)
   function gkFanHead(F, t) { if (t < F.t0 || t > F.t1) return -1; const x = Math.min(1, Math.max(0, (t - F.t0 + 1) / F.sw)); return 1 - (1 - x) * (1 - x); }
   function gkFanPolar(F, dir, px, py) { let dx = dir[0], dy = dir[1]; if (dx < 0) { px = -px; dx = -dx; } // px, py: field px from the hero's feet -> [r, u] in the fan (u = swept fraction a0 -> a1)
