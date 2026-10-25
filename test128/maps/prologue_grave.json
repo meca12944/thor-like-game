@@ -1,0 +1,4122 @@
+{
+ "type": "field",
+ "area": 1,
+ "id": "prologue_grave",
+ "name": "무명 무덤가",
+ "region": "ch1",
+ "ch1Origin": [
+  270,
+  394
+ ],
+ "title": {
+  "kicker": "PROLOGUE",
+  "name": "무명 무덤가",
+  "sub": "외성벽 아래, 이름 없는 무덤가 언덕"
+ },
+ "bgm": "field",
+ "battleBgm": "field_battle",
+ "tileset": "field",
+ "tile": 16,
+ "viewZoom": 1.3,
+ "grade": "ash",
+ "fog": 0.3,
+ "ash": 70,
+ "wind": [
+  4,
+  1.5
+ ],
+ "w": 64,
+ "h": 64,
+ "legend": {
+  ".": "dirt",
+  "#": "cliff",
+  "H": {
+   "ground": "dirt",
+   "solid": true
+  }
+ },
+ "solid": [
+  "#",
+  "H"
+ ],
+ "ground": [
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "###H##.###..#.....##.......####.#.#.............................",
+  "#H##.H#.........................................................",
+  "#####H##........................................................",
+  "#H#H..#.........................................................",
+  "###H..H.........................................................",
+  "##H#.#.H....................................####################",
+  "#H####......................................####################",
+  "####H..H.H..................................####################",
+  "####.##..H..................................####################",
+  "#H##.........H................H....................#############",
+  "#H##...............H...............................#############",
+  "#####..............................................#############",
+  "###H...H...............H...................H.......#############",
+  "#H##.H#.................H..HH....H.H...............#############",
+  "#####H..............................H..............#############",
+  "#H#H..........H....H....H.H.H...H..H...............#############",
+  "####...............................................#############",
+  "#H##..HH................H.H.H....H.H.........H.....#############",
+  "#H##..H................................H...........#############",
+  "####H.#H................H.H.....H.H................#############",
+  "#######...............H........................H...#############",
+  "#H####...........H..................H..............#############",
+  "####H...................................H...H......#############",
+  "#H##.H......H.......H..............................#############",
+  "#H#H.H....................................H........#############",
+  "######..........H..............................H.H.#############",
+  "#H##.##.......H....................................#############",
+  "###H.H.H..H.........H..............................#############",
+  "####...#...........................................#############",
+  "#H#H.H.....................H...............H.......#############",
+  "###H..#.........H..................................#############",
+  "#H####.H.................H....................H....#############",
+  "#####H#H...........................H...............#############",
+  "#H#H#.#..H.........................................#############",
+  "###H.H............H.................H...H..........#############",
+  "#H##.#.............................................#############",
+  "#H#H..##.....H..................H..................#############",
+  "######.H.H.....H...................................#############",
+  "####H..............................................#############",
+  "#H##.#H.....H....................................H.#############",
+  "####...H..........H..H..................H.....H....#############",
+  "#H##H.........................H.......H............#############",
+  "#H####.............................................#############",
+  "###H.................H..........H..................#############",
+  "#H###..#HH.........................................#############",
+  "###H#............................H....H............#############",
+  "#H##.........................H.............H.......#############",
+  "####.....H.........................................#############",
+  "#H####...H....H....................................#############",
+  "####.H......H................H...................H.#############",
+  "#####....H.........................................#############",
+  "####.H#.H..H........H..H..H..H..H..H..H..H..H..H..H#############",
+  "#####....#.##.H..H#...#.##.................#...##.##############",
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "################################################################",
+  "################################################################"
+ ],
+ "objects": [
+  {
+   "type": "clue",
+   "id": "pg_hollow",
+   "x": 30,
+   "y": 27,
+   "name": "사람 모양으로 꺼진 잿더미",
+   "flag": "pg_look_hollow",
+   "text": "재가 사람 모양으로 꺼져 있다. 방금까지 내가 누워 있던 자리.\n가장자리가 단단히 굳었다. 한두 번 누운 자리가 아니다.",
+   "textDone": "내가 누워 있던 자리. 벌써 재가 다시 쌓이고 있다."
+  },
+  {
+   "type": "clue",
+   "id": "pg_sword_marker",
+   "x": 26,
+   "y": 20,
+   "name": "무덤에 꽂힌 장검",
+   "flag": "pg_look_sword",
+   "text": "무덤 표지 대신 칼이 꽂혀 있다. 손잡이 가죽을 감은 방식이 내 것과 같다.\n이름은 없다. 여기 무덤은 전부 이름이 없다.",
+   "textDone": "이름 없는 무덤. 칼만 꽂혀 있다."
+  },
+  {
+   "type": "clue",
+   "id": "pg_tally",
+   "x": 33,
+   "y": 25,
+   "name": "돌에 그은 줄",
+   "flag": "pg_look_tally",
+   "text": "돌마다 칼끝으로 그은 줄이 빼곡하다. 다섯 개씩 묶은 표식.\n어느 돌부터인가 줄이 끊겼다. …세는 걸 그만둔 거다.",
+   "textDone": "끊긴 줄. 더 긋지 않았다."
+  },
+  {
+   "type": "clue",
+   "id": "pg_backpack",
+   "x": 42,
+   "y": 34,
+   "name": "고사목 아래 가죽 배낭",
+   "flag": "pg_backpack",
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "text": "마른 나무 밑동에 낡은 가죽 배낭이 기대 놓여 있다. 주인은 보이지 않는다.\n안에는 닳은 등불과 물약 한 병, 실이 다 풀린 바늘쌈.\n배낭 끈을 묶은 매듭이 내가 묶는 방식과 똑같다.\n등불을 들자, 심지에 푸른 불이 옮겨 붙는다.",
+   "textDone": "빈 가죽 배낭. 끈의 매듭만 낯익다."
+  },
+  {
+   "type": "waystone",
+   "id": "ws_prologue_grave",
+   "x": 16,
+   "y": 16,
+   "name": "무덤가 모닥불(꺼짐)",
+   "art": "hd"
+  },
+  {
+   "type": "clue",
+   "id": "pg_footprints",
+   "x": 31,
+   "y": 12,
+   "name": "재 위의 발자국",
+   "flag": "pg_look_steps",
+   "text": "언덕 위로 난 발자국. 반쯤 재에 덮였다.\n내 신발과 크기가 같다.",
+   "textDone": "반쯤 덮인 발자국."
+  },
+  {
+   "type": "vista",
+   "id": "pg_vista_crest",
+   "x": 31,
+   "y": 8,
+   "r": 3.2,
+   "zoom": 0.74,
+   "dir": 270,
+   "pan": 6,
+   "name": "잿빛 들판",
+   "sub": "불탄 왕도의 가장 바깥"
+  },
+  {
+   "type": "breakable",
+   "id": "pg_bramble",
+   "x": 46,
+   "y": 4,
+   "w": 2,
+   "h": 5,
+   "flag": "pg_bramble",
+   "name": "마른 가시덤불",
+   "text": "마른 가시덤불을 베어 길을 텄다"
+  },
+  {
+   "type": "pit",
+   "id": "pg_crack_4",
+   "x": 53,
+   "y": 4,
+   "soft": 1,
+   "text": "발밑이 꺼진다 — 뛰어넘자"
+  },
+  {
+   "type": "pit",
+   "id": "pg_crack_5",
+   "x": 53,
+   "y": 5,
+   "soft": 1,
+   "text": "발밑이 꺼진다 — 뛰어넘자"
+  },
+  {
+   "type": "pit",
+   "id": "pg_crack_6",
+   "x": 53,
+   "y": 6,
+   "soft": 1,
+   "text": "발밑이 꺼진다 — 뛰어넘자"
+  },
+  {
+   "type": "pit",
+   "id": "pg_crack_7",
+   "x": 53,
+   "y": 7,
+   "soft": 1,
+   "text": "발밑이 꺼진다 — 뛰어넘자"
+  },
+  {
+   "type": "pit",
+   "id": "pg_crack_8",
+   "x": 53,
+   "y": 8,
+   "soft": 1,
+   "text": "발밑이 꺼진다 — 뛰어넘자"
+  },
+  {
+   "type": "sign",
+   "x": 57,
+   "y": 4,
+   "text": "기울어진 이정표.\n「펠트 서문 →」"
+  },
+  {
+   "type": "exit",
+   "x": 63,
+   "y": 4,
+   "w": 1,
+   "h": 5,
+   "to": "felt",
+   "spawn": "field",
+   "label": "→ 펠트 서문",
+   "setFlag": "pg_left"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_move",
+   "x": 30,
+   "y": 26,
+   "r": 3,
+   "text": "이동: WASD / 방향키"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_pack",
+   "x": 42,
+   "y": 34,
+   "r": 3.5,
+   "text": "살펴보기·줍기: {interact}",
+   "unless": "pg_backpack"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_fire",
+   "x": 16,
+   "y": 17,
+   "r": 3.5,
+   "text": "꺼진 모닥불 — {interact}: 쉬기·저장 (쓰러지면 여기서 다시 시작)"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_crest",
+   "x": 31,
+   "y": 14,
+   "r": 2.5,
+   "text": "언덕 위로 올라가 보자"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_atk",
+   "x": 44,
+   "y": 6,
+   "r": 2.6,
+   "text": "공격: {attack} — 마른 가시덤불을 베어 길을 연다",
+   "unless": "pg_bramble"
+  },
+  {
+   "type": "hint",
+   "id": "pg_h_dash",
+   "x": 51,
+   "y": 6,
+   "r": 2.4,
+   "text": "점프 {dive} / 회피대시 {dash} — 땅 틈을 뛰어넘는다"
+  }
+ ],
+ "spawns": {
+  "default": [
+   30.5,
+   26.5,
+   "up"
+  ],
+  "wake": [
+   30.5,
+   26.5,
+   "up"
+  ],
+  "resume": [
+   30.5,
+   26.5,
+   "up"
+  ],
+  "from_felt": [
+   61.5,
+   6.5,
+   "left"
+  ]
+ },
+ "hd": {
+  "D": 1.5,
+  "ground": "assets/world/prologue/ground.webp",
+  "props": [
+   {
+    "img": "assets/world/felt/g4_far_castle.png",
+    "ax": 1300,
+    "ay": 380,
+    "id": "far_castle",
+    "x": 32.0,
+    "y": 3.2,
+    "D": 2.0,
+    "fade": 0,
+    "shadow": 0,
+    "par": 0.35
+   },
+   {
+    "id": "outer_wall_0",
+    "img": "assets/world/felt/g4_gate_wall.png",
+    "x": 6.0,
+    "y": 62.6,
+    "ax": 294,
+    "ay": 323,
+    "D": 1.9,
+    "fade": 1,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "outer_wall_1",
+    "img": "assets/world/felt/g4_gate_wall.png",
+    "x": 22.8,
+    "y": 63.1,
+    "ax": 294,
+    "ay": 323,
+    "D": 1.9,
+    "fade": 1,
+    "shadow": 0,
+    "flip": true
+   },
+   {
+    "id": "outer_wall_2",
+    "img": "assets/world/felt/g4_gate_wall.png",
+    "x": 38.0,
+    "y": 62.6,
+    "ax": 294,
+    "ay": 323,
+    "D": 1.9,
+    "fade": 1,
+    "shadow": 0,
+    "flip": false
+   },
+   {
+    "id": "outer_wall_3",
+    "img": "assets/world/felt/g4_gate_wall.png",
+    "x": 54.8,
+    "y": 63.1,
+    "ax": 294,
+    "ay": 323,
+    "D": 1.9,
+    "fade": 1,
+    "shadow": 0,
+    "flip": true
+   },
+   {
+    "id": "rubble_158",
+    "img": "assets/world/felt/rubble.png",
+    "x": 61.5,
+    "y": 3.9,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "pg_bramble_0_143",
+    "img": "assets/world/prologue/pg_bramble_0.png",
+    "x": 46.59,
+    "y": 4.95,
+    "ax": 20,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": true,
+    "solid": [
+     46,
+     4,
+     46,
+     4
+    ]
+   },
+   {
+    "id": "pg_bramble_1_144",
+    "img": "assets/world/prologue/pg_bramble_1.png",
+    "x": 47.62,
+    "y": 4.95,
+    "ax": 22,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": false,
+    "solid": [
+     47,
+     4,
+     47,
+     4
+    ]
+   },
+   {
+    "id": "sign_post_153",
+    "img": "assets/world/felt/sign_post.png",
+    "x": 57.5,
+    "y": 4.95,
+    "ax": 28,
+    "ay": 84,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "pg_petri_0_16",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 3.81,
+    "y": 5.38,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.2972494924457694,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_bramble_1_145",
+    "img": "assets/world/prologue/pg_bramble_1.png",
+    "x": 46.55,
+    "y": 5.95,
+    "ax": 22,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": false,
+    "solid": [
+     46,
+     5,
+     46,
+     5
+    ]
+   },
+   {
+    "id": "pg_bramble_0_146",
+    "img": "assets/world/prologue/pg_bramble_0.png",
+    "x": 47.45,
+    "y": 5.95,
+    "ax": 20,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": true,
+    "solid": [
+     47,
+     5,
+     47,
+     5
+    ]
+   },
+   {
+    "id": "pg_petri_2_15",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.22,
+    "y": 6.31,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.065542919782915,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_17",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 5.61,
+    "y": 6.37,
+    "ax": 59,
+    "ay": 132,
+    "D": 1.922839759791802,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_bramble_0_147",
+    "img": "assets/world/prologue/pg_bramble_0.png",
+    "x": 46.49,
+    "y": 6.95,
+    "ax": 20,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": false,
+    "solid": [
+     46,
+     6,
+     46,
+     6
+    ]
+   },
+   {
+    "id": "pg_bramble_1_148",
+    "img": "assets/world/prologue/pg_bramble_1.png",
+    "x": 47.58,
+    "y": 6.95,
+    "ax": 22,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": false,
+    "solid": [
+     47,
+     6,
+     47,
+     6
+    ]
+   },
+   {
+    "id": "pg_petri_2_20",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 5.16,
+    "y": 7.1,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.0153703539194407,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_bramble_1_149",
+    "img": "assets/world/prologue/pg_bramble_1.png",
+    "x": 46.44,
+    "y": 7.95,
+    "ax": 22,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": true,
+    "solid": [
+     46,
+     7,
+     46,
+     7
+    ]
+   },
+   {
+    "id": "pg_bramble_0_150",
+    "img": "assets/world/prologue/pg_bramble_0.png",
+    "x": 47.47,
+    "y": 7.95,
+    "ax": 20,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": true,
+    "solid": [
+     47,
+     7,
+     47,
+     7
+    ]
+   },
+   {
+    "id": "pg_petri_1_19",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 4.0,
+    "y": 7.99,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.0023488543534205,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_18",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.66,
+    "y": 8.24,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1438708678453455,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_bramble_0_151",
+    "img": "assets/world/prologue/pg_bramble_0.png",
+    "x": 46.5,
+    "y": 8.95,
+    "ax": 20,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": true,
+    "solid": [
+     46,
+     8,
+     46,
+     8
+    ]
+   },
+   {
+    "id": "pg_bramble_1_152",
+    "img": "assets/world/prologue/pg_bramble_1.png",
+    "x": 47.35,
+    "y": 8.95,
+    "ax": 22,
+    "ay": 37,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_bramble",
+    "flip": false,
+    "solid": [
+     47,
+     8,
+     47,
+     8
+    ]
+   },
+   {
+    "id": "pg_petri_2_23",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 6.16,
+    "y": 9.43,
+    "ax": 46,
+    "ay": 138,
+    "D": 1.89147894382875,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_22",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 3.0,
+    "y": 9.51,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.286311498973188,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_21",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 2.17,
+    "y": 9.84,
+    "ax": 46,
+    "ay": 138,
+    "D": 1.8226187462339287,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_1_154",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 40.5,
+    "y": 9.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "rubble_155",
+    "img": "assets/world/felt/rubble.png",
+    "x": 49.5,
+    "y": 9.9,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "g4_debris_1_156",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 55.5,
+    "y": 9.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "g4_debris_1_157",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 59.5,
+    "y": 9.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "pg_petri_1_24",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 7.33,
+    "y": 9.92,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.052367819757156,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_25",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.48,
+    "y": 11.06,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.9498230297276546,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_28",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 9.99,
+    "y": 12.0,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.1669260617384807,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_26",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 4.15,
+    "y": 12.19,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.128771836656336,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_27",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 7.39,
+    "y": 12.38,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9420882892763456,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_30",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 9.04,
+    "y": 13.19,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.279758035782413,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_29",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.63,
+    "y": 13.71,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.21320456075099,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g2_burnt_stump_a_137",
+    "img": "assets/world/felt/g2_burnt_stump_a.png",
+    "x": 13.5,
+    "y": 13.9,
+    "ax": 22,
+    "ay": 35,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "stone_low_180",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 30.5,
+    "y": 13.9,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g2_burnt_stump_a_138",
+    "img": "assets/world/felt/g2_burnt_stump_a.png",
+    "x": 19.5,
+    "y": 14.9,
+    "ax": 22,
+    "ay": 35,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "pg_petri_1_31",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 1.06,
+    "y": 15.03,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.044647157429877,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "stone_low_173",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 43.5,
+    "y": 16.9,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_banner_0_133",
+    "img": "assets/world/prologue/pg_banner_0.png",
+    "x": 23.5,
+    "y": 16.95,
+    "ax": 25,
+    "ay": 152,
+    "D": 3.0,
+    "fade": 0,
+    "shadow": 1,
+    "sway": 1.0
+   },
+   {
+    "id": "g4_firepit_136",
+    "img": "assets/world/felt/g4_firepit.png",
+    "x": 16.5,
+    "y": 17.0,
+    "ax": 61,
+    "ay": 62,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 0
+   },
+   {
+    "id": "pg_petri_3_33",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 3.91,
+    "y": 17.32,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.0469743894246637,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_35",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 7.89,
+    "y": 17.43,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.8062346066624697,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_grave_stone_0_102",
+    "img": "assets/world/prologue/pg_grave_stone_0.png",
+    "x": 24.5,
+    "y": 17.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_1_103",
+    "img": "assets/world/prologue/pg_grave_stake_1.png",
+    "x": 27.5,
+    "y": 17.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stone_2_104",
+    "img": "assets/world/prologue/pg_grave_stone_2.png",
+    "x": 28.5,
+    "y": 17.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_0_105",
+    "img": "assets/world/prologue/pg_grave_stake_0.png",
+    "x": 33.5,
+    "y": 17.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_1_106",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 35.5,
+    "y": 17.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_2_32",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.08,
+    "y": 18.03,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.2046093898804857,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_34",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 5.82,
+    "y": 18.07,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.8387359097589004,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_banner_1_134",
+    "img": "assets/world/prologue/pg_banner_1.png",
+    "x": 36.5,
+    "y": 18.95,
+    "ax": 27,
+    "ay": 156,
+    "D": 3.0,
+    "fade": 0,
+    "shadow": 1,
+    "sway": 1.0
+   },
+   {
+    "id": "pg_petri_3_38",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 5.35,
+    "y": 19.11,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.296983480709259,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g2_burnt_stump_a_139",
+    "img": "assets/world/felt/g2_burnt_stump_a.png",
+    "x": 14.5,
+    "y": 19.9,
+    "ax": 22,
+    "ay": 35,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "g2_burnt_stump_a_140",
+    "img": "assets/world/felt/g2_burnt_stump_a.png",
+    "x": 19.5,
+    "y": 19.9,
+    "ax": 22,
+    "ay": 35,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1
+   },
+   {
+    "id": "pg_petri_2_36",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.83,
+    "y": 19.95,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1544354607035805,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_grave_stone_2_107",
+    "img": "assets/world/prologue/pg_grave_stone_2.png",
+    "x": 24.5,
+    "y": 19.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_sword_108",
+    "img": "assets/world/prologue/pg_grave_sword.png",
+    "x": 26.5,
+    "y": 19.95,
+    "ax": 15,
+    "ay": 55,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stone_1_109",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 28.5,
+    "y": 19.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stake_2_110",
+    "img": "assets/world/prologue/pg_grave_stake_2.png",
+    "x": 32.5,
+    "y": 19.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_0_111",
+    "img": "assets/world/prologue/pg_grave_stone_0.png",
+    "x": 35.5,
+    "y": 19.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_1_37",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 3.92,
+    "y": 20.39,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9558373308857,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_grave_stone_1_112",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 24.5,
+    "y": 21.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_2_113",
+    "img": "assets/world/prologue/pg_grave_stake_2.png",
+    "x": 26.5,
+    "y": 21.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_0_114",
+    "img": "assets/world/prologue/pg_grave_stone_0.png",
+    "x": 28.5,
+    "y": 21.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_sword_115",
+    "img": "assets/world/prologue/pg_grave_sword.png",
+    "x": 33.5,
+    "y": 21.95,
+    "ax": 15,
+    "ay": 55,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stone_2_116",
+    "img": "assets/world/prologue/pg_grave_stone_2.png",
+    "x": 35.5,
+    "y": 21.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_0_128",
+    "img": "assets/world/prologue/pg_grave_stake_0.png",
+    "x": 45.5,
+    "y": 21.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_1_40",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 6.06,
+    "y": 21.98,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.0489439766768576,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_39",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.11,
+    "y": 22.05,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.276370168326622,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_41",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 7.19,
+    "y": 22.33,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.0027096647841893,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_2_168",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 39.5,
+    "y": 22.9,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_3_44",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 6.04,
+    "y": 23.11,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.177828196716142,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_42",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.15,
+    "y": 23.46,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.175367020585658,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_45",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 7.06,
+    "y": 23.93,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9246623582059093,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_grave_stone_0_117",
+    "img": "assets/world/prologue/pg_grave_stone_0.png",
+    "x": 24.5,
+    "y": 23.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stake_1_118",
+    "img": "assets/world/prologue/pg_grave_stake_1.png",
+    "x": 26.5,
+    "y": 23.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_2_119",
+    "img": "assets/world/prologue/pg_grave_stone_2.png",
+    "x": 32.5,
+    "y": 23.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_0_120",
+    "img": "assets/world/prologue/pg_grave_stake_0.png",
+    "x": 34.5,
+    "y": 23.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.3,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_2_43",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 4.11,
+    "y": 24.0,
+    "ax": 46,
+    "ay": 138,
+    "D": 1.9266061081447527,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_98",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 47.5,
+    "y": 24.9,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_3_171",
+    "img": "assets/world/felt/g4_debris_3.png",
+    "x": 22.5,
+    "y": 24.9,
+    "ax": 62,
+    "ay": 65,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_1_165",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 17.5,
+    "y": 25.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_banner_0_135",
+    "img": "assets/world/prologue/pg_banner_0.png",
+    "x": 36.5,
+    "y": 25.95,
+    "ax": 25,
+    "ay": 152,
+    "D": 3.0,
+    "fade": 0,
+    "shadow": 1,
+    "sway": 1.0
+   },
+   {
+    "id": "pg_petri_0_46",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.45,
+    "y": 26.34,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.205981133735386,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "rubble_169",
+    "img": "assets/world/felt/rubble.png",
+    "x": 40.5,
+    "y": 26.9,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_1_126",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 44.5,
+    "y": 26.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_3_48",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 4.11,
+    "y": 27.18,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.007433325587447,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_47",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 1.88,
+    "y": 27.63,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.1222453552092566,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_99",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 12.5,
+    "y": 27.9,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_0_166",
+    "img": "assets/world/felt/g4_debris_0.png",
+    "x": 20.5,
+    "y": 27.9,
+    "ax": 53,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_3_49",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 5.89,
+    "y": 27.91,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.127997663016114,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_2_170",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 42.5,
+    "y": 28.9,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_3_50",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 1.19,
+    "y": 29.29,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.0751932711155163,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_52",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 5.38,
+    "y": 29.52,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.24362572960586,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_51",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 3.91,
+    "y": 29.6,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.922042816470245,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_1_167",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 49.5,
+    "y": 29.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "rubble_175",
+    "img": "assets/world/felt/rubble.png",
+    "x": 16.5,
+    "y": 29.9,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_1_127",
+    "img": "assets/world/prologue/pg_grave_stake_1.png",
+    "x": 47.5,
+    "y": 29.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stake_0_121",
+    "img": "assets/world/prologue/pg_grave_stake_0.png",
+    "x": 14.5,
+    "y": 30.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_0_53",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.45,
+    "y": 31.47,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.0490729476418954,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_55",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 5.77,
+    "y": 31.6,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.224341838115226,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_54",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 3.82,
+    "y": 31.74,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.84629907858007,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_grave_stake_2_124",
+    "img": "assets/world/prologue/pg_grave_stake_2.png",
+    "x": 20.5,
+    "y": 31.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_3_56",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 7.04,
+    "y": 31.99,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.2841406329988554,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_57",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 10.12,
+    "y": 32.3,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.2861205609476207,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_59",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 3.92,
+    "y": 33.64,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.8006830199893513,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_58",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.19,
+    "y": 33.73,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.270745279734564,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_deadtree_1_101",
+    "img": "assets/world/felt/g4_deadtree_1.png",
+    "x": 43.5,
+    "y": 33.9,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.0,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0.3
+   },
+   {
+    "id": "g4_debris_3_172",
+    "img": "assets/world/felt/g4_debris_3.png",
+    "x": 27.5,
+    "y": 33.9,
+    "ax": 62,
+    "ay": 65,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_1_60",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 5.05,
+    "y": 34.0,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.1132363678954316,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_lantern_142",
+    "img": "assets/world/prologue/pg_lantern.png",
+    "x": 41.9,
+    "y": 34.9,
+    "ax": 10,
+    "ay": 27,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 0,
+    "hideFlag": "pg_backpack"
+   },
+   {
+    "id": "pg_grave_stake_1_122",
+    "img": "assets/world/prologue/pg_grave_stake_1.png",
+    "x": 16.5,
+    "y": 34.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_backpack_141",
+    "img": "assets/world/prologue/pg_backpack.png",
+    "x": 42.55,
+    "y": 34.95,
+    "ax": 23,
+    "ay": 37,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 0
+   },
+   {
+    "id": "pg_petri_3_62",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 3.01,
+    "y": 35.42,
+    "ax": 59,
+    "ay": 132,
+    "D": 1.9393018251617997,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_63",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 7.63,
+    "y": 35.77,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.2803071149133523,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_2_183",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 46.5,
+    "y": 35.9,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_1_132",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 25.5,
+    "y": 35.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_1_61",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 1.36,
+    "y": 36.32,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9940409737113187,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_2_176",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 35.5,
+    "y": 36.9,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_1_67",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 7.98,
+    "y": 37.32,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9325109778362166,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_66",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 5.01,
+    "y": 37.41,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.9026092935193166,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_65",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 3.44,
+    "y": 37.69,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1591661208143713,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_68",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 9.75,
+    "y": 37.85,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.0425263688602637,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_64",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 1.6,
+    "y": 37.94,
+    "ax": 59,
+    "ay": 132,
+    "D": 1.840546034489781,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_0_159",
+    "img": "assets/world/felt/g4_debris_0.png",
+    "x": 40.5,
+    "y": 38.9,
+    "ax": 53,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stake_0_123",
+    "img": "assets/world/prologue/pg_grave_stake_0.png",
+    "x": 18.5,
+    "y": 38.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_2_131",
+    "img": "assets/world/prologue/pg_grave_stone_2.png",
+    "x": 36.5,
+    "y": 38.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_3_70",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 3.06,
+    "y": 39.08,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.0248209822854673,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_71",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 5.14,
+    "y": 39.11,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9646213799367975,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_69",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.71,
+    "y": 40.29,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.9064745374904153,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_95",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 13.5,
+    "y": 40.9,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_2_160",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 32.5,
+    "y": 40.9,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_3_73",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 3.09,
+    "y": 41.11,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.2777574162377885,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_72",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 1.8,
+    "y": 41.53,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.29249144022054,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_75",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 9.65,
+    "y": 41.62,
+    "ax": 46,
+    "ay": 138,
+    "D": 1.9821244311977915,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_1_178",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 15.5,
+    "y": 41.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_3_74",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 7.43,
+    "y": 42.15,
+    "ax": 59,
+    "ay": 132,
+    "D": 1.8438801312791457,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_77",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 4.1,
+    "y": 43.36,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.2492758944839846,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_78",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 6.15,
+    "y": 43.86,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1732189451032715,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_1_186",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 49.5,
+    "y": 43.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stone_1_125",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 12.5,
+    "y": 43.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_3_76",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 1.49,
+    "y": 44.14,
+    "ax": 59,
+    "ay": 132,
+    "D": 1.8203247419579613,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_97",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 46.5,
+    "y": 44.9,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_1_182",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 18.5,
+    "y": 44.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_grave_stone_1_129",
+    "img": "assets/world/prologue/pg_grave_stone_1.png",
+    "x": 21.5,
+    "y": 44.95,
+    "ax": 20,
+    "ay": 49,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_grave_stake_1_130",
+    "img": "assets/world/prologue/pg_grave_stake_1.png",
+    "x": 40.5,
+    "y": 44.95,
+    "ax": 17,
+    "ay": 53,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_2_81",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 7.6,
+    "y": 45.01,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.211377626255564,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "rubble_161",
+    "img": "assets/world/felt/rubble.png",
+    "x": 38.5,
+    "y": 45.9,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_0_163",
+    "img": "assets/world/felt/g4_debris_0.png",
+    "x": 30.5,
+    "y": 45.9,
+    "ax": 53,
+    "ay": 67,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_0_79",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.71,
+    "y": 46.13,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.8121283524707643,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_80",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 4.15,
+    "y": 46.34,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.1948994288259995,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_0_82",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 1.38,
+    "y": 47.51,
+    "ax": 52,
+    "ay": 140,
+    "D": 2.0559423901040548,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_96",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 21.5,
+    "y": 47.9,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_1_184",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 32.5,
+    "y": 47.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_3_83",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 3.49,
+    "y": 47.91,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.0762973217093075,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_84",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 1.1,
+    "y": 49.13,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.2942160684979376,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_87",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 9.3,
+    "y": 49.34,
+    "ax": 41,
+    "ay": 139,
+    "D": 1.9406770493245415,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_86",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 8.01,
+    "y": 49.41,
+    "ax": 46,
+    "ay": 138,
+    "D": 1.986485518716486,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_85",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 3.16,
+    "y": 49.65,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.1739885223603417,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_2_100",
+    "img": "assets/world/prologue/pg_petri_2.png",
+    "x": 38.5,
+    "y": 49.9,
+    "ax": 46,
+    "ay": 138,
+    "D": 2.1,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_1_177",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 33.5,
+    "y": 49.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "stone_low_174",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 43.5,
+    "y": 50.9,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_1_185",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 29.5,
+    "y": 50.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_1_88",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 1.08,
+    "y": 51.35,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.0536622566219744,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_3_89",
+    "img": "assets/world/prologue/pg_petri_3.png",
+    "x": 9.57,
+    "y": 52.15,
+    "ax": 59,
+    "ay": 132,
+    "D": 2.257187776915268,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "stone_low_164",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 14.5,
+    "y": 52.9,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "pg_petri_1_92",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 9.44,
+    "y": 53.2,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.29993687963081,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_90",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 1.14,
+    "y": 53.27,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.2650868739005796,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_1_162",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 12.5,
+    "y": 53.9,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g2_burnt_stump_a_179",
+    "img": "assets/world/felt/g2_burnt_stump_a.png",
+    "x": 29.5,
+    "y": 53.9,
+    "ax": 22,
+    "ay": 35,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_3_181",
+    "img": "assets/world/felt/g4_debris_3.png",
+    "x": 49.5,
+    "y": 53.9,
+    "ax": 62,
+    "ay": 65,
+    "D": 2.6,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_0_91",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 5.31,
+    "y": 54.09,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.852890031179254,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "pg_petri_1_94",
+    "img": "assets/world/prologue/pg_petri_1.png",
+    "x": 9.12,
+    "y": 55.55,
+    "ax": 41,
+    "ay": 139,
+    "D": 2.119590972863127,
+    "fade": 1,
+    "shadow": 1,
+    "flip": true,
+    "sway": 0
+   },
+   {
+    "id": "stone_low_5",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 23.7,
+    "y": 55.62,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_1_14",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 50.94,
+    "y": 55.76,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "stone_low_1",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 11.14,
+    "y": 55.79,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "stone_low_11",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 41.94,
+    "y": 55.82,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "rubble_7",
+    "img": "assets/world/felt/rubble.png",
+    "x": 29.27,
+    "y": 55.87,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "pg_petri_0_93",
+    "img": "assets/world/prologue/pg_petri_0.png",
+    "x": 5.45,
+    "y": 55.87,
+    "ax": 52,
+    "ay": 140,
+    "D": 1.9017038860599196,
+    "fade": 1,
+    "shadow": 1,
+    "flip": false,
+    "sway": 0
+   },
+   {
+    "id": "g4_debris_2_0",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 8.78,
+    "y": 55.89,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_2_4",
+    "img": "assets/world/felt/g4_debris_2.png",
+    "x": 20.32,
+    "y": 56.08,
+    "ax": 50,
+    "ay": 71,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_3_13",
+    "img": "assets/world/felt/g4_debris_3.png",
+    "x": 47.93,
+    "y": 56.14,
+    "ax": 62,
+    "ay": 65,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "g4_debris_0_6",
+    "img": "assets/world/felt/g4_debris_0.png",
+    "x": 26.11,
+    "y": 56.22,
+    "ax": 53,
+    "ay": 67,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "rubble_10",
+    "img": "assets/world/felt/rubble.png",
+    "x": 38.28,
+    "y": 56.28,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "stone_low_9",
+    "img": "assets/world/felt/stone_low.png",
+    "x": 35.15,
+    "y": 56.41,
+    "ax": 69,
+    "ay": 42,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_1_8",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 32.82,
+    "y": 56.53,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_1_12",
+    "img": "assets/world/felt/g4_debris_1.png",
+    "x": 44.07,
+    "y": 56.56,
+    "ax": 42,
+    "ay": 66,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "id": "g4_debris_0_2",
+    "img": "assets/world/felt/g4_debris_0.png",
+    "x": 14.4,
+    "y": 56.76,
+    "ax": 53,
+    "ay": 67,
+    "D": 2.4,
+    "fade": 0,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "id": "rubble_3",
+    "img": "assets/world/felt/rubble.png",
+    "x": 17.71,
+    "y": 56.79,
+    "ax": 29,
+    "ay": 31,
+    "D": 2.2,
+    "fade": 0,
+    "shadow": 1,
+    "flip": false
+   }
+  ],
+  "decoArt": {},
+  "lights": [],
+  "smoke": [
+   [
+    16.5,
+    16.4,
+    0.5,
+    2
+   ]
+  ],
+  "grade": "dusk",
+  "gradeCol": "rgb(196,192,190)",
+  "flick": [],
+  "tufts": [
+   [
+    11.64,
+    5.91,
+    1
+   ],
+   [
+    14.64,
+    5.69,
+    1
+   ],
+   [
+    21.06,
+    5.32,
+    0
+   ],
+   [
+    23.78,
+    5.31,
+    2
+   ],
+   [
+    33.63,
+    6.0,
+    2
+   ],
+   [
+    36.84,
+    5.82,
+    1
+   ],
+   [
+    37.66,
+    5.42,
+    0
+   ],
+   [
+    45.64,
+    5.78,
+    2
+   ],
+   [
+    10.26,
+    6.47,
+    2
+   ],
+   [
+    25.03,
+    6.97,
+    0
+   ],
+   [
+    30.91,
+    6.4,
+    0
+   ],
+   [
+    31.62,
+    6.41,
+    0
+   ],
+   [
+    33.14,
+    6.75,
+    0
+   ],
+   [
+    36.59,
+    6.55,
+    2
+   ],
+   [
+    38.87,
+    6.94,
+    1
+   ],
+   [
+    39.21,
+    6.38,
+    0
+   ],
+   [
+    43.75,
+    6.74,
+    1
+   ],
+   [
+    44.1,
+    6.83,
+    0
+   ],
+   [
+    50.76,
+    6.94,
+    2
+   ],
+   [
+    11.41,
+    7.61,
+    0
+   ],
+   [
+    17.82,
+    7.42,
+    0
+   ],
+   [
+    21.35,
+    7.37,
+    2
+   ],
+   [
+    33.64,
+    7.36,
+    2
+   ],
+   [
+    35.33,
+    7.37,
+    1
+   ],
+   [
+    9.58,
+    8.67,
+    1
+   ],
+   [
+    34.96,
+    8.37,
+    1
+   ],
+   [
+    40.91,
+    8.5,
+    1
+   ],
+   [
+    42.85,
+    8.61,
+    0
+   ],
+   [
+    23.42,
+    9.85,
+    2
+   ],
+   [
+    28.86,
+    9.66,
+    2
+   ],
+   [
+    36.54,
+    9.41,
+    0
+   ],
+   [
+    38.57,
+    9.68,
+    2
+   ],
+   [
+    40.79,
+    9.56,
+    1
+   ],
+   [
+    14.27,
+    10.58,
+    0
+   ],
+   [
+    15.92,
+    10.74,
+    2
+   ],
+   [
+    15.72,
+    11.5,
+    0
+   ],
+   [
+    20.9,
+    11.41,
+    1
+   ],
+   [
+    22.83,
+    11.93,
+    0
+   ],
+   [
+    28.29,
+    11.73,
+    2
+   ],
+   [
+    20.47,
+    12.4,
+    1
+   ],
+   [
+    37.05,
+    12.82,
+    1
+   ],
+   [
+    39.48,
+    12.83,
+    0
+   ],
+   [
+    40.72,
+    12.74,
+    1
+   ],
+   [
+    41.66,
+    12.54,
+    2
+   ],
+   [
+    11.29,
+    13.55,
+    1
+   ],
+   [
+    26.72,
+    13.92,
+    2
+   ],
+   [
+    29.05,
+    13.88,
+    1
+   ],
+   [
+    45.18,
+    13.33,
+    0
+   ],
+   [
+    16.57,
+    14.33,
+    0
+   ],
+   [
+    22.68,
+    14.72,
+    2
+   ],
+   [
+    26.64,
+    14.45,
+    0
+   ],
+   [
+    29.67,
+    14.99,
+    0
+   ],
+   [
+    49.03,
+    14.34,
+    2
+   ],
+   [
+    21.95,
+    15.41,
+    1
+   ],
+   [
+    35.15,
+    15.88,
+    2
+   ],
+   [
+    44.26,
+    15.6,
+    2
+   ],
+   [
+    24.4,
+    16.8,
+    1
+   ],
+   [
+    26.38,
+    16.68,
+    2
+   ],
+   [
+    47.0,
+    16.56,
+    0
+   ],
+   [
+    49.32,
+    16.32,
+    1
+   ],
+   [
+    8.03,
+    17.99,
+    2
+   ],
+   [
+    19.2,
+    17.43,
+    0
+   ],
+   [
+    20.03,
+    17.56,
+    2
+   ],
+   [
+    25.6,
+    17.58,
+    0
+   ],
+   [
+    29.32,
+    17.46,
+    0
+   ],
+   [
+    40.26,
+    17.55,
+    2
+   ],
+   [
+    43.79,
+    17.8,
+    2
+   ],
+   [
+    46.32,
+    17.3,
+    0
+   ],
+   [
+    8.32,
+    18.48,
+    0
+   ],
+   [
+    20.62,
+    18.56,
+    2
+   ],
+   [
+    23.93,
+    18.89,
+    2
+   ],
+   [
+    24.97,
+    18.53,
+    0
+   ],
+   [
+    29.71,
+    18.69,
+    0
+   ],
+   [
+    34.57,
+    18.51,
+    0
+   ],
+   [
+    37.46,
+    18.64,
+    0
+   ],
+   [
+    39.9,
+    18.77,
+    0
+   ],
+   [
+    42.75,
+    18.98,
+    1
+   ],
+   [
+    46.29,
+    18.93,
+    0
+   ],
+   [
+    17.41,
+    19.49,
+    0
+   ],
+   [
+    25.09,
+    19.73,
+    1
+   ],
+   [
+    37.69,
+    19.66,
+    2
+   ],
+   [
+    44.41,
+    19.83,
+    0
+   ],
+   [
+    10.52,
+    20.61,
+    2
+   ],
+   [
+    11.36,
+    20.47,
+    1
+   ],
+   [
+    17.73,
+    20.61,
+    0
+   ],
+   [
+    20.97,
+    20.46,
+    0
+   ],
+   [
+    25.93,
+    20.82,
+    1
+   ],
+   [
+    26.6,
+    20.7,
+    2
+   ],
+   [
+    30.18,
+    20.49,
+    1
+   ],
+   [
+    18.52,
+    21.97,
+    1
+   ],
+   [
+    25.43,
+    21.65,
+    0
+   ],
+   [
+    34.98,
+    21.98,
+    0
+   ],
+   [
+    36.64,
+    21.49,
+    2
+   ],
+   [
+    40.1,
+    21.39,
+    0
+   ],
+   [
+    18.55,
+    22.89,
+    2
+   ],
+   [
+    28.33,
+    22.43,
+    2
+   ],
+   [
+    31.35,
+    22.9,
+    0
+   ],
+   [
+    37.02,
+    22.69,
+    2
+   ],
+   [
+    41.39,
+    22.61,
+    2
+   ],
+   [
+    11.86,
+    23.95,
+    1
+   ],
+   [
+    17.41,
+    23.68,
+    0
+   ],
+   [
+    47.92,
+    23.53,
+    2
+   ],
+   [
+    10.05,
+    24.7,
+    1
+   ],
+   [
+    20.68,
+    24.62,
+    0
+   ],
+   [
+    24.37,
+    24.58,
+    2
+   ],
+   [
+    35.36,
+    24.56,
+    0
+   ],
+   [
+    38.89,
+    24.78,
+    2
+   ],
+   [
+    10.41,
+    25.85,
+    1
+   ],
+   [
+    15.02,
+    25.32,
+    0
+   ],
+   [
+    28.1,
+    25.42,
+    2
+   ],
+   [
+    40.63,
+    25.9,
+    2
+   ],
+   [
+    41.19,
+    25.74,
+    0
+   ],
+   [
+    42.89,
+    25.71,
+    0
+   ],
+   [
+    46.93,
+    25.9,
+    1
+   ],
+   [
+    47.87,
+    25.62,
+    1
+   ],
+   [
+    24.53,
+    26.57,
+    1
+   ],
+   [
+    35.8,
+    26.47,
+    0
+   ],
+   [
+    36.27,
+    26.88,
+    0
+   ],
+   [
+    23.85,
+    27.82,
+    1
+   ],
+   [
+    24.72,
+    27.4,
+    0
+   ],
+   [
+    26.18,
+    27.9,
+    1
+   ],
+   [
+    29.91,
+    27.86,
+    1
+   ],
+   [
+    32.29,
+    27.87,
+    1
+   ],
+   [
+    41.68,
+    27.76,
+    1
+   ],
+   [
+    43.7,
+    27.62,
+    1
+   ],
+   [
+    47.91,
+    27.81,
+    2
+   ],
+   [
+    23.76,
+    28.76,
+    0
+   ],
+   [
+    29.32,
+    28.84,
+    1
+   ],
+   [
+    31.69,
+    28.58,
+    2
+   ],
+   [
+    21.64,
+    29.4,
+    2
+   ],
+   [
+    44.29,
+    29.55,
+    0
+   ],
+   [
+    45.9,
+    29.51,
+    0
+   ],
+   [
+    50.32,
+    29.63,
+    1
+   ],
+   [
+    10.47,
+    30.99,
+    1
+   ],
+   [
+    11.72,
+    30.99,
+    2
+   ],
+   [
+    20.29,
+    30.73,
+    2
+   ],
+   [
+    25.77,
+    30.89,
+    1
+   ],
+   [
+    31.72,
+    30.52,
+    2
+   ],
+   [
+    41.57,
+    30.74,
+    2
+   ],
+   [
+    43.22,
+    30.6,
+    2
+   ],
+   [
+    47.69,
+    30.41,
+    1
+   ],
+   [
+    13.61,
+    31.88,
+    2
+   ],
+   [
+    31.32,
+    31.62,
+    2
+   ],
+   [
+    38.68,
+    31.73,
+    1
+   ],
+   [
+    50.37,
+    32.73,
+    1
+   ],
+   [
+    10.59,
+    33.45,
+    1
+   ],
+   [
+    14.99,
+    33.44,
+    0
+   ],
+   [
+    29.6,
+    33.37,
+    2
+   ],
+   [
+    32.91,
+    33.47,
+    1
+   ],
+   [
+    37.02,
+    33.38,
+    1
+   ],
+   [
+    50.34,
+    33.41,
+    2
+   ],
+   [
+    9.84,
+    34.35,
+    2
+   ],
+   [
+    20.33,
+    34.45,
+    0
+   ],
+   [
+    22.17,
+    34.55,
+    1
+   ],
+   [
+    37.99,
+    34.55,
+    2
+   ],
+   [
+    41.56,
+    34.84,
+    0
+   ],
+   [
+    16.34,
+    35.53,
+    1
+   ],
+   [
+    37.19,
+    35.95,
+    2
+   ],
+   [
+    45.48,
+    35.93,
+    1
+   ],
+   [
+    9.05,
+    36.61,
+    2
+   ],
+   [
+    12.24,
+    36.34,
+    0
+   ],
+   [
+    14.81,
+    36.91,
+    1
+   ],
+   [
+    16.27,
+    36.75,
+    0
+   ],
+   [
+    26.41,
+    36.33,
+    2
+   ],
+   [
+    33.32,
+    36.76,
+    1
+   ],
+   [
+    34.61,
+    36.81,
+    1
+   ],
+   [
+    37.21,
+    36.67,
+    0
+   ],
+   [
+    50.65,
+    36.76,
+    2
+   ],
+   [
+    15.48,
+    37.76,
+    1
+   ],
+   [
+    44.66,
+    37.31,
+    2
+   ],
+   [
+    11.02,
+    38.8,
+    0
+   ],
+   [
+    48.11,
+    38.98,
+    0
+   ],
+   [
+    22.13,
+    39.72,
+    2
+   ],
+   [
+    24.02,
+    39.99,
+    1
+   ],
+   [
+    25.11,
+    39.97,
+    0
+   ],
+   [
+    27.22,
+    39.68,
+    2
+   ],
+   [
+    30.35,
+    39.65,
+    0
+   ],
+   [
+    39.04,
+    39.66,
+    1
+   ],
+   [
+    44.45,
+    39.5,
+    1
+   ],
+   [
+    16.61,
+    40.95,
+    1
+   ],
+   [
+    22.62,
+    40.32,
+    2
+   ],
+   [
+    23.69,
+    40.53,
+    2
+   ],
+   [
+    39.98,
+    40.49,
+    2
+   ],
+   [
+    26.38,
+    41.88,
+    1
+   ],
+   [
+    30.36,
+    41.86,
+    2
+   ],
+   [
+    36.63,
+    41.81,
+    0
+   ],
+   [
+    46.2,
+    41.7,
+    0
+   ],
+   [
+    13.13,
+    42.97,
+    1
+   ],
+   [
+    16.44,
+    42.56,
+    2
+   ],
+   [
+    29.2,
+    42.9,
+    0
+   ],
+   [
+    36.59,
+    42.62,
+    1
+   ],
+   [
+    41.4,
+    42.39,
+    0
+   ],
+   [
+    45.68,
+    42.69,
+    1
+   ],
+   [
+    47.22,
+    42.35,
+    0
+   ],
+   [
+    48.09,
+    42.83,
+    2
+   ],
+   [
+    17.63,
+    43.52,
+    0
+   ],
+   [
+    19.99,
+    43.49,
+    1
+   ],
+   [
+    20.38,
+    43.76,
+    1
+   ],
+   [
+    24.3,
+    43.91,
+    1
+   ],
+   [
+    28.54,
+    43.56,
+    1
+   ],
+   [
+    38.07,
+    43.97,
+    1
+   ],
+   [
+    39.22,
+    43.61,
+    0
+   ],
+   [
+    47.43,
+    43.75,
+    0
+   ],
+   [
+    10.72,
+    44.82,
+    0
+   ],
+   [
+    22.1,
+    44.85,
+    0
+   ],
+   [
+    29.7,
+    44.33,
+    1
+   ],
+   [
+    44.38,
+    44.75,
+    0
+   ],
+   [
+    10.35,
+    45.76,
+    0
+   ],
+   [
+    19.48,
+    45.9,
+    2
+   ],
+   [
+    31.0,
+    45.44,
+    0
+   ],
+   [
+    33.33,
+    45.61,
+    0
+   ],
+   [
+    36.83,
+    45.87,
+    2
+   ],
+   [
+    39.55,
+    45.85,
+    2
+   ],
+   [
+    41.04,
+    45.71,
+    1
+   ],
+   [
+    13.88,
+    46.38,
+    1
+   ],
+   [
+    19.26,
+    46.96,
+    1
+   ],
+   [
+    27.94,
+    46.64,
+    2
+   ],
+   [
+    34.39,
+    46.66,
+    1
+   ],
+   [
+    44.34,
+    46.37,
+    0
+   ],
+   [
+    9.94,
+    47.59,
+    1
+   ],
+   [
+    10.79,
+    47.4,
+    2
+   ],
+   [
+    33.72,
+    47.54,
+    0
+   ],
+   [
+    41.47,
+    47.85,
+    2
+   ],
+   [
+    10.97,
+    48.85,
+    1
+   ],
+   [
+    20.66,
+    48.58,
+    2
+   ],
+   [
+    25.65,
+    48.89,
+    1
+   ],
+   [
+    39.39,
+    48.63,
+    0
+   ],
+   [
+    41.27,
+    48.79,
+    1
+   ],
+   [
+    22.85,
+    49.37,
+    0
+   ],
+   [
+    27.55,
+    49.9,
+    2
+   ],
+   [
+    44.65,
+    49.65,
+    2
+   ],
+   [
+    46.83,
+    49.78,
+    2
+   ],
+   [
+    12.94,
+    50.49,
+    0
+   ],
+   [
+    15.39,
+    50.82,
+    2
+   ],
+   [
+    20.55,
+    50.59,
+    0
+   ],
+   [
+    41.3,
+    50.57,
+    1
+   ],
+   [
+    50.26,
+    50.58,
+    1
+   ],
+   [
+    11.93,
+    51.74,
+    2
+   ],
+   [
+    30.83,
+    51.7,
+    1
+   ],
+   [
+    36.6,
+    51.88,
+    2
+   ],
+   [
+    37.31,
+    51.75,
+    2
+   ],
+   [
+    15.41,
+    52.65,
+    2
+   ],
+   [
+    39.6,
+    52.88,
+    1
+   ],
+   [
+    46.02,
+    52.66,
+    0
+   ],
+   [
+    49.63,
+    52.4,
+    1
+   ],
+   [
+    11.54,
+    53.63,
+    1
+   ],
+   [
+    24.78,
+    53.32,
+    2
+   ],
+   [
+    30.11,
+    53.57,
+    2
+   ],
+   [
+    34.37,
+    53.67,
+    2
+   ],
+   [
+    36.48,
+    53.39,
+    1
+   ],
+   [
+    42.17,
+    53.83,
+    0
+   ],
+   [
+    17.21,
+    54.31,
+    2
+   ],
+   [
+    26.18,
+    54.55,
+    0
+   ],
+   [
+    29.11,
+    54.41,
+    1
+   ],
+   [
+    31.34,
+    54.52,
+    0
+   ],
+   [
+    49.73,
+    54.67,
+    0
+   ],
+   [
+    50.83,
+    54.85,
+    1
+   ],
+   [
+    21.2,
+    55.55,
+    0
+   ],
+   [
+    22.88,
+    55.96,
+    1
+   ],
+   [
+    31.72,
+    55.34,
+    1
+   ],
+   [
+    45.5,
+    55.57,
+    2
+   ]
+  ],
+  "fires": [],
+  "fx": {
+   "particles": "ash",
+   "birds": 3,
+   "mist": 6,
+   "tuft": [
+    "#57534a",
+    "#5e5a50",
+    "#4a463d"
+   ]
+  }
+ },
+ "pgLight": {
+  "a": 0.5,
+  "r": 2,
+  "r2": 4.5,
+  "flag": "pg_backpack",
+  "col": "#7fb2d6",
+  "col2": "#d8d0b8"
+ },
+ "steps": 1,
+ "navGoal": {
+  "map": "prologue_grave",
+  "x": 62,
+  "y": 6,
+  "label": "펠트 서문"
+ },
+ "note": "GENERATED by tools/hd/fields/build_prologue_grave.py (owner 10-25 B: awakening map) - do not hand-edit"
+}

@@ -243,7 +243,7 @@
       for (const d of m.decos) { const vs = A[(j.ground[d.ty] || '')[d.tx]] || A[d.spr]; if (!vs || !vs.length || d.tx < h.gx || d.ty < h.gy || d.tx >= h.gx + hw || d.ty >= h.gy + hh) continue; // the tile deco keeps its rules (solid, breakable, pillar shade)
         const f = n => { const v = Math.sin(d.tx * 127.1 + d.ty * 311.7 + n * 74.7) * 43758.5453; return v - Math.floor(v); }, v = vs[Math.floor(f(1) * vs.length)]; // and only its picture changes: variant, flip, jitter per tile
         const jt = v.flip === false ? 0 : 1; d.hd = { v, D: v.D || 3, flip: jt && f(2) < .5, dx: jt * Math.round((f(3) - .5) * 5), dy: jt * Math.round((f(4) - .5) * 3) }; } } // flip:false = a tiling piece (fence): no flip, no jitter
-    m.fires = j.fires || null; m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
+    m.fires = j.fires || null; m.hds = j.hds || null; for (const h of m.hds || []) for (const q of h.props || []) if (q.solid && !(q.hideFlag && SAVE.flags[q.hideFlag])) { const [x0, y0, x1, y1] = q.solid; for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const X = x + h.gx, Y = y + h.gy; if (X >= 0 && Y >= 0 && X < j.w && Y < j.h) m.solidG[Y * j.w + X] = 1; } }
     return m;
   }
   function mkObj(m, type, x, y) {
@@ -391,7 +391,7 @@
       for (const q of h.props || []) { if (!q.under) continue; const pi = HDIMG[q.img]; if (!pi) continue; const Dq = q.D || h.D, s2 = k / Dq, [px, py] = W2S((h.gx + q.x) * m.T, (h.gy + q.y) * m.T); // under: walked on (bridge planks)
         ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
-    for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
+    for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under || (q.hideFlag && SAVE.flags[q.hideFlag])) continue; // hideFlag: gone once the flag is set (무명 무덤가: 베어 낸 가시덤불, 집어 든 등불)
       let fx = (h.gx + q.x) * T; const fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue; if (q.par) fx += (S.cam[0] + EW / 2 - fx) * q.par; // par: far scenery (펠트 v4 먼 왕성) slides slower than the town
       const Dq = q.D || h.D, sc = k / Dq, iw = q.strip ? im.width / q.strip[0] : im.width, ax = q.ax ?? iw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + iw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
@@ -510,7 +510,14 @@
     for (const h of m.hds || []) { const fx = h.fx || {};
       for (const [i, f] of (h.fires || []).entries()) { const [sx, sy] = W2S((h.gx + f[0]) * T, (h.gy + f[1]) * T); if (onView(sx - 40 * k, sy - 40 * k, 80 * k, 60 * k)) drawFire(sx, sy, f[2], k, f[3], i * 3.7); }
       for (const f of h.fountains || []) if (f) drawFountain(f, h, k, T);
-      if (fx.mist) drawMist(fx.mist, k); if (fx.particles) drawParticles(fx.particles, k); if (fx.birds) drawBirds(fx.birds, k); if (fx.butterflies) drawButterflies(fx.butterflies, k); } }
+      if (fx.mist) drawMist(fx.mist, k); if (fx.particles) drawParticles(fx.particles, k); if (fx.birds) drawBirds(fx.birds, k); if (fx.butterflies) drawButterflies(fx.butterflies, k); }
+    if (m.pgLight) drawPgLight(m, k); }
+  let _pgC = null; function drawPgLight(m, k) { const L = m.pgLight, on = !!SAVE.flags[L.flag], rt = (on ? L.r2 : L.r) * m.T; S.pgR = S.pgR == null || S.pgM !== m.id ? rt : S.pgR + (rt - S.pgR) * .04; S.pgM = m.id; // 무명 무덤가: dim world, a small cold light on the hero (core glow r tiles; the lantern r2 after the backpack)
+    const W_ = cv.width, H_ = cv.height; if (!_pgC) _pgC = document.createElement('canvas'); if (_pgC.width !== W_ || _pgC.height !== H_) { _pgC.width = W_; _pgC.height = H_; } const d = _pgC.getContext('2d');
+    const [sx, sy] = W2S(hero.x, hero.y - 8), R = S.pgR * k, fl = 1 + (on ? .035 * Math.sin(S.t * 7.3) * Math.sin(S.t * 3.1 + 1) : 0);
+    d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, W_, H_); d.fillStyle = `rgba(8,9,14,${L.a})`; d.fillRect(0, 0, W_, H_); d.globalCompositeOperation = 'destination-out';
+    const gr = d.createRadialGradient(sx, sy, 0, sx, sy, R * 1.7 * fl); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.45, 'rgba(0,0,0,.85)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(sx - R * 2, sy - R * 2, R * 4, R * 4);
+    ctx.drawImage(_pgC, 0, 0); ctx.save(); ctx.globalCompositeOperation = 'lighter'; const c = on ? L.col2 : L.col, g2 = ctx.createRadialGradient(sx, sy, 0, sx, sy, R * 1.1); g2.addColorStop(0, c + '30'); g2.addColorStop(1, c + '00'); ctx.fillStyle = g2; ctx.fillRect(sx - R * 1.2, sy - R * 1.2, R * 2.4, R * 2.4); ctx.restore(); }
   // 문 (owner 10-24 「문이 열리고 들어가면 실내로」): a building door (prop.door {id, cx, by, w, h, col} in art px) swings open in 4 frames as the hero walks up,
   // closes again when he leaves; fully open + walking in = enter (fade to the interior). Interact on a closed door opens it first.
   function drawDoorHi(q, sx, sy, sc, ax, ay) { const d = q.door, A = S.doorA && S.doorA[d.id] || 0, f = Math.round(A * 3); if (!f) return; const im = HDIMG[q.img];
@@ -639,6 +646,11 @@
   function tempSolid(x, y, r, life, kind) { S.temp.push({ x, y, r, life, kind }); const d = Math.hypot(hero.x - x, hero.y - y); if (d < r + 5) { const a = Math.atan2(hero.y - y, hero.x - x) || 0, need = r + 6 - d; moveCol(hero, Math.cos(a) * need, Math.sin(a) * need, 5);
       if (Math.hypot(hero.x - x, hero.y - y) < r + 5) S.temp.pop(); } } // push out, never through a wall; if there is no room the crystal just doesn't form
   function randomFloor() { const m = M(); for (let i = 0; i < 60; i++) { const x = (2 + Math.random() * (m.w - 4)) * m.T, y = (2 + Math.random() * (m.h - 4)) * m.T; if (!blocked(x, y, 6)) return [x, y]; } return [hero.x, hero.y]; }
+  function breakObjNear(dv) { const m = M(), T = m.T, px = hero.x + dv[0] * 14, py = hero.y - 4 + dv[1] * 14; // breakable {x,y,w,h,flag,text}: solid (via hd props solid+hideFlag) until cut, remembered in SAVE.flags
+    for (const o of m.objs) { if (o.type !== 'breakable' || SAVE.flags[o.flag]) continue; const w = o.w || 1, h = o.h || 1;
+      if (px < o.tx * T - 10 || px > (o.tx + w) * T + 10 || py < o.ty * T - 10 || py > (o.ty + h) * T + 10) continue;
+      SAVE.flags[o.flag] = true; save(); for (let y = o.ty; y < o.ty + h; y++) for (let x = o.tx; x < o.tx + w; x++) m.solidG[y * m.w + x] = 0;
+      for (let i = 0; i < 16; i++) addFx('debris', (o.tx + Math.random() * w) * T, (o.ty + Math.random() * h) * T, { life: .6 }); shake(2); sfx('impact', .7); if (o.text) msg(o.text, 1.8); } }
   function breakDecoNear(x, y, r) { const m = M(); for (const d of m.decos) if (!d.broken && ['boulder', 'rocks', 'bush', 'stump', 'fence'].includes(d.spr) && Math.hypot(d.x - x, d.y - 6 - y) < r + 6) {
       d.broken = true; m.solidG[d.ty * m.w + d.tx] = 0; addFx('debris', d.x, d.y - 6, { life: .6 }); shake(2); } }
   // 필살기 safe zone: in a pillar's shadow as seen from the boss (computed live)
@@ -951,6 +963,7 @@
       moveCol(hero, dv[0] * lv * dt, dv[1] * lv * dt, 5); // running slash carries momentum
       { const mv = !!(ix || iy); hero.moving = mv; if (mv) { const sp = HERO_SPEED * (hero.run ? RUN.mul : 1) * ATK_MOVE * (hero.slowT > 0 ? .45 : 1); moveCol(hero, ix * sp * dt, iy * sp * dt, 5); hero.walkT += dt * (hero.run ? RUN.mul * RUN.cadence : 1) * ATK_MOVE; } } // [combat research] keep running while slashing (was: rooted for the whole swing)
       if (!SLASH_BODY && !a.gk && a.t >= AT.a0 - 2 / 60) { a.gk = true; gkSpawn(a.i); }
+      if (!a.brk && a.t >= AT.a0 - 2 / 60) { a.brk = true; breakObjNear(dv); } // type 'breakable' (무명 무덤가 가시덤불): one slash in front cuts it
       if (SLASH_BODY && a.t >= AT.a0 && a.t <= AT.a1) { // 검기 mode: hits are dealt by the flying arc (gkTick) const R = hbR(a.i), cosA = Math.cos(hbA(a.i) / 2 * Math.PI / 180);
         for (const mm of S.mobs) { if (mm.dead || a.hit.has(mm)) continue; const mh = (mm.D.h || 20) * (mm.scale || 1);
           const ddx = mm.x - hero.x, ddy = ((mm.y - mh * .3) - (hero.y - 4)) / .8, dd = Math.hypot(ddx, ddy);
@@ -976,21 +989,25 @@
     for (const o of m.objs) {
       const inside = o.tx === cx && o.ty === cy;
       const air = !!(hero.jump && hero.jump.air); // 점프 공중: 구멍·가시 함정 위를 지나감 (3번방 10-24)
-      if (o.type === 'pit' && inside && !hero.roll && !air) onPit = true;
+      if (o.type === 'pit' && inside && !hero.roll && !air) onPit = o;
+      if (o.type === 'hint' && !(S.hints || (S.hints = {}))[m.id + o.id] && !(o.unless && SAVE.flags[o.unless]) && Math.hypot(hero.x - o.x, hero.y - o.y) < (o.r || 2) * m.T) { S.hints[m.id + o.id] = 1; msg(o.text.replace(/\{(\w+)\}/g, (_, a) => keyHint(a) || a), o.t || 3.4); } // tutorial hint (무명 무덤가): shown once when the hero comes near; {action} = its key
       if (o.type === 'spikes' && inside && spikeUp(o) && !air) onSpike = true;
       if (o.type === 'key' && inside && !SAVE.keys[o.keyId]) { SAVE.keys[o.keyId] = true; save(); banner('열쇠를 얻었다!', 1.6); }
       if ((o.type === 'stairs_up' || o.type === 'stairs_down') && inside && m.links && m.links[o.type]) {
         if (m.boss && S.bossRef && !S.bossRef.dead) { hero.y = cy * m.T - 3; if (!S.msg) msg('봉인의 결계 — 보스를 쓰러뜨리기 전에는 나갈 수 없다', 1.6); continue; } // no fleeing mid-fight
         const L = m.links[o.type]; go(L.to, L.spawn); return; }
-      if (o.type === 'exit' && hero.x >= o.tx * m.T && hero.x < (o.tx + o.w) * m.T && hero.y >= o.ty * m.T && hero.y < (o.ty + o.h) * m.T) { go(o.to, o.spawn); return; }
+      if (o.type === 'exit' && hero.x >= o.tx * m.T && hero.x < (o.tx + o.w) * m.T && hero.y >= o.ty * m.T && hero.y < (o.ty + o.h) * m.T) { if (o.setFlag) { SAVE.flags[o.setFlag] = true; save(); } go(o.to, o.spawn); return; }
       if (o.type === 'warp' && Math.hypot(hero.x - o.x, hero.y - o.y) < 10) { go(o.to, o.spawn, { card: false }); return; }
       const bump = Math.abs(hero.x - o.x) < 10 && hero.y > o.y && hero.y - o.y < m.T * 1.05 && isHeld('up');
       if (o.type === 'boss_door' && bump) bossDoor(o);
       if (o.type === 'door_locked' && !o.open && bump) tryDoor(o);
     }
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
-    if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
+    if (onPit && onPit.soft) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: onPit.text || '발이 빠질 뻔했다', life: 1.1, color: '#e8dcc0' }); } // soft pit (tutorial crack): back to the edge, no damage
+    else if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
     else if (!onSpike && !hero.roll && !hero.jump && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
+    if (m.steps) { const st = S.steps && S.steps.map === m.id ? S.steps : (S.steps = { map: m.id, l: [], lx: hero.x, ly: hero.y, s: 0 }); // 재 위 발자국 (map.steps): a print every 7 px walked, fades in ~7 s
+      if (!hero.jump && Math.hypot(hero.x - st.lx, hero.y - st.ly) > 7) { st.s ^= 1; const v = FACEV[hero.face] || [0, 1]; st.l.push({ x: hero.x + (st.s ? 1 : -1) * 2.2 * Math.abs(v[1]), y: hero.y + 1 + (st.s ? 1 : -1) * 1.6 * Math.abs(v[0]), t: S.t, h: Math.abs(v[0]) > Math.abs(v[1]) }); st.lx = hero.x; st.ly = hero.y; if (st.l.length > 90) st.l.shift(); } }
     // mobs
     for (const mm of S.mobs) {
       if (mm.dead) continue;
@@ -1200,6 +1217,7 @@
     if (NAV()) NAV().drawGround(g, cx, cy);                  // guide route breadcrumbs
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
+    if (m.steps && S.steps && S.steps.map === m.id) for (const p of S.steps.l) { const a = 1 - (S.t - p.t) / 7; if (a <= 0) continue; g.fillStyle = `rgba(28,24,22,${(.6 * a).toFixed(3)})`; g.fillRect(Math.round(p.x) - (p.h ? 1 : 1), Math.round(p.y), p.h ? 3 : 2, p.h ? 2 : 3); }
     const list = [];                                         // y-sorted sprites
     for (const d of m.decos) if (!d.broken && !d.hd && d.x > cx - 40 && d.x < cx + EW + 40 && d.y > cy - 10 && d.y < cy + EH + 70) list.push({ y: d.y, f: () => { const gr = gradeAt(m, d.x, d.y); drawSpr(g, d.spr, d.x, d.y + 1, gr ? { mode: gr } : {}); } });
     for (const o of m.objs) {
@@ -2234,7 +2252,7 @@
   const GO = new URLSearchParams(location.search).get('go');
   if (GO) ready.then(() => { const t = setInterval(() => { if (!window.__game) return; clearInterval(t); go(GO, 'default'); }, 100); });
   ready.then(() => { W_API.ready = true; requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); }); }).catch(e => console.error('[world] init failed', e));
-  const START = GO ? null : Q.get('start') || (Q.has('old') ? null : 'felt'); /* ?go= (샌드박스·시험) wins over the Felt start */ // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
+  const START = GO ? null : Q.get('start') || (Q.has('old') ? null : (SAVE.flags && SAVE.flags.pg_left || SAVE.visited && SAVE.visited.felt ? 'felt' : 'prologue_grave')); /* 새 게임 = 무명 무덤가에서 눈뜸 (주인 10-25 B); 무덤가를 떠난 뒤로는 펠트 */ /* ?go= (샌드박스·시험) wins over the Felt start */ // 새 판 (주인 10-23 "최신 저장한 것만, 1장만"): the game opens in Felt; ?old = the previous build (old start village, areas 1-9)
   if (START) { cv.style.background = '#000'; show(true); } // 새 판 starts in the world: black behind the world canvas from boot, so the old town demo never shows through the fade (owner 10-23 「옛날버전 화면이 잠깐」)
   if (START) ready.then(() => { const id = START; let t0 = Date.now(); const tryGo = () => { const g = window.__game, T = window.__titleScreen; if (T && T.active) { t0 = Date.now(); setTimeout(tryGo, 100); return; } /* wait for the title: the map canvas would cover it while it still takes the keys */ const R0 = !Q.get('start') && !Q.has('nosave') && SAVE.resume; /* 이어하기 (owner 10-23): saved in a field -> start there */ if (g && g.ready && (R0 ? (S.pendingHp = R0.hp, S.pendingMsg = '이어하기 — 저장한 곳에서 시작', go(R0.map, 'resume', { card: false })) : go(id, 'default', { card: false }))) return; if (Date.now() - t0 < 8000) setTimeout(tryGo, 100); }; tryGo(); }); // ?start=felt: begin in a map scene (dev / test)
 })();

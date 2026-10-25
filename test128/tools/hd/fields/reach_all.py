@@ -6,7 +6,7 @@ import json, os, glob, sys
 from collections import deque
 R = os.path.join(os.path.dirname(__file__), '../../..'); MP = os.path.join(R, 'maps')
 TS = json.load(open(os.path.join(MP, 'tilesets.json')))
-names = ['felt', 'field_felt', 'arachne', 'arachne_boss', 'field00'] + ['field%02d' % i for i in range(2, 10)] + sorted(os.path.basename(p)[:-5] for p in glob.glob(MP + '/felt_int_*.json'))
+names = ['prologue_grave', 'felt', 'field_felt', 'arachne', 'arachne_boss', 'field00'] + ['field%02d' % i for i in range(2, 10)] + sorted(os.path.basename(p)[:-5] for p in glob.glob(MP + '/felt_int_*.json'))
 BLOCK = {'chest', 'sign', 'heal', 'waystone', 'npc', 'door'}
 def load(n): return json.load(open(os.path.join(MP, n + '.json')))
 def grid(j):
@@ -24,7 +24,7 @@ def grid(j):
     hds = j.get('hds') or ([dict(j['hd'], gx=0, gy=0)] if j.get('hd') else [])
     for hd in hds:
         for q in hd.get('props', []):
-            if q.get('solid'):
+            if q.get('solid') and not q.get('hideFlag'):  # hideFlag props (breakable brambles) open up in play
                 x0, y0, x1, y1 = q['solid']
                 for yy in range(y0, y1 + 1):
                     for xx in range(x0, x1 + 1):

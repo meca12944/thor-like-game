@@ -144,6 +144,7 @@
 
   // ---------------- objectives ----------------
   function autoGoal() {
+    const cm = H().M && H().M(); if (cm && cm.navGoal) return Object.assign({}, cm.navGoal); // map-level goal (무명 무덤가 → 펠트 서문): the prologue shows no chapter quest yet
     for (const q of QUESTS) if (qs(q.id) === 'active') { const g = questGoal(q); if (g) return g; }
     for (const q of QUESTS) if (avail(q)) { const g = questGoal(q); if (g) return g; }
     if (!OLD) return null; const t = IDX && IDX.destinations.find(d => d.kind === 'dungeon'); return t && !H().SAVE.flags.boss01 ? Object.assign({}, t) : null;

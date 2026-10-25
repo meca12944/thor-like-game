@@ -84,18 +84,19 @@ def prep_assets():
                'g2_thread_clump_1', 'g2_thread_clump_3', 'g2_thread_pile_1', 'g2_thread_pile_2', 'g2_ash_decal_a', 'g2_ash_decal_b', 'g2_ash_decal_c')}
     A['g2']['g2_laundry_line_strip'] = {'img': FA + 'g2_laundry_line_strip.png', 'ax': 53.5, 'ay': 82, 'strip': [4, 180, 1]}
     A['g2']['g2_ribbon_tree_strip'] = {'img': FA + 'g2_ribbon_tree_strip.png', 'ax': 113.0, 'ay': 203, 'strip': [4, 200, 0]}
-    for n in ('f3_banner_0', 'f3_banner_2', 'f3_hay_1', 'f3_goods_0', 'f3_goods_2', 'f3_garden_2', 'f3_sign_weapon_sword', 'f3_sign_tool_hammer_bag', 'f3_sign_herb_leaf'):
+    for n in ('f3_banner_0', 'f3_banner_1', 'f3_banner_2', 'f3_banner_3', 'f3_hay_0', 'f3_hay_1', 'f3_hay_2', 'f3_goods_1', 'f3_goods_3', 'f3_laundry_line', 'f3_goods_0', 'f3_goods_2', 'f3_garden_2', 'f3_sign_weapon_sword', 'f3_sign_tool_hammer_bag', 'f3_sign_herb_leaf'):
         A[n] = art(FA + n + '.png')
     return A
 # (key, art, x, foot y, D) — draft blocks: NW 이장 (40,32)->(40,50) · NE 여관 (100,32)->(100,51) · SW 리네트 (50,85)->(47,95) · SE 고물 수리점 (110,85)->(101..116,95)
-BUILD = [
- ('chief', 's_house', 40, 50, 2.25), ('empty', 'sw_house', 57, 47, 2.25),
- ('inn', 'inn', 100, 51, 2.25), ('herb', 'e_row', 119, 49, 2.25),
- ('atelier', 'linette', 47, 95, 2.25),
- ('weapon', 'west_b', 101, 97, 2.25), ('tool', 'bl_house', 116, 94, 2.25),
- ('forge', 'se_house', 19, 106, 2.25), ('chapel', 'chapel', 136, 40, 1.4),
- ('guard', 'watchtower', 8, 64, 1.5), ('arachne', 'web_arch', 12, 47, 2.5), ('stall2', 'stall_n', 139, 92, 3),
+BUILD = [  # (a6 owner 10-25 「건물이 작고 텅 빈 느낌」: houses D 2.25 -> 1.8 = 25% bigger)
+ ('chief', 's_house', 40, 50, 1.8), ('empty', 'sw_house', 57, 47, 1.8),
+ ('inn', 'inn', 100, 51, 1.8), ('herb', 'e_row', 119, 49, 1.8),
+ ('atelier', 'linette', 47, 95, 1.8),
+ ('weapon', 'west_b', 101, 97, 1.8), ('tool', 'bl_house', 116, 94, 1.8),
+ ('forge', 'se_house', 17, 106, 1.8), ('chapel', 'chapel', 136, 40, 1.15),
+ ('guard', 'watchtower', 8, 64, 1.3), ('arachne', 'web_arch', 12, 47, 2.5), ('stall2', 'stall_n', 139, 92, 2.5),
 ]
+RUIN_D = 1.85
 DOORART = {'atelier': (238, 265, 46, 70), 'tool': (106, 218, 40, 75), 'weapon': (92, 388, 40, 72), 'chief': (136, 300, 54, 100), 'forge': (60, 300, 44, 82),
            'inn': (176, 343, 48, 80), 'herb': (110, 300, 44, 75), 'chapel': (62, 200, 40, 55), 'empty': (175, 345, 44, 90)}
 RUINS = [(27, 41, 0), (24, 56, 1), (68, 46, 3), (88, 42, 2), (129, 62, 0), (112, 65, 3), (25, 86, 2), (63, 104, 1), (90, 111, 0), (131, 80, 1), (140, 108, 3), (58, 84, 0)]
@@ -143,6 +144,7 @@ def main():
     for key, an, x, y, Dq in BUILD:
         v = P(an); wc = v['w'] / Dq / T
         dep = {'guard': 2, 'stall2': 2, 'arachne': 3, 'chapel': 4}.get(key, 5 if v['w'] > 300 else 4)
+        if key not in ('guard', 'stall2', 'arachne'): dep = int(round(dep * 2.25 / Dq))
         x0 = int(round(x - wc * .43)); x1 = int(round(x + wc * .43)); Hs[y - dep:y, x0:x1] = True
         q = {'id': an, 'img': v['img'], 'x': x, 'y': y, 'ax': v['ax'], 'ay': v['ay'], 'D': Dq, 'fade': 1, 'shadow': 0}
         if key in DOORART:
@@ -152,15 +154,34 @@ def main():
             reg = im[int(by - dh * .9):int(by - dh * .1), int(cx - dw * .3):int(cx + dw * .3)].reshape(-1, 3)
             q['door'] = {'id': d['id'], 'cx': cx, 'by': by, 'w': dw, 'h': dh, 'col': [int(c) for c in np.median(reg, 0)]}
         props_.append(q)
-    for x, y, i in RUINS:                                                                                                                      # burnt-out shells
-        v = A['ruins'][i]; Dq = 2.25; wc = v['w'] / Dq / T; x0 = int(round(x - wc * .43)); x1 = int(round(x + wc * .43)); Hs[y - 4:y, x0:x1] = True
-        props_.append({'id': f'ruin_{x}_{y}', 'img': v['img'], 'x': x, 'y': y, 'ax': v['ax'], 'ay': v['ay'], 'D': Dq, 'fade': 1, 'shadow': 0, 'flip': (x + y) % 2 == 1})
     for key, dx, dy, d in doors:
         m = road | lanec; dist, ind = ndimage.distance_transform_edt(~m, return_indices=True)
         ty_, tx_ = ind[0][dy + 2, dx], ind[1][dy + 2, dx]
         kind = 'lane' if key in ('forge', 'chapel', 'empty', 'herb') else 'road'
         lay([(dx + .5, dy + 1.2), (dx + .5, dy + 2.0), ((dx + tx_) / 2 + .5, (dy + 2 + ty_) / 2 + .5), (tx_ + .5, ty_ + .5)], .85 if kind == 'road' else .75, kind, 1.4)
+    RUINS_ = []
+    rb = ndimage.binary_dilation(road | lanec, iterations=1)
+    for x, y, i in RUINS:
+        v = A['ruins'][i]; wc = v['w'] / RUIN_D / T; best = None
+        for ddx in range(-12, 13):
+            for ddy in range(-6, 7):
+                xx_, yy_ = x + ddx, y + ddy; a0 = int(round(xx_ - wc * .43)); a1 = int(round(xx_ + wc * .43))
+                if a0 < 3 or a1 > W - 3 or yy_ - 5 < WALL_Y + 3 or yy_ > H - 4: continue
+                if rb[yy_ - 5:yy_ + 1, a0:a1].any() or Hs[yy_ - 6:yy_ + 2, a0 - 1:a1 + 1].any(): continue
+                c = abs(ddx) + abs(ddy) * 1.5
+                if best is None or c < best[0]: best = (c, xx_, yy_)
+        if best: x, y = best[1], best[2]
+        RUINS_.append((x, y, i)); print('   ruin', i, (x, y), 'moved' if best else 'NOT FOUND')
+    RUINS[:] = RUINS_
+    for x, y, i in RUINS:                                                                                                                      # burnt-out shells
+        v = A['ruins'][i]; Dq = RUIN_D; wc = v['w'] / Dq / T; x0 = int(round(x - wc * .43)); x1 = int(round(x + wc * .43)); Hs[y - 5:y, x0:x1] = True
+        props_.append({'id': f'ruin_{x}_{y}', 'img': v['img'], 'x': x, 'y': y, 'ax': v['ax'], 'ay': v['ay'], 'D': Dq, 'fade': 1, 'shadow': 0, 'flip': (x + y) % 2 == 1})
     S &= ~clear
+    print('  building footprint over roads:', int((Hs & (road | lanec)).sum()))
+    for key, an, x, y, Dq in BUILD + [('ruin%d' % i, None, x, y, RUIN_D) for x, y, i in RUINS]:
+        v = P(an) if an else A['ruins'][int(key[4:])]; wc = v['w'] / Dq / T; x0 = int(round(x - wc * .43)); x1 = int(round(x + wc * .43))
+        n_ = int(((road | lanec) & Hs)[y - 6:y, x0:x1].sum())
+        if n_: print('   overlap', key, n_, (x0, x1, y))
     # ---- north band: far castle strip (parallax), the gate arch, broken walls on both sides ----
     back = []
     if A['far']:
@@ -222,7 +243,7 @@ def main():
     # SW: Linette's yard
     sp('crates', 53.6, 92.6); sp(None, 40.4, 96.6, True, 2.6, v=A['f3_goods_0'])
     # forge yard (outskirts, wide): anvil, quench barrels, woodpile, ore heap
-    sp('anvil', 27.6, 106.4); sp('anvil', 29.8, 103.6, flip=True); sp('woodpile', 11.6, 104.2); sp('barrels', 31.6, 108.2); sp('crates', 12.2, 108.4); deb(33.6, 102.0, 2.8)
+    sp('anvil', 27.6, 106.4); sp('anvil', 29.8, 103.6, flip=True); sp('woodpile', 11.6, 104.2); sp('barrels', 31.6, 108.2); sp('crates', 8.0, 109.2); deb(33.6, 102.0, 2.8)
     # Ben's wagon (east edge)
     sp('cart', 143.0, 95.6, True, 2.2); sp(None, 135.6, 95.2, True, 2.6, v=A['f3_goods_2']); sp('barrels', 142.6, 90.2)
     # Toby's shack (south, quiet)
@@ -243,8 +264,63 @@ def main():
                 if rnd.random() < .5: sp(None, x, y, True, 2.6, v=g2[rnd.choice(['g2_burnt_stump_a', 'g2_burnt_stump_b', 'g2_burnt_stump_c'])])
                 else: deb(x, y)
                 break
+    # ---- a6 owner 10-25 「텅 빈 느낌」: dense lived-in / ruined clutter around every block (off roads, never touching another solid) ----
+    RES = [(10, 69), (38, 115), (79, 73), (52, 98), (137, 96), (70, 69), (15, 50), (60, 30), (132, 43), (144, 37), (144, 97), (75, 75), (138, 95), (7, 71), (13, 73),
+           (64, 72), (85, 68), (79, 29), (54, 29), (96, 29), (11, 62), (10, 106), (75, 30), (75, 76), (137, 44), (75, 33), (75, 78), (3, 70), (12, 46), (8, 63)] + [(dx, dy + 1) for _k, dx, dy, _d in doors]
+    def okc(x, y, solid=True, m=1, rr=2.2):
+        cx_, cy_ = int(x), int(y - .6)
+        if not (2 <= cx_ < W - 2 and WALL_Y + 2 <= cy_ < H - 2): return False
+        if (road | lanec | S | X)[cy_, cx_] or Hs[cy_, cx_]: return False
+        if solid and (Hs | S | X)[cy_ - m:cy_ + m + 1, cx_ - m:cx_ + m + 1].any(): return False
+        if solid and (road | lanec)[cy_, cx_]: return False
+        if math.hypot(x - CAMP[0], y - CAMP[1]) < 9.5: return False
+        return all(math.hypot(cx_ - a, cy_ - b) > rr for a, b in RES)
+    def trysp(x, y, solid=True, **kw):
+        if okc(x, y, solid): sp(kw.pop('an', None), x, y, solid, **kw); return True
+        return False
+    LIVED = [('barrels', 3), ('crates', 3), ('woodpile', 3), ('cart', 2.6), ('lamp', 2.6), ('bench', 3)]
+    LIV2 = ['f3_hay_0', 'f3_hay_2', 'f3_goods_1', 'f3_goods_3', 'f3_banner_1', 'f3_banner_3', 'f3_banner_0', 'f3_banner_2']
+    nb0 = len(small)
+    for key, an, x, y, Dq in BUILD:
+        if key in ('arachne', 'guard', 'stall2'): continue
+        wc = P(an)['w'] / Dq / T
+        for side in (-1, 1):
+            for j in range(4):
+                px = x + side * (wc * .5 + rnd.uniform(.6, 3.4)); py = y + rnd.uniform(-2.6, 1.6)
+                k = rnd.random()
+                if k < .5: an2, D2 = rnd.choice(LIVED); trysp(px, py, an=an2, D=D2, flip=rnd.random() < .5)
+                elif k < .8:
+                    n = rnd.choice(LIV2); v = A.get(n)
+                    if v: trysp(px, py, D=2.6, v=v, flip=rnd.random() < .5, **({'sway': .6} if 'banner' in n else {}))
+                else: trysp(px, py, False, D=3, v=g2['g2_laundry_line_strip']) if rnd.random() < .5 else trysp(px, py, False, D=2.6, v=A['f3_laundry_line'])
+    for x, y, _ in RUINS:                                                                                  # ruins: tumbled wall pieces, broken pillars, burnt stumps, charred cart
+        for j in range(6):
+            px = x + rnd.uniform(-6, 6); py = y + rnd.uniform(-1.5, 3.2)
+            k = rnd.random()
+            if k < .45: (trysp(px, py, D=2.6, v=rnd.choice(A['debris']), flip=rnd.random() < .5) if A['debris'] else None)
+            elif k < .7: trysp(px, py, an=rnd.choice(['rubble', 'stone_low', 'ruin_pillar', 'ember_rubble']), D=3, flip=rnd.random() < .5)
+            elif k < .9: trysp(px, py, D=2.6, v=g2[rnd.choice(['g2_burnt_stump_a', 'g2_burnt_stump_b', 'g2_burnt_stump_c'])])
+            else: trysp(px, py, D=2.6, v=g2['g2_charred_cart_b'], flip=rnd.random() < .5)
+    rdist = ndimage.distance_transform_edt(~road)
+    lamps = 0
+    for _ in range(900):                                                                                   # roadside lamps / torches (light the stone roads)
+        if lamps >= 22: break
+        x = rnd.uniform(6, W - 6); y = rnd.uniform(WALL_Y + 5, H - 5); cx_, cy_ = int(x), int(y - .6)
+        if not (1.0 <= rdist[cy_, cx_] <= 1.9): continue
+        if any(math.hypot(q['x'] - x, q['y'] - y) < 11 for q in small if os.path.basename(q['img']).startswith(('lamp', 'brazier'))): continue
+        if trysp(x, y, an='lamp' if rnd.random() < .7 else 'brazier', D=3 if rnd.random() < .5 else 2.6): lamps += 1
+    for _ in range(70):                                                                                    # extra scatter through the district
+        for _t in range(30):
+            x = rnd.uniform(8, W - 8); y = rnd.uniform(WALL_Y + 4, H - 6)
+            k = rnd.random()
+            if k < .35: v = g2[rnd.choice(['g2_burnt_stump_a', 'g2_burnt_stump_b', 'g2_burnt_stump_c'])]; ok_ = trysp(x, y, D=2.6, v=v)
+            elif k < .7: ok_ = trysp(x, y, D=2.6, v=rnd.choice(A['debris'])) if A['debris'] else False
+            elif k < .85: ok_ = trysp(x, y, an=rnd.choice(['rubble', 'stone_low', 'ruin_pillar']), D=3)
+            else: ok_ = trysp(x, y, False, D=3.6, an='rubble', shadow=0)
+            if ok_: break
+    print('  a6 dense props added:', len(small) - nb0, 'lamps', lamps)
     under = []
-    for _ in range(40):
+    for _ in range(110):
         x = rnd.uniform(6, W - 6); y = rnd.uniform(WALL_Y + 3, H - 4); v = g2[rnd.choice(['g2_ash_decal_a', 'g2_ash_decal_b', 'g2_ash_decal_c'])]
         if math.hypot(x - CAMP[0], y - CAMP[1]) > 9 and not (road | lanec)[max(0, int(y) - 2):int(y) + 2, max(0, int(x) - 2):int(x) + 3].any():
             under.append({'id': f'ash_{len(under)}', 'img': v['img'], 'x': round(x, 2), 'y': round(y, 2), 'ax': v['ax'], 'ay': v['ay'], 'D': rnd.choice([2.2, 2.6, 3]), 'under': 1, 'fade': 0, 'shadow': 0, 'flip': rnd.random() < .5})
@@ -370,7 +446,9 @@ def main():
     lm = np.clip((lf - .2) / .45, 0, 1)[..., None] * .88                                          # packed earth paths + the camp clearing: trodden, paler, warmer
     packed = ndimage.uniform_filter(img, size=(11, 11, 1)) * np.array([1.24, 1.17, 1.05]) + 8 + (wang.vnoise(gh, gw, 3, SEED + 50) - .5)[..., None] * 14
     img = img * (1 - lm) + packed * lm
-    img = cobble.render(img, rf, None, 0, seed=SEED, lane=None, stone=(100, 94, 88)); cobble.bricks = ob
+    img = cobble.render(img, rf, None, 0, seed=SEED, lane=None, stone=(124, 117, 108), joint=.48, jdark=.4); cobble.bricks = ob
+    redge = up(np.clip(ndimage.gaussian_filter((ndimage.binary_dilation(road, iterations=1) & ~road).astype(float), .8), 0, 1)) * (1 - rf)
+    img *= (1 - .28 * redge)[..., None]                                                     # a6: dark verge so the stone roads read in overview
     bandm = ndimage.gaussian_filter(np.isin(grid, ['#', 'T', 'P', 'R', 'C']).astype(float), 1.0)
     img *= 1.22 * (1 - .4 * up(bandm))[..., None]
     # the north band: dark rubble at the wall foot, a cold misty void above the walls (behind the far castle)
@@ -379,8 +457,8 @@ def main():
     sky = np.array([92, 90, 100.]) * (1 - np.clip(yy2 / 18, 0, 1))[..., None] + np.array([58, 56, 62.]) * np.clip(yy2 / 18, 0, 1)[..., None]
     img = img * (1 - void[..., None]) + np.broadcast_to(sky, img.shape) * void[..., None]
     footd = np.clip(1 - np.abs(yy2 - WALL_Y) / 3, 0, 1); img *= (1 - .35 * footd)[..., None]
-    gimg = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-    gp = FA + 'ground4.png'; gimg.save(rel(gp), optimize=True)
+    gimg = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))                                       # a6: webp q88 (7.2MB png -> ~1.5MB)
+    gp = FA + 'ground4.webp'; gimg.save(rel(gp), 'WEBP', quality=88, method=6)
     # ---- hd block ----
     def arts(keys, D=3): return [{'img': props.OLD[k][0], 'ax': props.OLD[k][1], 'ay': props.OLD[k][2], 'D': D} for k in keys]
     decoArt = {'T': arts(['dead_tree', 'burnt_pine_a', 'burnt_pine_b', 'ash_tree_b']), 'P': arts(['burnt_pine_a', 'burnt_pine_b', 'dead_tree']),
@@ -406,7 +484,7 @@ def main():
     for y in range(WALL_Y + 1, H - 1):
         for x in range(1, W - 1):
             if grid[y, x] != '.': continue
-            if rnd.random() < (.4 if gcell[y, x] else .06): tufts.append([round(x + rnd.random(), 2), round(y + .3 + rnd.random() * .7, 2), 3 if rnd.random() < .2 else rnd.randrange(3)])
+            if rnd.random() < (.42 if gcell[y, x] else .15): tufts.append([round(x + rnd.random(), 2), round(y + .3 + rnd.random() * .7, 2), 3 if rnd.random() < .2 else rnd.randrange(3)])
     small.sort(key=lambda q: q['y']); props_.sort(key=lambda q: q['y'])
     allp = back + sorted(props_ + small, key=lambda q: q['y']) + under
     lights = []; fires = []; flick = []
@@ -430,7 +508,7 @@ def main():
     for q in small:
         if 'ember_rubble' in q['img']: fires.append([q['x'], q['y'] - .4, .7, 'embers'])
     hd = {'D': HD, 'ground': gp, 'props': allp, 'decoArt': decoArt, 'lights': lights, 'smoke': smoke, 'grade': 'dusk', 'gradeCol': 'rgb(214,203,192)', 'flick': flick, 'tufts': tufts,
-          'fires': fires, 'fx': {'particles': 'ash', 'birds': 4, 'mist': 10, 'tuft': ['#57534a', '#625d50', '#4a463d']},
+          'fires': fires, 'fx': {'particles': 'ash', 'birds': 4, 'mist': 7, 'tuft': ['#57534a', '#625d50', '#4a463d']},
           'webs': [[8.2, 50.6, 10.8, 52.2, .5, .3], [14.0, 49.5, 16.5, 50.2, .6, .3], [7.0, 45.5, 9.0, 47.6, .4, .25]]}
     legend = {'.': 'dirt', '=': 'dirt', '#': 'cliff', 'X': 'cliff', 'H': {'ground': 'dirt', 'solid': True},
               'T': {'ground': 'dirt', 'deco': 'tree'}, 'P': {'ground': 'dirt', 'deco': 'pine'}, 'R': {'ground': 'dirt', 'deco': 'boulder'},
@@ -438,7 +516,7 @@ def main():
     out = {k: ORIG[k] for k in ('type', 'area', 'title', 'bgm', 'battleBgm', 'tileset', 'tile', 'id', 'name')}
     cur = json.load(open(rel('maps/felt.json')))
     out['title'] = dict(out['title'], sub='무너진 옛 성문 그늘 아래, 생존자의 마을')
-    out.update({'region': ORIG['region'], 'viewZoom': 1.3, 'grade': 'ash', 'fog': .34, 'ash': 60, 'wind': [5, 1], 'w': W, 'h': H, 'legend': legend,
+    out.update({'region': ORIG['region'], 'viewZoom': 1.3, 'grade': 'ash', 'fog': .25, 'ash': 60, 'wind': [5, 1], 'w': W, 'h': H, 'legend': legend,
                 'solid': ['#', 'C', 'X', 'H', 'T', 'P', 'R', 'u', '~'], 'ground': [''.join(r) for r in grid], 'objects': objs, 'spawns': spawns, 'hd': hd,
                 'note': 'GENERATED by tools/hd/fields/build_felt4.py (ch1 draft layout: old gate arch north, campfire centre, four blocks) - do not hand-edit'})
     if 'mapPos' in cur: out['mapPos'] = cur['mapPos']

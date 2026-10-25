@@ -31,7 +31,7 @@ def rings(H, W, c, rh=16, sw=21, seed=2):
     sid = 50000 + ring * 997 + seg
     ta = (seg + .5 - ph) / n * 2 * np.pi - np.pi
     return u, v, arc / 2 - 1.1, np.full_like(u, rh / 2 - 1.1), sid, c[0] + rm * np.cos(ta), c[1] + rm * np.sin(ta)
-def render(base, road, plaza=None, plaza_r=0, seed=3, stone=(124, 114, 100), lane=None):
+def render(base, road, plaza=None, plaza_r=0, seed=3, stone=(124, 114, 100), lane=None, joint=.35, jdark=.52):
     """base: HxWx3 float ground. road: HxW float coverage 0..1 (cobble). lane: coverage of packed-dirt lanes.
     plaza: (cx, cy) px centre, plaza_r px radius (ring pattern inside). returns new image"""
     H, W = road.shape; img = base.astype(np.float32).copy()
@@ -66,6 +66,6 @@ def render(base, road, plaza=None, plaza_r=0, seed=3, stone=(124, 114, 100), lan
     col = col * (.82 + .18 * sunk[..., None]) + earth * (1 - (.82 + .18 * sunk[..., None])) * 0
     img = img * (1 - alpha) + col * alpha
     # mortar: darker earth in the joints inside the road
-    jm = ((d >= 0) & (road > .45))[..., None] * .35
-    img = img * (1 - jm) + img * .52 * jm
+    jm = ((d >= 0) & (road > .45))[..., None] * joint
+    img = img * (1 - jm) + img * jdark * jm
     return np.clip(img, 0, 255)
