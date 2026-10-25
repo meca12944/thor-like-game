@@ -396,6 +396,23 @@
   const lastTap = {}; function dirTap(d) { const now = performance.now() / 1000; if (now - (lastTap[d] ?? -9) <= RUN.dblTap) hero.runReq = true; lastTap[d] = now; }
   addEventListener('keyup', e => { held.delete(e.code); }, true);
   addEventListener('blur', () => held.clear());
+  addEventListener('keydown', () => { S.lastInput = 'kb'; }, true);
+  // [PC 조작] 팀장 10-25 「PC 게임」: 패드 (A 공격 · B 회피대시 · X 조사 · Y 물약 · LB 필살기 · RB 달리기 · 스틱/십자 이동 · L3/R3 점프; Start 메뉴는 index.html 그대로)
+  // + 마우스 (왼쪽 클릭 공격 · 오른쪽 클릭 = 마우스 쪽으로 회피대시). Buttons feed the same queue/held as the keyboard, so every rule (buffers, charge, run) stays one.
+  const WPAD = { 0: 'attack', 1: 'dash', 2: 'interact', 3: 'potion', 4: 'ult', 5: 'run', 10: 'dive', 11: 'dive', 12: 'up', 13: 'down', 14: 'left', 15: 'right' }, PAD_LABEL = { attack: 'A', dash: 'B', interact: 'X', potion: 'Y', ult: 'LB', run: 'RB', dive: 'L3', menu: 'Start' };
+  let padPrev = [];
+  function pollPadW() { S.padDir = null; if (!navigator.getGamepads) return; let gp = null; try { gp = [...navigator.getGamepads()].find(g => g && g.connected); } catch (e) { } if (!gp) return;
+    const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0; if (Math.hypot(ax, ay) >= .25) { S.padDir = [ax, ay]; S.lastInput = 'pad'; }
+    for (const i in WPAD) { const on = !!(gp.buttons[i] && gp.buttons[i].pressed), was = !!padPrev[i]; if (WPAD[i] === 'run') { if (on && !was) { hero.runReq = true; S.lastInput = 'pad'; } continue; } /* RB = 달리기 시작 (두 번 누르기와 같음) */ const code = codesOf(WPAD[i])[0]; if (!code) continue;
+      if (on && !was) { if (active()) { queue.push(code); if (queue.length > 8) queue.shift(); if (WPAD[i] in ARROW || ['up', 'down', 'left', 'right'].includes(WPAD[i])) dirTap(WPAD[i]); } held.add(code); S.lastInput = 'pad'; } else if (!on && was) held.delete(code); }
+    padPrev = gp.buttons.map(b => b.pressed); }
+  { const mouseCode = a => codesOf(a)[0];
+    cv.addEventListener('contextmenu', e => e.preventDefault());
+    cv.addEventListener('mousedown', e => { if (!active() || S.scene === 'town') return; S.lastInput = 'kb';
+      if (e.button === 0) { const c = mouseCode('attack'); queue.push(c); held.add(c); }
+      else if (e.button === 2) { const v = S.view, r = cv.getBoundingClientRect(), dpr = cv.width / Math.max(1, r.width); if (v && S.camI) { const wx = ((e.clientX - r.left) * dpr - v.ox) / v.k + S.camI[0], wy = ((e.clientY - r.top) * dpr - v.oy) / v.k + S.camI[1], dx = wx - hero.x, dy = wy - (hero.y - 12); if (Math.hypot(dx, dy) > 2) S.dashDir = [dx, dy]; } queue.push(mouseCode('dash')); }
+      if (queue.length > 8) queue.shift(); e.preventDefault(); });
+    addEventListener('mouseup', e => { if (e.button === 0) held.delete(mouseCode('attack')); }); }
 
   // ---------------- 폰 터치 (사장님 10-23 "핸드폰으로 조작하게"): 마을 화면의 이동 패드·공격·대시·달리기 버튼을 게임 지도 위로 올리고,
   // 공격 버튼을 이쪽 공격 키(J)에 잇고, 지도에서 필요한 조사·물약·필살기·메뉴 버튼을 더함(키를 누른 것처럼 보냄). 키보드 조작은 그대로.
@@ -974,6 +991,7 @@
   // ---------------- update ----------------
   function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl)) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
+    if (!ix && !iy && S.padDir) { const [px, py] = S.padDir, l = Math.hypot(px, py); ix = px / l; iy = py / l; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
@@ -994,6 +1012,7 @@
       const m = spawn(k, x, y); if (m) m.arena = true; }); }
   function step(dt) {
     S.t += dt; { const g = window.__game; if (g && g.potionCd > 0 && S.scene !== 'town') g.potionCd = Math.max(0, g.potionCd - dt); }
+    pollPadW();
     if (S.trans) { stepTrans(dt); if (S.trans && S.trans.phase !== 'in') return; }
     if (hero.kb) { const K = hero.kb; moveCol(hero, K.x, K.y, 5); K.x *= .6; K.y *= .6; if (++K.n >= 7) hero.kb = null; } // hit knockback slide (see hurt)
     if (S.scene === 'town') return;
@@ -1064,7 +1083,7 @@
         else { addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); } }
       if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     const dashP = takePress('dash'); if (dashP) hero.dashBuf = .15; hero.dashBuf = Math.max(0, (hero.dashBuf || 0) - dt); // 회피 누름 0.15초 보관 (PC 키보드 기준, 사장님 10-25 「PC용 게임」)
-    if (hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() && !hero.roll && hero.rollCd <= 0) { hero.dashBuf = 0; stSpend(STAM.dodge); let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
+    if (hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() && !hero.roll && hero.rollCd <= 0) { hero.dashBuf = 0; stSpend(STAM.dodge); let dx = ix, dy = iy; if (S.dashDir) { [dx, dy] = S.dashDir; S.dashDir = null; setFace(dx, dy); } if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
     if (takePress('attack')) hero.atkBuf = .2; /* 공격 누름 0.2초 보관 (PC 기준, 휘두르는 중 미리 누른 다음 타) */
@@ -1332,7 +1351,7 @@
   function render() {
     const dpr = Math.min(devicePixelRatio || 1, 2), /* owner 10-22 "너무 끊기는데": 3x phones drew 2.25x the pixels */ CW = Math.round(innerWidth * dpr), CH = Math.round(innerHeight * dpr);
     if (cv.width !== CW || cv.height !== CH) { cv.width = CW; cv.height = CH; }
-    const k = Math.max(1, Math.floor(Math.min(CW / LW, CH / LH))), ox = Math.floor((CW - LW * k) / 2), oy = Math.floor((CH - LH * k) / 2);
+    const kf = Math.min(CW / LW, CH / LH), k = window.__game && window.__game.screenFit === 1 ? Math.max(1, Math.floor(kf)) : Math.max(1, kf), /* 화면 채우기 (팀장 10-25 PC 기준): 기본 꽉 채우기(배율 소수) · 설정 「정수(또렷)」 = 옛 정수 배율 */ ox = Math.floor((CW - LW * k) / 2), oy = Math.floor((CH - LH * k) / 2);
     S.view = { k, ox, oy };
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, CW, CH);
     const tr = S.trans;
@@ -2157,7 +2176,7 @@
     ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh);
     const ta = Math.max(0, Math.min(1, (f.t - .3) / .5, (VISTA.fx - f.t) / .4)); if (ta <= 0) return; ctx.globalAlpha = ta;
     const n1 = Math.max(24 * u, SH * .09), n2 = Math.max(12 * u, SH * .042); textOut(V.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (V.sub) textOut(V.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.2, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
-  function keyHint(a) { const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
+  function keyHint(a) { if (S.lastInput === 'pad' && PAD_LABEL[a]) return PAD_LABEL[a]; const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
     const u = k / 3, m = M(), SW = LW * k, SH = LH * k, cxs = ox + SW / 2;
     if (m.type === 'world') {
