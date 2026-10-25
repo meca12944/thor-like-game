@@ -895,8 +895,12 @@
   // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_silmamul,c1_unrotting_hound*2[&tough=1][&ult=full]
   //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
   const AQ = new URLSearchParams(location.search), ARENA = (AQ.get('arena') || '').split(',').filter(Boolean).flatMap(t => { const [k, n] = t.split('*'); return Array(Math.max(1, Math.min(8, +n || 1))).fill(k); }), TOUGH = AQ.get('tough') === '1';
-  function arenaTick(dt) { if (!ARENA.length || !S.map || S.map.type === 'world') return;
-    if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; const at = (AQ.get('at') || '').split(',').map(Number); if (S.aliasFrom && at.length === 2) { const q = aliasPt({ map: S.aliasFrom, x: at[0], y: at[1] }); at[0] = q.x; at[1] = q.y; } /* ?go=field_felt&at= is in the part map's tiles */ if (at.length === 2 && at.every(v => v >= 0)) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; snapCam(); } /* at=tx,ty: start in an open spot */ for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
+  // ?at=tx,ty: start tile on the first map entered (?go= / bots / mob_check), with or without ?arena (was arena-only → 펠트 v5 뒤 봇이 늘 29,3에서 시작)
+  function atTick() { if (S.atDone || !S.map || S.map.type === 'world' || S.trans) return; S.atDone = true; const at = (AQ.get('at') || '').split(',').map(Number);
+    if (S.aliasFrom && at.length === 2) { const q = aliasPt({ map: S.aliasFrom, x: at[0], y: at[1] }); at[0] = q.x; at[1] = q.y; } /* ?go=field_felt&at= is in the part map's tiles */
+    if (at.length === 2 && at.every(v => v >= 0 && isFinite(v))) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; hero.safe = [hero.x, hero.y]; snapCam(); } }
+  function arenaTick(dt) { atTick(); if (!ARENA.length || !S.map || S.map.type === 'world') return;
+    if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
     if (TOUGH && hero.hp < 15) { hero.hp = hero.maxHp; addFx('text', hero.x, hero.y - 34, { text: '체력 회복 (시험장)', life: .8, color: '#9fffb0' }); }
     if (S.mobs.some(m => !m.dead && m.arena)) return;
     if ((S.arenaT -= dt) > 0) return; S.arenaT = 1.5;
