@@ -1,1 +1,3 @@
 [2026-10-24 23:56:03] edit walk_r2 completed usage {'type': 'generations', 'generations': 10.0}
+[2026-10-24 23:58:14] tween tw8_walk_r2 completed frames 9 usage {'type': 'generations', 'generations': 8.0}
+done walk_r2

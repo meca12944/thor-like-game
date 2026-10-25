@@ -23,8 +23,9 @@ def best(ref,k,i=0):
                 if c>bestc: bestc=c
         res.append((bestc,round(float(s),2)))
     return max(res)
-PAIRS=[('walk_right','walk_right'),('walk_right','run_right'),('walk_se','walk_se'),('walk_se','run_se'),('walk_down','walk_down'),('walk_down','run_s'),('walk_down','run_down(그록)')]
-OUT={}
-for a,b in PAIRS:
-    c,s=best(facepatch(a),b,0 if a!=b else 1);OUT[f'{a}->{b}']=dict(match=round(float(c),3),scale=s,face_ratio=round(1/s,2));print(a,'→',b,'닮음',round(float(c),3),'배율',s,'⇒ 얼굴이',round(1/s,2),'배')
-json.dump(OUT,open('facematch.json','w'),indent=1,ensure_ascii=False)
+if __name__=='__main__':
+  PAIRS=[('walk_right','walk_right'),('walk_right','run_right'),('walk_se','walk_se'),('walk_se','run_se'),('walk_down','walk_down'),('walk_down','run_s'),('walk_down','run_down(그록)')]
+  OUT={}
+  for a,b in PAIRS:
+      c,s=best(facepatch(a),b,0 if a!=b else 1);OUT[f'{a}->{b}']=dict(match=round(float(c),3),scale=s,face_ratio=round(1/s,2));print(a,'→',b,'닮음',round(float(c),3),'배율',s,'⇒ 얼굴이',round(1/s,2),'배')
+  json.dump(OUT,open('facematch.json','w'),indent=1,ensure_ascii=False)
