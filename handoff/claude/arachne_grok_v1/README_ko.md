@@ -1,0 +1,14 @@
+# 아라크네 그록판 v1 (4번방, 2026-10-24, 사장님 「아라크네도 이걸로. PixelLab 써도 되니 회의 의견으로」)
+- 원본: 그록 `raw/arachne_4view.jpg`, `raw/arachne_motion.jpg` (팀장 linette-8dir 7e4b2a17)
+- `cut.py`: 회색 배경·바닥 그림자 지우기(테두리에서 이어진 무채색만) + 원래 도트(약 2.5px)로 줄이기 → `clean/` (키 약 153px, 256칸, 다리 끝 y249)
+- 노출: 지금 게임 그림 수준을 넘지 않게 앞·옆 모습 가슴에 찢어진 붉은 천 덧입힘 (PixelLab edit 2번, 20) → `clean/front_cov.png`, `side_r_cov.png`
+- 옆 걷기: 걷는 자세 1장(edit 10) → 한 바퀴 8장(animate 8) → `build.py walk` (그림 도구가 넣은 글자 조각 지움) → `strips/c1_boss_arachne_g_walk.png`
+- 크기: 게임에서 주인공(30 field px)의 3.2배 = 96 field px. 그림 키 153px → `anim.F` ≈ 160 (256칸 기준). 새 주인공 키가 정해지면 이 숫자만 바꿈.
+- 미리보기: `walk_v1.mp4` (`preview.py`, 주인공 옆)
+- 핵심 자세 4장 (edit 각 10): 다리 칼끝 찍기 `key/stab_key`, 실 던지기 `cast_key`(공중에 떠서 땅으로 내림), 웅크림 `crouch_key`, 실 당기기 `pull_key` (맞기 젖힘에도 씀)
+- **실패 (크레딧 낭비, 교과서 1-00에 적음)**: 공격 사이 장을 animate-with-text로 뽑으면 "no slash trails"라고 써도 **흰 칼 빛줄기를 그림에 구워 넣음** (콤보 8장 8, 찌르기 4장 4 = 12 버림). → 사이 장 없이 핵심 자세를 `anim.map`으로 붙잡고 웅크림·늘임·흔들림은 게임 코드(drawFeltHi)가 함.
+- 2페이즈 = 그록 2줄 엎드린 거미형(`clean/m2_*`, 뒤집음) → rage·ragewalk·쓰러짐. 그록 3줄(피 토하며 젖히기·일어서 웃기)은 맨몸·구운 피라 안 씀. 1줄(위에서 본 기어오기)은 옆모습 게임과 시점이 달라 안 씀.
+- `build.py all` → `strips/` → `test128/assets/mobs_felt/c1_boss_arachne_*.png` (11개, 옛 그림은 git 기록에)
+- 게임: `world_mobs.js` def.arachne — F 160, h 96, r 26, 베기 거리 30→42·반지름 24→28, 이름 「뼈 다리 칼끝 찍기」「붉은 실 당기기」(정본 706ca348: 베틀은 보스방 소품)
+- 점검: mob_check 전 31/1/18.1초/0%/6% → 후 32/1/17.5초/0%/5% (모두 초록, `check_before_after.png`). 보스 봇 처치 274초(전 201~242초), CC 12%, 2페이즈 87초. test_openworld 17/17.
+- 크레딧 합계 **90** (가슴 천 20 + 걷기 18 + 핵심 자세 40 + 실패 12). 잔액 4265.95 → 4175.949999999701
