@@ -535,7 +535,7 @@ function closeUI(){ui=null;shopAt=null;sellPend=null;rebind=null;dlg=null;ovEl.c
 // 고를 수 있는 값을 칩으로 다 보여 줌 (◀ ▶ 대신 한눈에) · 고른 줄만 설명 한 줄 · 데모 바로가기는 아래 작게
 const inWorld=()=>{const W=window.__world;return !!(W&&W.scene&&W.scene!=='town');};
 function menuItems(){const W=window.__world,L=[{t:'계속하기',k:'menu',f:closeUI},{t:'설정',f:()=>openUI('settings')},{t:'인벤토리 · 장비',k:'inventory',f:()=>{invTab=0;openUI('inv');}}];
- if(inWorld()){L.push({t:'지도',f:()=>{closeUI();W.tap('KeyM');}},{t:Q.has('old')?'마을로 돌아가기':'펠트로 돌아가기',f:()=>{closeUI();W.home();}});}
+ if(inWorld()){L.push({t:'지도',f:()=>{closeUI();W.tap('KeyM');}},{t:Q.has('old')?'마을로 돌아가기':(W.placeText?W.placeText('펠트로 돌아가기'):'펠트로 돌아가기'),f:()=>{closeUI();W.home();}});}
  else L.push({t:'월드맵',k:'map',f:()=>openUI('map')},{t:'빠른 저장',k:'save',f:()=>{closeUI();quickSave();}});
  L.push({t:'상점',demo:1,f:()=>openShop('demo')},{t:'대장간',demo:1,f:()=>{invTab=2;listSel=0;openUI('inv');}});
  if(!inWorld())L.push({t:'빠른 저장 지우기',demo:1,f:()=>{try{localStorage.removeItem(LSQ);}catch(e){}closeUI();msg('빠른 저장을 삭제했다');}});
