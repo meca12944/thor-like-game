@@ -1825,7 +1825,8 @@
     // 이동·대시·점프 (모션연구방): sq < 1 = 눌림(가로 = 1 + (1 - sq) × .6), sq > 1 = 늘림, 틱 = 1/60초
     dashIn: .12, dashInT: 4, dashOut: .07, dashOutT: 6, /* 회피대시: 들어갈 때 눌림(가로 +7%) → 낮은 자세(그림) → 나올 때 세로 늘림 */
     jumpPre: .12, jumpUp: .10, jumpUpT: 7, jumpLand: .14, jumpLandT: 8, /* 점프: 웅크림 눌림 → 뜰 때 늘림 → 정점(그림 10틱) → 착지 눌림 */
-    smear: { t: 3, n: 2, gap: 6, st: .12, a: .45 }, /* 공격 스미어 (회의 10-25 추천 1): 판정 열리기 전 3틱 = 휘두름 장, 앞으로 당긴 반투명 몸 2장 + 휘두름 쪽 늘임 (Slynyrd: 스미어는 휘두름 장에만 1장) */
+    smear: { t: 3, n: 3, gap: 7, st: .14, a: .6 }, /* 공격 스미어 (회의 10-25 추천 1): 판정 열리기 전 3틱 = 휘두름 장, 앞으로 당긴 반투명 몸 2장 + 휘두름 쪽 늘임 (Slynyrd: 스미어는 휘두름 장에만 1장) */
+    hair: { cut: 116, top: 150, drag: .03, max: 5, w: 11, z: .22 }, /* 머리카락 2차 움직임 (회의 추천 2): 발에서 126 그림px 위(눈썹 위)부터 정수리까지만 옆으로 기울임, 몸이 가는 반대로 늦게 따라오고 멈추면 출렁(스프링) */
     dustJump: 6, dustLand: 8, /* 점프 먼지 알갱이 수 (교과서 13-1) */ dashGhostN: 4, dashGhostA: .5 /* 회피대시 잔상 장 수·처음 진하기 (8장·80%는 겹쳐 검게 번짐) */ };
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
   // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
@@ -1859,6 +1860,14 @@
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   const heroBlinkA = () => hero.inv > 0 && Math.floor(hero.inv * 20) % 2 && !hero.roll && S.deadT <= 0 && !S.ultFx ? .45 : 1; // no blink / white wash during an ultimate (the hero is the star of the shot)
+  function hairLag(h) { const HR = EXAG.hair, now = S.t; let dt = Math.min(.1, Math.max(0, now - (h.hrT ?? now))); h.hrT = now; // 머리카락 스프링 (그림 px, + = 오른쪽)
+    const vx = h.hrX == null || !dt ? 0 : (h.x - h.hrX) / dt; h.hrX = h.x; if (dt) h.hrVx = vx; const tg = Math.max(-HR.max, Math.min(HR.max, -(h.hrVx || 0) * HR.drag));
+    for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.hrV = (h.hrV || 0) + (-HR.w * HR.w * ((h.hrL || 0) - tg) - 2 * HR.z * HR.w * (h.hrV || 0)) * d; h.hrL = (h.hrL || 0) + h.hrV * d; }
+    return Math.max(-HR.max * 1.4, Math.min(HR.max * 1.4, h.hrL || 0)); }
+  function drawHair(h, c, x, y, k, a) { const L = h.roll || S.deadT > 0 || Q.get('hair') === '0' ? 0 : hairLag(h); /* ?hair=0 = 끔(전·후 비교) */ if (Math.abs(L) < .3) return drawH128(c, x, y, k, a, null);
+    const f = H128FIG / ART_FIG, [, sy] = W2S(x, y), cut = sy - EXAG.hair.cut * f * k, top = sy - EXAG.hair.top * f * k, sh = L * f * k / Math.max(1, cut - top); // 위쪽만 기울임 (cut 아래는 그대로라 이음새 없음)
+    ctx.save(); ctx.beginPath(); ctx.rect(-1e4, cut, 3e4, 3e4); ctx.clip(); drawH128(c, x, y, k, a, null); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(-1e4, -3e4, 3e4, cut + 3e4); ctx.clip(); ctx.transform(1, 0, -sh, 1, sh * cut, 0); drawH128(c, x, y, k, a, null); ctx.restore(); }
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero; nsPreload();
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, null); } // 잔상 = 주인공 모습 그대로 (색 덮기 없음)
     const BA = heroBlinkA(); // 무적 깜빡임 = 몸·칼 모두 45 % (전: 몸을 통째로 안 그려서 칼만 떠 있었음, 회의 2차 10-25)
@@ -1868,7 +1877,7 @@
     { const SM = EXAG.smear; if (h.atk && atkArt() && !SLASH_BODY) { const tk = h.atk.t * 60, hit = atkT(h.atk.i).a0 * 60; if (tk >= hit - SM.t && tk < hit) { const v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG, c = h128Cell(); // 스미어: 휘두르는 3틱 동안 몸이 앞으로 번져 보임 (그림 0)
       for (let j = SM.n; j >= 1; j--) { const wx = h.x + kx + v[0] * SM.gap * j * f, wy = h.y + ky + v[1] * SM.gap * j * f * .5 - (h.z || 0), [sx, sy] = W2S(wx, wy); ctx.save(); ctx.translate(sx, sy); ctx.scale(v[0] ? 1 + SM.st : 1, v[1] ? 1 + SM.st * .6 : 1); ctx.translate(-sx, -sy); drawH128(c, wx, wy, k, SM.a * BA / j, null); ctx.restore(); } } } }
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
-    drawH128(h128Cell(), h.x + kx, h.y + ky, k, BA, null); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
+    drawHair(h, h128Cell(), h.x + kx, h.y + ky, k, BA); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); drawStam(k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
