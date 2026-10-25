@@ -84,7 +84,9 @@ with sync_playwright() as p:
     ev("()=>__world.go('felt','default')"); settle(); adv(.2)
     ev("()=>{__world.killAll();__world.setHeroTile(2,70,'left')}")
     c1 = walk('ArrowLeft', 'field_felt'); pg.screenshot(path=O + '/10_felt_west_gate.png')
-    check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '재로 덮인 들' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)  # 바르트를 만나기 전(기억 없는 주인공, 사장님 10-25) = 보이는 대로 쓴 이름
+    check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)
+    pn = ev("()=>{const a=__world.placeText('잿빛 들판'),b=__world.placeText('1장 · 펠트');__world.learnPlaces('talk:f_bart');return [a,b,__world.placeText('잿빛 들판')]}")  # 기억 없는 주인공 (사장님 10-25): 바르트 전 = 보이는 대로, 뒤 = 이름
+    check('place names before/after Bart', pn == ['재로 덮인 들', '1장', '잿빛 들판'], pn)
     ev("()=>{__world.killAll();__world.setHeroTile(28,2,'up')}")
     ff = walk('ArrowUp', 'felt')
     check('ash field -> felt west gate', ff['map'] == 'felt' and ff['tr'] and abs(ff['t'][0] - 3) <= 2 and abs(ff['t'][1] - 70) <= 2, ff)
