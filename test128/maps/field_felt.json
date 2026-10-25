@@ -169,14 +169,14 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 22,
    "y": 27,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 10,
    "y": 14,
    "respawn": 30
@@ -204,7 +204,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 13,
    "y": 18,
    "respawn": 30
@@ -232,7 +232,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 20,
    "y": 17,
    "respawn": 30

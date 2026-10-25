@@ -46,10 +46,11 @@
   const FELT_STD = { restMelee: .91, restShoot: .7, restLunge: 1.26, restLeap: 1.19, backOff: 40 }; // x1.4 for the souls pace (was .65/.5/.9/.85) // 10-24 팀 기준(경고 0.6~0.8, 빈틈 0.8~1.2): strike -> moves again measured 0.73~0.82 s -> +0.1~0.15
   const FELT_SC = 1.35, FELT_CD = 1, FELT_REC = 1; /* souls pace: cooldown / recovery back to x1 (were .6/.7) */ // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function pickIntent(P, d, m) { // distance decides which move is likely; the same move never 3 times in a row
-    const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], ['shoot', d >= 90 ? 3 : .6]] : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
+    const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], (m.D.shots || []).length || m.D.summoned ? ['shoot', d >= 90 ? 3 : .6] : ['melee', d < 45 ? 3 : .6]] // no shots (누빔 멧돼지): close tusk jab instead : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
       : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
     const H = m.hist || (m.hist = []); for (const o of O) if (H.length >= 2 && H[0] === o[0] && H[1] === o[0]) o[1] = 0;
     for (const o of O) if (o[0] === 'shoot' && !(m.D.shots || []).length) o[1] = 0; // no shots (새끼 거미): bite only
+    if (!O.some(o => o[1] > 0)) { H.unshift('wait'); H.length = 2; m.cd = 1; return null; } // only one move left and it was used twice (누빔 멧돼지: 돌진만): circle for 1 s instead of a 3rd in a row
     let t = O.reduce((a, o) => a + o[1], 0) * Math.random(), pick = O[0][0]; for (const o of O) { t -= o[1]; if (t <= 0) { pick = o[0]; break; } }
     H.unshift(pick); H.length = Math.min(H.length, 2); return pick; }
   function felt(o) {
@@ -107,7 +108,7 @@
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + 0.3); set(m, 'melee'); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
       const packBusy = P === 'lunge' && W.mobs && W.mobs.some(o => o !== m && !o.dead && o.kind === m.kind && o.st === 'lunge' && o.sub !== 'rec'); // pack: one dog lunges at a time, the rest keep circling
       if (m.intent === 'lunge' && d < 95 && !packBusy && tok(m, W)) { m.intent = null; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1;
-        const w = lineTele(W, m, m.aim, 230 * .38, 0.6, m.r * 2 + 12); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = 1.9 * FELT_CD * RG / agg(W); return; }
+        const w = lineTele(W, m, m.aim, 230 * .38, 0.6, m.r * 2 + 12); set(m, 'lunge'); m.sub = 'aim'; m.warn = w; m.second = false; startAnim(m, 'attack', A.attack, A.attack.hit, w); m.cd = (this.cdLunge || 1.9) * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'leap' && d < 85 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), L = Math.min(d, 60); m.face = Math.cos(a) >= 0 ? 1 : -1;
         let aa = a; for (let t = 0; t < 4 && W.mobs && W.mobs.some(o => o !== m && !o.dead && Math.hypot(o.x - (m.x + Math.cos(aa) * L), o.y - (m.y + Math.sin(aa) * L)) < o.r + m.r + 6); t++) aa = a + (t % 2 ? -1 : 1) * .45 * (1 + (t >> 1)); // don't land on a packmate
         m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(aa) * L; m.ty = m.y + Math.sin(aa) * L; // lands on the marked spot (where the hero stood)
@@ -349,6 +350,10 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 누빔 멧돼지 (그록 10-25 「1장 마물」 01, handoff/claude/ch1_mobs_v1/01_boar): 돌진 역할(교본 1-9 #1). 걷기 = PixelLab 8장, 공격 = 그록 자세 서기 → 웅크림 → 돌진(map). 총알 없음(돌진만).
+    c1_quilted_boar: felt({ name: '누빔 멧돼지', style: 'lunge', col: '#a49c8c', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 60, h: 26, r: 9, sp: 34,
+      melee: { range: 28, rad: 15, dmg: 6 }, shots: [], cdLunge: 3, // 돌진 사이 약 0.75초 맴돎 (총알이 없어 쉬지 않고 돌진하던 것) + 가까우면 엄니 들이받기(melee 원)
+      anim: { src: 'assets/mobs_felt/c1_quilted_boar', F: 55.3, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2] } } }), // F: 띠 속 키 120 → 들판 35 (x FELT_SC 1.35)
     c1_unrotting_hound: felt({ name: '썩지 않는 들개', style: 'lunge', col: '#80766a', aff: { weak: ['blunt'], resist: ['slash'] }, hp: 60, h: 24, r: 8, sp: 34,
       melee: { range: 28, rad: 15, dmg: 6 },
       shots: [{ name: '돌껍질 파편 3갈래 2파', sp: 120, waves: [0, 0.23], spread: [-.25, 0, .25], shot: { kind: 'stone', r: 3, dmg: 4, life: 1.3 } }], // aimed; the main move is the lunge
