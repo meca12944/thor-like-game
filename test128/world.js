@@ -43,7 +43,7 @@
     const fl = h.kind === 'ult' ? F.ult : h.shape === 'line' ? F.charge_line : (h.dmg ? F.aoe : F.attack); h.warn = Math.max(fl, h.warn * d.telegraph); }
   // attack tokens: at most N melee + 1 ranged enemies may start an attack at once; a token is handed back ~1.2s later + 0.6s cooldown
   function token(m, ranged) { if (m.D.boss || m.D.champion) return true; const now = S.t, d = DIFF(); S.tokens = (S.tokens || []).filter(t => t.until > now && !t.m.dead);
-    if (S.tokens.some(t => t.m === m)) return true; const lim = ranged ? 1 : (d.tokens || 2); if (S.tokens.filter(t => !!t.r === !!ranged).length >= lim) return false;
+    if (S.tokens.some(t => t.m === m)) return true; const lim = ranged ? 1 : SOULS ? 1 : (d.tokens || 2); /* souls: 가까이 치는 몹은 한 번에 1마리 (몬스터 교본 1-8) */ if (S.tokens.filter(t => !!t.r === !!ranged).length >= lim) return false;
     S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
   const ATK = SOULS ? { dur: 0.50, a0: 0.05 + SW8 / 60, a1: 0.16 + SW8 / 60, chain: 0.40, reach: 15, r: 13 } : { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
   const ATK3 = Object.assign({}, ATK, SOULS ? { dur: 0.75, a0: 0.07 + SW8 / 60, a1: 0.24 + SW8 / 60 } : { dur: 0.413, a0: 0.103, a1: 0.273 }); // hit 3: longer active window + follow-through; 모션연구방 10-24 「탁, 타탁」: 3타만 예비동작 +2틱 (GK_FAN 3타 t0 6)

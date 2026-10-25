@@ -4,12 +4,13 @@
 #   per mob, in the canonical 잿빛 들판 (field_felt -> ch1, open spot 28,17; the old field01 now aliases into 바람길 where Linette kills the test mob) with the hero standing still (no damage):
 #     1 mob, 60 s : attacks (a chain that restarts within 0.35 s = one combo), longest run of the same attack, seconds standing still after attacks (the opening)
 #     3 mobs, 20 s: % of walking time facing away from the hero, % of time two of them overlap
-import asyncio, json, sys, subprocess
+import asyncio, os, json, sys, subprocess
 from playwright.async_api import async_playwright
 from PIL import Image, ImageDraw, ImageFont
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8931'
 OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
 KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
+# MOBCHECK_Q 환경변수 = 주소 뒤에 붙일 것 (예: '&noscene&pace=souls' = souls 속도로 점검)
 SETUP = "()=>{const W=__world;W.setManual(true);(W.map.objects||[]).forEach(o=>{if(o.type==='spawn')o.respawn=1e9});}"
 ONE = """(K)=>{const W=__world,h=W.hero;{const q=window.__worldHooks.aliasPt?__worldHooks.aliasPt({map:'field_felt',x:28,y:17}):{x:28,y:17};W.setHeroTile(q.x,q.y);}W.killAll(m=>!m.D.boss);W.S.mobs.length=0;W.S.hazards.length=0;W.S.shots.length=0;const m=W.spawn(K,h.x+60,h.y);
   const seq=[];let prev='',still=0,endT=-9,endS='';const X=['idle','rest','hop','walk','stagger','stun','dormant','rise','aim','intro','phase'];for(let i=0;i<3600;i++){h.hp=999;h.inv=0;W.S.dialog=null;W.advance(1/60);let s=m.st;if(s==='shoot')s+=m.pi;if(s==='atk')s+=':'+(m.last||m.D.ai||'');if(s!==prev){if(!X.includes(prev)){endT=i/60;endS=prev;}if(!X.includes(s)&&!(s===endS&&i/60-endT<.35))seq.push(s);prev=s;}
@@ -26,7 +27,7 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); pg = await b.new_page(viewport={'width': 960, 'height': 540}); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(BASE + '/index.html?nosave=1&go=field_felt'); await pg.wait_for_function('window.__world&&__world.ready&&__world.scene&&__world.scene!="town"&&__world.map', timeout=90000); await pg.wait_for_timeout(2500)
+        await pg.goto(BASE + '/index.html?nosave=1&go=field_felt' + os.environ.get('MOBCHECK_Q', '')); await pg.wait_for_function('window.__world&&__world.ready&&__world.scene&&__world.scene!="town"&&__world.map', timeout=90000); await pg.wait_for_timeout(2500)
         await pg.evaluate(SETUP)
         for k in KINDS:
             r = await pg.evaluate(ONE, k); r.update(await pg.evaluate(PACK, k)); r['kind'] = k; rows.append(r); print(json.dumps(r, ensure_ascii=False))
