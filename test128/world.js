@@ -1695,7 +1695,7 @@
   // 평소 칼 (10-25 새 그록 주인공 = 빈 손 그림): 공격이 아닐 때 그 칸의 손(H8.grip)에서 grip 각도로 코드 칼. grip 없는 칸(맞기·대시 등)은 안 그림.
   function carryGrip() { if (hero.atk || hero.hp <= 0) return null; const G = h128(), H = G && G.H8, c = h128Cell(); if (!H || !H.grip || !c || c.h8 === undefined) return null;
     const g = H.grip[c.h8 + ':' + c.ci]; if (!g) return null; const fl = !!c.fl, d = (fl ? 180 - g[2] : g[2]) * Math.PI / 180; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1], Math.cos(d), Math.sin(d)]; }
-  function carryBlade(ctx, cg) { const [gx, gy, ux, uy] = cg, L = 17 * 117 / H128FIG; // 들고 다닐 때는 조금 짧게 보이게 (휘두를 때 21) ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
+  function carryBlade(ctx, cg) { const [gx, gy, ux, uy] = cg, L = 17 * 117 / H128FIG; /* 들고 다닐 때는 조금 짧게 (휘두를 때 21) */ ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
     seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); } // heroBlade 와 같은 칼 모양
   function gkDraw(k) { const cg = carryGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
