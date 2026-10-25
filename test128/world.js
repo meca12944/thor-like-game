@@ -1503,7 +1503,7 @@
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
     h.gaitK = h8GaitK(H, LL); // per-clip leg speed (H8.gaitMul): clips drawn with a shorter stride step a little faster so the planted foot slides less (motion lab 10-24)
-    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.fl = fl; c.ox = h8Pop(h, c, LL, fl); return c; }
+    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.ci = e[1]; c.fl = fl; /* ci = cell index for H8.grip (c is a copy: indexOf(c) never found it) */ c.ox = h8Pop(h, c, LL, fl); return c; }
   function h8GaitK(H, L) { if (!H.gaitMul || !L) return 1; if (!H._gk) { H._gk = new Map(); for (const k in H.gaitMul) if (H.anims[k]) H._gk.set(H.anims[k], H.gaitMul[k]); } return H._gk.get(L) || 1; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
@@ -1683,18 +1683,18 @@
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
     const hd = tk < F.t0 ? 0 : tk > F.t1 ? 1 : Math.max(0, gkFanHead(F, tk)), [tx, ty] = gkRibPt(a.i, dir, hd); let ex = tx * A, ey = ty * A; { const BL = 21 * A, q = Math.hypot(ex - gx, ey - gy) || 1; ex = gx + (ex - gx) / q * BL; ey = gy + (ey - gy) / q * BL; } // 칼끝 = 검기 띠 앞끝 쪽, 칼 길이 고정
-    if (tk < F.t0) { const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + G.cells[c.h8].indexOf(c)] : null;
+    if (tk < F.t0) { const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + c.ci] : null;
       if (g0) { const q = tk / F.t0, e = q * q * (3 - 2 * q), d = (c.fl ? 180 - g0[2] : g0[2]) * Math.PI / 180, L = Math.hypot(ex - gx, ey - gy); ex = gx + (Math.cos(d) * L) * (1 - e) + (ex - gx) * e; ey = gy + (Math.sin(d) * L) * (1 - e) + (ey - gy) * e; } }
     const L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
     ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
     seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); }
-  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const ci = H.cells[c.h8].indexOf(c), g = H.grip[c.h8 + ':' + ci]; if (g) { const fl = !!c.fl; return gripKick((fl ? -g[0] : g[0]) + (c.ox || 0), g[1]); } }
+  function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const g = H.grip[c.h8 + ':' + c.ci]; if (g) { const fl = !!c.fl; return gripKick((fl ? -g[0] : g[0]) + (c.ox || 0), g[1]); } }
     return gripKick(dir[0] * 14, -58 + dir[1] * 12); }
   function gripKick(gx, gy) { const a = hero.atk; if (!a || SLASH_BODY) return [gx, gy]; const K = gkKick(a), v = FACEV[hero.face] || [1, 0]; // 손도 몸 반동(기울기·내딛기·찌그러짐)을 따라감 = drawHeroHi 와 같은 식 (모션연구방 10-24)
     gy *= K.sq; return [gx * (1 + (1 - K.sq) * .6) - v[0] * K.lean * gy / 117 + v[0] * K.step, gy + v[1] * K.step * .5]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
   // 평소 칼 (10-25 새 그록 주인공 = 빈 손 그림): 공격이 아닐 때 그 칸의 손(H8.grip)에서 grip 각도로 코드 칼. grip 없는 칸(맞기·대시 등)은 안 그림.
   function carryGrip() { if (hero.atk || hero.hp <= 0) return null; const G = h128(), H = G && G.H8, c = h128Cell(); if (!H || !H.grip || !c || c.h8 === undefined) return null;
-    const g = H.grip[c.h8 + ':' + H.cells[c.h8].indexOf(c)]; if (!g) return null; const fl = !!c.fl, d = (fl ? 180 - g[2] : g[2]) * Math.PI / 180; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1], Math.cos(d), Math.sin(d)]; }
+    const g = H.grip[c.h8 + ':' + c.ci]; if (!g) return null; const fl = !!c.fl, d = (fl ? 180 - g[2] : g[2]) * Math.PI / 180; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1], Math.cos(d), Math.sin(d)]; }
   function carryBlade(ctx, cg) { const [gx, gy, ux, uy] = cg, L = 21 * 117 / H128FIG; ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
     seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); } // heroBlade 와 같은 칼 모양·길이
   function gkDraw(k) { const cg = carryGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
