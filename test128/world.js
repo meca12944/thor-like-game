@@ -1551,6 +1551,7 @@
     h.popL = L; h.popF = fl; h.popTg = tg; return Math.abs(h.pop) < .5 ? 0 : h.pop; }
   // 콤보 1~3타 빈 손 공격 그림의 틱 (모션 긴급회의·회의 2차 10-25 「치는 칸 = 1·2타 8틱 / 3타 11틱, 합 30/30/45」, handoff/claude/hero_fix2/SLASH_DESIGN_ko.md): [그림 장 번호 (-1 = 서기), 틱]. 치는 장은 판정이 열리는 틱(GK_FAN t0)에 시작.
   const ATK_SEQ = [[[0, 4], [1, 4], [2, 8], [3, 7], [-1, 7]], [[0, 8], [1, 8], [1, 7], [-1, 7]], [[0, 11], [1, 10], [1, 12], [-1, 12]]]; // 모션 설계표(회의 2차) 예고·치기·따라·복귀 [8,8,7,7] / [11,10,12,12], 보이는 장 최소 3틱
+  const atkArt = () => { const G = h128(), H = G && G.H8, L = H && H.anims && H.anims.hit1_right; return !!(L && bareSheet(H, L[0][0])); }; // 빈 손 공격 그림을 쓰는 중
   const bareSheet = (H, i) => !!(H && H.bare && H.bare.includes(i)); // H8.bare = 칼이 그림에 없는 시트 (새 그록 주인공): 공격 내내 코드 칼
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h8Turn(h, h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down'));
     // same choice as the town (index.html heroCell8, owner 10-23 "합본"): facing up/down -> the front / back art (diagonals too, mirrored when heading left), else the side art
@@ -1807,14 +1808,14 @@
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
     // [모션연구방 10-24] 1→2→3타 점점 세게 (KICK3, 3타 약 2배). 몸이 앞으로 튀어 나가는 순간(rel) = 몸 중심 부채꼴 판정이 열리는 틱(GK_FAN t0: 1·2타 3틱, 3타 4틱)
     // 3타 = 내려베기: 들어 올림(키 늘고 뒤로 젖힘) → 판정 열리고 1틱 더 머리 위 → 내려꽂으며 납작(찌그러짐 최대 t0+2.5 = 칼이 앞에 닿는 틱) + 앞으로 크게 기울고 내딛기
-    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0;
+    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0, sm = a.i <= 2 && atkArt() ? 0 : 1; // sm: 공격 그림이 내딛는 동안 코드 내딛기 0 (회의 2차, 겹침 방지)
     if (u < rel) { const q = Math.min(1, (u + 1 / 60) / Math.max(rel, 1e-3)), e = 1 - (1 - q) * (1 - q); return big ? /* 누른 틱부터 바로 예비 자세 (보고서 5장 f0 「즉시」: 빠르게 들어가 천천히 멈춤) */ { lean: -4 * R * e, step: 0, sq: 1 + .05 * e } : { lean: -3 * R * e, step: 0, sq: 1 - Math.min(.08, .04 * R) * e }; }
     const t = u - rel, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), spr = t => Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
     if (big) { const x = t * 60, hold = .5 / 60, L0 = 9 * R; // 머리 위 1틱 더 → 내려꽂기 (틱 표: 칼이 앞에 닿는 틱 = t0+1 에 몸도 내려꽂기 시작)
       const lean = t < hold ? -4 * R : L0 * spr(t - hold), sq = 1 + .05 * Math.max(0, 1 - x / 3) - .11 * Math.exp(-(((x - 2.5) / 2) ** 2)), st = 5 * R * (1 - Math.exp(-Math.max(0, t - hold) * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35)));
-      return { lean, step: st, sq, t }; }
+      return { lean, step: st * sm, sq, t }; }
     const L0 = 6 * R, st = 1.5 * R * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
-    return { lean: L0 * spr(t), step: st, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40), t };
+    return { lean: L0 * spr(t), step: st * sm, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40), t };
   }
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
   // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
