@@ -11,7 +11,7 @@ def check(name, cond, info=None):
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=os.environ.get('PW_CHROME') or None); pg = b.new_page(viewport={'width': 1280, 'height': 720}); errs = []
     pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto(B + '?worldreset&nosave&noscene'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
+    pg.goto(B + '?worldreset&nosave&noscene&start=field00'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
     ev = pg.evaluate; adv = lambda s: ev(f'()=>__world.advance({s})')
     def settle():  # the map load is async (fetch): advance in separate evaluates so the promise can resolve
         for _ in range(80):
@@ -79,7 +79,7 @@ with sync_playwright() as p:
     ev("()=>__world.go('felt','default')"); settle(); adv(.2)
     ev("()=>{__world.killAll();__world.setHeroTile(2,70,'left')}")
     c1 = walk('ArrowLeft', 'field_felt'); pg.screenshot(path=O + '/10_felt_west_gate.png')
-    check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)
+    check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '재로 덮인 들' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)  # 바르트를 만나기 전(기억 없는 주인공, 사장님 10-25) = 보이는 대로 쓴 이름
     ev("()=>{__world.killAll();__world.setHeroTile(28,2,'up')}")
     ff = walk('ArrowUp', 'felt')
     check('ash field -> felt west gate', ff['map'] == 'felt' and ff['tr'] and abs(ff['t'][0] - 3) <= 2 and abs(ff['t'][1] - 70) <= 2, ff)
