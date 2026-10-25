@@ -16,13 +16,14 @@
   const WORLD_ZOOM = 0.5;          // overworld scale vs field (0.5 => 8px tiles, ~13px hero). Try 0.75 / 1.
   const LW = 384, LH = 216;        // logical screen (DQ6 SFC-like 16:9), integer-scaled to the window
   // ?pace=souls (주인 10-24 「너무 스피디, 2D 엘든링 느낌」 회의 시험판): 걷기 72 · 전력질주 1.5배 · 스태미나 · 제자리 베기(시작 5틱 더, 뒤 빈틈) · 회피대시 1.6키 · 가벼운 타 멈춤 1틱. 기본 게임은 그대로
-  const SOULS = /[?&]pace=souls/.test(location.search), SW8 = SOULS ? 5 : 0;
-  const STAM = { max: 100, hit: [14, 14, 20], dash: 18, charge: 20, dodge: 18, run: 10, regen: 45, delay: .5, exDelay: 1, exRegen: 30, exEnd: 30, floor: -20 }; // 엘든링·다크소울3 비율을 100으로 줄임 (구르기 ~16, 회복 ~45/초, 0.5초 쉼)
-  const HERO_SPEED = SOULS ? 72 : 82, WORLD_SPEED = 46;
-  const RUN = Object.assign({ mul: 1.9, startMul: 2.3, startT: 0.17, skidT: 0.2, dblTap: 0.25, cadence: .9 }, SOULS ? { mul: 1.5, startMul: 1.5, skidT: .28 } : {}); // run: 1.9x walk, no MP/stamina; anim cadence = speed x .9 (no foot sliding)
+  // ?pace=mid (사장님 10-25 「엘든링보다는 조금 빨라야지」): souls 와 기본 사이 — 걷기 76 · 질주 x1.7 · 가벼운 스태미나 · 베기 0.38/0.55초(시작 2틱 늦게) · 휘두르며 이동 30% · 회피대시 0.30초 42px
+  const PACE = (location.search.match(/[?&]pace=(souls|mid)/) || [])[1] || '', MID = PACE === 'mid', SOULS = !!PACE, SW8 = MID ? 2 : SOULS ? 5 : 0; // SOULS = 느린 페이스 켜짐 (souls 또는 mid)
+  const STAM = Object.assign({ max: 100, hit: [14, 14, 20], dash: 18, charge: 20, dodge: 18, run: 10, regen: 45, delay: .5, exDelay: 1, exRegen: 30, exEnd: 30, floor: -20 }, MID ? { hit: [10, 10, 15], dash: 14, charge: 15, dodge: 15, run: 6, regen: 55, delay: .4, exDelay: .8, exRegen: 40 } : {}); // 엘든링·다크소울3 비율을 100으로 줄임 (구르기 ~16, 회복 ~45/초, 0.5초 쉼)
+  const HERO_SPEED = MID ? 76 : SOULS ? 72 : 82, WORLD_SPEED = 46;
+  const RUN = Object.assign({ mul: 1.9, startMul: 2.3, startT: 0.17, skidT: 0.2, dblTap: 0.25, cadence: .9 }, MID ? { mul: 1.7, startMul: 1.7, skidT: .24 } : SOULS ? { mul: 1.5, startMul: 1.5, skidT: .28 } : {}); // run: 1.9x walk, no MP/stamina; anim cadence = speed x .9 (no foot sliding)
   // swing hitbox = forward sector (tile 16): sword 29px = 1.8 tiles, 150 deg; other weapons scale with the town range table (__game.swingRange)
   const SWING = { range: 29, arc: 150, arc3: 100, r3: 1.15 }; // hit 3 = finishing slash: 100 deg forward, reach x1.15 (longer swing timing ATK3 kept)
-  const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => { const D = (window.__game && window.__game.DODGE) || null; if (!D || !SOULS) return D; if (!DG.c || DG.c.src !== D) DG.c = { src: D, v: Object.assign({}, D, { durTicks: 20, iframeTicks: 13, cdTicks: 6, tiles: D.tiles * 1.35 }, D.travel ? { travel: D.travel * 1.35 } : {}, D.burstTicks ? { burstTicks: 16 } : {}) }; return DG.c.v; }; // souls: 0.33s, 무적 13틱, 쿨 6틱(스태미나가 대신), 거리 x1.35 // dodge dash config (ANIM.dodge); ROLL kept as fallback
+  const ROLL = { dur: 0.22, iframe: 0.18, speed: 250, cd: 0.4 }; const DG = () => { const D = (window.__game && window.__game.DODGE) || null; if (!D || !SOULS) return D; if (!DG.c || DG.c.src !== D) DG.c = { src: D, v: Object.assign({}, D, MID ? { durTicks: 18, iframeTicks: 11, cdTicks: 12, tiles: D.tiles * 1.17 } : { durTicks: 20, iframeTicks: 13, cdTicks: 6, tiles: D.tiles * 1.35 }, D.travel ? { travel: D.travel * (MID ? 1.17 : 1.35) } : {}, D.burstTicks ? { burstTicks: MID ? 15 : 16 } : {}) }; return DG.c.v; }; // souls: 0.33s, 무적 13틱, 쿨 6틱(스태미나가 대신), 거리 x1.35 // dodge dash config (ANIM.dodge); ROLL kept as fallback
   const EASE = { outCubic: p => 1 - (1 - p) ** 3, outQuad: p => 1 - (1 - p) ** 2, linear: p => p };
   const BUILD_V = (Date.parse(document.lastModified) || 0).toString(36); // deploy stamp (see index.html): new deploy -> new asset URLs
   const V = u => (window.__v ? __v(u) : u); // 지도·그림 주소에 배포 시각 붙이기 (index.html __v)
@@ -31,7 +32,7 @@
   // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
   const ATK_DMG = [10, 10, 20]; // [combat research] hit 3 14 -> 20 so the full combo out-damages hit-1 spam
-  const ATK_MOVE = SOULS ? 0 : 0.7; // [combat research] move speed kept while a basic swing plays (stick held)
+  const ATK_MOVE = MID ? 0.3 : SOULS ? 0 : 0.7; // [combat research] move speed kept while a basic swing plays (stick held)
   const POT = { heal: 30, cd: 4.0, heartPct: 5, heartDrop: 0.04 };
   // 심연의 힘 (주인 10-23, 벌칙 없는 역전 장치 · 가슴 속 사멸의 코어가 새어 나옴): 맞아서 체력이 25% 이하가 되면 8초 동안 공격·검기 x1.8, 45초마다 한 번
   const LAST_STAND = { hpPct: 0.25, dur: 8, cd: 20, atk: 1.8, flag: 'abyss_awake' }; // cd: 초필살기를 아직 안 썼으면 20초 뒤 다시 켜질 수 있음 (쓰고 나면 쉼터에서 쉴 때까지 끝) // 중반 해금: 5장 보스 발바도스를 베면 flag (폭주의 기억). 시험용 ?abyss=1
@@ -45,8 +46,8 @@
   function token(m, ranged) { if (m.D.boss || m.D.champion) return true; const now = S.t, d = DIFF(); S.tokens = (S.tokens || []).filter(t => t.until > now && !t.m.dead);
     if (S.tokens.some(t => t.m === m)) return true; const lim = ranged ? 1 : (d.tokens || 2); if (S.tokens.filter(t => !!t.r === !!ranged).length >= lim) return false;
     S.tokens.push({ m, r: !!ranged, until: now + 1.2 + 0.6 }); return true; }
-  const ATK = SOULS ? { dur: 0.50, a0: 0.05 + SW8 / 60, a1: 0.16 + SW8 / 60, chain: 0.40, reach: 15, r: 13 } : { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
-  const ATK3 = Object.assign({}, ATK, SOULS ? { dur: 0.75, a0: 0.07 + SW8 / 60, a1: 0.24 + SW8 / 60 } : { dur: 0.413, a0: 0.103, a1: 0.273 }); // hit 3: longer active window + follow-through; 모션연구방 10-24 「탁, 타탁」: 3타만 예비동작 +2틱 (GK_FAN 3타 t0 6)
+  const ATK = SOULS ? { dur: MID ? 0.38 : 0.50, a0: 0.05 + SW8 / 60, a1: 0.16 + SW8 / 60, chain: MID ? 0.36 : 0.40, reach: 15, r: 13 } : { dur: 0.26, a0: 0.05, a1: 0.16, chain: 0.32, reach: 15, r: 13 };
+  const ATK3 = Object.assign({}, ATK, SOULS ? { dur: MID ? 0.55 : 0.75, a0: 0.103 + SW8 / 60, a1: 0.273 + SW8 / 60 } : { dur: 0.413, a0: 0.103, a1: 0.273 }); // hit 3: longer active window + follow-through; 모션연구방 10-24 「탁, 타탁」: 3타만 예비동작 +2틱 (GK_FAN 3타 t0 6)
   const atkT = i => i >= 3 ? atkTS(i) : i === 2 ? ATK3 : ATK;
   // dash attack (run + attack, i 3) / charge attack lv1 / lv2 (hold attack, i 4 / 5): same data as the town (__game.ANIM.special), town px x .3, ticks / 60
   const SPW_DEF = { dash: { dur: 26, a0: 4, a1: 12, lunge: 90, rangeMul: 1, arc: 100, dmgMul: 1.3, cool: .3 }, charge: { t1: .6, t2: 1.2, moveMul: .4,
@@ -867,11 +868,11 @@
         else { addFx('dust', hero.x - 5, hero.y, { life: .3 }); addFx('dust', hero.x + 5, hero.y, { life: .3 }); } }
       if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     const dashP = takePress('dash'); if (SOULS) { if (dashP) hero.dashBuf = .2; hero.dashBuf = Math.max(0, (hero.dashBuf || 0) - dt); } // souls: 회피 누름 0.2초 보관
-    if ((SOULS ? hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() : dashP) && !hero.roll && hero.rollCd <= 0) { if (SOULS) { hero.dashBuf = 0; stSpend(STAM.dodge); } let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
+    if ((SOULS ? hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + (MID ? .04 : .06)) && stOk() : dashP) && !hero.roll && hero.rollCd <= 0) { if (SOULS) { hero.dashBuf = 0; stSpend(STAM.dodge); } let dx = ix, dy = iy; if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
-    if (takePress('attack')) hero.atkBuf = SOULS ? .25 : .18;
-    if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1 + (SOULS ? .1 : 0)) && (!SOULS || stOk())) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
+    if (takePress('attack')) hero.atkBuf = MID ? .22 : SOULS ? .25 : .18;
+    if (hero.atkBuf > 0 && !hero.roll && !(hero.atkCd > 0) && (!hero.atk || hero.atk.t > atkT(hero.atk.i).a1 + (MID ? .04 : SOULS ? .1 : 0)) && (!SOULS || stOk())) { hero.atkBuf = 0; hero.holdT = 0; hero.holdOk = true; hero.charge = null; const prevAtk = hero.atk; // running + attack = 돌진베기
       if (hero.run && hero.moving && !hero.atk) { hero.atk = { t: 0, hit: new Set(), i: 3 }; addFx('dust', hero.x, hero.y, { life: .35 }); sfx('swing_heavy', .8); } else { hero.combo = prevAtk && prevAtk.i < 2 ? prevAtk.i + 1 : (hero.comboT > 0 && hero.combo < 2) ? hero.combo + 1 : 0; hero.atk = { t: 0, hit: new Set(), i: hero.combo, runSlash: !!(hero.run && hero.moving) }; /* [combat research] a press during the swing continues the combo (was: back to hit 1) */ sfx(hero.combo === 2 ? 'swing_heavy' : 'swing_light', .7); if (hero.atk.runSlash) addFx('dust', hero.x, hero.y, { life: .3 }); if (ix || iy) { setFace(ix, iy); aimAssist(hero.combo, AIM_HELD); } else aimAssist(hero.combo); } }
     if (!(S.heroStopT > 0)) hero.atkBuf = Math.max(0, (hero.atkBuf || 0) - dt); // 멈춘 동안 누른 공격은 그대로 기억
     if (SOULS && hero.atk && !hero.atk.paid) { hero.atk.paid = true; stSpend(hero.atk.i === 3 ? STAM.dash : hero.atk.i > 3 ? STAM.charge : STAM.hit[hero.atk.i]); }
