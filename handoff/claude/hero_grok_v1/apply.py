@@ -19,7 +19,10 @@ for n,v in NEW['anims'].items(): H['anims'][n]=[[e[0]+base,e[1],e[2]] for e in v
 idle=H['anims']['idle_right'][0]
 for n,v in H['anims'].items():
     if n.startswith('cast_'): H['anims'][n]=[[idle[0],idle[1]]+e[2:] for e in v]   # 마법진(fx) 층은 그대로, 몸만 새 주인공
-H['figH']=NEW['figH'];H['jumpPh'].update(NEW['jumpPh']);H['grip']={};H['gaitMul']={}
+H['figH']=NEW['figH'];H['jumpPh'].update(NEW['jumpPh']);H['grip']={}
+# 걷기 보폭(팀장 10-25 ②): 새 그림 옆 걷기·달리기 한 바퀴에 땅 디딘 발이 뒤로 간 거리(slip8 방식, 144) 걷기 120·달리기 143 art px → 한 바퀴 거리 = cyc×(32/84 | 46/119)×144/34 가 같게
+# ↘는 같은 바퀴에 발이 덜 감(걷기 85·달리기 119) → 그 그림만 다리 빠르게(gaitMul = 옆/↘). 정면·뒷면은 제자리걸음(탑다운 흔함)이라 그대로
+H['gait']={'walkCyc':74.4,'runCyc':87.3};H['gaitMul']={'walk_dr':1.41,'run_dr':1.2}
 gp=f'{R}/grip.json'
 if os.path.exists(gp):   # 검흔 담당 grip(새 칸 기준 "시트:칸") → 번호 옮김
     for kk,vv in json.load(open(gp)).items(): s,c=kk.split(':');H['grip'][f'{int(s)+base}:{c}']=vv
