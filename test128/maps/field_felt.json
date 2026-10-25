@@ -162,7 +162,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 47,
    "y": 9,
    "respawn": 30
@@ -197,7 +197,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 7,
    "y": 23,
    "respawn": 30
@@ -225,7 +225,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 15,
    "y": 11,
    "respawn": 30

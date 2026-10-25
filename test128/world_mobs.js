@@ -350,6 +350,13 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 실패 거미 (그록 10-25 「1장 마물」 06, handoff/claude/ch1_mobs_v1/06_spider): 뛰어들기 역할(교본 1-9). 걷기 = PixelLab 8장, 폴짝 = 그록 서기 → 웅크림 → 공중(높이 air는 코드) → 웅크림 착지(map).
+    c1_spool_spider: felt({ name: '실패 거미', style: 'skirm', col: '#8c8478', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 45, h: 22, r: 7, sp: 30,
+      melee: { range: 20, rad: 12, dmg: 5 },
+      shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } },
+        { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
+      anim: { src: 'assets/mobs_felt/c1_spool_spider', F: 57.7, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 10, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 8, 4], hit: 7, air: 12, map: [0, 1, 1, 2, 2, 2, 2, 1, 0, 0] },
+        shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4, map: [0, 1, 1, 1, 0, 0, 0, 0, 0] } } }),
     // 누빔 멧돼지 (그록 10-25 「1장 마물」 01, handoff/claude/ch1_mobs_v1/01_boar): 돌진 역할(교본 1-9 #1). 걷기 = PixelLab 8장, 공격 = 그록 자세 서기 → 웅크림 → 돌진(map). 총알 없음(돌진만).
     c1_quilted_boar: felt({ name: '누빔 멧돼지', style: 'lunge', col: '#a49c8c', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 60, h: 26, r: 9, sp: 34,
       melee: { range: 28, rad: 15, dmg: 6 }, shots: [], cdLunge: 3, // 돌진 사이 약 0.75초 맴돎 (총알이 없어 쉬지 않고 돌진하던 것) + 가까우면 엄니 들이받기(melee 원)
@@ -515,7 +522,7 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge

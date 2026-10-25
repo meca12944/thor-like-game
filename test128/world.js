@@ -1925,6 +1925,7 @@
       if (mm.hitT > .18) { const e = .3 - mm.hitT, hk = mm.hitK || 1, q = e < .034 ? 1 : Math.max(0, 1 - (e - .034) / .086); bx *= 1 + .2 * hk * q; by *= 1 - .17 * hk * q; } // squash: full for 2 ticks, eases back by 0.12 s (finisher x1.5)
       if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
+      if (mm.st === 'leap' && A.attack && A.attack.air && mm.t < mm.warn) { const q3 = Math.min(1, mm.t / mm.warn), e3 = q3 * q3 * (3 - 2 * q3); if (e3 > .04) { oy -= Math.sin(Math.PI * e3) * A.attack.air * k; bx = .96; by = 1.06; } } // 실패 거미: 폴짝 높이(코드), 공중에선 웅크림 대신 살짝 늘림
       if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
       const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0) + stopJit(mm), mm.y);
       if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry

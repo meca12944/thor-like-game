@@ -387,7 +387,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 6,
    "y": 19,
    "respawn": 0
@@ -401,7 +401,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 41,
    "y": 20,
    "respawn": 0
@@ -415,14 +415,14 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 30,
    "y": 20,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 10,
    "y": 37,
    "respawn": 0
@@ -436,7 +436,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 14,
    "y": 44,
    "respawn": 0
@@ -457,7 +457,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 14,
    "y": 51,
    "respawn": 0
