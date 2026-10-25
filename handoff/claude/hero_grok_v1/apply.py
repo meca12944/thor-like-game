@@ -25,7 +25,10 @@ H['figH']=NEW['figH'];H['jumpPh'].update(NEW['jumpPh']);H['grip']={}
 H['gait']={'walkCyc':74.4,'runCyc':87.3};H['gaitMul']={'walk_dr':1.41,'run_dr':1.2}
 gp=f'{R}/grip.json'
 if os.path.exists(gp):   # 검흔 담당 grip(새 칸 기준 "시트:칸") → 번호 옮김
-    for kk,vv in json.load(open(gp)).items(): s,c=kk.split(':');H['grip'][f'{int(s)+base}:{c}']=vv
+    for kk,vv in json.load(open(gp)).items():
+        if ':' in kk: s,c=kk.split(':');H['grip'][f'{int(s)+base}:{c}']=vv
+        elif kk in NEW['anims']:   # 동작 이름 형식 {"walk_right":[[dx,dy,deg]×장수]} (검흔 담당) → 그 장의 칸 번호로
+            for e,g in zip(NEW['anims'][kk],vv): H['grip'][f"{e[0]+base}:{e[1]}"]=g
 H['_grok_note']='10-25 새 그록 주인공(handoff/claude/hero_grok_v1): 걷기·달리기·서기 5방향, 회피대시·점프 4방향, 맞기 3방향, 사망·달리기 점프 옆, 공격 3방향(사이 장). 옛 칸은 시트 0~%d에 그대로(되돌리기 쉬움).'%(base-1)
 html=html[:j]+json.dumps(H,ensure_ascii=False,separators=(',',':'))+html[k+1:];open(p,'w',encoding='utf-8').write(html)
 w=f'{REPO}/test128/world.js';s=open(w,encoding='utf-8').read();n0=s.count('117')
