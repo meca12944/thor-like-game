@@ -155,12 +155,16 @@
         for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
     return c; }
   // 잿가루 바람 + 먼 안개 띠 (경관 회의 10-24, 효과 담당): 그림에 굽지 않고 코드로, 화면 좌표만 계산 (저장·화소 계산 없음).
-  // 바람 = m.wind [x, y] px/초 (없으면 [9, 0]) + 느린 돌풍. 개수 = 화면 넓이에 비례 (전망 줌으로 물러나도 밀도 그대로), m.ash 로 구역마다 조절 (기본 46 = 줌 1 기준).
+  // 바람 = m.wind [x, y] px/초 (없으면 [9, 0]) + 느린 돌풍. 개수 = 화면 넓이에 비례 (전망 줌으로 물러나도 밀도 그대로), m.ash 로 구역마다 조절 (기본 46 = 줌 1 기준). 두 겹: 먼 작은 재 + 가까운 큰 재(22 %, 시차 1.35).
   function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; const wd = m.wind || ASH_WIND, gust = 1 + .6 * Math.sin(S.t * .35) * Math.sin(S.t * .13 + 1), wx = wd[0] * gust, wy = wd[1] * gust;
-    const n = Math.min(160, Math.round((m.ash || 46) * EW * EH / (LW * LH))), W = EW + 8, H = EH + 8;
+    const n = Math.min(260, Math.round((m.ash || 46) * EW * EH / (LW * LH))), W = EW + 8, H = EH + 8; // PC (사장님 10-25 「PC용 게임」): cap 160 → 260
     for (let i = 0; i < n; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
       const x = ((Math.abs(h1) * W + Math.sin(S.t * .6 + i) * 6 + S.t * wx * (.7 + Math.abs(h2) * .6)) % W + W) % W - 4, y = ((Math.abs(h2) * H + S.t * (sp + wy)) % H + H) % H - 4;
-      g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), Math.abs(wx) > 14 && i % 3 === 0 ? 2 : 1, 1); } } // strong wind: some flakes streak 2 px
+      g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), Math.abs(wx) > 14 && i % 3 === 0 ? 2 : 1, 1); } // strong wind: some flakes streak 2 px
+    const n2 = Math.round(n * .22), W2 = EW + 16, H2 = EH + 16; g.fillStyle = 'rgba(218,212,226,.5)'; // near layer (PC, 10-25): a few big soft flakes close to the eye — faster, 2 px, and they slide 35 % more than the ground when the camera moves = depth
+    for (let i = 0; i < n2; i++) { const h1 = Math.sin(i * 39.346) * 43758.5453 % 1, h2 = Math.sin(i * 11.135) * 23421.631 % 1, sp = 16 + Math.abs(h2) * 14;
+      const x = ((Math.abs(h1) * W2 + Math.sin(S.t * .9 + i) * 10 + S.t * wx * 1.8 - cx * 1.35) % W2 + W2) % W2 - 8, y = ((Math.abs(h2) * H2 + S.t * (sp + wy * 1.5) - cy * 1.35) % H2 + H2) % H2 - 8;
+      g.fillRect(Math.round(cx + x), Math.round(cy + y), 2, 2); } }
   const ASH_WIND = [9, 0];
   // 먼 안개 띠: 화면 위쪽(= 북쪽 먼 곳) 38%에 아래로 옅어지는 안개 한 장. 그라데이션은 1x64 캔버스에 한 번만 그리고 drawImage 로 늘림 (한 장면 drawImage 1번).
   // 전망 줌으로 물러나면(S.vz < 1) 진해져서 깊이가 산다. m.fog = 진하기 (기본 .32), 밖(던전·m.dark)은 안 그림.
