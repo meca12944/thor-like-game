@@ -1549,6 +1549,9 @@
   function h8Pop(h, c, L, fl) { const hx = h8HeadX(c), now = S.t; if (hx == null) return h.pop || 0; const tg = fl ? -hx : hx, dt = Math.min(.1, Math.max(0, now - (h.popT ?? now))); h.popT = now;
     h.pop = (h.pop || 0) * Math.exp(-dt / POP_TAU); if (h.popL && (h.popL !== L || h.popF !== fl) && !(S.deadT > 0)) h.pop = Math.max(-60, Math.min(60, h.pop + h.popTg - tg));
     h.popL = L; h.popF = fl; h.popTg = tg; return Math.abs(h.pop) < .5 ? 0 : h.pop; }
+  // 콤보 1~3타 빈 손 공격 그림의 틱 (모션 긴급회의·회의 2차 10-25 「치는 칸 = 1·2타 8틱 / 3타 11틱, 합 30/30/45」, handoff/claude/hero_fix2/SLASH_DESIGN_ko.md): [그림 장 번호 (-1 = 서기), 틱]. 치는 장은 판정이 열리는 틱(GK_FAN t0)에 시작.
+  const ATK_SEQ = [[[0, 4], [1, 4], [2, 8], [3, 7], [-1, 7]], [[0, 8], [1, 8], [1, 7], [-1, 7]], [[0, 11], [1, 10], [1, 12], [-1, 12]]]; // 모션 설계표(회의 2차) 예고·치기·따라·복귀 [8,8,7,7] / [11,10,12,12], 보이는 장 최소 3틱
+  const bareSheet = (H, i) => !!(H && H.bare && H.bare.includes(i)); // H8.bare = 칼이 그림에 없는 시트 (새 그록 주인공): 공격 내내 코드 칼
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h8Turn(h, h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down'));
     // same choice as the town (index.html heroCell8, owner 10-23 "합본"): facing up/down -> the front / back art (diagonals too, mirrored when heading left), else the side art
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
@@ -1560,6 +1563,8 @@
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
+    else if (h.atk && h.atk.i <= 2 && bareSheet(H, (A(h.atk.i === 2 ? 'hit3' : h.atk.i === 1 ? 'hit2' : 'hit1') || [[]])[0][0])) { const L = LL, Q = ATK_SEQ[h.atk.i]; let tk = h.atk.t * 60, j = 0; for (; j < Q.length - 1 && tk >= Q[j][1]; j++) tk -= Q[j][1]; // 빈 손 그록 공격 그림(긴급회의 10-25): 그림 장 수 그대로, 시간만 검기에 맞춤 (치는 장 = 판정 열리는 틱)
+      e = Q[j][0] < 0 ? A('idle')[0] : L[Math.min(L.length - 1, Q[j][0])]; }
     else if (h.atk && (SLASH_BODY || (ATK_BODY && h.atk.i <= 2))) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
@@ -1742,7 +1747,7 @@
   function nsSrc(i) { const H = h128() && h128().H8; return H && H.nsSheets && H.nsSheets[i] || null; }
   function nsPreload() { const H = h128() && h128().H8; if (H && H.nsSheets && !nsPreload.done) { nsPreload.done = 1; for (const i in H.nsSheets) nsImg(+i); } } // 첫 공격에 그림이 덜 와서 그림 칼이 보이던 것 막기
   function nsImg(i) { const src = nsSrc(i); if (!src) return null; let im = NS_IMG[i]; if (!im) { im = NS_IMG[i] = new Image(); im.src = V('assets/' + src); } return im.complete && im.naturalWidth ? im : null; }
-  function swordC() { nsPreload(); const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && nsSrc(c.h8)); }
+  function swordC() { nsPreload(); const c = h128() && h128Cell(); return !!(c && c.h8 !== undefined && (nsSrc(c.h8) || bareSheet(h128().H8, c.h8))); }
   // [모션연구방 10-24, 사장님 「칼이 안사라지는데?」] 콤보 1~3타는 공격하는 동안 내내 그림 칼을 숨기고 코드 칼(heroBlade)이 부채꼴 각도를 따라감 (전에는 검기 4.5틱만 숨겨서 나머지 동안 그림 칼이 보였음)
   const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && !ATK_BODY && hero.hp > 0);
   let _swIn = false; // h8Cell(달리기 ↗↖ + 공격) -> swordHidden -> swordC -> h128Cell -> h8Cell ... 끝없는 되부름(Maximum call stack, 챔피언전 멈춤 원인) 막기: 안쪽 호출은 '안 숨김'으로 보고 그때의 칸(run)을 검사
@@ -1754,6 +1759,9 @@
     if (tk < F.t0) { const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + c.ci] : null;
       if (g0) { const q = tk / F.t0, e = q * q * (3 - 2 * q), d = (c.fl ? 180 - g0[2] : g0[2]) * Math.PI / 180, L = Math.hypot(ex - gx, ey - gy); ex = gx + (Math.cos(d) * L) * (1 - e) + (ex - gx) * e; ey = gy + (Math.sin(d) * L) * (1 - e) + (ey - gy) * e; } }
     const L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
+    { const B = a._bh || (a._bh = []); if (!B.length || B[B.length - 1][4] !== tk) B.push([gx, gy, ex, ey, tk]); if (B.length > 4) B.shift(); // 휘두르는 칼 잔상 (긴급회의 10-25 ③): 휘두르는 틱 동안 지난 칼 자리들 사이를 옅은 띠로 메움 = 그림에 없는 중간 동작
+      if (tk >= F.t0 && tk <= F.t1 + 2) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (let k = B.length - 2; k >= 0; k--) { const P = B[k], N = B[k + 1], al = .32 * (k + 1) / B.length; ctx.fillStyle = `rgba(150,220,235,${al.toFixed(3)})`;
+        ctx.beginPath(); ctx.moveTo(P[0], P[1]); ctx.lineTo(P[2], P[3]); ctx.lineTo(N[2], N[3]); ctx.lineTo(N[0], N[1]); ctx.closePath(); ctx.fill(); } ctx.restore(); } }
     ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
     seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); }
   function gkGrip(dir) { const G = h128(), H = G && G.H8, c = h128Cell(); if (H && H.grip && c && c.h8 !== undefined) { const g = H.grip[c.h8 + ':' + c.ci]; if (g) { const fl = !!c.fl; return gripKick((fl ? -g[0] : g[0]) + (c.ox || 0), g[1]); } }
