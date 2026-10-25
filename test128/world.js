@@ -28,7 +28,7 @@
   const EASE = { outCubic: p => 1 - (1 - p) ** 3, outQuad: p => 1 - (1 - p) ** 2, linear: p => p };
   const BUILD_V = (Date.parse(document.lastModified) || 0).toString(36); // deploy stamp (see index.html): new deploy -> new asset URLs
   const V = u => (window.__v ? __v(u) : u); // 지도·그림 주소에 배포 시각 붙이기 (index.html __v)
-  function fieldDash(D) { return D.travel ? D.travel * 1.5 / 124 * H128FIG : D.tiles * 16 * .68; } // town: travel (=150 logical px / LSC 1.5) for a 124 px figure -> same ratio for the 30 px field figure (36 px, 1.21 hero-heights)
+  function fieldDash(D) { return D.travel ? D.travel * 1.5 / 124 * H128FIG : D.tiles * 16 * .68; } /* H128FIG 34 = 거리 단위(밸런스) — 화면 키 42와 다름, 그대로 */ // town: travel (=150 logical px / LSC 1.5) for a 124 px figure -> same ratio for the 30 px field figure (36 px, 1.21 hero-heights)
   function rollDur() { const D = DG(); return D ? D.durTicks / 60 : ROLL.dur; }
   // [balance] levels.json roll.base: 0.18s i-frames in a 0.22s roll, 0.40s cooldown (speed raised so the roll still covers ~40px)
   // [balance] numeric HP (hero 50), hero combo 10/10/14, difficulty multipliers from the town template (window.__game.diff = levels.json difficulty.levels[])
@@ -550,10 +550,10 @@
       for (const [e0, e1] of [[ex0 - 2, ex0 + ew], [ex1 + 2, ex1 - ew]]) { if (Math.max(e0, e1) < 0 || Math.min(e0, e1) > W_) continue; const gr = ctx.createLinearGradient(e0, 0, e1, 0); gr.addColorStop(0, b.sky); gr.addColorStop(1, b.sky + '00'); ctx.fillStyle = gr; ctx.fillRect(Math.min(e0, e1), 0, Math.abs(e1 - e0), Hc); }
       ctx.fillStyle = b.sky; if (ex0 > 0) ctx.fillRect(0, 0, ex0 - 1, Hc); if (ex1 < W_) ctx.fillRect(ex1 + 1, 0, W_ - ex1, Hc); }
     ctx.restore(); ctx.imageSmoothingEnabled = false; }
-  // 앞 가림 (지도 회의 10-25, 키 큰 새 주인공): 주인공 몸 상자(발 ±9, 키 H128FIG)가 앞 그림(나무·지붕·소품) 상자에 20 % 넘게 덮이면 그 그림을 반투명 (.45).
+  // 앞 가림 (지도 회의 10-25, 키 큰 새 주인공): 주인공 몸 상자(발 ±9, 키 HERO_H 42)가 앞 그림(나무·지붕·소품) 상자에 20 % 넘게 덮이면 그 그림을 반투명 (.45).
   // 예전엔 발 한 점만 봐서 머리·어깨가 가려도 안 비쳤고, props 는 q.fade 를 단 것만 됐음 → 키 28 field px 넘는 그림은 모두.
-  function occl(wl, wt, wr, fy) { if (hero.y >= fy) return false; const x0 = hero.x - 9, x1 = hero.x + 9, y0 = hero.y - H128FIG, ox = Math.min(x1, wr) - Math.max(x0, wl), oy = Math.min(hero.y, fy) - Math.max(y0, wt);
-    return ox > 0 && oy > 0 && ox * oy > .2 * 18 * H128FIG; }
+  function occl(wl, wt, wr, fy) { if (hero.y >= fy) return false; const x0 = hero.x - 9, x1 = hero.x + 9, y0 = hero.y - HERO_H, ox = Math.min(x1, wr) - Math.max(x0, wl), oy = Math.min(hero.y, fy) - Math.max(y0, wt);
+    return ox > 0 && oy > 0 && ox * oy > .2 * 18 * HERO_H; }
   const OCC_A = .45;
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under || (q.hideFlag && SAVE.flags[q.hideFlag])) continue; // hideFlag: gone once the flag is set (무명 무덤가: 베어 낸 가시덤불, 집어 든 등불)
@@ -789,18 +789,18 @@
   }
   function lastStandOn() { return !!(S.lastStand && S.lastStand.t > 0); }
   function checkLastStand() { const L = S.lastStand || (S.lastStand = { t: 0, cd: 0 }); if (!(SAVE.flags[LAST_STAND.flag] || Q.has('abyss')) || S.abyssSpent || L.t > 0 || L.cd > 0 || hero.hp <= 0 || hero.hp > hero.maxHp * LAST_STAND.hpPct) return;
-    L.t = LAST_STAND.dur; banner('가슴의 문양이 깨어난다 — 심연의 힘', 2.2); shake(3); addFx('text', hero.x, hero.y - 34, { text: '심연의 힘', life: 1, color: '#c9a0ff' }); }
+    L.t = LAST_STAND.dur; banner('가슴의 문양이 깨어난다 — 심연의 힘', 2.2); shake(3); addFx('text', hero.x, hero.y - HERO_H - 2, { text: '심연의 힘', life: 1, color: '#c9a0ff' }); }
   function stepLastStand(dt) { const L = S.lastStand; if (!L) return; if (L.t > 0) { L.t -= dt; if (L.t <= 0) L.cd = LAST_STAND.cd; } else if (L.cd > 0) L.cd -= dt; }
   function hurt(dmg, src, raw) {
     if (S.scene === 'world' || hero.hp <= 0 || S.deadT > 0) return false;
     if (W_API.god || S.ultFx) return false; // invulnerable during the 필살기
     if (hero.roll && hero.roll.t < iframe()) { const just = !hero.roll.just && hero.roll.t < (DIFF().perfect_ticks || 7) / 60; // 저스트 회피 = 회피대시 시작 perfect_ticks 안 (보통 7틱) -> 필살기 게이지 크게
       if (just) { const ow = src && (src.owner || (src.D ? src : null)); if (ow && ow.D && ow.D.felt) { ow.dazeT = .6; addFx('text', ow.x, ow.y - (ow.D.h || 20) - 8, { text: '?', life: .6, color: '#cfe6ff' }); } // the attacker is caught off guard
-        hero.roll.just = true; S.slowmo = .3; flash(.14, '170,230,255', .28); addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - 30, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - 30, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
+        hero.roll.just = true; S.slowmo = .3; flash(.14, '170,230,255', .28); addFx('justring', hero.x, hero.y - 12, { life: .4 }); ultAdd('gainPerfect', 1); if (lastStandOn() && !S.abyssSpent) { S.slowmo = 0; castAbyss(); return false; } addFx('text', hero.x, hero.y - HERO_H - 2, { text: '저스트 회피!', life: .7, color: '#ffe08a' }); } else if (hero.dodgeT <= 0) addFx('text', hero.x, hero.y - HERO_H - 2, { text: '회피!', life: .6, color: '#9ff' }); if (just) sfx('dodge', .6); hero.dodgeT = .3; return false; }
     if (hero.inv > 0) return false;
     if (!raw) dmg = Math.max(1, Math.round(dmg * DIFF().enemy_dmg)); hero.hp = Math.max(0, hero.hp - dmg); sfx('hurt', .9); hero.inv = 1.0; hero.charge = null; hero.holdOk = false; shake(3); hitStop(2 / 60, true); ultAdd('gainHit', 1);
     if (src && src.x !== undefined) { const a = Math.atan2(hero.y - src.y, hero.x - src.x); if (!hero.atk) setFace(-Math.cos(a), -Math.sin(a)); hero.kb = { x: Math.cos(a) * EXAG.hurt.kb, y: Math.sin(a) * EXAG.hurt.kb, n: 0 }; } // turn to the attacker (the recoil pose leans away from it) and slide ~8px over 7 ticks instead of a 1-tick teleport (motion lab 10-23)
-    addFx('text', hero.x, hero.y - 30, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
+    addFx('text', hero.x, hero.y - HERO_H - 2, { text: '-' + dmg, life: .7, color: '#ff6a5a' });
     syncTownHp(); checkLastStand();
     if (hero.hp <= 0) die();
     return true;
@@ -1032,7 +1032,7 @@
     if (at.length === 2 && at.every(v => v >= 0 && isFinite(v))) { hero.x = (at[0] + .5) * S.map.T; hero.y = (at[1] + .5) * S.map.T; hero.safe = [hero.x, hero.y]; snapCam(); } }
   function arenaTick(dt) { atTick(); if (!ARENA.length || !S.map || S.map.type === 'world') return;
     if (S.arenaMap !== S.map) { S.arenaMap = S.map; S.arenaT = .8; for (const o of (S.map.objects || [])) if (o.type === 'spawn') o.respawn = 0; for (const m of S.mobs) if (!m.D.boss) m.dead = true; }
-    if (TOUGH && hero.hp < 15) { hero.hp = hero.maxHp; addFx('text', hero.x, hero.y - 34, { text: '체력 회복 (시험장)', life: .8, color: '#9fffb0' }); }
+    if (TOUGH && hero.hp < 15) { hero.hp = hero.maxHp; addFx('text', hero.x, hero.y - HERO_H - 2, { text: '체력 회복 (시험장)', life: .8, color: '#9fffb0' }); }
     if (S.mobs.some(m => !m.dead && m.arena)) return;
     if ((S.arenaT -= dt) > 0) return; S.arenaT = 1.5;
     ARENA.forEach((k, i) => { let x = hero.x, y = hero.y; for (let t = 0; t < 12; t++) { const a = i * 2.4 + t * .7, r = 95 + t * 4; x = hero.x + Math.cos(a) * r; y = hero.y + Math.sin(a) * r * .8; if (!blocked(x, y, 6)) break; }
@@ -1106,12 +1106,12 @@
     if (hero.jump) { const J = hero.jump; J.t += dt; const ta = J.t - J.pre, p = Math.max(0, Math.min(1, ta / J.T)); J.air = ta > 0 && ta < J.T; hero.z = J.air ? 4 * p * (1 - p) * JUMP.h : 0;
       if (J.air) for (const c of codesOf('dash').concat(codesOf('attack'))) { const qi = queue.indexOf(c); if (qi >= 0) queue.splice(qi, 1); } // no dash / swing in the air (same as the town)
       if (ta >= J.T && !J.landed) { J.landed = true; const mm = M(), tx = Math.floor(hero.x / mm.T), ty = Math.floor(hero.y / mm.T);
-        if (mm.hopG && mm.hopG[ty * mm.w + tx]) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(3, null, true); hero.jump = null; hero.z = 0; } // landed in a gap / water: small hit, back to the last solid ground
+        if (mm.hopG && mm.hopG[ty * mm.w + tx]) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - HERO_H - 2, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(3, null, true); hero.jump = null; hero.z = 0; } // landed in a gap / water: small hit, back to the last solid ground
         else addFx('dust', hero.x, hero.y, { life: .36, n: EXAG.dustLand }); }
       if (hero.jump && J.landed && (ta >= J.T + J.land || hero.roll)) { hero.jump = null; hero.z = 0; } }
     const dashP = takePress('dash'); if (dashP) hero.dashBuf = .15; hero.dashBuf = Math.max(0, (hero.dashBuf || 0) - dt); // 회피 누름 0.15초 보관 (PC 키보드 기준, 사장님 10-25 「PC용 게임」)
     if (hero.dashBuf > 0 && (!hero.atk || hero.atk.t >= atkT(hero.atk.i).a1 + .06) && stOk() && !hero.roll && hero.rollCd <= 0) { hero.dashBuf = 0; stSpend(STAM.dodge); let dx = ix, dy = iy; if (S.dashDir) { [dx, dy] = S.dashDir; S.dashDir = null; setFace(dx, dy); } if (!dx && !dy) { const f8 = hero.f8 && hero.f8.includes(hero.face) ? hero.f8 : null, a = f8 ? DIR8.indexOf(f8) * Math.PI / 4 : null; [dx, dy] = a !== null ? [Math.cos(a), Math.sin(a)] : FACEV[hero.face]; } const L = Math.hypot(dx, dy);
-      if (hero.rootT > 0 || S.tether) { hero.rootT = 0; if (S.tether) S.tether.cut = true; addFx('text', hero.x, hero.y - 34, { text: '끊었다!', life: .6, color: '#ffd0a0' }); } // a dash always breaks a bind / tether (CC 공정성)
+      if (hero.rootT > 0 || S.tether) { hero.rootT = 0; if (S.tether) S.tether.cut = true; addFx('text', hero.x, hero.y - HERO_H - 2, { text: '끊었다!', life: .6, color: '#ffd0a0' }); } // a dash always breaks a bind / tether (CC 공정성)
       hero.roll = { t: 0, dx: dx / L, dy: dy / L, carry: hero.run ? HERO_SPEED * RUN.mul : 0 }; hero.atk = null; setFace(dx, dy); addFx('dust', hero.x, hero.y, { life: .35 }); sfx('roll', .8); }
     // [combat research 10-23] attack input buffer: a press is kept 0.18s, so a press during the swing / roll is not lost
     if (takePress('attack')) hero.atkBuf = .2; /* 공격 누름 0.2초 보관 (PC 기준, 휘두르는 중 미리 누른 다음 타) */
@@ -1180,8 +1180,8 @@
       if (o.type === 'door_locked' && !o.open && bump) tryDoor(o);
     }
     if (onSpike) hurt(1, { x: hero.x, y: hero.y + 10 });
-    if (onPit && onPit.soft) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: onPit.text || '발이 빠질 뻔했다', life: 1.1, color: '#e8dcc0' }); } // soft pit (tutorial crack): back to the edge, no damage
-    else if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - 30, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
+    if (onPit && onPit.soft) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - HERO_H - 2, { text: onPit.text || '발이 빠질 뻔했다', life: 1.1, color: '#e8dcc0' }); } // soft pit (tutorial crack): back to the edge, no damage
+    else if (onPit) { hero.x = hero.safe[0]; hero.y = hero.safe[1]; addFx('text', hero.x, hero.y - HERO_H - 2, { text: '추락!', life: .7, color: '#ffb0a0' }); hero.inv = 0; hurt(1); }
     else if (!onSpike && !hero.roll && !hero.jump && !trapAt(cx, cy) && Math.floor(S.t * 4) !== Math.floor((S.t - dt) * 4)) hero.safe = [hero.x, hero.y];
     if (m.steps) { const st = S.steps && S.steps.map === m.id ? S.steps : (S.steps = { map: m.id, l: [], lx: hero.x, ly: hero.y, s: 0 }); // 재 위 발자국 (map.steps): a print every 7 px walked, fades in ~7 s
       if (!hero.jump && Math.hypot(hero.x - st.lx, hero.y - st.ly) > 7) { st.s ^= 1; const v = FACEV[hero.face] || [0, 1]; st.l.push({ x: hero.x + (st.s ? 1 : -1) * 2.2 * Math.abs(v[1]), y: hero.y + 1 + (st.s ? 1 : -1) * 1.6 * Math.abs(v[0]), t: S.t, h: Math.abs(v[0]) > Math.abs(v[1]) }); st.lx = hero.x; st.ly = hero.y; if (st.l.length > 90) st.l.shift(); } }
@@ -1218,7 +1218,7 @@
     for (let i = S.shots.length - 1; i >= 0; i--) { const s = S.shots[i]; s.t += dt; if (s.home && s.t > (s.homeAfter || 0)) { const want = Math.atan2(hero.y - 8 - s.y, hero.x - s.x), cur = Math.atan2(s.vy, s.vx), d = Math.atan2(Math.sin(want - cur), Math.cos(want - cur)), na = cur + Math.max(-s.home * dt, Math.min(s.home * dt, d)), sp = Math.hypot(s.vx, s.vy); s.vx = Math.cos(na) * sp; s.vy = Math.sin(na) * sp; } s.x += s.vx * dt; s.y += s.vy * dt; // home = turn rate (rad/s): a slow orb that follows a little
       if (s.ret && !s.back && s.t > s.life / 2) { s.back = true; s.vx = -s.vx; s.vy = -s.vy; } // boomerang (felt puppet blades)
       if (Math.hypot(hero.x - s.x, hero.y - 8 - s.y) < s.r + 5 && hurt(s.dmg, s)) { if (s.pull && s.owner && !s.owner.dead) { const a = Math.atan2(s.owner.y - hero.y, s.owner.x - hero.x); moveCol(hero, Math.cos(a) * s.pull, Math.sin(a) * s.pull, 5); const H = s.owner.hist || (s.owner.hist = []); if (!(H[0] === 'melee' && H[1] === 'melee')) { s.owner.intent = 'melee'; s.owner.cd = Math.min(s.owner.cd || 0, .15); H.unshift('melee'); H.length = Math.min(H.length, 2); } } // thread yank -> follow-up claw
-        if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); if (s.root && hero.ccCd <= 0 && !S.tether) { hero.rootT = s.root; hero.ccCd = 2.5; addFx('text', hero.x, hero.y - 34, { text: '묶임! 회피대시로 끊기', life: .8, color: '#ff9a8a' }); } S.shots.splice(i, 1); continue; }
+        if (s.slow) hero.slowT = Math.max(hero.slowT, s.slow); if (s.root && hero.ccCd <= 0 && !S.tether) { hero.rootT = s.root; hero.ccCd = 2.5; addFx('text', hero.x, hero.y - HERO_H - 2, { text: '묶임! 회피대시로 끊기', life: .8, color: '#ff9a8a' }); } S.shots.splice(i, 1); continue; }
       if (s.t > s.life || solidAt(s.x, s.y + 6)) { if (s.zone) hazard({ shape: 'circle', x: s.x, y: s.y + 6, r: 12, warn: 0, act: 2, dmg: 0, kind: 'web', zone: true }); // slowing web patch
         addFx('spark', s.x, s.y, { life: .2 }); S.shots.splice(i, 1); } }
     for (let i = S.temp.length - 1; i >= 0; i--) if ((S.temp[i].life -= dt) <= 0) { const t = S.temp[i]; if (t.kind === 'thread') addFx('tsnap', t.x, t.y - 10, { life: .55, red: threadRed(), seed: (Math.random() * 2147483646 | 0) + 1 }); S.temp.splice(i, 1); }
@@ -1243,7 +1243,7 @@
     const deny = (word, k) => { Q.shake = k; Q.note = word; Q.noteT = word ? 1.1 : 0; sfx('deny', .5); };
     if (!n) return deny('물약 없음', 1); if (hero.hp >= hero.maxHp) return deny('체력 가득', .6); if (g.potionCd > 0) return deny('', .6);
     const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20);
-    addFx('text', hero.x, hero.y - 32, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
+    addFx('text', hero.x, hero.y - HERO_H - 2, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
   function feedAdd(name, n, col) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
   // 대화창 v2 (2번방 10-23, 1장 어두운 톤): pages ('\n\n' or 3 lines), typewriter DLG.cps with a soft blip, skip = show the page, choices [{t, f}] picked with up/down
   const DLG = { cps: 60, lines: 3, guard: .45 }; // 점검 10-24: 글자 38→60자/초, 닫힌 뒤 0.45초는 조사 키·Esc 무시 (같은 키로 바로 다시 열리던 것)
@@ -1386,7 +1386,7 @@
   function drawIntro(ox, oy, SW, SH) { const I = S.intro, d = introDark(); if (!I || I.ctl) return;
     if (d > 0) { ctx.fillStyle = `rgba(0,0,0,${d})`; ctx.fillRect(ox, oy, SW, SH); }
     const [c0, c1] = INTRO.core; if (I.t < c0 || I.t > c1) return; // 가슴의 코어가 푸르게 깜빡임 (코드로 그린 빛, 높이 = 주인공 키의 절반)
-    const k = (I.t - c0) / (c1 - c0), puls = .55 + .45 * Math.sin((I.t - c0) * 9), a = Math.min(1, k * 4, (1 - k) * 3) * puls, [sx, sy] = W2S(hero.x, hero.y - H128FIG * .5), r = SH * .05 * (1 + .4 * puls);
+    const k = (I.t - c0) / (c1 - c0), puls = .55 + .45 * Math.sin((I.t - c0) * 9), a = Math.min(1, k * 4, (1 - k) * 3) * puls, [sx, sy] = W2S(hero.x, hero.y - HERO_H * .5), r = SH * .05 * (1 + .4 * puls);
     const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3); gr.addColorStop(0, `rgba(180,230,255,${a})`); gr.addColorStop(.25, `rgba(80,170,255,${a * .7})`); gr.addColorStop(1, 'rgba(40,90,255,0)');
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + zoneZL(m, z)[0] * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
@@ -1528,7 +1528,10 @@
     if (h.roll && D && D.frames && D.frames.world) { const p = h.roll.t / rollDur(), ph = D.frames.world.find(f => p <= f.until); if (ph) fi = ph.frame; } return 'hero_' + d + '_' + fi; }
   function tickTrail(dt) { if (!S.trail) return; for (const a of S.trail) a.t += dt; S.trail = S.trail.filter(a => a.t < a.life); }
   // ---- test128: 128px hero drawn in the hi-res pass (fields/dungeons; the overworld map keeps the tiny sprite) ----
-  const H128FIG = 34; const ART_FIG = (window.H8 && H8.figH) || 117; // figure height in field px (tile 16): about the old hero's 28px
+  // 주인공 크기 (팀장·4번방 10-25): 전에는 ART_FIG = (window.H8 && H8.figH) || 117 이었는데 H8이 const라 window에 없어 늘 117로 떨어졌음(우연).
+  // 사장님이 계속 본 그 크기를 정식으로: 그림 1px = 34/117 필드px → 새 주인공(그림 키 144) 화면 키 = 144 × 34/117 ≈ **42 필드px**(타일 16의 2.6칸).
+  const H128FIG = 34, ART_FIG = 117; // 그림 px → 필드 px 배율 (H128FIG / ART_FIG). H128FIG = 배율 단위(옛 주인공 키), 몸 키가 아님
+  const HERO_H = 42; // 새 주인공 화면 키 (필드 px): 가림 상자·머리 위 글자 높이
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   // ---- 자연스러운 방향 전환 (모션연구방 10-23, 사장님 "누가 봐도 자연스러운 방향전환"): 그림 방향은 45°씩 돌아감(90° 이상 꺾으면 사이 방향을 0.04초씩 거침,
   // 뒤로 돌 때는 화면 쪽(↓)으로 돎) + 동작이 바뀌는 순간 머리가 순간이동하지 않게 그 차이를 0.06초에 걸쳐 풀어 줌(H8POP). 그림만 바뀌고 이동·공격 방향은 그대로.
@@ -1877,8 +1880,8 @@
     if (h.atk && h.atk.i <= 2 && !SLASH_BODY && SMEAR.on) { const F = GK_FAN[h.atk.i], tk = h.atk.t * 60 - F.t0, L = SMEAR.ticks[h.atk.i]; if (tk >= 0 && tk < L) { const q = 1 - tk / L, v = FACEV[h.face] || [1, 0], [fx, fy] = W2S(h.x + kx, h.y + ky - (h.z || 0)), st = 1 + SMEAR.stretch[h.atk.i] * q, mid = H128FIG * .45 * k; // 스미어 (주인공 회의 추천 1, 10-25): 치는 자세를 휘두름 방향으로 늘인 반투명 복사 1장, 그림 0 — 칠 때 0~L틱만
       ctx.save(); ctx.translate(fx, fy - (v[0] ? mid : 0)); if (v[0]) ctx.scale(st, 1); else ctx.scale(1, st); ctx.translate(-fx - v[0] * SMEAR.back * k * q, -(fy - (v[0] ? mid : 0)) - v[1] * SMEAR.back * k * q * .5); drawH128(h128Cell(), h.x + kx, h.y + ky - (h.z || 0), k, SMEAR.a * q, SMEAR.tint); ctx.restore(); } }
     if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; const gt = K.t != null ? K.t - 1 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
-    { const SM = EXAG.smear; if (h.atk && atkArt() && !SLASH_BODY) { const tk = h.atk.t * 60, hit = atkT(h.atk.i).a0 * 60; if (tk >= hit - SM.t && tk < hit) { const v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG, c = h128Cell(); // 스미어: 휘두르는 3틱 동안 몸이 앞으로 번져 보임 (그림 0)
-      for (let j = SM.n; j >= 1; j--) { const wx = h.x + kx + v[0] * SM.gap * j * f, wy = h.y + ky + v[1] * SM.gap * j * f * .5 - (h.z || 0), [sx, sy] = W2S(wx, wy); ctx.save(); ctx.translate(sx, sy); ctx.scale(v[0] ? 1 + SM.st : 1, v[1] ? 1 + SM.st * .6 : 1); ctx.translate(-sx, -sy); drawH128(c, wx, wy, k, SM.a * BA / j, null); ctx.restore(); } } } }
+    { const SM = EXAG.smear; if (h.atk && atkArt() && !SLASH_BODY && Q.get('smear') !== '0') { /* 비교용 ?smear=0 끔 · ?smeartint=1 청색 (팀장이 고른 뒤 지움) */ const tk = h.atk.t * 60, hit = atkT(h.atk.i).a0 * 60; if (tk >= hit - SM.t && tk < hit) { const v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG, c = h128Cell(); // 스미어: 휘두르는 3틱 동안 몸이 앞으로 번져 보임 (그림 0)
+      for (let j = SM.n; j >= 1; j--) { const wx = h.x + kx + v[0] * SM.gap * j * f, wy = h.y + ky + v[1] * SM.gap * j * f * .5 - (h.z || 0), [sx, sy] = W2S(wx, wy); ctx.save(); ctx.translate(sx, sy); ctx.scale(v[0] ? 1 + SM.st : 1, v[1] ? 1 + SM.st * .6 : 1); ctx.translate(-sx, -sy); drawH128(c, wx, wy, k, SM.a * BA / j, Q.get('smeartint') === '1' ? 'dodge' : null); ctx.restore(); } } } }
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawHair(h, h128Cell(), h.x + kx, h.y + ky, k, BA); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); drawStam(k); } // hero8 attack frames carry their own painted slash trail
