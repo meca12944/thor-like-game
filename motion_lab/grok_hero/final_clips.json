@@ -23,5 +23,14 @@
  "hurt_right": "moves/hurt_right",
  "hurt_up": "moves/hurt_up",
  "death_right": "moves/death_right",
- "rjump_right": "moves/rjump_right"
+ "rjump_right": "moves/rjump_right",
+ "atk1_down": "moves/atk1_down",
+ "atk1_right": "moves/atk1_right",
+ "atk1_up": "moves/atk1_up",
+ "atk2_down": "moves/atk2_down",
+ "atk2_right": "moves/atk2_right",
+ "atk2_up": "moves/atk2_up",
+ "atk3_down": "moves/atk3_down",
+ "atk3_right": "moves/atk3_right",
+ "atk3_up": "moves/atk3_up"
 }
