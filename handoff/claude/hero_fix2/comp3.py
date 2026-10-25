@@ -3,10 +3,17 @@ from PIL import Image,ImageDraw,ImageFont
 R='rec3/';L=json.load(open(R+'labels.json'))
 segs={}
 for i,l in enumerate(L): segs.setdefault(l,[]).append(i)
+ORD=['서기','걷기','달리기 ','출발','제자리','달리며','걷기→','대각선','회피대시','점프','달리기 점프','공격 1','공격 중','맞기']
+def rank(l):
+    if l.startswith('달리기 점프'): return ORD.index('달리기 점프')
+    for i,k in enumerate(ORD):
+        if l.startswith(k): return i
+    return 99
 order=[];
 for l,ids in segs.items():
   if l.startswith('맞기'): ids=ids[-76:]
   order.append((l,ids))
+order.sort(key=lambda x:rank(x[0]))
 F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',32);F2=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',16)
 out='rec3_out/';os.makedirs(out,exist_ok=True)
 for f in os.listdir(out): os.remove(out+f)

@@ -107,6 +107,24 @@ for n in list(H['anims']):
         if len(used.get(f[1],()))>1: f[1]=newcell(f[1],0,-d)
         else: C[f[1]][5]-=d
     log.append(('발 높이',n,'내림',ds))
+_sl={'x':0,'y':None,'rh':0}
+def slot(w,h):   # 시트 아래에 새 줄을 붙여 자리 주기
+    global S
+    if _sl['y'] is None: _sl['y']=S.height+2
+    if _sl['x']+w>S.width: _sl['x']=0;_sl['y']+=_sl['rh']+2;_sl['rh']=0
+    need=_sl['y']+h+2
+    if need>S.height: T=Image.new('RGBA',(S.width,need));T.paste(S,(0,0));S=T
+    x,y=_sl['x'],_sl['y'];_sl['x']+=w+2;_sl['rh']=max(_sl['rh'],h);return x,y
+# 7) 4번방 3차: 그래도 4px 넘게 뜬 달리기 장(↗ 다리 접은 공중 장) → 허리 아래를 세로로 늘여 발을 −4px로 (머리는 그대로)
+for n in list(H['anims']):
+    if not mine(n) or not n.startswith('run_'): continue
+    for f in H['anims'][n]:
+        im,ax,ay=get(f[1]);b=bbox(im);bot=b[3]-C[f[1]][5]
+        if bot>=-4: continue
+        dd=-4-bot;w,h=im.size;belt=b[1]+int((b[3]-b[1])*.52);h2=h+dd
+        low=im.crop((0,belt,w,b[3])).resize((w,b[3]-belt+dd),Image.NEAREST);o=Image.new('RGBA',(w,h2));o.paste(im.crop((0,0,w,belt)),(0,0));o.paste(low,(0,belt),low)
+        x,y=slot(w,h2);S.paste(o,(x,y));e=list(C[f[1]]);C.append([x,y,w,h2,e[4],e[5]]);f[1]=len(C)-1   # 늘인 그림은 칸이 커져서 시트 아래 새 자리에
+        log.append(('다리 늘임',n,f[1],dd))
 S.save(SP,lossless=True);H['_fix3_note']='10-25 회의 2차 3단계: 대시 [3,3,5,3,3,3]·구운 빛 지움·늘어난 다리 줄임·발 땅·달리기 머리 4~6 (handoff/claude/hero_fix2/fix3.py)'
 save(R,s,j,k,H)
 for l in log: print(*l)
