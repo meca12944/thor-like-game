@@ -1,0 +1,21 @@
+row-major, 8 columns, 16px
+0: ash_0
+1: ash_1
+2: ash_2
+3: ash_3
+4: ash_4
+5: ash_5
+6: ash_cinder_0
+7: ash_cinder_1
+8: ash_soilpatch_0
+9: ash_soilpatch_1
+10: ash_soilpatch_2
+11: soil_bare
+12: ash_drift_light_0
+13: ash_drift_light_1
+14: ash_drygrass_0
+15: ash_drygrass_1
+16: ash_drygrass_2
+17: ash_drygrass_3
+18: ash_footprints_ns
+19: ash_footprints_ew
