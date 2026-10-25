@@ -97,7 +97,7 @@ props.append({'id': 'belltower_tip', 'img': tip_p, 'x': 128.5, 'y': 62, 'D': 1, 
 
 # 쓰러진 거인 기사상 (안 늘린 판 120x38, 설계도 466,160 → 26,90). 손바닥(왼쪽 끝 11타일) = 걸어 올라가는 쉼터
 kn_p, kn = save_img(f'{G1}/05_giant_knight/05_knight_body_alt_uniform_back.png', 'giant_knight')
-KX, KY, KD = 26, 96, 1.6   # 팀장 10-25 「거인 전체가 보이게」: 120타일(화면 3.4개)은 전망에서도 안 들어와서 1/1.6 = 75x24타일 (주인공 키의 약 11배), 그림도 줄여 그려 더 또렷
+KX, KY, KD = 26, 96, 1.6   # 팀장 10-25 「거인 전체가 보이게」: 120타일(화면 3.4개)은 전망에서도 안 들어와서 1/1.6 = 75x24타일 (몸 길이 = 주인공 키 42px의 약 29배, 누운 몸 폭 약 9배), 그림도 줄여 그려 더 또렷
 under.append({'id': 'giant_knight', 'img': kn_p, 'x': KX, 'y': KY, 'ax': 0, 'ay': 0, 'D': KD, 'under': 1})
 alpha_mask(kn.resize((round(kn.width / KD), round(kn.height / KD)), Image.LANCZOS), KX, KY, 'K', keep=lambda tx, ty: tx <= 7 and ty >= 16, thr=.55)
 hm_p, hm = save_img(f'{G1}/05_giant_knight/05_knight_helmet_back.png', 'giant_helmet')
@@ -108,13 +108,14 @@ under.append({'id': 'giant_sword', 'img': sw_p, 'x': 6, 'y': 186, 'ax': 0, 'ay':
 
 # 1~2장 승강기 (설계도 600,280 → 160,210), 4배 원본 D=4
 lf_p, lf = save_img(f'{G2}/17_shortcuts/17b_lift_256x320_4x_master.png', 'lift')
-props.append({'id': 'lift_ch2', 'img': lf_p, 'x': 162, 'y': 214, 'D': 4, 'fade': 1, 'shadow': 1})
-rect(160, 211, 164, 214, 'X')
+HS = 42 / 34   # 주인공 실제 화면 키 42 필드px (팀장 10-25, 그록은 34 기준으로 그림) → 사람 크기에 맞춘 소품(승강기·베르디)은 1.24배
+props.append({'id': 'lift_ch2', 'img': lf_p, 'x': 162, 'y': 214, 'D': round(4 / HS, 2), 'fade': 1, 'shadow': 1})
+rect(159, 210, 165, 214, 'X')
 
 # 1장 정문 옆 베르디의 돌기둥 문 (4배 원본, 정문 서쪽)
 vd_p, vd = save_img(f'{G2}/16_gate_verdi/16_gate_verdi_384x320_4x_master.png', 'verdi_gate')
-props.append({'id': 'verdi_gate', 'img': vd_p, 'x': 64, 'y': 246, 'D': 4, 'fade': 1, 'shadow': 1})
-rect(61, 243, 68, 246, 'X')
+props.append({'id': 'verdi_gate', 'img': vd_p, 'x': 64, 'y': 246, 'D': round(4 / HS, 2), 'fade': 1, 'shadow': 1})
+rect(60, 243, 68, 246, 'X')
 
 # 작은 경관 (그록 12a·b·d): 정문~거인 사이 빈 벌판에 눈 둘 곳. back = 바닥 높이, front = 위쪽(주인공을 가림), 가로 기준선 = 그록 README 값
 SM = f'{G1}/12_small_sceneries'
