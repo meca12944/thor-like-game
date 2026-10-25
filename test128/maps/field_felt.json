@@ -251,6 +251,18 @@
    "name": "잿빛 들판 비석"
   },
   {
+   "type": "vista",
+   "id": "ashfield_nw",
+   "x": 4,
+   "y": 3,
+   "r": 3,
+   "zoom": 0.72,
+   "dir": 45,
+   "pan": 40,
+   "name": "잿빛 들판",
+   "sub": "불탄 왕도 외곽, 실에 얽힌 들"
+  },
+  {
    "type": "chest",
    "id": "ff_chest_stream",
    "x": 48,

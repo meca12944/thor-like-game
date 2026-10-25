@@ -42,7 +42,7 @@ def ragged(im, r=14):                               # cut sides (opaque right up
         if edge.mean() > .12: dist = np.minimum(dist, d)
     keep = np.clip(dist / r + (nz - .5) * .9, 0, 1) > .35
     a[..., 3] = np.where(keep, a[..., 3], 0); return Image.fromarray(a, 'RGBA')
-IM['fountain'] = dry_fountain(IM['fountain'])
+# IM['fountain'] = dry_fountain(...) 지움: 그록 펠트 개선안 1단계 「분수 물 흐르게」 — 물은 fountain_water_strip 오버레이(아래 GROK2)
 for pid in IM:
     if PJ[pid].get('kind') == 'building' and pid not in ('linette', 'bl_house'): IM[pid] = ragged(IM[pid]); IM['west_a'] = wipe_sign(IM['west_a'])
 
@@ -88,6 +88,34 @@ for pid, p in PJ.items():
     if 'grok_foot' in p: place(pid, *p['grok_foot'])
 ss = PJ['shop_sign']; place('well', ss['grok_foot'][0] - 92 / D / S, ss['grok_foot'][1] + 4, '_shop')   # covers the villager baked into the store art
 for i, (pid, gx, gy) in enumerate(EXTRA): place(pid, gx, gy, f'_{i}')
+# ---------- 그록 펠트 프롭 2단계 (docs_art/felt_props, 1타일 = 48px = D3, 발 앵커 = 아래 가운데, 데칼은 가운데·바닥) ----------
+GP = os.path.join(ROOT, '..', 'docs_art', 'felt_props')
+GROK2 = [  # (파일, 타일 x, 타일 y, 막는 폭 타일(0 = 안 막음), 옵션)   좌표 = docs_art/felt_props/INDEX_ko.md 배치 제안
+ ('ration_tent', 30.4, 17.4, 3, {}), ('refugee_tent_a', 51.0, 15.0, 2, {}), ('refugee_tent_crest_a', 55.0, 14.0, 2, {}), ('refugee_tent_b', 53.5, 18.6, 2, {}),
+ ('refugee_tent_d', 5.2, 22.6, 2, {}), ('laundry_line_strip', 3.4, 20.4, 0, {'strip': [4, 180, 1]}),
+ ('memorial_wall_day', 31.6, 12.7, 3, {}), ('ribbon_tree_strip', 38.2, 32.6, 1, {'strip': [4, 200, 0]}), ('gold_arch', 25.5, 11.2, 0, {'fade': 1}),
+ ('charred_cart_b', 49.0, 31.6, 2, {}), ('burnt_stump_a', 45.2, 33.2, 1, {}), ('burnt_stump_c', 56.5, 33.0, 1, {}), ('burnt_stump_b', 34.2, 30.4, 1, {}),
+ ('ash_decal_a', 52.0, 32.0, 0, {'under': 1}), ('ash_decal_b', 56.0, 30.8, 0, {'under': 1}), ('ash_decal_c', 38.0, 30.2, 0, {'under': 1}),
+ ('thread_clump_1', 49.6, 24.4, 0, {}), ('thread_clump_3', 53.4, 24.2, 0, {}), ('thread_pile_1', 50.2, 25.8, 0, {}), ('thread_pile_2', 53.0, 26.2, 0, {}),
+ ('sign_gate_sunset', 27.4, 28.4, 0, {}), ('rope_barrier', 33.6, 6.4, 2, {})]
+for fid, tx, ty, sw, opt in GROK2:
+    gim = Image.open(os.path.join(GP, fid + '.png')).convert('RGBA'); n = (opt.get('strip') or [1])[0]; fw = gim.width // n
+    IM['g2_' + fid] = gim; PJ['g2_' + fid] = {'img': 'g2_' + fid + '.png'}
+    under = bool(opt.get('under')); ax, ay = (fw / 2, gim.height / 2) if under else (fw / 2, gim.height)
+    sol = None
+    if sw:
+        sx0, sx1, sy = int(tx - sw / 2), int(tx + sw / 2 - .01), int(ty - .01)
+        for y in (sy - 1, sy) if sw >= 2 else (sy,):
+            for x in range(max(1, sx0), min(W - 1, sx1 + 1)): solid[y][x] = True
+        sol = [sx0, sy - (1 if sw >= 2 else 0), sx1, sy]
+    q = {'id': 'g2_' + fid, 'role': 'grok felt_props', 'img': f'assets/world/felt/g2_{fid}.png', 'x': tx, 'y': ty, 'ax': ax, 'ay': ay, 'solid': sol,
+         'fade': opt.get('fade', 1 if gim.height / D / T > 2.5 else 0), 'shadow': 0 if under or not sw else 1}
+    if under: q['under'] = 1
+    if opt.get('strip'): q['strip'] = opt['strip']
+    props.append(q)
+fq = next(i for i, q in enumerate(props) if q['id'] == 'fountain')       # 분수 물: 분수와 같은 자리·앵커, 한 단계 위 (바로 뒤에 그림)
+IM['g2_fountain_water_strip'] = Image.open(os.path.join(GP, 'fountain_water_strip.png')).convert('RGBA'); PJ['g2_fountain_water_strip'] = {'img': 'g2_fountain_water_strip.png'}
+props.insert(fq + 1, dict(props[fq], id='g2_fountain_water', img='assets/world/felt/g2_fountain_water_strip.png', solid=None, shadow=0, strip=[6, 120, 0], role='grok fountain water'))
 P = {q['id']: q for q in props}
 for f in os.listdir(OUT):                                           # the folder holds exactly the pictures this map uses
     if f != 'ground.png': os.remove(os.path.join(OUT, f))
@@ -130,7 +158,7 @@ img[yard] = np.where((n3[yard] > .45)[:, None], cols['g1'], np.where((n2[yard] >
 # roads: packed dirt, darker rim, ruts and pebbles
 road = dr < 0; rim = (dr >= 0) & (dr < 3)
 rv = n2 * .7 + n3 * .3; t = np.clip((rv[road] - .25) / .55, 0, 1)[:, None]; img[road] = cols['r2'] * (1 - t) + cols['r3'] * t   # soft packed dirt
-img[rim] = cols['r0']; peb = road & (n3 > .8) & (vnoise(1.2, 4) > .7); img[peb] = cols['r5']; img[road & (vnoise(1.5, 5) > .86)] = cols['d4']
+img[road] *= 1.17; img[rim] = cols['r0'] * 1.1; peb = road & (n3 > .8) & (vnoise(1.2, 4) > .7); img[peb] = cols['r5']; img[road & (vnoise(1.5, 5) > .86)] = cols['d4']
 # plaza: cobble ring (stone cells by jittered grid), mortar in between, inner basin ring stones
 cell = 4.0; jx, jy = vnoise(4, 6) * 1.6, vnoise(4, 7) * 1.6
 cx, cy = (wxp + jx) / cell, (wyp + (np.floor((wxp + jx) / cell) % 2) * cell / 2 + jy) / cell
@@ -140,7 +168,7 @@ stone = sel([shade < .35, shade < .6, shade < .82], [cols['s1'], cols['s2'], col
 img[plaza] = np.where(mort[plaza][:, None], cols['s0'], stone[plaza]); img[plaza & (pr > .9) & (pr < .97)] = cols['s0']
 # edges: darker toward the map border (no hard frame), backdrop band darker still
 edge = np.minimum.reduce([wxp, wyp, W * T - wxp, H * T - wyp + 400])   # no dark band at the bottom: the ash field joins there; img *= np.clip(.55 + edge / 60, .55, 1)[..., None]
-img[wyp < 175 * S] *= .7
+img[wyp < 175 * S] *= .8   # 가장자리 어둡기 완화 (.7 -> .8)
 # snap to the town palette (base24 + accents)
 pal = np.array([hx(c) for c in (PAL['base24'] + PAL['accent8'] if PAL else [v for v in ('#201810',)])])
 BAYER = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16 - .47)[(yy % 4).astype(int), (xx % 4).astype(int)][..., None]   # ordered dither: fine 1-pixel grain instead of big blotches
@@ -170,7 +198,7 @@ for o in F['objects']:
         o['x'], o['y'] = {'f_mark_fountain': foot('fountain', 0, -2), 'f_mark_stall': foot('red_stall'), 'f_mark_gate': [EX[0], EX[1] - 1]}.get(i, [o['x'], o['y']])
     elif t == 'npc': o['x'], o['y'] = int(o['x'] * W / 56), int(o['y'] * H / 38)    # no near rule -> scaled spot (fixed below)
     objs.append(o)
-NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', -4, 0],
+NEAR = {'f_rom': ['f_door_smith', -1, 1], 'f_sera': ['f_door_herb', 0, 1], 'f_ben': ['f_mark_stall', 0, 1],
         'f_linette': ['f_door_atelier', -4, 1], 'f_luca': ['f_mark_fountain', 5, 1],  # -4: the door's own tile is inside the building picture, she needs open ground to pace. 바르트·마르타·오스왈드는 집 안에만 있다
         'f_toby': ['f_mark_fountain', 2, 4], 'f_gas': ['f_mark_gate', -2, -5]}
 if not any(o['type'] == 'mark' for o in objs):
@@ -197,6 +225,10 @@ LIGHTS += [[q['x'], q['y'] - 1.4, 26, '#ffc070', .7] for q in props if q['id'].s
 LIGHTS += [[q['x'], q['y'] - .5, 22, '#ff6a2a', .9] for q in props if q['id'].startswith('ember_rubble')]           # 불씨 잔해 (art room)
 LIGHTS += [[q['x'], q['y'] - 2.2, 22, '#c090ff', .7] for q in props if q['id'].startswith('candelabra')]
 LIGHTS += [[q['x'], q['y'] - 2.2, 40, '#ffc880', .7] for q in props if q['id'].startswith('string_lights')]
+# 깜빡이는 불 (그록 펠트 개선안 1단계, 매 프레임 그림 = 몇 곳만): 화덕·대장간·광장 등 2·촛대·여관
+FLICK = [lp(next(q['id'] for q in props if q['id'].startswith('brazier')), 0, -.6, 40, '#ff8a3a', 1), lp('se_house', -1, -2, 36, '#ff7a2a', 1), lp('inn', 0, -1, 30, '#ffb060', .8)]
+FLICK += [[q['x'], q['y'] - 1.4, 18, '#ffc070', .8] for q in props if q['id'].startswith('lamp_')][:2]
+FLICK += [[q['x'], q['y'] - 2.2, 16, '#c090ff', .8] for q in props if q['id'].startswith('candelabra')][:2]
 # smoke (code, not baked): Rom's forge chimney (art room: se_house picture x~120, y~20) + the burned castle
 se = P['se_house']; SMOKE = [[se['x'] + (120 - se['ax']) / D / T, se['y'] - (se['ay'] - 20) / D / T, 1]]
 for c in ('castle_l', 'castle_r'): q = P[c]; SMOKE.append([q['x'] + .5, q['y'] - 5, 1.6])
@@ -233,9 +265,9 @@ SPAWNS = {'default': [EX[0] + .5, EX[1] - 7.5, 'up'], 'world': [EX[0] + .5, EX[1
 for o in objs:
     if o.get('type') == 'door' and o.get('out'): SPAWNS[o['out']] = [o['x'] + .5, o['y'] + 1.5, 'up']  # step back out on the tile in front of that door
 m = {k: F[k] for k in ('type', 'area', 'region', 'title', 'bgm', 'battleBgm', 'tileset', 'tile') if k in F}
-m.update(id='felt', name='펠트', w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
+m.update(id='felt', name='펠트', viewZoom=1.3, w=W, h=H, legend={'.': 'dirt', '#': 'cliff'}, solid=['#'], ground=[''.join(r) for r in rows], objects=objs,
          spawns=SPAWNS,   # start inside the south gate (forge, chief's house, statue ahead); out-spawns = walk back out of an interior
-         hd={'D': GD, 'ground': 'assets/world/felt/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk'},
+         hd={'D': GD, 'ground': 'assets/world/felt/ground.png', 'props': [dict(q, D=D) for q in props], 'lights': LIGHTS, 'webs': WEBS, 'smoke': SMOKE, 'grade': 'dusk', 'gradeCol': 'rgb(222,214,234)', 'flick': FLICK},   # 석양 색 약화 (206,196,222 -> 222,214,234)
          note='GENERATED by tools/hd/build_felt.py from the town-art room parts + maps/src/felt.json (doors / NPCs / clues) - do not hand-edit')
 json.dump(m, open(os.path.join(ROOT, 'maps', 'felt.json'), 'w'), ensure_ascii=False, indent=1)
 FF = json.load(open(os.path.join(ROOT, 'maps', 'field_felt.json')))

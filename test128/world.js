@@ -154,8 +154,21 @@
       if (i % 3 === 0) { const wx = Math.round(ax), wy = Math.round(ay); g.fillStyle = 'rgba(220,214,228,.42)'; for (let a = 0; a < 6; a++) { const an = a / 6 * Math.PI * 2; for (let d = 1; d < 7; d++) g.fillRect(Math.round(wx + Math.cos(an) * d), Math.round(wy + Math.sin(an) * d * .7), 1, 1); }
         for (let rr = 3; rr <= 6; rr += 3) for (let a = 0; a < 18; a++) { const an = a / 18 * Math.PI * 2; g.fillRect(Math.round(wx + Math.cos(an) * rr), Math.round(wy + Math.sin(an) * rr * .7), 1, 1); } } }
     return c; }
-  function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; for (let i = 0; i < 46; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
-      const x = ((Math.abs(h1) * EW + Math.sin(S.t * .6 + i) * 6) % EW + EW) % EW, y = ((Math.abs(h2) * EH + S.t * sp) % (EH + 8)) - 4; g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); } }
+  // 잿가루 바람 + 먼 안개 띠 (경관 회의 10-24, 효과 담당): 그림에 굽지 않고 코드로, 화면 좌표만 계산 (저장·화소 계산 없음).
+  // 바람 = m.wind [x, y] px/초 (없으면 [9, 0]) + 느린 돌풍. 개수 = 화면 넓이에 비례 (전망 줌으로 물러나도 밀도 그대로), m.ash 로 구역마다 조절 (기본 46 = 줌 1 기준).
+  function drawAshFall(g, m, cx, cy) { if (m.grade !== 'ash') return; const wd = m.wind || ASH_WIND, gust = 1 + .6 * Math.sin(S.t * .35) * Math.sin(S.t * .13 + 1), wx = wd[0] * gust, wy = wd[1] * gust;
+    const n = Math.min(160, Math.round((m.ash || 46) * EW * EH / (LW * LH))), W = EW + 8, H = EH + 8;
+    for (let i = 0; i < n; i++) { const h1 = Math.sin(i * 12.9898) * 43758.5453 % 1, h2 = Math.sin(i * 78.233) * 12345.678 % 1, sp = 6 + Math.abs(h2) * 10; // slow falling ash (screen space)
+      const x = ((Math.abs(h1) * W + Math.sin(S.t * .6 + i) * 6 + S.t * wx * (.7 + Math.abs(h2) * .6)) % W + W) % W - 4, y = ((Math.abs(h2) * H + S.t * (sp + wy)) % H + H) % H - 4;
+      g.fillStyle = i % 5 ? 'rgba(196,190,204,.55)' : 'rgba(255,170,110,.6)'; g.fillRect(Math.round(cx + x), Math.round(cy + y), Math.abs(wx) > 14 && i % 3 === 0 ? 2 : 1, 1); } } // strong wind: some flakes streak 2 px
+  const ASH_WIND = [9, 0];
+  // 먼 안개 띠: 화면 위쪽(= 북쪽 먼 곳) 38%에 아래로 옅어지는 안개 한 장. 그라데이션은 1x64 캔버스에 한 번만 그리고 drawImage 로 늘림 (한 장면 drawImage 1번).
+  // 전망 줌으로 물러나면(S.vz < 1) 진해져서 깊이가 산다. m.fog = 진하기 (기본 .32), 밖(던전·m.dark)은 안 그림.
+  let _fogC = null;
+  function drawFarFog(g, m, cx, cy) { if (m.grade !== 'ash' || m.dark) return; if (!_fogC) { _fogC = document.createElement('canvas'); _fogC.width = 1; _fogC.height = 64; const f = _fogC.getContext('2d'), gr = f.createLinearGradient(0, 0, 0, 64);
+      gr.addColorStop(0, 'rgba(178,172,188,1)'); gr.addColorStop(.45, 'rgba(160,154,172,.55)'); gr.addColorStop(1, 'rgba(150,144,160,0)'); f.fillStyle = gr; f.fillRect(0, 0, 1, 64); }
+    const z = S.vz || 1, a = Math.min(.75, (m.fog ?? .32) * (1 + Math.max(0, 1 - z) * 2.2)) * (.92 + .08 * Math.sin(S.t * .4)); if (a <= .01) return;
+    g.save(); g.globalAlpha = a; g.imageSmoothingEnabled = true; g.drawImage(_fogC, Math.floor(cx) - 1, Math.floor(cy) - 1, EW + 3, Math.round(EH * .38)); g.restore(); }
   // 던전 분위기 층 (팀장 마을배경방, 주인 10-24 「다크한 설정이 잘 나오게 · 웅장한 보스전」): m.dark 지도 전부 — 떠도는 먼지(어둠 아래라 빛 근처만 보임),
   // 천장에서 늘어진 실 가닥(월드에 붙어 흔들림), 위에서 비스듬히 내려오는 희미한 빛줄기, 가장자리 어둠. 보스 2페이즈면 붉게 맥박친다.
   const hsh = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -330,7 +343,8 @@
   { const st = document.createElement('style'); st.textContent = 'body.touch.inworld #ui{z-index:45;visibility:visible!important} body.touch.inworld #ui>*{visibility:visible} body.inworld #ui>.slot,body.inworld #slotsKeys,body.inworld #wbtn,body.inworld #hint,body.inworld #khud,body.inworld #qslot{display:none!important}'
       + '.wtb{position:fixed;display:none;border-radius:50%;pointer-events:auto;text-align:center;color:#fff6e0;font:bold 15px sans-serif;border:4px solid #1a1206;box-shadow:0 0 0 3px #e8d6b0 inset,0 4px 0 #000a;text-shadow:2px 2px 0 #000;user-select:none;-webkit-user-select:none;touch-action:none}'
       + '.wtb.on{transform:scale(.92);filter:brightness(1.25)} body.touch.inworld .wtb{display:block}'
-      + 'body.wdlg #atk,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
+      + 'body.wvista #atk,body.wvista #jumpb,body.wvista #dashb,body.wvista #runb,body.wvista #stick,body.wvista .wtb{opacity:.25!important;transition:opacity .4s}'
+      + 'body.wdlg #atk,body.wdlg #jumpb,body.wdlg #dashb,body.wdlg #runb,body.wdlg #stick,body.wdlg .wtb:not(#wtb_act):not(#wtb_menu){opacity:0!important;pointer-events:none!important;transition:opacity .15s}'
       + '#wtb_ult{right:max(34px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom) + 118px));width:72px;height:72px;line-height:64px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#d09a20 60%,#6a4608)}'
       + '#wtb_act{right:max(124px,calc(env(safe-area-inset-right) + 96px));bottom:max(196px,calc(env(safe-area-inset-bottom) + 166px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#d8d0ff,#6a5ab8 60%,#2e2466)}'
       + '#wtb_pot{right:max(40px,env(safe-area-inset-right));bottom:max(232px,calc(env(safe-area-inset-bottom) + 202px));width:60px;height:60px;line-height:52px;background:radial-gradient(circle at 40% 35%,#ffb0c0,#c03050 60%,#5a1020)}'
@@ -379,10 +393,12 @@
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
       const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
-      const Dq = q.D || h.D, sc = k / Dq, ax = q.ax ?? im.width / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + im.width / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
+      const Dq = q.D || h.D, sc = k / Dq, iw = q.strip ? im.width / q.strip[0] : im.width, ax = q.ax ?? iw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + iw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
       if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); }
+      if (q.strip) { const [n, ms, pp] = q.strip, fw = im.width / n, c = Math.floor(S.t * 1000 / ms) % (pp ? 2 * n - 2 : n), f = c < n ? c : 2 * n - 2 - c; // 그록 프롭 애니 (분수 물·빨래·리본·촛불): 가로 스트립, pp = 왕복
+        ctx.imageSmoothingEnabled = false; ctx.globalAlpha = q._a ?? 1; ctx.drawImage(im, f * fw, 0, fw, im.height, Math.round(sx) - Math.round(ax * sc), Math.round(sy) - Math.round(ay * sc), Math.round(fw * sc), Math.round(im.height * sc)); ctx.globalAlpha = 1; continue; }
       hdBlit(im, sx, sy, ax * sc, ay * sc, sc, q.flip, q._a, q.sway ? Math.sin(S.t * 1.1 + q.x * .9) * .018 * q.sway : 0); if (q.door) drawDoorHi(q, sx, sy, sc, ax, ay); }
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
@@ -400,7 +416,7 @@
     const lm = document.createElement('canvas'); lm.width = Math.ceil(im.width / h.D / 2); lm.height = Math.ceil(im.height / h.D / 2); const g = lm.getContext('2d'); g.globalCompositeOperation = 'lighter';
     for (const [lx, ly, r, col, a] of h.lights) g.drawImage(lightSprite(col, a, Math.round(r / 2)), lx * T / 2 - r / 2, ly * T / 2 - r / 2 * .72, r, r * .72); // half world px: soft anyway
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const cg = c.getContext('2d'); cg.drawImage(im, 0, 0); cg.globalCompositeOperation = 'lighter'; cg.imageSmoothingEnabled = true; cg.drawImage(lm, 0, 0, lm.width * 2 * h.D, lm.height * 2 * h.D);
-    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
+    for (const q of h.props || []) { const pi = HDIMG[q.img]; if (!pi || q.under || q.strip) continue; const Dq = q.D || h.D, ax = q.ax ?? pi.width / 2, ay = q.ay ?? pi.height, wl = q.x * T - ax / Dq, wt = q.y * T - ay / Dq; // the light that falls on this prop
       const t = document.createElement('canvas'); t.width = pi.width; t.height = pi.height; const tg = t.getContext('2d'); tg.imageSmoothingEnabled = true; tg.drawImage(lm, wl / 2, wt / 2, pi.width / Dq / 2, pi.height / Dq / 2, 0, 0, pi.width, pi.height);
       tg.globalCompositeOperation = 'destination-in'; tg.drawImage(pi, 0, 0); const o = document.createElement('canvas'); o.width = pi.width; o.height = pi.height; const og = o.getContext('2d'); og.drawImage(pi, 0, 0); og.globalCompositeOperation = 'lighter'; og.drawImage(t, 0, 0);
       q._lit = o; }
@@ -412,7 +428,9 @@
   function drawHDLight(k) { const m = M(); if (!m || !m.hds) return; const v = S.view, T = m.T;
     for (const h of m.hds) { const [ox, oy] = W2S(h.gx * T, h.gy * T), im = HDIMG[h.ground], gw = im ? im.width / h.D * k : 0, gh = im ? im.height / h.D * k : 0;
       if (h.grade === 'dusk') { const ax = Math.max(ox, v.ox), ay = Math.max(oy, v.oy), bx = Math.min(ox + gw, v.ox + (EW + 1) * v.k), by = Math.min(oy + gh, v.oy + (EH + 1) * v.k);
-        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
+        if (bx > ax && by > ay) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = h.gradeCol || 'rgb(206,196,222)'; ctx.fillRect(ax, ay, bx - ax, by - ay); ctx.restore(); } } // dusk: one grade over ground, props and characters alike
+      if (h.flick) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < h.flick.length; i++) { const [lx, ly, r, col, a] = h.flick[i], [fx, fy] = W2S((h.gx + lx) * T, (h.gy + ly) * T), R = r * k; if (fx < v.ox - R || fx > v.ox + (EW + 1) * v.k + R) continue; // 횃불·화덕·촛불 깜빡임 (그록 펠트 개선안 1단계): 몇 곳만 매 프레임 (나머지는 구워 둔 빛)
+          ctx.globalAlpha = Math.max(0, .35 + .25 * Math.sin(S.t * 9.1 + i * 1.7) + .15 * Math.sin(S.t * 23.3 + i * 4.1)); ctx.drawImage(lightSprite(col, a, Math.round(r)), fx - R, fy - R * .72, R * 2, R * 2 * .72); } ctx.restore(); }
       if (h.webs) { ctx.save(); ctx.lineCap = 'round'; for (const [x1, y1, x2, y2, sag, al] of h.webs) { // 거미줄 실 (breadcrumbs toward the Arachne gate), swaying a little
         const [ax, ay] = W2S((h.gx + x1) * T, (h.gy + y1) * T), [bx, by] = W2S((h.gx + x2) * T, (h.gy + y2) * T), sw = Math.sin(S.t * 1.3 + x1) * .6 * k;
         ctx.strokeStyle = `rgba(226,224,236,${al ?? .55})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo((ax + bx) / 2 + sw, (ay + by) / 2 + (sag || 1) * T * k / 2, bx, by); ctx.stroke(); }
@@ -812,7 +830,8 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
+  function dirInput() { if (S.vfx && S.vfx.t < VISTA.lock) return [0, 0]; return rawDir(); }
+  function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
@@ -1119,8 +1138,20 @@
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1]; return [clampC(fx - EW / 2, m.pw - EW), clampC(fy - EH / 2, m.ph - EH)]; } // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { if (M()) S.cam = camTarget(); }
-  function viewZoomOf(m) { if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
-  function updateCam(dt) { if (!M()) return; { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, k = Math.min(1, dt * LOOK.k); S.look = S.look || [0, 0]; S.look[0] += (v[0] * d - S.look[0]) * k; S.look[1] += (v[1] * d * .7 - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } // look-ahead + hit kick clock { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+  // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
+  // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
+  // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
+  const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
+  function vistaNow() { const m = M(); if (!m || m.type === 'world' || S.dialog || S.engaged || (S.bossRef && !S.bossRef.dead) || hero.hp <= 0) return null; const T = m.T;
+    const V = (m.objects || []).find(o => o.type === 'vista' && Math.hypot(hero.x / T - o.x - .5, hero.y / T - o.y - .5) < (o.r || 3)); if (!V) return null;
+    return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
+  function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
+    if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
+    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
+    const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
+  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && S.vfx ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------
@@ -1198,7 +1229,7 @@
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
-    drawAshFall(g, m.compose ? { grade: gradeAt(m, hero.x, hero.y) } : m, cx, cy);
+    { const ar = m.compose ? areaOf(m, hero.x, hero.y) : null, am = m.compose ? { grade: gradeAt(m, hero.x, hero.y), wind: ar && ar.wind, ash: ar && ar.ash, fog: ar && ar.fog } : m; drawFarFog(g, am, cx, cy); drawAshFall(g, am, cx, cy); }
     drawLairBelow(g, m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
@@ -1940,6 +1971,10 @@
       ctx.fillStyle = on ? 'rgba(60,18,22,.95)' : 'rgba(10,8,14,.9)'; ctx.fillRect(cx, cy, cw, 19 * u); ctx.strokeStyle = on ? '#b04a3a' : '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(cx, cy, cw, 19 * u); textOut((on ? '▶ ' : '   ') + c.t, cx + 9 * u, cy + 14 * u, 12 * u, on ? '#ffe2c8' : '#a99c8c', '#000', 'left'); });
     if (done && !(d.choices && d.pi === P.length - 1)) { const bob = Math.round(Math.sin(d.t * 6) * 1.5 * u); textOut(d.pi < P.length - 1 ? '▼' : '■', x + w - 16 * u, y + h - 10 * u + bob, Math.max(10 * u, fs * .7), '#b04a3a', '#000', 'right'); }
     if (P.length > 1) textOut((d.pi + 1) + '/' + P.length, x + w - 18 * u - fs * .8, y + h - 10 * u, Math.max(9 * u, fs * .6), '#6e6458', '#000', 'right'); }
+  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, a = Math.max(0, Math.min(1, f.t / .4, (VISTA.fx - f.t) / .4)), bh = Math.round(SH * .06 * a);
+    ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh);
+    const ta = Math.max(0, Math.min(1, (f.t - .3) / .5, (VISTA.fx - f.t) / .4)); if (ta <= 0) return; ctx.globalAlpha = ta;
+    const n1 = Math.max(24 * u, SH * .09), n2 = Math.max(12 * u, SH * .042); textOut(V.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (V.sub) textOut(V.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.2, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
   function keyHint(a) { const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
     const u = k / 3, m = M(), SW = LW * k, SH = LH * k, cxs = ox + SW / 2;
@@ -1952,29 +1987,32 @@
       textOut('월드맵', ox + 10 * u, oy + 20 * u, 15 * u, '#ffe08a', '#000', 'left');
       textOut(`이동 방향키/WASD · ${keyHint('interact')}/Enter 들어가기`, ox + 10 * u, oy + 36 * u, 10 * u, '#dde', '#000', 'left');
     } else {
+      ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); /* mob bars · champion names · damage numbers stay inside the game picture (not on the black side bands) */
       for (const mm of S.mobs) { if (mm.dead || mm.spawnT > 0 || mm.D.boss || mm.noBar) continue; if (mm.hp >= mm.maxHp && !mm.D.champion) continue;
         const [sx, sy] = W2S(mm.x, mm.y - (mm.D.h || 20) * (mm.scale || 1) - (mm.D.hover || 0) - 3); hpBar(mm, sx, sy, (mm.D.champion ? 46 : 20) * u, 4 * u);
         if (mm.D.champion) { textOut('CHAMPION', sx, sy - 4 * u, 10 * u, 'rgb(255,205,50)', '#5a0a0a'); textOut(mm.D.name, sx, sy - 15 * u, 9 * u, '#fff'); } }
       for (const f of S.fx) if (f.type === 'text') { const [sx, sy] = W2S(f.x, f.y - f.t * 16); ctx.globalAlpha = Math.max(0, 1 - f.t / f.life); const pk = f.pop ? 1 + (DMGPOP.from - 1) * Math.max(0, 1 - f.t * 60 / DMGPOP.ticks) : 1; textOut(f.text, sx, sy, Math.round(12 * u * (f.sz || 1) * pk), f.color || '#fff'); ctx.globalAlpha = 1; }
-      const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
+      ctx.restore(); ctx.globalAlpha = 1;
+      const g = window.__game, hu = Math.max(.75, SH / 600); let hb = oy + 26 * u; S.hudY = 0; const hudA = S.hudA == null ? 1 : S.hudA; ctx.globalAlpha = hudA; /* 전망 자리: HUD fades */ // modern HUD (town/hud.js): HP/MP/EXP + Lv badge, 필살기 gauge bottom centre
       if (window.HUD) { hb = HUD.drawPlayer(ctx, { x: ox + 10 * hu, y: oy + 10 * hu, u: hu, hp: hero.hp, maxHp: hero.maxHp, mp: g ? g.mp : 0, maxMp: g ? g.mpMax() : 0, exp: g ? g.exp : 0, expNext: g && g.expNext ? g.expNext(g.lvl) : 0, lvl: g ? g.lvl : 1 }) + 14 * hu; S.hudY = hb + 14 * hu;
         if (g && g.ULT_CFG) HUD.drawUlt(ctx, { cx: cxs, y: oy + SH - (b0() ? 62 : 40) * hu, u: hu, v: g.ultG / g.ULT_CFG.max, name: g.ULTS && g.ultId ? g.ULTS[g.ultId()].name : '', key: keyHint('ult') || 'R', pop: g.ultPop }); }
       if (window.HUD && HUD.drawQuick) { const Q = S.qs || {}; hb = HUD.drawQuick(ctx, { x: ox + 12 * hu, y: hb - 6 * hu, u: hu, n: g ? g.potions : 0, cap: DIFF().potion_cap || 5, cd: g ? g.potionCd : 0, cdMax: POT.cd, key: keyHint('potion'), low: hero.hp > 0 && hero.hp < hero.maxHp * .35, flash: Q.flash || 0, shake: Q.shake || 0, note: Q.noteT > 0 ? Q.note : '' }) + 4 * hu; if (S.hudY) S.hudY = hb; }
       else textOut(`물약 ${g ? g.potions : 0}/${DIFF().potion_cap || 5} [${keyHint('potion')}]` + (g && g.potionCd > 0 ? ' ' + g.potionCd.toFixed(1) + 's' : ''), ox + 12 * u, hb, 11 * u, '#cfe8ff', '#000', 'left');
       { const pb = document.getElementById('wtb_pot'); if (pb && g) { const n = g.potions || 0, cf = g.potionCd > 0 ? g.potionCd / POT.cd : 0, sig = n + '|' + Math.round(cf * 40); if (pb._sig !== sig) { pb._sig = sig; pb.innerHTML = '물약<b class="pc">' + n + '</b>'; pb.style.setProperty('--cd', (cf * 100).toFixed(1) + '%'); pb.classList.toggle('zero', !n); } } } // touch button = same count / cooldown as the HUD slot
-      if (window.HUD && HUD.drawFeed && S.feed && S.feed.length) HUD.drawFeed(ctx, { x: ox + SW - 12 * hu, y: oy + SH - 40 * hu, u: hu, items: S.feed });
+      if (window.HUD && HUD.drawFeed && S.feed && S.feed.length && hudA > .9) HUD.drawFeed(ctx, { x: ox + SW - 12 * hu, y: oy + SH - 40 * hu, u: hu, items: S.feed });
       if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초 · 저스트 회피 → 반격 「사멸의 궤적」`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
       const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }
       { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
+      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u);
       const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
       if (!S.dialog && !(b && !b.dead) && !TOUCH()) textOut(`이동 방향키/WASD · 공격 ${keyHint('attack')} · 회피대시 Shift/${keyHint('dash')} (무적) · 점프 ${keyHint('dive') || 'Space'} · 조사 ${keyHint('interact')} · 물약 ${keyHint('potion')} · 지도 M · 미니맵 V · 목표 G · Esc`, cxs, oy + SH - (b && !b.dead ? 48 : 6) * u, 9 * u, 'rgba(230,230,240,.85)');
     }
-    if (NAV() && m.type !== 'world') NAV().drawHud(k, ox, oy, u);
+    if (NAV() && m.type !== 'world') { ctx.globalAlpha = S.hudA == null ? 1 : S.hudA; NAV().drawHud(k, ox, oy, u); ctx.globalAlpha = 1; }
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
