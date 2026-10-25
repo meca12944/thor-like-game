@@ -16,7 +16,12 @@ with sync_playwright() as p:
     def settle():  # the map load is async (fetch): advance in separate evaluates so the promise can resolve
         for _ in range(80):
             if ev('()=>{__world.advance(.1);return !__world.trans&&__world.scene!=="town"}'): break
-    ev("()=>{localStorage.removeItem('thor.world.v1');__world.reset();__world.setManual(true);__world.go('field00','town')}"); settle(); adv(.5)
+    # the new-game start (prologue_grave) may still be loading: go() is refused while a transition runs, so wait for it, then go and check we really arrived
+    for _ in range(3):
+        for _ in range(100):
+            if ev('()=>{__world.advance(.05);return !__world.trans}'): break
+        ev("()=>{localStorage.removeItem('thor.world.v1');__world.reset();__world.setManual(true);__world.go('field00','town')}"); settle(); adv(.5)
+        if ev('()=>__world.map&&__world.map.id') == 'field00': break
     m = ev('()=>({id:__world.map.id,w:__world.map.w,h:__world.map.h,areas:(__world.map.areas||[]).map(a=>a.name)})')
     check('stitched map', m['w'] == 120 and len(m['areas']) == 2, m)
     # walk east across the old seam: no transition, area card, auto-save
