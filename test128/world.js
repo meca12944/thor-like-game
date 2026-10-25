@@ -392,7 +392,7 @@
         ctx.drawImage(pi, Math.round(px - (q.ax ?? pi.width / 2) * s2), Math.round(py - (q.ay ?? pi.height) * s2), Math.round(pi.width * s2), Math.round(pi.height * s2)); } } }
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under) continue;
-      const fx = (h.gx + q.x) * T, fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue;
+      let fx = (h.gx + q.x) * T; const fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue; if (q.par) fx += (S.cam[0] + EW / 2 - fx) * q.par; // par: far scenery (펠트 v4 먼 왕성) slides slower than the town
       const Dq = q.D || h.D, sc = k / Dq, iw = q.strip ? im.width / q.strip[0] : im.width, ax = q.ax ?? iw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + iw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
       const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
@@ -451,9 +451,9 @@
             ctx.strokeStyle = `rgba(230,220,230,${.6 * p})`; ctx.lineWidth = Math.max(1, k / 3); ctx.beginPath(); ctx.moveTo(sx, v.oy); ctx.lineTo(sx + sw, top); ctx.stroke();
             ctx.fillStyle = `rgba(214,200,190,${p})`; ctx.beginPath(); ctx.ellipse(sx + sw, top + 9 * k, 5 * k, 10 * k, 0, 0, TAU); ctx.fill(); ctx.fillStyle = `rgba(150,30,45,${.5 * p})`; ctx.fillRect(sx + sw - k, top + 4 * k, 2 * k, 12 * k); }
           ctx.restore(); } }
-      for (const [x0, y0, sz] of h.smoke || []) for (let i = 0; i < 9; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade
-        const ph = (S.t * .16 + i / 9 + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz, [sx, sy] = W2S(wx, wy);
-        ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7) * sz * k, 0, TAU); ctx.fill(); }
+      for (const [x0, y0, sz, tall] of h.smoke || []) { const tl = tall || 1, n = Math.round(9 * tl); for (let i = 0; i < n; i++) { // 연기 (code, not baked): puffs rise, drift with the wind, grow and fade; tall = a column seen from afar (모닥불)
+        const ph = (S.t * .16 / Math.sqrt(tl) + i / n + x0 * .37) % 1, wx = (h.gx + x0) * T + ph * 14 * sz * tl + Math.sin(S.t * .9 + i * 2.1) * 2 * sz, wy = (h.gy + y0) * T - ph * 46 * sz * tl, [sx, sy] = W2S(wx, wy);
+        ctx.fillStyle = `rgba(${74 - ph * 20 | 0},${66 - ph * 18 | 0},${72 - ph * 16 | 0},${(.42 * Math.min(1, ph * 6) * (1 - ph)).toFixed(3)})`; ctx.beginPath(); ctx.arc(sx, sy, (2.5 + ph * 7 * Math.sqrt(tl)) * sz * k, 0, TAU); ctx.fill(); } }
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       ctx.restore(); } }
 
@@ -490,6 +490,11 @@
     for (let i = 0; i < P[5]; i++) { const a = hs2(i, 1), b = hs2(i, 2), c = hs2(i, 3);
       let x = a * W_ + t * P[3] * (.5 + b) + Math.sin(t * .7 + i) * 8 - S.cam[0], y = b * H_ + t * P[2] * (.5 + c) - S.cam[1]; x = ((x % W_) + W_) % W_ - 20; y = ((y % H_) + H_) % H_ - 20;
       const al = P[4] * (.55 + .45 * Math.sin(t * 1.5 + i * 2.3)), z = Math.max(1, Math.round(P[1] * k * (.6 + c * .7))); ctx.fillStyle = P[0] + al.toFixed(2) + ')'; ctx.fillRect(Math.round(v.ox + x * k), Math.round(v.oy + y * k), z, z); } }
+  let MISTS = null; function drawMist(n, k) { const v = S.view, t = S.t, W_ = EW + 320, H_ = EH + 240; // 안개 (hd.fx.mist = count): big soft grey banks drifting slowly, world-anchored, one cached sprite
+    if (!MISTS) { MISTS = document.createElement('canvas'); MISTS.width = MISTS.height = 128; const g = MISTS.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(190,184,178,.55)'); gr.addColorStop(.55, 'rgba(184,178,172,.22)'); gr.addColorStop(1, 'rgba(180,174,168,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+    for (let i = 0; i < n; i++) { const a = hs2(i, 11), b = hs2(i, 12), c = hs2(i, 13); let x = a * W_ + t * (3 + 5 * c) - S.cam[0], y = b * H_ + Math.sin(t * .11 + i) * 10 - S.cam[1]; x = ((x % W_) + W_) % W_ - 160; y = ((y % H_) + H_) % H_ - 120;
+      const R = (80 + 90 * c) * k; ctx.globalAlpha = .3 + .16 * Math.sin(t * .27 + i * 1.9); ctx.drawImage(MISTS, v.ox + x * k - R, v.oy + y * k - R * .45, R * 2, R * .9); }
+    ctx.globalAlpha = 1; }
   function drawBirds(n, k) { const v = S.view, t = S.t, Wd = EW + 200; // 새 (not spirits): small dark Vs crossing the sky now and then, a soft shadow far below
     for (let i = 0; i < n; i++) { const sp = 20 + hs2(i, 7) * 12, ph = (t * sp + hs2(i, 5) * Wd * 3) % (Wd * 3); if (ph > Wd) continue; const x = i % 2 ? ph - 100 : EW + 100 - ph, y = 18 + hs2(i, 6) * (EH - 70) + Math.sin(t * .5 + i) * 8;
       for (let j = 0; j < 3; j++) { const bx = v.ox + (x + (j ? -9 * (i % 2 ? 1 : -1) : 0)) * k, by = v.oy + (y + j * 6 - (j === 2 ? 12 : 0)) * k, fl = Math.sin(t * 9 + i * 2 + j * 1.3);
@@ -505,7 +510,7 @@
     for (const h of m.hds || []) { const fx = h.fx || {};
       for (const [i, f] of (h.fires || []).entries()) { const [sx, sy] = W2S((h.gx + f[0]) * T, (h.gy + f[1]) * T); if (onView(sx - 40 * k, sy - 40 * k, 80 * k, 60 * k)) drawFire(sx, sy, f[2], k, f[3], i * 3.7); }
       for (const f of h.fountains || []) if (f) drawFountain(f, h, k, T);
-      if (fx.particles) drawParticles(fx.particles, k); if (fx.birds) drawBirds(fx.birds, k); if (fx.butterflies) drawButterflies(fx.butterflies, k); } }
+      if (fx.mist) drawMist(fx.mist, k); if (fx.particles) drawParticles(fx.particles, k); if (fx.birds) drawBirds(fx.birds, k); if (fx.butterflies) drawButterflies(fx.butterflies, k); } }
   // 문 (owner 10-24 「문이 열리고 들어가면 실내로」): a building door (prop.door {id, cx, by, w, h, col} in art px) swings open in 4 frames as the hero walks up,
   // closes again when he leaves; fully open + walking in = enter (fade to the interior). Interact on a closed door opens it first.
   function drawDoorHi(q, sx, sy, sc, ax, ay) { const d = q.door, A = S.doorA && S.doorA[d.id] || 0, f = Math.round(A * 3); if (!f) return; const im = HDIMG[q.img];
