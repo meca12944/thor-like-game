@@ -1,0 +1,650 @@
+{
+ "walk_r2/000.png:A": {
+  "iou": 0.93,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/000.png:B": {
+  "iou": 0.93,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/000.png:C": {
+  "iou": 0.93,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/001.png:A": {
+  "iou": 0.9,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.98,
+  "stamped": true
+ },
+ "walk_r2/001.png:B": {
+  "iou": 0.9,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.98,
+  "stamped": true
+ },
+ "walk_r2/001.png:C": {
+  "iou": 0.9,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.98,
+  "stamped": true
+ },
+ "walk_r2/002.png:A": {
+  "iou": 0.88,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.91,
+  "stamped": true
+ },
+ "walk_r2/002.png:B": {
+  "iou": 0.88,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.91,
+  "stamped": true
+ },
+ "walk_r2/002.png:C": {
+  "iou": 0.88,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 0.91,
+  "stamped": true
+ },
+ "walk_r2/003.png:A": {
+  "iou": 0.94,
+  "at": [
+   38,
+   150
+  ],
+  "size_k": 0.99,
+  "stamped": true
+ },
+ "walk_r2/003.png:B": {
+  "iou": 0.94,
+  "at": [
+   38,
+   150
+  ],
+  "size_k": 0.99,
+  "stamped": true
+ },
+ "walk_r2/003.png:C": {
+  "iou": 0.94,
+  "at": [
+   38,
+   150
+  ],
+  "size_k": 0.99,
+  "stamped": true
+ },
+ "walk_r2/004.png:A": {
+  "iou": 0.87,
+  "at": [
+   39,
+   151
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/004.png:B": {
+  "iou": 0.87,
+  "at": [
+   39,
+   151
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/004.png:C": {
+  "iou": 0.87,
+  "at": [
+   39,
+   151
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/005.png:A": {
+  "iou": 0.96,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "walk_r2/005.png:B": {
+  "iou": 0.96,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "walk_r2/005.png:C": {
+  "iou": 0.96,
+  "at": [
+   42,
+   150
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "walk_r2/006.png:A": {
+  "iou": 0.84,
+  "at": [
+   41,
+   149
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "walk_r2/006.png:B": {
+  "iou": 0.84,
+  "at": [
+   41,
+   149
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "walk_r2/006.png:C": {
+  "iou": 0.84,
+  "at": [
+   41,
+   149
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "walk_r2/007.png:A": {
+  "iou": 0.87,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/007.png:B": {
+  "iou": 0.87,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "walk_r2/007.png:C": {
+  "iou": 0.87,
+  "at": [
+   39,
+   150
+  ],
+  "size_k": 0.97,
+  "stamped": true
+ },
+ "run_se2/000.png:A": {
+  "iou": 0.68,
+  "at": [
+   33,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/000.png:B": {
+  "iou": 0.68,
+  "at": [
+   33,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/000.png:C": {
+  "iou": 0.68,
+  "at": [
+   33,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/001.png:A": {
+  "iou": 0.74,
+  "at": [
+   35,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/001.png:B": {
+  "iou": 0.74,
+  "at": [
+   35,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/001.png:C": {
+  "iou": 0.74,
+  "at": [
+   35,
+   167
+  ],
+  "size_k": 1.0,
+  "stamped": true
+ },
+ "run_se2/002.png:A": {
+  "iou": 0.68,
+  "at": [
+   39,
+   164
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "run_se2/002.png:B": {
+  "iou": 0.68,
+  "at": [
+   39,
+   164
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "run_se2/002.png:C": {
+  "iou": 0.68,
+  "at": [
+   39,
+   164
+  ],
+  "size_k": 0.94,
+  "stamped": true
+ },
+ "run_se2/003.png:A": {
+  "iou": 0.67,
+  "at": [
+   34,
+   163
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/003.png:B": {
+  "iou": 0.67,
+  "at": [
+   34,
+   163
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/003.png:C": {
+  "iou": 0.67,
+  "at": [
+   34,
+   163
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/004.png:A": {
+  "iou": 0.72,
+  "at": [
+   31,
+   164
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/004.png:B": {
+  "iou": 0.72,
+  "at": [
+   31,
+   164
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/004.png:C": {
+  "iou": 0.72,
+  "at": [
+   31,
+   164
+  ],
+  "size_k": 1.01,
+  "stamped": true
+ },
+ "run_se2/005.png:A": {
+  "iou": 0.71,
+  "at": [
+   35,
+   164
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_se2/005.png:B": {
+  "iou": 0.71,
+  "at": [
+   35,
+   164
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_se2/005.png:C": {
+  "iou": 0.71,
+  "at": [
+   35,
+   164
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_se2/006.png:A": {
+  "iou": 0.67,
+  "at": [
+   38,
+   165
+  ],
+  "size_k": 0.96,
+  "stamped": true
+ },
+ "run_se2/006.png:B": {
+  "iou": 0.67,
+  "at": [
+   38,
+   165
+  ],
+  "size_k": 0.96,
+  "stamped": true
+ },
+ "run_se2/006.png:C": {
+  "iou": 0.67,
+  "at": [
+   38,
+   165
+  ],
+  "size_k": 0.96,
+  "stamped": true
+ },
+ "run_se2/007.png:A": {
+  "iou": 0.69,
+  "at": [
+   34,
+   167
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_se2/007.png:B": {
+  "iou": 0.69,
+  "at": [
+   34,
+   167
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_se2/007.png:C": {
+  "iou": 0.69,
+  "at": [
+   34,
+   167
+  ],
+  "size_k": 1.03,
+  "stamped": true
+ },
+ "run_s/000.png:A": {
+  "iou": 0.83,
+  "at": [
+   42,
+   123
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/000.png:B": {
+  "iou": 0.83,
+  "at": [
+   42,
+   123
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/000.png:C": {
+  "iou": 0.83,
+  "at": [
+   42,
+   123
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/001.png:A": {
+  "iou": 0.84,
+  "at": [
+   41,
+   122
+  ],
+  "size_k": 0.89,
+  "stamped": true
+ },
+ "run_s/001.png:B": {
+  "iou": 0.84,
+  "at": [
+   41,
+   122
+  ],
+  "size_k": 0.89,
+  "stamped": true
+ },
+ "run_s/001.png:C": {
+  "iou": 0.84,
+  "at": [
+   41,
+   122
+  ],
+  "size_k": 0.89,
+  "stamped": true
+ },
+ "run_s/002.png:A": {
+  "iou": 0.77,
+  "at": [
+   39,
+   124
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/002.png:B": {
+  "iou": 0.77,
+  "at": [
+   39,
+   124
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/002.png:C": {
+  "iou": 0.77,
+  "at": [
+   39,
+   124
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/003.png:A": {
+  "iou": 0.81,
+  "at": [
+   39,
+   125
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/003.png:B": {
+  "iou": 0.81,
+  "at": [
+   39,
+   125
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/003.png:C": {
+  "iou": 0.81,
+  "at": [
+   39,
+   125
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/004.png:A": {
+  "iou": 0.84,
+  "at": [
+   42,
+   126
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/004.png:B": {
+  "iou": 0.84,
+  "at": [
+   42,
+   126
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/004.png:C": {
+  "iou": 0.84,
+  "at": [
+   42,
+   126
+  ],
+  "size_k": 0.84,
+  "stamped": true
+ },
+ "run_s/005.png:A": {
+  "iou": 0.78,
+  "at": [
+   42,
+   125
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/005.png:B": {
+  "iou": 0.78,
+  "at": [
+   42,
+   125
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/005.png:C": {
+  "iou": 0.78,
+  "at": [
+   42,
+   125
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/006.png:A": {
+  "iou": 0.76,
+  "at": [
+   38,
+   125
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/006.png:B": {
+  "iou": 0.76,
+  "at": [
+   38,
+   125
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/006.png:C": {
+  "iou": 0.76,
+  "at": [
+   38,
+   125
+  ],
+  "size_k": 0.85,
+  "stamped": true
+ },
+ "run_s/007.png:A": {
+  "iou": 0.8,
+  "at": [
+   39,
+   123
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/007.png:B": {
+  "iou": 0.8,
+  "at": [
+   39,
+   123
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ },
+ "run_s/007.png:C": {
+  "iou": 0.8,
+  "at": [
+   39,
+   123
+  ],
+  "size_k": 0.87,
+  "stamped": true
+ }
+}
