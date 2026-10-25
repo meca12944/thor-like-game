@@ -227,8 +227,16 @@ mp = {
     'objects': objs,
     'camZones': [{'x0': 0, 'y0': 12, 'x1': W, 'y1': 34, 'zoom': 0.8, 'look': -7.5, 'f': 8}],   # 북쪽 끝에선 위를 올려다봄 (무덤가와 같은 값) → 낭떠러지 너머 왕성
     'spawns': {'default': [75.5, 243.5, 'up'], 'felt': [75.5, 243.5, 'up']},
-    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {}, 'fx': {}},
+    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {}, 'fx': {},
+           # 모닥불 2곳: 불·연기·깜빡이는 빛은 코드 (효과 담당 10-25)
+           'fires': [[33.5, 121.4, 1.1], [120.5, 80.4, 1.0]], 'smoke': [[33.5, 121.0, 1.0], [120.5, 80.0, 0.9]], 'flick': [[33.5, 121.4, 48, '#ff8a3a', 1], [120.5, 80.4, 44, '#ff8a3a', 1]]},
     'note': '1장 동쪽 들판 (build_ch1_east.py 가 만든다, 고칠 땐 빌더를 고치고 다시 돌린다). 설계도 field_e = 전체 440,70.',
 }
+# 코드 효과 (효과 담당 10-25, world.js scenefx): 검은 호수에 비친 왕성 + 잔물결 + 물가 반짝임 / 종탑 물결·먼 종 / 북쪽 낭떠러지 안개 + 모닥불 쉼터 그림
+for o in mp['objects']:
+    if o['type'] == 'waystone' and o['id'] in ('ws_giant_palm', 'ws_road_head'): o['art'] = 'camp'
+mp['objects'] += [{'type': 'scenefx', 'kind': 'lakeart', 'x': 84, 'y': 34, 'w': 85, 'h': 50, 'img': 'assets/world/ch1_east/black_lake.webp', 'cw': .5, 'ch': .6},
+                  {'type': 'scenefx', 'kind': 'bell', 'x': 128.5, 'y': 61.7, 'w': 1, 'h': 1, 'r': 3, 'per': 20},
+                  {'type': 'scenefx', 'kind': 'mistband', 'x': 0, 'y': 9, 'w': 190, 'h': 9, 'a': 1, 'sp': 7}]
 json.dump(mp, open(os.path.join(T128, 'maps/ch1_field_e.json'), 'w'), ensure_ascii=False, indent=1)
 print('ok', W, H, 'mobs', sum(1 for o in objs if o['type'] == 'spawn'), 'props', len(props), 'under', len(under))

@@ -339,14 +339,16 @@
    "id": "ws_giant_palm",
    "x": 33,
    "y": 121,
-   "name": "거인 손바닥 모닥불"
+   "name": "거인 손바닥 모닥불",
+   "art": "camp"
   },
   {
    "type": "waystone",
    "id": "ws_road_head",
    "x": 120,
    "y": 80,
-   "name": "가도 들머리 모닥불"
+   "name": "가도 들머리 모닥불",
+   "art": "camp"
   },
   {
    "type": "vista",
@@ -659,6 +661,37 @@
    "x": 175,
    "y": 78,
    "respawn": 30
+  },
+  {
+   "type": "scenefx",
+   "kind": "lakeart",
+   "x": 84,
+   "y": 34,
+   "w": 85,
+   "h": 50,
+   "img": "assets/world/ch1_east/black_lake.webp",
+   "cw": 0.5,
+   "ch": 0.6
+  },
+  {
+   "type": "scenefx",
+   "kind": "bell",
+   "x": 128.5,
+   "y": 61.7,
+   "w": 1,
+   "h": 1,
+   "r": 3,
+   "per": 20
+  },
+  {
+   "type": "scenefx",
+   "kind": "mistband",
+   "x": 0,
+   "y": 9,
+   "w": 190,
+   "h": 9,
+   "a": 1,
+   "sp": 7
   }
  ],
  "camZones": [
@@ -1465,7 +1498,47 @@
   },
   "grade": "ash",
   "decoArt": {},
-  "fx": {}
+  "fx": {},
+  "fires": [
+   [
+    33.5,
+    121.4,
+    1.1
+   ],
+   [
+    120.5,
+    80.4,
+    1.0
+   ]
+  ],
+  "smoke": [
+   [
+    33.5,
+    121.0,
+    1.0
+   ],
+   [
+    120.5,
+    80.0,
+    0.9
+   ]
+  ],
+  "flick": [
+   [
+    33.5,
+    121.4,
+    48,
+    "#ff8a3a",
+    1
+   ],
+   [
+    120.5,
+    80.4,
+    44,
+    "#ff8a3a",
+    1
+   ]
+  ]
  },
  "note": "1장 동쪽 들판 (build_ch1_east.py 가 만든다, 고칠 땐 빌더를 고치고 다시 돌린다). 설계도 field_e = 전체 440,70."
 }
