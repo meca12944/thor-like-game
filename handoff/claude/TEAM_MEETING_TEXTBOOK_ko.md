@@ -369,6 +369,7 @@
 
 ## 6-3. 경관 효과
 - 먼 안개 띠 `drawFarFog` + 잿가루 바람 `drawAshFall`(`m.wind`·`m.ash`·`m.fog`) — main 반영(#162), 합쳐 0.13~0.19ms (`handoff/claude/team/vista_fx_v1/`).
+- **PC로 늘림 (10-25, 사장님 「PC용 게임」)**: 잿가루를 두 겹으로 — 먼 작은 재(1px, 화면에 고정) + 가까운 큰 재(2px, 22%, 카메라가 움직이면 땅보다 1.35배 더 미끄러짐 = 깊이). 개수 한도 160 → 260. 늘어난 그리기 = 점 약 40~60개 (`claude/pc-ash`, 영상 `handoff/claude/team/pc_ash_v1/ash_two_layer_pc_v1.mp4`).
 - **scenefx 물체 5종** (지도 `objects` 에 `{"type":"scenefx","kind",…}`): shade(수도교 그늘 띠 + 빛줄기) / ashfall(잿가루 폭포) / updraft(구덩이로 빨려 오르는 재) / thread(붉은 실 흔들림 + 박동) / lake(검은 물에 비친 왕성 탑). 5개 모두 켜도 0.85~0.90ms (`claude/ch1-scenefx` 23aac302, `scenefx_obj_v1/README_ko.md`). 위치는 1장 지도 담당이 정함.
 - 실 효과(아라크네): 겨냥 실(느슨→팽팽), 실 감옥 빛나는 실, 2페이즈 붉은 실 + 심장 박동 1.1초 (`claude/boss-threadfx`).
 
