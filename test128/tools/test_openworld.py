@@ -65,15 +65,24 @@ with sync_playwright() as p:
     ev("()=>__world.go('dungeon01_b2','boss')"); settle(); adv(.2)
     b2 = ev("()=>({map:__world.map.id,t:__world.tile()})")
     check('dungeon01_b2 alias (boss room exit)', b2['map'] == 'dungeon01_b1' and abs(b2['t'][0] - 84) <= 1, b2)
-    # 1장 (새 판): 펠트 + 잿빛 들판 = one map (maps/ch1.json composeMap), music follows the area, ?go=field_felt&at= still lands right
+    # 1장 (그록 펠트 v5, 10-25): 펠트(150x120)와 잿빛 들판은 따로 — 펠트 서쪽 출입구 ↔ field_felt 북쪽 길 (문 = 페이드 전환)
+    def walk(key, dest):  # hold a key until the door fade has run and we stand in `dest` (map loads are async: one evaluate per step)
+        ev("()=>__world.key('%s',true)" % key); seen = {'tr': False, 'card': None}
+        for _ in range(140):
+            r = ev("()=>{let o={};for(let i=0;i<6;i++){__world.advance(1/60);const T=__world.S.trans;if(T){o.tr=1;if(T.cardData)o.card=T.cardData.name;}}return Object.assign(o,{busy:!!__world.S.trans,map:__world.map&&__world.map.id})}")
+            if r.get('tr'): seen['tr'] = True
+            if r.get('card'): seen['card'] = r['card']
+            if seen['tr'] and not r['busy'] and r['map'] == dest: break
+            pg.wait_for_timeout(15)
+        ev("()=>__world.key('%s',false)" % key); adv(.2)
+        return dict(seen, **ev("()=>({map:__world.map.id,t:__world.tile(),bgm:__world.S.bgm})"))
     ev("()=>__world.go('felt','default')"); settle(); adv(.2)
-    ev("()=>{__world.killAll();__world.setHeroTile(30,31,'down');__world.S.area='felt'}"); ev("()=>__world.key('ArrowDown',true)")
-    c1 = ev("()=>{let tr=false,card=null;for(let i=0;i<200;i++){__world.advance(1/60);if(__world.trans)tr=true;if(__world.S.areaCard)card=__world.S.areaCard.a.name;}__world.key('ArrowDown',false);return {tr,card,y:__world.tile()[1],map:__world.map.id,bgm:__world.S.bgm}}")
-    pg.screenshot(path=O + '/10_ch1_seam.png')
-    check('felt -> ash field one map', c1['map'] == 'ch1' and not c1['tr'] and c1['y'] >= 36 and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest', c1)
-    ev("()=>__world.go('field_felt','felt')"); settle(); adv(.2)
-    ff = ev("()=>({map:__world.map.id,t:__world.tile()})")
-    check('field_felt alias', ff['map'] == 'ch1' and abs(ff['t'][1] - 37) <= 1, ff)
+    ev("()=>{__world.killAll();__world.setHeroTile(2,70,'left')}")
+    c1 = walk('ArrowLeft', 'field_felt'); pg.screenshot(path=O + '/10_felt_west_gate.png')
+    check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)
+    ev("()=>{__world.killAll();__world.setHeroTile(28,2,'up')}")
+    ff = walk('ArrowUp', 'felt')
+    check('ash field -> felt west gate', ff['map'] == 'felt' and ff['tr'] and abs(ff['t'][0] - 3) <= 2 and abs(ff['t'][1] - 70) <= 2, ff)
     # resume after a reload: last save = here
     ev("()=>{__world.killAll();__world.tap('F5')}"); adv(.1); sv = ev("()=>__world.SAVE.resume")
     pg.goto(B + '?noscene'); pg.wait_for_function('window.__world&&__world.ready&&__world.scene!=="town"&&!__world.trans', timeout=30000); pg.wait_for_timeout(600)
