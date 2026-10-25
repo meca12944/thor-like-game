@@ -3847,10 +3847,36 @@
    "floor": "#24201e",
    "side": "#24201e",
    "edge": 0.07,
+   "skyArt": {
+    "img": "assets/world/castle_far/sky.webp",
+    "w": 2560,
+    "h": 1440,
+    "dim": 0.25,
+    "clouds": [
+     {
+      "img": "assets/world/castle_far/clouds_far.webp",
+      "w": 3072,
+      "v": 25.6
+     },
+     {
+      "img": "assets/world/castle_far/clouds_near.webp",
+      "w": 4608,
+      "v": 38.4
+     }
+    ]
+   },
+   "city": {
+    "img": "assets/world/castle_far/city.webp",
+    "x0": -3400,
+    "y0": 566.0,
+    "w": 9360,
+    "h": 878.0
+   },
    "x": 46,
    "px": 0.95,
    "fit": [-0.8, 13.05, 1.2, 2.2, 3.4],
    "clipY": 12.7,
+   "lift": 0.4,
    "fog": [
     [
      1209.6,
@@ -3864,8 +3890,7 @@
      0.11,
      -4
     ]
-   ],
-   "lift": 0.4
+   ]
   },
   "fx": {
    "particles": "ash",

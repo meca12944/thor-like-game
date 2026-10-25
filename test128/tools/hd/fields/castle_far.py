@@ -7,9 +7,10 @@ Game files (test128/assets/world/castle_far/):
   castle_far.webp        the whole castle (back layer), 1920x1080
   castle_far_front.webp  the outer wall band only (y >= 1345 in the 2560 picture), drawn on top with a touch of extra parallax
   castle_glow_4x4.webp   lit windows (flicker), 16 frames, 4x4 cells, cropped to the window box, 0.75 scale (= the base picture)
+  sky.webp, clouds_far.webp, clouds_near.webp  the illustrator's sky + two drifting cloud layers (half size), behind the castle
   castle_fx_4x4.webp     smoke + ash + crows, 16 frames, 4x4 cells, cropped to their box, 0.5 scale
 world.js drawBackdrop draws base -> glow cell -> fx cell -> front at the same fit/scale; frame = floor(t * fps) % 16.
-usage: python3 tools/hd/fields/castle_far.py [src dir]   (rebuilds the webp files and patches the backdrop in maps/felt.json + maps/prologue_grave.json)"""
+usage: python3 tools/hd/fields/castle_far.py [src dir | sky]   (rebuilds the webp files and patches the backdrop in maps/felt.json + maps/prologue_grave.json)"""
 import os, sys, json
 from PIL import Image
 import numpy as np
@@ -65,6 +66,14 @@ def build(src):
     json.dump(meta, open(rel(OUT + 'castle_far.json'), 'w'), indent=1)
     return meta
 
+SKY_SRC = '/workspace/map_review/castle_art/sky'   # the illustrator's sky + clouds (owner 10-25 「구름이 움직여야지」): sky.png 2560x1440, clouds_far 3072 / clouds_near 4608 wide, tile left-right
+def build_sky(src=SKY_SRC):
+    """sky.webp + clouds_far.webp + clouds_near.webp at half size (soft watercolour: no visible loss; 2.5 MB -> a few hundred KB)"""
+    Image.open(src + '/sky.png').convert('RGB').resize((SW // 2, SH // 2), Image.LANCZOS).save(rel(OUT + 'sky.webp'), 'WEBP', quality=84, method=6)
+    for n in ('clouds_far', 'clouds_near'):
+        im = Image.open(src + '/%s.png' % n).convert('RGBA'); im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
+        a = np.array(im); a[a[..., 3] < 2] = 0; Image.fromarray(a).save(rel(OUT + n + '.webp'), 'WEBP', quality=84, method=6, alpha_quality=88)
+
 def backdrop(kind, meta=None):
     """the hd.backdrop entry (picture px = the 2560x1440 source; world.js scales by b.iw / image width)."""
     meta = meta or json.load(open(rel(OUT + 'castle_far.json')))
@@ -75,9 +84,14 @@ def backdrop(kind, meta=None):
          'sky': BG, 'floor': BG, 'side': BG, 'edge': .07,
          # 살아 있는 성 (사장님 10-25, 팀 회의 교본 6-6): 핵 심장 박동 빛 · 굳은 기사의 잿빛 횃불 순찰 [x0, x1, 속도, 위상, 성곽y?] · 먼 종 [x, y, 색, 반지름, 주기초] — 그림 좌표(2560)
          'alive': {'core': [1259, 92, '#6cc4ff', 90], 'torch': [[160, 760, 34, 0], [700, 1250, 26, .4], [1180, 1660, 30, .7], [1900, 2380, 22, .2], [620, 1080, 24, .3, 1146], [1100, 1560, 20, .6, 1182], [240, 560, 18, .1, 1188]],
-                   'ty': 1352, 'bell': [1300, 1060, '#ffe2b0', 60, 26]}}
+                   'ty': 1352, 'bell': [1300, 1060, '#ffe2b0', 60, 26]},
+         # skyArt (world.js CASTLE_SKY / ?nosky): the illustrator's sky behind the castle, mirrored left-right past its ends; clouds tile left-right and drift left
+         # (v = source px / s: one tile per 120 s), drawn before the castle so they only pass behind it; dim = dark veil over sky + clouds (the castle must read)
+         'skyArt': {'img': OUT + 'sky.webp', 'w': SW, 'h': SH, 'dim': .25, 'clouds': [{'img': OUT + 'clouds_far.webp', 'w': 3072, 'v': 25.6}, {'img': OUT + 'clouds_near.webp', 'w': 4608, 'v': 38.4}]}}
+    cj = rel(OUT + 'city.json')   # a13: the capital round the castle (castle_city.py), drawn before the castle picture, its bottom row stretched to the clip line
+    if os.path.exists(cj): b['city'] = json.load(open(cj))
     if kind == 'felt':      # behind the capital wall: shows through the breaches, the whole castle from the gate vista
-        b.update({'x': 75, 'px': .92, 'fit': [.02, 14, .9, .97, 1.04, .33], 'clipY': 26.5, 'fog': [[SH * .80, SH * .12, .07, 5], [SH * .90, SH * .12, .10, 9]]})
+        b.update({'x': 75, 'px': .92, 'fit': [.02, 17.5, .9, .97, 1.04], 'nv': [.55, .3, 25.2], 'nvv': [.82, .5], 'clipY': 26.5, 'fog': [[SH * .80, SH * .12, .07, 5], [SH * .90, SH * .12, .10, 9]]})
     else:                   # 무명 무덤가: past the end of the road / from the crest, over the field's lip
         b.update({'x': 46, 'px': .95, 'fit': [.02, 13.05, .25, .97, 1.04], 'clipY': 12.7, 'lift': .4, 'fog': [[SH * .84, SH * .10, .08, 5], [SH * .92, SH * .09, .11, -4]]})
     return b
@@ -86,11 +100,14 @@ def patch_maps(meta):
     for f, kind in (('maps/felt.json', 'felt'), ('maps/prologue_grave.json', 'pg')):
         p = rel(f); j = json.load(open(p)); h = j['hd'] if 'hd' in j else j['hds'][0]
         old = h.get('backdrop') or {}; nb = backdrop(kind, meta)
-        for k in ('x', 'px', 'fit', 'clipY'): nb[k] = old.get(k, nb[k])   # keep the map's own placement (set by its build script)
+        for k in ('x', 'px', 'fit', 'clipY', 'nv', 'nvv'):
+            if k in old or k in nb: nb[k] = old.get(k, nb.get(k))   # keep the map's own placement (set by its build script)
         if isinstance(old.get('front'), list): nb['front'] = [nb['front']] + old['front'][1:]   # 무명 무덤가: 펠트 마을 띠 등 덧붙인 앞 띠는 지킴 (팀장 10-25)
         h['backdrop'] = nb; json.dump(j, open(p, 'w'), ensure_ascii=False, indent=1); print('patched', f)
 
 if __name__ == '__main__':
     src = sys.argv[1] if len(sys.argv) > 1 else '/workspace/map_review/castle_art'
-    m = build(src); print(json.dumps(m)); patch_maps(m)
+    if src == 'sky': build_sky(); patch_maps(None)
+    elif src == 'patch': patch_maps(None)            # a13: only re-write the two maps' backdrop entries (e.g. after castle_city.py)
+    else: m = build(src); build_sky(); print(json.dumps(m)); patch_maps(m)
     for n in sorted(os.listdir(rel(OUT))): print(n, os.path.getsize(rel(OUT + n)))
