@@ -1777,8 +1777,9 @@
   function gkDraw(k) { const cg = carryGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg) return; const sc = k * H128FIG / ART_FIG, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
-    if (cg) carryBlade(ctx, cg);
+    ctx.globalAlpha = heroBlinkA(); if (cg) carryBlade(ctx, cg);
     if (comboBlade() && swordC()) heroBlade(ctx); // 콤보 당김·끝에 멈춤 동안 코드 칼 (모션연구방 10-24 「칼이 안사라지는데?」)
+    ctx.globalAlpha = 1;
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
       ctx.strokeStyle = `rgba(220,245,255,${al})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 4 + a * (m.big ? 4 : 3), 0, TAU); ctx.stroke();
@@ -1844,14 +1845,15 @@
     if (h.brake) { h.brake = 0; h.lnV = (h.lnV || 0) + BRAKE_KICK; } // reversal: the body keeps going the old way for a moment (lnDir = old heading)
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
+  const heroBlinkA = () => hero.inv > 0 && Math.floor(hero.inv * 20) % 2 && !hero.roll && S.deadT <= 0 && !S.ultFx ? .45 : 1; // no blink / white wash during an ultimate (the hero is the star of the shot)
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero; nsPreload();
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, null); } // 잔상 = 주인공 모습 그대로 (색 덮기 없음)
-    if (h.inv > 0 && Math.floor(h.inv * 20) % 2 && !h.roll && S.deadT <= 0 && !S.ultFx) return; // no blink / white wash during an ultimate (the hero is the star of the shot)
+    const BA = heroBlinkA(); // 무적 깜빡임 = 몸·칼 모두 45 % (전: 몸을 통째로 안 그려서 칼만 떠 있었음, 회의 2차 10-25)
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     { const LN = h8Lean(h); if (LN) { const f = H128FIG / ART_FIG; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; const gt = K.t != null ? K.t - 1 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
-    drawH128(h128Cell(), h.x + kx, h.y + ky, k, 1, null); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
+    drawH128(h128Cell(), h.x + kx, h.y + ky, k, BA, null); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); drawStam(k); } // hero8 attack frames carry their own painted slash trail
   function drawSlashHi(k) { const a = hero.atk, AT = atkT(a.i), p = a.t / AT.dur, dv = FACEV[hero.face], base = Math.atan2(dv[1], dv[0]); if (p > (a.i === 2 ? .9 : .85)) return;
     const G = h128(), SL = (G.H128.slash || {}), hs = SL[a.i >= 2 ? 'hit3' : a.i === 1 ? 'hit2' : 'hit1'] || {}, pv = (SL.pivot || {})[hero.face] || [0, -34], f = H128FIG / 78; // town px -> field px via figure ratio
