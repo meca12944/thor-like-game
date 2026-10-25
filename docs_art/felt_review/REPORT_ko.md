@@ -1,4 +1,6 @@
 # 펠트 마을 "느낌이 안 산다" 진단 & 개선 회의록
+
+> **알림 (2026-10-24)**: 새 최우선 정본은 `docs_story/MASTER_PLAN_정본_20261024_ko.md`다. 이 문서와 어긋나는 곳은 마스터 플랜을 따른다 — "30년 전 왕도 화재" 배경·펠트 NPC 구성과 생김새·리네트 첫 만남 위치가 새 정본과 다르다.
 작성: Grok Bot (executor) · 2026-10-24 (KST) · 대상: `thor-like-game` origin/main `19d26408` (읽기 전용으로 확인, 레포는 수정 안 함)
 참여 자료: 인게임 캡처 (`shots/`), `tools/hd/build_felt.py`, `maps/src/felt.json`, `maps/felt.json`, `world.js`, `FELT.md`, 컨셉 `town_felt/felt_2.png`, 스토리 작가안 `story_ideas_ko.md`
 
