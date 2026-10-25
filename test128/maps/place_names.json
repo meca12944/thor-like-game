@@ -1,0 +1,122 @@
+{
+ "note": "기억 없는 주인공의 지명 (사장님 10-25). 배우기 전엔 unknown 이 보인다. learn: talk:<NPC id> / scene:<장면 키> / visit:<지도 id>. 스토리 담당이 채운다. world.js placeText·learnPlaces. 채움: 스토리 3번방 10-25 — 바르트 첫 대화(왕도·잿빛 들판·펠트를 처음 말해 줌) 또는 아라크네 뒤 기억 조각에서 배움. 긴 글(문장 통째)을 먼저 넣어 「성벽 아래 마을 마을」처럼 겹치지 않게.",
+ "places": [
+  {
+   "name": "펠트 성벽 바깥, 이름 없는 무덤가 언덕",
+   "unknown": "낯선 성벽 바깥, 이름 없는 무덤가 언덕",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "저 성벽 너머, 펠트 — 그리고 왕성",
+   "unknown": "그 너머 높은 성벽 — 그리고 거대한 성",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "왕도의 거대한 성벽 그늘 아래, 불타 버린 외곽 마을",
+   "unknown": "거대한 성벽 그늘 아래, 불타 버린 마을",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "왕도의 성벽 — 펠트는 그 그늘 아래에 있다",
+   "unknown": "하늘을 가린 성벽 — 마을은 그 그늘 아래에 웅크려 있다",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "불탄 왕도 외곽, 실에 얽힌 들",
+   "unknown": "불탄 성 바깥, 실에 얽힌 들",
+   "flag": "know_ashfield",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "1장 · 펠트",
+   "unknown": "1장",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "펠트 마을",
+   "unknown": "성벽 아래 마을",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "펠트 서문",
+   "unknown": "성벽 쪽 길",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "펠트로",
+   "unknown": "마을로",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "펠트",
+   "unknown": "성벽 아래 마을",
+   "flag": "know_felt",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "잿빛 들판",
+   "unknown": "재로 덮인 들",
+   "flag": "know_ashfield",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "왕도",
+   "unknown": "거대한 성",
+   "flag": "know_capital",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  },
+  {
+   "name": "왕성",
+   "unknown": "거대한 성",
+   "flag": "know_capital",
+   "learn": [
+    "talk:f_bart",
+    "scene:boss_post:arachne"
+   ]
+  }
+ ]
+}

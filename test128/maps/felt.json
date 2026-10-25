@@ -4,8 +4,7 @@
  "title": {
   "kicker": "CHAPTER 1",
   "name": "펠트",
-  "sub": "왕도의 거대한 성벽 그늘 아래, 불타 버린 외곽 마을",
-  "unk": {"name": "성벽 아래 마을", "sub": "거대한 성벽 그늘 아래, 불타 버린 마을", "flag": "met_f_bart"}
+  "sub": "왕도의 거대한 성벽 그늘 아래, 불타 버린 외곽 마을"
  },
  "bgm": "town_ruin",
  "battleBgm": "field_battle",
@@ -618,7 +617,6 @@
    "pan": 20.5,
    "name": "무너진 옛 성문",
    "sub": "왕도의 성벽 — 펠트는 그 그늘 아래에 있다",
-   "unk": {"sub": "하늘을 가린 성벽 — 마을은 그 그늘 아래에 웅크려 있다", "flag": "met_f_bart"},
    "x": 75,
    "y": 38,
    "hold": 1
