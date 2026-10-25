@@ -1533,10 +1533,10 @@
   // ---- 자연스러운 방향 전환 (모션연구방 10-23, 사장님 "누가 봐도 자연스러운 방향전환"): 그림 방향은 45°씩 돌아감(90° 이상 꺾으면 사이 방향을 0.04초씩 거침,
   // 뒤로 돌 때는 화면 쪽(↓)으로 돎) + 동작이 바뀌는 순간 머리가 순간이동하지 않게 그 차이를 0.06초에 걸쳐 풀어 줌(H8POP). 그림만 바뀌고 이동·공격 방향은 그대로.
   const PIVOT = { on: Q.get('pivot') !== '0', t: .08, lo: .35 }; // run reversal: 0.08 s plant, speed 35% -> 100% (input / facing / attack direction stay instant)
-  const TURN_STEP = .04, POP_TAU = .06, H8HX = new Map(); let h8HXcv = null;
+  const TURN_STEP = 3 / 60, POP_TAU = .06, H8HX = new Map(); let h8HXcv = null;
   // 방향 전환 연구 (모션연구방 10-24, 사장님 "방향 전환 시 모션이 있어야 부드럽고 역동적"): 달리며 크게 꺾으면 한 칸씩 더 천천히 돌고(TURN_RUN),
   // 135° 이상 꺾으면 브레이크 = 발밑 먼지 + 몸이 원래 가던 쪽으로 쏠렸다 돌아옴(h8Lean 반동). 그림·이동 방향은 그대로 바로.
-  const TURN_RUN = .07, BRAKE_KICK = 170;
+  const TURN_RUN = 3 / 60, BRAKE_KICK = 170; // 달리기 돌기도 45°마다 3틱 (교과서 13-1, 4번방 재검수 10-25: .07 = 4.2틱이라 180°가 약 17틱)
   function h8Turn(h, f8) { const T = DIR8.indexOf(f8), now = S.t; if (T < 0) return f8;
     if (h.vd == null || S.deadT > 0 || h.roll || h.vdSnap || now < (h.vdT ?? now)) { h.vdSnap = false; h.vd = T; h.vdTg = T; h.vdT = now; h.vdAcc = 0; return f8; }
     const dt = Math.min(.1, now - h.vdT); h.vdT = now; let diff = ((T - h.vd) % 8 + 8) % 8;
