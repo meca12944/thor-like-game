@@ -181,10 +181,6 @@
     [
      "potion",
      1
-    ],
-    [
-     "m_hardwood",
-     1
     ]
    ]
   },
@@ -374,10 +370,6 @@
     [
      "potion",
      2
-    ],
-    [
-     "m_hardwood",
-     2
     ]
    ],
    "note": "secret: walk through the odd tree (Y) at the top of the glade"
@@ -389,7 +381,7 @@
    "y": 31,
    "loot": [
     [
-     "heart_piece",
+     "potion",
      1
     ]
    ],
@@ -404,10 +396,6 @@
     [
      "potion",
      1
-    ],
-    [
-     "m_a1_shared",
-     3
     ]
    ]
   },
@@ -418,7 +406,7 @@
    "y": 14,
    "loot": [
     [
-     "spirit_drop",
+     "potion",
      1
     ]
    ],
