@@ -3802,11 +3802,18 @@
    "ay": 1372,
    "cy0": 17,
    "bw": 2518,
-   "front": {
-    "img": "assets/world/castle_far/castle_far_front.webp",
-    "y": 1343,
-    "px": 0.03
-   },
+   "front": [
+    {
+     "img": "assets/world/castle_far/castle_far_front.webp",
+     "y": 1343,
+     "px": 0.03
+    },
+    {
+     "img": "assets/world/castle_far/felt_far_band.webp",
+     "y": 1090,
+     "px": 0.06
+    }
+   ],
    "anim": {
     "fps": 8,
     "n": 16,
@@ -3841,7 +3848,7 @@
    "edge": 0.07,
    "x": 46,
    "px": 0.95,
-   "fit": [-0.42, 13.05, 0.9, 1.5, 2.3],
+   "fit": [-0.8, 13.05, 1.2, 2.2, 3.4],
    "clipY": 12.7,
    "fog": [
     [
