@@ -1063,7 +1063,7 @@
     if (S.deadT > 0) { S.deadT += dt; if (S.deadT > 1.4) { if (takePress('attack') || takePress('interact')) retry(S.snap ? 'snap' : 'way'); else if (queue.includes('KeyT')) retry('way'); } queue.length = 0; return; }
     if (S.scene !== 'world' && takePress('save')) saveHere('manual');
     if (hero.hp > 0 && S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150)) ultAdd('autoPerSec', dt); // 필살기 게이지: 싸우는 동안 저절로 (몹이 가까이 있을 때만, owner 10-23)
-    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(S.heroStopT > 0); if (S.map && !S.trans && S.deadT <= 0) { stepPet(dt); stepDoors(dt); } if (NAV() && S.map && !S.trans) NAV().step(dt); }
+    if (S.scene === 'world') stepWorld(dt); else { stepMap(dt); gkTick(S.heroStopT > 0, dt); if (S.map && !S.trans && S.deadT <= 0) { stepPet(dt); stepDoors(dt); } if (NAV() && S.map && !S.trans) NAV().step(dt); }
     queue.length = 0;
     updateCam(dt);
   }
@@ -1726,7 +1726,7 @@
         ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); } }
     ctx.restore(); }
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
-  function gkTick(held) { if (S.gk && !held) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
+  function gkTick(held, dt = 1 / 60) { if (S.gk && !held) { for (const f of S.gk) { f.ft = (f.ft || 0) + dt * 60; while (f.ft >= .999) { f.ft--; f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } } /* 검기 틱 = 게임 시간 (저스트 회피 슬로 0.3배에서 몸은 느린데 검기만 1배로 지나가던 것, 회의 2차 10-25) */ S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
   function gkArcDraw(ctx, f) { // one arc at the local origin (hero feet), atlas px; shared with the town (window.GKART)
     if (f.i !== undefined && f.i <= 2 && S.gk && S.gk.includes(f)) return; // field combo 1-3 = the body fan (gkFanDraw); dashes / charges keep the flying arc
     const P = gkPose(f), { a, Y, fl, ox, oy } = P, [dx, dy] = f.dir; // rides with the hero, flies forward to its reach and stops there
