@@ -78,8 +78,23 @@ def save_img(src, name, scale=None):
     p = f'{OUT}/{name}.webp'; im.save(os.path.join(T128, p), 'WEBP', quality=88, method=6); return p, im
 
 # 검은 호수 (설계도 524,104 → 84,34), 물 = 막힘
-lake_p, lake = save_img(f'{G1}/08_black_lake/08_black_lake_empty_back.png', 'black_lake')
 LX, LY = 84, 34
+import numpy as np
+from scipy import ndimage as ndi
+def lake_art():   # 팀장 10-25 「까만 면」: 물가 한 줄 밝은 물결 + 종탑이 물에 거꾸로 비친 밑그림 (움직이는 잔물결·왕성 반사는 검흔 코드)
+    im = Image.open(f'{G1}/08_black_lake/08_black_lake_empty_back.png').convert('RGBA'); a = np.asarray(im).astype(np.float32)
+    water = (a[..., 3] > 128) & (a[..., :3].mean(-1) < 40)
+    rim = water & ~ndi.binary_erosion(water, iterations=5); rim = ndi.gaussian_filter(rim.astype(np.float32), 2.5)
+    glow = ndi.gaussian_filter(water.astype(np.float32), 40) * water   # 물 가운데로 갈수록 아주 조금 밝은 남색 (깊이)
+    out = a.copy(); out[..., :3] += (rim[..., None] * np.array([70, 72, 80]) * .9) + ((1 - glow)[..., None] * water[..., None] * np.array([10, 12, 18]))
+    o = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+    t = Image.open(f'{G1}/08_black_lake/08_sunken_belltower_tip_back.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+    t = Image.eval(t.convert('RGB'), lambda v: int(v * .45)).convert('RGBA'); t.putalpha(Image.open(f'{G1}/08_black_lake/08_sunken_belltower_tip_back.png').split()[3].transpose(Image.FLIP_TOP_BOTTOM).point(lambda v: int(v * .32)))
+    bx, by = int((128.5 - LX) * TS - t.width / 2), int((62 - LY) * TS - 6)
+    m = Image.fromarray((water * 255).astype(np.uint8)).crop((bx, by, bx + t.width, by + t.height)); ta = t.split()[3]
+    t.putalpha(Image.fromarray((np.asarray(ta).astype(np.float32) * np.asarray(m) / 255).astype(np.uint8)))
+    o.alpha_composite(t, (bx, by)); p = f'{OUT}/black_lake.webp'; o.save(os.path.join(T128, p), 'WEBP', quality=90, method=6); return p, im
+lake_p, lake = lake_art()
 under.append({'id': 'black_lake', 'img': lake_p, 'x': LX, 'y': LY, 'ax': 0, 'ay': 0, 'D': 1, 'under': 1})
 alpha_mask(lake, LX, LY, '~', thr=.45, dark=40)
 tip_p, tip = save_img(f'{G1}/08_black_lake/08_sunken_belltower_tip_back.png', 'belltower_tip')
@@ -87,9 +102,9 @@ props.append({'id': 'belltower_tip', 'img': tip_p, 'x': 128.5, 'y': 62, 'D': 1, 
 
 # 쓰러진 거인 기사상 (안 늘린 판 120x38, 설계도 466,160 → 26,90). 손바닥(왼쪽 끝 11타일) = 걸어 올라가는 쉼터
 kn_p, kn = save_img(f'{G1}/05_giant_knight/05_knight_body_alt_uniform_back.png', 'giant_knight')
-KX, KY = 26, 90
-under.append({'id': 'giant_knight', 'img': kn_p, 'x': KX, 'y': KY, 'ax': 0, 'ay': 0, 'D': 1, 'under': 1})
-alpha_mask(kn, KX, KY, 'K', keep=lambda tx, ty: tx <= 11 and ty >= 26, thr=.55)
+KX, KY, KD = 26, 96, 1.6   # 팀장 10-25 「거인 전체가 보이게」: 120타일(화면 3.4개)은 전망에서도 안 들어와서 1/1.6 = 75x24타일 (주인공 키의 약 11배), 그림도 줄여 그려 더 또렷
+under.append({'id': 'giant_knight', 'img': kn_p, 'x': KX, 'y': KY, 'ax': 0, 'ay': 0, 'D': KD, 'under': 1})
+alpha_mask(kn.resize((round(kn.width / KD), round(kn.height / KD)), Image.LANCZOS), KX, KY, 'K', keep=lambda tx, ty: tx <= 7 and ty >= 16, thr=.55)
 hm_p, hm = save_img(f'{G1}/05_giant_knight/05_knight_helmet_back.png', 'giant_helmet')
 props.append({'id': 'giant_helmet', 'img': hm_p, 'x': 136, 'y': 181, 'D': 1, 'fade': 1, 'shadow': 1})
 rect(130, 175, 143, 181, 'X')
@@ -108,14 +123,25 @@ rect(61, 243, 68, 246, 'X')
 
 # 작은 경관 (그록 12a·b·d): 정문~거인 사이 빈 벌판에 눈 둘 곳. back = 바닥 높이, front = 위쪽(주인공을 가림), 가로 기준선 = 그록 README 값
 SM = f'{G1}/12_small_sceneries'
-def small(name, x, y, split, solid_thr=None):
-    bp, bi = save_img(f'{SM}/{name}_back.png', name + '_back')
-    under.append({'id': name + '_b', 'img': bp, 'x': x, 'y': y, 'ax': 0, 'ay': 0, 'D': 1, 'under': 1})
+_sm_n = {}
+def save_fl(src, name, fl):
+    im = Image.open(src).convert('RGBA')
+    if fl: im = im.transpose(Image.FLIP_LEFT_RIGHT); name += '_fl'
+    p = f'{OUT}/{name}.webp'
+    if not os.path.exists(os.path.join(T128, p)) or p not in _sm_n: im.save(os.path.join(T128, p), 'WEBP', quality=88, method=6); _sm_n[p] = 1
+    return p, im
+def small(name, x, y, split, solid_thr=None, fl=False):
+    k = _sm_n[name] = _sm_n.get(name, 0) + 1
+    bp, bi = save_fl(f'{SM}/{name}_back.png', name + '_back', fl)
+    under.append({'id': f'{name}_b{k}', 'img': bp, 'x': x, 'y': y, 'ax': 0, 'ay': 0, 'D': 1, 'under': 1})
     if split is not None:
-        fp, fi = save_img(f'{SM}/{name}_front.png', name + '_front')
-        props.append({'id': name + '_f', 'img': fp, 'x': x, 'y': round(y + split * fi.height / TS, 2), 'ax': 0, 'ay': round(split * fi.height), 'D': 1, 'fade': 1, 'shadow': 0})
-    if solid_thr: alpha_mask(Image.open(f'{SM}/{name}_full_ref.png' if split is not None else f'{SM}/{name}_back.png').convert('RGBA'), x, y, 'X', thr=solid_thr,
-                             keep=lambda tx, ty: split is not None and ty < split * 0.9 * bi.height / TS)
+        fp, fi = save_fl(f'{SM}/{name}_front.png', name + '_front', fl)
+        props.append({'id': f'{name}_f{k}', 'img': fp, 'x': x, 'y': round(y + split * fi.height / TS, 2), 'ax': 0, 'ay': round(split * fi.height), 'D': 1, 'fade': 1, 'shadow': 0})
+    if solid_thr:
+        ref = Image.open(f'{SM}/{name}_full_ref.png' if split is not None else f'{SM}/{name}_back.png').convert('RGBA')
+        if fl: ref = ref.transpose(Image.FLIP_LEFT_RIGHT)
+        alpha_mask(ref, x, y, 'X', thr=solid_thr, keep=lambda tx, ty: split is not None and ty < split * 0.9 * bi.height / TS)
+    return bi.width / TS, bi.height / TS
 small('12a_collapsed_tower', 14, 150, .5, .6)
 small('12b_old_battlefield_spears', 98, 204, .45)
 small('12d_ash_mound_hill', 120, 230, None, .8)
@@ -156,6 +182,51 @@ for i in range(26):                    # 떨어진 바위 (세워진 소품, 밑
     else: continue
     props.append({'id': f'rock_{i}', 'img': rp, 'x': round(x, 1), 'y': round(y, 1), 'D': 1, 'fade': 1, 'shadow': 1})
     if i % 3 != 2: rect(int(x - w / 2 + .5), int(y - 1), int(x + w / 2 - .5), int(y), 'X')
+# ---- 화면마다 눈 둘 것 하나 (팀장 10-25 「너무 비어 보임」, 엘든링식 멀리 보이는 표지물) ----
+# PC 1080p 화면 ≈ 30x17타일 → 그 크기 칸마다 큰 경관이 없으면 하나 놓음: 마른 나무 숲 / 그록 작은 경관(뒤집은 판 포함) / 돌무더기 / 부서진 무기
+BIG = [(26, 96, 75, 24), (84, 34, 85, 50), (129, 161, 15, 20), (6, 186, 60, 6), (156, 204, 9, 10), (55, 234, 30, 14), (14, 150, 24, 18), (98, 204, 30, 21), (120, 230, 28, 16)]
+felt_deco = felt['hd'].get('decoArt', {})
+def crop_at(x, y, k):   # 길가·옛 싸움 흔적 = 펠트 잔해 그림 (그록 옛 싸움터 그림은 무기가 땅과 붙어 있어 낱개로 못 자름)
+    q = felt_deco['R'][k % len(felt_deco['R'])]; props.append(dict(q, id=f'wreck_{len(props)}', x=round(x, 1), y=round(y, 1), fade=1, shadow=1))
+def chars_near(cx, cy, ch, k, r):
+    for _ in range(k * 6):
+        if k <= 0: break
+        x, y = int(cx + rnd.uniform(-r, r)), int(cy + rnd.uniform(-r * .6, r * .6))
+        if free(x, y, 1): put(x, y, ch); k -= 1
+_dbg = [0, 0]
+SMALLS = [('12a_collapsed_tower', .5, .6), ('12b_old_battlefield_spears', .45, None), ('12c_petrified_grove', .55, None), ('12d_ash_mound_hill', None, .8)]
+for cy in range(18, 236, 17):
+    for cx in range(0, W - 10, 30):
+        if any(bx - 6 < cx + 15 < bx + bw + 6 and by - 4 < cy + 8.5 < by + bh + 4 for bx, by, bw, bh in BIG): continue   # 칸 가운데가 큰 경관 곁이면 이미 볼 것이 있음
+        kind = rnd.random(); x, y = cx + rnd.uniform(6, 24), cy + rnd.uniform(4, 13)
+        _dbg[0] += 1
+        if kind < .32:                                   # 마른 나무 숲
+            chars_near(x, y, 'T', rnd.randint(4, 7), 6); chars_near(x, y, 's', 2, 7)
+        elif kind < .62:                                 # 그록 작은 경관
+            nm, sp, st = rnd.choice(SMALLS); w0, h0 = (24, 18) if nm.startswith('12a') else (30, 21) if nm.startswith('12b') else (32, 22) if nm.startswith('12c') else (28, 16)
+            x0, y0 = min(W - w0 - 2, max(2, x - w0 / 2)), min(240 - h0, max(16, y - h0 / 2))
+            if all(free(x0 + i * w0 / 3, y0 + j * h0 / 2, 1) for i in range(4) for j in range(3)):
+                small(nm, round(x0), round(y0), sp, st, fl=rnd.random() < .5); BIG.append((round(x0), round(y0), w0, h0)); _dbg[1] += 1
+            else: chars_near(x, y, 'T', 4, 6)
+        elif kind < .82:                                 # 돌무더기
+            (rp, ri) = rocks[rnd.randrange(2)]
+            if free(x, y - 1, 2): props.append({'id': f'rock_c{len(props)}', 'img': rp, 'x': round(x, 1), 'y': round(y, 1), 'D': 1, 'fade': 1, 'shadow': 1}); rect(int(x - 2), int(y - 1), int(x + 2), int(y), 'X')
+            chars_near(x, y, 'R', rnd.randint(3, 5), 6)
+        else:                                            # 옛 싸움의 잔해
+            for k in range(rnd.randint(3, 5)):
+                px_, py_ = x + rnd.uniform(-5, 5), y + rnd.uniform(-3, 3)
+                if free(px_, py_, 1): crop_at(px_, py_, rnd.randrange(99))
+for Rd in (ROAD1, ROAD2):                                # 길가 흔적: 그루터기·부서진 무기·자갈 (길 = 사람이 다녔던 곳)
+    for i in range(len(Rd) - 1):
+        (x0, y0), (x1, y1) = Rd[i], Rd[i + 1]; L_ = math.hypot(x1 - x0, y1 - y0); nx, ny = -(y1 - y0) / max(L_, 1e-6), (x1 - x0) / max(L_, 1e-6)
+        for k in range(int(L_ / 7)):
+            t = (k + .5) / max(1, int(L_ / 7)); sd = 3.5 if (k + i) % 2 else -3.5; x, y = x0 + (x1 - x0) * t + nx * sd, y0 + (y1 - y0) * t + ny * sd
+            if not (16 < y < 240) or grid[int(y)][int(x)] != '.': continue
+            r_ = rnd.random()
+            if r_ < .35: put(int(x), int(y), 's')
+            elif r_ < .7: crop_at(x, y, rnd.randrange(99))
+            else: props.append({'id': f'peb_{len(props)}', 'img': rocks[2][0], 'x': round(x, 1), 'y': round(y, 1), 'D': 1, 'fade': 0, 'shadow': 0})
+
 for _ in range(140):
     x, y = rnd.uniform(4, W - 8), rnd.uniform(16, 240); im = rnd.choice(deco)
     if free(x + im.width / 32, y + im.height / 32, 4): ground.alpha_composite(im, (int(x * TS), int(y * TS)))
@@ -176,12 +247,11 @@ objs = []
 objs.append({'type': 'exit', 'x': 72, 'y': 259, 'w': 8, 'h': 1, 'to': 'felt', 'spawn': 'gate', 'label': '↓ 펠트 마을'})
 objs.append({'type': 'npc', 'id': 'f_verdi', 'x': 65, 'y': 243, 'name': '베르디', 'role': '기록관', 'main': 1, 'art': 'hd', 'portrait': 'f_verdi', 'face0': 'right',
              'idle': '오늘도 적을 것이 없군. 다행인지 불행인지.'})
-objs.append({'type': 'waystone', 'id': 'ws_giant_palm', 'x': 33, 'y': 121, 'name': '거인 손바닥 모닥불'})
+objs.append({'type': 'waystone', 'id': 'ws_giant_palm', 'x': 30, 'y': 115, 'name': '거인 손바닥 모닥불'})
 objs.append({'type': 'waystone', 'id': 'ws_road_head', 'x': 120, 'y': 80, 'name': '가도 들머리 모닥불'})
-objs.append({'type': 'vista', 'id': 'ce_palm', 'x': 31, 'y': 119, 'r': 3, 'zoom': 0.72, 'dir': 0, 'pan': 30, 'hold': 1,
+objs.append({'type': 'vista', 'id': 'ce_giant', 'x': 64, 'y': 142, 'r': 3.5, 'zoom': 0.27, 'dir': 270, 'pan': 24, 'hold': 1,
              'name': '쓰러진 거인', 'sub': '성문의 맹세를 지키다 누운 기사'})
-objs.append({'type': 'vista', 'id': 'ce_lake', 'x': 126, 'y': 89, 'r': 3, 'zoom': 0.62, 'dir': 270, 'pan': 24, 'hold': 1,
-             'name': '검은 호수', 'sub': '물 위로 종탑 끝만 남은 옛 거리'})
+# 검은 호수 전망 카드는 검흔이 물 반사·잔물결을 넣은 뒤에 켬 (팀장 10-25): {'id': 'ce_lake', 'x': 126, 'y': 89, 'zoom': 0.62, 'dir': 270, 'pan': 24, 'name': '검은 호수', 'sub': '물 위로 종탑 끝만 남은 옛 거리'}
 objs.append({'type': 'vista', 'id': 'ce_gate', 'x': 75, 'y': 238, 'r': 3, 'zoom': 0.62, 'dir': 270, 'pan': 0, 'hold': 1,
              'name': '1장 정문 밖', 'sub': '돌기둥에 앉은 기록관이 문을 지킨다'})
 objs.append({'type': 'clue', 'id': 'ce_remains', 'x': 80, 'y': 160, 'name': '쓰러진 탈영병', 'flag': 'ce_look_remains',
@@ -195,7 +265,7 @@ rect(0, 200, 2, 222, '#')
 rect(176, 20, W, 31, '.'); rect(W - 1, 20, W, 31, '#')
 objs.append({'type': 'sign', 'x': 186, 'y': 25, 'text': '부서진 이정표. 「철혈의 가도 →」\n길 끝이 무너진 성벽 잔해로 막혀 있다.'})
 objs.append({'type': 'sign', 'x': 186, 'y': 130, 'text': '돌무더기로 막힌 좁은 샛길. 누군가 일부러 막아 둔 것 같다.'})
-objs.append({'type': 'hint', 'id': 'ce_h_palm', 'x': 40, 'y': 130, 'r': 3, 'text': '거인의 손바닥 위로 올라갈 수 있다'})
+objs.append({'type': 'hint', 'id': 'ce_h_palm', 'x': 31, 'y': 121, 'r': 3, 'text': '거인의 손바닥 위로 올라갈 수 있다'})
 
 # 몹 무리: 설계도 자리 → 지금 1장 몹 4종을 돌려 씀
 MOBS = ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound']
@@ -221,14 +291,15 @@ mp = {
     'name': '잿빛 들판 — 동쪽', 'title': {'kicker': '1장 · 펠트', 'name': '잿빛 들판', 'sub': '쓰러진 거인과 검은 호수, 가도로 가는 들머리'},
     'bgm': 'area01_forest', 'battleBgm': json.load(open(os.path.join(T128, 'maps/field_felt.json'))).get('battleBgm'), 'tileset': 'field', 'tile': 16, 'grade': 'ash', 'fog': .22, 'ash': 1, 'wind': [5, 1],
     'w': W, 'h': H,
-    'legend': {'.': 'dirt', '#': 'cliff', '~': {'ground': 'dirt', 'solid': True}, 'K': {'ground': 'dirt', 'solid': True}, 'X': {'ground': 'dirt', 'solid': True}},
-    'solid': ['#', '~', 'K', 'X'],
+    'legend': {'.': 'dirt', '#': 'cliff', '~': {'ground': 'dirt', 'solid': True}, 'K': {'ground': 'dirt', 'solid': True}, 'X': {'ground': 'dirt', 'solid': True},
+               'T': {'ground': 'dirt', 'deco': 'tree'}, 'R': {'ground': 'dirt', 'deco': 'boulder'}, 's': {'ground': 'dirt', 'deco': 'stump', 'solid': False}},
+    'solid': ['#', '~', 'K', 'X', 'T', 'R'],
     'ground': [''.join(r) for r in grid],
     'objects': objs,
     'camZones': [{'x0': 0, 'y0': 12, 'x1': W, 'y1': 34, 'zoom': 0.8, 'look': -7.5, 'f': 8}],   # 북쪽 끝에선 위를 올려다봄 (무덤가와 같은 값) → 낭떠러지 너머 왕성
     'spawns': {'default': [75.5, 243.5, 'up'], 'felt': [75.5, 243.5, 'up']},
-    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {}, 'fx': {}},
+    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {k: felt_deco[k] for k in ('T', 'R', 's') if k in felt_deco}, 'fx': {}},   # 마른 나무·돌무더기·그루터기 = 펠트와 같은 그림
     'note': '1장 동쪽 들판 (build_ch1_east.py 가 만든다, 고칠 땐 빌더를 고치고 다시 돌린다). 설계도 field_e = 전체 440,70.',
 }
 json.dump(mp, open(os.path.join(T128, 'maps/ch1_field_e.json'), 'w'), ensure_ascii=False, indent=1)
-print('ok', W, H, 'mobs', sum(1 for o in objs if o['type'] == 'spawn'), 'props', len(props), 'under', len(under))
+print('cells', _dbg, 'ok', W, H, 'mobs', sum(1 for o in objs if o['type'] == 'spawn'), 'props', len(props), 'under', len(under))
