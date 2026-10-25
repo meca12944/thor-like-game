@@ -1,10 +1,12 @@
 """Prologue awakening map 「무명 무덤가」 (prologue_grave, 64x64, ch1Origin [270,394]) — owner 10-25 B.
-Layout (local = ch1 - (270,394)): south = the colossal outer wall foot + rubble, west = petrified forest, centre = nameless graves (12x8),
-north = hill crest vista, east = slope corridor down to the exit (fade -> Felt west gate, felt spawn 'field').
+v2 (owner 10-25 C 「주인공은 펠트 바깥에서 들어오는 설정」): the hero wakes OUTSIDE Felt. North of the crest the land drops away and the hd.backdrop
+shows Felt's colossal wall seen from outside with the tall ruined castle soaring behind it (same castle as the title / arrival CG);
+it grows as the hero walks the outer road east (looking up), and fills the crest vista. South = ash dunes, west = petrified forest,
+centre = nameless graves (12x8, the hero wakes in the lane between them), east = the outer road (rows 13..17) to the exit (fade -> Felt west gate, felt spawn 'field').
 Tutorial route ~120 tiles: wake (30,26) -> backpack (42,34) [interact] -> cold campfire (16,16) [waystone] -> crest vista (31,8)
 -> dry brambles (46..47, 4..8) [attack, breakable flag pg_bramble] -> ground crack (x 53) [dash/jump, soft pit] -> sign (57,4) -> exit (x 63).
 Art: everything code-drawn here (no PixelLab): ground painted with numpy, small sprites (graves, backpack, brambles, lantern) drawn with PIL,
-felt props reused (outer wall, dead trees tinted to stone, debris, firepit, banners, sign, far castle). Light / fog / ash / smoke / crows /
+felt props reused (dead trees tinted to stone, debris, firepit, banners, sign); the far wall + castle picture is castle_backdrop.py. Light / fog / ash / smoke / crows /
 footprints / darkness are drawn by world.js at runtime (map keys: dark, steps, hd.fx, hd.smoke).
 Rules: no spirits, no gore, no bodies/bones/blood; the backpack holds belongings only; no children, no Linette.
 Usage: python3 build_prologue_grave.py -> maps/prologue_grave.json + assets/world/prologue/*"""
@@ -19,23 +21,23 @@ ROOT = props.ROOT; T = 16; W = H = 64; HD = 1.5; G = int(T * HD); OX, OY = 270, 
 PA = 'assets/world/prologue/'; FA = 'assets/world/felt/'
 def rel(p): return os.path.join(ROOT, p)
 rnd = random.Random(7)
-WAKE = (30, 26); PACK = (42, 34); FIRE = (16, 16); CREST = (31, 8); BR_X = (46, 47); CRACK_X = 53; SIGN = (57, 4); EXIT_X = 63
+WAKE = (30, 22); PACK = (42, 30); FIRE = (16, 19); CREST = (31, 14); BR_X = (46, 47); CRACK_X = 53; SIGN = (57, 13); EXIT_X = 63
+LIP = 12.75; RY = 13                              # v2 (owner 10-25 C): rows < 13 = the drop beyond the crest, where the far wall + castle backdrop shows; the outer road runs on rows 13..17
 # ---------------- grid ----------------
 g = np.full((H, W), '.', dtype='<U1')
-g[:4, :] = '#'                                   # beyond the crest: the drop to the plain (void, painted)
-g[57:, :] = '#'                                  # outer wall foot
+g[:RY, :] = '#'                                  # beyond the crest: the drop to the plain (the backdrop: Felt's colossal wall and the castle behind it)
+g[60:, :] = '#'                                  # south: ash dunes (the hero comes from outside, there is no wall behind him any more)
 g[:, :4] = '#'                                   # deep petrified forest
-g[9:, 51:] = '#'                                 # east slope (rocky drop)
-g[9:13, 44:51] = '#'                             # ledge under the corridor: the crest is the only way east
-g[4:9, 44:] = '.'                                # the corridor down the east slope
-g[3, 44:] = '#'
-for y in range(4, 57):                           # ragged edges
+g[RY + 5:, 51:] = '#'                            # east slope (rocky drop)
+g[RY + 5:RY + 9, 44:51] = '#'                    # ledge under the road: the crest is the only way east
+g[RY:RY + 5, 44:] = '.'                          # the outer road along the crest, toward Felt's west gate
+for y in range(RY, 60):                           # ragged edges
     for x in range(4, 8):
         if rnd.random() < .35 - (x - 4) * .08: g[y, x] = '#'
 for x in range(4, 44):
-    if rnd.random() < .3: g[4, x] = '#'
+    if rnd.random() < .3: g[RY, x] = '#'
 for x in range(8, 51):
-    if rnd.random() < .35: g[56, x] = '#'
+    if rnd.random() < .35: g[59, x] = '#'
 SOL = {'#', 'H'}
 def solid_at(x, y): return g[y, x] in SOL
 props_ = []; objs = []
@@ -126,38 +128,37 @@ def bramble(i):
                 b = a + r.choice([-1, 1]) * 1.1; d.line([(p[0] * 4, p[1] * 4), ((p[0] + math.cos(b) * 2.6) * 4, (p[1] + math.sin(b) * 2.6) * 4)], fill=INK, width=4)
     return finish(im, f'pg_bramble_{i}', w, h)
 def petrify(src, name, seed):
+    if not os.path.exists(rel(src)): return art(PA + name + '.png')   # the old Felt source was archived (map-a7): reuse the baked copy
     im = Image.open(rel(src)).convert('RGBA'); a = np.array(im).astype(np.float32); r = np.random.RandomState(seed)
     l = (a[..., :3] * [.3, .59, .11]).sum(-1, keepdims=True); hh, ww = a.shape[:2]
     mott = ndimage.gaussian_filter(r.rand(hh, ww), 1.6)[..., None]; mott = (mott - mott.mean()) / (mott.std() + 1e-6)
     stone = np.clip(l * .82 + 34 + mott * 7, 0, 255) * np.array([.98, .99, 1.04])
     a[..., :3] = np.clip(stone, 0, 255); p = PA + name + '.png'; Image.fromarray(a.astype(np.uint8)).save(rel(p), optimize=True); return art(p)
 def tint(src, name, sat=.45, gain=.78):
+    if not os.path.exists(rel(src)): return art(PA + name + '.png')
     im = Image.open(rel(src)).convert('RGBA'); a = props._grade(np.array(im).astype(np.float32), sat, (1.0, .97, .93), gain)
     p = PA + name + '.png'; Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(rel(p), optimize=True); return art(p)
 stones = [grave_stone(i) for i in range(3)]; stakes = [grave_stake(i) for i in range(3)]; gsword = grave_sword()
 packA = backpack(); lantA = lantern(); brA = [bramble(i) for i in range(2)]
 petri = [petrify(FA + f'g4_deadtree_{i}.png', f'pg_petri_{i}', i) for i in range(4)]
 banner = [tint(FA + f'f3_banner_{i}.png', f'pg_banner_{i}') for i in range(2)]
-wallA = art(FA + 'g4_gate_wall.png'); fireA = art(FA + 'g4_firepit.png'); signA = art(FA + 'sign_post.png')
+fireA = art(FA + 'g4_firepit.png'); signA = art(FA + 'sign_post.png')
 deadA = art(FA + 'g4_deadtree_1.png'); debris = [art(FA + f'g4_debris_{i}.png') for i in range(4)]
 rubA = art(FA + 'rubble.png'); stlowA = art(FA + 'stone_low.png'); stumpA = art(FA + 'g2_burnt_stump_a.png')
-farA = {'img': FA + 'g4_far_castle.png', 'ax': 1300, 'ay': 380}
 # ---------------- props ----------------
-back = [dict(farA, id='far_castle', x=32.0, y=3.2, D=2.0, fade=0, shadow=0, par=.35)]
-for i, x in enumerate((6.0, 22.0, 38.0, 54.0)):                                                  # the outer wall foot (south), rises out of view
-    back.append({'id': f'outer_wall_{i}', 'img': wallA['img'], 'x': x + (i % 2) * .8, 'y': 62.6 + (i % 2) * .5, 'ax': 294, 'ay': 323, 'D': 1.9, 'fade': 1, 'shadow': 0, 'flip': i % 2 == 1})
-for x in range(8, 52, 3):                                                                        # fallen rubble along the wall foot
-    y = 55.6 + rnd.random() * 1.2
-    if rnd.random() < .55: sp(rnd.choice(debris), x + rnd.random(), y, D=2.4, flip=rnd.random() < .5)
-    else: sp(rnd.choice([rubA, stlowA]), x + rnd.random(), y, D=2.2, flip=rnd.random() < .5)
-for y in range(5, 57, 2):                                                                        # petrified forest (west)
+back = []                                                                                         # (the far wall + castle are the hd.backdrop picture now)
+for x in range(8, 52, 3):                                                                        # south: the ash dunes, dead wood and stones half sunk in ash
+    y = 59.4 + rnd.random() * 1.0
+    if rnd.random() < .45: sp(rnd.choice(petri), x + rnd.random(), y, D=rnd.uniform(1.9, 2.3), flip=rnd.random() < .5, fade=1)
+    else: sp(rnd.choice([rubA, stlowA, stumpA] + debris[:2]), x + rnd.random(), y, D=2.3, flip=rnd.random() < .5)
+for y in range(RY + 1, 60, 2):                                                                        # petrified forest (west)
     for x in range(1, 10, 2):
         if rnd.random() < (.95 - (x - 1) * .09) and not (abs(x - FIRE[0]) < 5 and abs(y - FIRE[1]) < 4):
             xx, yy = x + rnd.random() * 1.2, y + rnd.random() * 1.4
-            if yy < 56: sp(rnd.choice(petri), xx, yy, D=rnd.uniform(1.8, 2.3), flip=rnd.random() < .5, sway=0, fade=1)
+            if yy < 59: sp(rnd.choice(petri), xx, yy, D=rnd.uniform(1.8, 2.3), flip=rnd.random() < .5, sway=0, fade=1)
 for (x, y) in [(13, 40), (21, 47), (46, 44), (47, 24), (12, 27), (38, 49)]:                     # a few loose petrified trunks inside
     sp(rnd.choice(petri), x + .5, y + .9, D=2.1, flip=rnd.random() < .5, fade=1)
-sp(deadA, PACK[0] + 1.5, PACK[1] - .1, D=2.0, foot=[(43, 33)], flip=True, sway=.3, fade=1)       # the dead tree the backpack leans on
+sp(deadA, PACK[0] + 1.5, PACK[1] - .1, D=2.0, foot=[(43, PACK[1] - 1)], flip=True, sway=.3, fade=1)       # the dead tree the backpack leans on
 # nameless graves: 12x8 block x 24..35, y 17..24 (rows 17,19,21,23 + offsets); a lane down the middle (x 29..30) stays open
 gs = []
 for y in (17, 19, 21, 23):
@@ -169,24 +170,24 @@ for k, (x, y) in enumerate(gs):
     a = stones[k % 3] if kind in (0, 2, 4) else stakes[k % 3]
     if k in (6, 13): a = gsword
     sp(a, x + .5, y + .95, D=2.3, flip=rnd.random() < .5)
-for (x, y) in [(14, 30), (16, 34), (18, 38), (20, 31), (12, 43), (44, 26), (47, 29), (45, 21), (21, 44), (40, 44), (36, 38), (25, 35)]:  # older scattered graves
+for (x, y) in [(14, 30), (16, 34), (18, 38), (20, 31), (12, 43), (44, 26), (47, 33), (45, 23), (21, 44), (40, 44), (36, 38), (25, 35)]:  # older scattered graves
     sp(rnd.choice(stones + stakes), x + .5, y + .95, D=2.4, flip=rnd.random() < .5)
 for (x, y, b) in [(23, 16, 0), (36, 18, 1), (36, 25, 0)]:                                       # torn banners on poles at the grave corners
     sp(banner[b], x + .5, y + .95, D=3.0, sway=1.0)
 sp(fireA, FIRE[0] + .5, FIRE[1] + 1.0, D=2.3, solid=False, shadow=0)                            # the cold campfire (waystone object sits on it)
-for (x, y) in [(13, 13), (19, 14), (14, 19), (19, 19)]: sp(stumpA, x + .5, y + .9, D=2.6)        # log seats / burnt stumps round the fire
+for (x, y) in [(13, 16), (19, 17), (14, 22), (19, 22)]: sp(stumpA, x + .5, y + .9, D=2.6)        # log seats / burnt stumps round the fire
 sp(packA, PACK[0] + .55, PACK[1] + .95, D=2.4, solid=False, shadow=0)                            # belongings only
 sp(lantA, PACK[0] - .1, PACK[1] + .9, D=2.4, solid=False, shadow=0, hideFlag='pg_backpack')
-for y in range(4, 9):                                                                             # dry brambles: breakable (flag pg_bramble)
+for y in range(RY, RY + 5):                                                                       # dry brambles: breakable (flag pg_bramble)
     for j, x in enumerate(BR_X):
         q = sp(brA[(x + y) % 2], x + .5 + rnd.uniform(-.15, .15), y + .95, D=2.2, solid=False, shadow=0, hideFlag='pg_bramble', flip=rnd.random() < .5)
         q['solid'] = [x, y, x, y]
 sp(signA, SIGN[0] + .5, SIGN[1] + .95, D=2.6, solid=False)
-for (x, y) in [(41, 6), (40, 9), (49, 9), (55, 9), (59, 9), (61, 3)]:                            # corridor edge stones
-    if g[y, x] == '#' or y in (3, 9): sp(rnd.choice([stlowA, rubA] + debris[:2]), x + .5, y + .9, D=2.6, solid=False)
+for (x, y) in [(41, 15), (40, 18), (49, 18), (55, 18), (59, 18), (61, 12)]:                      # road edge stones
+    if g[y, x] == '#' or y in (RY - 1, RY + 5): sp(rnd.choice([stlowA, rubA] + debris[:2]), x + .5, y + .9, D=2.6, solid=False)
 for k in range(28):                                                                               # scatter on the open ash (keep the route clear)
     for _ in range(40):
-        x, y = rnd.randint(10, 49), rnd.randint(13, 54)
+        x, y = rnd.randint(10, 49), rnd.randint(RY + 6, 57)
         if g[y, x] != '.' or min(abs(x - a_) + abs(y - b_) for a_, b_ in (WAKE, PACK, FIRE)) < 5: continue
         if np.any(g[y - 1:y + 2, x - 1:x + 2] == 'H'): continue
         sp(rnd.choice(debris + [rubA, stlowA, stumpA]), x + .5, y + .9, D=2.6, flip=rnd.random() < .5); break
@@ -203,21 +204,21 @@ objs = [
   'text': '마른 나무 밑동에 낡은 가죽 배낭이 기대 놓여 있다. 주인은 보이지 않는다.\n안에는 닳은 등불과 물약 한 병, 실이 다 풀린 바늘쌈.\n배낭 끈을 묶은 매듭이 내가 묶는 방식과 똑같다.\n등불을 들자, 심지에 푸른 불이 옮겨 붙는다.',
   'textDone': '빈 가죽 배낭. 끈의 매듭만 낯익다.'},
  {'type': 'waystone', 'id': 'ws_prologue_grave', 'x': FIRE[0], 'y': FIRE[1], 'name': '무덤가 모닥불(꺼짐)', 'art': 'hd'},
- {'type': 'clue', 'id': 'pg_footprints', 'x': 31, 'y': 12, 'name': '재 위의 발자국', 'flag': 'pg_look_steps',
+ {'type': 'clue', 'id': 'pg_footprints', 'x': 33, 'y': 15, 'name': '재 위의 발자국', 'flag': 'pg_look_steps',
   'text': '언덕 위로 난 발자국. 반쯤 재에 덮였다.\n내 신발과 크기가 같다.', 'textDone': '반쯤 덮인 발자국.'},
- {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.2, 'zoom': .74, 'dir': 270, 'pan': 6, 'name': '잿빛 들판', 'sub': '불탄 왕도의 가장 바깥'},
- {'type': 'breakable', 'id': 'pg_bramble', 'x': BR_X[0], 'y': 4, 'w': len(BR_X), 'h': 5, 'flag': 'pg_bramble', 'name': '마른 가시덤불', 'text': '마른 가시덤불을 베어 길을 텄다'},
-] + [{'type': 'pit', 'id': f'pg_crack_{y}', 'x': CRACK_X, 'y': y, 'soft': 1, 'text': '발밑이 꺼진다 — 뛰어넘자'} for y in range(4, 9)] + [
+ {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.0, 'zoom': .55, 'dir': 270, 'pan': 5, 'hold': 1, 'name': '잿빛 들판', 'sub': '저 성벽 너머, 펠트 — 그리고 왕성'},
+ {'type': 'breakable', 'id': 'pg_bramble', 'x': BR_X[0], 'y': RY, 'w': len(BR_X), 'h': 5, 'flag': 'pg_bramble', 'name': '마른 가시덤불', 'text': '마른 가시덤불을 베어 길을 텄다'},
+] + [{'type': 'pit', 'id': f'pg_crack_{y}', 'x': CRACK_X, 'y': y, 'soft': 1, 'text': '발밑이 꺼진다 — 뛰어넘자'} for y in range(RY, RY + 5)] + [
  {'type': 'sign', 'x': SIGN[0], 'y': SIGN[1], 'text': '기울어진 이정표.\n「펠트 서문 →」'},
- {'type': 'exit', 'x': EXIT_X, 'y': 4, 'w': 1, 'h': 5, 'to': 'felt', 'spawn': 'field', 'label': '→ 펠트 서문', 'setFlag': 'pg_left'},
+ {'type': 'exit', 'x': EXIT_X, 'y': RY, 'w': 1, 'h': 5, 'to': 'felt', 'spawn': 'field', 'label': '→ 펠트 서문', 'setFlag': 'pg_left'},
  {'type': 'hint', 'id': 'pg_h_move', 'x': WAKE[0], 'y': WAKE[1], 'r': 3, 'text': '이동: WASD / 방향키'},
  {'type': 'hint', 'id': 'pg_h_pack', 'x': PACK[0], 'y': PACK[1], 'r': 3.5, 'text': '살펴보기·줍기: ' + KI, 'unless': 'pg_backpack'},
  {'type': 'hint', 'id': 'pg_h_fire', 'x': FIRE[0], 'y': FIRE[1] + 1, 'r': 3.5, 'text': '꺼진 모닥불 — ' + KI + ': 쉬기·저장 (쓰러지면 여기서 다시 시작)'},
- {'type': 'hint', 'id': 'pg_h_crest', 'x': 31, 'y': 14, 'r': 2.5, 'text': '언덕 위로 올라가 보자'},
- {'type': 'hint', 'id': 'pg_h_atk', 'x': 44, 'y': 6, 'r': 2.6, 'text': '공격: {attack} — 마른 가시덤불을 베어 길을 연다', 'unless': 'pg_bramble'},
- {'type': 'hint', 'id': 'pg_h_dash', 'x': 51, 'y': 6, 'r': 2.4, 'text': '점프 {dive} / 회피대시 {dash} — 땅 틈을 뛰어넘는다'},
+ {'type': 'hint', 'id': 'pg_h_crest', 'x': 31, 'y': 17, 'r': 2.0, 'text': '언덕 위로 올라가 보자'},
+ {'type': 'hint', 'id': 'pg_h_atk', 'x': 44, 'y': RY + 2, 'r': 2.6, 'text': '공격: {attack} — 마른 가시덤불을 베어 길을 연다', 'unless': 'pg_bramble'},
+ {'type': 'hint', 'id': 'pg_h_dash', 'x': 51, 'y': RY + 2, 'r': 2.4, 'text': '점프 {dive} / 회피대시 {dash} — 땅 틈을 뛰어넘는다'},
 ]
-spawns = {'default': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'wake': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'resume': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'from_felt': [61.5, 6.5, 'left']}
+spawns = {'default': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'wake': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'resume': [WAKE[0] + .5, WAKE[1] + .5, 'up'], 'from_felt': [61.5, RY + 2.5, 'left']}
 for o in objs:                                                                                    # objects stand on free cells
     if o['type'] in ('clue', 'waystone', 'sign', 'hint', 'pit') and g[o['y'], o['x']] == 'H': g[o['y'], o['x']] = '.'
 # ---------------- reachability: with brambles solid the exit must be shut; cut, it must open ----------------
@@ -227,10 +228,10 @@ for o in objs:
 sx, sy = WAKE
 def reach(fr): return bfs(fr, sx, sy)
 fb = free.copy()
-for y in range(4, 9):
+for y in range(RY, RY + 5):
     for x in BR_X: fb[y, x] = False
 r_shut = reach(fb); r_open = reach(free)
-ex_cells = [(EXIT_X, y) for y in range(4, 9)]
+ex_cells = [(EXIT_X, y) for y in range(RY, RY + 5)]
 def nb_ok(r, x, y): return r[y, x] or any(0 <= x + a < W and 0 <= y + b < H and r[y + b, x + a] for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))
 print('reach open', int(r_open.sum()), 'shut', int(r_shut.sum()))
 print('exit shut by brambles:', not any(r_shut[y, x] for x, y in ex_cells), '| exit open after cut:', any(r_open[y, x] for x, y in ex_cells))
@@ -249,7 +250,7 @@ def dist(a, b, fr):
             if 0 <= X < W and 0 <= Y < H and fr[Y, X] and D_[Y, X] < 0: D_[Y, X] = D_[y, x] + 1; q.append((X, Y))
     return -1
 fr2 = free.copy(); fr2[FIRE[1], FIRE[0]] = True
-beats = [WAKE, (PACK[0], PACK[1] + 1), (FIRE[0] + 1, FIRE[1]), CREST, (45, 6), (52, 6), (56, 6), (62, 6)]
+beats = [WAKE, (PACK[0], PACK[1] + 1), (FIRE[0] + 1, FIRE[1]), CREST, (45, RY + 2), (52, RY + 2), (56, RY + 2), (62, RY + 2)]
 legs = [dist(a, b, fr2) for a, b in zip(beats, beats[1:])]; print('route legs', legs, 'total', sum(legs))
 # ---------------- ground painting (code: ash, worn path, mounds, hollow, crest void, east slope, wall shadow, crack) ----------------
 gh = gw = W * G
@@ -268,7 +269,7 @@ west = np.clip((12 - tx) / 8, 0, 1) * (.6 + .4 * sn(40, 6))                     
 img = img * (1 - .55 * west[..., None]) + np.array([104, 106, 108.]) * .55 * west[..., None]
 # the worn path (wake -> crest -> corridor), footprints along it
 pm = Image.new('L', (W * 4, H * 4), 0); pd = ImageDraw.Draw(pm)
-for pts, wd in (([(30.5, 26.5), (30.8, 20), (30.5, 14), (31.2, 9), (36, 6.6), (44, 6.5), (52, 6.6), (64, 6.4)], 7), ([(30.5, 27), (36, 31), (42.5, 35)], 3), ([(30, 22), (24, 19), (17, 16.5)], 3)):
+for pts, wd in (([(30.5, 22.5), (30.8, 18.5), (31.2, 14.8), (36, 15.6), (44, 15.5), (52, 15.6), (64, 15.4)], 7), ([(30.5, 23), (36, 27), (42.5, 31)], 3), ([(30, 19.5), (24, 18.6), (17, 19.6)], 3)):
     pd.line([(x * 4, y * 4) for x, y in pts], fill=255, width=wd, joint='curve')
 pmask = up(np.array(pm.filter(ImageFilter.GaussianBlur(3))).astype(np.float32) / 255.)
 pmask = np.clip(pmask * 1.3 + (sn(30, 7) - .5) * .5, 0, 1)
@@ -284,24 +285,24 @@ for (x, y) in gs: m_, c = blot(x + .5, y + .75, 1.0, .55, None, .5); img *= (1 -
 m_, _ = blot(WAKE[0] + .5, WAKE[1] + .6, 1.25, .55, None, 1, 6); rim, _ = blot(WAKE[0] + .5, WAKE[1] + .6, 1.6, .8, None, 1, 6)
 kr = ((rim - m_).clip(0, 1) * .3)[..., None]; img = img * (1 - .35 * m_)[..., None]; img = img * (1 - kr) + np.array([150, 144, 134.]) * kr
 # beyond the crest (rows < 3.6): the drop to the plain, a cold misty void; crest lip line
-void = np.clip((3.6 - ty) / 2.4, 0, 1)
+void = np.clip((LIP - .15 - ty) / 2.4, 0, 1)
 sky = np.array([84, 84, 92.]) * (1 - np.clip(ty / 4, 0, 1))[..., None] + np.array([70, 68, 72.]) * np.clip(ty / 4, 0, 1)[..., None]
 img = img * (1 - void[..., None]) + sky * void[..., None]
-lip = np.exp(-((ty - 3.75) / .18) ** 2) * (.7 + .3 * sn(12, 8)); img *= (1 - .45 * lip)[..., None]
-img += (np.exp(-((ty - 4.25) / .25) ** 2) * 14)[..., None]                                       # the crest catches the light
+lip = np.exp(-((ty - LIP) / .18) ** 2) * (.7 + .3 * sn(12, 8)); img *= (1 - .45 * lip)[..., None]
+img += (np.exp(-((ty - LIP - .5) / .25) ** 2) * 14)[..., None]                                       # the crest catches the light
 # east slope + ledge: hatched rock drop; the corridor darkens toward the exit (fade)
-slope = up(ndimage.gaussian_filter(((np.arange(W)[None, :] >= 51) & (np.arange(H)[:, None] >= 9) | ((np.arange(W)[None, :] >= 44) & (np.arange(H)[:, None] >= 9) & (np.arange(H)[:, None] < 13))).astype(np.float32), .8))
+slope = up(ndimage.gaussian_filter(((np.arange(W)[None, :] >= 51) & (np.arange(H)[:, None] >= RY + 5) | ((np.arange(W)[None, :] >= 44) & (np.arange(H)[:, None] >= RY + 5) & (np.arange(H)[:, None] < RY + 9))).astype(np.float32), .8))
 hatch = (np.sin((xx + yy * .6) / 3.2) > .55).astype(np.float32) * .12
 img *= (1 - slope * (.38 + hatch + .12 * sn(20, 9)))[..., None]
-fadeE = np.clip((tx - 58) / 6, 0, 1) * np.clip(1 - np.abs(ty - 6.5) / 4, 0, 1); img *= (1 - .45 * fadeE)[..., None]
-# south: the outer wall's long shadow (rows 42..57) and the dark foot strip
-ws = np.clip((ty - 42) / 15, 0, 1) ** 1.4; img *= (1 - .42 * ws)[..., None]
-img *= (1 - .5 * np.clip((ty - 56.5) / 2, 0, 1))[..., None]
+fadeE = np.clip((tx - 58) / 6, 0, 1) * np.clip(1 - np.abs(ty - RY - 2.5) / 4, 0, 1); img *= (1 - .45 * fadeE)[..., None]
+# south: ash dunes (soft pale ridges with blue-grey shade, no wall shadow any more)
+dn = np.sin(tx * .55 + sn(60, 21) * 5) * .5 + .5; dun = np.clip((ty - 52) / 8, 0, 1)
+img = img * (1 - .18 * dun[..., None]) + np.array([150, 146, 140.]) * (.18 * dun * dn)[..., None]; img *= (1 - .3 * np.clip((ty - 59.5) / 3, 0, 1))[..., None]
 # west edge: under the trees
 img *= (1 - .35 * np.clip((6 - tx) / 4, 0, 1))[..., None]
 # the ground crack at x 53 (rows 3.8 .. 9.1): jagged black fissure, pale broken edges
 ck = np.zeros((gh, gw), np.float32); r9 = np.random.RandomState(9)
-ys_ = np.arange(int(3.8 * G), int(9.1 * G)); off = ndimage.gaussian_filter1d(r9.randn(len(ys_)) * 5, 3); wid = .30 + .12 * np.sin(ys_ / 9.0) + .06 * r9.rand(len(ys_))
+ys_ = np.arange(int((RY - .2) * G), int((RY + 5.1) * G)); off = ndimage.gaussian_filter1d(r9.randn(len(ys_)) * 5, 3); wid = .30 + .12 * np.sin(ys_ / 9.0) + .06 * r9.rand(len(ys_))
 for i, y in enumerate(ys_):
     c = (CRACK_X + .5) * G + off[i]; w_ = wid[i] * G; ck[y, int(c - w_):int(c + w_)] = 1
 edge = ndimage.binary_dilation(ck > 0, iterations=3) & ~(ck > 0)
@@ -312,21 +313,31 @@ sol = up(ndimage.gaussian_filter((g == '#').astype(np.float32), .9)); img *= (1 
 img = np.clip(img, 0, 255)
 gimg = Image.fromarray(img.astype(np.uint8)); gp = PA + 'ground.webp'; gimg.save(rel(gp), 'WEBP', quality=88, method=6)
 gimg.resize((W * 8, H * 8), Image.LANCZOS).save('/tmp/work/pg_ground_small.png')
+# ---------------- backdrop: Felt's wall from outside + the castle behind it (code-drawn, castle_backdrop.py) ----------------
+import castle_backdrop as CB
+BPT = 32; BW, BH, BCX = 180, 23, 90; BFOOT = 21.2
+bim, bmeta = CB.compose(BW, BH, BPT, BCX, 19.0, 17.5, 17, seed=23, wall={'foot': BFOOT, 'h': 4.6, 'gates': [BCX]}, hor_t=20, top_fade=6.5); SKY = bmeta['sky']
+bp = PA + 'castle_backdrop.webp'; bim.save(rel(bp), 'WEBP', quality=86, method=6); bim.resize((BW * 8, BH * 8), Image.LANCZOS).save('/tmp/work/pg_backdrop_small.png')
+backdrop = {'img': bp, 'D': BPT / T, 'ppt': BPT, 'ax': BCX * BPT, 'ay': BFOOT * BPT, 'x': 46, 'px': .85, 'y': LIP + .25, 'clipY': LIP - .05,
+            'sky': SKY, 'floor': '#6c6662', 'side': '#5a5450', 'grow': [36, 60, .27, .48], 'vs': .42,
+            'glows': bmeta['glows'], 'smoke': bmeta['smoke'][:6], 'shaft': [BCX * BPT, 8 * BPT, 30 * BPT, 9 * BPT],
+            'fog': [[(BFOOT - 1.6) * BPT, 3.2 * BPT, .55, 5], [12.5 * BPT, 3.4 * BPT, .35, -4], [7 * BPT, 2.6 * BPT, .26, 3], [(BFOOT - 4.8) * BPT, 2.4 * BPT, .4, 7]]}
+camZones = [{'x0': 8, 'y0': RY, 'x1': 42, 'y1': 25, 'zoom': .8, 'look': -5.5, 'f': 4}, {'x0': 40, 'y0': RY, 'x1': 64, 'y1': RY + 5, 'zoom': .9, 'look': -3, 'f': 3}]
 # ---------------- tufts (dead grass), hd block, json ----------------
 tufts = []
-for y in range(5, 56):
+for y in range(RY + 1, 59):
     for x in range(8, 51):
         if g[y, x] == '.' and rnd.random() < .12: tufts.append([round(x + rnd.random(), 2), round(y + .3 + rnd.random() * .7, 2), rnd.randrange(3)])
 allp = back + sorted(props_, key=lambda q: q['y'])
 smoke = [[FIRE[0] + .5, FIRE[1] + .4, .5, 2]]                                                    # one thin thread of smoke from the cold fire
-hd = {'D': HD, 'ground': gp, 'props': allp, 'decoArt': {}, 'lights': [], 'smoke': smoke, 'grade': 'dusk', 'gradeCol': 'rgb(196,192,190)', 'flick': [], 'tufts': tufts, 'fires': [],
+hd = {'D': HD, 'ground': gp, 'props': allp, 'decoArt': {}, 'lights': [], 'smoke': smoke, 'grade': 'dusk', 'gradeCol': 'rgb(196,192,190)', 'flick': [], 'tufts': tufts, 'fires': [], 'backdrop': backdrop,
       'fx': {'particles': 'ash', 'birds': 3, 'mist': 6, 'tuft': ['#57534a', '#5e5a50', '#4a463d']}}
 legend = {'.': 'dirt', '#': 'cliff', 'H': {'ground': 'dirt', 'solid': True}}
 out = {'type': 'field', 'area': 1, 'id': 'prologue_grave', 'name': '무명 무덤가', 'region': 'ch1', 'ch1Origin': [OX, OY],
-       'title': {'kicker': 'PROLOGUE', 'name': '무명 무덤가', 'sub': '외성벽 아래, 이름 없는 무덤가 언덕'}, 'bgm': 'field', 'battleBgm': 'field_battle', 'tileset': 'field', 'tile': T,
-       'viewZoom': 1.3, 'grade': 'ash', 'fog': .3, 'ash': 70, 'wind': [4, 1.5], 'w': W, 'h': H, 'legend': legend, 'solid': ['#', 'H'],
+       'title': {'kicker': 'PROLOGUE', 'name': '무명 무덤가', 'sub': '펠트 성벽 바깥, 이름 없는 무덤가 언덕'}, 'bgm': 'field', 'battleBgm': 'field_battle', 'tileset': 'field', 'tile': T,
+       'viewZoom': 1.3, 'grade': 'ash', 'fog': .3, 'ash': 70, 'wind': [4, 1.5], 'w': W, 'h': H, 'skyTop': 5, 'camZones': camZones, 'legend': legend, 'solid': ['#', 'H'],
        'ground': [''.join(r) for r in g], 'objects': objs, 'spawns': spawns, 'hd': hd,
-       'dark': None, 'pgLight': {'a': .5, 'r': 2, 'r2': 4.5, 'flag': 'pg_backpack', 'col': '#7fb2d6', 'col2': '#d8d0b8'}, 'steps': 1, 'navGoal': {'map': 'prologue_grave', 'x': 62, 'y': 6, 'label': '펠트 서문'},
+       'dark': None, 'pgLight': {'a': .5, 'r': 2, 'r2': 4.5, 'flag': 'pg_backpack', 'col': '#7fb2d6', 'col2': '#d8d0b8'}, 'steps': 1, 'navGoal': {'map': 'prologue_grave', 'x': 62, 'y': RY + 2, 'label': '펠트 서문'},
        'note': 'GENERATED by tools/hd/fields/build_prologue_grave.py (owner 10-25 B: awakening map) - do not hand-edit'}
 del out['dark']
 json.dump(out, open(rel('maps/prologue_grave.json'), 'w'), ensure_ascii=False, indent=1)

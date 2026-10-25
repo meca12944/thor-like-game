@@ -58,10 +58,16 @@ lane &= ~road
 # ---------------------------------------------------------------- north band (capital wall + gate)
 print('wall...')
 band = WL.build_band(); bim = band.finish(cut=band.meta['cut']); pc, ox, oy = band.meta['portc_pic']; bim.alpha_composite(pc.finish(), (ox, oy))
-far = WL.far_castle(Wt=152, kxt=111).finish(far=.4)   # keep centred on the east breach so it shows between the towers
-fp = save(far, 'far_castle')
-props.append({'id': 'far_castle', 'img': fp, 'x': 75.0, 'y': 19.0, 'ax': far.width / 2, 'ay': far.height - 4 - (25 - 22.6) * 0, 'D': D, 'fade': 0, 'shadow': 0, 'par': .32})
-far_q = props[-1]; far_q['ay'] = far.height - 4
+# the royal castle far behind the wall (owner 10-25 「성 뒷편 뷰를 우리 인트로 영상처럼 높은 성으로」): a screen-pinned far backdrop (castle_backdrop.py),
+# drawn by world.js drawBackdrop only in the sky behind the wall (clipY); it shows through the deep breaches in normal play and whole from the gate vista.
+import castle_backdrop as CB
+BPT = 20; BW, BH, BCX, BBASE, BHC, BWC = 180, 42, 90, 38, 30, 22
+bdi, bdm = CB.compose(BW, BH, BPT, BCX, BBASE, BHC, BWC, seed=11, city_t=(0, 3.2))
+bdp = FA + 'castle_backdrop.webp'; bdi.save(rel(bdp), 'WEBP', quality=88, method=6)
+backdrop = {'img': bdp, 'D': BPT / 16, 'ppt': BPT, 'ax': BCX * BPT, 'ay': (BBASE - BHC) * BPT, 'x': 75, 'px': .92, 'fy': .03, 'clipY': WALL_Y - 1.5,
+            'sky': '#4a4440', 'floor': '#b9ae9e', 'side': '#9a9086', 'glows': bdm['glows'], 'smoke': bdm['smoke'][:7],
+            'shaft': [BCX * BPT, (BBASE - BHC * .62) * BPT, BWC * 1.3 * BPT, BHC * .45 * BPT],
+            'fog': [[(BBASE - BHC * .55) * BPT, 2.4 * BPT, .35, 5], [(BBASE - 7) * BPT, 4 * BPT, .5, 9], [(BBASE - 3.5) * BPT, 5 * BPT, .7, 14], [(BBASE - 1) * BPT, 6 * BPT, .8, 20]]}
 tp, tox, toy = WL.tunnel(); tim = tp.finish(); tpath = save(tim, 'gate_tunnel')
 tunnel_q = {'id': 'gate_tunnel', 'img': tpath, 'x': round(tox / AT, 3), 'y': WALL_Y - 3.5, 'ax': 0, 'ay': round((WALL_Y - 3.5) * AT - toy, 1), 'D': D, 'fade': 0, 'shadow': 0}
 SL = 25; band_q = []
@@ -273,7 +279,7 @@ for i, (x, y) in [('f_clue_gate', (79, 30)), ('f_clue_moat', (40, 31)), ('f_hid_
         put(o, x, y, adjust=(o['type'] != 'clue'))
 for i, (x, y) in [('lm_felt_castle', (75, 32)), ('lm_felt_fountain', (75, 76)), ('lm_felt_grave', (138, 47))]:
     if i in OB: put(OB[i], x, y)
-put(dict(OB['felt_gate'], zoom=.5, pan=15, r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
+put(dict(OB['felt_gate'], zoom=.22, pan=25, hold=1, r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
 # clue tiles placed inside rubble keep their tile; make sure a neighbour is floor
 for o in objs:
     if o['type'] == 'clue' and grid[o['y'], o['x']] not in '.=':
@@ -416,16 +422,17 @@ for y in range(WALL_Y + 3, H - 1):
     for x in range(1, W - 1):
         if grid[y, x] != '.': continue
         if rnd.random() < (.45 if gcell[y, x] else .12): tufts.append([round(x + rnd.random(), 2), round(y + .3 + rnd.random() * .7, 2), 3 if rnd.random() < .2 else rnd.randrange(3)])
-allp = [far_q, tunnel_q] + sorted([q for q in props if q is not far_q] + band_q, key=lambda q: q['y'])
+allp = [tunnel_q] + sorted(props + band_q, key=lambda q: q['y'])
 webs = [[129.4, 111.2, 131.6, 112.6, .5, .3], [136.0, 111.0, 138.4, 112.2, .6, .3], [127.2, 113.8, 129.0, 115.6, .4, .25], [139.2, 113.5, 141.0, 115.0, .5, .3]]
-hd = {'D': HD, 'ground': gp, 'props': allp, 'decoArt': deco, 'lights': lights, 'smoke': smoke, 'grade': 'dusk', 'gradeCol': 'rgb(214,203,192)', 'flick': flick,
+hd = {'D': HD, 'ground': gp, 'backdrop': backdrop, 'props': allp, 'decoArt': deco, 'lights': lights, 'smoke': smoke, 'grade': 'dusk', 'gradeCol': 'rgb(214,203,192)', 'flick': flick,
       'tufts': tufts, 'fires': fires, 'fx': {'particles': 'ash', 'birds': 5, 'mist': 6, 'tuft': ['#57534a', '#625d50', '#4a463d']}, 'webs': webs}
 legend = {'.': 'dirt', '=': 'dirt', '#': 'cliff', 'X': {'ground': 'dirt', 'solid': True}, 'H': {'ground': 'dirt', 'solid': True},
           'T': {'ground': 'dirt', 'deco': 'tree'}, 'P': {'ground': 'dirt', 'deco': 'pine'}, 'R': {'ground': 'dirt', 'deco': 'boulder'},
           'u': {'ground': 'dirt', 'deco': 'bush'}, 's': {'ground': 'dirt', 'deco': 'stump', 'solid': False}, 'w': {'ground': 'dirt', 'deco': 'mushrooms', 'solid': False}}
 out = {k: SRC[k] for k in ('type', 'area', 'title', 'bgm', 'battleBgm', 'tileset', 'tile', 'id', 'name') if k in SRC}
 out['title'] = dict(out.get('title', {}), sub='왕도의 거대한 성벽 그늘 아래, 불타 버린 외곽 마을')
-out.update({'region': SRC.get('region'), 'viewZoom': 1.3, 'grade': 'ash', 'fog': .22, 'ash': 60, 'wind': [5, 1], 'w': W, 'h': H, 'legend': legend,
+out.update({'region': SRC.get('region'), 'viewZoom': 1.3, 'grade': 'ash', 'fog': .22, 'ash': 60, 'wind': [5, 1], 'w': W, 'h': H, 'legend': legend, 'skyTop': 20,
+            'camZones': [{'x0': 6, 'y0': 28, 'x1': 144, 'y1': 32, 'zoom': .9, 'look': -3.5, 'f': 6}],
             'solid': ['#', 'C', 'X', 'H', 'T', 'P', 'R', 'u', '~'], 'ground': [''.join(r) for r in grid], 'objects': objs, 'spawns': spawns, 'hd': hd,
             'note': 'GENERATED by tools/hd/fields/build_felt5.py (felt v5: everything drawn in code, assets/world/felt5) - do not hand-edit'})
 if 'mapPos' in SRC: out['mapPos'] = SRC['mapPos']

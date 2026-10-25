@@ -7,7 +7,7 @@ T = 32                       # art px per tile (D=2)
 WALL_Y = 28                  # foot line of the north wall face
 FACE_TOP = 15                # curtain face top (13 tiles = ~6.5 hero heights)
 GATE_X = 75.5; ARCH_W = 8; ARCH_SPRING = 22; ARCH_APEX = 17.2
-COLLAPSE = [(33, 47, 23.5), (104, 117, 22.0)]          # (x0, x1, lowest top y) broken curtain runs
+COLLAPSE = [(32, 48, 24.8), (103, 118, 24.6)]          # (x0, x1, lowest top y) broken curtain runs
 TOWERS = [(10, 9, 10.0), (30, 8, 10.5), (52, 8, 9.5), (99, 8, 9.8), (121, 8, 10.4), (141, 8, 10.2)]  # (cx, w, top y)
 GH = dict(x0=60, x1=91, tl=(60, 68.5), tr=(82.5, 91), top=3.0, ctop=7.0)
 def P(x, y): return x * T, y * T
