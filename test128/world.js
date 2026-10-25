@@ -164,6 +164,61 @@
   const ASH_WIND = [9, 0];
   // 먼 안개 띠: 화면 위쪽(= 북쪽 먼 곳) 38%에 아래로 옅어지는 안개 한 장. 그라데이션은 1x64 캔버스에 한 번만 그리고 drawImage 로 늘림 (한 장면 drawImage 1번).
   // 전망 줌으로 물러나면(S.vz < 1) 진해져서 깊이가 산다. m.fog = 진하기 (기본 .32), 밖(던전·m.dark)은 안 그림.
+  // ---- 경관 효과 물체 (사장님 10-24 새 1장 짓기 순서, 효과 담당): 지도 objects 에 {type:'scenefx', kind, x, y, w, h} (타일, x·y = 왼쪽 위) 를 두면 코드로 그림.
+  // 그림에 굽지 않음 · 화면 밖은 건너뜀 · 미리 그린 그림 + drawImage 위주 (한 장면 1ms 아래 목표). layer 0 = 땅 위·인물 아래, layer 1 = 인물 위.
+  //  shade  : 수도교 그늘 띠 + 아치 사이 비스듬한 빛줄기 (arches = 아치 수, 기본 w/10)           [1]
+  //  ashfall: 잿가루 폭포 — 좁은 기둥 안에서 빠르게 떨어지는 재 + 밑동 재 안개 (drawAshFall 과 같은 해시 방식) [1]
+  //  updraft: 구덩이 둘레(타원 x,y,w,h)에서 위로 빨려 오르는 재                                        [0]
+  //  thread : 붉은 실 (x,y) -> (x+w, y+h), 흔들림 + 심장 박동 빛 + 실 끝 반짝임 (threadLine·heartbeat 재사용) [1]
+  //  lake   : 검은 호수(타원 x,y,w,h)에 거꾸로 비친 왕성 탑 + 물결 (탑 그림이 오기 전 임시 실루엣)          [0]
+  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0 };
+  function drawSceneObjs(g, m, cx, cy, layer) { if (!m.sfxObjs) m.sfxObjs = m.objs.filter(o => o.type === 'scenefx'); if (!m.sfxObjs.length) return; const T = m.T;
+    for (const o of m.sfxObjs) { if ((SFX_LAYER[o.kind] ?? 1) !== layer) continue; const x = o.tx * T, y = o.ty * T, w = (o.w || 1) * T, h = (o.h || 1) * T, pad = o.kind === 'updraft' ? 40 : o.kind === 'thread' ? 12 : 4;
+      const x0 = Math.min(x, x + w), x1 = Math.max(x, x + w), y0 = Math.min(y, y + h), y1 = Math.max(y, y + h); if (x1 + pad < cx || x0 - pad > cx + EW || y1 + pad < cy || y0 - pad - (o.kind === 'updraft' ? 60 : 0) > cy + EH) continue; // off screen
+      const f = SFX[o.kind]; if (f) { g.save(); f(g, o, x, y, w, h); g.restore(); } } }
+  const sh = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+  let _rayC = null; // one soft light ray (8x64) drawn once, stretched per arch
+  const SFX = {
+    shade(g, o, x, y, w, h) { g.globalCompositeOperation = 'multiply'; g.drawImage(sfxCan(o, 'band', w, h, (t, W, H) => { t.fillStyle = `rgba(70,62,84,${o.a ?? .55})`; t.fillRect(0, 3, W, H - 6); t.fillStyle = 'rgba(110,100,120,.5)'; t.fillRect(0, 0, W, 3); t.fillRect(0, H - 3, W, 3); }), x, y); // the bridge's shadow band, soft edges (made once)
+      if (!_rayC) { _rayC = document.createElement('canvas'); _rayC.width = 8; _rayC.height = 64; const r = _rayC.getContext('2d'), gr = r.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,226,180,0)'); gr.addColorStop(.35, 'rgba(255,226,180,.9)'); gr.addColorStop(1, 'rgba(255,226,180,0)'); r.fillStyle = gr; r.fillRect(0, 0, 8, 64); }
+      g.globalCompositeOperation = 'lighter'; const n = o.arches || Math.max(2, Math.round(w / 160)), sl = o.slant ?? .5;
+      g.transform(1, 0, -sl, 1, sl * (y - 10), 0); // shear: rays lean (light from the upper left)
+      for (let i = 0; i < n; i++) { const ax = x + (i + .5) * w / n, br = .5 + .5 * Math.sin(S.t * .7 + i * 1.9); g.globalAlpha = (o.ray ?? .22) * (.55 + .45 * br); g.drawImage(_rayC, ax - w / n * .18, y - 10, w / n * .36, h + 20); } },
+    ashfall(g, o, x, y, w, h) { const P = sfxParts(o, Math.min(120, o.n || Math.round(w * h / 50))); for (let pass = 0; pass < 2; pass++) { g.fillStyle = pass ? 'rgba(255,190,140,.75)' : 'rgba(200,194,208,.7)'; // two colour passes (no fillStyle switching per flake)
+        for (let i = 0; i < P.n; i += pass ? 6 : 1) { if (!pass && i % 6 === 0) continue; const py = y + ((P.b[i] * h + S.t * (70 + P.b[i] * 60)) % h); g.fillRect(Math.round(x + P.a[i] * w + Math.sin(S.t * 3 + i) * 1.5), Math.round(py), 1, i % 3 ? 2 : 3); } }
+      const R = w * 1.6; g.drawImage(sfxGlow(o, 'mist', R, 'rgba(190,184,198,.45)'), x + w / 2 - R, y + h - R); }, // ash mist where it lands (made once)
+    updraft(g, o, x, y, w, h) { const ex = x + w / 2, ey = y + h / 2, rx = w / 2, ry = h / 2, P = sfxParts(o, Math.min(60, o.n || Math.round((w + h) / 3))), rise = o.rise || 42;
+      g.globalCompositeOperation = 'multiply'; g.drawImage(sfxPit(o, rx, ry), ex - rx, ey - ry); g.globalCompositeOperation = 'source-over'; // the drop under it reads darker (made once, until the pit art comes)
+      const B = [[], [], []]; for (let i = 0; i < P.n; i++) { const life = 2.2 + P.c[i] * 1.6, q = ((S.t + P.b[i] * life) % life) / life, s1 = Math.sin(q * Math.PI), r = 1 - q * .35; // rise, lean inward, fade (3 brightness steps)
+        B[s1 > .66 ? 2 : s1 > .33 ? 1 : 0].push(Math.round(ex + P.cx[i] * rx * r), Math.round(ey + P.cy[i] * ry * r - q * rise), i % 3 ? 1 : 2); }
+      for (let b = 0; b < 3; b++) { g.fillStyle = UPD_COL[b]; const A = B[b]; for (let j = 0; j < A.length; j += 3) g.fillRect(A[j], A[j + 1], A[j + 2], A[j + 2] + 1); } },
+    thread(g, o, x, y, w, h) { const red = o.red !== false, hb = heartbeat(), sw = Math.sin(S.t * 1.3 + o.tx) * (o.sway ?? 6);
+      threadLine(g, x, y, x + w, y + h, sw, S.t * 2, red, .55 + hb * .35, 1); const tx = x + w, ty = y + h, L = 2 + hb * 3; g.globalCompositeOperation = 'lighter'; g.fillStyle = thrCol(red, 1, .6 + hb * .4); // tip sparkle (the beat you see from far)
+      g.fillRect(Math.round(tx - L), Math.round(ty), Math.round(2 * L + 1), 1); g.fillRect(Math.round(tx), Math.round(ty - L), 1, Math.round(2 * L + 1)); },
+    lake(g, o, x, y, w, h) { const im = lakeTower(Math.round(w * .62), Math.round(h * .9)), bx = x + w / 2 - im.width / 2 + (o.dx || 0), by = y + 2;
+      g.drawImage(sfxLake(o, w, h), x, y); g.globalAlpha = o.a ?? .8; const st = 5; // water + mirrored grey sky (made once), then the upside-down tower in rippled rows
+      for (let r = 0; r < im.height; r += st) { const off = Math.sin(S.t * 1.6 + r * .35) * (1 + r / im.height * 2); g.drawImage(im, 0, r, im.width, st, Math.round(bx + off), by + r, im.width, st); }
+      g.globalAlpha = .18; g.fillStyle = '#d8d2e6'; for (let i = 0; i < 4; i++) { const ly = y + h * (.2 + .13 * i) + Math.sin(S.t * .8 + i) * 1.5; g.fillRect(Math.round(x + w * (.25 + .1 * Math.sin(i * 2.3))), Math.round(ly), Math.round(w * .3), 1); } } }; // glints
+  function sfxParts(o, n) { if (o._p && o._p.n === n) return o._p; const P = { n, a: [], b: [], c: [], cx: [], cy: [] }; for (let i = 0; i < n; i++) { P.a.push(sh(i)); P.b.push(sh(i + 77)); P.c.push(sh(i + 9)); const an = sh(i) * TAU; P.cx.push(Math.cos(an)); P.cy.push(Math.sin(an)); } return (o._p = P); } // random numbers made once per object
+  const UPD_COL = ['rgba(210,204,222,.3)', 'rgba(210,204,222,.6)', 'rgba(230,214,220,.9)'];
+  // per-object pictures made once (objects never move): soft glow, pit shade, lake water
+  function sfxCan(o, key, W, H, draw) { o._c = o._c || {}; if (o._c[key]) return o._c[key]; const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(W)); c.height = Math.max(1, Math.ceil(H)); draw(c.getContext('2d'), c.width, c.height); return (o._c[key] = c); }
+  const sfxGlow = (o, key, R, col) => sfxCan(o, key, R * 2, R * 2, (t, W) => { const gr = t.createRadialGradient(R, R, 2, R, R, R); gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)')); t.fillStyle = gr; t.fillRect(0, 0, W, W); });
+  const sfxPit = (o, rx, ry) => sfxCan(o, 'pit', rx * 2, ry * 2, (t, W, H) => { t.translate(rx, ry); t.scale(1, ry / rx); const gr = t.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(.75, 'rgba(0,0,0,.3)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); t.fillStyle = gr; t.beginPath(); t.arc(0, 0, rx, 0, TAU); t.fill(); });
+  const sfxLake = (o, w, h) => sfxCan(o, 'lake', w, h, (t, W, H) => { t.beginPath(); t.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, TAU); t.clip(); if (o.water !== false) { t.fillStyle = 'rgba(8,8,16,.7)'; t.fillRect(0, 0, W, H); } // 물 그림이 오기 전: 검은 물을 코드로 (water:false = 땅 그림의 물 위에 비침만)
+    const gr = t.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(150,140,170,.32)'); gr.addColorStop(.7, 'rgba(110,100,130,.12)'); gr.addColorStop(1, 'rgba(110,100,130,0)'); t.fillStyle = gr; t.fillRect(0, 0, W, H); });
+  const _lakeT = {};
+  // 호수에 비친 왕성 = 그록 원화 castle_far 하나로 통일 (팀장 10-25 PR #167): 성 부분(cy0~ay)을 위아래 뒤집어 어둡게 눌러 담음. 그림이 오기 전 몇 장면만 임시 실루엣.
+  const CASTLE_FAR = { src: 'assets/world/castle_far/castle_far.webp', cy0: 17, ay: 1372 }; let _castleIm = null;
+  function castleIm() { if (!_castleIm) { _castleIm = new Image(); _castleIm.src = V(CASTLE_FAR.src); } return _castleIm.complete && _castleIm.naturalWidth ? _castleIm : null; }
+  function lakeTower(W, H) { const ci = castleIm(), k = W + 'x' + H + (ci ? 'c' : 't'); if (_lakeT[k]) return _lakeT[k];
+    if (ci) { const sh = CASTLE_FAR.ay - CASTLE_FAR.cy0, sw = ci.naturalWidth, s = Math.min(W / sw, H / sh), dw = Math.max(4, Math.round(sw * s)), dh = Math.max(4, Math.round(sh * s)), c = document.createElement('canvas'); c.width = dw; c.height = dh; const t = c.getContext('2d');
+      t.translate(0, dh); t.scale(1, -1); t.imageSmoothingEnabled = true; t.drawImage(ci, 0, CASTLE_FAR.cy0, sw, sh, 0, 0, dw, dh); t.setTransform(1, 0, 0, 1, 0, 0);
+      t.globalCompositeOperation = 'source-atop'; t.fillStyle = 'rgba(6,5,12,.55)'; t.fillRect(0, 0, dw, dh); return (_lakeT[k] = c); } // reflections read darker than the thing itself
+    const c = document.createElement('canvas'); c.width = Math.max(4, W); c.height = Math.max(4, H); const t = c.getContext('2d'); t.fillStyle = '#05040a';
+    const cx = c.width / 2; t.beginPath(); t.moveTo(cx - W * .32, 0); t.lineTo(cx + W * .32, 0); t.lineTo(cx + W * .26, H * .55); t.lineTo(cx + W * .12, H * .62); t.lineTo(cx + W * .06, H * .9); t.lineTo(cx, H); t.lineTo(cx - W * .06, H * .9); t.lineTo(cx - W * .12, H * .62); t.lineTo(cx - W * .26, H * .55); t.closePath(); t.fill(); // 임시 실루엣: main keep, upside down (spire points down)
+    t.fillRect(cx - W * .5, 0, W * .14, H * .38); t.fillRect(cx + W * .36, 0, W * .14, H * .38); t.fillStyle = 'rgba(255,90,70,.9)'; t.fillRect(Math.round(cx) - 1, Math.round(H * .3), 2, 2); // side towers, one lit window
+    return (_lakeT[k] = c); }
   let _fogC = null;
   function drawFarFog(g, m, cx, cy) { if (m.grade !== 'ash' || m.dark || (m.hds && m.hds[0] && m.hds[0].backdrop)) return; /* a map with a far backdrop picture draws its own fog bands */ if (!_fogC) { _fogC = document.createElement('canvas'); _fogC.width = 1; _fogC.height = 64; const f = _fogC.getContext('2d'), gr = f.createLinearGradient(0, 0, 0, 64);
       gr.addColorStop(0, 'rgba(178,172,188,1)'); gr.addColorStop(.45, 'rgba(160,154,172,.55)'); gr.addColorStop(1, 'rgba(150,144,160,0)'); f.fillStyle = gr; f.fillRect(0, 0, 1, 64); }
@@ -1307,6 +1362,7 @@
     g.translate(-cx, -cy);
     if (m.type === 'world') { drawWorldNodes(g, m); drawHeroSprite(g, WORLD_ZOOM); g.setTransform(1, 0, 0, 1, 0, 0); return; }
     for (const o of m.objs) drawObjTile(g, m, o);
+    drawSceneObjs(g, m, cx, cy, 0); // 경관 효과 (땅 위)
     if (NAV()) NAV().drawGround(g, cx, cy);                  // guide route breadcrumbs
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
     drawLock(g);
@@ -1345,7 +1401,7 @@
     for (const s of S.shots) drawShot(g, s);
     for (const h of S.hazards) drawHazard(g, h, true);
     for (const f of S.fx) drawFx(g, f);
-    { const ar = m.compose ? areaOf(m, hero.x, hero.y) : null, am = m.compose ? { grade: gradeAt(m, hero.x, hero.y), wind: ar && ar.wind, ash: ar && ar.ash, fog: ar && ar.fog } : m; drawFarFog(g, am, cx, cy); drawAshFall(g, am, cx, cy); }
+    { const ar = m.compose ? areaOf(m, hero.x, hero.y) : null, am = m.compose ? { grade: gradeAt(m, hero.x, hero.y), wind: ar && ar.wind, ash: ar && ar.ash, fog: ar && ar.fog } : m; drawSceneObjs(g, m, cx, cy, 1); drawFarFog(g, am, cx, cy); drawAshFall(g, am, cx, cy); }
     drawLairBelow(g, m, cx, cy);
     if (m.dark) { // dungeon darkness, light around the hero, torches and crystals
       const D = darkLayer(), d = D.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, EW + 1, EH + 1);
