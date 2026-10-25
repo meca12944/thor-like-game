@@ -72,7 +72,10 @@ def backdrop(kind, meta=None):
     b = {'img': OUT + 'castle_far.webp', 'iw': SW, 'ih': SH, 'D': 1, 'ppt': 16, 'ax': (X0 + X1) / 2, 'ay': HIDE, 'cy0': TIP, 'bw': X1 - X0 + 1,
          'front': {'img': OUT + 'castle_far_front.webp', 'y': BAND - 2, 'px': .03},
          'anim': {'fps': FPS, 'n': N, 'layers': [dict(meta['glow'], img=OUT + 'castle_glow_4x4.webp'), dict(meta['fx'], img=OUT + 'castle_fx_4x4.webp')]},
-         'sky': BG, 'floor': BG, 'side': BG, 'edge': .07}
+         'sky': BG, 'floor': BG, 'side': BG, 'edge': .07,
+         # 살아 있는 성 (사장님 10-25, 팀 회의 교본 6-6): 핵 심장 박동 빛 · 굳은 기사의 잿빛 횃불 순찰 [x0, x1, 속도, 위상, 성곽y?] · 먼 종 [x, y, 색, 반지름, 주기초] — 그림 좌표(2560)
+         'alive': {'core': [1259, 92, '#6cc4ff', 90], 'torch': [[160, 760, 34, 0], [700, 1250, 26, .4], [1180, 1660, 30, .7], [1900, 2380, 22, .2], [620, 1080, 24, .3, 1146], [1100, 1560, 20, .6, 1182], [240, 560, 18, .1, 1188]],
+                   'ty': 1352, 'bell': [1300, 1060, '#ffe2b0', 60, 26]}}
     if kind == 'felt':      # behind the capital wall: shows through the breaches, the whole castle from the gate vista
         b.update({'x': 75, 'px': .92, 'fit': [.02, 14, .9, .97, 1.04, .33], 'clipY': 26.5, 'fog': [[SH * .80, SH * .12, .07, 5], [SH * .90, SH * .12, .10, 9]]})
     else:                   # 무명 무덤가: past the end of the road / from the crest, over the field's lip
@@ -84,6 +87,7 @@ def patch_maps(meta):
         p = rel(f); j = json.load(open(p)); h = j['hd'] if 'hd' in j else j['hds'][0]
         old = h.get('backdrop') or {}; nb = backdrop(kind, meta)
         for k in ('x', 'px', 'fit', 'clipY'): nb[k] = old.get(k, nb[k])   # keep the map's own placement (set by its build script)
+        if isinstance(old.get('front'), list): nb['front'] = [nb['front']] + old['front'][1:]   # 무명 무덤가: 펠트 마을 띠 등 덧붙인 앞 띠는 지킴 (팀장 10-25)
         h['backdrop'] = nb; json.dump(j, open(p, 'w'), ensure_ascii=False, indent=1); print('patched', f)
 
 if __name__ == '__main__':
