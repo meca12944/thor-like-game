@@ -3,7 +3,7 @@ import numpy as np, json, glob, os, subprocess, math
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 F = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', 18); FS = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', 14)
 M = json.load(open('turn_measure.json')); BG = (54, 56, 64, 255)
-ORDER = [('↓', 'walk_s2', 'run_s2_leg', 0), ('↘', 'walk_se', 'run_se2', 0), ('→', 'walk_r2', 'run_r2', 0), ('↗', 'walk_ne', 'run_ne2', 0), ('↑', 'walk_up', 'run_n', 0), ('↖', 'walk_ne', 'run_ne2', 1), ('←', 'walk_r2', 'run_r2', 1), ('↙', 'walk_se', 'run_se2', 1)]
+ORDER = [('↓', 'walk_s2', 'run_s2_leg', 0), ('↘', 'walk_se', 'run_se3', 0), ('→', 'walk_r2', 'run_r3', 0), ('↗', 'walk_ne', 'run_ne2', 0), ('↑', 'walk_up', 'run_n', 0), ('↖', 'walk_ne', 'run_ne2', 1), ('←', 'walk_r2', 'run_r3', 1), ('↙', 'walk_se', 'run_se3', 1)]
 def fr(d, i, flip):
     fs = sorted(glob.glob(f'{d}/[0-9][0-9][0-9].png')); im = Image.open(fs[i % len(fs)]).convert('RGBA'); return ImageOps.mirror(im) if flip else im, len(fs)
 def guides(dr, ox, oy, S=1):
