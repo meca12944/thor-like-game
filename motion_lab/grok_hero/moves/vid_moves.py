@@ -5,11 +5,13 @@ kind=sys.argv[1];S=int(sys.argv[2]) if len(sys.argv)>2 else 2
 F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',28);M=json.load(open('moves.json'))
 D8=[('down','↓',0),('dr','↘',0),('right','→',0),('ur','↗',0),('up','↑',0),('ur','↖',1),('right','←',1),('dr','↙',1)]
 def seq(d,fl):
-    k=f'{kind}_{d}'
-    if k not in M: return None
-    ims=[Image.open(f).convert('RGBA') for f in sorted(glob.glob(f'{k}/*.png'))];idle=Image.open(f'idle_{d}.png').convert('RGBA')
-    out=[idle]*30
-    for im,t in zip(ims,M[k]['ticks']): out+= [im]*t
+    ks=[f'atk{i}_{d}' for i in (1,2,3)] if kind=='atk' else [f'{kind}_{d}']
+    if any(k not in M for k in ks): return None
+    idle=Image.open(f'idle_{d}.png').convert('RGBA');out=[idle]*30
+    for k in ks:
+        ims=[Image.open(f).convert('RGBA') for f in sorted(glob.glob(f'{k}/*.png'))]
+        for im,t in zip(ims,M[k]['ticks']): out+=[im]*t
+        if kind=='atk': out+=[ims[-1]]*10
     out+=[idle]*30
     return [ImageOps.mirror(i) if fl else i for i in out]
 cells=[(lab,seq(d,fl)) for d,lab,fl in D8];cells=[c for c in cells if c[1]]
