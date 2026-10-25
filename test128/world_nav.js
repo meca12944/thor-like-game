@@ -144,6 +144,7 @@
 
   // ---------------- objectives ----------------
   function autoGoal() {
+    const cm = H().M && H().M(); if (cm && cm.navGoal) return Object.assign({}, cm.navGoal); // map-level goal (무명 무덤가 → 펠트 서문): the prologue shows no chapter quest yet
     for (const q of QUESTS) if (qs(q.id) === 'active') { const g = questGoal(q); if (g) return g; }
     for (const q of QUESTS) if (avail(q)) { const g = questGoal(q); if (g) return g; }
     if (!OLD) return null; const t = IDX && IDX.destinations.find(d => d.kind === 'dungeon'); return t && !H().SAVE.flags.boss01 ? Object.assign({}, t) : null;
@@ -269,13 +270,13 @@
   function drawMinimap(k, ox, oy, u) {
     const h = H(), m = h.M(), d = NM[m.id]; if (!d || st.miniMode === 2) return; const c = h.ctx, cfg = MINI[st.miniMode];
     const W = cfg.w * u, Hh = cfg.h * u, x0 = ox + h.LW * k - W - 8 * u, y0 = oy + 50 * u;
-    c.save(); c.globalAlpha = Math.min(1, uiAlpha() + .2);
+    c.save(); c.globalAlpha *= Math.min(1, uiAlpha() + .2);
     c.fillStyle = 'rgba(8,12,28,.62)'; c.fillRect(x0, y0, W, Hh); c.beginPath(); c.rect(x0 + 2, y0 + 2, W - 4, Hh - 4); c.clip();
     let s, mx, my;
     if (cfg.tile) { s = cfg.tile * u; mx = x0 + W / 2 - h.hero.x / m.T * s; my = y0 + Hh / 2 - h.hero.y / m.T * s; }
     else { s = Math.min((W - 8) / m.w, (Hh - 8) / m.h); mx = x0 + (W - m.w * s) / 2; my = y0 + (Hh - m.h * s) / 2; }
     drawMapLayer(c, m, d, mx, my, s, { route: true, big: !cfg.tile });
-    c.restore(); c.save(); c.globalAlpha = Math.min(1, uiAlpha() + .3); c.strokeStyle = '#e2c27a'; c.lineWidth = 2; c.strokeRect(x0 + 1, y0 + 1, W - 2, Hh - 2); c.restore();
+    c.restore(); c.save(); c.globalAlpha *= Math.min(1, uiAlpha() + .3); c.strokeStyle = '#e2c27a'; c.lineWidth = 2; c.strokeRect(x0 + 1, y0 + 1, W - 2, Hh - 2); c.restore();
     if (!document.body.classList.contains('touch')) h.textOut('V ' + ['작게', '크게'][st.miniMode] + ' · M 지도', x0 + W - 4 * u, y0 + Hh + 11 * u, 8 * u, 'rgba(230,230,240,.85)', '#000', 'right');
   }
   function drawGuide(k, ox, oy, u) {

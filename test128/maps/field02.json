@@ -17,49 +17,95 @@
  "battleBgm": "battle_champion",
  "tileset": "field",
  "tile": 16,
- "w": 52,
- "h": 32,
+ "w": 56,
+ "h": 36,
+ "ground": [
+  "#R#T#####P##TPTRRTR#####R#PP#T##RRT##R#R####T#R#R#RPP##R",
+  "T#RPRPTR#TTTP##PRPPTRT##T#R#R#RR#TPPT##RR#PRRRR#T##RRR#R",
+  "R#TPTTPTRTRRTT#P##R#RPRP###RTRTPRTT###TRR####R#TTPTTP#TR",
+  "##R........#P#P......TR#T#P#PT#PTTT##P#RR#TPTTT....#TPP#",
+  "RP#R..............s...............##RT#R#TPP........TP##",
+  "#RPT.......................~~~................s.....PPPT",
+  "T#PT.......................~~~~..~..................R#P#",
+  "R#RP............T.u........~~~~~~~~....u.........T..T#PP",
+  "#RP#........................~~~~~~~~............PT..T##R",
+  "#RRR.........T..........R...~~~~~~~~~............P..PPR#",
+  "#RPP....................T..~~~~~~~~~...T....=....T..PT#R",
+  "TPRT..LLLL..u...........P...~~~~..........==LLL..#..T#PR",
+  "RR#T..LLLL.......L...........~~~........====LLL.....R#PT",
+  "PPRT..LLLL...................~~~.......====.===.....RR#R",
+  "TRPP..........L..L.L.................=====..===.....RP##",
+  "..........u.......L.................====.........#..T#RR",
+  "..................L...............=====...u......R..RRP#",
+  "==========......................=====..........TP...RTR#",
+  "================.............=======....u..TRPR.....T#R#",
+  "......============================.........T###.....##RR",
+  "...........====================.......s....PP#T..s..TR#R",
+  "T#P#...................=...................P#P#.T...RR#R",
+  "PRTP..................................u.....TT#.....##RP",
+  "T###.........s.................TTRT..........PRR....P###",
+  "#PRT.su.............r........RTP###P#.........R#R#..TPT#",
+  "#RPP....u.....r..............RT##PR#R..........##T..PTRP",
+  "TT##.............u....s.u....TPR##TRR.........P###..RT##",
+  "###T.............................TR##...u....PTT....TPRP",
+  "####..T.....s...s..........T.......R........TRT.....TR#T",
+  "P#P...P#........T............................TP.....P#TR",
+  "###.s.#.....u.......................................R#RP",
+  "#PR............RP#RTP........TT#T#RRTP#T.......u....P#PP",
+  "##T......RP###TRT###TRP....PT#PRRT##R##TR#TTTT.....#T##P",
+  "TR###T#RR##R#RP##R##P###PPPTTRP####T#RPT##TP##RPT##T#RR#",
+  "###RTTRPPRT#####T#T#R###RRT##RTPRTTTT###TR#R##R####R###T",
+  "#RTPR###P#R#RP#TT##TPR##T##P#P#R##T#T#TR#T#P##PRTPPTT##R"
+ ],
  "legend": {
   ".": "soil",
-  ",": "stones",
-  ":": "dirt_pebble",
-  "#": "cliff_rock",
-  "A": {
+  "=": "stones",
+  "~": "water",
+  "b": "bridge_h",
+  "#": "cliff",
+  "L": "soil",
+  "T": {
    "ground": "soil",
-   "deco": "crystal"
+   "deco": "tree"
   },
-  "B": {
+  "P": {
+   "ground": "soil",
+   "deco": "pine"
+  },
+  "R": {
    "ground": "soil",
    "deco": "boulder"
   },
-  "C": {
+  "r": {
    "ground": "soil",
    "deco": "rocks"
-  }
+  },
+  "u": {
+   "ground": "soil",
+   "deco": "bush"
+  },
+  "s": {
+   "ground": "soil",
+   "deco": "mushrooms",
+   "solid": false
+  },
+  "w": "soil"
  },
  "solid": [
   "#",
-  "A",
-  "B",
-  "C"
+  "T",
+  "P",
+  "R",
+  "r",
+  "u",
+  "L",
+  "~"
  ],
- "spawns": {
-  "default": [
-   3.5,
-   16,
-   "right"
-  ],
-  "world": [
-   3.5,
-   16,
-   "right"
-  ]
- },
  "objects": [
   {
    "type": "exit",
    "x": 0,
-   "y": 13,
+   "y": 15,
    "w": 1,
    "h": 6,
    "to": "world",
@@ -69,126 +115,367 @@
   {
    "type": "sign",
    "x": 4,
-   "y": 12,
+   "y": 14,
    "text": "2지역 · 수정 동굴\n← 월드맵"
   },
   {
-   "type": "spawn",
-   "mob": "a2_06_glow_worm",
-   "x": 44,
-   "y": 7,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_06_glow_worm",
-   "x": 30,
-   "y": 7,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_06_glow_worm",
-   "x": 23,
-   "y": 5,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_06_glow_worm",
-   "x": 10,
-   "y": 20,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_07_cave_mole",
-   "x": 23,
-   "y": 26,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_07_cave_mole",
-   "x": 36,
-   "y": 20,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_07_cave_mole",
-   "x": 39,
-   "y": 11,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_07_cave_mole",
-   "x": 48,
-   "y": 22,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_08_crystal_slime",
-   "x": 14,
-   "y": 11,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a2_08_crystal_slime",
-   "x": 25,
+   "type": "landmark",
+   "id": "lm_field02_0",
+   "x": 45,
    "y": 13,
+   "name": "거대 자수정"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_field02_1",
+   "x": 17,
+   "y": 15,
+   "name": "수정 군락"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_field02_2",
+   "x": 7,
+   "y": 13,
+   "name": "부서진 수정 제단"
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_06_glow_worm",
+   "x": 51,
+   "y": 19,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "a2_08_crystal_slime",
-   "x": 40,
+   "mob": "a2_06_glow_worm",
+   "x": 8,
+   "y": 7,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_06_glow_worm",
+   "x": 24,
+   "y": 14,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_06_glow_worm",
+   "x": 7,
+   "y": 28,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_07_cave_mole",
+   "x": 18,
    "y": 24,
    "respawn": 30
   },
   {
    "type": "spawn",
+   "mob": "a2_07_cave_mole",
+   "x": 32,
+   "y": 29,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_07_cave_mole",
+   "x": 19,
+   "y": 29,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_07_cave_mole",
+   "x": 15,
+   "y": 27,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
    "mob": "a2_08_crystal_slime",
-   "x": 12,
-   "y": 26,
+   "x": 46,
+   "y": 32,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_08_crystal_slime",
+   "x": 22,
+   "y": 17,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_08_crystal_slime",
+   "x": 18,
+   "y": 18,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a2_08_crystal_slime",
+   "x": 51,
+   "y": 5,
    "respawn": 30
   }
  ],
- "ground": [
-  "####################################################",
-  "####################################################",
-  "##.................,,.............................##",
-  "##.....A..A......,,,,,,,.......................D..##",
-  "##.....A..AA......,,,,,,...................D..D...##",
-  "##................,C,,,....................D......##",
-  "##.................C.........................,,...##",
-  "##..................................,,....A,,,,,..##",
-  "##.....................,..........,,,,C.AA.A,,,,..##",
-  "##..................,,,,,,......A,,,CC,,...,,,,,..##",
-  "##..................,,,,,,........,,,,,...........##",
-  "##..................,,,,,...C...A....,............##",
-  "##...................,,,...C.C....................##",
-  "............................C.....................##",
-  "..................................................##",
-  "........................,,,.......................##",
-  ".....................,,,,,,.........,,............##",
-  "....................,,,,,,,.......,,,,,...........##",
-  ".............:.A.....,,,,,,,.....,,,,,,...........##",
-  "##........:A:A:......,,,,,,.......,,,,,...........##",
-  "##.......A:AA:AA......,...........,...............##",
-  "##........:::::...................................##",
-  "##..,.......:A..............C.....................##",
-  "##,,,,,....A..............C.C.....................##",
-  "##,,,,,,......A...................................##",
-  "##,,,,,,............................D.......C.....##",
-  "##.,.,...............................DD...C..C....##",
-  "##.......................:::::........D.CC..C.C...##",
-  "##......................::::::....................##",
-  "##.......................:::::....................##",
-  "####################################################",
-  "####################################################"
- ]
+ "spawns": {
+  "default": [
+   2.5,
+   18.5,
+   "right"
+  ],
+  "world": [
+   2.5,
+   18.5,
+   "right"
+  ]
+ },
+ "hd": {
+  "D": 3,
+  "ground": "assets/world/fields_hd/field02_ground.png",
+  "decoArt": {
+   "T": [
+    {
+     "img": "assets/world/fields_hd/stalag_0.png",
+     "ax": 46,
+     "ay": 138
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_1.png",
+     "ax": 40,
+     "ay": 136
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_2.png",
+     "ax": 42,
+     "ay": 134
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_3.png",
+     "ax": 38,
+     "ay": 138
+    }
+   ],
+   "P": [
+    {
+     "img": "assets/world/fields_hd/stalag_0.png",
+     "ax": 46,
+     "ay": 138
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_1.png",
+     "ax": 40,
+     "ay": 136
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_2.png",
+     "ax": 42,
+     "ay": 134
+    },
+    {
+     "img": "assets/world/fields_hd/stalag_3.png",
+     "ax": 38,
+     "ay": 138
+    }
+   ],
+   "R": [
+    {
+     "img": "assets/world/field_felt_hd/boulder.png",
+     "ax": 41,
+     "ay": 87
+    }
+   ],
+   "r": [
+    {
+     "img": "assets/world/fields_hd/crystal_0.png",
+     "ax": 40,
+     "ay": 90
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_1.png",
+     "ax": 48,
+     "ay": 71
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_2.png",
+     "ax": 46,
+     "ay": 88
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_3.png",
+     "ax": 46,
+     "ay": 90
+    }
+   ],
+   "u": [
+    {
+     "img": "assets/world/fields_hd/crystal_0.png",
+     "ax": 40,
+     "ay": 90
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_1.png",
+     "ax": 48,
+     "ay": 71
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_2.png",
+     "ax": 46,
+     "ay": 88
+    },
+    {
+     "img": "assets/world/fields_hd/crystal_3.png",
+     "ax": 46,
+     "ay": 90
+    }
+   ],
+   "s": [
+    {
+     "img": "assets/world/felt/rubble.png",
+     "ax": 27,
+     "ay": 32
+    }
+   ]
+  },
+  "props": [
+   {
+    "img": "assets/world/fields_hd/lm_cave_0.png",
+    "ax": 51,
+    "ay": 138,
+    "D": 1.5,
+    "x": 45.5,
+    "y": 13.0,
+    "shadow": 1,
+    "id": "lm_field02_0"
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_0.png",
+    "ax": 40,
+    "ay": 90,
+    "x": 17.5,
+    "y": 12.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_1.png",
+    "ax": 48,
+    "ay": 71,
+    "x": 14.5,
+    "y": 14.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_2.png",
+    "ax": 46,
+    "ay": 88,
+    "x": 19.5,
+    "y": 14.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_3.png",
+    "ax": 46,
+    "ay": 90,
+    "x": 17.5,
+    "y": 14.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_0.png",
+    "ax": 40,
+    "ay": 90,
+    "x": 18.5,
+    "y": 15.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/fields_hd/crystal_1.png",
+    "ax": 48,
+    "ay": 71,
+    "x": 18.5,
+    "y": 16.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/fields_hd/lm_cave_3.png",
+    "ax": 55,
+    "ay": 129,
+    "D": 1.5,
+    "x": 7.92,
+    "y": 13.51,
+    "shadow": 1,
+    "id": "lm_field02_2"
+   }
+  ],
+  "water": [
+   [
+    5,
+    27,
+    29
+   ],
+   [
+    6,
+    27,
+    30
+   ],
+   [
+    6,
+    33,
+    33
+   ],
+   [
+    7,
+    27,
+    34
+   ],
+   [
+    8,
+    28,
+    35
+   ],
+   [
+    9,
+    28,
+    36
+   ],
+   [
+    10,
+    27,
+    35
+   ],
+   [
+    11,
+    28,
+    31
+   ],
+   [
+    12,
+    29,
+    31
+   ],
+   [
+    13,
+    29,
+    31
+   ]
+  ],
+  "tufts": [],
+  "fx": {
+   "particles": "motes",
+   "tuft": null,
+   "water": "lake"
+  }
+ }
 }

@@ -1,0 +1,611 @@
+{
+"oak": [
+{
+"img": "assets/world/fields_hd/oak_0.png",
+"ax": 57,
+"ay": 144,
+"w": 116,
+"h": 146
+},
+{
+"img": "assets/world/fields_hd/oak_1.png",
+"ax": 55,
+"ay": 138,
+"w": 116,
+"h": 140
+},
+{
+"img": "assets/world/fields_hd/oak_2.png",
+"ax": 57,
+"ay": 141,
+"w": 116,
+"h": 144
+},
+{
+"img": "assets/world/fields_hd/oak_3.png",
+"ax": 58,
+"ay": 145,
+"w": 117,
+"h": 147
+}
+],
+"oak1": [
+{
+"img": "assets/world/fields_hd/oak1_0.png",
+"ax": 71,
+"ay": 174,
+"w": 144,
+"h": 176
+}
+],
+"crystal": [
+{
+"img": "assets/world/fields_hd/crystal_0.png",
+"ax": 40,
+"ay": 90,
+"w": 80,
+"h": 94
+},
+{
+"img": "assets/world/fields_hd/crystal_1.png",
+"ax": 48,
+"ay": 71,
+"w": 94,
+"h": 75
+},
+{
+"img": "assets/world/fields_hd/crystal_2.png",
+"ax": 46,
+"ay": 88,
+"w": 92,
+"h": 92
+},
+{
+"img": "assets/world/fields_hd/crystal_3.png",
+"ax": 46,
+"ay": 90,
+"w": 92,
+"h": 93
+}
+],
+"stalag": [
+{
+"img": "assets/world/fields_hd/stalag_0.png",
+"ax": 46,
+"ay": 138,
+"w": 94,
+"h": 143
+},
+{
+"img": "assets/world/fields_hd/stalag_1.png",
+"ax": 40,
+"ay": 136,
+"w": 95,
+"h": 140
+},
+{
+"img": "assets/world/fields_hd/stalag_2.png",
+"ax": 42,
+"ay": 134,
+"w": 84,
+"h": 142
+},
+{
+"img": "assets/world/fields_hd/stalag_3.png",
+"ax": 38,
+"ay": 138,
+"w": 78,
+"h": 142
+}
+],
+"palm": [
+{
+"img": "assets/world/fields_hd/palm_0.png",
+"ax": 45,
+"ay": 163,
+"w": 105,
+"h": 168
+},
+{
+"img": "assets/world/fields_hd/palm_1.png",
+"ax": 41,
+"ay": 162,
+"w": 119,
+"h": 164
+},
+{
+"img": "assets/world/fields_hd/palm_2.png",
+"ax": 61,
+"ay": 162,
+"w": 118,
+"h": 164
+},
+{
+"img": "assets/world/fields_hd/palm_3.png",
+"ax": 55,
+"ay": 165,
+"w": 112,
+"h": 167
+}
+],
+"desert_rock": [
+{
+"img": "assets/world/fields_hd/desert_rock_0.png",
+"ax": 51,
+"ay": 87,
+"w": 110,
+"h": 91
+},
+{
+"img": "assets/world/fields_hd/desert_rock_1.png",
+"ax": 61,
+"ay": 78,
+"w": 112,
+"h": 82
+},
+{
+"img": "assets/world/fields_hd/desert_rock_2.png",
+"ax": 50,
+"ay": 88,
+"w": 101,
+"h": 92
+},
+{
+"img": "assets/world/fields_hd/desert_rock_3.png",
+"ax": 56,
+"ay": 77,
+"w": 112,
+"h": 81
+}
+],
+"sandruin": [
+{
+"img": "assets/world/fields_hd/sandruin_0.png",
+"ax": 55,
+"ay": 142,
+"w": 96,
+"h": 144
+},
+{
+"img": "assets/world/fields_hd/sandruin_1.png",
+"ax": 45,
+"ay": 129,
+"w": 85,
+"h": 137
+},
+{
+"img": "assets/world/fields_hd/sandruin_2.png",
+"ax": 29,
+"ay": 128,
+"w": 92,
+"h": 133
+},
+{
+"img": "assets/world/fields_hd/sandruin_3.png",
+"ax": 45,
+"ay": 106,
+"w": 96,
+"h": 112
+}
+],
+"coral": [
+{
+"img": "assets/world/fields_hd/coral_0.png",
+"ax": 45,
+"ay": 57,
+"w": 90,
+"h": 59
+},
+{
+"img": "assets/world/fields_hd/coral_1.png",
+"ax": 42,
+"ay": 62,
+"w": 92,
+"h": 65
+},
+{
+"img": "assets/world/fields_hd/coral_2.png",
+"ax": 47,
+"ay": 64,
+"w": 92,
+"h": 67
+},
+{
+"img": "assets/world/fields_hd/coral_3.png",
+"ax": 46,
+"ay": 67,
+"w": 92,
+"h": 70
+}
+],
+"coastpine": [
+{
+"img": "assets/world/fields_hd/coastpine_0.png",
+"ax": 69,
+"ay": 157,
+"w": 118,
+"h": 162
+},
+{
+"img": "assets/world/fields_hd/coastpine_1.png",
+"ax": 51,
+"ay": 158,
+"w": 118,
+"h": 164
+},
+{
+"img": "assets/world/fields_hd/coastpine_2.png",
+"ax": 39,
+"ay": 157,
+"w": 130,
+"h": 164
+},
+{
+"img": "assets/world/fields_hd/coastpine_3.png",
+"ax": 81,
+"ay": 157,
+"w": 131,
+"h": 162
+}
+],
+"basalt": [
+{
+"img": "assets/world/fields_hd/basalt_0.png",
+"ax": 47,
+"ay": 89,
+"w": 93,
+"h": 92
+},
+{
+"img": "assets/world/fields_hd/basalt_1.png",
+"ax": 41,
+"ay": 79,
+"w": 93,
+"h": 83
+},
+{
+"img": "assets/world/fields_hd/basalt_2.png",
+"ax": 42,
+"ay": 86,
+"w": 94,
+"h": 89
+},
+{
+"img": "assets/world/fields_hd/basalt_3.png",
+"ax": 50,
+"ay": 89,
+"w": 94,
+"h": 92
+}
+],
+"snowrock": [
+{
+"img": "assets/world/fields_hd/snowrock_0.png",
+"ax": 45,
+"ay": 75,
+"w": 92,
+"h": 78
+},
+{
+"img": "assets/world/fields_hd/snowrock_1.png",
+"ax": 49,
+"ay": 74,
+"w": 90,
+"h": 78
+},
+{
+"img": "assets/world/fields_hd/snowrock_2.png",
+"ax": 34,
+"ay": 76,
+"w": 71,
+"h": 80
+},
+{
+"img": "assets/world/fields_hd/snowrock_3.png",
+"ax": 47,
+"ay": 71,
+"w": 94,
+"h": 74
+}
+],
+"temple": [
+{
+"img": "assets/world/fields_hd/temple_0.png",
+"ax": 46,
+"ay": 154,
+"w": 92,
+"h": 158
+},
+{
+"img": "assets/world/fields_hd/temple_1.png",
+"ax": 45,
+"ay": 145,
+"w": 88,
+"h": 151
+},
+{
+"img": "assets/world/fields_hd/temple_2.png",
+"ax": 45,
+"ay": 142,
+"w": 92,
+"h": 144
+},
+{
+"img": "assets/world/fields_hd/temple_3.png",
+"ax": 45,
+"ay": 153,
+"w": 92,
+"h": 155
+}
+],
+"pine_snow": [
+{
+"img": "assets/world/fields_hd/pine_snow_0.png",
+"ax": 35,
+"ay": 141,
+"w": 73,
+"h": 144
+},
+{
+"img": "assets/world/fields_hd/pine_snow_1.png",
+"ax": 35,
+"ay": 134,
+"w": 74,
+"h": 138
+},
+{
+"img": "assets/world/fields_hd/pine_snow_2.png",
+"ax": 42,
+"ay": 138,
+"w": 82,
+"h": 142
+},
+{
+"img": "assets/world/fields_hd/pine_snow_3.png",
+"ax": 34,
+"ay": 129,
+"w": 75,
+"h": 134
+}
+],
+"lm_cave": [
+{
+"img": "assets/world/fields_hd/lm_cave_0.png",
+"ax": 51,
+"ay": 138,
+"w": 102,
+"h": 142
+},
+{
+"img": "assets/world/fields_hd/lm_cave_1.png",
+"ax": 60,
+"ay": 131,
+"w": 123,
+"h": 137
+},
+{
+"img": "assets/world/fields_hd/lm_cave_2.png",
+"ax": 66,
+"ay": 127,
+"w": 136,
+"h": 133
+},
+{
+"img": "assets/world/fields_hd/lm_cave_3.png",
+"ax": 55,
+"ay": 129,
+"w": 114,
+"h": 137
+}
+],
+"lm_desert": [
+{
+"img": "assets/world/fields_hd/lm_desert_0.png",
+"ax": 76,
+"ay": 113,
+"w": 157,
+"h": 118
+},
+{
+"img": "assets/world/fields_hd/lm_desert_1.png",
+"ax": 78,
+"ay": 115,
+"w": 157,
+"h": 120
+},
+{
+"img": "assets/world/fields_hd/lm_desert_2.png",
+"ax": 78,
+"ay": 118,
+"w": 156,
+"h": 124
+},
+{
+"img": "assets/world/fields_hd/lm_desert_3.png",
+"ax": 83,
+"ay": 111,
+"w": 162,
+"h": 115
+}
+],
+"lm_pyramid": [
+{
+"img": "assets/world/fields_hd/lm_pyramid_0.png",
+"ax": 71,
+"ay": 104,
+"w": 138,
+"h": 112
+},
+{
+"img": "assets/world/fields_hd/lm_pyramid_1.png",
+"ax": 71,
+"ay": 103,
+"w": 136,
+"h": 108
+},
+{
+"img": "assets/world/fields_hd/lm_pyramid_2.png",
+"ax": 72,
+"ay": 103,
+"w": 138,
+"h": 107
+},
+{
+"img": "assets/world/fields_hd/lm_pyramid_3.png",
+"ax": 69,
+"ay": 104,
+"w": 138,
+"h": 111
+}
+],
+"lm_wreck": [
+{
+"img": "assets/world/fields_hd/lm_wreck_0.png",
+"ax": 67,
+"ay": 118,
+"w": 145,
+"h": 122
+},
+{
+"img": "assets/world/fields_hd/lm_wreck_1.png",
+"ax": 76,
+"ay": 104,
+"w": 163,
+"h": 110
+},
+{
+"img": "assets/world/fields_hd/lm_wreck_2.png",
+"ax": 61,
+"ay": 111,
+"w": 150,
+"h": 115
+},
+{
+"img": "assets/world/fields_hd/lm_wreck_3.png",
+"ax": 68,
+"ay": 104,
+"w": 155,
+"h": 110
+}
+],
+"lm_lighthouse": [
+{
+"img": "assets/world/fields_hd/lm_lighthouse_0.png",
+"ax": 51,
+"ay": 150,
+"w": 104,
+"h": 153
+},
+{
+"img": "assets/world/fields_hd/lm_lighthouse_1.png",
+"ax": 50,
+"ay": 128,
+"w": 105,
+"h": 132
+},
+{
+"img": "assets/world/fields_hd/lm_lighthouse_2.png",
+"ax": 53,
+"ay": 154,
+"w": 104,
+"h": 157
+},
+{
+"img": "assets/world/fields_hd/lm_lighthouse_3.png",
+"ax": 51,
+"ay": 141,
+"w": 104,
+"h": 145
+}
+],
+"lm_vfort": [
+{
+"img": "assets/world/fields_hd/lm_vfort_0.png",
+"ax": 69,
+"ay": 124,
+"w": 151,
+"h": 128
+},
+{
+"img": "assets/world/fields_hd/lm_vfort_1.png",
+"ax": 77,
+"ay": 119,
+"w": 148,
+"h": 124
+},
+{
+"img": "assets/world/fields_hd/lm_vfort_2.png",
+"ax": 64,
+"ay": 126,
+"w": 149,
+"h": 135
+},
+{
+"img": "assets/world/fields_hd/lm_vfort_3.png",
+"ax": 88,
+"ay": 123,
+"w": 152,
+"h": 128
+}
+],
+"lm_frosttower": [
+{
+"img": "assets/world/fields_hd/lm_frosttower_0.png",
+"ax": 44,
+"ay": 142,
+"w": 86,
+"h": 145
+},
+{
+"img": "assets/world/fields_hd/lm_frosttower_1.png",
+"ax": 44,
+"ay": 136,
+"w": 87,
+"h": 140
+},
+{
+"img": "assets/world/fields_hd/lm_frosttower_2.png",
+"ax": 44,
+"ay": 140,
+"w": 89,
+"h": 143
+},
+{
+"img": "assets/world/fields_hd/lm_frosttower_3.png",
+"ax": 46,
+"ay": 128,
+"w": 90,
+"h": 131
+}
+],
+"lm_temple": [
+{
+"img": "assets/world/fields_hd/lm_temple_0.png",
+"ax": 74,
+"ay": 127,
+"w": 148,
+"h": 130
+},
+{
+"img": "assets/world/fields_hd/lm_temple_1.png",
+"ax": 75,
+"ay": 119,
+"w": 145,
+"h": 128
+},
+{
+"img": "assets/world/fields_hd/lm_temple_2.png",
+"ax": 68,
+"ay": 121,
+"w": 134,
+"h": 126
+},
+{
+"img": "assets/world/fields_hd/lm_temple_3.png",
+"ax": 79,
+"ay": 130,
+"w": 157,
+"h": 133
+}
+]
+}
