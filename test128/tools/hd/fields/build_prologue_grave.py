@@ -6,7 +6,7 @@ centre = nameless graves (12x8, the hero wakes in the lane between them), east =
 Tutorial route ~120 tiles: wake (30,26) -> backpack (42,34) [interact] -> cold campfire (16,16) [waystone] -> crest vista (31,8)
 -> dry brambles (46..47, 4..8) [attack, breakable flag pg_bramble] -> ground crack (x 53) [dash/jump, soft pit] -> sign (57,4) -> exit (x 63).
 Art: everything code-drawn here (no PixelLab): ground painted with numpy, small sprites (graves, backpack, brambles, lantern) drawn with PIL,
-felt props reused (dead trees tinted to stone, debris, firepit, banners, sign); the far wall + castle picture is castle_backdrop.py. Light / fog / ash / smoke / crows /
+felt props reused (dead trees tinted to stone, debris, firepit, banners, sign); the far castle picture is the illustrator's hand-drawn castle_far (castle_far.py). Light / fog / ash / smoke / crows /
 footprints / darkness are drawn by world.js at runtime (map keys: dark, steps, hd.fx, hd.smoke).
 Rules: no spirits, no gore, no bodies/bones/blood; the backpack holds belongings only; no children, no Linette.
 Usage: python3 build_prologue_grave.py -> maps/prologue_grave.json + assets/world/prologue/*"""
@@ -313,15 +313,11 @@ sol = up(ndimage.gaussian_filter((g == '#').astype(np.float32), .9)); img *= (1 
 img = np.clip(img, 0, 255)
 gimg = Image.fromarray(img.astype(np.uint8)); gp = PA + 'ground.webp'; gimg.save(rel(gp), 'WEBP', quality=88, method=6)
 gimg.resize((W * 8, H * 8), Image.LANCZOS).save('/tmp/work/pg_ground_small.png')
-# ---------------- backdrop: Felt's wall from outside + the castle behind it (code-drawn, castle_backdrop.py) ----------------
-import castle_fortress as CF                                     # v7 (owner 10-25 「하늘은 그리지 말고 화면에 성 전체가 꽉 차게」): no sky; Felt's curtain wall + gate and the castle fill the frame
-CW, CH = 2400, 1200
-bim, bmeta = CF.compose(CW, CH, seed=31, front_gate=True)
-bp = PA + 'castle_backdrop.webp'; bim.save(rel(bp), 'WEBP', quality=86, method=6); bim.resize((CW // 4, CH // 4), Image.LANCZOS).save('/tmp/work/pg_backdrop_small.png')
-BG = '#2e2a28'                                                   # flat dark fog tone behind the silhouette (not a sky)
-backdrop = {'img': bp, 'D': 1, 'ppt': 16, 'ax': CW / 2, 'ay': CH, 'cy0': bmeta['bbox'][1], 'bw': bmeta['bbox'][2] - bmeta['bbox'][0] + 1, 'x': 46, 'px': .95,
-            'fit': [.02, LIP + .3, .25, .97, 1.04], 'clipY': LIP - .05, 'sky': BG, 'floor': BG, 'side': BG,
-            'glows': bmeta['glows'], 'smoke': bmeta['smoke'][:6], 'fog': [[CH * .84, CH * .12, .12, 5], [CH * .92, CH * .10, .16, -4]]}
+# ---------------- backdrop: the royal castle past the end of the road / from the crest (over the field's lip) ----------------
+# v8 (owner 10-25 「일러스트 작가랑 손그림풍 성 원화 새로 그려서 써라」「그림이 움직이게」): the illustrator's hand-drawn castle + its 16-frame loop (castle_far.py);
+# the picture already has its own outer wall band, so no extra code-drawn Felt wall / gate in front (castle_fortress.py -> tools/hd/_archive_old_felt).
+import castle_far as CFAR
+backdrop = CFAR.backdrop('pg'); backdrop.update({'x': 46, 'px': .95, 'fit': [.02, LIP + .3, .25, .97, 1.04], 'clipY': LIP - .05})   # (castle_far 'pg' already carries lift .4: brighter under the grave's dark light)
 camZones = [{'x0': 8, 'y0': RY, 'x1': 42, 'y1': 25, 'zoom': .8, 'look': -7.5, 'f': 4}, {'x0': 40, 'y0': RY, 'x1': 64, 'y1': RY + 5, 'zoom': .9, 'look': -7.5, 'f': 3}]
 # ---------------- tufts (dead grass), hd block, json ----------------
 tufts = []

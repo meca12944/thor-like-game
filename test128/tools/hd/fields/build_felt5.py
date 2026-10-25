@@ -58,16 +58,11 @@ lane &= ~road
 # ---------------------------------------------------------------- north band (capital wall + gate)
 print('wall...')
 band = WL.build_band(); bim = band.finish(cut=band.meta['cut']); pc, ox, oy = band.meta['portc_pic']; bim.alpha_composite(pc.finish(), (ox, oy))
-# the royal castle far behind the wall (owner 10-25 「성 뒷편 뷰를 우리 인트로 영상처럼 높은 성으로」): a screen-pinned far backdrop (castle_backdrop.py),
-# drawn by world.js drawBackdrop only in the sky behind the wall (clipY); it shows through the deep breaches in normal play and whole from the gate vista.
-import castle_fortress as CF                                     # v7 (owner 10-25 「하늘은 그리지 말고 화면에 성 전체가 꽉 차게」): no sky, the whole castle fits the screen
-CW, CH = 2400, 1200
-bdi, bdm = CF.compose(CW, CH, seed=31, front_gate=False)
-bdp = FA + 'castle_backdrop.webp'; bdi.save(rel(bdp), 'WEBP', quality=86, method=6)
-BG = '#2c2826'                                                   # flat dark fog tone behind the silhouette (not a sky)
-backdrop = {'img': bdp, 'D': 1, 'ppt': 16, 'ax': CW / 2, 'ay': CH, 'cy0': bdm['bbox'][1], 'bw': bdm['bbox'][2] - bdm['bbox'][0] + 1, 'x': 75, 'px': .92,
-            'fit': [.02, 14, .9, .97, 1.04], 'clipY': WALL_Y - 1.5, 'sky': BG, 'floor': BG, 'side': BG, 'glows': bdm['glows'], 'smoke': bdm['smoke'][:7],
-            'fog': [[CH * .78, CH * .12, .10, 5], [CH * .88, CH * .14, .14, 9]]}
+# the royal castle far behind the wall: a screen-pinned far backdrop drawn by world.js drawBackdrop only behind the wall (clipY); it shows through the
+# deep breaches in normal play and whole from the gate vista. v8 (owner 10-25 「일러스트 작가랑 손그림풍 성 원화 새로 그려서 써라」「그림이 움직이게」): the illustrator's
+# hand-drawn castle + its 16-frame loop (castle_far.py builds assets/world/castle_far/); the code-drawn castle_fortress.py is in tools/hd/_archive_old_felt.
+import castle_far as CFAR
+backdrop = CFAR.backdrop('felt'); backdrop.update({'x': 75, 'px': .92, 'fit': [.02, 14, .9, .97, 1.04, .33], 'clipY': WALL_Y - 1.5})
 tp, tox, toy = WL.tunnel(); tim = tp.finish(); tpath = save(tim, 'gate_tunnel')
 tunnel_q = {'id': 'gate_tunnel', 'img': tpath, 'x': round(tox / AT, 3), 'y': WALL_Y - 3.5, 'ax': 0, 'ay': round((WALL_Y - 3.5) * AT - toy, 1), 'D': D, 'fade': 0, 'shadow': 0}
 SL = 25; band_q = []
