@@ -27,7 +27,7 @@ R = {
 }
 NPC = {'herb': ('f_sera', 14, 7), 'forge': ('f_rom', 12, 9)}
 def main():
-    felt = json.load(open(os.path.join(ROOT, 'tools/hd/fields/orig/felt.json')))
+    felt = json.load(open(os.path.join(ROOT, 'tools/hd/fields/felt_v4_objects.json')))
     OB = {o.get('id'): o for o in felt['objects']}
     for k, r in R.items():
         im = Image.open(f'{SRC}/int_{k}_0.png').convert('RGB'); a = np.array(im).astype(float)
