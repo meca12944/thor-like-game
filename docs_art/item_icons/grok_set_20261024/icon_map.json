@@ -1,0 +1,1839 @@
+{
+ "note": "그록 아이템 아이콘 세트(2026-10-24) → 정본 이름·id 짝. 잘라낸 투명 PNG(원본 크기) = cut/<id>.png, 게임 = test128/assets/icons/grok/<id>_32.png·_64.png(작은 칸)·_128.webp(큰 칸). inGame = 지금 게임 아이템 표(ITEMS)에 있음.",
+ "items": [
+  {
+   "name": "태초의 잿빛 흉갑",
+   "id": "a_first_ash",
+   "slot": "armor",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 0,
+   "col": 0,
+   "size": [
+    324,
+    389
+   ],
+   "inGame": false
+  },
+  {
+   "name": "마모 저항 방어구",
+   "id": "a_wear_guard",
+   "slot": "armor",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 0,
+   "col": 1,
+   "size": [
+    357,
+    402
+   ],
+   "inGame": false
+  },
+  {
+   "name": "그림자 도둑의 망토",
+   "id": "c_shadow_thief",
+   "slot": "cloak",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 0,
+   "col": 2,
+   "size": [
+    312,
+    449
+   ],
+   "inGame": false
+  },
+  {
+   "name": "투박한 나무 의수",
+   "id": "k_wood_arm",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 0,
+   "col": 3,
+   "size": [
+    339,
+    365
+   ],
+   "inGame": false
+  },
+  {
+   "name": "왕가의 열쇠",
+   "id": "k_royal_key",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 1,
+   "col": 0,
+   "size": [
+    308,
+    315
+   ],
+   "inGame": false
+  },
+  {
+   "name": "성문 기어 손잡이",
+   "id": "k_gate_gear",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 1,
+   "col": 1,
+   "size": [
+    276,
+    295
+   ],
+   "inGame": false
+  },
+  {
+   "name": "암호화된 금서",
+   "id": "k_cipher_book",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 1,
+   "col": 2,
+   "size": [
+    301,
+    326
+   ],
+   "inGame": false
+  },
+  {
+   "name": "두꺼운 흡음 천",
+   "id": "k_sound_cloth",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 1,
+   "col": 3,
+   "size": [
+    365,
+    282
+   ],
+   "inGame": false
+  },
+  {
+   "name": "이안의 붉은 가죽 공",
+   "id": "k_ian_ball",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 2,
+   "col": 0,
+   "size": [
+    279,
+    281
+   ],
+   "inGame": false
+  },
+  {
+   "name": "루카의 현 끊어진 비파",
+   "id": "k_luca_lute",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 2,
+   "col": 1,
+   "size": [
+    306,
+    301
+   ],
+   "inGame": false
+  },
+  {
+   "name": "카일라의 덧대기 키트",
+   "id": "k_kaila_kit",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 2,
+   "col": 2,
+   "size": [
+    341,
+    300
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잿빛 화염병",
+   "id": "ash_firebomb",
+   "slot": "consumable",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 2,
+   "col": 3,
+   "size": [
+    248,
+    316
+   ],
+   "inGame": true
+  },
+  {
+   "name": "평범한 회복 물약",
+   "id": "potion",
+   "slot": "consumable",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 3,
+   "col": 0,
+   "size": [
+    191,
+    281
+   ],
+   "inGame": true
+  },
+  {
+   "name": "던지기용 투척 나이프",
+   "id": "throw_knife",
+   "slot": "consumable",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 3,
+   "col": 1,
+   "size": [
+    286,
+    304
+   ],
+   "inGame": true
+  },
+  {
+   "name": "닳은 등불",
+   "id": "k_worn_lamp",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 3,
+   "col": 2,
+   "size": [
+    171,
+    335
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잿빛 장비 수리 망치",
+   "id": "k_ash_hammer",
+   "slot": "quest",
+   "sheet": "part1.png",
+   "part": 7,
+   "row": 3,
+   "col": 3,
+   "size": [
+    301,
+    305
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳지 않는 잿빛유물",
+   "id": "k_ash_relic",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 0,
+   "col": 0,
+   "size": [
+    184,
+    277
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시계태엽 부품",
+   "id": "k_clock_parts",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 0,
+   "col": 1,
+   "size": [
+    256,
+    223
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잊혀진 양피지",
+   "id": "k_lost_parch",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 0,
+   "col": 2,
+   "size": [
+    265,
+    280
+   ],
+   "inGame": false
+  },
+  {
+   "name": "공허의 핏방울",
+   "id": "k_void_drop",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 0,
+   "col": 3,
+   "size": [
+    125,
+    266
+   ],
+   "inGame": false
+  },
+  {
+   "name": "기사의 부서진 투구",
+   "id": "k_knight_helm",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 1,
+   "col": 0,
+   "size": [
+    230,
+    283
+   ],
+   "inGame": false
+  },
+  {
+   "name": "낡은 열쇠 꾸러미",
+   "id": "k_old_keys",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 1,
+   "col": 1,
+   "size": [
+    289,
+    286
+   ],
+   "inGame": false
+  },
+  {
+   "name": "석회화된 유골",
+   "id": "k_lime_bones",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 1,
+   "col": 2,
+   "size": [
+    265,
+    231
+   ],
+   "inGame": false
+  },
+  {
+   "name": "연금술 조제도구",
+   "id": "k_alch_kit",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 1,
+   "col": 3,
+   "size": [
+    277,
+    249
+   ],
+   "inGame": false
+  },
+  {
+   "name": "부러진 검의 날",
+   "id": "k_broken_blade",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 2,
+   "col": 0,
+   "size": [
+    272,
+    281
+   ],
+   "inGame": false
+  },
+  {
+   "name": "가죽 팔토시",
+   "id": "k_leather_bracer",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 2,
+   "col": 1,
+   "size": [
+    277,
+    276
+   ],
+   "inGame": false
+  },
+  {
+   "name": "낡은 무쇠 망치",
+   "id": "k_old_iron_hammer",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 2,
+   "col": 2,
+   "size": [
+    296,
+    297
+   ],
+   "inGame": false
+  },
+  {
+   "name": "찢어진 염주",
+   "id": "k_torn_beads",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 2,
+   "col": 3,
+   "size": [
+    252,
+    264
+   ],
+   "inGame": false
+  },
+  {
+   "name": "검은 이끼 물약",
+   "id": "black_moss_potion",
+   "slot": "consumable",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 3,
+   "col": 0,
+   "size": [
+    217,
+    273
+   ],
+   "inGame": false
+  },
+  {
+   "name": "녹슨 해체톱",
+   "id": "k_rust_saw",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 3,
+   "col": 1,
+   "size": [
+    315,
+    273
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아빠진 장갑",
+   "id": "k_worn_gloves",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 3,
+   "col": 2,
+   "size": [
+    272,
+    273
+   ],
+   "inGame": false
+  },
+  {
+   "name": "연금술용 수은관",
+   "id": "k_mercury_tube",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 3,
+   "col": 3,
+   "size": [
+    242,
+    274
+   ],
+   "inGame": false
+  },
+  {
+   "name": "굳어진 연회용 칼",
+   "id": "k_feast_knife",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 4,
+   "col": 0,
+   "size": [
+    269,
+    285
+   ],
+   "inGame": false
+  },
+  {
+   "name": "수장고의 낡은 사슬",
+   "id": "k_vault_chain",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 4,
+   "col": 1,
+   "size": [
+    315,
+    249
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잿빛 정화제",
+   "id": "ash_purifier",
+   "slot": "consumable",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 4,
+   "col": 2,
+   "size": [
+    199,
+    251
+   ],
+   "inGame": true
+  },
+  {
+   "name": "가문의 마지막 맹세",
+   "id": "k_family_oath",
+   "slot": "quest",
+   "sheet": "part2.png",
+   "part": 6,
+   "row": 4,
+   "col": 3,
+   "size": [
+    286,
+    269
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아버린 결혼반지",
+   "id": "r_worn_wedding",
+   "slot": "ring",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 0,
+   "col": 0,
+   "size": [
+    239,
+    246
+   ],
+   "inGame": false
+  },
+  {
+   "name": "녹은 펜던트",
+   "id": "k_melt_pendant",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 0,
+   "col": 1,
+   "size": [
+    205,
+    290
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잊혀진 나선 열쇠",
+   "id": "k_spiral_key",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 0,
+   "col": 2,
+   "size": [
+    265,
+    300
+   ],
+   "inGame": false
+  },
+  {
+   "name": "안개 진화 물약",
+   "id": "mist_douse",
+   "slot": "consumable",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 0,
+   "col": 3,
+   "size": [
+    180,
+    280
+   ],
+   "inGame": false
+  },
+  {
+   "name": "재가 되지 못한 편지",
+   "id": "k_unburnt_letter",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 1,
+   "col": 0,
+   "size": [
+    256,
+    311
+   ],
+   "inGame": false
+  },
+  {
+   "name": "최초의 배교자 심장",
+   "id": "k_apostate_heart",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 1,
+   "col": 1,
+   "size": [
+    229,
+    304
+   ],
+   "inGame": false
+  },
+  {
+   "name": "부서진 맹세의 칼자루",
+   "id": "k_oath_hilt",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 1,
+   "col": 2,
+   "size": [
+    291,
+    309
+   ],
+   "inGame": false
+  },
+  {
+   "name": "순백의 관현",
+   "id": "k_white_pipe",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 1,
+   "col": 3,
+   "size": [
+    306,
+    309
+   ],
+   "inGame": false
+  },
+  {
+   "name": "가시 박힌 철사",
+   "id": "k_barbed_wire",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 2,
+   "col": 0,
+   "size": [
+    309,
+    309
+   ],
+   "inGame": false
+  },
+  {
+   "name": "불탄 귀족의 외투 조각",
+   "id": "k_noble_scrap",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 2,
+   "col": 1,
+   "size": [
+    334,
+    278
+   ],
+   "inGame": false
+  },
+  {
+   "name": "굳어버린 안경테",
+   "id": "k_stiff_glasses",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 2,
+   "col": 2,
+   "size": [
+    349,
+    184
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잿빛 이끼",
+   "id": "k_ash_moss",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 2,
+   "col": 3,
+   "size": [
+    320,
+    267
+   ],
+   "inGame": false
+  },
+  {
+   "name": "탐욕의 무게 반지",
+   "id": "r_greed_weight",
+   "slot": "ring",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 3,
+   "col": 0,
+   "size": [
+    242,
+    258
+   ],
+   "inGame": false
+  },
+  {
+   "name": "눈먼 자의 귀마개",
+   "id": "k_blind_plugs",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 3,
+   "col": 1,
+   "size": [
+    251,
+    289
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시간이 굳은 모래",
+   "id": "k_time_sand",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 3,
+   "col": 2,
+   "size": [
+    232,
+    279
+   ],
+   "inGame": false
+  },
+  {
+   "name": "사멸의 파편",
+   "id": "k_death_shard",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 3,
+   "col": 3,
+   "size": [
+    233,
+    298
+   ],
+   "inGame": false
+  },
+  {
+   "name": "수은 정화통",
+   "id": "k_mercury_can",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 4,
+   "col": 0,
+   "size": [
+    271,
+    270
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아빠진 바늘 상자",
+   "id": "k_needle_box",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 4,
+   "col": 1,
+   "size": [
+    277,
+    250
+   ],
+   "inGame": false
+  },
+  {
+   "name": "부러진 검병",
+   "id": "k_broken_hilt",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 4,
+   "col": 2,
+   "size": [
+    291,
+    299
+   ],
+   "inGame": false
+  },
+  {
+   "name": "붉은 인광석",
+   "id": "k_red_glowstone",
+   "slot": "quest",
+   "sheet": "part3.png",
+   "part": 5,
+   "row": 4,
+   "col": 3,
+   "size": [
+    240,
+    259
+   ],
+   "inGame": false
+  },
+  {
+   "name": "붉은 목도리",
+   "id": "k_red_scarf",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 0,
+   "col": 0,
+   "size": [
+    245,
+    293
+   ],
+   "inGame": false
+  },
+  {
+   "name": "녹슨 군번줄",
+   "id": "k_rust_tags",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 0,
+   "col": 1,
+   "size": [
+    279,
+    291
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시간의 양피지",
+   "id": "k_time_parch",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 0,
+   "col": 2,
+   "size": [
+    300,
+    287
+   ],
+   "inGame": false
+  },
+  {
+   "name": "루프의 잔해 파편",
+   "id": "k_loop_shard",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 0,
+   "col": 3,
+   "size": [
+    221,
+    280
+   ],
+   "inGame": false
+  },
+  {
+   "name": "황금 톱니바퀴",
+   "id": "k_gold_cog",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 1,
+   "col": 0,
+   "size": [
+    270,
+    271
+   ],
+   "inGame": false
+  },
+  {
+   "name": "꺾인 맹세의 검병",
+   "id": "k_oath_grip",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 1,
+   "col": 1,
+   "size": [
+    282,
+    290
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시간이 봉인된 기름",
+   "id": "k_sealed_oil",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 1,
+   "col": 2,
+   "size": [
+    157,
+    284
+   ],
+   "inGame": false
+  },
+  {
+   "name": "정화의 송진",
+   "id": "k_pure_resin",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 1,
+   "col": 3,
+   "size": [
+    234,
+    237
+   ],
+   "inGame": false
+  },
+  {
+   "name": "부러진 근위대의 창",
+   "id": "k_guard_spear_broken",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 2,
+   "col": 0,
+   "size": [
+    305,
+    304
+   ],
+   "inGame": false
+  },
+  {
+   "name": "타임키퍼의 해체 공구",
+   "id": "k_keeper_tools",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 2,
+   "col": 1,
+   "size": [
+    270,
+    270
+   ],
+   "inGame": false
+  },
+  {
+   "name": "피 묻은 기록관의 안경",
+   "id": "k_archivist_glasses",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 2,
+   "col": 2,
+   "size": [
+    215,
+    130
+   ],
+   "inGame": false
+  },
+  {
+   "name": "조율사의 시약병",
+   "id": "k_tuner_vial",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 2,
+   "col": 3,
+   "size": [
+    268,
+    271
+   ],
+   "inGame": false
+  },
+  {
+   "name": "버려진 껍데기 반지",
+   "id": "r_husk",
+   "slot": "ring",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 3,
+   "col": 0,
+   "size": [
+    233,
+    243
+   ],
+   "inGame": false
+  },
+  {
+   "name": "붉은 실타래 반지",
+   "id": "r_red_thread",
+   "slot": "ring",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 3,
+   "col": 1,
+   "size": [
+    249,
+    242
+   ],
+   "inGame": true
+  },
+  {
+   "name": "태초의 공허 반지",
+   "id": "r_first_void",
+   "slot": "ring",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 3,
+   "col": 2,
+   "size": [
+    244,
+    235
+   ],
+   "inGame": false
+  },
+  {
+   "name": "사멸의 핵철 반지",
+   "id": "r_death_core",
+   "slot": "ring",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 3,
+   "col": 3,
+   "size": [
+    234,
+    238
+   ],
+   "inGame": false
+  },
+  {
+   "name": "석화된 연금술사의 물약병",
+   "id": "stone_alch_vial",
+   "slot": "consumable",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 4,
+   "col": 0,
+   "size": [
+    220,
+    279
+   ],
+   "inGame": false
+  },
+  {
+   "name": "특수 숫돌",
+   "id": "whetstone_sp",
+   "slot": "consumable",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 4,
+   "col": 1,
+   "size": [
+    277,
+    225
+   ],
+   "inGame": true
+  },
+  {
+   "name": "영혼이 꿰매진 인형",
+   "id": "k_stitched_doll",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 4,
+   "col": 2,
+   "size": [
+    217,
+    278
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시간이 굳은 핏방울",
+   "id": "k_time_blood",
+   "slot": "quest",
+   "sheet": "part4.png",
+   "part": 4,
+   "row": 4,
+   "col": 3,
+   "size": [
+    153,
+    254
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아빠진 루프의 장검",
+   "id": "w_loop_long",
+   "slot": "weapon",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 0,
+   "col": 0,
+   "size": [
+    376,
+    392
+   ],
+   "inGame": true
+  },
+  {
+   "name": "아라크네의 붉은 척추검",
+   "id": "w_ara_spine",
+   "slot": "weapon",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 0,
+   "col": 1,
+   "size": [
+    368,
+    392
+   ],
+   "inGame": true
+  },
+  {
+   "name": "철혈의 부러진 대검",
+   "id": "w_iron_broken",
+   "slot": "weapon",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 0,
+   "col": 2,
+   "size": [
+    342,
+    391
+   ],
+   "inGame": false
+  },
+  {
+   "name": "맹세의 흑연검",
+   "id": "w_oath_ink",
+   "slot": "weapon",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 0,
+   "col": 3,
+   "size": [
+    375,
+    393
+   ],
+   "inGame": false
+  },
+  {
+   "name": "귀족의 그을린 세검",
+   "id": "w_noble_rapier",
+   "slot": "weapon",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 0,
+   "col": 4,
+   "size": [
+    367,
+    379
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아빠진 잿빛 망토",
+   "id": "c_ash_cloak",
+   "slot": "cloak",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 1,
+   "col": 0,
+   "size": [
+    302,
+    340
+   ],
+   "inGame": true
+  },
+  {
+   "name": "아라크네의 실크 망토",
+   "id": "c_ara_silk",
+   "slot": "cloak",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 1,
+   "col": 1,
+   "size": [
+    300,
+    351
+   ],
+   "inGame": true
+  },
+  {
+   "name": "철혈기사의 무쇠망토",
+   "id": "c_iron_knight",
+   "slot": "cloak",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 1,
+   "col": 2,
+   "size": [
+    287,
+    342
+   ],
+   "inGame": false
+  },
+  {
+   "name": "대서고의 양피지 망토",
+   "id": "c_archive_parch",
+   "slot": "cloak",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 1,
+   "col": 3,
+   "size": [
+    280,
+    346
+   ],
+   "inGame": false
+  },
+  {
+   "name": "불타는 귀족의 외투",
+   "id": "c_burning_noble",
+   "slot": "cloak",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 1,
+   "col": 4,
+   "size": [
+    309,
+    347
+   ],
+   "inGame": false
+  },
+  {
+   "name": "잿가루 낀 철환",
+   "id": "r_ash_iron",
+   "slot": "ring",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 2,
+   "col": 0,
+   "size": [
+    264,
+    268
+   ],
+   "inGame": true
+  },
+  {
+   "name": "부서진 톱니 반지",
+   "id": "r_broken_cog",
+   "slot": "ring",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 2,
+   "col": 1,
+   "size": [
+    266,
+    277
+   ],
+   "inGame": false
+  },
+  {
+   "name": "공허의 핏빛 반지",
+   "id": "r_void_blood",
+   "slot": "ring",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 2,
+   "col": 2,
+   "size": [
+    279,
+    283
+   ],
+   "inGame": false
+  },
+  {
+   "name": "석화된 해골 반지",
+   "id": "r_stone_skull",
+   "slot": "ring",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 2,
+   "col": 3,
+   "size": [
+    242,
+    255
+   ],
+   "inGame": false
+  },
+  {
+   "name": "낡은 은반지",
+   "id": "r_old_silver",
+   "slot": "ring",
+   "sheet": "part5.png",
+   "part": 1,
+   "row": 2,
+   "col": 4,
+   "size": [
+    257,
+    256
+   ],
+   "inGame": true
+  },
+  {
+   "name": "저주받은 이단의 대검",
+   "id": "w_heretic_great",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 0,
+   "col": 0,
+   "size": [
+    310,
+    320
+   ],
+   "inGame": false
+  },
+  {
+   "name": "껍데기들의 거울검",
+   "id": "w_husk_mirror",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 0,
+   "col": 1,
+   "size": [
+    297,
+    308
+   ],
+   "inGame": false
+  },
+  {
+   "name": "근위대의 꺾인 창검",
+   "id": "w_guard_spear",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 0,
+   "col": 2,
+   "size": [
+    328,
+    324
+   ],
+   "inGame": false
+  },
+  {
+   "name": "연금술사의 수은검",
+   "id": "w_alch_mercury",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 0,
+   "col": 3,
+   "size": [
+    291,
+    303
+   ],
+   "inGame": false
+  },
+  {
+   "name": "초침을 부수는 대검",
+   "id": "w_hand_breaker",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 1,
+   "col": 0,
+   "size": [
+    302,
+    309
+   ],
+   "inGame": false
+  },
+  {
+   "name": "박제된 군주의 대검",
+   "id": "w_king_great",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 1,
+   "col": 1,
+   "size": [
+    358,
+    376
+   ],
+   "inGame": false
+  },
+  {
+   "name": "1회차 루프의 태초검",
+   "id": "w_first_loop",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 1,
+   "col": 2,
+   "size": [
+    364,
+    376
+   ],
+   "inGame": false
+  },
+  {
+   "name": "사멸의 진검",
+   "id": "w_true_death",
+   "slot": "weapon",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 1,
+   "col": 3,
+   "size": [
+    356,
+    374
+   ],
+   "inGame": false
+  },
+  {
+   "name": "오스왈드의 철염주 망토",
+   "id": "c_oswald_rosary",
+   "slot": "cloak",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 2,
+   "col": 0,
+   "size": [
+    306,
+    358
+   ],
+   "inGame": false
+  },
+  {
+   "name": "시계태엽의 황동 망토",
+   "id": "c_clock_brass",
+   "slot": "cloak",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 2,
+   "col": 1,
+   "size": [
+    300,
+    352
+   ],
+   "inGame": false
+  },
+  {
+   "name": "박제된 군주의 망토",
+   "id": "c_king",
+   "slot": "cloak",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 2,
+   "col": 2,
+   "size": [
+    298,
+    357
+   ],
+   "inGame": false
+  },
+  {
+   "name": "이안의 붉은 소년 망토",
+   "id": "c_ian_red",
+   "slot": "cloak",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 2,
+   "col": 3,
+   "size": [
+    303,
+    354
+   ],
+   "inGame": false
+  },
+  {
+   "name": "타임키퍼의 부러진 반쪽 반지",
+   "id": "r_keeper_half",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 3,
+   "col": 0,
+   "size": [
+    258,
+    239
+   ],
+   "inGame": false
+  },
+  {
+   "name": "묘지의 뼛조각 반지",
+   "id": "r_grave_bone",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 3,
+   "col": 1,
+   "size": [
+    228,
+    248
+   ],
+   "inGame": false
+  },
+  {
+   "name": "멍든 수은 반지",
+   "id": "r_bruise_mercury",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 3,
+   "col": 2,
+   "size": [
+    241,
+    238
+   ],
+   "inGame": false
+  },
+  {
+   "name": "철사 감긴 묵주반지",
+   "id": "r_wire_rosary",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 3,
+   "col": 3,
+   "size": [
+    283,
+    271
+   ],
+   "inGame": false
+  },
+  {
+   "name": "탐욕의 루비 반지",
+   "id": "r_greed_ruby",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 4,
+   "col": 0,
+   "size": [
+    222,
+    250
+   ],
+   "inGame": false
+  },
+  {
+   "name": "기록관의 렌즈 반지",
+   "id": "r_archivist_lens",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 4,
+   "col": 1,
+   "size": [
+    225,
+    245
+   ],
+   "inGame": false
+  },
+  {
+   "name": "도굴꾼의 그림자 반지",
+   "id": "r_robber_shadow",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 4,
+   "col": 2,
+   "size": [
+    241,
+    240
+   ],
+   "inGame": false
+  },
+  {
+   "name": "멈춰버린 모래시계 반지",
+   "id": "r_stopped_glass",
+   "slot": "ring",
+   "sheet": "part6.png",
+   "part": 2,
+   "row": 4,
+   "col": 3,
+   "size": [
+    219,
+    233
+   ],
+   "inGame": false
+  },
+  {
+   "name": "숨겨진 요람의 목검",
+   "id": "w_cradle_wood",
+   "slot": "weapon",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 0,
+   "col": 0,
+   "size": [
+    363,
+    388
+   ],
+   "inGame": false
+  },
+  {
+   "name": "망각된 집행관의 참수검",
+   "id": "w_executioner",
+   "slot": "weapon",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 0,
+   "col": 1,
+   "size": [
+    368,
+    378
+   ],
+   "inGame": false
+  },
+  {
+   "name": "붉은 마지막 기록 실타래",
+   "id": "k_last_thread",
+   "slot": "quest",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 0,
+   "col": 2,
+   "size": [
+    290,
+    343
+   ],
+   "inGame": false
+  },
+  {
+   "name": "수은 필터",
+   "id": "k_mercury_filter",
+   "slot": "quest",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 0,
+   "col": 3,
+   "size": [
+    342,
+    368
+   ],
+   "inGame": false
+  },
+  {
+   "name": "태초의 잿빛 망토",
+   "id": "c_first_ash",
+   "slot": "cloak",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 1,
+   "col": 0,
+   "size": [
+    306,
+    373
+   ],
+   "inGame": false
+  },
+  {
+   "name": "닳아버린 의복 조각",
+   "id": "k_worn_cloth",
+   "slot": "quest",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 1,
+   "col": 1,
+   "size": [
+    311,
+    365
+   ],
+   "inGame": false
+  },
+  {
+   "name": "수장고의 뼈 망토",
+   "id": "c_vault_bone",
+   "slot": "cloak",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 1,
+   "col": 2,
+   "size": [
+    319,
+    371
+   ],
+   "inGame": false
+  },
+  {
+   "name": "연금술사의 석회 망토",
+   "id": "c_alch_lime",
+   "slot": "cloak",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 1,
+   "col": 3,
+   "size": [
+    323,
+    369
+   ],
+   "inGame": false
+  },
+  {
+   "name": "재앙의 흑요석 반지",
+   "id": "r_doom_obsidian",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 2,
+   "col": 0,
+   "size": [
+    260,
+    298
+   ],
+   "inGame": false
+  },
+  {
+   "name": "처형인의 무쇠 반지",
+   "id": "r_executioner",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 2,
+   "col": 1,
+   "size": [
+    281,
+    282
+   ],
+   "inGame": false
+  },
+  {
+   "name": "피 묻은 바늘 반지",
+   "id": "r_blood_needle",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 2,
+   "col": 2,
+   "size": [
+    286,
+    286
+   ],
+   "inGame": true
+  },
+  {
+   "name": "망자의 눈물 반지",
+   "id": "r_dead_tear",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 2,
+   "col": 3,
+   "size": [
+    279,
+    281
+   ],
+   "inGame": false
+  },
+  {
+   "name": "불타는 낙인 반지",
+   "id": "r_burning_brand",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 3,
+   "col": 0,
+   "size": [
+    278,
+    272
+   ],
+   "inGame": false
+  },
+  {
+   "name": "거울 파편 반지",
+   "id": "r_mirror_shard",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 3,
+   "col": 1,
+   "size": [
+    267,
+    300
+   ],
+   "inGame": false
+  },
+  {
+   "name": "공허의 소용돌이 반지",
+   "id": "r_void_swirl",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 3,
+   "col": 2,
+   "size": [
+    265,
+    295
+   ],
+   "inGame": false
+  },
+  {
+   "name": "파열된 철갑 반지",
+   "id": "r_burst_plate",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 3,
+   "col": 3,
+   "size": [
+    280,
+    286
+   ],
+   "inGame": false
+  },
+  {
+   "name": "광기의 톱니 반지",
+   "id": "r_mad_cog",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 4,
+   "col": 0,
+   "size": [
+    285,
+    272
+   ],
+   "inGame": false
+  },
+  {
+   "name": "조율사의 귀마개 반지",
+   "id": "r_tuner_plug",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 4,
+   "col": 1,
+   "size": [
+    279,
+    277
+   ],
+   "inGame": false
+  },
+  {
+   "name": "방랑자의 징검다리 반지",
+   "id": "r_wander_step",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 4,
+   "col": 2,
+   "size": [
+    274,
+    265
+   ],
+   "inGame": true
+  },
+  {
+   "name": "수색가의 낡은 반지",
+   "id": "r_seeker_old",
+   "slot": "ring",
+   "sheet": "part7.png",
+   "part": 3,
+   "row": 4,
+   "col": 3,
+   "size": [
+    281,
+    274
+   ],
+   "inGame": true
+  }
+ ]
+}

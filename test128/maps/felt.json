@@ -468,7 +468,7 @@
    "y": 99,
    "loot": [
     [
-     "riceball",
+     "potion",
      1
     ]
    ],
@@ -553,7 +553,7 @@
    "id": "f_hid_moat",
    "loot": [
     [
-     "riceball",
+     "potion",
      1
     ]
    ],
@@ -579,7 +579,7 @@
    "id": "f_hid_forge",
    "loot": [
     [
-     "riceball",
+     "potion",
      1
     ]
    ],
