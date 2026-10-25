@@ -1,0 +1,4 @@
+{
+ "note": "기억 없는 주인공의 지명 (사장님 10-25). 배우기 전엔 unknown 이 보인다. learn: talk:<NPC id> / scene:<장면 키> / visit:<지도 id>. 스토리 담당이 채운다. world.js placeText·learnPlaces.",
+ "places": []
+}
