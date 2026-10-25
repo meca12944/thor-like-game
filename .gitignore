@@ -6,3 +6,5 @@ motion_lab/grok_hero/se_test/log_*.txt
 motion_lab/grok_hero/se_test/run.log
 motion_lab/grok_hero/face/_raw/
 motion_lab/grok_hero/face/run.log
+motion_lab/grok_hero/stamp/_raw/
+motion_lab/grok_hero/stamp/run.log

@@ -1,0 +1,2 @@
+{"walk_down":"se_test/walk_s2","walk_dr":"se_test/walk_se","walk_right":"se_test/walk_r2","walk_ur":"se_test/walk_ne","walk_up":"frames/walk_up",
+ "run_down":"se_test/run_s2_leg","run_dr":"se_test/run_se3","run_right":"se_test/run_r3","run_ur":"se_test/run_ne2","run_up":"se_test/run_n"}
