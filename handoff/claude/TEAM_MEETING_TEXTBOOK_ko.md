@@ -463,6 +463,7 @@
 | 10-24 | 검흔 손맛·칼 | 효과·모션 | 판정 ×0.7, C안, 콤보 내내 칼 숨김 | `handoff/claude/HITBOX_FAN_ko.md`, motion-lab 2f0625a6 |
 | 10-24 | 「자꾸 멈춘다」 | 2번·효과·팀장 | #154 짧은 멈춤 → 국소 히트스톱 | linette-8dir 7878a901 |
 | 10-24 | 2D 엘든링 페이스 | 3번방 | `?pace=souls` 주소 스위치만 main(#155) | `handoff/claude/PACE_SOULS_ko.md` |
+| 10-25 | 속도 3종 비교 → 엘든링식 기본 | 사장님·3번방 | 「엘든링보다는 조금 빨라야지」→ mid 시험 → 「엘든링식이 제일 좋다」→ souls 기본 | `claude/pace-mid` 15fc8b2d, `claude/pace-souls-default` |
 | 10-24 | 타격음 | 3번방 | 재질 4종·음높이 계단(#156) | `handoff/claude/hit_sfx_v1/` |
 | 10-24 | 정본 확정 1~3차 | 사장님·3번방 | 들판 남쪽 시작, 리네트 동행, 13종, 왕비, 아이들 해방 등 | 정본 0절, `claude/canon-master` |
 | 10-24 | 지도 설계도 1~8장 | 전원 | 담당별 설계도, `--check` 0 | `docs_maps/README_ko.md`, 6802d684 |
