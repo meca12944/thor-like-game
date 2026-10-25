@@ -17,6 +17,8 @@
   const LW = 384, LH = 216;        // logical screen (DQ6 SFC-like 16:9), integer-scaled to the window
   // 속도 = 엘든링식 기본 (사장님 10-24 「너무 스피디, 2D 엘든링 느낌」 → 10-25 세 가지 비교 영상 보고 「엘든링식이 제일 좋다」): 걷기 72 · 질주 1.5배 · 스태미나 · 제자리 베기(시작 5틱 더, 뒤 빈틈) · 회피대시 1.6키. 옛 빠른 속도는 git 기록에만
   const SW8 = 5; // 베기 시작을 5틱 늦춤 (칼자국 GK_FAN 도 같이)
+  // 하늘 + 흐르는 구름 (owner 10-25 「구름이 움직여야지」): ONE flag — false (or ?nosky) = back to the flat dark tone behind the castle (b.sky)
+  const CASTLE_SKY = !/[?&]nosky/.test(location.search);
   const STAM = { max: 100, hit: [14, 14, 20], dash: 18, charge: 20, dodge: 18, run: 10, regen: 45, delay: .5, exDelay: 1, exRegen: 30, exEnd: 30, floor: -20 }; // 엘든링·다크소울3 비율을 100으로 줄임 (구르기 ~16, 회복 ~45/초, 0.5초 쉼)
   const HERO_SPEED = 72, WORLD_SPEED = 46;
   const RUN = { mul: 1.5, startMul: 1.5, startT: 0.17, skidT: .28, dblTap: 0.25, cadence: .9 }; // run: 1.5x walk (질주는 몹 근처에서 스태미나를 씀), no start burst; anim cadence = speed x .9 (no foot sliding)
@@ -94,7 +96,7 @@
   // under everything, props (buildings / trees) one by one, y-sorted with the hero (see-through when the hero is behind), light pools on top.
   const HDIMG = {};
   function loadHD(j) { if (!j.hds && j.hd) j.hds = [Object.assign({}, j.hd, { gx: 0, gy: 0 })]; if (!j.hds) return j;
-    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); if (h.backdrop) { urls.add(h.backdrop.img); for (const F of [].concat(h.backdrop.front || [])) urls.add(F.img); for (const L of (h.backdrop.anim && h.backdrop.anim.layers) || []) urls.add(L.img); } for (const q of h.props || []) urls.add(q.img); for (const k in h.decoArt || {}) for (const v of h.decoArt[k]) urls.add(v.img); }
+    const urls = new Set(); for (const h of j.hds) { if (h.ground) urls.add(h.ground); if (h.backdrop) { urls.add(h.backdrop.img); for (const F of [].concat(h.backdrop.front || [])) urls.add(F.img); for (const L of (h.backdrop.anim && h.backdrop.anim.layers) || []) urls.add(L.img); const SA = CASTLE_SKY && h.backdrop.skyArt; if (SA) { urls.add(SA.img); for (const C of SA.clouds || []) urls.add(C.img); } } for (const q of h.props || []) urls.add(q.img); for (const k in h.decoArt || {}) for (const v of h.decoArt[k]) urls.add(v.img); }
     return Promise.all([...urls].map(u => HDIMG[u] ? 0 : new Promise(res => { const im = new Image(); im.onload = () => { HDIMG[u] = im; res(); }; im.onerror = () => res(); im.src = V(u); }))).then(() => j); }
   // 이어 붙인 지도 (세미 오픈월드, owner 10-23 「추천대로」): j.compose = [{map, x, y}] -> the part maps are read as they are (other rooms keep editing
   // felt.json / field_felt.json) and laid side by side into ONE map: ground rows, objects, spawns ('<part>:<name>'), exits between parts dropped.
@@ -470,10 +472,19 @@
   // hd.backdrop = {img, iw (source picture width: every px value below is in source px; the webp may be smaller), D, ax, ay (anchor = the source row that sits on the
   // near horizon), cy0 (first castle row), bw (castle width), x (world tiles), px (horizontal parallax 0..1), fit [fy (tip, screen fraction), base (world tile
   // row the castle foot hides behind), min, max (castle height / screen height), sw (max width / screen width), nl (normal view: sink the castle by this fraction of its height)], clipY (world tiles: drawn only above this line =
-  // behind the wall / the field's lip), sky (one flat dark tone behind the silhouette — no sky picture), edge (fade the picture's left/right edges into that tone,
+  // behind the wall / the field's lip), sky (flat dark tone behind the silhouette; under skyArt = the illustrator's sky + drifting clouds when CASTLE_SKY), edge (fade the picture's left/right edges into that tone,
   // fraction of its width: no tiling), front {img, y, px} (the outer wall band, a touch more parallax), anim {fps, n, layers [{img, sx, sy, sw, sh (source box),
-  // cw, ch (sheet cell), cols}]} (the illustrator's 16-frame loop: window flicker, smoke + ash, crows), fog [[y, h, a, speed]] (weak code fog, source px), lift (0..1: add the picture onto itself once more = brighter, for a dark map)}.
+  // cw, ch (sheet cell), cols}]}, nv / nvv [vis, hmin, floor] (normal view / vista: castle height = the strip above the wall / vis, at least hmin x screen, and its foot reaches row floor = no gap under it in a breach) (the illustrator's 16-frame loop: window flicker, smoke + ash, crows), fog [[y, h, a, speed]] (weak code fog, source px), lift (0..1: add the picture onto itself once more = brighter, for a dark map)}.
   // The picture and its loop come from tools/hd/fields/castle_far.py.
+  const _skyEdge = new Map(); function skyEdgeCols(im) { let c = _skyEdge.get(im); if (c) return c; try { const g = document.createElement('canvas'); g.width = 1; g.height = 2; const x = g.getContext('2d'); x.drawImage(im, 0, 0, im.width, 4, 0, 0, 1, 1); x.drawImage(im, 0, im.height - 4, im.width, 4, 0, 1, 1, 1);
+    const d = x.getImageData(0, 0, 1, 2).data; c = ['rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')', 'rgb(' + d[4] + ',' + d[5] + ',' + d[6] + ')']; } catch (e) { c = ['#24201e', '#24201e']; } _skyEdge.set(im, c); return c; } // the sky picture's top / bottom tone (fills past its ends)
+  function drawSkyArt(b, SA, sk, dx, dy, sc, W_, Hc, t) { const sw = SA.w * sc, sh = SA.h * sc, x0 = Math.round(dy) > 0 ? 0 : 0, [ct, cb] = skyEdgeCols(sk), y0 = Math.round(dy), y1 = Math.round(dy + sh);
+    if (y0 > 0) { ctx.fillStyle = ct; ctx.fillRect(0, 0, W_, y0 + 1); } if (y1 < Hc) { ctx.fillStyle = cb; ctx.fillRect(0, y1 - 1, W_, Hc - y1 + 1); }
+    for (let i = Math.floor(-dx / sw); dx + i * sw < W_; i++) { const x = Math.round(dx + i * sw), w = Math.round(dx + (i + 1) * sw) - x; // mirrored every other copy past the picture's ends = no seam
+      if (i & 1) { ctx.save(); ctx.translate(x + w, 0); ctx.scale(-1, 1); ctx.drawImage(sk, 0, y0, w, y1 - y0); ctx.restore(); } else ctx.drawImage(sk, x, y0, w, y1 - y0); }
+    for (const C of SA.clouds || []) { const ci = HDIMG[C.img]; if (!ci) continue; const cw = C.w * sc, ch = (ci.height * C.w / ci.width) * sc, off = (t * (C.v || 0) * sc) % cw; // drift left; whole px every frame (no shimmer)
+      for (let x = dx - off - Math.ceil((dx - off) / cw) * cw; x < W_; x += cw) { const xi = Math.round(x); ctx.drawImage(ci, xi, y0, Math.round(x + cw) - xi, Math.round(dy + ch) - y0); } }
+    if (SA.dim) { ctx.fillStyle = 'rgba(16,12,10,' + SA.dim + ')'; ctx.fillRect(0, 0, W_, Hc); } }
   let _bdFog = null; function bdFogTex() { if (_bdFog) return _bdFog; const c = document.createElement('canvas'); c.width = 512; c.height = 96; const g = c.getContext('2d'); let sd = 7; const rn = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
     for (let i = 0; i < 70; i++) { const x = rn() * 512, y = 30 + rn() * 36, rx = 30 + rn() * 70, ry = 8 + rn() * 16; for (const ox of [-512, 0, 512]) { g.save(); g.translate(x + ox, y); g.scale(1, ry / rx); const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, 'rgba(204,194,178,.30)'); gr.addColorStop(1, 'rgba(204,194,178,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore(); } }
     return (_bdFog = c); }
@@ -493,13 +504,16 @@
     let dy = (b.y != null ? W2S(0, b.y * T)[1] : top + (b.fy || 0) * EH * k) - b.ay * sc;
     if (b.fit) { const [ffy, fbase, fmn, fmx, fsw, fnl] = b.fit, VH = EH * k, ch = b.ay - b.cy0, tipY = top + ffy * VH, baseY = W2S(0, fbase * T)[1], hi = Math.min(fmx * VH, (fsw || 9) * cv.width * ch / b.bw);
       const want = baseY - tipY; sc = Math.max(fmn * VH, Math.min(hi, want)) / ch; dy = want > hi ? baseY - b.ay * sc : tipY - b.cy0 * sc;
-      if (fnl && want < fmn * VH) dy -= fnl * Math.min(1, (fmn * VH - want) / (fmn * VH)) * ch * sc; } // fnl: up close to the wall (normal view) the castle sinks so its towers, not just the spire tip, show through the breaches
+      if (fnl && want < fmn * VH) dy -= fnl * Math.min(1, (fmn * VH - want) / (fmn * VH)) * ch * sc;
+      const nv = S.vista && b.nvv ? b.nvv : b.nv; // a11 (owner 10-25 「펠트에서 보는 시점도」): nv [vis, hmin] = the strip above the wall is short in normal play -> size the castle so at least vis of it rises over the parapet (never under hmin x screen height), tip at the top
+      if (nv && want < fmn * VH) { const H = Math.max(nv[1] * VH, Math.min(fmn * VH, hi, want / nv[0]), nv[2] ? (W2S(0, nv[2] * T)[1] - tipY) * ch / (ih0 - b.cy0) : 0); sc = H / ch; dy = tipY - b.cy0 * sc; } } // fnl: up close to the wall (normal view) the castle sinks so its towers, not just the spire tip, show through the breaches
     const dx = ax - b.ax * sc, iw = IW * sc, ih = ih0 * sc, W_ = cv.width, Hc = Math.min(cy, cv.height), r = IW / im.width;
     b._geo = [dx, dy, sc, Hc]; // last placement (screen = dx + src * sc), read by tests / tools
     const t = S.t || 0, AL = b.alive;
     const ph = (t / 1.8) % 1, p = AL && AL.core ? Math.exp(-(((ph - .05) / .05) ** 2)) + .6 * Math.exp(-(((ph - .25) / .06) ** 2)) : 0; // the core's heartbeat: lub-dub every 1.8 s (UI 10-25: ≥ 1.6 s, apart from the low-HP pulse) (stone wash + spire glow)
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W_, Hc); ctx.clip();
-    if (b.fit) { ctx.fillStyle = b.sky; ctx.fillRect(0, 0, W_, Hc); } // fit: one flat dark tone behind the whole silhouette (no sky; the ground picture must not show through)
+    const SA = CASTLE_SKY && b.skyArt, sk = SA && HDIMG[SA.img];
+    if (b.fit) { ctx.fillStyle = b.sky; ctx.fillRect(0, 0, W_, Hc); if (sk) drawSkyArt(b, SA, sk, dx, dy, sc, W_, Hc, S.t || 0); } // fit: one flat dark tone behind the whole silhouette (no sky; the ground picture must not show through)
     else { if (dy > 0) { ctx.fillStyle = b.sky || '#5a524c'; ctx.fillRect(0, 0, W_, Math.ceil(dy) + 1); } if (dy + ih < Hc) { ctx.fillStyle = b.floor || '#bcb2a4'; ctx.fillRect(0, Math.floor(dy + ih) - 1, W_, Hc - dy - ih + 2); }
       if (dx > 0) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(0, dy, Math.ceil(dx) + 1, ih); } if (dx + iw < W_) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(Math.floor(dx + iw) - 1, dy, W_ - dx - iw + 2, ih); } }
     const x0 = Math.max(0, Math.floor(-dx / sc / r)), y0 = Math.max(0, Math.floor(-dy / sc / r)), x1 = Math.min(im.width, Math.ceil((W_ - dx) / sc / r)), y1 = Math.min(im.height, Math.ceil((Hc - dy) / sc / r)), q = sc * r;
@@ -527,7 +541,7 @@
           if (ty > Hc || ty < Hc * .12) return; for (const [rr, aa] of [[28, .45], [7, .95]]) { const R = Math.max(1.2, rr * sc); ctx.globalAlpha = aa * fl; ctx.drawImage(gt, x - R, ty - R, 2 * R, 2 * R); } }); // UI 10-25: not inside the top 12 % (HUD)
         ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; } } }
     const ft = bdFogTex(); for (const [fy, fh, fa, fs] of b.fog || []) { const h = fh * sc, y = dy + fy * sc, w = h / 96 * 512 * 3, off = (((t * (fs || 6) * sc) % w) + w) % w; if (y > Hc || y + h < 0) continue; ctx.globalAlpha = fa; for (let x = dx - w + off; x < W_; x += w) ctx.drawImage(ft, x, y, w, h); ctx.globalAlpha = 1; }
-    if (b.edge) { const ew = b.edge * iw, ex0 = dx + (b.ax - b.bw / 2) * sc, ex1 = ex0 + b.bw * sc; // no tiling: the castle's left / right ends melt into the dark tone (wide screens); narrow screens just crop
+    if (b.edge && !sk) { const ew = b.edge * iw, ex0 = dx + (b.ax - b.bw / 2) * sc, ex1 = ex0 + b.bw * sc; // no tiling: the castle's left / right ends melt into the dark tone (wide screens); narrow screens just crop
       for (const [e0, e1] of [[ex0 - 2, ex0 + ew], [ex1 + 2, ex1 - ew]]) { if (Math.max(e0, e1) < 0 || Math.min(e0, e1) > W_) continue; const gr = ctx.createLinearGradient(e0, 0, e1, 0); gr.addColorStop(0, b.sky); gr.addColorStop(1, b.sky + '00'); ctx.fillStyle = gr; ctx.fillRect(Math.min(e0, e1), 0, Math.abs(e1 - e0), Hc); }
       ctx.fillStyle = b.sky; if (ex0 > 0) ctx.fillRect(0, 0, ex0 - 1, Hc); if (ex1 < W_) ctx.fillRect(ex1 + 1, 0, W_ - ex1, Hc); }
     ctx.restore(); ctx.imageSmoothingEnabled = false; }
@@ -1321,7 +1335,7 @@
   // ---------------- camera ----------------
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
   function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1] + (b ? 0 : S.zl || 0), ty = fy - EH / 2; return [clampC(fx - EW / 2, m.pw - EW), m.skyTop && m.ph > EH ? Math.max(-m.skyTop * m.T, Math.min(m.ph - EH, ty)) : clampC(ty, m.ph - EH)]; } // skyTop: the camera may rise above the map top (the sky + far backdrop up there) // boss intro: the camera looks at the boss first (art room 10-23)
-  function snapCam() { const m = M(); if (!m) return; S.zl = 0; if (m.camZones) { const [w, z] = camZoneW(m); if (z) S.zl = (z.look || 0) * m.T * w; } S.cam = camTarget(); }
+  function snapCam() { const m = M(); if (!m) return; S.zl = 0; if (m.camZones) { const [w, z] = camZoneW(m); if (z) S.zl = zoneZL(m, z)[1] * w; } S.cam = camTarget(); }
   // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
   // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
   // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
@@ -1334,8 +1348,12 @@
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
     const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
-  // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles)}] -> the zoom eases toward zone.zoom and the view looks up/down
+  // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles), top/zmin/hp (see zoneZL)}] -> the zoom eases toward zone.zoom and the view looks up/down
   function camZoneW(m) { let w = 0, z = null; for (const c of m.camZones || []) { const f = c.f || 4, hx = hero.x / m.T, hy = hero.y / m.T, d = Math.max(c.x0 - hx, hx - c.x1, c.y0 - hy, hy - c.y1, 0), q = Math.max(0, 1 - d / f), wq = q * q * (3 - 2 * q); if (wq > w) { w = wq; z = c; } } return [w, z]; }
+  // a11 (owner 10-25 「펠트에서 보는 시점도」): zone.top (row) pins the screen top there (the castle over the wall stays in view) — the zoom eases out between zone.zoom and zone.zmin
+  // so the hero's feet stay at most zone.hp (default .84) down the screen; returns [zoom, look px]
+  function zoneZL(m, c) { if (c.top == null) return [c.zoom, (c.look || 0) * m.T]; const hp = c.hp || .84, need = Math.max(1, (hero.y - c.top * m.T) / hp), zz = Math.max(c.zmin || .4, Math.min(c.zoom || 1, LH / need)), eh = LH / zz;
+    return [zz, Math.max(c.top * m.T + eh / 2 - (hero.y - 10), eh * (.5 - hp) + 10)]; }
   // [새 1장 인트로] 사장님 10-25 「전부 진행해」: 새 게임 첫 깨어남(SAVE.flags.pg_woke 없음)에서 한 번만, 무명 무덤가(prologue_grave) wake 자리.
   // 검은 화면 + 심장 소리 2번 -> 두 번째 소리에 가슴 코어가 푸르게 깜빡임 -> 첫 대사 -> 조작 시작 (배낭·언덕 전망·안내는 그록 지도 물체 pg_*). ?intro=1 = flag와 상관없이 다시 봄.
   const INTRO = { map: 'prologue_grave', flag: 'pg_woke', force: Q.get('intro') === '1', beats: [.5, 1.15], core: [1.15, 4.2], fade: [2.6, 4.4], say: 4.6,
@@ -1355,9 +1373,9 @@
     const k = (I.t - c0) / (c1 - c0), puls = .55 + .45 * Math.sin((I.t - c0) * 9), a = Math.min(1, k * 4, (1 - k) * 3) * puls, [sx, sy] = W2S(hero.x, hero.y - H128FIG * .5), r = SH * .05 * (1 + .4 * puls);
     const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3); gr.addColorStop(0, `rgba(180,230,255,${a})`); gr.addColorStop(.25, `rgba(80,170,255,${a * .7})`); gr.addColorStop(1, 'rgba(40,90,255,0)');
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
-  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + z.zoom * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
+  function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + zoneZL(m, z)[0] * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && (S.vfx || V.hold) ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
-    { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = (z.look || 0) * m.T * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
+    { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = zoneZL(m, z)[1] * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
   // ---------------- render: low-res world, then display-res text/HUD ----------------

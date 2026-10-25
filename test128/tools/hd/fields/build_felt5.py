@@ -57,13 +57,36 @@ paint(lane, [(8, 66), (8, 70)], 2); paint(lane, [(24, 52), (34, 55.5)], 2)
 lane &= ~road
 # ---------------------------------------------------------------- north band (capital wall + gate)
 print('wall...')
+WL.GH.update(top=10.0, ctop=12.0)   # a11: the gatehouse no longer towers over the parapet (was 3 / 7) — level with the wall towers, so the castle shows over the gate too
 band = WL.build_band(); bim = band.finish(cut=band.meta['cut']); pc, ox, oy = band.meta['portc_pic']; bim.alpha_composite(pc.finish(), (ox, oy))
 # the royal castle far behind the wall: a screen-pinned far backdrop drawn by world.js drawBackdrop only behind the wall (clipY); it shows through the
 # deep breaches in normal play and whole from the gate vista. v8 (owner 10-25 「일러스트 작가랑 손그림풍 성 원화 새로 그려서 써라」「그림이 움직이게」): the illustrator's
 # hand-drawn castle + its 16-frame loop (castle_far.py builds assets/world/castle_far/); the code-drawn castle_fortress.py is in tools/hd/_archive_old_felt.
 import castle_far as CFAR
-backdrop = CFAR.backdrop('felt'); backdrop.update({'x': 75, 'px': .92, 'fit': [-.8, 14, 1.2, 2.2, 3.4, .33], 'clipY': WALL_Y - 1.5})
-tp, tox, toy = WL.tunnel(); tim = tp.finish(); tpath = save(tim, 'gate_tunnel')
+# a11 (owner 10-25 「펠트에서 보는 시점도」): fit + nv = in normal play the castle is sized to the strip above the wall (at least nv[0] of it shows), nvv in the vista.
+backdrop = CFAR.backdrop('felt'); backdrop.update({'x': 75, 'px': .92, 'fit': [.02, 17.5, .9, .97, 1.04], 'nv': [.55, .3, 25.2], 'nvv': [.82, .5], 'clipY': WALL_Y - 1.5})
+# a11: the wall face is squashed upward of row SQ1 (rate SQS above SQ0, smooth between) so the castle's upper half rises over the parapet in normal play:
+# curtain top 15 -> ~19.3, flanking towers 10 -> ~16.8, gatehouse 3 -> ~13.3; the foot (batter, rubble, arch floor, solids, exit) stays where it was.
+SQ0, SQ1, SQS = 21.0, 26.0, .5
+_gy = np.arange(0, (WALL_Y + 6) * AT + 1, dtype=np.float64)           # src px -> dst px (cumulative rate, measured up from SQ1)
+_t = np.clip((SQ1 * AT - _gy) / ((SQ1 - SQ0) * AT), 0, 1); _rate = 1 + (SQS - 1) * _t * _t * (3 - 2 * _t)
+_G = np.where(_gy >= SQ1 * AT, _gy, SQ1 * AT - np.array([_rate[int(y):int(SQ1 * AT)].sum() for y in _gy]))
+def sq_y(y_px): return float(np.interp(y_px, _gy, _G))
+def squash(im, off):
+    """remap picture rows (global px offset off) through _G with area averaging; returns (new picture, new offset)"""
+    a = np.asarray(im.convert('RGBA'), dtype=np.float32) / 255.; h, w = a.shape[:2]; a[..., :3] *= a[..., 3:4]
+    C = np.concatenate([np.zeros((1, w, 4), np.float32), np.cumsum(a, 0)], 0)          # C[k] = sum of rows < k (local)
+    d0, d1 = int(math.floor(sq_y(off))), int(math.ceil(sq_y(off + h))); out = np.zeros((d1 - d0, w, 4), np.float32)
+    inv = lambda yd: np.interp(yd, _G, _gy) - off                                       # dst global px -> src local px
+    for j in range(d1 - d0):
+        s0, s1 = np.clip(inv(d0 + j), 0, h), np.clip(inv(d0 + j + 1), 0, h)
+        if s1 - s0 < 1e-6: continue
+        def Cf(y): k = int(min(h - 1, math.floor(y))); f = y - k; return C[k] * (1 - f) + C[k + 1] * f
+        out[j] = (Cf(s1) - Cf(s0)) / (s1 - s0)
+    al = out[..., 3:4]; out[..., :3] = np.where(al > 1e-5, out[..., :3] / np.maximum(al, 1e-5), 0)
+    return Image.fromarray(np.clip(out * 255 + .5, 0, 255).astype(np.uint8), 'RGBA'), d0
+_sb, _so = squash(bim, 0); bim = Image.new('RGBA', bim.size); bim.alpha_composite(_sb.crop((0, 0, bim.width, min(_sb.height, bim.height - _so))), (0, _so))
+tp, tox, toy = WL.tunnel(); tim = tp.finish(); tim, toy = squash(tim, toy); tpath = save(tim, 'gate_tunnel')
 tunnel_q = {'id': 'gate_tunnel', 'img': tpath, 'x': round(tox / AT, 3), 'y': WALL_Y - 3.5, 'ax': 0, 'ay': round((WALL_Y - 3.5) * AT - toy, 1), 'D': D, 'fade': 0, 'shadow': 0}
 SL = 25; band_q = []
 for i, x0 in enumerate(range(0, 150, SL)):
@@ -274,7 +297,8 @@ for i, (x, y) in [('f_clue_gate', (79, 30)), ('f_clue_moat', (40, 31)), ('f_hid_
         put(o, x, y, adjust=(o['type'] != 'clue'))
 for i, (x, y) in [('lm_felt_castle', (75, 32)), ('lm_felt_fountain', (75, 76)), ('lm_felt_grave', (138, 47))]:
     if i in OB: put(OB[i], x, y)
-put(dict(OB['felt_gate'], zoom=.26, pan=14, hold=1, r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
+put(dict(OB['felt_gate'], zoom=.24, pan=20.5, hold=1,   # a11: the hero stays on screen (feet ~88% down) under the castle
+     r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
 # 토비의 숯 낙서 5개 (사장님 10-25 확정 「토비의 숯 낙서 찾기」, 3번방): 벽 옆 바닥, 다 찾으면 토비가 선물 (quests.json q_felt_doodle)
 put(dict(type='clue', id='f_doodle_1', name='숯 낙서 — 이장 집 담벼락', flag='toby_doodle_1', text="벽에 숯으로 그린 그림: 등 굽은 할아버지가 지팡이를 휘두르며 화내고 있다.\n옆에 삐뚤빼뚤한 글씨 — \"이장님 무서움\"."), 37, 55)
 put(dict(type='clue', id='f_doodle_2', name='숯 낙서 — 여관 담벼락', flag='toby_doodle_2', text="숯 그림: 커다란 술잔을 든 앞치마 아줌마. 술잔에는 금이 쭉 그어져 있다.\n밑에 작게 — \"마르타 아줌마 수건 냄새\"."), 103, 56)
@@ -433,7 +457,7 @@ legend = {'.': 'dirt', '=': 'dirt', '#': 'cliff', 'X': {'ground': 'dirt', 'solid
 out = {k: SRC[k] for k in ('type', 'area', 'title', 'bgm', 'battleBgm', 'tileset', 'tile', 'id', 'name') if k in SRC}
 out['title'] = dict(out.get('title', {}), sub='왕도의 거대한 성벽 그늘 아래, 불타 버린 외곽 마을')
 out.update({'region': SRC.get('region'), 'viewZoom': 1.3, 'grade': 'ash', 'fog': .22, 'ash': 60, 'wind': [5, 1], 'w': W, 'h': H, 'legend': legend, 'skyTop': 48,
-            'camZones': [{'x0': 6, 'y0': 28, 'x1': 144, 'y1': 32, 'zoom': .9, 'look': -3.5, 'f': 6}],
+            'camZones': [{'x0': 6, 'y0': 28, 'x1': 144, 'y1': 40, 'zoom': .56, 'zmin': .4, 'top': 9.5, 'hp': .84, 'f': 14}],   # a11: north district — zoom out + look up (hero low on screen, castle over the wall)
             'solid': ['#', 'C', 'X', 'H', 'T', 'P', 'R', 'u', '~'], 'ground': [''.join(r) for r in grid], 'objects': objs, 'spawns': spawns, 'hd': hd,
             'note': 'GENERATED by tools/hd/fields/build_felt5.py (felt v5: everything drawn in code, assets/world/felt5) - do not hand-edit'})
 if 'mapPos' in SRC: out['mapPos'] = SRC['mapPos']
