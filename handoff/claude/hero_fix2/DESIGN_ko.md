@@ -37,7 +37,8 @@
 1. `motion_lab/grok_hero/faceplate/snap.py`처럼 그록 그림을 10×10 칸이면 1배로, 그림체면 `cut.py`처럼 자른 뒤 **걷기와 같은 배율**(얼굴 맞추기 0.95~1.05)로 맞춰요.
 2. 발 189, 몸 가운데 128을 동작 하나에 한 번만 맞춰요. 몸에서 떨어진 조각(먼지·글자)은 지워요.
 3. 144로 줄이고(`final144.py`), 얼굴 B는 동작 전체 겹침 80% 이상일 때만 찍어요.
-4. 아틀라스(`build_atlas.py`) → hero_check 빨간 칸 0 → 게임 안 영상(1배·0.25배, 몹 쳐서) → 4번방 검수 → 팀장 → 사장님.
+4. **grip 찍기** (`grip_make.py`, 검흔 담당): 새 장마다 칼 손잡이 [dx,dy,deg] → `grip.json`(동작 이름 형식, apply.py가 칸으로 바꿈). 빈 손이라 grip 없으면 코드 칼이 안 붙음.
+5. 아틀라스(`build_atlas.py`) → hero_check 빨간 칸 0 → 게임 안 영상(1배·0.25배, 몹 쳐서) → 4번방 검수 → 팀장 → 사장님.
 
 ## 3. 그록 부탁 글 초안 (공격 36장)
 ```
@@ -47,6 +48,7 @@ BODY ONLY: empty hands as if holding an invisible sword (the sword and all slash
  - hit 1 (horizontal slash right-to-left): ready stance -> wind-up (arm pulled back across the body) -> strike (arm fully extended forward-left) -> follow-through
  - hit 2 (horizontal slash left-to-right): wind-up -> strike -> follow-through -> recover
  - hit 3 (big finishing slash, wide arc, step forward): wind-up (body twisted back) -> strike (lunge, arm extended) -> follow-through (body turned) -> recover
+ALSO 2 RUNNING KEY POSES (body only): front view running toward the viewer and straight back view running away — the driving knee lifted HIGH (thigh near horizontal), the pushing foot clearly off the ground behind, arms pumping with elbows bent; feet movement at least 15 game pixels between the two feet.
 Same character size in every pose (feet on the same ground line), true pixel art on a grid where 1 game pixel = exactly 10x10 image pixels, transparent PNG (not JPG), one row per hit and view, no text.
 ```
 
@@ -54,6 +56,27 @@ Same character size in every pose (feet on the same ground line), true pixel art
 - 회피대시 [3,3,6,3,3,2], 점프 [4,4,4,10,6,6,8], 달리기 점프 [4,4,14,6,6,8], 맞기 ↑ [4,10,6]으로 아틀라스 틱만 바꿔요.
 - 공격: ATK_BODY는 끄고(지금처럼 코드 공격) 그록 원본이 올 때까지 둬요.
 - hero_check(2번방) 빨간 칸 0 + 게임 안 영상.
+
+## 4-1. 연습장 (교과서 0부 11절)
+- hero-fix2에서 `python3 tools/sandbox/build_hero_game.py test128/sandbox/assets` 다시 뽑음(48동작 249칸).
+
+## 4-2. 검수 목록 번호별 숫자 (4번방 CHECKLIST, 잰 것 `check_numbers.json`, 144 그림)
+| # | 결과 | 숫자 |
+|---|---|---|
+| A1 | ○ | 모든 동작 출발 = 그록 걷기 시트(방향별) → PixelLab 핵심 자세. 글만으로 뽑은 장 0 |
+| A2 | △ | 걷기 ±1~2.4%, 달리기 ±0.7~2.9%(↗ ±8.6), 대시 ±4~15%·점프 ±3~10%는 웅크림 자세 차이(크기 아님). 동작 하나에 한 번만 맞춤 |
+| A3 | ○ | 걷기 5방향 키 141~148(얼굴 맞추기 0.98~1.04) |
+| A4 | △ | 얼굴 B: 걷기·달리기 살색 넓이 원래 −8~0%. 새 동작은 도장 안 찍음(겹침 80% 미만) |
+| A5 | △ | 땅 디딘 장 발 188~189 ○, **atk1_up 192(3px 땅 밑) ×** → 고침 필요 |
+| A6 | ○ | 옆 걷기 머리 4px·좌우 7.6, 달리기 머리 6~8(달리기 발 폭은 hero_check로) |
+| A8 | ○ | 청색(검기) 칸 0, 흰 칸은 눈 반짝임 0~20 |
+| A10 | ○ | 8방향 표 `../hero_grok_v1/ingame_8dir_table.png` 빈 칸 0 |
+| B1 | ○(fix2) | 대시 [3,3,6,3,3,2]→실제 3~7틱, 점프 4.1틱 이상, 맞기 20. 공격 몸은 ATK_BODY 꺼짐(안 나옴) |
+| B2 | △ | 맞기 1장 20틱·점프 공중 10틱 → 코드 움직임(맞기 밀림·기울기)만 있음, 점프는 망토 흔들림 없음 |
+| B4 | ○ | 코드 DG durTicks 20·iframe 13 (옛 17/9 아님), 낮은 자세 6~12틱 |
+| C1 | ○ | 1·2타 활동 8~15, 3타 11~21 (GK_FAN t0/t1 + SW8 5) |
+| C2 | × | 공격 몸 예고 자세 없음 → 그록 공격 원본 36장 뒤에 |
+| 나머지 C3~E3 | 검흔·2번방 표와 합쳐서 |
 
 ## 5. 크레딧 예상
 - 0: 틱 다시 나누기, 그록 원본 칸 맞추기
