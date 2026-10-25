@@ -6,7 +6,7 @@ from pxscale import pxscale
 def bodyx(im):
     a=np.array(im)[...,3]>0;ys,xs=np.nonzero(a[60:150]);return float(xs.mean())
 R={}
-SC={'run_s':1.0,'run_n':.78,'run_ne2':.86,'run_se2':.87}   # 10-25 겹쳐 보기(ratio/overlay.png)로 다시: ↘달리기 ×0.87, 뒷면 ×0.92 더; 정면은 얼굴 폭(15px = 정면 걷기)에 맞춰 1.0 (팀장 10-25)   # 그림 도구가 정면·뒷면 달리기를 크게 그림 → 걷기 머리 크기에 맞춰 동작 하나에 한 배율(눈으로 비교 sc.png)
+SC={'walk_ne':.96,'run_s':1.0,'run_n':.78,'run_ne2':.86,'run_se2':.87}   # 10-25 겹쳐 보기(ratio/overlay.png)로 다시: ↘달리기 ×0.87, 뒷면 ×0.92 더; 정면은 얼굴 폭(15px = 정면 걷기)에 맞춰 1.0 (팀장 10-25)   # 그림 도구가 정면·뒷면 달리기를 크게 그림 → 걷기 머리 크기에 맞춰 동작 하나에 한 배율(눈으로 비교 sc.png)
 TOP={'run_s2':24+3}   # 걷기 ↓ 머리 위끝 24, 걷기 ↑ 29
 for k in sys.argv[1:]:
     ims=[Image.open(f).convert('RGBA') for f in sorted(glob.glob(f'tw8_{k}/*.png'))[:8]]
