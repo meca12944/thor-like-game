@@ -1,0 +1,44 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m07_side_stand.png",
+  "size": [
+   377,
+   693
+  ],
+  "game_file": "m07_side_stand_game.png",
+  "game_size": [
+   22,
+   41
+  ],
+  "game_body_h": 40.6
+ },
+ {
+  "name": "front_stand",
+  "file": "m07_front_stand.png",
+  "size": [
+   378,
+   699
+  ],
+  "game_file": "m07_front_stand_game.png",
+  "game_size": [
+   22,
+   42
+  ],
+  "game_body_h": 41.0
+ },
+ {
+  "name": "cocoon_burst",
+  "file": "m07_cocoon_burst.png",
+  "size": [
+   466,
+   681
+  ],
+  "game_file": "m07_cocoon_burst_game.png",
+  "game_size": [
+   28,
+   41
+  ],
+  "game_body_h": 39.9
+ }
+]
