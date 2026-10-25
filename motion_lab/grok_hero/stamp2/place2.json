@@ -1,4 +1,164 @@
 {
+ "walk_down/000.png": {
+  "dy": 52,
+  "dx": 121,
+  "iou": 1.0
+ },
+ "walk_down/001.png": {
+  "dy": 50,
+  "dx": 121,
+  "iou": 0.97
+ },
+ "walk_down/002.png": {
+  "dy": 50,
+  "dx": 120,
+  "iou": 0.94
+ },
+ "walk_down/003.png": {
+  "dy": 52,
+  "dx": 120,
+  "iou": 0.95
+ },
+ "walk_down/004.png": {
+  "dy": 54,
+  "dx": 121,
+  "iou": 0.96
+ },
+ "walk_down/005.png": {
+  "dy": 51,
+  "dx": 120,
+  "iou": 0.94
+ },
+ "walk_down/006.png": {
+  "dy": 50,
+  "dx": 121,
+  "iou": 0.95
+ },
+ "walk_down/007.png": {
+  "dy": 50,
+  "dx": 121,
+  "iou": 0.96
+ },
+ "run_down/000.png": {
+  "dy": 52,
+  "dx": 121,
+  "iou": 0.96
+ },
+ "run_down/001.png": {
+  "dy": 53,
+  "dx": 122,
+  "iou": 0.91
+ },
+ "run_down/002.png": {
+  "dy": 56,
+  "dx": 122,
+  "iou": 0.92
+ },
+ "run_down/003.png": {
+  "dy": 56,
+  "dx": 121,
+  "iou": 0.91
+ },
+ "run_down/004.png": {
+  "dy": 52,
+  "dx": 122,
+  "iou": 0.94
+ },
+ "run_down/005.png": {
+  "dy": 54,
+  "dx": 122,
+  "iou": 0.9
+ },
+ "run_down/006.png": {
+  "dy": 55,
+  "dx": 122,
+  "iou": 0.92
+ },
+ "run_down/007.png": {
+  "dy": 54,
+  "dx": 121,
+  "iou": 0.92
+ },
+ "walk_dr/000.png": {
+  "dy": 57,
+  "dx": 140,
+  "iou": 1.0
+ },
+ "walk_dr/001.png": {
+  "dy": 57,
+  "dx": 141,
+  "iou": 0.95
+ },
+ "walk_dr/002.png": {
+  "dy": 55,
+  "dx": 141,
+  "iou": 0.92
+ },
+ "walk_dr/003.png": {
+  "dy": 55,
+  "dx": 140,
+  "iou": 0.92
+ },
+ "walk_dr/004.png": {
+  "dy": 58,
+  "dx": 140,
+  "iou": 0.89
+ },
+ "walk_dr/005.png": {
+  "dy": 57,
+  "dx": 141,
+  "iou": 0.92
+ },
+ "walk_dr/006.png": {
+  "dy": 55,
+  "dx": 140,
+  "iou": 0.96
+ },
+ "walk_dr/007.png": {
+  "dy": 55,
+  "dx": 140,
+  "iou": 0.96
+ },
+ "run_dr/000.png": {
+  "dy": 55,
+  "dx": 141,
+  "iou": 0.99
+ },
+ "run_dr/001.png": {
+  "dy": 57,
+  "dx": 141,
+  "iou": 0.9
+ },
+ "run_dr/002.png": {
+  "dy": 59,
+  "dx": 141,
+  "iou": 0.88
+ },
+ "run_dr/003.png": {
+  "dy": 55,
+  "dx": 141,
+  "iou": 0.93
+ },
+ "run_dr/004.png": {
+  "dy": 54,
+  "dx": 141,
+  "iou": 0.93
+ },
+ "run_dr/005.png": {
+  "dy": 55,
+  "dx": 141,
+  "iou": 0.89
+ },
+ "run_dr/006.png": {
+  "dy": 59,
+  "dx": 142,
+  "iou": 0.89
+ },
+ "run_dr/007.png": {
+  "dy": 56,
+  "dx": 141,
+  "iou": 0.94
+ },
  "walk_right/000.png": {
   "dy": 50,
   "dx": 146,
