@@ -206,7 +206,7 @@ objs = [
  {'type': 'waystone', 'id': 'ws_prologue_grave', 'x': FIRE[0], 'y': FIRE[1], 'name': '무덤가 모닥불(꺼짐)', 'art': 'hd'},
  {'type': 'clue', 'id': 'pg_footprints', 'x': 33, 'y': 15, 'name': '재 위의 발자국', 'flag': 'pg_look_steps',
   'text': '언덕 위로 난 발자국. 반쯤 재에 덮였다.\n내 신발과 크기가 같다.', 'textDone': '반쯤 덮인 발자국.'},
- {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.0, 'zoom': .55, 'dir': 270, 'pan': 10, 'hold': 1, 'name': '잿빛 들판', 'sub': '저 성벽 너머, 펠트 — 그리고 왕성'},
+ {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.0, 'zoom': .6, 'dir': 270, 'pan': 10, 'hold': 1, 'name': '잿빛 들판', 'sub': '저 성벽 너머, 펠트 — 그리고 왕성'},
  {'type': 'breakable', 'id': 'pg_bramble', 'x': BR_X[0], 'y': RY, 'w': len(BR_X), 'h': 5, 'flag': 'pg_bramble', 'name': '마른 가시덤불', 'text': '마른 가시덤불을 베어 길을 텄다'},
 ] + [{'type': 'pit', 'id': f'pg_crack_{y}', 'x': CRACK_X, 'y': y, 'soft': 1, 'text': '발밑이 꺼진다 — 뛰어넘자'} for y in range(RY, RY + 5)] + [
  {'type': 'sign', 'x': SIGN[0], 'y': SIGN[1], 'text': '기울어진 이정표.\n「펠트 서문 →」'},
@@ -317,7 +317,9 @@ gimg.resize((W * 8, H * 8), Image.LANCZOS).save('/tmp/work/pg_ground_small.png')
 # v8 (owner 10-25 「일러스트 작가랑 손그림풍 성 원화 새로 그려서 써라」「그림이 움직이게」): the illustrator's hand-drawn castle + its 16-frame loop (castle_far.py);
 # the picture already has its own outer wall band, so no extra code-drawn Felt wall / gate in front (castle_fortress.py -> tools/hd/_archive_old_felt).
 import castle_far as CFAR
-backdrop = CFAR.backdrop('pg'); backdrop.update({'x': 46, 'px': .95, 'fit': [.02, LIP + .3, .25, .97, 1.04], 'clipY': LIP - .05})   # (castle_far 'pg' already carries lift .4: brighter under the grave's dark light)
+backdrop = CFAR.backdrop('pg'); backdrop.update({'x': 46, 'px': .95, 'fit': [-.8, LIP + .3, 1.2, 2.2, 3.4], 'clipY': LIP - .05})
+# 사장님 10-25 「펠트 마을도 앞에」: castle_far 앞에 펠트 마을 띠 (felt_far_band.webp, 팀장) — front 는 목록
+backdrop['front'] = [backdrop['front'], {'img': 'assets/world/castle_far/felt_far_band.webp', 'y': 1090, 'px': .06}] if isinstance(backdrop.get('front'), dict) else backdrop.get('front')   # (castle_far 'pg' already carries lift .4: brighter under the grave's dark light)
 camZones = [{'x0': 8, 'y0': RY, 'x1': 42, 'y1': 25, 'zoom': .8, 'look': -7.5, 'f': 4}, {'x0': 40, 'y0': RY, 'x1': 64, 'y1': RY + 5, 'zoom': .9, 'look': -7.5, 'f': 3}]
 # ---------------- tufts (dead grass), hd block, json ----------------
 tufts = []
