@@ -85,19 +85,28 @@ for n in H['anims']:
             if nc is None: C[f[1]][5]+=bot
             else: f[1]=nc
             log.append(('발',n,f[1],-bot))
-# 5) 달리기 머리 오르내림
-for n in ['run_right','run_n','run_down','run_dr','run_up']:
+# 6) 4번방 2차: 걷기는 한 발이 늘 땅(뜬 장 0으로), 달리기 공중은 4px 이하 (같이 쓰는 칸이면 새 칸)
+for n in list(H['anims']):
+    if not mine(n) or not n.startswith(('walk_','run_')): continue
     L=H['anims'][n]
-    def tops(): return [bbox(get(f[1])[0])[1]-C[f[1]][5] for f in L]
-    T=tops();bots=[bbox(get(f[1])[0])[3]-C[f[1]][5] for f in L];rng=max(T)-min(T)
-    if 4<=rng<=6: continue
-    if rng>6:   # 가장 높은 장은 내리고 가장 낮은 장은 올려 6으로
-        hi=T.index(min(T));lo=T.index(max(T));over=rng-6;dn=min(over,max(0,-bots[hi]));C[L[hi][1]][5]-=dn;up=over-dn;C[L[lo][1]][5]+=up
-        log.append(('머리',n,'내림',L[hi][1],dn,'올림',L[lo][1],up))
-    else:       # 발이 가장 높이 뜬 장(공중) 들을 1px씩 올려 4로
-        need=4-rng;air=sorted(range(len(L)),key=lambda i:bots[i])[:2]
-        for i in air: C[L[i][1]][5]+=need
-        log.append(('머리',n,'공중 올림',[L[i][1] for i in air],need))
+    T=[bbox(get(f[1])[0])[1]-C[f[1]][5] for f in L];B=[bbox(get(f[1])[0])[3]-C[f[1]][5] for f in L]
+    if n.startswith('walk_'): ds=[max(0,-b) for b in B]   # 걷기: 한 발이 늘 땅
+    else:   # 달리기: 머리 오르내림 4~6 안에서 가장 덜 뜨게 (땅 밑 금지)
+        best=None
+        for Wn in range(min(T)-20,max(T)+20):
+            d2=[min(Wn+6-t,-b) for t,b in zip(T,B)]
+            if any(d<Wn-t for d,t in zip(d2,T)): continue
+            tt=[t+d for t,d in zip(T,d2)]
+            fl=max(-(b+d) for b,d in zip(B,d2));key=(max(tt)-min(tt)<4,fl)
+            if best is None or key<best[0]: best=(key,d2)
+        ds=best[1];tt=[t+d for t,d in zip(T,ds)];rng=max(tt)-min(tt)
+        if rng<4:   # 너무 평평 → 발이 가장 높이 뜬 장 2개를 더 올림 (공중 = 몸이 뜸)
+            for i in sorted(range(len(L)),key=lambda i:B[i]+ds[i])[:2]: ds[i]-=4-rng
+    for f,d in zip(L,ds):
+        if not d: continue
+        if len(used.get(f[1],()))>1: f[1]=newcell(f[1],0,-d)
+        else: C[f[1]][5]-=d
+    log.append(('발 높이',n,'내림',ds))
 S.save(SP,lossless=True);H['_fix3_note']='10-25 회의 2차 3단계: 대시 [3,3,5,3,3,3]·구운 빛 지움·늘어난 다리 줄임·발 땅·달리기 머리 4~6 (handoff/claude/hero_fix2/fix3.py)'
 save(R,s,j,k,H)
 for l in log: print(*l)
