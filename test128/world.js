@@ -1692,9 +1692,15 @@
     return gripKick(dir[0] * 14, -58 + dir[1] * 12); }
   function gripKick(gx, gy) { const a = hero.atk; if (!a || SLASH_BODY) return [gx, gy]; const K = gkKick(a), v = FACEV[hero.face] || [1, 0]; // 손도 몸 반동(기울기·내딛기·찌그러짐)을 따라감 = drawHeroHi 와 같은 식 (모션연구방 10-24)
     gy *= K.sq; return [gx * (1 + (1 - K.sq) * .6) - v[0] * K.lean * gy / 117 + v[0] * K.step, gy + v[1] * K.step * .5]; } // art px from the feet; no grip for this frame: chest height, a little toward the swing
-  function gkDraw(k) { if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC())) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
+  // 평소 칼 (10-25 새 그록 주인공 = 빈 손 그림): 공격이 아닐 때 그 칸의 손(H8.grip)에서 grip 각도로 코드 칼. grip 없는 칸(맞기·대시 등)은 안 그림.
+  function carryGrip() { if (hero.atk || hero.hp <= 0) return null; const G = h128(), H = G && G.H8, c = h128Cell(); if (!H || !H.grip || !c || c.h8 === undefined) return null;
+    const g = H.grip[c.h8 + ':' + H.cells[c.h8].indexOf(c)]; if (!g) return null; const fl = !!c.fl, d = (fl ? 180 - g[2] : g[2]) * Math.PI / 180; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1], Math.cos(d), Math.sin(d)]; }
+  function carryBlade(ctx, cg) { const [gx, gy, ux, uy] = cg, L = 21 * 117 / H128FIG; ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
+    seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); } // heroBlade 와 같은 칼 모양·길이
+  function gkDraw(k) { const cg = carryGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg) return; const sc = k * H128FIG / 117, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
+    if (cg) carryBlade(ctx, cg);
     if (comboBlade() && swordC()) heroBlade(ctx); // 콤보 당김·끝에 멈춤 동안 코드 칼 (모션연구방 10-24 「칼이 안사라지는데?」)
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
