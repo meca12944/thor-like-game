@@ -769,8 +769,7 @@
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
   function shakeMul() { const g = window.__game, v = g && g.shakeMul; return typeof v === 'number' ? v : 1; } // '화면 흔들림' 끔/약/보통 = 0 / .67 / 1 — also scales the directional hit kick (보고서 3-3)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
-  const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
-    m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재', m_leather_strap: '질긴 가죽끈', riceball: '주먹밥' };
+  const NAMES = {}; // 이름은 가방 데이터(__game.IT) 에서 (옛 데모 아이템 이름 삭제 10-25)
   const itemName = id => { const d = window.__game && __game.IT && __game.IT[id]; return NAMES[id] || (d && d.n) || id; }; // pickup feed: item names from the bag data (was showing raw ids)
   function giveLoot(list) { const g = window.__game; const names = [];
     for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff', g && g.iconUrl && g.iconUrl(id)); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}

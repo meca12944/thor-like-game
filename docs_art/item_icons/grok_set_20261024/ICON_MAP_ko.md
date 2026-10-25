@@ -140,3 +140,42 @@
 | 닳아버린 의복 조각 | `k_worn_cloth` | 열쇠·퀘스트 |  | part7.png 2줄 2칸 |
 | 닳아빠진 장갑 | `k_worn_gloves` | 열쇠·퀘스트 |  | part2.png 4줄 3칸 |
 | 닳은 등불 | `k_worn_lamp` | 열쇠·퀘스트 |  | part1.png 4줄 3칸 |
+
+## 옛 아이템 삭제 (사장님 10-25 「이전 게임 아이템은 다 지워」, claude/grok-icons)
+
+- 게임 아이템 표(test128 `ITEMS`) = 정본 132개만 (그림 131 + 왕실 특수 천). 옛 데모 아이템 약 390개 삭제. `GAME_VER 2026-10-25-canon-items` (예전 판 저장은 한 번 지워짐).
+- 정본 중 효과가 아직 없는 소모품은 `efTodo` — 써도 없어지지 않고 「아직 구현되지 않은 효과」 안내만. 장비는 이름·그림·종류만 (능력치는 나중에).
+- 옛 그림 삭제: `test128/assets/icons/new/` (1360장), `items_demo.json`·`items_new.json`·`icons.json`. `icons32/64.png` 는 UI 그림 3개(금화·가방·모루)만 남김. 라이브 /town/ 은 안 건드림.
+- 그대로 둔 것: 옛 마을 장면(?old)의 잠수 보물(생명의 진주·금화 주머니·고급 회복약)은 가방 아이템이 아니라 그 장면 전용이라 그대로.
+
+| 어디 | 전 | 후 |
+|---|---|---|
+| 시작 가방 | 회복약3·빨간 약초5·중급 회복약·정령수·해독초·폭탄·귀환 깃털·재료 14종 등 24칸 | 평범한 회복 물약×3, 닳은 등불 |
+| 회복 물약 표(POTION) | 약초·회복약·중급·주먹밥·고급·영약 | 평범한 회복 물약(30%)만 |
+| 세라의 약초 오두막 | 빨간 약초·회복약·해독초·맑은 눈약·재생의 물약 | 평범한 회복 물약 |
+| 벤의 노점 | 수색가 반지·특수 숫돌·화염병 + 귀환 깃털·횃불·바람 사탕·주먹밥·재료 3 | 수색가의 낡은 반지·특수 숫돌·잿빛 화염병 (정본 그대로) |
+| 옛 마을 상점 A~D, 상점 데모 | 소모품 목록 | 비움 (「지금은 팔 물건이 없다」) |
+| 대장간 | 레시피 0, 강화 재료 이름(거친 수정 원석 등) | 강화만 (금화), 옛 재료 이름 지움 |
+| 몹 드롭 | 몹 12종이 옛 재료(포자·멧돼지 가죽 등) 떨굼 | 안 떨굼 (금화·하트는 그대로) |
+| 퀘스트 보상 | 하트 조각, 해독초 | 평범한 회복 물약×1 |
+| 맵 arachne.json chests/35,6/loot | heart_piece×1, potion×1 | potion×1 |
+| 맵 arachne.json chests/3,24/loot | potion×1, bomb×1 | potion×1 |
+| 맵 arachne.json objects/2/loot | potion×2, bomb×2 | potion×2 |
+| 맵 arachne.json objects/3/loot | potion×2, antidote×1 | potion×2 |
+| 맵 arachne_boss.json boss/reward | heart_piece×1 | w_ara_spine×1, c_ara_silk×1, k_last_thread×1 |
+| 맵 boss01.json boss/reward | m_a1_shared×5, heart_piece×1 | potion×1 |
+| 맵 dungeon01_b1.json chests/5,19/loot | m_spore×2, bomb×1 | potion×1 |
+| 맵 felt.json objects/21/loot | riceball×1 | potion×1 |
+| 맵 felt.json objects/30/loot | riceball×1 | potion×1 |
+| 맵 felt.json objects/32/loot | riceball×1 | potion×1 |
+| 맵 felt_int_atelier.json objects/8/loot | m_leather_strap×2 | potion×1 |
+| 맵 felt_int_chief_inner.json objects/4/loot | heart_piece×1 | potion×1 |
+| 맵 felt_int_herb.json objects/2/loot | riceball×1 | potion×1 |
+| 맵 felt_int_inn_kit.json objects/1/loot | riceball×1 | potion×1 |
+| 맵 field00.json objects/4/loot | potion×1, m_hardwood×1 | potion×1 |
+| 맵 field00.json objects/29/loot | potion×2, m_hardwood×2 | potion×2 |
+| 맵 field00.json objects/30/loot | heart_piece×1 | potion×1 |
+| 맵 field00.json objects/31/loot | potion×1, m_a1_shared×3 | potion×1 |
+| 맵 field00.json objects/32/loot | spirit_drop×1 | potion×1 |
+| 맵 field_felt.json objects/21/loot | potion×2, bomb×1 | potion×2 |
+| 맵 felt.json 숨은 물건 3곳 | riceball×1 | potion×1 |
