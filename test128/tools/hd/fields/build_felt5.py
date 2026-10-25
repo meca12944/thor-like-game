@@ -275,6 +275,12 @@ for i, (x, y) in [('f_clue_gate', (79, 30)), ('f_clue_moat', (40, 31)), ('f_hid_
 for i, (x, y) in [('lm_felt_castle', (75, 32)), ('lm_felt_fountain', (75, 76)), ('lm_felt_grave', (138, 47))]:
     if i in OB: put(OB[i], x, y)
 put(dict(OB['felt_gate'], zoom=.22, pan=53, hold=1, r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
+# 토비의 숯 낙서 5개 (사장님 10-25 확정 「토비의 숯 낙서 찾기」, 3번방): 벽 옆 바닥, 다 찾으면 토비가 선물 (quests.json q_felt_doodle)
+put(dict(type='clue', id='f_doodle_1', name='숯 낙서 — 이장 집 담벼락', flag='toby_doodle_1', text="벽에 숯으로 그린 그림: 등 굽은 할아버지가 지팡이를 휘두르며 화내고 있다.\n옆에 삐뚤빼뚤한 글씨 — \"이장님 무서움\"."), 37, 55)
+put(dict(type='clue', id='f_doodle_2', name='숯 낙서 — 여관 담벼락', flag='toby_doodle_2', text="숯 그림: 커다란 술잔을 든 앞치마 아줌마. 술잔에는 금이 쭉 그어져 있다.\n밑에 작게 — \"마르타 아줌마 수건 냄새\"."), 103, 56)
+put(dict(type='clue', id='f_doodle_3', name='숯 낙서 — 공방 담벼락', flag='toby_doodle_3', text="숯 그림: 긴 머리 누나가 커다란 바늘을 칼처럼 들고 있다. 둘레에 별이 반짝반짝.\n\"리네트 누나 = 바늘 기사\"."), 45, 99)
+put(dict(type='clue', id='f_doodle_4', name='숯 낙서 — 고물상 거리 벽', flag='toby_doodle_4', text="숯 그림: 아이 둘이 공을 차고 있다. 한 아이 목에는 길게 늘어진 목도리.\n\"나랑 펠릭스. 펠릭스가 맨날 이김\"."), 96, 100)
+put(dict(type='clue', id='f_doodle_5', name='숯 낙서 — 무너진 옛 성문 돌', flag='toby_doodle_5', text="숯 그림: 검은 망토를 두른 키 큰 사람. 가슴에 동그라미가 그려져 있다.\n옆에 커다란 물음표 — \"괴물 아저씨?\""), 70, 33)
 # clue tiles placed inside rubble keep their tile; make sure a neighbour is floor
 for o in objs:
     if o['type'] == 'clue' and grid[o['y'], o['x']] not in '.=':
