@@ -39,7 +39,7 @@ with sync_playwright() as p:
     r3 = ev("()=>__world.SAVE.lastWay"); ev("()=>{for(let i=0;i<30&&__world.S.dialog;i++){__world.advance(.15);__world.tap('KeyL');__world.advance(.02);}}")   # close the dialog (it types out, ignores presses in its first 0.12 s, may have pages)
     check('waystone = respawn point', r3 and r3['id'] == 'ws_temple', r3)
     # champion ring: walk up to 돌엄니 (49+56, 26)
-    ev("()=>{__world.killAll(m=>!m.D.champion);const c=__world.mobs.find(m=>m.kind==='champ_boar');__world.hero.x=c.x-70;__world.hero.y=c.y;__world.hero.hp=__world.hero.maxHp}"); adv(.1)
+    ev("()=>{__world.killAll(m=>!m.D.champion);const c=__world.mobs.find(m=>m.kind==='champ_boar');if(!c)throw new Error('champ_boar missing: map '+__world.map.id+' hp '+__world.hero.hp+' dead '+__world.S.deadT);__world.hero.x=c.x-70;__world.hero.y=c.y;__world.hero.hp=__world.hero.maxHp}"); adv(.1)
     lk = ev("()=>!!__world.S.lock"); ev("()=>__world.key('ArrowLeft',true)"); adv(2.5); ev("()=>__world.key('ArrowLeft',false)")
     d = ev("()=>{const L=__world.S.lock,h=__world.hero;return L?Math.hypot(h.x-L.x,(h.y-L.y)/.75):-1}"); pg.screenshot(path=O + '/4_ring.png')
     check('champion ring holds the hero', lk and 0 < d <= 150, {'lock': lk, 'd': d})
