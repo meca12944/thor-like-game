@@ -66,7 +66,7 @@
   const cv = document.createElement('canvas'); cv.id = 'wc';
   cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:40;display:none;image-rendering:pixelated;background:transparent';
   const ctx = cv.getContext('2d');
-  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); let EW = LW, EH = LH; // EW x EH = world px on screen (bigger than LW x LH when a town view zooms out, owner 10-23 「마을 카메라 조금 멀리」) // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
+  const low = document.createElement('canvas'); low.width = LW + 1; low.height = LH + 1; const lx = low.getContext('2d'); const hazC = document.createElement('canvas'); let hazOn = false; /* hazC: telegraphs again above tall front pictures (hd maps) */ let EW = LW, EH = LH; // EW x EH = world px on screen (bigger than LW x LH when a town view zooms out, owner 10-23 「마을 카메라 조금 멀리」) // +1: the sub-pixel camera shifts it by the fraction (owner 10-23 「걸을때 뛸때 화면이 흔들린다」)
   const gateHint = document.createElement('div');
   gateHint.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:35;padding:3px 12px;background:rgba(12,18,44,.7);color:#ffe08a;font:bold 13px sans-serif;border:2px solid #e2c27a;border-radius:3px;pointer-events:none;display:none';
   gateHint.textContent = '▼ 마을 밖으로 (바람길)';
@@ -531,11 +531,16 @@
       for (const [e0, e1] of [[ex0 - 2, ex0 + ew], [ex1 + 2, ex1 - ew]]) { if (Math.max(e0, e1) < 0 || Math.min(e0, e1) > W_) continue; const gr = ctx.createLinearGradient(e0, 0, e1, 0); gr.addColorStop(0, b.sky); gr.addColorStop(1, b.sky + '00'); ctx.fillStyle = gr; ctx.fillRect(Math.min(e0, e1), 0, Math.abs(e1 - e0), Hc); }
       ctx.fillStyle = b.sky; if (ex0 > 0) ctx.fillRect(0, 0, ex0 - 1, Hc); if (ex1 < W_) ctx.fillRect(ex1 + 1, 0, W_ - ex1, Hc); }
     ctx.restore(); ctx.imageSmoothingEnabled = false; }
+  // 앞 가림 (지도 회의 10-25, 키 큰 새 주인공): 주인공 몸 상자(발 ±9, 키 H128FIG)가 앞 그림(나무·지붕·소품) 상자에 20 % 넘게 덮이면 그 그림을 반투명 (.45).
+  // 예전엔 발 한 점만 봐서 머리·어깨가 가려도 안 비쳤고, props 는 q.fade 를 단 것만 됐음 → 키 28 field px 넘는 그림은 모두.
+  function occl(wl, wt, wr, fy) { if (hero.y >= fy) return false; const x0 = hero.x - 9, x1 = hero.x + 9, y0 = hero.y - H128FIG, ox = Math.min(x1, wr) - Math.max(x0, wl), oy = Math.min(hero.y, fy) - Math.max(y0, wt);
+    return ox > 0 && oy > 0 && ox * oy > .2 * 18 * H128FIG; }
+  const OCC_A = .45;
   function drawPropsHi(k, front) { const m = M(); if (!m || !m.hds) return; const T = m.T;
     for (const h of m.hds) for (const q of h.props || []) { hdBake(h, T); const im = q._lit || HDIMG[q.img]; if (!im || q.under || (q.hideFlag && SAVE.flags[q.hideFlag])) continue; // hideFlag: gone once the flag is set (무명 무덤가: 베어 낸 가시덤불, 집어 든 등불)
       let fx = (h.gx + q.x) * T; const fy = (h.gy + q.y) * T; if ((fy > hero.y) !== !!front) continue; if (q.par) fx += (S.cam[0] + EW / 2 - fx) * q.par; // par: far scenery (펠트 v4 먼 왕성) slides slower than the town
       const Dq = q.D || h.D, sc = k / Dq, iw = q.strip ? im.width / q.strip[0] : im.width, ax = q.ax ?? iw / 2, ay = q.ay ?? im.height, wl = fx - ax / Dq, wr = wl + iw / Dq, wt = fy - ay / Dq; // a prop may carry its own D (e.g. a D=3 part on a D=1.25 board)
-      const behind = q.fade && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; q._a = (q._a ?? 1) + ((behind ? .42 : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
+      const behind = !q.under && (q.fade || im.height / Dq > 28) && occl(wl, wt, wr, fy); q._a = (q._a ?? 1) + ((behind ? OCC_A : 1) - (q._a ?? 1)) * .2; // see-through when the hero walks behind
       const [sx, sy] = W2S(fx, fy); if (!onView(sx - ax * sc, sy - ay * sc, im.width * sc, im.height * sc + 4 * k)) continue;
       if (q.shadow) { ctx.fillStyle = 'rgba(18,12,20,.32)'; ctx.beginPath(); ctx.ellipse(sx + 3 * k, sy - 1 * k, im.width * sc * .42, Math.max(3 * k, im.width * sc * .06), 0, 0, TAU); ctx.fill(); }
       if (q.strip) { const [n, ms, pp] = q.strip, fw = im.width / n, c = Math.floor(S.t * 1000 / ms) % (pp ? 2 * n - 2 : n), f = c < n ? c : 2 * n - 2 - c; // 그록 프롭 애니 (분수 물·빨래·리본·촛불): 가로 스트립, pp = 왕복
@@ -544,7 +549,7 @@
     const cx0 = S.cam[0] - 60, cx1 = S.cam[0] + EW + 60, cy1 = S.cam[1] + EH + 140;
     for (const d of m.decos) { const e = d.hd; if (!e || d.broken || (d.y > hero.y) !== !!front || d.x < cx0 || d.x > cx1 || d.y < S.cam[1] - 10 || d.y > cy1) continue; const im = HDIMG[e.v.img]; if (!im) continue;
       const sc = k / e.D, fx = d.x + e.dx, fy = d.y + e.dy, wl = fx - e.v.ax / e.D, wt = fy - e.v.ay / e.D, wr = wl + im.width / e.D;
-      const behind = im.height / e.D > 28 && hero.y < fy && hero.y > wt + 6 && hero.x > wl + 4 && hero.x < wr - 4; d._a = (d._a ?? 1) + ((behind ? .5 : 1) - (d._a ?? 1)) * .2;
+      const behind = im.height / e.D > 28 && occl(wl, wt, wr, fy); d._a = (d._a ?? 1) + ((behind ? OCC_A : 1) - (d._a ?? 1)) * .2;
       const [sx, sy] = W2S(fx, fy); ctx.fillStyle = 'rgba(14,10,18,.3)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy - k, im.width * sc * .34, Math.max(2 * k, im.width * sc * .07), 0, 0, TAU); ctx.fill();
       hdBlit(im, sx, sy, e.v.ax * sc, e.v.ay * sc, sc, e.flip, d._a, e.v.sway ? (Math.sin(S.t * 1.2 + d.x * .045 + d.y * .02) + .4 * Math.sin(S.t * 2.9 + d.x * .1)) * .016 * e.v.sway : 0); } }
   function hdBlit(im, sx, sy, ax, ay, sc, flip, a, sk) { // one picture at its foot point, no save/restore (owner 10-23 「최적화」: save/restore per prop was ~20 % of a frame)
@@ -1367,12 +1372,12 @@
     if (showWorld) {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
       drawLow(); ctx.imageSmoothingEnabled = false; const z = cutZoom();
-      const bodies = kk => { drawTufts(kk); drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); if (!SLASH_BODY) gkFanDraw(kk, 0); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); drawAmbient(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDraw(kk, 1); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
+      const bodies = kk => { drawTufts(kk); drawPropsHi(kk, 0); drawNpcHi(kk, 0); drawFeltHi(kk, mm => mm.y <= hero.y); drawPetHi(kk, false); if (!SLASH_BODY) gkFanDraw(kk, 0); drawHeroHi(kk); drawPetHi(kk, true); drawPropsHi(kk, 1); if (hazOn && S._lowR) { ctx.globalAlpha = .55; ctx.drawImage(hazC, ...S._lowR); ctx.globalAlpha = 1; } drawFeltHi(kk, mm => mm.y > hero.y); drawNpcHi(kk, 1); drawHDLight(kk); drawAmbient(kk); if (!SLASH_BODY) { gkDraw(kk); gkFanDraw(kk, 1); gkFanDbg(kk); } }; // hi-res bodies (검기 above the mobs it hits)
       const kv = k * (S.vz || 1); S.view = { k: kv, ox, oy }; // world scale on screen (k, or less in a wider town view)
       if (z > 1.001) { const px = hero.x - S.camI[0], py = hero.y - 14 - S.camI[1], kz = kv * z, zx = ox + LW * k / 2 - px * kz, zy = oy + LH * k / 2 - py * kz, mix = Math.min(1, (z - 1) / .6);
         const vx = Math.round(ox + (zx - ox) * mix + (ox + px * kv - px * kz - ox) * (1 - mix)), vy = Math.round(oy + (zy - oy) * mix + (oy + py * kv - py * kz - oy) * (1 - mix));
-        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); drawBackdrop(kz); ctx.drawImage(low, vx, vy, (EW + 1) * kz, (EH + 1) * kz); bodies(kz); ctx.restore(); S.view = { k: kv, ox, oy }; S.camF = cf; }
-      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(kv); drawBackdrop(kv); ctx.drawImage(low, ox - Math.round(cf[0] * kv), oy - Math.round(cf[1] * kv), (EW + 1) * kv, (EH + 1) * kv); bodies(kv); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
+        const cf = S.camF; S.camF = [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); S.view = { k: kz, ox: vx, oy: vy }; drawHDGround(kz); drawBackdrop(kz); S._lowR = [vx, vy, (EW + 1) * kz, (EH + 1) * kz]; ctx.drawImage(low, ...S._lowR); bodies(kz); ctx.restore(); S.view = { k: kv, ox, oy }; S.camF = cf; }
+      else { const cf = S.camF || [0, 0]; ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, LW * k, LH * k); ctx.clip(); drawHDGround(kv); drawBackdrop(kv); S._lowR = [ox - Math.round(cf[0] * kv), oy - Math.round(cf[1] * kv), (EW + 1) * kv, (EH + 1) * kv]; ctx.drawImage(low, ...S._lowR); bodies(kv); ctx.restore(); } // hi-res bodies stay inside the view (no spill into the letterbox)
       drawHiRes(k, ox, oy);
     }
     if (tr) { let a = 1;
@@ -1400,6 +1405,7 @@
     if (S.webs) { g.save(); for (const w of S.webs) { if (w.cut) continue; g.strokeStyle = `rgba(200,30,40,${.55 + .25 * Math.sin(S.t * 6 + w.x)})`; g.lineWidth = w.hot ? 2 : 1; g.beginPath(); g.moveTo(w.x, w.y); g.lineTo(w.x2, w.y2); g.stroke(); } g.restore(); }
     if (S.tether && S.tether.mob) { const T = S.tether, m = T.mob; g.save(); g.strokeStyle = `rgba(230,40,50,${.6 + .3 * Math.sin(S.t * 20)})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(m.x, m.y - 30); g.quadraticCurveTo((m.x + hero.x) / 2, (m.y + hero.y) / 2 - 10, hero.x, hero.y - 10); g.stroke(); g.restore(); }
     for (const h of S.hazards) drawHazard(g, h, false);     // telegraphs on the floor, under sprites
+    hazOn = !!(m.hds && S.hazards.length); if (hazOn) { if (hazC.width !== EW + 1 || hazC.height !== EH + 1) { hazC.width = EW + 1; hazC.height = EH + 1; } const q = hazC.getContext('2d'); q.setTransform(1, 0, 0, 1, 0, 0); q.clearRect(0, 0, EW + 1, EH + 1); q.translate(-cx, -cy); for (const h of S.hazards) drawHazard(q, h, false); } // 경고·장판은 늘 앞 가림 위 (지도 회의 10-25)
     drawLock(g);
     if (m.steps && S.steps && S.steps.map === m.id) for (const p of S.steps.l) { const a = 1 - (S.t - p.t) / 7; if (a <= 0) continue; g.fillStyle = `rgba(28,24,22,${(.6 * a).toFixed(3)})`; g.fillRect(Math.round(p.x) - (p.h ? 1 : 1), Math.round(p.y), p.h ? 3 : 2, p.h ? 2 : 3); }
     const list = [];                                         // y-sorted sprites
