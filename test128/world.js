@@ -804,6 +804,7 @@
   }
   function show(v) { cv.style.display = v ? 'block' : 'none'; document.body.classList.toggle('inworld', !!v); }
   function enterScene(to, spawnName) {
+    if (S.intro && !S.intro.ctl) S.intro = null; // left the grave mid-intro (tests / ?go=): drop it so input and HUD never stay locked
     S.roomP2 = undefined; S.cocoonGone = []; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
@@ -907,7 +908,7 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { if (S.vfx && S.vfx.t < VISTA.lock) return [0, 0]; return rawDir(); }
+  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl)) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
@@ -930,6 +931,7 @@
     if (S.scene === 'town') return;
     arenaTick(dt);
     { const g = window.__game; if (g && g.ui) { queue.length = 0; return; } } // DOM UI (shop) open over a map: paused
+    stepIntro(dt);
     if (S.dialog) { stepDialog(dt); queue.length = 0; return; }
     if (NAV() && NAV().screenStep(dt)) { queue.length = 0; return; } // full map screen open (paused)
     if (S.t < (S.dlgGuard || 0)) takePress('menu'); // the Esc that closed a dialog must not also open the pause menu
@@ -1153,7 +1155,7 @@
   addEventListener('boss-phase', e => { const d = e.detail || {}; if (d.phase === 2) { S.roomP2 = true; S.roomP2Rate = Math.min(.2, 1 / (60 * (d.dur || 1.8)) * 3); } }); // monster room's boss events (claude/arachne-epic)
   addEventListener('boss-dead', () => { S.roomP2 = false; S.roomP2Rate = .012; });
   addEventListener('cocoon-drop', e => { const i = (e.detail || {}).i; if (i !== undefined) (S.cocoonGone = S.cocoonGone || []).push(i); }); // a ceiling cocoon falls (고치 비): hide it here // the red threads unravel slowly
-  function areaScene(id, delay) { playScene('area:' + id, delay); if (SAVE.flags.boss_arachne) playScene('area:' + id + ':after', delay + .3); } // ':after' = first visit after the chapter boss (펠트 재방문 → 리네트 동행)
+  function areaScene(id, delay) { if (introPending(id)) return; /* the wake-up intro plays this scene itself, after the dark + core beat */ playScene('area:' + id, delay); if (SAVE.flags.boss_arachne) playScene('area:' + id + ':after', delay + .3); } // ':after' = first visit after the chapter boss (펠트 재방문 → 리네트 동행)
   function playScene(key, delay) { if (Q.has('noscene')) return; /* ?noscene: tests / recordings run without story scenes */ after(delay || 0, () => { const t = DLGD && DLGD.scenes && DLGD.scenes[key]; if (!t || SAVE.flags['scene_' + key]) return; SAVE.flags['scene_' + key] = true; save(); const sq = withArt(toSeq(t), key); if (!S.dialog) playSeq(sq); else { const d = S.dialog, th = d.then; d.then = () => { if (th) th(); playSeq(sq); }; } }); }
   function withArt(seq, key) { const A = DLGD && DLGD.sceneArt && DLGD.sceneArt[key]; if (A) { seq.forEach((it, i) => { for (const [src, from, dx] of A) if (i >= from) { it.cg = src; it.cgDx = dx || 0; } }); seq.forEach((it, i) => { if (it.cg && (!seq[i + 1] || seq[i + 1].cg !== it.cg)) it.cgLast = true; }); } return seq; } // 이야기 그림: sceneArt[장면] = [[그림, 몇 번째 말부터, 시선 -1/0/1]]; cgLast = 그 그림의 마지막 말 (SCENE_FX snap)
   function interact() {
@@ -1230,10 +1232,29 @@
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
-    const ht = S.vfx ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
-    if (document.body.classList.contains('wvista') !== !!S.vfx) document.body.classList.toggle('wvista', !!S.vfx); }
+    const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
   // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles)}] -> the zoom eases toward zone.zoom and the view looks up/down
   function camZoneW(m) { let w = 0, z = null; for (const c of m.camZones || []) { const f = c.f || 4, hx = hero.x / m.T, hy = hero.y / m.T, d = Math.max(c.x0 - hx, hx - c.x1, c.y0 - hy, hy - c.y1, 0), q = Math.max(0, 1 - d / f), wq = q * q * (3 - 2 * q); if (wq > w) { w = wq; z = c; } } return [w, z]; }
+  // [새 1장 인트로] 사장님 10-25 「전부 진행해」: 새 게임 첫 깨어남(SAVE.flags.pg_woke 없음)에서 한 번만, 무명 무덤가(prologue_grave) wake 자리.
+  // 검은 화면 + 심장 소리 2번 -> 두 번째 소리에 가슴 코어가 푸르게 깜빡임 -> 첫 대사 -> 조작 시작 (배낭·언덕 전망·안내는 그록 지도 물체 pg_*). ?intro=1 = flag와 상관없이 다시 봄.
+  const INTRO = { map: 'prologue_grave', flag: 'pg_woke', force: Q.get('intro') === '1', beats: [.5, 1.15], core: [1.15, 4.2], fade: [2.6, 4.4], say: 4.6,
+    line: '...또다시 이 무덤가인가. 몇 번째 반복인지 이제 세지도 않았다.' }; // 대사·순서 = 스토리 docs_story/CH1_NEW_DIALOGUE_ko.md 1절
+  function stepIntro(dt) { const m = M(); if (!m || m.id !== INTRO.map || S.trans) return;
+    if (!S.intro) { if (SAVE.flags[INTRO.flag] && !INTRO.force) return; S.intro = { t: 0, b: 0, said: false, ctl: false }; }
+    const I = S.intro; if (I.ctl) return; if (!S.dialog) I.t += dt;
+    while (I.b < INTRO.beats.length && I.t >= INTRO.beats[I.b]) { sfx('hit_thud', I.b ? .55 : .45); I.b++; } // 심장 소리 2번 (진짜 심장 소리가 생기면 이름만 바꿈)
+    if (!I.said && I.t >= INTRO.say) { I.said = true; const key = 'area:' + INTRO.map; // 스토리 장면 「area:prologue_grave」(dialog_ch1.json)가 있으면 그걸 틀고, 없거나 이미 봤으면 첫 대사 한 줄
+      if (!Q.has('noscene') && DLGD && DLGD.scenes && DLGD.scenes[key] && !SAVE.flags['scene_' + key]) playScene(key, 0); else S.dialog = { name: '필멸자', text: INTRO.line }; return; }
+    if (I.said && !S.dialog && I.t > INTRO.say + .15) { I.ctl = true; SAVE.flags[INTRO.flag] = true; save(); } else if (!S.dialog) queue.length = 0; } /* presses before the line are dropped; the dialog keeps its own */
+  function introPending(id) { return id === INTRO.map && !(S.intro && S.intro.ctl) && (INTRO.force || !SAVE.flags[INTRO.flag]); }
+  function introDark() { const I = S.intro; if (!I || I.ctl) return 0; const [a, b] = INTRO.fade; return I.t <= a ? 1 : Math.max(0, 1 - (I.t - a) / (b - a)); }
+  function drawIntro(ox, oy, SW, SH) { const I = S.intro, d = introDark(); if (!I || I.ctl) return;
+    if (d > 0) { ctx.fillStyle = `rgba(0,0,0,${d})`; ctx.fillRect(ox, oy, SW, SH); }
+    const [c0, c1] = INTRO.core; if (I.t < c0 || I.t > c1) return; // 가슴의 코어가 푸르게 깜빡임 (코드로 그린 빛, 높이 = 주인공 키의 절반)
+    const k = (I.t - c0) / (c1 - c0), puls = .55 + .45 * Math.sin((I.t - c0) * 9), a = Math.min(1, k * 4, (1 - k) * 3) * puls, [sx, sy] = W2S(hero.x, hero.y - H128FIG * .5), r = SH * .05 * (1 + .4 * puls);
+    const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3); gr.addColorStop(0, `rgba(180,230,255,${a})`); gr.addColorStop(.25, `rgba(80,170,255,${a * .7})`); gr.addColorStop(1, 'rgba(40,90,255,0)');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + z.zoom * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && (S.vfx || V.hold) ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
     { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = (z.look || 0) * m.T * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
@@ -2095,7 +2116,11 @@
       if (lastStandOn()) { textOut(`심연의 힘 ${S.lastStand.t.toFixed(1)}초 · 저스트 회피 → 반격 「사멸의 궤적」`, ox + 12 * u, hb + 14 * u, 10 * u, '#c9a0ff', '#000', 'left'); if (S.hudY) S.hudY += 14 * u; }
       const arN = areaAt(m, hero.x, hero.y); textOut(arN ? arN.name : m.name, ox + SW - 10 * u, oy + 20 * u, 12 * u, '#ffe08a', '#000', 'right');
       if (S.areaCard) { const A = S.areaCard, al = Math.max(0, Math.min(1, A.t * 2, (2.4 - A.t) * 4)); ctx.globalAlpha = al; textOut(A.a.name, cxs, oy + 40 * u, 20 * u, '#f4ead2'); textOut(A.a.sub || '', cxs, oy + 56 * u, 11 * u, '#d8cbb0'); ctx.globalAlpha = 1; }
-      { const fc = inCombat(); textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)', '#000', 'right'); }
+      { const fc = inCombat(), col = S.saved ? '#bff5c0' : fc ? '#ff9a8a' : 'rgba(190,240,190,.85)';
+        if (TOUCH()) { /* 폰 (사장님 10-25 「추천대로」): 대시 버튼에 가리던 저장 글 → 화면 위 가운데, 메뉴 버튼 바로 아래 (F5 글자 없음) */
+          if (!(S.mbT > 0)) { const mb = document.getElementById('wtb_menu'), r = mb && mb.offsetParent ? mb.getBoundingClientRect() : null, dpr = ctx.canvas.width / Math.max(1, innerWidth); S.mbY = r && r.bottom > 0 ? r.bottom * dpr : 0; S.mbT = 30; } S.mbT--;
+          textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : '● 저장 가능', cxs, Math.max(oy + 30 * u, (S.mbY || 0) + 16 * u), 10 * u, col, '#000', 'center'); }
+        else textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, col, '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
       ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u);
@@ -2109,6 +2134,7 @@
     if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
+    if (S.intro) drawIntro(ox, oy, SW, SH);
     if (S.dialog) drawDialog(ox, oy, SW, SH, u);
     { const on = !!(S.dialog || (window.__game && window.__game.ui)); if (document.body.classList.contains('wdlg') !== on) document.body.classList.toggle('wdlg', on); } // phone: fight buttons step aside while talking
     if (S.pause) { ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(ox, oy, SW, SH); panel(cxs - 150 * u, oy + SH / 2 - 50 * u, 300 * u, 100 * u);
