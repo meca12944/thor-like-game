@@ -1732,7 +1732,7 @@ function castFireDraw(front,o){if(!CFIRE||!IMG['h8_'+CFIRE.sheet])return;const h
 function castCircleReveal(o){const h=hero;if(!(CFIRE&&h.sk&&h.cfx))return false;const ph=castFirePhase(h.sk,h.cfx);if(!(ph.p<1))return false;if(ph.p<=0)return true; // magic circle shows only where the fire has passed
  const L=1/LSC,[dx,dy,rx,ry]=CFIRE.ring,cx=h.x+dx*L,cy=h.y-(h.z||0)+dy*L;ctx.save();ctx.beginPath();ctx.moveTo(cx,cy);ctx.ellipse(cx,cy,rx*3*L,ry*3*L,0,CFIRE.a0,CFIRE.a0+ph.p*Math.PI*2);ctx.closePath();ctx.clip();h8fx(o.fxb,o.ffl??o.fl);ctx.restore();return true;}
 function h8fx(r,fl){const h=hero;blitHero({c:H8.cells[r[0]][r[1]],dx:0,dy:0,fl,h8:r[0]},h.x,h.y-(h.z||0));}
-const H8TINT={white:['#ffffff',1],red:['#ff3020',1],ghost:['#8fdcff',1],blink:['#dcfaff',.85]};
+const H8TINT={white:['#ffffff',1],red:['#ff3020',1],ghost:['#8fdcff',1],blink:['#dcfaff',.85],slash:['#c8f4ff',.7]}; // slash = 공격 스미어 청색 (검기 심지와 같은 #c8f4ff, 흰색 아님)
 let h8scr=null;
 function h8tinted(img,c,tint){const[cx,cy,w,h]=c;if(!h8scr){h8scr=document.createElement('canvas');}const t=h8scr;if(t.width<w)t.width=w;if(t.height<h)t.height=h;const g=t.getContext('2d');
  const T=tint==='dodge'?[(DODGE.afterimage||{}).tint||'#6ed7ff',(DODGE.afterimage||{}).tintMix??.75]:(H8TINT[tint]||H8TINT.white);
