@@ -1,0 +1,82 @@
+{
+ "walk_down/000.png": {
+  "dy": 60,
+  "dx": 123,
+  "fit": 1.0
+ },
+ "walk_down/001.png": {
+  "dy": 58,
+  "dx": 123,
+  "fit": 0.97
+ },
+ "walk_down/002.png": {
+  "dy": 58,
+  "dx": 122,
+  "fit": 0.94
+ },
+ "walk_down/003.png": {
+  "dy": 60,
+  "dx": 122,
+  "fit": 0.95
+ },
+ "walk_down/004.png": {
+  "dy": 62,
+  "dx": 123,
+  "fit": 0.96
+ },
+ "walk_down/005.png": {
+  "dy": 59,
+  "dx": 122,
+  "fit": 0.94
+ },
+ "walk_down/006.png": {
+  "dy": 58,
+  "dx": 123,
+  "fit": 0.95
+ },
+ "walk_down/007.png": {
+  "dy": 58,
+  "dx": 123,
+  "fit": 0.96
+ },
+ "run_down/000.png": {
+  "dy": 60,
+  "dx": 123,
+  "fit": 0.96
+ },
+ "run_down/001.png": {
+  "dy": 61,
+  "dx": 124,
+  "fit": 0.91
+ },
+ "run_down/002.png": {
+  "dy": 64,
+  "dx": 124,
+  "fit": 0.92
+ },
+ "run_down/003.png": {
+  "dy": 64,
+  "dx": 123,
+  "fit": 0.91
+ },
+ "run_down/004.png": {
+  "dy": 60,
+  "dx": 124,
+  "fit": 0.94
+ },
+ "run_down/005.png": {
+  "dy": 62,
+  "dx": 124,
+  "fit": 0.9
+ },
+ "run_down/006.png": {
+  "dy": 63,
+  "dx": 124,
+  "fit": 0.92
+ },
+ "run_down/007.png": {
+  "dy": 62,
+  "dx": 123,
+  "fit": 0.92
+ }
+}

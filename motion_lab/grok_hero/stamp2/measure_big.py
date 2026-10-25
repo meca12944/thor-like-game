@@ -19,7 +19,7 @@ if __name__=='__main__':
     for c in sys.argv[1:]:
         for f in sorted(glob.glob(f'../final/{c}/*.png'))[:8:3]:
             n=f.split('/')[-1];o=np.array(Image.open(f).convert('RGBA'));R[f'{c}/{n}']={'원래':stats(o)}
-            for lab,root in (('v2','../final_stamped2'),('A','../final_stampedA')):
+            for lab,root in (('v2','../final_stamped2'),('A','../final_stampedA'),('B','../final_stampedB')):
                 try: R[f'{c}/{n}'][lab]=stats(np.array(Image.open(f'{root}/{c}/{n}').convert('RGBA')),o)
                 except FileNotFoundError: pass
     for k,v in R.items(): print(k,' | '.join(f"{lab} 넓이{s['area']} {s['w']}x{s['h']} 밝기{s['V']} 채도{s['S']}"+(f" 머리→살{s['hair_to_skin']}" if 'hair_to_skin' in s else '') for lab,s in v.items()))
