@@ -3,7 +3,7 @@ import numpy as np, json, glob, sys
 from PIL import Image
 from common import load, skinmask
 FEET = 189
-DIRS = [('↓', 'walk_s2', 'run_s', False), ('↘', 'walk_se', 'run_se2', False), ('→', 'walk_r2', 'run_r2', False), ('↗', 'walk_ne', 'run_ne2', False), ('↑', 'walk_up', 'run_n', False)]
+DIRS = [('↓', 'walk_s2', 'run_s2_leg', False), ('↘', 'walk_se', 'run_se2', False), ('→', 'walk_r2', 'run_r2', False), ('↗', 'walk_ne', 'run_ne2', False), ('↑', 'walk_up', 'run_n', False)]
 def meas(a):
     al = a[..., 3] > 40; ys, xs = np.nonzero(al); crown = ys.min(); bottom = ys.max(); H = FEET - crown
     sk = skinmask(a); sy, sx = np.nonzero(sk); face = None; eye = None

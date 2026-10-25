@@ -25,28 +25,28 @@
   ]
  },
  "달리기 ↓": {
-  "src": "run_s",
+  "src": "run_s2_leg",
   "n": 8,
   "crown": [
-   34,
-   37
+   24,
+   30
   ],
-  "height_avg": 153.5,
+  "height_avg": 161.9,
   "eye_from_crown": [
-   11,
-   16
+   13,
+   18
   ],
   "face_h": [
-   12,
-   16
+   13,
+   19
   ],
   "face_w": [
-   12,
-   14
+   14,
+   15
   ],
   "shoulder": [
-   52,
-   55
+   54,
+   59
   ]
  },
  "걷기 ↘": {
@@ -153,22 +153,22 @@
   "src": "walk_ne",
   "n": 8,
   "crown": [
-   15,
-   18
+   22,
+   25
   ],
-  "height_avg": 172.9,
+  "height_avg": 165.9,
   "eye_from_crown": null,
   "face_h": [
    7,
-   8
+   7
   ],
   "face_w": [
    3,
    3
   ],
   "shoulder": [
-   55,
-   64
+   52,
+   61
   ]
  },
  "달리기 ↗": {
