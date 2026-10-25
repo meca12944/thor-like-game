@@ -1825,6 +1825,7 @@
     // 이동·대시·점프 (모션연구방): sq < 1 = 눌림(가로 = 1 + (1 - sq) × .6), sq > 1 = 늘림, 틱 = 1/60초
     dashIn: .12, dashInT: 4, dashOut: .07, dashOutT: 6, /* 회피대시: 들어갈 때 눌림(가로 +7%) → 낮은 자세(그림) → 나올 때 세로 늘림 */
     jumpPre: .12, jumpUp: .10, jumpUpT: 7, jumpLand: .14, jumpLandT: 8, /* 점프: 웅크림 눌림 → 뜰 때 늘림 → 정점(그림 10틱) → 착지 눌림 */
+    smear: { t: 3, n: 2, gap: 6, st: .12, a: .45 }, /* 공격 스미어 (회의 10-25 추천 1): 판정 열리기 전 3틱 = 휘두름 장, 앞으로 당긴 반투명 몸 2장 + 휘두름 쪽 늘임 (Slynyrd: 스미어는 휘두름 장에만 1장) */
     dustJump: 6, dustLand: 8, /* 점프 먼지 알갱이 수 (교과서 13-1) */ dashGhostN: 4, dashGhostA: .5 /* 회피대시 잔상 장 수·처음 진하기 (8장·80%는 겹쳐 검게 번짐) */ };
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
   // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
@@ -1864,6 +1865,8 @@
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     sq *= heroExag(h); { const LN = h8Lean(h); if (LN) { const f = H128FIG / ART_FIG; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; const gt = K.t != null ? K.t - 1 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
+    { const SM = EXAG.smear; if (h.atk && atkArt() && !SLASH_BODY) { const tk = h.atk.t * 60, hit = atkT(h.atk.i).a0 * 60; if (tk >= hit - SM.t && tk < hit) { const v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG, c = h128Cell(); // 스미어: 휘두르는 3틱 동안 몸이 앞으로 번져 보임 (그림 0)
+      for (let j = SM.n; j >= 1; j--) { const wx = h.x + kx + v[0] * SM.gap * j * f, wy = h.y + ky + v[1] * SM.gap * j * f * .5 - (h.z || 0), [sx, sy] = W2S(wx, wy); ctx.save(); ctx.translate(sx, sy); ctx.scale(v[0] ? 1 + SM.st : 1, v[1] ? 1 + SM.st * .6 : 1); ctx.translate(-sx, -sy); drawH128(c, wx, wy, k, SM.a * BA / j, null); ctx.restore(); } } } }
     ky -= h.z || 0; const [fx, fy] = W2S(h.x + kx, h.y + ky); ctx.save(); ctx.translate(fx, fy); ctx.scale(1 + (1 - sq) * .6, sq); if (lean) ctx.transform(1, 0, -lean / (H128FIG * k), 1, 0, 0); ctx.translate(-fx, -fy);
     drawH128(h128Cell(), h.x + kx, h.y + ky, k, BA, null); if (h.inv > 1 - EXAG.hurt.flash / 60 && !h.roll && !S.ultFx) drawH128(h128Cell(), h.x + kx, h.y + ky, k, .7, 'white'); /* 맞기: 1~2틱 짧은 번쩍 (EXAG) */ ctx.restore();
     if (h.atk && !h128().H8) drawSlashHi(k); if (h.atk) drawHB(ctx, k); drawStam(k); } // hero8 attack frames carry their own painted slash trail
