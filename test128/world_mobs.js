@@ -62,6 +62,8 @@
       const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; m.losT = (m.losT || 0) - dt; if (m.losT <= 0) { m.losT = .25; m.sees = !W.los || W.los(m, h); }
       const d = m.sees || m.st !== 'idle' ? W.dist(m, h) : 999; // 팀장 10-24: behind a wall the hero counts as far away (no alert, no shots, just wanders)
       m.guardOn = P === 'guard' && m.st === 'idle' && !(m.hitT > .08) && d < 110 && (h.x - m.x) * m.face > 0; m._W = W; // 철장 간수: 정면 방패 (dmgMul)
+      if (W.mobs && (m.st === 'rest' || (m.st === 'lunge' && m.sub === 'rec'))) for (const o of W.mobs) { if (o === m || o.dead) continue; const dx = m.x - o.x, dy = m.y - o.y, dd = Math.hypot(dx, dy) || .01, gap = m.r + o.r; /* 빈틈 동안에도 천천히 떨어짐 (돌진 끝이 주인공 자리로 모여 겹침, 4번방 10-25) */
+        if (dd < gap) { const push = Math.min(gap - dd, 90 * dt); W.moveCol(m, dx / dd * push, dy / dd * push, m.r); } }
       m.burstT = (m.burstT || 0) - dt; m.burstCd = (m.burstCd || 0) - dt; m.hopCd = (m.hopCd || 0) - dt; const RG = m.rage ? .8 : 1; // RG: angry = shorter cooldowns
       if (!m.alerted && d < 160) { m.alerted = true; m.alertT = .45; W.fx('text', m.x, m.y - this.h * FELT_SC - 6, { text: '!', life: .7, color: '#ffd84a' }); if (W.sfx) W.sfx('tele', .6); m.cd = Math.max(m.cd, .5); } // first sight: "!" + a hop (drawn)
       if (m.alertT > 0) { m.alertT -= dt; m.anim = 'walk'; m.moving = false; return; }
@@ -592,7 +594,7 @@
   { const B = def.c1_quilted_boar, up = B.update; def.champ_c1_hound = Object.assign({}, B, { champion: true, name: '누빔 멧돼지 우두머리', title: '잿빛 들판의 우두머리', hp: 180, deco: 'eyes', h: 30, r: 11, tint: 'saturate(.6) brightness(1.25) contrast(1.15)',
       init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }),
       update(m, W, dt) { // 사냥 3연 돌진 (고유): after each lunge recovers it lunges again, up to 3 in a row, then a long pant (1.4 s opening)
-        if (m.st === 'lunge' && m.sub === 'rec' && m.t > .25 && (m.chain || 0) < 2 && W.dist(m, W.hero) < 130) { m.chain = (m.chain || 0) + 1; const h = W.hero; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; // the chain stays one attack (one lunge state)
+        if (m.st === 'lunge' && m.sub === 'rec' && m.t > .25 && (m.chain || 0) < 2 && W.dist(m, W.hero) < 130 && !(W.mobs || []).some(o => o !== m && !o.dead && o.kind === m.kind && o.st === 'lunge' && o.sub !== 'rec')) { /* 무리 규칙: 다른 우두머리가 돌진 중이면 이어 돌진 안 함 (겹침 17~28% → 줄임) */ m.chain = (m.chain || 0) + 1; const h = W.hero; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; // the chain stays one attack (one lunge state)
           m.sub = 'aim'; m.t = 0; m.second = true; m.warn = lineTele(W, m, m.aim, 230 * .38, .6, m.r * 2 + 12); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, m.warn); W.fx('dust', m.x, m.y); }
         if (m.pst === 'lunge' && m.st === 'idle') { if ((m.chain || 0) >= 2) { m.st = 'rest'; m.t = 0; m.restT = 1.4; m.cd = Math.max(m.cd || 0, 1.5); W.fx('text', m.x, m.y - 40, { text: '헉헉', life: .9, color: '#cfc4b0' }); } m.chain = 0; } // the chain is one pick in pickIntent's history (never 3 lunges in a row)
         m.pst = m.st;
