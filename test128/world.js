@@ -1549,8 +1549,6 @@
   function h8Pop(h, c, L, fl) { const hx = h8HeadX(c), now = S.t; if (hx == null) return h.pop || 0; const tg = fl ? -hx : hx, dt = Math.min(.1, Math.max(0, now - (h.popT ?? now))); h.popT = now;
     h.pop = (h.pop || 0) * Math.exp(-dt / POP_TAU); if (h.popL && (h.popL !== L || h.popF !== fl) && !(S.deadT > 0)) h.pop = Math.max(-60, Math.min(60, h.pop + h.popTg - tg));
     h.popL = L; h.popF = fl; h.popTg = tg; return Math.abs(h.pop) < .5 ? 0 : h.pop; }
-  // 콤보 1~3타 빈 손 공격 그림의 틱 (모션 긴급회의·회의 2차 10-25 「치는 칸 = 1·2타 8틱 / 3타 11틱, 합 30/30/45」, handoff/claude/hero_fix2/SLASH_DESIGN_ko.md): [그림 장 번호 (-1 = 서기), 틱]. 치는 장은 판정이 열리는 틱(GK_FAN t0)에 시작.
-  const ATK_SEQ = [[[0, 4], [1, 4], [2, 8], [3, 7], [-1, 7]], [[0, 8], [1, 8], [1, 7], [-1, 7]], [[0, 11], [1, 10], [1, 12], [-1, 12]]]; // 모션 설계표(회의 2차) 예고·치기·따라·복귀 [8,8,7,7] / [11,10,12,12], 보이는 장 최소 3틱
   const atkArt = () => { const G = h128(), H = G && G.H8, L = H && H.anims && H.anims.hit1_right; return !!(L && bareSheet(H, L[0][0])); }; // 빈 손 공격 그림을 쓰는 중
   const bareSheet = (H, i) => !!(H && H.bare && H.bare.includes(i)); // H8.bare = 칼이 그림에 없는 시트 (새 그록 주인공): 공격 내내 코드 칼
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h8Turn(h, h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down'));
@@ -1564,8 +1562,7 @@
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
     { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? (H.gait && H.gait.runCyc ? H.gait.runCyc * 46 / 119 : 46) : (H.gait && H.gait.walkCyc ? H.gait.walkCyc * 32 / 84 : 32))) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
-    else if (h.atk && h.atk.i <= 2 && bareSheet(H, (A(h.atk.i === 2 ? 'hit3' : h.atk.i === 1 ? 'hit2' : 'hit1') || [[]])[0][0])) { const L = LL, Q = ATK_SEQ[h.atk.i]; let tk = h.atk.t * 60, j = 0; for (; j < Q.length - 1 && tk >= Q[j][1]; j++) tk -= Q[j][1]; // 빈 손 그록 공격 그림(긴급회의 10-25): 그림 장 수 그대로, 시간만 검기에 맞춤 (치는 장 = 판정 열리는 틱)
-      e = Q[j][0] < 0 ? A('idle')[0] : L[Math.min(L.length - 1, Q[j][0])]; }
+    else if (h.atk && h.atk.i <= 2 && bareSheet(H, (A(h.atk.i === 2 ? 'hit3' : h.atk.i === 1 ? 'hit2' : 'hit1') || [[]])[0][0])) { e = seq(LL, h.atk.t * 60); } // 빈 손 그록 공격 그림 (회의 2차 10-25): 아틀라스 틱 그대로(절대 틱, 합 30/30/45 = 코드 길이), 치는 장 시작 = 판정 틱 8/8/11 — H8._atk_note
     else if (h.atk && (SLASH_BODY || (ATK_BODY && h.atk.i <= 2))) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
@@ -1684,7 +1681,7 @@
   // 맞는 판정 = 지금 땅 부채꼴(GK_FAN) 그대로 (세운 면을 판정으로 쓰면 앞쪽 좁은 띠만 맞아 적중률이 크게 떨어짐 — 10-24 연구). 띠의 끝은 부채꼴 앞끝 쪽 땅에 닿고,
   // 띠의 앞끝 = gkFanHead(t) (판정과 같은 틱), 땅에는 판정 부채꼴을 아주 옅게 깔아 「맞는 곳」을 보여 줌. 판정 끝 뒤 GK_FADE 틱 동안 꼬리부터 접히며 꺼짐.
   const GK_FADE = 10, hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-  const GKC = { fan: hexRGB('#2aa9c4'), line: hexRGB('#5fe3f4'), glow: 'rgba(40,190,225,', body: 'rgba(110,232,250,', core: 'rgba(236,255,255,', part: ['#7fe9f8', '#e8ffff'] }; // ground hint, its edge, ribbon glow / body / white core, sparks
+  const GKC = { fan: hexRGB('#2aa9c4'), line: hexRGB('#5fe3f4'), glow: 'rgba(40,190,225,', body: 'rgba(110,232,250,', core: 'rgba(200,244,255,', part: ['#7fe9f8', '#c8f4ff'] }; // ground hint, its edge, ribbon glow / body / white core, sparks
   // 띠 모양 (몸 키 HH 필드px 기준, 그록 시트에서 잰 비율): plane 'v' = 세운 면 (중심 높이 cy·앞 cf·옆 cl, 반지름 = 끝이 땅에 닿게, 각도 a0 → a1, 옆으로 눕힘 tilt), 'ring' = 허리 고리
   const GK_HH = 34, GK_RIB = [{ plane: 'v', cy: .55, cf: .05, cl: .25, a0: 105, a1: -50, tilt: .2, w: 3, trail: .8 }, { plane: 'ring', cy: .55, rr: .8, sq: .45, a0: 150, a1: -110, w: 3, trail: .75 }, { plane: 'v', cy: .6, cf: .15, cl: .1, a0: 100, a1: -45, tilt: .45, w: 4.2, trail: .85 }];
   function gkRibPt(i, dir, u) { // swept fraction u (0..1) -> [x, y, behind] field px from the feet (behind = the ring's far half, drawn under the hero)
@@ -1808,14 +1805,15 @@
     // then a damped spring settles it (small overshoot = follow-through); hit 3 also takes a short step. lean/step in art px at head height / feet.
     // [모션연구방 10-24] 1→2→3타 점점 세게 (KICK3, 3타 약 2배). 몸이 앞으로 튀어 나가는 순간(rel) = 몸 중심 부채꼴 판정이 열리는 틱(GK_FAN t0: 1·2타 3틱, 3타 4틱)
     // 3타 = 내려베기: 들어 올림(키 늘고 뒤로 젖힘) → 판정 열리고 1틱 더 머리 위 → 내려꽂으며 납작(찌그러짐 최대 t0+2.5 = 칼이 앞에 닿는 틱) + 앞으로 크게 기울고 내딛기
-    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0, sm = a.i <= 2 && atkArt() ? 0 : 1; // sm: 공격 그림이 내딛는 동안 코드 내딛기 0 (회의 2차, 겹침 방지)
+    const AT = atkT(a.i), u = a.t, big = a.i === 2, R = a.i <= 2 ? KICK3[a.i] : 1, rel = a.i <= 2 ? GK_FAN[a.i].t0 / 60 : AT.a0, sm = a.i < 2 ? 0 : 1, art = a.i <= 2 && atkArt(); // sm: 1·2타 내딛기 0, 3타만 한 발 (교과서 1-1 「큰 공격만 한 발」, 회의 2차) / art: 빈 손 공격 그림 쓰는 중
     if (u < rel) { const q = Math.min(1, (u + 1 / 60) / Math.max(rel, 1e-3)), e = 1 - (1 - q) * (1 - q); return big ? /* 누른 틱부터 바로 예비 자세 (보고서 5장 f0 「즉시」: 빠르게 들어가 천천히 멈춤) */ { lean: -4 * R * e, step: 0, sq: 1 + .05 * e } : { lean: -3 * R * e, step: 0, sq: 1 - Math.min(.08, .04 * R) * e }; }
     const t = u - rel, w = 30, z = .45, wd = w * Math.sqrt(1 - z * z), spr = t => Math.exp(-z * w * t) * (Math.cos(wd * t) + z / Math.sqrt(1 - z * z) * Math.sin(wd * t));
     if (big) { const x = t * 60, hold = .5 / 60, L0 = 9 * R; // 머리 위 1틱 더 → 내려꽂기 (틱 표: 칼이 앞에 닿는 틱 = t0+1 에 몸도 내려꽂기 시작)
       const lean = t < hold ? -4 * R : L0 * spr(t - hold), sq = 1 + .05 * Math.max(0, 1 - x / 3) - .11 * Math.exp(-(((x - 2.5) / 2) ** 2)), st = 5 * R * (1 - Math.exp(-Math.max(0, t - hold) * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35)));
-      return { lean, step: st * sm, sq, t }; }
+      const hp = art ? Math.sin(Math.PI * Math.min(1, t / Math.max(.05, AT.dur - rel))) : 0; return { lean: lean + 2.5 * R * hp, step: st * sm, sq: sq - .03 * hp, t }; } // art: 붙잡는 장 동안 천천히 더 숙였다 돌아옴 (B2)
     const L0 = 6 * R, st = 1.5 * R * (1 - Math.exp(-t * 28)) * Math.max(0, Math.min(1, (AT.dur - u) / (AT.dur * .35))); // the step eases back during the recovery (draw offset only)
-    return { lean: L0 * spr(t), step: st * sm, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40), t };
+    const hp = art ? Math.sin(Math.PI * Math.min(1, t / Math.max(.05, AT.dur - rel))) : 0; // 붙잡는 장 동안 천천히 더 숙였다 돌아옴 (회의 2차 B2, ↓처럼 그림 1장인 방향도 움직임)
+    return { lean: L0 * spr(t) + 2.5 * R * hp, step: st * sm, sq: 1 + Math.min(.09, .045 * R) * Math.exp(-t * 30) * Math.cos(t * 40) - .03 * hp, t };
   }
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
   // 출발·멈춤 무게감 (모션연구방 10-23, "사용자 입장에서 더 실제처럼"): 속도가 바뀌는 순간 몸(머리 쪽)이 스프링처럼 쏠림 —
@@ -2489,7 +2487,7 @@
     go, dirTap, hitMob, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
-    tap(code) { queue.push(code); }, placeText, learnPlaces, heroTiming: () => ({ atk: [ATK.dur * 60, ATK.dur * 60, ATK3.dur * 60], hit: [ATK.a0 * 60, ATK.a0 * 60, ATK3.a0 * 60], dash: rollDur() * 60, jump: (JUMP.pre + JUMP.T + JUMP.land) * 60, atkBody: ATK_BODY }), /* tools/hero_check.py: 그림 틱 vs 코드 동작 길이 */
+    tap(code) { queue.push(code); }, placeText, learnPlaces, heroTiming: () => ({ atk: [ATK.dur * 60, ATK.dur * 60, ATK3.dur * 60], hit: [ATK.a0 * 60, ATK.a0 * 60, ATK3.a0 * 60], dash: rollDur() * 60, jump: (JUMP.pre + JUMP.T + JUMP.land) * 60, atkBody: ATK_BODY || atkArt() }), /* tools/hero_check.py: 그림 틱 vs 코드 동작 길이 */
     flag(id, v = true) { SAVE.flags[id] = v; save(); }, reset() { SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null }; save(); if (NAV()) NAV().reset(); },
     get nav() { return NAV(); },
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
