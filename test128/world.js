@@ -950,7 +950,7 @@
         if (tr.to === 'town') returnToTown();
         const m = S.map; const wantCard = tr.card !== undefined ? tr.card : !!(m && m.title && (first || m.type === 'boss'));
         SAVE.visited[tr.to] = true; save();
-        tr.cardData = wantCard && m ? m.title : null;
+        tr.cardData = wantCard && m ? known(m.title) : null;
         tr.phase = tr.cardData ? 'card' : 'in'; tr.t = 0;
         document.body.classList.toggle('wscene', S.scene !== 'town');
       }).catch(e => { console.error(e); S.trans = null; msg('맵을 불러오지 못했다: ' + e.message); });
@@ -1344,12 +1344,14 @@
   // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
   // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
   // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
+  // 기억 없는 주인공 (사장님 10-25 「주인공은 기억이 없어진 상황」): 지명 카드·전망 글에 unk {name, sub, kicker, flag} 가 있으면 flag 전(이름을 누가 알려 주기 전)엔 보이는 대로 쓴 글을 띄움
+  function known(o) { return o && o.unk && !SAVE.flags[o.unk.flag] ? Object.assign({}, o, o.unk) : o; }
   const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
   function vistaNow() { const m = M(); if (!m || m.type === 'world' || S.dialog || S.engaged || (S.bossRef && !S.bossRef.dead) || hero.hp <= 0) return null; const T = m.T;
     const V = (m.objects || []).find(o => o.type === 'vista' && Math.hypot(hero.x / T - o.x - .5, hero.y / T - o.y - .5) < (o.r || 3)); if (!V) return null;
     return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
-    if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
+    if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: known(V), t: 0 }; }
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
     const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
@@ -1362,7 +1364,7 @@
   // [새 1장 인트로] 사장님 10-25 「전부 진행해」: 새 게임 첫 깨어남(SAVE.flags.pg_woke 없음)에서 한 번만, 무명 무덤가(prologue_grave) wake 자리.
   // 검은 화면 + 심장 소리 2번 -> 두 번째 소리에 가슴 코어가 푸르게 깜빡임 -> 첫 대사 -> 조작 시작 (배낭·언덕 전망·안내는 그록 지도 물체 pg_*). ?intro=1 = flag와 상관없이 다시 봄.
   const INTRO = { map: 'prologue_grave', flag: 'pg_woke', force: Q.get('intro') === '1', beats: [.5, 1.15], core: [1.15, 4.2], fade: [2.6, 4.4], say: 4.6,
-    line: '...또다시 이 무덤가인가. 몇 번째 반복인지 이제 세지도 않았다.' }; // 대사·순서 = 스토리 docs_story/CH1_NEW_DIALOGUE_ko.md 1절
+    line: '……여긴… 어디지. 이름이… 생각나지 않는다.' }; // 대사·순서 = 스토리 docs_story/CH1_NEW_DIALOGUE_ko.md 1절
   function stepIntro(dt) { const m = M(); if (!m || m.id !== INTRO.map || S.trans) return;
     if (!S.intro) { if (SAVE.flags[INTRO.flag] && !INTRO.force) return; S.intro = { t: 0, b: 0, said: false, ctl: false }; }
     const I = S.intro; if (I.ctl) return; if (!S.dialog) I.t += dt;
