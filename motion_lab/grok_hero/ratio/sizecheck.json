@@ -1,0 +1,37 @@
+{
+ "walk_s2": {
+  "boot": 12
+ },
+ "walk_se": {
+  "boot": 37
+ },
+ "walk_r2": {
+  "boot": 27
+ },
+ "walk_ne": {
+  "boot": 10
+ },
+ "walk_up": {
+  "boot": 26
+ },
+ "run_s": {
+  "boot": 32,
+  "head_vs_walk": 1.14
+ },
+ "run_se2": {
+  "boot": 26,
+  "head_vs_walk": 0.98
+ },
+ "run_r2": {
+  "boot": 36,
+  "head_vs_walk": 1.04
+ },
+ "run_ne2": {
+  "boot": 13,
+  "head_vs_walk": 1.22
+ },
+ "run_n": {
+  "boot": 58,
+  "head_vs_walk": 1.03
+ }
+}

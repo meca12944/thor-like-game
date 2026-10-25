@@ -1,0 +1,72 @@
+{
+ "walk_s2": {
+  "crown_belt": 49.0,
+  "rng": [
+   48,
+   50
+  ]
+ },
+ "walk_se": {
+  "crown_belt": 70.0,
+  "rng": [
+   70,
+   70
+  ]
+ },
+ "walk_r2": {
+  "crown_belt": 69.0,
+  "rng": [
+   68,
+   70
+  ]
+ },
+ "walk_ne": {
+  "crown_belt": 52.0,
+  "rng": [
+   51,
+   52
+  ]
+ },
+ "walk_up": {
+  "crown_belt": 72.5,
+  "rng": [
+   51,
+   73
+  ]
+ },
+ "run_s": {
+  "crown_belt": 86.0,
+  "rng": [
+   57,
+   87
+  ]
+ },
+ "run_se2": {
+  "crown_belt": 73.0,
+  "rng": [
+   68,
+   77
+  ]
+ },
+ "run_r2": {
+  "crown_belt": 81.0,
+  "rng": [
+   47,
+   83
+  ]
+ },
+ "run_ne2": {
+  "crown_belt": 61.5,
+  "rng": [
+   51,
+   69
+  ]
+ },
+ "run_n": {
+  "crown_belt": 70.5,
+  "rng": [
+   60,
+   92
+  ]
+ }
+}
