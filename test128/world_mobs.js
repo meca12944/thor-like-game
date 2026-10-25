@@ -350,6 +350,11 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 핀이빨 솜뭉치 (그록 10-25 「1장 마물」 08, handoff/claude/ch1_mobs_v1/0807_stuffing_cocoon, 크레딧 0): 작은 떼(소환물, 새끼 거미 자리). 아라크네·고치 어미가 부름. 걷기 그림 없음 → 통통 튀기는 코드(walk.bob.hop), 물기 = 서기 → 입 벌림(map). 짧은 일직선 물기, 9초 뒤 터져 사라짐.
+    c1_pin_stuffing: (() => { const D = felt({ name: '핀이빨 솜뭉치', summoned: true, style: 'lunge', col: '#e4dccc', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 8, h: 15, r: 4, sp: 44,
+      melee: { range: 16, rad: 8, dmg: 3 }, shots: [],
+      anim: { src: 'assets/mobs_felt/c1_pin_stuffing', F: 39.8, walk: { n: 1, ticks: [5], bob: { hop: 9, amp: 4 } }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0] } } }), up = D.update;
+      D.update = function (m, W, dt) { m.life = (m.life ?? 9) - dt; if (m.life <= 0 && m.st !== 'lunge') { m.dead = true; W.fx('fluff', m.x, m.y - 6, { life: .5, col: this.col, n: 6 }); return; } up.call(this, m, W, dt); }; return D; })(),
     // 실묶음 허수아비 (그록 10-25 「1장 마물」 02, handoff/claude/ch1_mobs_v1/02_scarecrow): 묶기 역할. 걷기 = PixelLab 8장, 실 던지기 = 그록 서기 → 감기 → 던짐(map, 손에 매달린 실은 지우고 실은 코드), 할퀴기도 같은 자세.
     c1_thread_scarecrow: felt({ name: '실묶음 허수아비', style: 'bind', col: '#cfc8bc', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 50, h: 31, r: 7, sp: 22,
       melee: { range: 24, rad: 14, dmg: 5 },
@@ -463,7 +468,7 @@
       const mv = Math.hypot(m.x - x0, m.y - y0); m.moving = mv > 1e-3; m.wph = (m.wph || 0) + mv / this.sp; m.wdir = 'side'; m.anim = P2 ? (m.moving ? 'ragewalk' : 'rage') : 'walk'; // phase 2: angry stance / fast walk (모션 v2)
       m.shedT = (m.shedT ?? 3) - dt; if (m.shedT <= 0) { m.shedT = P2 ? 4.5 : 7; // 사장님 10-24 「몸통에서 새끼 거미가 계속 나와서」: while she walks, the spool-belly drops one spiderling (2번방 numbers)
         if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const bx = m.x - m.face * 20, by = m.y - 8; W.fx('fluff', bx, by, { life: .5, col: '#3a2a40', n: 7 }); if (W.sfx) W.sfx('deny', .6, .7);
-          const c = W.spawn('c1_spiderling', bx, m.y + 4); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .6; c.spawnT = .25; } } }
+          const c = W.spawn('c1_pin_stuffing', bx, m.y + 4); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .6; c.spawnT = .25; } } }
       if (P2 && W.webs && (!W.webs() || W.webs().every(w => w.cut))) { m.webT = (m.webT || 0) + dt; if (m.webT > 12) { m.webT = 0; spinWebs(m, W); } } // cut them all: she spins them again 12 s later
       if (P2 && m.ultCd <= 0 && m.st === 'idle' && W.ult) { m.ultCd = 26; m.last = 'ult'; W.banner(ARA.name.ult, .9, true); W.ult(m, 2.4, { text: '필살 — 천 갈래 붉은 실!  기둥 뒤로 숨거나, 조이는 순간 회피대시', pct: .4 }); startAnim(m, 'prison', A.prison, A.prison.release, 1.2); set(m, 'ult'); return; } // 정본 7-0 맵 전체 스킬
       if (!P2 && !m.ult1 && m.hp < m.maxHp * .75 && m.st === 'idle' && W.ult) { m.ult1 = true; m.last = 'ult'; W.banner(ARA.name.ult, .9, true); W.ult(m, 2.6, { text: '필살 — 천 갈래 붉은 실!  기둥 뒤로 숨거나, 조이는 순간 회피대시', pct: .35 }); startAnim(m, 'prison', A.prison, A.prison.release, 1.2); set(m, 'ult'); return; }
@@ -505,7 +510,7 @@
         startAnim(m, 'pounce', A.pounce, A.pounce.hit, z.warn); set(m, 'pounce'); return; }
       if (k === 'brood') { const n = P2 ? 3 : 2, z = W.hazard({ shape: 'circle', x: m.x - m.face * 14, y: m.y - 4, r: 20, warn: .6, act: 0, dmg: 0, kind: 'web' }); m.swell = z.warn; // 사장님 10-24 「몸통에서 새끼 거미가 계속 나와서 주인공을 공격」: the spool-belly swells (warning), then spiderlings burst out
         W.after(z.warn, () => { if (m.dead) return; W.shake(2); W.fx('fluff', m.x - m.face * 14, m.y - 18, { life: .7, col: '#3a2a40', n: 12 });
-          for (let i = 0; i < n; i++) { if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= ARA.broodMax) break; const b = rnd(0, TAU), c = W.spawn('c1_spiderling', m.x - m.face * 14 + Math.cos(b) * 14, m.y + Math.sin(b) * 10);
+          for (let i = 0; i < n; i++) { if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= ARA.broodMax) break; const b = rnd(0, TAU), c = W.spawn('c1_pin_stuffing', m.x - m.face * 14 + Math.cos(b) * 14, m.y + Math.sin(b) * 10);
             if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .3 + i * .25; c.spawnT = .25; } } });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, z.warn); set(m, 'atk'); return; }
       if (k === 'cage') { const R = W.map && W.map.pw ? Math.min(170, W.map.pw * .4) : 150; // 실 감옥 (팀장 10-24): a thread wall closes in from the room edge around the hero, one gap; escape through it before the centre crushes
@@ -519,7 +524,7 @@
           const from = ci >= 0 ? { fx: ARA.ceil[ci][0] * T, fy: ARA.ceil[ci][1] * T } : {}; if (ci >= 0) { U[ci] = 1; try { dispatchEvent(new CustomEvent('cocoon-drop', { detail: { i: ci } })); } catch (e) { } }
           const z = W.hazard({ shape: 'circle', x, y, r: 15, warn: .9, act: .05, dmg: HP(.3), kind: 'quake', owner: m }); W.fx('cocoonfall', x, y, Object.assign({ life: z.warn + .05, warn: z.warn }, from));
           W.after(z.warn, () => { if (m.dead) return; W.shake(2); W.fx('fluff', x, y - 4, { life: .5, col: '#e8e2d4', n: 8 }); W.tempSolid(x, y, 7, 4, 'cocoon');
-            if (Math.random() < .3 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const c = W.spawn('c1_spiderling', x, y + 8); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .8; c.spawnT = .25; } } }); });
+            if (Math.random() < .3 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const c = W.spawn('c1_pin_stuffing', x, y + 8); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .8; c.spawnT = .25; } } }); });
         startAnim(m, 'rain', A.rain, A.rain.release, .6); set(m, 'atk'); m.hold = .45 * 4 + .9 + .1; return; }
       if (k === 'rain') { let tw = .55; for (let w = 0; w < 3; w++) W.after(w * .5, () => { if (m.dead) return; const b = ang(m, W.hero.x, W.hero.y); // 3 aimed pin fans, each with its own line
           for (const s of [-.22, 0, .22]) lineTele(W, m, b + s, 150, tw, 5);
@@ -527,9 +532,7 @@
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); m.hold = 1.0 + tw + .1; return; }
     },
     onDeath(m, W) { const D = this.anim.death; W.fx('strip', m.x, m.y, { src: this.anim.src + '_death', ticks: D.ticks, F: this.anim.F, face: m.face, life: D.ticks.reduce((a, v) => a + v, 0) / 60 + 1.6 }); W.fx('fluff', m.x, m.y - 30, { life: 1.2, col: '#c8c2d0', n: 26 }); W.fx('unravel', m.x, m.y - 30, { life: 2.2, n: 26 }); W.shake(5); try { dispatchEvent(new CustomEvent('boss-dead', { detail: { kind: 'arachne' } })); } catch (e) { } /* collapse: the threads holding her together unravel */ for (const o of W.mobs || []) if (!o.dead && o.mom === m) { o.dead = true; W.fx('fluff', o.x, o.y - 6, { life: .5, col: '#3a2a40', n: 6 }); } } }; // her brood dies with her
-  // 새끼 거미 (아라크네 몸통에서 나옴): the needle spider's art at half size, dog-like straight bite (lunge role: short line, one beat), weak, lives 9 s
-  { const B = def.c1_needle_spider, up = B.update; def.c1_spiderling = Object.assign({}, B, { name: '새끼 거미', summoned: true, style: 'lunge', tint: 'brightness(1.45) saturate(1.3)', hp: 8, h: 11, r: 4, sp: 44, col: '#3a2a40', anim: Object.assign({}, B.anim, { F: B.anim.F * .5 }), melee: Object.assign({}, B.melee, { range: 16, rad: 8, dmg: 3 }),
-      shots: [], update(m, W, dt) { m.life = (m.life ?? 9) - dt; if (m.life <= 0 && m.st !== 'lunge') { m.dead = true; W.fx('fluff', m.x, m.y - 6, { life: .5, col: this.col, n: 6 }); return; } up.call(this, m, W, dt); } }); }
+
   // 1장 던전 챔피언 (owner 10-23 「챔피언 2종」, 크레딧 0: 펠트 그림을 키우고 색을 바꿈). champion = the base mob's role + one extra rule, red glow (always angry)
   // 챔피언 고유 기술 (팀장 10-24 「색만 바꾼 상태 → 생김새·기술 차이」, 크레딧 0): every 8 s, when free and in range, one move the base mob never does, then a clear opening.
   function champSig(m, W, dt, cd, range, start) { if (m.st === 'sig') { m.t += dt; m.at = (m.at || 0) + dt; m.moving = false; if (m.t > m.sigEnd) { m.st = 'rest'; m.t = 0; m.restT = .8; m.anim = 'walk'; } return true; }
@@ -537,21 +540,24 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
       return champSig(m, W, dt, 8, 130, (m, W) => { const h = W.hero, a = ang(m, h.x, h.y), nx = -Math.sin(a), ny = Math.cos(a); let w = .7;
         for (const o of [-22, 0, 22]) { const x = m.x + nx * o, y = m.y + ny * o; w = W.hazard({ shape: 'line', x, y, x2: x + Math.cos(a) * 170, y2: y + Math.sin(a) * 170, width: 10, warn: .75, act: .05, dmg: 7, kind: 'swipe', owner: m }).warn; }
         W.fx('text', m.x, m.y - 50, { text: '날실 가르기', life: .9, color: '#ffb0a0' }); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, w); return w + .25; }); }); // 꼭두각시 + always the 3-snip combo (rage)
-    mk('champ_c1_cocoon', 'c1_needle_spider', { name: '고치 어미', title: '고치 저장고의 우두머리', hp: 210, h: 28, r: 11, tint: 'hue-rotate(40deg) saturate(1.3)', deco: 'sac' }, function (m, W, dt) {
+    // 고치 어미 (그록 10-25 「1장 마물」 07, 정본 이름, 크레딧 0): 실패 거미 역할 바탕 + 소환·거미줄 그물. 그록 키 41 × 1.3(중간 보스) → 들판 65. 걷기 그림 없음 → 떠다니기 코드(walk.bob.float), 공격·뱉기 = 서기 → 고치 터뜨리기(map).
+    mk('champ_c1_cocoon', 'c1_spool_spider', { name: '고치 어미', title: '고치 저장고의 우두머리', hp: 210, h: 48, r: 11, col: '#e0d8cc',
+      anim: { src: 'assets/mobs_felt/c1_cocoon_mother', F: 62.0, walk: { n: 1, ticks: [5], bob: { float: 2.2, amp: 5 } }, attack: { n: 10, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 8, 4], hit: 7, air: 8, map: [0, 0, 0, 0, 0, 0, 0, 1, 1, 0] },
+        shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4, map: [0, 0, 1, 1, 1, 1, 1, 0, 0] } } }, function (m, W, dt) {
       if (champSig(m, W, dt, 9, 120, (m, W) => { const h = W.hero; // 거미줄 그물: a web ring closes around the hero (the middle is safe, the ring binds) -> stay in or dodge out on the beat
         const z = W.hazard({ shape: 'ring', x: h.x, y: h.y, r0: 16, r: 44, warn: .85, act: .05, dmg: 4, slow: 1.2, kind: 'web', owner: m }); W.fx('text', m.x, m.y - 44, { text: '거미줄 그물', life: .9, color: '#e8e0d0' });
         startAnim(m, 'shoot', this.anim.shoot, this.anim.shoot.release, z.warn); return z.warn + .2; })) return true; m.hopCd = 99; // the mother does not hop away when hit (stays to be fought; 팀장 10-24 fight ran > 6 min) // 소환 role: a marked cocoon bursts into a spiderling (max 2)
       m.sumT = (m.sumT ?? 4) - dt; if (m.sumT > 0 || W.dist(m, W.hero) > 170) return; m.sumT = 9;
       if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= 2) return;
       const a = rnd(0, TAU), x = m.x + Math.cos(a) * 36, y = m.y + Math.sin(a) * 26; W.hazard({ shape: 'circle', x, y, r: 9, warn: .8, act: 0, dmg: 0, kind: 'web' });
-      W.after(.8, () => { if (m.dead) return; W.fx('fluff', x, y - 6, { life: .6, col: '#e8e0d0', n: 10 }); const c = W.spawn('c1_spiderling', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); }); } // babies, not full spiders: weak, 9 s (팀장 10-24: the fight ran > 6 min)
+      W.after(.8, () => { if (m.dead) return; W.fx('fluff', x, y - 6, { life: .6, col: '#e8e0d0', n: 10 }); const c = W.spawn('c1_pin_stuffing', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); }); } // babies, not full spiders: weak, 9 s (팀장 10-24: the fight ran > 6 min)
   // 잿빛 들판 챔피언 (팀장 10-24 「들판이 2~3분으로 짧다」, 크레딧 0): 들개 우두머리 = 들개 역할 + 울부짖음(12초마다 주변 들개를 깨워 곧바로 돌진, 무리가 적으면 1마리 부름, 최대 2)
   { const B = def.c1_unrotting_hound, up = B.update; def.champ_c1_hound = Object.assign({}, B, { champion: true, name: '썩지 않는 사냥개 우두머리', title: '잿빛 들판의 우두머리', hp: 180, deco: 'eyes', h: 30, r: 11, tint: 'saturate(.6) brightness(1.25) contrast(1.15)',
       init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }),
