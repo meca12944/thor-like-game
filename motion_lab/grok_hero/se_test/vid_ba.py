@@ -5,7 +5,7 @@ F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',22)
 G='../frames'
 def L(p): return [Image.open(f).convert('RGBA').crop((40,0,216,200)) for f in sorted(glob.glob(p+'/*.png'))]
 BEFORE=[('전 걷기',6,[f'{G}/walk_down','walk_se',f'{G}/walk_right','walk_ne',f'{G}/walk_up']),('전 달리기',4,['run_s','run_se',f'{G}/run_right','run_ne','run_n'])]
-AFTER=[('후 걷기',6,['walk_s2','walk_se','walk_r2','walk_ne',f'{G}/walk_up']),('후 달리기',4,['run_s2_leg','run_se2','run_r2','run_ne2','run_n'])]
+AFTER=[('후 걷기',6,['walk_s2','walk_se','walk_r2','walk_ne',f'{G}/walk_up']),('후 달리기',4,['run_s2_leg','run_se3','run_r3','run_ne2','run_n'])]
 rows=[(n,t,[L(p) for p in ps],[a!=b for a,b in zip(ps,ref)]) for (n,t,ps),(_,_,ref) in zip(BEFORE+AFTER,BEFORE+BEFORE)]
 A='↓↘→↗↑';S=2;CW=176*S;CH=200*S;D=tempfile.mkdtemp()
 for k in range(30*8):

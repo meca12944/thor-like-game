@@ -6,7 +6,7 @@ from pxscale import pxscale
 from scipy import ndimage
 F=ImageFont.truetype('/usr/share/fonts/opentype/unifont/unifont.otf',16)
 G='..'
-PAIRS=[('run_se2','../se_test/run_se2','../se_test/walk_se'),('run_n','../se_test/run_n','../frames/walk_up'),('run_s','../se_test/run_s','../se_test/walk_s2'),('run_r2','../se_test/run_r2','../se_test/walk_r2'),('run_ne2','../se_test/run_ne2','../se_test/walk_ne')]
+PAIRS=[('run_se3','../se_test/run_se3','../se_test/walk_se'),('run_r3','../se_test/run_r3','../se_test/walk_r2')]
 SC=[1.10,1.0,0.92,0.85]
 def headbox(im):
     a=np.array(im)[...,3]>0;t=int(np.nonzero(a.any(1))[0].min());xs=np.nonzero(a[t:t+12].any(0))[0];return t,(xs.min()+xs.max())/2
