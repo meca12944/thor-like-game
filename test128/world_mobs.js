@@ -350,6 +350,13 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 실묶음 허수아비 (그록 10-25 「1장 마물」 02, handoff/claude/ch1_mobs_v1/02_scarecrow): 묶기 역할. 걷기 = PixelLab 8장, 실 던지기 = 그록 서기 → 감기 → 던짐(map, 손에 매달린 실은 지우고 실은 코드), 할퀴기도 같은 자세.
+    c1_thread_scarecrow: felt({ name: '실묶음 허수아비', style: 'bind', col: '#cfc8bc', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 50, h: 31, r: 7, sp: 22,
+      melee: { range: 24, rad: 14, dmg: 5 },
+      shots: [{ name: '실타래 3갈래', sp: 80, waves: [0], spread: [-.35, 0, .35], shot: { kind: 'threadball', r: 4, dmg: 4, life: 2.0, slow: 1.0, pull: 16 } },
+        { name: '실 함정', trap: { r: 16, dmg: 4, slow: 1.0 } }],
+      anim: { src: 'assets/mobs_felt/c1_thread_scarecrow', F: 64.6, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 0] },
+        shoot: { n: 7, ticks: [5, 5, 10, 5, 5, 5, 5], release: 2, map: [0, 1, 2, 2, 2, 2, 0] } } }),
     // 가위 재단사 (그록 10-25 「1장 마물」 05, handoff/claude/ch1_mobs_v1/05_tailor): 연속 베기 역할. 걷기 = PixelLab 8장, 2연속 베기 = 그록 서기 → 베기1 → 베기2(map), 던지기 = 베기1 자세.
     c1_shear_tailor: felt({ name: '가위 재단사', style: 'duel', col: '#d2c6b0', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 55, h: 32, r: 6, sp: 20,
       melee: { range: 26, rad: 15, dmg: 6 },
@@ -530,7 +537,7 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge

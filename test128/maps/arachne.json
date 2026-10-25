@@ -408,7 +408,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 18,
    "y": 19,
    "respawn": 0
@@ -429,7 +429,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 36,
    "y": 37,
    "respawn": 0
@@ -443,7 +443,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 40,
    "y": 43,
    "respawn": 0
