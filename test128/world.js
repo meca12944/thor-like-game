@@ -195,7 +195,7 @@
     thread(g, o, x, y, w, h) { const red = o.red !== false, hb = heartbeat(), sw = Math.sin(S.t * 1.3 + o.tx) * (o.sway ?? 6);
       threadLine(g, x, y, x + w, y + h, sw, S.t * 2, red, .55 + hb * .35, 1); const tx = x + w, ty = y + h, L = 2 + hb * 3; g.globalCompositeOperation = 'lighter'; g.fillStyle = thrCol(red, 1, .6 + hb * .4); // tip sparkle (the beat you see from far)
       g.fillRect(Math.round(tx - L), Math.round(ty), Math.round(2 * L + 1), 1); g.fillRect(Math.round(tx), Math.round(ty - L), 1, Math.round(2 * L + 1)); },
-    lake(g, o, x, y, w, h) { const im = lakeTower(Math.round(w * .28), Math.round(h * .9)), bx = x + w / 2 - im.width / 2 + (o.dx || 0), by = y + 2;
+    lake(g, o, x, y, w, h) { const im = lakeTower(Math.round(w * .62), Math.round(h * .9)), bx = x + w / 2 - im.width / 2 + (o.dx || 0), by = y + 2;
       g.drawImage(sfxLake(o, w, h), x, y); g.globalAlpha = o.a ?? .8; const st = 5; // water + mirrored grey sky (made once), then the upside-down tower in rippled rows
       for (let r = 0; r < im.height; r += st) { const off = Math.sin(S.t * 1.6 + r * .35) * (1 + r / im.height * 2); g.drawImage(im, 0, r, im.width, st, Math.round(bx + off), by + r, im.width, st); }
       g.globalAlpha = .18; g.fillStyle = '#d8d2e6'; for (let i = 0; i < 4; i++) { const ly = y + h * (.2 + .13 * i) + Math.sin(S.t * .8 + i) * 1.5; g.fillRect(Math.round(x + w * (.25 + .1 * Math.sin(i * 2.3))), Math.round(ly), Math.round(w * .3), 1); } } }; // glints
@@ -208,7 +208,14 @@
   const sfxLake = (o, w, h) => sfxCan(o, 'lake', w, h, (t, W, H) => { t.beginPath(); t.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, TAU); t.clip(); if (o.water !== false) { t.fillStyle = 'rgba(8,8,16,.7)'; t.fillRect(0, 0, W, H); } // 물 그림이 오기 전: 검은 물을 코드로 (water:false = 땅 그림의 물 위에 비침만)
     const gr = t.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(150,140,170,.32)'); gr.addColorStop(.7, 'rgba(110,100,130,.12)'); gr.addColorStop(1, 'rgba(110,100,130,0)'); t.fillStyle = gr; t.fillRect(0, 0, W, H); });
   const _lakeT = {};
-  function lakeTower(W, H) { const k = W + 'x' + H; if (_lakeT[k]) return _lakeT[k]; const c = document.createElement('canvas'); c.width = Math.max(4, W); c.height = Math.max(4, H); const t = c.getContext('2d'); t.fillStyle = '#05040a';
+  // 호수에 비친 왕성 = 그록 원화 castle_far 하나로 통일 (팀장 10-25 PR #167): 성 부분(cy0~ay)을 위아래 뒤집어 어둡게 눌러 담음. 그림이 오기 전 몇 장면만 임시 실루엣.
+  const CASTLE_FAR = { src: 'assets/world/castle_far/castle_far.webp', cy0: 17, ay: 1372 }; let _castleIm = null;
+  function castleIm() { if (!_castleIm) { _castleIm = new Image(); _castleIm.src = V(CASTLE_FAR.src); } return _castleIm.complete && _castleIm.naturalWidth ? _castleIm : null; }
+  function lakeTower(W, H) { const ci = castleIm(), k = W + 'x' + H + (ci ? 'c' : 't'); if (_lakeT[k]) return _lakeT[k];
+    if (ci) { const sh = CASTLE_FAR.ay - CASTLE_FAR.cy0, sw = ci.naturalWidth, s = Math.min(W / sw, H / sh), dw = Math.max(4, Math.round(sw * s)), dh = Math.max(4, Math.round(sh * s)), c = document.createElement('canvas'); c.width = dw; c.height = dh; const t = c.getContext('2d');
+      t.translate(0, dh); t.scale(1, -1); t.imageSmoothingEnabled = true; t.drawImage(ci, 0, CASTLE_FAR.cy0, sw, sh, 0, 0, dw, dh); t.setTransform(1, 0, 0, 1, 0, 0);
+      t.globalCompositeOperation = 'source-atop'; t.fillStyle = 'rgba(6,5,12,.55)'; t.fillRect(0, 0, dw, dh); return (_lakeT[k] = c); } // reflections read darker than the thing itself
+    const c = document.createElement('canvas'); c.width = Math.max(4, W); c.height = Math.max(4, H); const t = c.getContext('2d'); t.fillStyle = '#05040a';
     const cx = c.width / 2; t.beginPath(); t.moveTo(cx - W * .32, 0); t.lineTo(cx + W * .32, 0); t.lineTo(cx + W * .26, H * .55); t.lineTo(cx + W * .12, H * .62); t.lineTo(cx + W * .06, H * .9); t.lineTo(cx, H); t.lineTo(cx - W * .06, H * .9); t.lineTo(cx - W * .12, H * .62); t.lineTo(cx - W * .26, H * .55); t.closePath(); t.fill(); // 임시 실루엣: main keep, upside down (spire points down)
     t.fillRect(cx - W * .5, 0, W * .14, H * .38); t.fillRect(cx + W * .36, 0, W * .14, H * .38); t.fillStyle = 'rgba(255,90,70,.9)'; t.fillRect(Math.round(cx) - 1, Math.round(H * .3), 2, 2); // side towers, one lit window
     return (_lakeT[k] = c); }
