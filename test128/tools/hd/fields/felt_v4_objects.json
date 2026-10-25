@@ -1,0 +1,452 @@
+{
+ "type": "town",
+ "area": 1,
+ "title": {
+  "kicker": "CHAPTER 1",
+  "name": "펠트",
+  "sub": "무너진 옛 성문 그늘 아래, 생존자의 마을"
+ },
+ "bgm": "town_ruin",
+ "battleBgm": "field_battle",
+ "tileset": "field",
+ "tile": 16,
+ "id": "felt",
+ "name": "펠트",
+ "region": "felt",
+ "mapPos": [
+  0,
+  0
+ ],
+ "objects": [
+  {
+   "type": "door",
+   "id": "f_door_chief",
+   "x": 37,
+   "y": 49,
+   "name": "이장 바르트의 집",
+   "to": "felt_int_chief",
+   "spawn": "door",
+   "out": "chief_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_empty",
+   "x": 57,
+   "y": 46,
+   "name": "빈집",
+   "text": "판자로 막힌 빈집이다. 문틈으로 탄내가 새어 나온다.\n…안에는 아무도 없다."
+  },
+  {
+   "type": "door",
+   "id": "f_door_inn",
+   "x": 99,
+   "y": 50,
+   "name": "마르타의 여관",
+   "to": "felt_int_inn",
+   "spawn": "door",
+   "out": "inn_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_herb",
+   "x": 118,
+   "y": 48,
+   "name": "세라의 약초 오두막",
+   "to": "felt_int_herb",
+   "spawn": "door",
+   "out": "herb_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_atelier",
+   "x": 49,
+   "y": 94,
+   "name": "리네트의 공방",
+   "to": "felt_int_atelier",
+   "spawn": "door",
+   "out": "atelier_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_weapon",
+   "x": 99,
+   "y": 96,
+   "name": "중고 무기점",
+   "to": "felt_int_weapon",
+   "spawn": "door",
+   "out": "weapon_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_tool",
+   "x": 115,
+   "y": 93,
+   "name": "잡화점",
+   "to": "felt_int_tool",
+   "spawn": "door",
+   "out": "tool_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_smith",
+   "x": 12,
+   "y": 105,
+   "name": "롬의 대장간",
+   "to": "felt_int_forge",
+   "spawn": "door",
+   "out": "forge_out"
+  },
+  {
+   "type": "door",
+   "id": "f_door_chapel",
+   "x": 135,
+   "y": 39,
+   "name": "낡은 예배당",
+   "to": "felt_int_chapel",
+   "spawn": "door",
+   "out": "chapel_out"
+  },
+  {
+   "type": "door",
+   "id": "f_arachne_gate",
+   "x": 12,
+   "y": 46,
+   "name": "아라크네의 폐공방",
+   "text": "거미줄로 뒤덮인 폐공방 입구. 안쪽 깊은 곳에서 철사 긁는 소리가 난다.",
+   "to": "arachne",
+   "spawn": "felt",
+   "scene": "door:arachne"
+  },
+  {
+   "type": "door",
+   "id": "f_door_guard",
+   "x": 8,
+   "y": 63,
+   "name": "경비 초소",
+   "text": "경비 초소와 감시탑. 안에서 주사위 구르는 소리가 난다. 문은 잠겨 있다."
+  },
+  {
+   "type": "exit",
+   "x": 73,
+   "y": 24,
+   "w": 5,
+   "h": 1,
+   "to": "field_felt",
+   "spawn": "felt",
+   "label": "↑ 1장 정문"
+  },
+  {
+   "type": "exit",
+   "x": 0,
+   "y": 68,
+   "w": 1,
+   "h": 5,
+   "to": "field_felt",
+   "spawn": "felt",
+   "label": "← 펠트 서문 · 잿빛 들판"
+  },
+  {
+   "type": "npc",
+   "id": "f_gas",
+   "x": 10,
+   "y": 69,
+   "name": "가스",
+   "role": "경비대장",
+   "main": 0,
+   "idle": "밤만 되면 어디선가 실 잣는 소리가 들려. 철사를 긁는 것 같은…… 외지인, 해 지면 돌아다니지 마.",
+   "art": "a_guard",
+   "quests": [
+    "q_felt_corpse"
+   ],
+   "anim": "felt_gas",
+   "wander": 1,
+   "face0": "down"
+  },
+  {
+   "type": "npc",
+   "id": "f_toby",
+   "x": 38,
+   "y": 115,
+   "name": "토비",
+   "role": "아이",
+   "main": 0,
+   "idle": "펠릭스가 공방 쪽으로 공 주우러 갔는데 안 돌아와요…… 아저씨, 혹시 못 봤어요?",
+   "art": "a_kid",
+   "quests": [
+    "q_felt_toby"
+   ],
+   "anim": "felt_toby",
+   "wander": 2,
+   "face0": "right"
+  },
+  {
+   "type": "npc",
+   "id": "f_luca",
+   "x": 79,
+   "y": 73,
+   "name": "루카",
+   "role": "시인",
+   "main": 0,
+   "idle": "「잿빛 성벽 아래 등불 하나……」 아, 또 이런 가사가 나오네. 요즘은 밝은 노래가 안 써져.",
+   "art": "a_bard",
+   "anim": "felt_luca",
+   "wander": 1.5,
+   "face0": "left"
+  },
+  {
+   "type": "npc",
+   "id": "f_linette",
+   "x": 52,
+   "y": 98,
+   "name": "리네트",
+   "role": "재봉사",
+   "main": 1,
+   "idle": "여긴 왕실 의상실이 있던 자리예요. 언젠가 여기서 영웅의 망토를 만들 거예요!",
+   "art": "linette8",
+   "quests": [
+    "q_felt_main"
+   ],
+   "wander": 1.2,
+   "face0": "down"
+  },
+  {
+   "type": "npc",
+   "id": "f_ben",
+   "x": 137,
+   "y": 96,
+   "name": "벤",
+   "role": "떠돌이 상인",
+   "main": 0,
+   "idle": "이 장부, 분명 30년 전 거라는데 글씨가 하나도 안 바랬어. 이상하지 않아?",
+   "art": "f_merchant",
+   "shop": "f_ben",
+   "quests": [
+    "q_felt_ledger"
+   ],
+   "anim": "felt_ben",
+   "wander": 0.8,
+   "face0": "left"
+  },
+  {
+   "type": "waystone",
+   "id": "ws_felt_plaza",
+   "x": 70,
+   "y": 69,
+   "name": "광장 분수",
+   "walk": true
+  },
+  {
+   "type": "waystone",
+   "id": "ws_arachne",
+   "x": 15,
+   "y": 50,
+   "name": "폐공방 앞 비석"
+  },
+  {
+   "type": "chest",
+   "id": "f_chest_plaza",
+   "x": 60,
+   "y": 30,
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "note": "moved onto a free tile beside the west crates by build_felt.py"
+  },
+  {
+   "type": "clue",
+   "id": "f_clue_bell",
+   "x": 132,
+   "y": 43,
+   "name": "종탑 아래 뚜껑문",
+   "flag": "felt_bell_open",
+   "needFlags": [
+    "boss_arachne"
+   ],
+   "textLocked": "종탑 아래 바닥에 지하로 내려가는 뚜껑문이 있다. 굳게 잠겨 있다.\n밤마다 이 아래에서 무언가 대답한다고, 오스왈드가 말했다.",
+   "text": "응답이 끊긴 뒤로 뚜껑문의 빗장이 녹슬어 떨어졌다.\n아래로 계단이 이어지지만, 중간이 무너져 있다.\n찬 바람에 섞여… 아주 멀리서, 종소리.",
+   "textDone": "무너진 계단 아래에서 찬 바람이 올라온다.",
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ]
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_grave",
+   "x": 144,
+   "y": 37,
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "find": "묘지 풀밭에서 찾았다!"
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_cart",
+   "x": 144,
+   "y": 97,
+   "loot": [
+    [
+     "riceball",
+     1
+    ]
+   ],
+   "find": "수레 밑에서 찾았다!"
+  },
+  {
+   "type": "mark",
+   "id": "f_mark_fountain",
+   "x": 75,
+   "y": 75,
+   "name": "금 간 분수"
+  },
+  {
+   "type": "mark",
+   "id": "f_mark_stall",
+   "x": 138,
+   "y": 95,
+   "name": "벤의 수레 노점"
+  },
+  {
+   "type": "mark",
+   "id": "f_mark_gate",
+   "x": 7,
+   "y": 71,
+   "name": "남쪽 출구(잿빛 들판)"
+  },
+  {
+   "type": "sign",
+   "x": 13,
+   "y": 73,
+   "text": "펠트 서문\n→ 루카의 모닥불(쉼터) · 이장 집 · 여관 · 리네트 공방\n↑ 무너진 옛 성문 (1장 정문)   ↘ 고물상 거리 (중고 무기점 · 잡화점)\n↙ 롬의 대장간 (외곽)   ↖ 아라크네의 폐공방"
+  },
+  {
+   "type": "door",
+   "id": "f_well_wish",
+   "name": "소원 우물",
+   "wish": 1,
+   "fortunes": [
+    "대길 — 잃어버린 것이 돌아온다.",
+    "길 — 오늘 산 칼은 잘 든다.",
+    "소길 — 따뜻한 스튜 한 그릇의 운.",
+    "평 — 실 잣는 소리에 귀 기울이지 말 것.",
+    "흉 — 해 지기 전에 돌아갈 것."
+   ],
+   "x": 64,
+   "y": 72
+  },
+  {
+   "type": "sign",
+   "text": "〔펠트 게시판〕\n· 옛 성문 밖은 해 지기 전까지만 — 경비대\n· 약초 캐 오실 분 구함, 값 쳐 드림 — 약초꾼 세라\n· 밤에는 여관 문을 잠급니다 — 마르타\n· 들판의 굳은 사슴을 본 자는 서문 초소로",
+   "x": 85,
+   "y": 68
+  },
+  {
+   "type": "clue",
+   "id": "f_clue_gate",
+   "name": "무너진 옛 성문",
+   "flag": "felt_look_gate",
+   "text": "왕도의 옛 성문. 거인도 드나들었을 법한 아치가 반쯤 무너진 채 펠트에 그늘을 드리운다.\n그을린 돌에 새겨진 문장은 이제 읽을 수 없다. 아치 아래로 성 밖 길이 이어진다.",
+   "textDone": "무너진 옛 성문. 아치 아래로 지나가면 성 밖 길이다.",
+   "x": 79,
+   "y": 29
+  },
+  {
+   "type": "clue",
+   "id": "f_clue_moat",
+   "name": "성문 잔해의 녹슨 투구",
+   "flag": "felt_look_moat",
+   "text": "성문 잔해 사이에 녹슨 경비대 투구가 끼어 있다. 안쪽에 이름이 긁혀 있다 — 「가스」.\n…경비대장의 옛 투구일까.",
+   "textDone": "녹슨 투구. 안쪽의 이름은 「가스」.",
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "x": 54,
+   "y": 29
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_moat",
+   "loot": [
+    [
+     "riceball",
+     1
+    ]
+   ],
+   "find": "성문 잔해 틈에서 찾았다!",
+   "x": 96,
+   "y": 29
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_tower",
+   "loot": [
+    [
+     "potion",
+     1
+    ]
+   ],
+   "find": "초소 뒤 돌 틈에서 찾았다!",
+   "x": 11,
+   "y": 62
+  },
+  {
+   "type": "hidden",
+   "id": "f_hid_forge",
+   "loot": [
+    [
+     "riceball",
+     1
+    ]
+   ],
+   "find": "장작더미 뒤에서 찾았다!",
+   "x": 10,
+   "y": 106
+  },
+  {
+   "type": "landmark",
+   "id": "lm_felt_castle",
+   "name": "무너진 옛 성문",
+   "x": 75,
+   "y": 30
+  },
+  {
+   "type": "landmark",
+   "id": "lm_felt_fountain",
+   "name": "루카의 모닥불",
+   "x": 75,
+   "y": 76
+  },
+  {
+   "type": "landmark",
+   "id": "lm_felt_grave",
+   "name": "예배당 묘지",
+   "x": 137,
+   "y": 44
+  },
+  {
+   "type": "vista",
+   "id": "felt_gate",
+   "r": 3,
+   "zoom": 0.72,
+   "dir": 270,
+   "pan": 5,
+   "name": "무너진 옛 성문",
+   "sub": "펠트는 그 그늘 아래에 있다",
+   "x": 75,
+   "y": 33
+  }
+ ],
+ "note": "felt v5 source snapshot (objects/ids/texts of the felt map as of map-a6) — build_felt5.py places them on the new layout. Replaces the archived orig/felt.json (tools/hd/_archive_old_felt/orig_felt.json)."
+}

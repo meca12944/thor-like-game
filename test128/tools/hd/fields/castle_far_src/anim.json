@@ -1,0 +1,25 @@
+{
+ "frames": 16,
+ "fps": 8,
+ "frame_size": [
+  2560,
+  1440
+ ],
+ "loop": "seamless: frame N == frame 0 (all motion uses t/N periodic functions)",
+ "sheet": {
+  "file": "castle_anim_spritesheet_4x4_1280x720.png",
+  "cols": 4,
+  "rows": 4,
+  "cell": [
+   1280,
+   720
+  ],
+  "order": "row-major"
+ },
+ "layers": {
+  "frames": "frames/castle_anim_XX.png (castle+all fx, composited)",
+  "fx_glow": "fx_glow/glow_XX.png (lit window pixels only, flickered)",
+  "fx_smoke": "fx_smoke/smoke_XX.png (smoke wisps + ash)",
+  "fx_crows": "fx_crows/crows_XX.png"
+ }
+}
