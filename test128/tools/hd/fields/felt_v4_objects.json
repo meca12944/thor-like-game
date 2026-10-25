@@ -173,7 +173,8 @@
    "idle": "펠릭스가 공방 쪽으로 공 주우러 갔는데 안 돌아와요…… 아저씨, 혹시 못 봤어요?",
    "art": "a_kid",
    "quests": [
-    "q_felt_toby"
+    "q_felt_toby",
+    "q_felt_doodle"
    ],
    "anim": "felt_toby",
    "wander": 2,
