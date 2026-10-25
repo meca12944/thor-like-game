@@ -1,0 +1,228 @@
+{
+ "걷기 ↓": {
+  "src": "walk_s2",
+  "n": 8,
+  "crown": [
+   22,
+   27
+  ],
+  "height_avg": 165.4,
+  "eye_from_crown": [
+   12,
+   18
+  ],
+  "face_h": [
+   13,
+   19
+  ],
+  "face_w": [
+   14,
+   15
+  ],
+  "shoulder": [
+   52,
+   52
+  ]
+ },
+ "달리기 ↓": {
+  "src": "run_s",
+  "n": 8,
+  "crown": [
+   34,
+   37
+  ],
+  "height_avg": 153.5,
+  "eye_from_crown": [
+   11,
+   16
+  ],
+  "face_h": [
+   12,
+   16
+  ],
+  "face_w": [
+   12,
+   14
+  ],
+  "shoulder": [
+   52,
+   55
+  ]
+ },
+ "걷기 ↘": {
+  "src": "walk_se",
+  "n": 8,
+  "crown": [
+   20,
+   24
+  ],
+  "height_avg": 167.0,
+  "eye_from_crown": [
+   17,
+   19
+  ],
+  "face_h": [
+   11,
+   13
+  ],
+  "face_w": [
+   11,
+   12
+  ],
+  "shoulder": [
+   56,
+   68
+  ]
+ },
+ "달리기 ↘": {
+  "src": "run_se2",
+  "n": 8,
+  "crown": [
+   37,
+   44
+  ],
+  "height_avg": 148.8,
+  "eye_from_crown": [
+   16,
+   18
+  ],
+  "face_h": [
+   9,
+   11
+  ],
+  "face_w": [
+   11,
+   12
+  ],
+  "shoulder": [
+   53,
+   94
+  ]
+ },
+ "걷기 →": {
+  "src": "walk_r2",
+  "n": 8,
+  "crown": [
+   21,
+   25
+  ],
+  "height_avg": 165.9,
+  "eye_from_crown": [
+   18,
+   19
+  ],
+  "face_h": [
+   10,
+   11
+  ],
+  "face_w": [
+   8,
+   10
+  ],
+  "shoulder": [
+   47,
+   58
+  ]
+ },
+ "달리기 →": {
+  "src": "run_r2",
+  "n": 8,
+  "crown": [
+   35,
+   41
+  ],
+  "height_avg": 152.0,
+  "eye_from_crown": [
+   18,
+   19
+  ],
+  "face_h": [
+   11,
+   12
+  ],
+  "face_w": [
+   9,
+   11
+  ],
+  "shoulder": [
+   52,
+   66
+  ]
+ },
+ "걷기 ↗": {
+  "src": "walk_ne",
+  "n": 8,
+  "crown": [
+   15,
+   18
+  ],
+  "height_avg": 172.9,
+  "eye_from_crown": null,
+  "face_h": [
+   7,
+   8
+  ],
+  "face_w": [
+   3,
+   3
+  ],
+  "shoulder": [
+   55,
+   64
+  ]
+ },
+ "달리기 ↗": {
+  "src": "run_ne2",
+  "n": 8,
+  "crown": [
+   23,
+   30
+  ],
+  "height_avg": 163.0,
+  "eye_from_crown": null,
+  "face_h": [
+   4,
+   5
+  ],
+  "face_w": [
+   5,
+   6
+  ],
+  "shoulder": [
+   47,
+   85
+  ]
+ },
+ "걷기 ↑": {
+  "src": "walk_up",
+  "n": 6,
+  "crown": [
+   21,
+   22
+  ],
+  "height_avg": 167.5,
+  "eye_from_crown": null,
+  "face_h": null,
+  "face_w": null,
+  "shoulder": [
+   52,
+   55
+  ]
+ },
+ "달리기 ↑": {
+  "src": "run_n",
+  "n": 8,
+  "crown": [
+   24,
+   27
+  ],
+  "height_avg": 163.6,
+  "eye_from_crown": null,
+  "face_h": null,
+  "face_w": null,
+  "shoulder": [
+   55,
+   60
+  ]
+ }
+}
