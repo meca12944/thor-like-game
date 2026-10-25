@@ -137,8 +137,8 @@
   function talk(o) {
     const h = H();
     for (const id of o.quests || []) { const q = QBY[id]; if (q && qs(id) === 'active' && flagsOk(q)) { h.SAVE.quests[id] = 'done'; const got = h.giveLoot((q.reward || []).concat([['gold', window.__game && window.__game.goldFor ? window.__game.goldFor('quest', q.area || 1) : 0]])); h.save(); h.banner('퀘스트 완료: ' + q.title, 2.2); st.dirty = true; return q.done + (got ? '\n보상: ' + got : ''); } }
-    for (const id of o.quests || []) { const q = QBY[id]; if (q && qs(id) === 'active') return q.progress; }
     for (const id of o.quests || []) { const q = QBY[id]; if (q && avail(q)) { h.SAVE.quests[id] = 'active'; h.SAVE.dest = { type: 'quest', id }; h.save(); h.banner('퀘스트 수락: ' + q.title, 2.2, true); st.dirty = true; return q.offer + '\n(목표가 지도와 미니맵에 표시된다 · G: 목표 전환)'; } }
+    for (const id of o.quests || []) { const q = QBY[id]; if (q && qs(id) === 'active') return q.progress; } /* 새 퀘스트를 먼저 건넨 뒤 진행 중 대사 (한 사람이 퀘스트 둘: 토비 = 펠릭스 + 숯 낙서, 10-25) */
     return o.idle || '…';
   }
 
