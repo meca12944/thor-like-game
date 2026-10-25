@@ -11,8 +11,7 @@
  "title": {
   "kicker": "1장 · 펠트",
   "name": "잿빛 들판",
-  "sub": "불탄 왕도 외곽, 실에 얽힌 들",
-  "unk": {"kicker": "1장", "name": "재로 덮인 들", "sub": "불탄 성 바깥, 실에 얽힌 들", "flag": "met_f_bart"}
+  "sub": "불탄 왕도 외곽, 실에 얽힌 들"
  },
  "bgm": "area01_forest",
  "battleBgm": "battle_champion",
@@ -261,8 +260,7 @@
    "dir": 45,
    "pan": 40,
    "name": "잿빛 들판",
-   "sub": "불탄 왕도 외곽, 실에 얽힌 들",
-   "unk": {"name": "재로 덮인 들", "sub": "불탄 성 바깥, 실에 얽힌 들", "flag": "met_f_bart"}
+   "sub": "불탄 왕도 외곽, 실에 얽힌 들"
   },
   {
    "type": "chest",
