@@ -1,8 +1,0 @@
-{
- "http": 202,
- "body": {
-  "usage": null,
-  "background_job_id": "ec15f690-6353-4015-8fbd-f7b5a31eef53",
-  "status": "processing"
- }
-}

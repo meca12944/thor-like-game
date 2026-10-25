@@ -1,3 +1,6 @@
 assets_src/packs/
 preview.png
 __pycache__/
+motion_lab/grok_hero/se_test/_raw/
+motion_lab/grok_hero/se_test/log_*.txt
+motion_lab/grok_hero/se_test/run.log
