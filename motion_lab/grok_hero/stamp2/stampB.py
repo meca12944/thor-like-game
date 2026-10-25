@@ -9,7 +9,7 @@ from common import load,skinmask
 G=S.G;OUT=f'{G}/final_stampedB'
 def area(a): return ndimage.binary_fill_holes(ndimage.binary_closing(skinmask(a),iterations=1))
 def build(dn):
-    s=load(f'{S.R}/src_{dn}.png');b=load(f'{S.R}/faceB_{dn}.png');m=ndimage.binary_dilation(area(s),iterations=1)&(s[...,3]>0)
+    s=load(f'{S.R}/src_{dn}.png');b=load(f'{S.R}/faceB_{dn}.png');m=area(s)&(s[...,3]>0)   # 팀장 10-25: 판 둘레 = 원래 살색 +0px
     ys,xs=np.nonzero(m);y0,y1,x0,x1=ys.min(),ys.max()+1,xs.min(),xs.max()+1;S.POS[dn]=(int(y0),int(x0));return b[y0:y1,x0:x1].copy(),m[y0:y1,x0:x1]
 if __name__=='__main__':
     dirs=sys.argv[1:] or ['down','dr','right'];T={}
@@ -22,11 +22,17 @@ if __name__=='__main__':
         for c in [k for k,v in S.DIR.items() if v==dn]:
             for f in sorted(glob.glob(f'{G}/final/{c}/*.png')):
                 a=load(f);dy,dx,sc=S.headfit(a,dn);y0,x0=S.POS[dn][0]+dy,S.POS[dn][1]+dx;o=a.copy()
-                put=M&ndimage.binary_dilation(area(a),iterations=1)[y0:y0+h,x0:x0+w]&(a[y0:y0+h,x0:x0+w,3]>0)
+                put=M&area(a)[y0:y0+h,x0:x0+w]&(a[y0:y0+h,x0:x0+w,3]>0)
                 Q=P.copy();sk=skinmask(a)
                 if sk.any():
                     tgt=a[sk][:,:3].astype(float).mean(0);ps=put&(Q[...,:3].astype(float).mean(2)>90);src=Q[ps][:,:3].astype(float).mean(0) if ps.any() else tgt
                     Q[ps,:3]=np.clip(Q[ps,:3]*(tgt/np.maximum(src,1)),0,255).astype(np.uint8)
+                    for _ in range(3):   # 찍은 뒤 살색 평균 밝기를 원래와 같게 (±3 기준)
+                        tmp=o.copy();tmp[y0:y0+h,x0:x0+w][put]=Q[put];sk2=skinmask(tmp)
+                        if not sk2.any(): break
+                        k=a[sk][:,:3].astype(float).mean()/max(1,tmp[sk2][:,:3].astype(float).mean())
+                        if abs(k-1)<.005: break
+                        Q[ps,:3]=np.clip(Q[ps,:3]*k,0,255).astype(np.uint8)
                 o[y0:y0+h,x0:x0+w][put]=Q[put];Image.fromarray(o).save(f'{OUT}/{c}/{os.path.basename(f)}');T[f'{c}/{os.path.basename(f)}']=dict(dy=int(y0),dx=int(x0),fit=sc)
             print(c,'찍음')
     json.dump(T,open('placeB.json','w'),indent=1)
