@@ -373,14 +373,14 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 21,
    "y": 6,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 28,
    "y": 7,
    "respawn": 0
@@ -394,7 +394,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 8,
    "y": 22,
    "respawn": 0
@@ -450,7 +450,7 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 8,
    "y": 52,
    "respawn": 0

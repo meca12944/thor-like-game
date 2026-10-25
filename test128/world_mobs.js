@@ -350,17 +350,25 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 가위 재단사 (그록 10-25 「1장 마물」 05, handoff/claude/ch1_mobs_v1/05_tailor): 연속 베기 역할. 걷기 = PixelLab 8장, 2연속 베기 = 그록 서기 → 베기1 → 베기2(map), 던지기 = 베기1 자세.
+    c1_shear_tailor: felt({ name: '가위 재단사', style: 'duel', col: '#d2c6b0', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 55, h: 32, r: 6, sp: 20,
+      melee: { range: 26, rad: 15, dmg: 6 },
+      shots: [{ name: '가위날 투척', sp: 105, waves: [0], spread: [0], shot: { kind: 'blade', r: 4, dmg: 5, life: 1.6, ret: true } },
+        { name: '시침핀 3연사', sp: 135, waves: [0, 0.13, 0.27], spread: [0], shot: { kind: 'pin', r: 2, dmg: 3, life: 1.2 } }],
+      anim: { src: 'assets/mobs_felt/c1_shear_tailor', F: 64.8, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 0] },
+        shoot: { n: 12, ticks: [5, 5, 5, 5, 5, 10, 5, 5, 5, 5, 5, 5], release: 5, map: [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0] } } }),
     // 실패 거미 (그록 10-25 「1장 마물」 06, handoff/claude/ch1_mobs_v1/06_spider): 뛰어들기 역할(교본 1-9). 걷기 = PixelLab 8장, 폴짝 = 그록 서기 → 웅크림 → 공중(높이 air는 코드) → 웅크림 착지(map).
-    c1_spool_spider: felt({ name: '실패 거미', style: 'skirm', col: '#8c8478', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 45, h: 22, r: 7, sp: 30,
+    c1_spool_spider: felt({ name: '실패 거미', style: 'skirm', col: '#8c8478', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 45, h: 26, r: 7, sp: 30,
       melee: { range: 20, rad: 12, dmg: 5 },
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } },
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
-      anim: { src: 'assets/mobs_felt/c1_spool_spider', F: 57.7, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 10, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 8, 4], hit: 7, air: 12, map: [0, 1, 1, 2, 2, 2, 2, 1, 0, 0] },
+      anim: { src: 'assets/mobs_felt/c1_spool_spider', F: 68.9, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 10, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 8, 4], hit: 7, air: 12, map: [0, 1, 1, 2, 2, 2, 2, 1, 0, 0] },
         shoot: { n: 9, ticks: [5, 5, 5, 5, 10, 5, 5, 5, 5], release: 4, map: [0, 1, 1, 1, 0, 0, 0, 0, 0] } } }),
+    // 그록 마물 크기 (4번방 10-25 잼): 그록 키는 「주인공 34」 기준인데 게임 주인공은 실제로 42로 그려짐(world.js ART_FIG가 H8.figH 144가 아니라 117로 떨어짐: H8이 window에 없음) → F = 그록 키 / 34 × 42 / 띠 속 키 × 256 / 1.35
     // 누빔 멧돼지 (그록 10-25 「1장 마물」 01, handoff/claude/ch1_mobs_v1/01_boar): 돌진 역할(교본 1-9 #1). 걷기 = PixelLab 8장, 공격 = 그록 자세 서기 → 웅크림 → 돌진(map). 총알 없음(돌진만).
-    c1_quilted_boar: felt({ name: '누빔 멧돼지', style: 'lunge', col: '#a49c8c', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 60, h: 26, r: 9, sp: 34,
+    c1_quilted_boar: felt({ name: '누빔 멧돼지', style: 'lunge', col: '#a49c8c', aff: { weak: ['slash'], resist: ['blunt'] }, hp: 60, h: 32, r: 9, sp: 34,
       melee: { range: 28, rad: 15, dmg: 6 }, shots: [], cdLunge: 3, // 돌진 사이 약 0.75초 맴돎 (총알이 없어 쉬지 않고 돌진하던 것) + 가까우면 엄니 들이받기(melee 원)
-      anim: { src: 'assets/mobs_felt/c1_quilted_boar', F: 55.3, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2] } } }), // F: 띠 속 키 120 → 들판 35 (x FELT_SC 1.35)
+      anim: { src: 'assets/mobs_felt/c1_quilted_boar', F: 66.5, walk: { n: 8, ticks: [5, 5, 5, 5, 5, 5, 5, 5] }, attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2] } } }), // F: 띠 속 키 120 → 들판 42 (x FELT_SC 1.35) = 그록 34 / 34 × 실제 주인공 키 42
     c1_unrotting_hound: felt({ name: '썩지 않는 들개', style: 'lunge', col: '#80766a', aff: { weak: ['blunt'], resist: ['slash'] }, hp: 60, h: 24, r: 8, sp: 34,
       melee: { range: 28, rad: 15, dmg: 6 },
       shots: [{ name: '돌껍질 파편 3갈래 2파', sp: 120, waves: [0, 0.23], spread: [-.25, 0, .25], shot: { kind: 'stone', r: 3, dmg: 4, life: 1.3 } }], // aimed; the main move is the lunge
@@ -522,7 +530,7 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
