@@ -2489,7 +2489,7 @@
     go, dirTap, hitMob, RUN, SWING, swingR, hbR, hbA, spOf, arcW, setManual(v) { manual = v; }, cell8() { const c = h8Cell(); return c && [c.h8, c[0], c[1], c[2], c[3], c[4], c[5], c.fl ? 1 : 0, c.ox || 0]; },
     advance(sec) { for (let t = 0; t < sec - 1e-9; t += DT) { if (S.scene === 'town' && !S.trans) watchTown(); else step(DT); } render(); publish(); },
     key(code, down) { if (down) { if (!held.has(code)) queue.push(code); held.add(code); } else held.delete(code); },
-    tap(code) { queue.push(code); }, placeText, learnPlaces,
+    tap(code) { queue.push(code); }, placeText, learnPlaces, heroTiming: () => ({ atk: [ATK.dur * 60, ATK.dur * 60, ATK3.dur * 60], hit: [ATK.a0 * 60, ATK.a0 * 60, ATK3.a0 * 60], dash: rollDur() * 60, jump: (JUMP.pre + JUMP.T + JUMP.land) * 60, atkBody: ATK_BODY }), /* tools/hero_check.py: 그림 틱 vs 코드 동작 길이 */
     flag(id, v = true) { SAVE.flags[id] = v; save(); }, reset() { SAVE = { flags: {}, chests: {}, keys: {}, opened: {}, levers: {}, visited: {}, explored: {}, waystones: {}, landmarks: {}, quests: {}, pin: null, dest: null }; save(); if (NAV()) NAV().reset(); },
     get nav() { return NAV(); },
     killAll(filter) { S.mobs.filter(m => !m.dead && (!filter || filter(m))).forEach(killMob); },
