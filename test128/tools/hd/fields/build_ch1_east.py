@@ -81,19 +81,14 @@ def save_img(src, name, scale=None):
 LX, LY = 84, 34
 import numpy as np
 from scipy import ndimage as ndi
-def lake_art():   # 팀장 10-25 「까만 면」: 물가 한 줄 밝은 물결 + 종탑이 물에 거꾸로 비친 밑그림 (움직이는 잔물결·왕성 반사는 검흔 코드)
+def lake_art():   # 팀장 10-25 「까만 면」: 물가 한 줄 밝은 물결 + 물 깊이 옅은 남색 (반사 왕성·종탑·잔물결은 효과 담당 코드 lakeart)
     im = Image.open(f'{G1}/08_black_lake/08_black_lake_empty_back.png').convert('RGBA'); a = np.asarray(im).astype(np.float32)
     water = (a[..., 3] > 128) & (a[..., :3].mean(-1) < 40)
     rim = water & ~ndi.binary_erosion(water, iterations=5); rim = ndi.gaussian_filter(rim.astype(np.float32), 2.5)
     glow = ndi.gaussian_filter(water.astype(np.float32), 40) * water   # 물 가운데로 갈수록 아주 조금 밝은 남색 (깊이)
     out = a.copy(); out[..., :3] += (rim[..., None] * np.array([70, 72, 80]) * .9) + ((1 - glow)[..., None] * water[..., None] * np.array([10, 12, 18]))
     o = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
-    t = Image.open(f'{G1}/08_black_lake/08_sunken_belltower_tip_back.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
-    t = Image.eval(t.convert('RGB'), lambda v: int(v * .45)).convert('RGBA'); t.putalpha(Image.open(f'{G1}/08_black_lake/08_sunken_belltower_tip_back.png').split()[3].transpose(Image.FLIP_TOP_BOTTOM).point(lambda v: int(v * .32)))
-    bx, by = int((128.5 - LX) * TS - t.width / 2), int((62 - LY) * TS - 6)
-    m = Image.fromarray((water * 255).astype(np.uint8)).crop((bx, by, bx + t.width, by + t.height)); ta = t.split()[3]
-    t.putalpha(Image.fromarray((np.asarray(ta).astype(np.float32) * np.asarray(m) / 255).astype(np.uint8)))
-    o.alpha_composite(t, (bx, by)); p = f'{OUT}/black_lake.webp'; o.save(os.path.join(T128, p), 'WEBP', quality=90, method=6); return p, im
+    p = f'{OUT}/black_lake.webp'; o.save(os.path.join(T128, p), 'WEBP', quality=90, method=6); return p, im   # 종탑 거꾸로 비침은 코드(lakeart)가 그림 → 여기선 안 구움
 lake_p, lake = lake_art()
 under.append({'id': 'black_lake', 'img': lake_p, 'x': LX, 'y': LY, 'ax': 0, 'ay': 0, 'D': 1, 'under': 1})
 alpha_mask(lake, LX, LY, '~', thr=.45, dark=40)
@@ -251,7 +246,8 @@ objs.append({'type': 'waystone', 'id': 'ws_giant_palm', 'x': 30, 'y': 115, 'name
 objs.append({'type': 'waystone', 'id': 'ws_road_head', 'x': 120, 'y': 80, 'name': '가도 들머리 모닥불'})
 objs.append({'type': 'vista', 'id': 'ce_giant', 'x': 64, 'y': 142, 'r': 3.5, 'zoom': 0.27, 'dir': 270, 'pan': 24, 'hold': 1,
              'name': '쓰러진 거인', 'sub': '성문의 맹세를 지키다 누운 기사'})
-# 검은 호수 전망 카드는 검흔이 물 반사·잔물결을 넣은 뒤에 켬 (팀장 10-25): {'id': 'ce_lake', 'x': 126, 'y': 89, 'zoom': 0.62, 'dir': 270, 'pan': 24, 'name': '검은 호수', 'sub': '물 위로 종탑 끝만 남은 옛 거리'}
+objs.append({'type': 'vista', 'id': 'ce_lake', 'x': 126, 'y': 89, 'r': 3, 'zoom': 0.62, 'dir': 270, 'pan': 24, 'hold': 1,   # 효과 담당 lakeart(반사 왕성·잔물결) 뒤 다시 켬
+             'name': '검은 호수', 'sub': '물 위로 종탑 끝만 남은 옛 거리'})
 objs.append({'type': 'vista', 'id': 'ce_gate', 'x': 75, 'y': 238, 'r': 3, 'zoom': 0.62, 'dir': 270, 'pan': 0, 'hold': 1,
              'name': '1장 정문 밖', 'sub': '돌기둥에 앉은 기록관이 문을 지킨다'})
 objs.append({'type': 'clue', 'id': 'ce_remains', 'x': 80, 'y': 160, 'name': '쓰러진 탈영병', 'flag': 'ce_look_remains',
@@ -298,8 +294,16 @@ mp = {
     'objects': objs,
     'camZones': [{'x0': 0, 'y0': 12, 'x1': W, 'y1': 34, 'zoom': 0.8, 'look': -7.5, 'f': 8}],   # 북쪽 끝에선 위를 올려다봄 (무덤가와 같은 값) → 낭떠러지 너머 왕성
     'spawns': {'default': [75.5, 243.5, 'up'], 'felt': [75.5, 243.5, 'up']},
-    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {k: felt_deco[k] for k in ('T', 'R', 's') if k in felt_deco}, 'fx': {}},   # 마른 나무·돌무더기·그루터기 = 펠트와 같은 그림
+    'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {k: felt_deco[k] for k in ('T', 'R', 's') if k in felt_deco}, 'fx': {},   # 마른 나무·돌무더기·그루터기 = 펠트와 같은 그림
+           # 모닥불 2곳 (거인 손바닥 30,115 / 가도 들머리 120,80): 불·연기·깜빡이는 빛은 코드 (효과 담당 10-25)
+           'fires': [[30.5, 115.4, 1.1], [120.5, 80.4, 1.0]], 'smoke': [[30.5, 115.0, 1.0], [120.5, 80.0, 0.9]], 'flick': [[30.5, 115.4, 48, '#ff8a3a', 1], [120.5, 80.4, 44, '#ff8a3a', 1]]},
     'note': '1장 동쪽 들판 (build_ch1_east.py 가 만든다, 고칠 땐 빌더를 고치고 다시 돌린다). 설계도 field_e = 전체 440,70.',
 }
+# 코드 효과 (효과 담당 10-25, world.js scenefx): 검은 호수에 비친 왕성 + 잔물결 + 물가 반짝임 / 종탑 물결·먼 종 / 북쪽 낭떠러지 안개 + 모닥불 쉼터 그림
+for o in mp['objects']:
+    if o['type'] == 'waystone' and o['id'] in ('ws_giant_palm', 'ws_road_head'): o['art'] = 'camp'
+mp['objects'] += [{'type': 'scenefx', 'kind': 'lakeart', 'x': 84, 'y': 34, 'w': 85, 'h': 50, 'img': 'assets/world/ch1_east/black_lake.webp', 'cw': .5, 'ch': .6},
+                  {'type': 'scenefx', 'kind': 'bell', 'x': 128.5, 'y': 61.7, 'w': 1, 'h': 1, 'r': 3, 'per': 20},
+                  {'type': 'scenefx', 'kind': 'mistband', 'x': 0, 'y': 9, 'w': 190, 'h': 9, 'a': 1, 'sp': 7}]
 json.dump(mp, open(os.path.join(T128, 'maps/ch1_field_e.json'), 'w'), ensure_ascii=False, indent=1)
 print('cells', _dbg, 'ok', W, H, 'mobs', sum(1 for o in objs if o['type'] == 'spawn'), 'props', len(props), 'under', len(under))
