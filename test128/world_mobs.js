@@ -47,7 +47,7 @@
   const FELT_SC = 1.35, FELT_CD = 1, FELT_REC = 1; /* souls pace: cooldown / recovery back to x1 (were .6/.7) */ // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function pickIntent(P, d, m) { // distance decides which move is likely; the same move never 3 times in a row
     const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], (m.D.shots || []).length || m.D.summoned ? ['shoot', d >= 90 ? 3 : .6] : ['melee', d < 45 ? 3 : .6]] // no shots (누빔 멧돼지): close tusk jab instead : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
-      : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
+      : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : P === 'guard' ? [['melee', d < 55 ? 3 : 1], ['bash', d < 70 ? 2 : .6]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
     const H = m.hist || (m.hist = []); for (const o of O) if (H.length >= 2 && H[0] === o[0] && H[1] === o[0]) o[1] = 0;
     for (const o of O) if (o[0] === 'shoot' && !(m.D.shots || []).length) o[1] = 0; // no shots (새끼 거미): bite only
     if (!O.some(o => o[1] > 0)) { H.unshift('wait'); H.length = 2; m.cd = 1; return null; } // only one move left and it was used twice (누빔 멧돼지: 돌진만): circle for 1 s instead of a 3rd in a row
@@ -61,6 +61,7 @@
     return Object.assign({ felt: true, update(m, W, dt) {
       const h = W.hero, A = this.anim, P = this.style || 'base'; m.t += dt; m.at = (m.at || 0) + dt; m.cd = (m.cd ?? rnd(1, 2)) - dt; m.losT = (m.losT || 0) - dt; if (m.losT <= 0) { m.losT = .25; m.sees = !W.los || W.los(m, h); }
       const d = m.sees || m.st !== 'idle' ? W.dist(m, h) : 999; // 팀장 10-24: behind a wall the hero counts as far away (no alert, no shots, just wanders)
+      m.guardOn = P === 'guard' && m.st === 'idle' && !(m.hitT > .08) && d < 110 && (h.x - m.x) * m.face > 0; m._W = W; // 철장 간수: 정면 방패 (dmgMul)
       m.burstT = (m.burstT || 0) - dt; m.burstCd = (m.burstCd || 0) - dt; m.hopCd = (m.hopCd || 0) - dt; const RG = m.rage ? .8 : 1; // RG: angry = shorter cooldowns
       if (!m.alerted && d < 160) { m.alerted = true; m.alertT = .45; W.fx('text', m.x, m.y - this.h * FELT_SC - 6, { text: '!', life: .7, color: '#ffd84a' }); if (W.sfx) W.sfx('tele', .6); m.cd = Math.max(m.cd, .5); } // first sight: "!" + a hop (drawn)
       if (m.alertT > 0) { m.alertT -= dt; m.anim = 'walk'; m.moving = false; return; }
@@ -70,7 +71,7 @@
         if (P === 'skirm' && m.hopCd <= 0) { const a = ang(m, h.x, h.y) + Math.PI; m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * 40; m.ty = m.y + Math.sin(a) * 40; m.hopCd = 3; set(m, 'hop'); m.anim = 'walk'; return; }
         m.anim = 'walk'; m.moving = false; return; }
       if (m.dazeT > 0 && (m.st === 'idle' || m.st === 'rest')) { m.dazeT -= dt; m.anim = 'walk'; m.moving = false; return; } // the hero just-dodged its attack: stunned for a moment
-      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? FELT_STD.restMelee : (this.restShoot || FELT_STD.restShoot); set(m, 'rest'); m.restT = r; m.anim = 'walk'; } return; }
+      if (m.st === 'melee' || m.st === 'shoot') { if (m.at > m.dur) { const r = m.st === 'melee' ? (this.restMelee || FELT_STD.restMelee) : (this.restShoot || FELT_STD.restShoot); set(m, 'rest'); m.restT = r; m.anim = this.melee.slam && m.anim === 'attack' ? 'attack' : 'walk'; /* 철장 간수: 빈틈 동안 망치가 땅에 박힌 자세 그대로 */ } return; }
       if (m.st === 'rest') { m.moving = false; if (m.t > m.restT) set(m, 'idle'); return; } // standard opening: stands still after an attack
       if (m.st === 'lunge') { // committed: the aim does not follow the hero after the line appears
         if (m.sub === 'aim') { if (m.t > m.warn) { m.sub = 'go'; m.t = 0; m.bit = false; } return; }
@@ -82,7 +83,7 @@
         else if (m.t > m.warn + FELT_STD.restLeap) { set(m, 'idle'); m.anim = 'walk'; } return; }
       m.anim = 'walk'; const x0 = m.x, y0 = m.y;
       if (m.cd <= 0 && !m.intent) m.intent = pickIntent(P, d, m); // each cooldown: pick one move (distance-weighted, never 3 in a row)
-      const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? (this.keep || 70) : 52; // hold ~52px between attacks (저격수 keep: 멀리서 쏨)
+      const want = m.intent === 'melee' || m.intent === 'combo' ? this.melee.range : m.intent === 'bash' ? this.melee.range + 8 : m.intent === 'lunge' ? 70 : m.intent === 'leap' ? 55 : m.intent === 'shoot' ? (this.keep || 70) : 52; // hold ~52px between attacks (저격수 keep: 멀리서 쏨)
       if ((P === 'bind' || P === 'duel') && (m.intent === 'melee' || m.intent === 'combo') && d > this.melee.range + 20 && d < 110 && m.burstCd <= 0) { m.burstT = .3; m.burstCd = 2.5; W.fx('dust', m.x, m.y); } // quick scuttle / step-in before a close attack
       const spd = this.sp * FELT_SPD * (m.burstT > 0 ? 3 : 1) * (m.rage ? 1.25 : 1);
       if (d < 200) { if (d > want + 6) toward(m, W, dt, spd, h.x, h.y); else if (d < (m.intent === 'shoot' ? FELT_STD.backOff : want - 14)) toward(m, W, dt, -this.sp * FELT_SPD * .5, h.x, h.y); // shooters only back off when the hero is right on them
@@ -97,10 +98,15 @@
       const engaged = d < 200, fa = engaged ? ang(m, h.x, h.y) : Math.atan2(vy, vx); // engaged: always look at the hero (backpedal / sidestep), else face the way it walks
       if (engaged || m.moving) { const k = ((Math.round(fa / (Math.PI / 4)) % 8) + 8) % 8; m.wdir = ['side', 'se', 's', 'se', 'side', 'ne', 'n', 'ne'][k]; if (Math.abs(Math.cos(fa)) > 1e-3) m.face = Math.cos(fa) > 0 ? 1 : -1; } // 8-way walk strips (↙↖ = mirrored ↘↗)
       m.back = engaged && m.moving && vx * Math.cos(fa) + vy * Math.sin(fa) < 0; // walking away from where it looks -> walk strip plays backwards
+      if (P === 'guard' && d < 110) m.anim = 'guard'; // 철장 간수: 가까우면 방패를 앞으로 들고 다가옴
       if (m.cd > 0 || d > 150) return;
       if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
-        const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
+        const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: this.melee.warn || 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
+        if (this.melee.slam) W.after(z.warn, () => { if (!m.dead) { W.shake(3); W.fx('dust', z.x, z.y); } }); // 철장 간수: 내려찍기 땅 흔들림
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD * RG / agg(W); return; }
+      if (m.intent === 'bash' && d < this.melee.range + 30 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y); m.face = Math.cos(a) >= 0 ? 1 : -1; // 방패 밀치기: 앞으로 짧은 줄, 0.6초
+        const z = W.hazard({ shape: 'line', x: m.x, y: m.y, x2: m.x + Math.cos(a) * 50, y2: m.y + Math.sin(a) * 50 * .8, width: 22, warn: .6, act: .05, dmg: Math.max(3, this.melee.dmg - 4), kind: 'swipe', owner: m });
+        startAnim(m, 'bash', A.bash, A.bash.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'combo' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), r1 = this.melee.range * .6, r2 = this.melee.range * 1.25; m.face = Math.cos(a) >= 0 ? 1 : -1; // scissor 2-hit: snip, then a longer snip 0.3s later
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * r1, y: m.y + Math.sin(a) * r1 * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
         W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * r2, y: m.y + Math.sin(a) * r2 * .8, r: this.melee.rad, warn: z.warn + 0.3, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
@@ -350,6 +356,12 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 철장 수문병·간수 (그록 10-25 「1장 마물」 04, handoff/claude/ch1_mobs_v1/04_warden, 크레딧 0): 방패 역할(새, 들판 정예 후보). 정면에서 베면 피해 x0.3(방패 「막음」) → 내려찍기(원 0.8초) 뒤 1.2초 망치가 박혀 있을 때 / 등 뒤로 돌아가 벰. 걷기 그림 없음 → 끌기 코드(walk.bob.drag).
+    c1_iron_warden: felt({ name: '철장 간수', style: 'guard', col: '#8a8070', aff: { weak: ['blunt'], resist: ['slash', 'pierce'] }, hp: 120, h: 43, r: 10, sp: 16, restMelee: 1.2,
+      melee: { range: 30, rad: 20, dmg: 9, warn: .8, slam: true }, shots: [],
+      dmgMul(m) { if (!m.guardOn) return 1; const W = m._W; if (W && (m.blockT || 0) <= 0) { m.blockT = .25; W.fx('text', m.x, m.y - 60, { text: '막음', life: .5, color: '#c8c0b0' }); } return .3; },
+      anim: { src: 'assets/mobs_felt/c1_iron_warden', F: 55.0, walk: { n: 1, ticks: [5], bob: { drag: 5, amp: 1.5 } }, guard: { n: 1, ticks: [5], bob: { drag: 5, amp: 1.5 } },
+        attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2] }, bash: { n: 6, ticks: [6, 6, 6, 6, 8, 8], hit: 4, map: [0, 1, 1, 1, 1, 1] } } }),
     // 바늘 사수 (그록 10-25 「1장 마물」 03, handoff/claude/ch1_mobs_v1/03_marksman): 저격 역할(새). 멀리(keep 110) 서서 긴 줄 0.8초 겨냥 → 빠른 바늘 1발 → 장전 빈틈 0.9초(조준 자세 붙잡기). 붙으면 쇠뇌로 밀치기. 걷기 = PixelLab 8장.
     c1_needle_marksman: felt({ name: '바늘 사수', style: 'snipe', col: '#bdb6a6', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 40, h: 28, r: 6, sp: 22, keep: 110, restShoot: .9,
       melee: { range: 22, rad: 13, dmg: 5 },
@@ -546,7 +558,7 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', c1_needle_marksman: 'bone', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', c1_needle_marksman: 'bone', c1_iron_warden: 'bone', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
     mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
