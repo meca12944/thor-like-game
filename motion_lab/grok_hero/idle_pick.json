@@ -1,0 +1,7 @@
+{
+ "down": "se_test/walk_s2/000.png",
+ "dr": "se_test/walk_se/006.png",
+ "right": "se_test/walk_r2/003.png",
+ "ur": "se_test/walk_ne/006.png",
+ "up": "frames/walk_up/003.png"
+}

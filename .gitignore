@@ -11,3 +11,6 @@ motion_lab/grok_hero/stamp/run.log
 motion_lab/grok_hero/stamp2/_raw/
 motion_lab/grok_hero/stamp2/run.log
 motion_lab/grok_hero/stamp2/log_*.txt
+motion_lab/grok_hero/moves/_raw/
+motion_lab/grok_hero/moves/run.log
+motion_lab/grok_hero/moves/log_*.txt
