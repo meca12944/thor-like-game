@@ -270,8 +270,8 @@ def tunnel(seed=3):
     R = (fx1 - fx0) * .8; sp = fy0 + 10
     far = [L(fx0, fy1)] + [L(fx0 + R * (1 + math.cos(a)) - R + 0 if False else fx1 - R + R * math.cos(a), sp + R * math.sin(a)) for a in np.linspace(math.pi, math.pi * 1.5 - .35, 10)]
     far = [L(fx0, fy1), L(fx0, sp)] + [L(fx1 - R + R * math.cos(a), sp + R * math.sin(a)) for a in np.linspace(math.pi, math.pi * 1.62, 8)] + [L(fx0 + R + R * math.cos(a), sp + R * math.sin(a)) for a in np.linspace(math.pi * 1.38, math.pi * 2, 8)] + [L(fx1, sp), L(fx1, fy1)]
-    p.fill(far, (214, 206, 190), wob=.3, line=1.2)
-    p.fill([L(fx0, fy1), L(fx0, fy1 - 10), L(fx0 + 30, fy1 - 14), L(fx1 - 20, fy1 - 9), L(fx1, fy1 - 12), L(fx1, fy1)], (168, 160, 146), wob=.6, line=.8, la=140)
+    p.fill(far, (122, 114, 104), wob=.3, line=1.2)   # v7 (owner 10-25 「하늘은 그리지 말고」): a dim fog-dark opening, not a pale sky
+    p.fill([L(fx0, fy1), L(fx0, fy1 - 10), L(fx0 + 30, fy1 - 14), L(fx1 - 20, fy1 - 9), L(fx1, fy1 - 12), L(fx1, fy1)], (96, 90, 84), wob=.6, line=.8, la=140)
     tx = fx0 + 40; p.stroke([L(tx, fy1 - 12), L(tx + 2, fy1 - 40), L(tx - 6, fy1 - 52)], 1.2, 150); p.stroke([L(tx + 2, fy1 - 34), L(tx + 12, fy1 - 46)], .9, 150)
     def dark(pp, col, a):
         h, w = a.shape; yy, xx = np.mgrid[0:h, 0:w]; cxp = (GATE_X * T - ox); d = np.hypot((xx - cxp) / (w * .5), (yy - (fy0 + fy1) / 2 + oy) / (h * .6))

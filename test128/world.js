@@ -394,17 +394,21 @@
   // parallax 0..1), fy (anchor y = view top + fy * view height: it is far away, so it does not slide up/down with the camera) or y (world tiles: anchored behind a near horizon, e.g. a hill lip), vs (scale in a vista), clipY (world tiles: drawn
   // only above this line = the sky behind the wall), sky / floor (fill above / below the picture), grow [x0,x1,s0,s1] (scale by the hero's x tile: the
   // approach road), ppt (picture px per tile), fog [[y,h,a,speed]], glows [[x,y,r]], smoke [[x,y]], shaft [x,y,rx,ry]} (picture px). Fog, ember light,
-  // smoke and the light break are drawn here in code each frame; the picture itself is drawn by tools/hd/fields/castle_backdrop.py.
+  // smoke and the light break are drawn here in code each frame; the picture itself is drawn by tools/hd/fields/castle_fortress.py (v7: transparent, no sky; b.fit sizes it to the screen).
   let _bdFog = null; function bdFogTex() { if (_bdFog) return _bdFog; const c = document.createElement('canvas'); c.width = 512; c.height = 96; const g = c.getContext('2d'); let sd = 7; const rn = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
     for (let i = 0; i < 70; i++) { const x = rn() * 512, y = 30 + rn() * 36, rx = 30 + rn() * 70, ry = 8 + rn() * 16; for (const ox of [-512, 0, 512]) { g.save(); g.translate(x + ox, y); g.scale(1, ry / rx); const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, 'rgba(204,194,178,.30)'); gr.addColorStop(1, 'rgba(204,194,178,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore(); } }
     return (_bdFog = c); }
   function drawBackdrop(k) { const m = M(); if (!m || !m.hds) return; const b = m.hds[0].backdrop; if (!b) return; const im = HDIMG[b.img]; if (!im) return; const T = m.T;
     let s = 1; if (b.grow) { const [x0, x1, s0, s1] = b.grow; let t = Math.min(1, Math.max(0, (hero.x / T - x0) / (x1 - x0))); t = t * t * (3 - 2 * t); s = s0 + (s1 - s0) * t; } if (S.vista && b.vs) s = b.vs; b._s = b._s == null || b._m !== m.id ? s : b._s + (s - b._s) * .05; b._m = m.id; s = b._s; // vs: scale while standing in a vista
-    const sc = k / b.D * s, camC = S.cam[0] + EW / 2, wx = b.x * T + (camC - b.x * T) * (b.px || 0), [ax] = W2S(wx, 0), [, top] = W2S(0, S.cam[1]), cy = W2S(0, (b.clipY ?? 1e3) * T)[1];
+    let sc = k / b.D * s; const camC = S.cam[0] + EW / 2, wx = b.x * T + (camC - b.x * T) * (b.px || 0), [ax] = W2S(wx, 0), [, top] = W2S(0, S.cam[1]), cy = W2S(0, (b.clipY ?? 1e3) * T)[1];
     if (cy <= Math.max(S.view.oy, top) - 1) return;
-    const dx = ax - b.ax * sc, dy = (b.y != null ? W2S(0, b.y * T)[1] : top + (b.fy || 0) * EH * k) - b.ay * sc, iw = im.width * sc, ih = im.height * sc, W_ = cv.width, Hc = Math.min(cy, cv.height);
+    let dy = (b.y != null ? W2S(0, b.y * T)[1] : top + (b.fy || 0) * EH * k) - b.ay * sc;
+    if (b.fit) { // owner 10-25 「하늘은 그리지 말고 화면에 성 전체가 꽉 차게」: fit = [fy (tip, screen fraction), base (world tile row the castle foot hides behind), min, max (castle height / screen height), sw (max width / screen width)]
+      const [ffy, fbase, fmn, fmx, fsw] = b.fit, VH = EH * k, ch = b.ay - b.cy0, tipY = top + ffy * VH, baseY = W2S(0, fbase * T)[1], hi = Math.min(fmx * VH, (fsw || 9) * cv.width * ch / b.bw);
+      const want = baseY - tipY; sc = Math.max(fmn * VH, Math.min(hi, want)) / ch; dy = want > hi ? baseY - b.ay * sc : tipY - b.cy0 * sc; }
+    const dx = ax - b.ax * sc, iw = im.width * sc, ih = im.height * sc, W_ = cv.width, Hc = Math.min(cy, cv.height);
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W_, Hc); ctx.clip();
-    if (dy > 0) { ctx.fillStyle = b.sky || '#5a524c'; ctx.fillRect(0, 0, W_, Math.ceil(dy) + 1); } if (dy + ih < Hc) { ctx.fillStyle = b.floor || '#bcb2a4'; ctx.fillRect(0, Math.floor(dy + ih) - 1, W_, Hc - dy - ih + 2); }
+    if (b.fit) { ctx.fillStyle = b.sky; ctx.fillRect(0, 0, W_, Hc); } else if (dy > 0) { ctx.fillStyle = b.sky || '#5a524c'; ctx.fillRect(0, 0, W_, Math.ceil(dy) + 1); } // fit: one flat dark tone behind the whole silhouette (no sky; the ground picture must not show through) if (dy + ih < Hc) { ctx.fillStyle = b.floor || '#bcb2a4'; ctx.fillRect(0, Math.floor(dy + ih) - 1, W_, Hc - dy - ih + 2); }
     if (dx > 0) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(0, dy, Math.ceil(dx) + 1, ih); } if (dx + iw < W_) { ctx.fillStyle = b.side || b.floor || '#8a8078'; ctx.fillRect(Math.floor(dx + iw) - 1, dy, W_ - dx - iw + 2, ih); }
     const x0 = Math.max(0, Math.floor(-dx / sc)), y0 = Math.max(0, Math.floor(-dy / sc)), x1 = Math.min(im.width, Math.ceil((W_ - dx) / sc)), y1 = Math.min(im.height, Math.ceil((Hc - dy) / sc));
     ctx.imageSmoothingEnabled = true; if (x1 > x0 && y1 > y0) ctx.drawImage(im, x0, y0, x1 - x0, y1 - y0, dx + x0 * sc, dy + y0 * sc, (x1 - x0) * sc, (y1 - y0) * sc);
