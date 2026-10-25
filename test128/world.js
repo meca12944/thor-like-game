@@ -946,11 +946,11 @@
       if (n.scene === 'town') go('town', null, { card: false }); else go(n.scene, 'world');
     }
   }
-  // ---- 스태미나 (엘든링식 기본, 사장님 10-25): 마지막 행동은 0 아래(-20)까지 허용, 0 이하 = 지침(회복 1초 뒤 30/초, 30까지 질주 불가), 질주는 몹 가까이(150px)일 때만 닳음
+  // ---- 스태미나 (엘든링식 기본, 사장님 10-25): 마지막 행동은 0 아래(-20)까지 허용, 0 이하 = 지침(회복 1초 뒤 30/초, 30까지 질주 불가), 질주는 가까운 몹(150px)이 공격 중일 때만 닳음
   function stOk() { if (hero.st == null) hero.st = STAM.max; if (hero.st > 0) return true; hero.stFlash = .4; return false; }
   function stSpend(c) { if (hero.st == null) hero.st = STAM.max; hero.st = Math.max(STAM.floor, hero.st - c); hero.stLast = S.t; if (hero.st <= 0) hero.stEx = true; }
   function stTick(dt) { if (hero.st == null || hero.hp <= 0) { hero.st = STAM.max; hero.stEx = false; } hero.stFlash = Math.max(0, (hero.stFlash || 0) - dt);
-    const near = S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150), spr = hero.run && hero.moving && !hero.atk && !hero.roll && near;
+    const near = S.mobs.some(m => !m.dead && Math.hypot(m.x - hero.x, m.y - hero.y) < 150 && (m.st === 'melee' || m.st === 'shoot' || m.st === 'leap' || m.st === 'lunge' || m.tele > 0)) /* 질주 기운은 가까운 몹이 공격(경고·공격) 중일 때만 닳음 (팀장 시험 B, 사장님 10-25 「전부 진행」) */, spr = hero.run && hero.moving && !hero.atk && !hero.roll && near;
     if (spr) { hero.st -= STAM.run * dt; hero.stLast = S.t; if (hero.st <= 0) { hero.stEx = true; hero.run = false; hero.stFlash = .4; } }
     else if (S.t - (hero.stLast || 0) > (hero.stEx ? STAM.exDelay : STAM.delay) && !hero.roll && !(hero.atk && hero.atk.t < atkT(hero.atk.i).dur)) hero.st = Math.min(STAM.max, hero.st + (hero.stEx ? STAM.exRegen : STAM.regen) * dt);
     if (hero.stEx && hero.st >= STAM.exEnd) hero.stEx = false; if (hero.st < STAM.max) hero.stFullT = 0; else hero.stFullT = (hero.stFullT || 0) + dt; }
