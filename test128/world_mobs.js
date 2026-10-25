@@ -47,7 +47,7 @@
   const FELT_SC = 1.35, FELT_CD = 1, FELT_REC = 1; /* souls pace: cooldown / recovery back to x1 (were .6/.7) */ // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function pickIntent(P, d, m) { // distance decides which move is likely; the same move never 3 times in a row
     const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], (m.D.shots || []).length || m.D.summoned ? ['shoot', d >= 90 ? 3 : .6] : ['melee', d < 45 ? 3 : .6]] // no shots (누빔 멧돼지): close tusk jab instead : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
-      : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : P === 'guard' ? [['melee', d < 55 ? 3 : 1], ['bash', d < 70 ? 2 : .6]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
+      : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : P === 'guard' || P === 'echo' ? [['melee', d < 55 ? 3 : 1], ['bash', d < 70 ? 2 : .6]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
     const H = m.hist || (m.hist = []); for (const o of O) if (H.length >= 2 && H[0] === o[0] && H[1] === o[0]) o[1] = 0;
     for (const o of O) if (o[0] === 'shoot' && !(m.D.shots || []).length) o[1] = 0; // no shots (새끼 거미): bite only
     if (!O.some(o => o[1] > 0)) { H.unshift('wait'); H.length = 2; m.cd = 1; return null; } // only one move left and it was used twice (누빔 멧돼지: 돌진만): circle for 1 s instead of a 3rd in a row
@@ -103,9 +103,10 @@
       if (m.intent === 'melee' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), reach = this.melee.range * .6; m.face = Math.cos(a) >= 0 ? 1 : -1;
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach, y: m.y + Math.sin(a) * reach * .8, r: this.melee.rad, warn: this.melee.warn || 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
         if (this.melee.slam) W.after(z.warn, () => { if (!m.dead) { W.shake(3); W.fx('dust', z.x, z.y); } }); // 철장 간수: 내려찍기 땅 흔들림
+        if (this.melee.echo) { const e = this.melee.echo; W.hazard({ shape: 'circle', x: z.x, y: z.y, r: this.melee.rad, warn: z.warn + e, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m }); W.after(z.warn + e, () => { if (!m.dead) { W.shake(2); W.fx('text', z.x, z.y - 30, { text: '메아리', life: .6, color: '#d8d0ff' }); } }); } // 시간 메아리: 같은 자리에 0.8초 뒤 한 번 더
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'bash' && d < this.melee.range + 30 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y); m.face = Math.cos(a) >= 0 ? 1 : -1; // 방패 밀치기: 앞으로 짧은 줄, 0.6초
-        const z = W.hazard({ shape: 'line', x: m.x, y: m.y, x2: m.x + Math.cos(a) * 50, y2: m.y + Math.sin(a) * 50 * .8, width: 22, warn: .6, act: .05, dmg: Math.max(3, this.melee.dmg - 4), kind: 'swipe', owner: m });
+        const z = W.hazard({ shape: 'line', x: m.x, y: m.y, x2: m.x + Math.cos(a) * (this.bashLen || 50), y2: m.y + Math.sin(a) * (this.bashLen || 50) * .8, width: 22, warn: .6, act: .05, dmg: Math.max(3, this.melee.dmg - 4), kind: 'swipe', owner: m });
         startAnim(m, 'bash', A.bash, A.bash.hit, z.warn); set(m, 'melee'); m.cd = 1.6 * FELT_CD * RG / agg(W); return; }
       if (m.intent === 'combo' && d < this.melee.range + 12 && tok(m, W)) { m.intent = null; const a = ang(m, h.x, h.y), r1 = this.melee.range * .6, r2 = this.melee.range * 1.25; m.face = Math.cos(a) >= 0 ? 1 : -1; // scissor 2-hit: snip, then a longer snip 0.3s later
         const z = W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * r1, y: m.y + Math.sin(a) * r1 * .8, r: this.melee.rad, warn: 0.55, act: 0.05, dmg: this.melee.dmg, kind: 'swipe', owner: m });
@@ -356,6 +357,17 @@
       shots: [{ name: '거미줄 탄', sp: 85, waves: [0], spread: [0], shot: { kind: 'web', r: 4, dmg: 3, life: 1.6, slow: 0.6, zone: true } }, // aimed; leaves a slowing web where it ends
         { name: '독침 3갈래 2파', sp: 128, waves: [0, 0.4], spread: [-.3, 0, .3], shot: { kind: 'venom', r: 2, dmg: 3, life: 1.2 } }],
       anim: { src: 'assets/mobs_felt/c1_03_needle_spider', F: 34, walk: { n: 8, ticks: [5,  5,  5,  5,  5,  5,  5,  5] }, attack: { n: 10, ticks: [6,  4,  4,  3,  3,  3,  3,  3,  8,  4], hit: 7 }, shoot: { n: 9, ticks: [5,  5,  5,  5,  10,  5,  5,  5,  5], release: 4, map: [0, 1, 2, 3, 3, 2, 8, 8, 8] } } }), // map: skip the strip's steep rear-up frames 4-7 (looked upside-down)
+    // 시간 메아리 (그록 10-25 「1장 마물」 09, handoff/claude/ch1_mobs_v1/09_echo): 히든 정예(북쪽 절벽 석화 나무 밑동, 맵 생기면 배치). 석상으로 잠들어 있다가 가까이 오거나 맞으면 깨어남(0.8초, 발밑 원) → 내려찍기(원 0.8초) + 0.8초 뒤 같은 자리 메아리 · 찌르기 줄 → 칼이 박힌 빈틈 1.5초. 그록 키 43.3 × 1.3 → 들판 70. 걷기 = PixelLab 8장.
+    c1_time_echo: (() => { const D = felt({ name: '시간 메아리', style: 'echo', elite: true, col: '#d8d0c4', aff: { weak: ['blunt'], resist: ['pierce'] }, hp: 260, h: 52, r: 11, sp: 18, restMelee: 1.5, bashLen: 70,
+      melee: { range: 34, rad: 24, dmg: 12, warn: .8, slam: true, echo: .8 }, shots: [],
+      anim: { src: 'assets/mobs_felt/c1_time_echo', F: 66.1, walk: { n: 8, ticks: [6, 6, 6, 6, 6, 6, 6, 6] }, statue: { n: 1, ticks: [5] }, awaken: { n: 6, ticks: [8, 8, 8, 8, 10, 10], hit: 4, map: [0, 1, 1, 1, 2, 2] },
+        attack: { n: 11, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 3, 8, 4], hit: 8, map: [0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2] }, bash: { n: 6, ticks: [6, 6, 6, 6, 8, 8], hit: 4, map: [0, 0, 0, 0, 1, 1] } } }), up = D.update;
+      D.init = m => { m.st = 'dormant'; m.noBar = true; m.anim = 'statue'; };
+      D.update = function (m, W, dt) { const A = this.anim, h = W.hero;
+        if (m.st === 'dormant') { m.anim = 'statue'; m.moving = false; if (W.dist(m, h) < 80 || m.hitT > 0) { m.st = 'rise'; m.t = 0; m.at = 0; m.noBar = false; m.alerted = true; m.face = h.x >= m.x ? 1 : -1;
+            const z = W.hazard({ shape: 'circle', x: m.x, y: m.y, r: 34, warn: .8, act: .05, dmg: 8, kind: 'swipe', owner: m }); startAnim(m, 'awaken', A.awaken, A.awaken.hit, z.warn); W.fx('text', m.x, m.y - 80, { text: '!', life: .8, color: '#ffd84a' }); W.shake(2); } return; }
+        if (m.st === 'rise') { m.t += dt; m.at += dt; if (m.t > 1.4) { m.st = 'idle'; m.t = 0; m.cd = .6; m.anim = 'walk'; } return; } // 깨어난 뒤 0.6초 빈틈
+        up.call(this, m, W, dt); }; return D; })(),
     // 철장 수문병·간수 (그록 10-25 「1장 마물」 04, handoff/claude/ch1_mobs_v1/04_warden, 크레딧 0): 방패 역할(새, 들판 정예 후보). 정면에서 베면 피해 x0.3(방패 「막음」) → 내려찍기(원 0.8초) 뒤 1.2초 망치가 박혀 있을 때 / 등 뒤로 돌아가 벰. 걷기 그림 없음 → 끌기 코드(walk.bob.drag).
     c1_iron_warden: felt({ name: '철장 간수', style: 'guard', col: '#8a8070', aff: { weak: ['blunt'], resist: ['slash', 'pierce'] }, hp: 120, h: 43, r: 10, sp: 16, restMelee: 1.2,
       melee: { range: 30, rad: 20, dmg: 9, warn: .8, slam: true }, shots: [],
@@ -558,13 +570,13 @@
     m.sigCd = cd; m.face = W.hero.x >= m.x ? 1 : -1; const end = start(m, W); m.st = 'sig'; m.t = 0; m.sigEnd = end; return true; }
   // 타격 재질 소리 (sfx_synth.js mat_*): 살 / 실 / 뼈·갑옷 / 껍질 — 챔피언은 아래에서 바탕 몹 것을 그대로 물려받음
   for (const [k, mt] of Object.entries({ mushroom: 'flesh', rabbit: 'flesh', boar: 'flesh', squirrel: 'flesh', slime: 'flesh', champ_boar: 'flesh', scarecrow: 'thread', c1_silmamul: 'thread', c1_thread_puppet: 'thread',
-    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', c1_needle_marksman: 'bone', c1_iron_warden: 'bone', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
+    golem: 'bone', wasp: 'shell', champ_wasp: 'shell', sprout: 'shell', c1_needle_spider: 'shell', c1_unrotting_hound: 'shell', c1_quilted_boar: 'thread', c1_spool_spider: 'shell', c1_shear_tailor: 'thread', c1_thread_scarecrow: 'thread', c1_pin_stuffing: 'thread', c1_needle_marksman: 'bone', c1_iron_warden: 'bone', c1_time_echo: 'bone', champ_c1_cocoon: 'thread', arachne: 'shell' })) if (def[k]) def[k].sfxMat = mt;
   { const mk = (id, base, o, extra) => { const B = def[base]; def[id] = Object.assign({}, B, { champion: true, init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }) }, o);
       if (extra) { const up = B.update; def[id].update = function (m, W, dt) { if (extra.call(this, m, W, dt) === true) return; up.call(this, m, W, dt); }; } };
-    mk('champ_c1_loom', 'c1_thread_puppet', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
+    mk('champ_c1_loom', 'c1_shear_tailor', { name: '베틀 파수꾼', title: '실 공방의 우두머리', hp: 280, h: 34, r: 10, tint: 'hue-rotate(-25deg) saturate(1.4) brightness(.9)', deco: 'strings' }, function (m, W, dt) { // 날실 가르기: three parallel warp threads aimed through the hero, one beat -> slip between them or dodge
       return champSig(m, W, dt, 8, 130, (m, W) => { const h = W.hero, a = ang(m, h.x, h.y), nx = -Math.sin(a), ny = Math.cos(a); let w = .7;
         for (const o of [-22, 0, 22]) { const x = m.x + nx * o, y = m.y + ny * o; w = W.hazard({ shape: 'line', x, y, x2: x + Math.cos(a) * 170, y2: y + Math.sin(a) * 170, width: 10, warn: .75, act: .05, dmg: 7, kind: 'swipe', owner: m }).warn; }
-        W.fx('text', m.x, m.y - 50, { text: '날실 가르기', life: .9, color: '#ffb0a0' }); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, w); return w + .25; }); }); // 꼭두각시 + always the 3-snip combo (rage)
+        W.fx('text', m.x, m.y - 50, { text: '날실 가르기', life: .9, color: '#ffb0a0' }); startAnim(m, 'attack', this.anim.attack, this.anim.attack.hit, w); return w + .25; }); }); // 가위 재단사 바탕(그록 10-25) + always the 3-snip combo (rage)
     // 고치 어미 (그록 10-25 「1장 마물」 07, 정본 이름, 크레딧 0): 실패 거미 역할 바탕 + 소환·거미줄 그물. 그록 키 41 × 1.3(중간 보스) → 들판 65. 걷기 그림 없음 → 떠다니기 코드(walk.bob.float), 공격·뱉기 = 서기 → 고치 터뜨리기(map).
     mk('champ_c1_cocoon', 'c1_spool_spider', { name: '고치 어미', title: '고치 저장고의 우두머리', hp: 210, h: 48, r: 11, col: '#e0d8cc',
       anim: { src: 'assets/mobs_felt/c1_cocoon_mother', F: 62.0, walk: { n: 1, ticks: [5], bob: { float: 2.2, amp: 5 } }, attack: { n: 10, ticks: [6, 4, 4, 3, 3, 3, 3, 3, 8, 4], hit: 7, air: 8, map: [0, 0, 0, 0, 0, 0, 0, 1, 1, 0] },
@@ -577,7 +589,7 @@
       const a = rnd(0, TAU), x = m.x + Math.cos(a) * 36, y = m.y + Math.sin(a) * 26; W.hazard({ shape: 'circle', x, y, r: 9, warn: .8, act: 0, dmg: 0, kind: 'web' });
       W.after(.8, () => { if (m.dead) return; W.fx('fluff', x, y - 6, { life: .6, col: '#e8e0d0', n: 10 }); const c = W.spawn('c1_pin_stuffing', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); }); } // babies, not full spiders: weak, 9 s (팀장 10-24: the fight ran > 6 min)
   // 잿빛 들판 챔피언 (팀장 10-24 「들판이 2~3분으로 짧다」, 크레딧 0): 들개 우두머리 = 들개 역할 + 울부짖음(12초마다 주변 들개를 깨워 곧바로 돌진, 무리가 적으면 1마리 부름, 최대 2)
-  { const B = def.c1_unrotting_hound, up = B.update; def.champ_c1_hound = Object.assign({}, B, { champion: true, name: '썩지 않는 사냥개 우두머리', title: '잿빛 들판의 우두머리', hp: 180, deco: 'eyes', h: 30, r: 11, tint: 'saturate(.6) brightness(1.25) contrast(1.15)',
+  { const B = def.c1_quilted_boar, up = B.update; def.champ_c1_hound = Object.assign({}, B, { champion: true, name: '누빔 멧돼지 우두머리', title: '잿빛 들판의 우두머리', hp: 180, deco: 'eyes', h: 30, r: 11, tint: 'saturate(.6) brightness(1.25) contrast(1.15)',
       init(m) { m.rage = true; }, anim: Object.assign({}, B.anim, { F: B.anim.F * 1.3 }), melee: Object.assign({}, B.melee, { dmg: B.melee.dmg + 3, rad: B.melee.rad * 1.3 }),
       update(m, W, dt) { // 사냥 3연 돌진 (고유): after each lunge recovers it lunges again, up to 3 in a row, then a long pant (1.4 s opening)
         if (m.st === 'lunge' && m.sub === 'rec' && m.t > .25 && (m.chain || 0) < 2 && W.dist(m, W.hero) < 130) { m.chain = (m.chain || 0) + 1; const h = W.hero; m.aim = ang(m, h.x, h.y); m.face = Math.cos(m.aim) >= 0 ? 1 : -1; // the chain stays one attack (one lunge state)
@@ -585,10 +597,10 @@
         if (m.pst === 'lunge' && m.st === 'idle') { if ((m.chain || 0) >= 2) { m.st = 'rest'; m.t = 0; m.restT = 1.4; m.cd = Math.max(m.cd || 0, 1.5); W.fx('text', m.x, m.y - 40, { text: '헉헉', life: .9, color: '#cfc4b0' }); } m.chain = 0; } // the chain is one pick in pickIntent's history (never 3 lunges in a row)
         m.pst = m.st;
         m.howlT = (m.howlT ?? 5) - dt; const d = W.dist(m, W.hero);
-        if (m.howlT <= 0 && d < 170 && (m.st === 'idle' || m.st === 'rest')) { m.howlT = 12; W.fx('text', m.x, m.y - 44, { text: '아우우——!', life: 1.1, color: '#e8d8c0' }); W.shake(2); if (W.sfx) W.sfx('tele', .8, .6);
-          const pack = (W.mobs || []).filter(o => !o.dead && o !== m && o.kind === 'c1_unrotting_hound' && W.dist(o, m) < 220); for (const o of pack) { o.alerted = true; o.cd = Math.min(o.cd || 0, .3); o.intent = 'lunge'; }
+        if (m.howlT <= 0 && d < 170 && (m.st === 'idle' || m.st === 'rest')) { m.howlT = 12; W.fx('text', m.x, m.y - 44, { text: '꾸에에엑——!', life: 1.1, color: '#e8d8c0' }); W.shake(2); if (W.sfx) W.sfx('tele', .8, .6);
+          const pack = (W.mobs || []).filter(o => !o.dead && o !== m && o.kind === 'c1_quilted_boar' && W.dist(o, m) < 220); for (const o of pack) { o.alerted = true; o.cd = Math.min(o.cd || 0, .3); o.intent = 'lunge'; }
           if (pack.length < 2 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < 2) { const a = rnd(0, TAU), x = m.x + Math.cos(a) * 60, y = m.y + Math.sin(a) * 45; W.hazard({ shape: 'circle', x, y, r: 10, warn: .7, act: 0, dmg: 0, kind: 'web' });
-            W.after(.7, () => { if (m.dead) return; W.fx('dust', x, y); const c = W.spawn('c1_unrotting_hound', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); } }
+            W.after(.7, () => { if (m.dead) return; W.fx('dust', x, y); const c = W.spawn('c1_quilted_boar', x, y); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.spawnT = .25; } }); } }
         up.call(this, m, W, dt); } }); }
   // 1장 던전 placeholders (owner 10-23 「제1던전까지」) until the monster room's real champions / boss land under the same ids: bigger copies of the felt mobs
   for (const [id, base, name, title, hp, boss] of [['champ_c1_loom', 'c1_thread_puppet', '베틀 파수꾼', '실 공방의 우두머리', 260], ['champ_c1_cocoon', 'c1_needle_spider', '고치 어미', '고치 저장고의 우두머리', 240], ['champ_c1_hound', 'c1_unrotting_hound', '썩지 않는 사냥개 우두머리', '잿빛 들판의 우두머리', 180],
