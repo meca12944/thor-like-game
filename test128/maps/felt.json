@@ -627,7 +627,7 @@
    "y": 24,
    "w": 7,
    "h": 1,
-   "to": "field_felt",
+   "to": "ch1_field_e",
    "spawn": "felt",
    "label": "↑ 1장 정문"
   },
@@ -3225,7 +3225,12 @@
     "fade": 0,
     "shadow": 0,
     "id": "ewall_s_10"
-   }
+   },
+   {"id": "doodle_1", "img": "assets/world/felt5/doodle_1.webp", "x": 37.5, "y": 54.95, "ax": 64, "ay": 128, "D": 4, "fade": 0, "shadow": 0},
+   {"id": "doodle_2", "img": "assets/world/felt5/doodle_2.webp", "x": 103.5, "y": 55.95, "ax": 64, "ay": 128, "D": 4, "fade": 0, "shadow": 0},
+   {"id": "doodle_3", "img": "assets/world/felt5/doodle_3.webp", "x": 45.5, "y": 98.95, "ax": 64, "ay": 128, "D": 4, "fade": 0, "shadow": 0},
+   {"id": "doodle_4", "img": "assets/world/felt5/doodle_4.webp", "x": 96.5, "y": 99.95, "ax": 64, "ay": 128, "D": 4, "fade": 0, "shadow": 0},
+   {"id": "doodle_5", "img": "assets/world/felt5/doodle_5.webp", "x": 70.5, "y": 32.95, "ax": 64, "ay": 128, "D": 4, "fade": 0, "shadow": 0}
   ],
   "decoArt": {
    "T": [
