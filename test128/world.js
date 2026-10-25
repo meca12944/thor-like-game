@@ -1357,12 +1357,19 @@
       ctx.fillStyle = '#fff'; ctx.fillRect(Math.round(hx + (f.dir[0] < 0 ? -1 : 1) * F.c[0] * k) - 1, Math.round(hy + F.c[1] * k) - 1, 3, 3); } }
   window.__gkFan = { FAN: GK_FAN, inFan: gkFanIn, head: gkFanHead }; // test hook (numeric checks)
 
-  // ---- 콤보 1~3타 검흔 = 판정 부채꼴(GK_FAN)을 그대로 그림 (그록 다크 검흔 v3, 「보이는 곳 = 맞는 곳」, 효과는 코드로). 1 그림px = 필드 1px.
-  // 같은 gkFanPolar 로 화소마다 계산: 열림 = gkFanHead(t)(판정 틱 t0~t1), 판정 끝 뒤 GK_FADE 틱 동안 면이 안쪽부터 접혀 테두리로 모였다가 꺼짐.
-  // 면(어두운 3단 + 1px 선)은 주인공 뒤, 테두리 날(칼끝 쪽으로 굵고 밝아짐)·칼끝 반짝임·스타일 조각은 앞. 8방향 = 판정과 같은 땅 평면 회전.
-  // 색 = 파쇄 강철 (사장님 10-24 그록 6종 중 「4 파쇄 강철」): 가는 강철 선이 판정이 끝나면 금 가며 각진 조각으로 떨어짐.
+  // ---- 콤보 1~3타 검흔 (사장님 10-24 「검기는 청록색으로」 + 그록 새 주인공 공격 그림 모양, 효과는 코드로). 1 그림px = 필드 1px.
+  // 그리기 = 그록 모양의 청록 빛 띠 (흰 심지): 1타 세운 초승달(머리 위 → 앞 땅) · 2타 허리 높이에서 몸을 감는 고리(뒤쪽 반은 주인공 뒤 층) · 3타 머리 위에서 내려꽂는 큰 반원.
+  // 맞는 판정 = 지금 땅 부채꼴(GK_FAN) 그대로 (세운 면을 판정으로 쓰면 앞쪽 좁은 띠만 맞아 적중률이 크게 떨어짐 — 10-24 연구). 띠의 끝은 부채꼴 앞끝 쪽 땅에 닿고,
+  // 띠의 앞끝 = gkFanHead(t) (판정과 같은 틱), 땅에는 판정 부채꼴을 아주 옅게 깔아 「맞는 곳」을 보여 줌. 판정 끝 뒤 GK_FADE 틱 동안 꼬리부터 접히며 꺼짐.
   const GK_FADE = 10, hexRGB = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-  const GKC = { fan: ['#1a1f27', '#1d232c', '#222933'].map(hexRGB), line: hexRGB('#0b0e12'), ol: hexRGB('#0f1318'), rim: ['#45515e', '#6d7d8d', '#a8b5c1', '#dce3ea'].map(hexRGB), part: ['#a8b5c1', '#dce3ea'] }; // fan 3 tones / edge / outline, rim shadow-body-hi-glint, shards
+  const GKC = { fan: hexRGB('#2aa9c4'), line: hexRGB('#5fe3f4'), glow: 'rgba(40,190,225,', body: 'rgba(110,232,250,', core: 'rgba(236,255,255,', part: ['#7fe9f8', '#e8ffff'] }; // ground hint, its edge, ribbon glow / body / white core, sparks
+  // 띠 모양 (몸 키 HH 필드px 기준, 그록 시트에서 잰 비율): plane 'v' = 세운 면 (중심 높이 cy·앞 cf·옆 cl, 반지름 = 끝이 땅에 닿게, 각도 a0 → a1, 옆으로 눕힘 tilt), 'ring' = 허리 고리
+  const GK_HH = 34, GK_RIB = [{ plane: 'v', cy: .55, cf: .05, cl: .25, a0: 105, a1: -50, tilt: .2, w: 3, trail: .8 }, { plane: 'ring', cy: .55, rr: .8, sq: .45, a0: 150, a1: -110, w: 3, trail: .75 }, { plane: 'v', cy: .6, cf: .15, cl: .1, a0: 100, a1: -45, tilt: .45, w: 4.2, trail: .85 }];
+  function gkRibPt(i, dir, u) { // swept fraction u (0..1) -> [x, y, behind] field px from the feet (behind = the ring's far half, drawn under the hero)
+    const B = GK_RIB[i], H = GK_HH, dx = dir[0], dy = dir[1], fx = dx, fy = dy * GK_SQ, lx = -dy, ly = dx * GK_SQ, a = (B.a0 + (B.a1 - B.a0) * u) * Math.PI / 180;
+    if (B.plane === 'ring') { const R = B.rr * H, gx = Math.cos(a), gy = Math.sin(a), wx = gx * dx - gy * dy, wy = gx * dy + gy * dx; return [wx * R, -B.cy * H + wy * R * B.sq, wy < 0]; } // ground circle, squashed; wy < 0 = farther from the camera
+    const cy = -B.cy * H, ox = (B.cf * fx + B.cl * lx) * H, oy = cy + (B.cf * fy + B.cl * ly) * H, R = B.cy * H / Math.sin(-B.a1 * Math.PI / 180); // radius: the end touches the ground
+    const c = Math.cos(a), sn = Math.sin(a); return [ox + R * (c * fx - sn * B.tilt * lx), oy + R * (c * fy - sn * (1 + B.tilt * ly)), false]; }
   const FAN_W = 100, FAN_H = 84, FAN_X0 = -50, FAN_Y0 = -60;
   // 성능 (팀장 10-24 「챔피언전 멈춤」): 화소마다 gkFanPolar 를 매 프레임 다시 하던 것을 (타, 방향) 표로 한 번만 계산(gkFanTab) + 완성 그림을 (타, 방향, 틱, 층) 으로 보관(gkFanImg, 최대 FAN_CMAX장).
   // 그림은 i·dir·t·layer 만으로 정해짐 (조각·반짝임 같은 seed 쪽은 gkFanBits 가 매번 그림). 방향은 8개뿐 (gkDir) -> 표는 맵과 상관없어서 시작할 때 gkFanWarm 이 쉬는 틈에 하나씩 미리 만듦 (첫 휘두름도 안 끊기게).
@@ -1374,31 +1381,30 @@
     const idle = window.requestIdleCallback || (fn => setTimeout(fn, 30)), step = () => { const q = todo.shift(); if (!q) return; gkFanTab(q[0], q[1]); idle(step); }; idle(step); } // one table per idle slice
   gkFanWarm();
   function gkFanState(f) { const F = GK_FAN[f.i], t = gkFanT(f); if (t < F.t0) return null; const open = t <= F.t1; return { F, t, open, head: open ? gkFanHead(F, t) : 1, k: open ? 0 : (t - F.t1) / GK_FADE }; }
-  function gkFanImg(f, St, layer) { // the fan as a field-px image (layer 0 = body behind the hero, 1 = rim in front), cached per (hit, dir, tick, layer)
+  function gkFanImg(f, St, layer) { // the slash as a field-px image (layer 0 = ground hint + far half of the ring, behind the hero; 1 = ribbon in front), cached per (hit, dir, tick, layer)
     const key = f.i + '|' + fanDirKey(f.dir) + '|' + St.t + '|' + layer; let cv = _fanImg.get(key); if (cv) return cv;
     cv = document.createElement('canvas'); cv.width = FAN_W; cv.height = FAN_H;
-    const C = GKC, { F, head, k, open } = St, T = gkFanTab(f.i, f.dir), TR = T.r, TU = T.u;
-    const g = cv.getContext('2d'), id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R, arc = Math.abs(F.a1 - F.a0) * Math.PI / 180 * R; // arc length in px (for the 1px edge on the swept ends)
-    const put = (i, c, a) => { d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = a; };
-    for (let j = 0, n = FAN_W * FAN_H; j < n; j++) { const r = TR[j], u = TU[j], i = j * 4;
-      if (u < 0 || u > head || u > 1) continue; const v = head > 0 ? u / head : 0, rn = r / R; // v: 0 at the start of the swing, 1 at the blade (tip)
-      if (layer === 0) { if (r > R || rn < k) continue; const edge = r > R - 1 || u * arc < 1 || (head - u) * arc < 1 || rn < k + 1 / R; // fill collapses outward on the fade
-        if (edge) put(i, C.line, 235 * (1 - k * .5)); else put(i, rn < .55 ? C.fan[0] : rn < .82 ? C.fan[1] : C.fan[2], 205 * (1 - k * .6)); continue; }
-      const w = (open ? 1 + 3.2 * Math.pow(v, 1.4) : (1 + 2 * v) * (1 - k)) * (u < .04 ? u / .04 : 1), rr = R - r; // rim trail: thicker and brighter toward the tip, thins out on the fade
-      if (!open && ((Math.floor(u * 15) * 7919) % 97) / 97 < k * 1.25) continue; // crack: the rim splits into ~15 angular pieces that go out one by one
-      if (rr >= 0 && rr < w) { const c = v > .9 && rr < w * .6 ? C.rim[3] : v > .6 ? (rr < w * .5 ? C.rim[2] : C.rim[1]) : v > .25 ? C.rim[1] : C.rim[0]; put(i, c, 255 * (open ? 1 : Math.sqrt(1 - k))); }
-      else if (rr < 0 && rr > -1.2 && v > .12 && w > .6) put(i, C.ol, 230 * (open ? 1 : 1 - k)); } // 1px dark outline outside the rim (reads on light floors)
-    g.putImageData(id, 0, 0); if (_fanImg.size >= FAN_CMAX) _fanImg.delete(_fanImg.keys().next().value); _fanImg.set(key, cv); return cv; }
+    const C = GKC, { F, head, k, open } = St, g = cv.getContext('2d');
+    if (layer === 0 && open) { const T = gkFanTab(f.i, f.dir), TR = T.r, TU = T.u, id = g.createImageData(FAN_W, FAN_H), d = id.data, R = F.R; // 맞는 곳: the hit fan, very faint (only while it can hit)
+      for (let j = 0, n = FAN_W * FAN_H; j < n; j++) { const r = TR[j], u = TU[j]; if (u < 0 || u > head || u > 1 || r > R) continue; const i = j * 4, c = r > R - 1 ? C.line : C.fan; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = r > R - 1 ? 70 : 34; }
+      g.putImageData(id, 0, 0); }
+    const B = GK_RIB[f.i], tail = open ? Math.max(0, head - B.trail) : head - B.trail * (1 - k) * (1 - k), al = open ? 1 : 1 - k * k, N = 40; // fade: the tail runs up to the tip
+    if (head > tail) { const P = []; for (let n = 0; n <= N; n++) { const u = tail + (head - tail) * n / N; P.push(gkRibPt(f.i, f.dir, u)); }
+      g.lineCap = 'round'; g.translate(-FAN_X0, -FAN_Y0);
+      for (const [col, kw, from] of [[C.glow, 1.9, 0], [C.body, 1, 0], [C.core, .42, .35]]) for (let n = 0; n < N; n++) { const v = (n + .5) / N; if (v < from || (P[n][2] || P[n + 1][2]) !== (layer === 0)) continue; // ring: far half on layer 0 only
+        const w = B.w * Math.pow(v, .7) * (v > .9 ? (1 - v) / .1 * .7 + .3 : 1) * (open ? 1 : 1 - k * .5); g.strokeStyle = col + (al * (col === C.glow ? .45 : col === C.body ? .9 : 1)).toFixed(3) + ')'; g.lineWidth = Math.max(.6, w * kw);
+        g.beginPath(); g.moveTo(P[n][0], P[n][1]); g.lineTo(P[n + 1][0], P[n + 1][1]); g.stroke(); }
+      g.setTransform(1, 0, 0, 1, 0, 0); const id = g.getImageData(0, 0, FAN_W, FAN_H), d = id.data; for (let i = 3; i < d.length; i += 4) { const a = d[i]; if (a) d[i] = a < 40 ? 0 : a < 120 ? 110 : a < 200 ? 190 : 255; } g.putImageData(id, 0, 0); } // pixel look: 3 alpha steps
+    if (_fanImg.size >= FAN_CMAX) _fanImg.delete(_fanImg.keys().next().value); _fanImg.set(key, cv); return cv; }
   function gkFanDraw(k, layer) { if (!S.gk) return; const [hx, hy] = W2S(hero.x, hero.y);
     for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const St = gkFanState(f); if (!St) continue;
       const im = gkFanImg(f, St, layer); ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(im, Math.round(hx + FAN_X0 * k), Math.round(hy + FAN_Y0 * k), FAN_W * k, FAN_H * k); ctx.restore();
       if (layer === 1) gkFanBits(k, f, St, hx, hy); } } // the sword itself = heroBlade (motion lab, whole combo)
-  function gkFanBits(k, f, St, hx, hy) { const { F, head, open, t } = St, C = GKC, P = (r, u) => { const [x, y] = gkFanPt(F, f.dir, r, u); return [hx + x * k, hy + y * k]; }; ctx.save();
-    if (open && head < 1) { const [sx, sy] = P(F.R - .5, head), L = 2.5 * k; ctx.fillStyle = '#dce3ea'; ctx.fillRect(Math.round(sx - L), Math.round(sy - k / 2), Math.round(2 * L), Math.round(k)); ctx.fillRect(Math.round(sx - k / 2), Math.round(sy - L), Math.round(k), Math.round(2 * L)); } // tip sparkle
-    const age = t - (F.t1 - 3); if (age > 0 && age < GK_FADE + 4) { let sd = (f.seed || 1) + 5; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, q = age / (GK_FADE + 4); // style bits shed off the rim
-      for (let n = 0; n < 9; n++) { const u = .25 + rnd() * .75, [x0, y0] = P(F.R - .5, u), a = rnd() * TAU, s = rnd(); let x = x0, y = y0, sz = k;
-        x += Math.cos(a) * age * .4 * k; y += (age * age * .06 + s) * k; sz = k * (s > .5 ? 2 : 1); // angular shards drop
-        ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); if (sz > k) { ctx.fillStyle = '#0f1318'; ctx.fillRect(Math.round(x + sz - k), Math.round(y + sz - k), Math.round(k), Math.round(k)); } } } // two-tone corner = angular chip
+  function gkFanBits(k, f, St, hx, hy) { const { F, head, open, t } = St, C = GKC, P = u => { const [x, y] = gkRibPt(f.i, f.dir, u); return [hx + x * k, hy + y * k]; }; ctx.save();
+    if (open && head < 1) { const [sx, sy] = P(head), L = 2.5 * k; ctx.fillStyle = '#f2ffff'; ctx.fillRect(Math.round(sx - L), Math.round(sy - k / 2), Math.round(2 * L), Math.round(k)); ctx.fillRect(Math.round(sx - k / 2), Math.round(sy - L), Math.round(k), Math.round(2 * L)); } // tip sparkle
+    const age = t - (F.t1 - 3); if (age > 0 && age < GK_FADE + 4) { let sd = (f.seed || 1) + 5; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, q = age / (GK_FADE + 4); // light motes shed off the ribbon
+      for (let n = 0; n < 9; n++) { const u = .3 + rnd() * .7, [x0, y0] = P(u), a = rnd() * TAU, s = rnd(); const x = x0 + Math.cos(a) * age * .5 * k, y = y0 + (Math.sin(a) * age * .4 - age * .15) * k, sz = k * (s > .6 ? 2 : 1);
+        ctx.globalAlpha = Math.max(0, 1 - q); ctx.fillStyle = C.part[n % 2]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(sz), Math.round(sz)); } }
     ctx.restore(); }
   function gkFanSwing() { if (!S.gk) return null; for (const f of S.gk) { if (f.i > 2 || f.map !== S.map) continue; const F = GK_FAN[f.i], t = gkFanT(f); if (t >= F.t0 - 1 && t <= F.t1 + 2) return f; } return null; }
   function gkTick(held) { if (S.gk && !held) { for (const f of S.gk) { f.t++; if (f.map === S.map && S.scene !== 'world') gkHits(f); } S.gk = S.gk.filter(f => (f.i <= 2 ? gkFanT(f) <= GK_FAN[f.i].t1 + GK_FADE + 1 : f.t * GK_STEP <= GK_LIFE + 3) && f.map === S.map); } if (S.gkImp) { for (const m of S.gkImp) m.t++; S.gkImp = S.gkImp.filter(m => m.t < 10); } }
@@ -1425,10 +1431,10 @@
   const comboBlade = () => !!(hero.atk && hero.atk.i <= 2 && !SLASH_BODY && !ATK_BODY && hero.hp > 0);
   let _swIn = false; // h8Cell(달리기 ↗↖ + 공격) -> swordHidden -> swordC -> h128Cell -> h8Cell ... 끝없는 되부름(Maximum call stack, 챔피언전 멈춤 원인) 막기: 안쪽 호출은 '안 숨김'으로 보고 그때의 칸(run)을 검사
   function swordHidden() { if (ATK_BODY || _swIn) return false; _swIn = true; try { return !!(gkFanSwing() || comboBlade()) && swordC(); } finally { _swIn = false; } } // 콤보 공격 내내 (모션연구방 10-24 「칼이 안사라지는데?」)
-  function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 부채꼴 앞끝.
+  function heroBlade(ctx) { // 콤보 1~3타 내내 그림 칼 대신 코드 칼: 손(grip) -> 검기 띠 앞끝 쪽.
     // 판정 틱 전 = 원래 칼 방향에서 시작 각도(head 0)로 들어 올림, 판정 틱 동안 = 앞끝을 따라 휘두름, 뒤 = 끝 각도에 멈춤
     const a = hero.atk, F = GK_FAN[a.i], tk = a.t * 60, dir = (S.gk && S.gk.length && S.gk[S.gk.length - 1].dir) || gkDir(), [gx, gy] = gkGrip(dir), A = 117 / H128FIG; // field px -> art px
-    const hd = tk < F.t0 ? 0 : tk > F.t1 ? 1 : Math.max(0, gkFanHead(F, tk)), [tx, ty] = gkFanPt(F, dir, F.R, hd); let ex = tx * A, ey = ty * A;
+    const hd = tk < F.t0 ? 0 : tk > F.t1 ? 1 : Math.max(0, gkFanHead(F, tk)), [tx, ty] = gkRibPt(a.i, dir, hd); let ex = tx * A, ey = ty * A; { const BL = 21 * A, q = Math.hypot(ex - gx, ey - gy) || 1; ex = gx + (ex - gx) / q * BL; ey = gy + (ey - gy) / q * BL; } // 칼끝 = 검기 띠 앞끝 쪽, 칼 길이 고정
     if (tk < F.t0) { const G = h128().H8, c = h128Cell(), g0 = G && G.grip && c && c.h8 !== undefined ? G.grip[c.h8 + ':' + G.cells[c.h8].indexOf(c)] : null;
       if (g0) { const q = tk / F.t0, e = q * q * (3 - 2 * q), d = (c.fl ? 180 - g0[2] : g0[2]) * Math.PI / 180, L = Math.hypot(ex - gx, ey - gy); ex = gx + (Math.cos(d) * L) * (1 - e) + (ex - gx) * e; ey = gy + (Math.sin(d) * L) * (1 - e) + (ey - gy) * e; } }
     const L = Math.hypot(ex - gx, ey - gy) || 1, ux = (ex - gx) / L, uy = (ey - gy) / L;
