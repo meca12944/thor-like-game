@@ -58,7 +58,8 @@ lane &= ~road
 # ---------------------------------------------------------------- north band (capital wall + gate)
 print('wall...')
 WL.GH.update(top=10.0, ctop=12.0)   # a11: the gatehouse no longer towers over the parapet (was 3 / 7) — level with the wall towers, so the castle shows over the gate too
-band = WL.build_band(); bim = band.finish(cut=band.meta['cut']); pc, ox, oy = band.meta['portc_pic']; bim.alpha_composite(pc.finish(), (ox, oy))
+import castle_tone as CT
+band = WL.build_band(); bim = CT.clean_finish(band, cut=band.meta['cut']); pc, ox, oy = band.meta['portc_pic']; bim.alpha_composite(pc.finish(), (ox, oy))
 # the royal castle far behind the wall: a screen-pinned far backdrop drawn by world.js drawBackdrop only behind the wall (clipY); it shows through the
 # deep breaches in normal play and whole from the gate vista. v8 (owner 10-25 「일러스트 작가랑 손그림풍 성 원화 새로 그려서 써라」「그림이 움직이게」): the illustrator's
 # hand-drawn castle + its 16-frame loop (castle_far.py builds assets/world/castle_far/); the code-drawn castle_fortress.py is in tools/hd/_archive_old_felt.
@@ -86,7 +87,14 @@ def squash(im, off):
     al = out[..., 3:4]; out[..., :3] = np.where(al > 1e-5, out[..., :3] / np.maximum(al, 1e-5), 0)
     return Image.fromarray(np.clip(out * 255 + .5, 0, 255).astype(np.uint8), 'RGBA'), d0
 _sb, _so = squash(bim, 0); bim = Image.new('RGBA', bim.size); bim.alpha_composite(_sb.crop((0, 0, bim.width, min(_sb.height, bim.height - _so))), (0, _so))
-tp, tox, toy = WL.tunnel(); tim = tp.finish(); tim, toy = squash(tim, toy); tpath = save(tim, 'gate_tunnel')
+# a13 (owner 10-25 「뒷 벽이랑 성벽이랑, 뒤에 왕도하고 일체화 시켜야지」): every piece of the capital wall is re-toned onto the illustrator's castle stone
+# (castle_tone.py: the castle's sepia ramp + quantiles, flat cel fills, black ink lines, drip streaks under the ledges) so wall + castle + city read as one.
+# Pixels only — the alpha (= the drawn silhouette) and every solid / door / exit stay exactly as they were.
+TONE = CT.Tone(bim, mix=.35, flat=0, cel=0, lift=1.45, ink=.8);   # light stone + thin black mortar like the castle; no blur (it turned the brush wash into blotches)
+WL.FINISH = CT.clean_finish
+def stone(im, seed, dens=1.0): return CT.drips(TONE.apply(im), seed, dens=dens * .35, lmin=24)
+bim = stone(bim, 11)
+tp, tox, toy = WL.tunnel(); tim = CT.clean_finish(tp); tim, toy = squash(tim, toy); tim = stone(tim, 12); tpath = save(tim, 'gate_tunnel')
 tunnel_q = {'id': 'gate_tunnel', 'img': tpath, 'x': round(tox / AT, 3), 'y': WALL_Y - 3.5, 'ax': 0, 'ay': round((WALL_Y - 3.5) * AT - toy, 1), 'D': D, 'fade': 0, 'shadow': 0}
 SL = 25; band_q = []
 for i, x0 in enumerate(range(0, 150, SL)):
@@ -103,14 +111,14 @@ road[24:WALL_Y + 1, 72:79] = True
 # rubble mounds at the collapsed runs (solid), dark at the wall foot
 for k, (a, b, lo) in enumerate(WL.COLLAPSE):
     for j, xx in enumerate(np.arange(a + .5, b, 3.4)):
-        ww = rnd.uniform(3.4, 4.6); p, ax, ay = PR.rubble(300 + k * 20 + j, ww, rnd.uniform(1.6, 2.4)); im = p.finish(); path = save(im, f'rubble_wall_{k}_{j}')
+        ww = rnd.uniform(3.4, 4.6); p, ax, ay = PR.rubble(300 + k * 20 + j, ww, rnd.uniform(1.6, 2.4)); im = stone(CT.clean_finish(p), 400 + k * 20 + j, .4); path = save(im, f'rubble_wall_{k}_{j}')
         y = WALL_Y + rnd.uniform(1.6, 2.6); prop(path, xx + ww / 2 - .5, y, ax, ay, id=f'rubble_wall_{k}_{j}')
         solid(int(xx), WALL_Y, int(xx + ww), int(y) + 1, '#')
 # ---------------------------------------------------------------- side walls (west + east edges)
 print('side walls...')
 def side(x0, x1, y0, y1, hfn, seed, inner, tag):
     for j, (im, xtl, yb, ax, ay) in enumerate(WL.side_wall_chunks(x0, x1, y0, y1, hfn, seed, 3.0, inner)):
-        path = save(im, f'{tag}_{j}'); prop(path, x0, yb, ax, ay, id=f'{tag}_{j}')
+        im = stone(im, seed * 10 + j); path = save(im, f'{tag}_{j}'); prop(path, x0, yb, ax, ay, id=f'{tag}_{j}')
     solid(int(x0), int(y0), int(math.ceil(x1)), int(math.ceil(y1)), '#')
 side(0, 4, WALL_Y + 1, 63, lambda y: 7.5 - (2.5 if 44 < y < 52 else 0), 71, 'right', 'wwall_n')
 side(0, 4, 78, 118, lambda y: 6.5 - max(0, (y - 96)) * .18, 72, 'right', 'wwall_s')
@@ -134,7 +142,7 @@ def gate_tower(cx, foot, seed, tag, top_):
     p.post.append(inkart.soot_post(lambda yy, xx: np.clip(1 - (yy - ft) / (fb - ft), 0, 1) * .8, .5, seed))
     inkart.crack(p, xl + 2 * AT, ft + 30, 90, seed, 1.3)
     p.fill([(xl - 10, fb + 2), (xr + 10, fb + 2), (xr + 6, fb - 10), (xl - 6, fb - 10)], 'stone_d', wob=.5, line=1.2)
-    im = p.finish(); path = save(im, tag); prop(path, cx, foot, 3.5 * AT, fb, id=tag)
+    im = stone(CT.clean_finish(p), seed + 500); path = save(im, tag); prop(path, cx, foot, 3.5 * AT, fb, id=tag)
     solid(int(cx - 2.6), int(foot - 3), int(math.ceil(cx + 2.6)), int(foot) + 0, '#')
 gate_tower(3.2, 66.5, 81, 'wgate_tower_n', 55.5); gate_tower(3.2, 79.0, 82, 'wgate_tower_s', 68.0)
 for y in range(67, 75):

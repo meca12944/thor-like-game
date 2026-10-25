@@ -88,6 +88,8 @@ def backdrop(kind, meta=None):
          # skyArt (world.js CASTLE_SKY / ?nosky): the illustrator's sky behind the castle, mirrored left-right past its ends; clouds tile left-right and drift left
          # (v = source px / s: one tile per 120 s), drawn before the castle so they only pass behind it; dim = dark veil over sky + clouds (the castle must read)
          'skyArt': {'img': OUT + 'sky.webp', 'w': SW, 'h': SH, 'dim': .25, 'clouds': [{'img': OUT + 'clouds_far.webp', 'w': 3072, 'v': 25.6}, {'img': OUT + 'clouds_near.webp', 'w': 4608, 'v': 38.4}]}}
+    cj = rel(OUT + 'city.json')   # a13: the capital round the castle (castle_city.py), drawn before the castle picture, its bottom row stretched to the clip line
+    if os.path.exists(cj): b['city'] = json.load(open(cj))
     if kind == 'felt':      # behind the capital wall: shows through the breaches, the whole castle from the gate vista
         b.update({'x': 75, 'px': .92, 'fit': [.02, 17.5, .9, .97, 1.04], 'nv': [.55, .3, 25.2], 'nvv': [.82, .5], 'clipY': 26.5, 'fog': [[SH * .80, SH * .12, .07, 5], [SH * .90, SH * .12, .10, 9]]})
     else:                   # 무명 무덤가: past the end of the road / from the crest, over the field's lip
@@ -106,5 +108,6 @@ def patch_maps(meta):
 if __name__ == '__main__':
     src = sys.argv[1] if len(sys.argv) > 1 else '/workspace/map_review/castle_art'
     if src == 'sky': build_sky(); patch_maps(None)
+    elif src == 'patch': patch_maps(None)            # a13: only re-write the two maps' backdrop entries (e.g. after castle_city.py)
     else: m = build(src); build_sky(); print(json.dumps(m)); patch_maps(m)
     for n in sorted(os.listdir(rel(OUT))): print(n, os.path.getsize(rel(OUT + n)))

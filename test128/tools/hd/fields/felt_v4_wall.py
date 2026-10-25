@@ -299,6 +299,7 @@ def far_castle(seed=9, Wt=120, kxt=None):
         top = np.clip(1 - yy / (H * .7), 0, 1); col[:] = col * (1 - .2 * top[..., None]) + np.array([170, 168, 172.]) * .2 * top[..., None]
     p.post.append(fog)
     return p
+FINISH = None   # a13: build_felt5 sets castle_tone.clean_finish (the castle's stone) for the side-wall chunks
 def side_wall_chunks(x0, x1, y0, y1, hfn, seed, L=3.0, inner='right'):
     """N-S wall run on the map edge, cut in y-chunks (y-sorted props). returns list of (Image, x_tl_tiles, y_foot, ax, ay)"""
     out = []; r = random.Random(seed); y = y0
@@ -320,7 +321,7 @@ def side_wall_chunks(x0, x1, y0, y1, hfn, seed, L=3.0, inner='right'):
         p.post.append(moss_post(lambda yy, xx, ft=ft: np.clip((yy - ft) / 60., 0, 1) * .3 + (yy < ft) * .5, .7, 'moss', 8, 6 + int(y), .6))
         p.post.append(soot_post(lambda yy, xx, ft=ft, fb=fb: np.clip(1 - (yy - ft) / (fb - ft + 1), 0, 1) * (yy > ft) * .6, .45, int(y)))
         if r.random() < .5: crack(p, r.uniform(ox + 10, ox + w * T - 10), ft + 6, r.uniform(30, (fb - ft)), seed + int(y * 17), 1.2)
-        out.append((p.finish(), x0 - .3, yb, (x0 - x0 + .3) * T, fb - 0))
+        out.append(((FINISH or Pic.finish)(p), x0 - .3, yb, (x0 - x0 + .3) * T, fb - 0))
         y = yb
     return out
 if __name__ == '__main__':
