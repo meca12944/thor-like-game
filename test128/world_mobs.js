@@ -39,10 +39,12 @@
   const T60 = a => a.reduce((s, v) => s + v, 0) / 60;
   function startAnim(m, name, a, key, warn) { // play strip `name`; frames before `key` stretch so frame `key` lands at `warn` s (the telegraph end)
     m.anim = name; m.at = 0; m.keyT = warn; m.preT = T60(a.ticks.slice(0, key)); m.dur = warn + T60(a.ticks.slice(key)) * (m.D.rec || 1); }
-  const FELT_SPD = 1.4; // owner 10-22 "걷는속도 빠르게": move x1.4, walk cycle 5 ticks/frame (was 7)
+  // 엘든링식 속도 기본 (사장님 10-25 「엘든링식이 제일 좋다」, 몬스터 교본 1-8): 주인공 걷기 72 · 늦은 제자리 베기 · 스태미나 → 한 번에 한 마리와 싸우게
+  //   공격 간격 x0.6→x1, 공격 뒤 빈틈 x1.4, 맞은 뒤 회복 x0.7→x1, 걸음 1.4→1.1 (주인공 걷기의 47~74%), 일반 몹 체력 x0.7
+  const FELT_SPD = 1.1; // was 1.4 (owner 10-22 "걷는속도 빠르게"); walk cycle 5 ticks/frame
   // 몹 공격 기준 (owner 10-23 "펠트 몹으로 기준을 잡자"; handoff/claude/MOBS_ROOM4_ko.md 기준표): seconds the mob stands still after each attack = the opening to slash
-  const FELT_STD = { restMelee: .65, restShoot: .5, restLunge: .9, restLeap: .85, backOff: 40 }; // 10-24 팀 기준(경고 0.6~0.8, 빈틈 0.8~1.2): strike -> moves again measured 0.73~0.82 s -> +0.1~0.15
-  const FELT_SC = 1.35, FELT_CD = .6, FELT_REC = .7; // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
+  const FELT_STD = { restMelee: .91, restShoot: .7, restLunge: 1.26, restLeap: 1.19, backOff: 40 }; // x1.4 for the souls pace (was .65/.5/.9/.85) // 10-24 팀 기준(경고 0.6~0.8, 빈틈 0.8~1.2): strike -> moves again measured 0.73~0.82 s -> +0.1~0.15
+  const FELT_SC = 1.35, FELT_CD = 1, FELT_REC = 1; /* souls pace: cooldown / recovery back to x1 (were .6/.7) */ // owner 10-22 "크기 더 키우고 공속 더빠르게": body x1.35 (reach x1.15), cooldowns x0.6, recovery after the hit x0.7 (telegraphs unchanged)
   function pickIntent(P, d, m) { // distance decides which move is likely; the same move never 3 times in a row
     const O = P === 'lunge' ? [['lunge', d >= 35 && d < 110 ? 3 : 1], ['shoot', d >= 90 ? 3 : .6]] : P === 'skirm' ? [['leap', d < 80 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]]
       : P === 'duel' ? [['combo', d < 60 ? 3 : 1], ['shoot', d >= 60 ? 3 : 1]] : [['melee', d < 45 ? 3 : 1], ['shoot', d >= 45 ? 3 : 1]];
@@ -519,6 +521,6 @@
   // area-1 regulars keep their AI and get the room-3 hi-res strips (body height x1.3)
   for (const [k, id] of Object.entries({ mushroom: 'field_mushroom', rabbit: 'field_horned_rabbit', wasp: 'field_wasp', boar: 'field_boar', scarecrow: 'field_scarecrow', slime: 'a1_06_forest_slime', squirrel: 'a1_07_acorn_squirrel', sprout: 'a1_08_spirit_sprout' })) { def[k].s47 = id; def[k].h = Math.round(def[k].h * 1.3); }
   for (const k in def) { const D = def[k]; if (!D.felt || D.style === 'boss') continue; // 8-way shots (owner 10-22 "4방향 -> 8방향"), bigger, faster attacks
-    D.anim.F *= FELT_SC; D.h = Math.round(D.h * FELT_SC); D.r = Math.round(D.r * 1.2); D.melee.range *= 1.15; D.melee.rad *= 1.15; D.rec = FELT_REC; }
+    if (!D.champion && !D.elite && !D.boss) D.hp = Math.round(D.hp * .7); /* souls pace: a regular mob falls in 3~4 slashes = one stamina bar (교본 1-8) */ D.anim.F *= FELT_SC; D.h = Math.round(D.h * FELT_SC); D.r = Math.round(D.r * 1.2); D.melee.range *= 1.15; D.melee.rad *= 1.15; D.rec = FELT_REC; }
   window.WorldMobs = { def };
 })();
