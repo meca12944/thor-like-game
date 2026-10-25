@@ -47,6 +47,7 @@
     mat_bone:   [['n', { f0: 1900, f1: 1200, dur: .07, v: .3, q: 5 }], ['t', { type: 'square', f0: 880, f1: 660, dur: .045, v: .08 }]],                  // 딱
     mat_shell:  [['n', { f0: 2600, f1: 700, dur: .09, v: .32, q: 2.2 }], ['t', { type: 'triangle', f0: 520, f1: 260, dur: .06, v: .1 }]],              // 껍질 깨짐 (빠직)
     hit_thud:   [['t', { type: 'sine', f0: 92, f1: 44, dur: .22, v: .45 }], ['n', { f0: 260, f1: 60, dur: .18, v: .3, filter: 'lowpass', q: .7 }]],      // 3타 저음 쿵
+    bell_far:   [['t', { type: 'sine', f0: 110, dur: 3.4, v: .09, a: .01 }], ['t', { type: 'sine', f0: 220, dur: 2.8, v: .1, a: .008 }], ['t', { type: 'sine', f0: 263, dur: 2.0, v: .06, a: .008 }], ['t', { type: 'sine', f0: 331, dur: 1.5, v: .04, a: .008 }], ['t', { type: 'sine', f0: 442, dur: 1.1, v: .045, a: .006 }], ['n', { f0: 900, f1: 300, dur: .12, v: .05, filter: 'lowpass' }]], // 먼 성의 종 (성이 살아 있게 10-25): hum · prime · minor third · fifth · octave partials, long fade
     fight_end:  [['t', { type: 'triangle', f0: 784, dur: .1, v: .1 }], ['t', { type: 'triangle', f0: 1175, dur: .3, v: .1, d: .09 }], ['n', { f0: 6000, f1: 7500, dur: .3, v: .04, filter: 'highpass', d: .09 }]], // 들판 마지막 적: 짧은 마무리
   };
   function voice(ctx, dest, nb, k, vol, rate, t0) { const out = ctx.createGain(); out.gain.value = vol; out.connect(dest); const r = rate * (.975 + Math.random() * .05); // 무작위 ±2.5% (콤보 +3% 계단이 들리게)
