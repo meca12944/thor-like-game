@@ -163,15 +163,15 @@
   {
    "type": "spawn",
    "mob": "c1_needle_spider",
-   "x": 39,
-   "y": 7,
+   "x": 47,
+   "y": 9,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "c1_unrotting_hound",
-   "x": 24,
-   "y": 31,
+   "x": 22,
+   "y": 27,
    "respawn": 30
   },
   {
@@ -184,8 +184,8 @@
   {
    "type": "spawn",
    "mob": "c1_silmamul",
-   "x": 44,
-   "y": 30,
+   "x": 47,
+   "y": 17,
    "respawn": 30
   },
   {
@@ -226,8 +226,8 @@
   {
    "type": "spawn",
    "mob": "c1_needle_spider",
-   "x": 8,
-   "y": 4,
+   "x": 15,
+   "y": 11,
    "respawn": 30
   },
   {
