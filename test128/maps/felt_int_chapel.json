@@ -128,15 +128,15 @@
   {
    "type": "npc",
    "id": "f_oswald",
-   "x": 5,
+   "x": 7,
    "y": 4,
    "name": "오스왈드",
    "role": "수도사",
    "idle": "기도하시오, 이방인. 밤마다 종이 울리면… 저 아래에서 응답이 들려오니.",
    "art": "c_priest",
    "anim": "felt_oswald",
-   "wander": 0.6,
-   "face0": "up"
+   "wander": 0.3,
+   "face0": "left"
   }
  ],
  "ground": [

@@ -17,44 +17,95 @@
  "battleBgm": "battle_champion",
  "tileset": "field",
  "tile": 16,
- "w": 52,
- "h": 32,
+ "w": 56,
+ "h": 36,
+ "ground": [
+  "P#####PP#########T#PTTTPTPP#TP##TPPTT#####T##P##PPPT#T##",
+  "PTT##TT###TTPTTP#T##T#P#####PPP##TTT##T####PTPT#PT#TTPTP",
+  "###PTTP#T#T##T##TP###P#####TRP.PP##TT#RP#TPT#T#PP##P####",
+  "TT##PT#PRPRPP#P#TPTRRTPPRRPP...........PTTTTTT##PPPRPP#T",
+  "P#PP............................r..................TP###",
+  "##T#......T..................u.................s...PPT#P",
+  "####.........PPP#TPPPTPR#PP........................T#PPP",
+  "PP#P...u.............................u.............PR##P",
+  "P#P#T....TPP..u.....................................#PT#",
+  "T##T#....PPP..........L..................u...P......TP##",
+  "P#P##...PP#T............L......u............TRP.....#RTP",
+  "###T#....R##...r.r..L.......................PRT...r..P##",
+  "P#PPT....P#R........L....L...r.......................P##",
+  "P###T.s................L........s....r....T..........TTT",
+  "TPTR..........................T......................PPT",
+  "............=========................................TT#",
+  "......=====================......................T...RP#",
+  "============================================LLL......R##",
+  "==========.............=====================LLL...u..T#T",
+  ".............................=======........===......RT#",
+  "..........................................u.===...r.RP##",
+  "TRP.....s.s.....~~~..R...s..s.....LLLL..............RPTP",
+  "PTP....s......~~~~~..T............LLLL....r......u..####",
+  "##P......P....~~~~~...............LLLL..............P##P",
+  "###.r.......~~~~~~~.............s..................TPPT#",
+  "P#T........~~~~~~~~~~...............................TP##",
+  "P#P.......~~~~~~~~~~~........r......su.....s........#T##",
+  "##RP....s..~~~~~~~~~~...............................PTT#",
+  "#T#R....u.......~~~..........T.......................PPP",
+  "P#TP......u..u.....................s...R.......#RR...###",
+  "###TP................T.........s............u.........PT",
+  "##T#PT#TTRPPT...........R........r...................PP#",
+  "##T#PPT#PT#####.......#TPRPP..........RPTT#TTTPRT#R..##T",
+  "##TT##T##P#P#PTTTPTP#R###P#TTTT#TTTRPPPP#P#PP####P#PT###",
+  "##T######T#TPPTP#P#######P#TT##T###T##T##PP#T#TT#P#PT##P",
+  "TP###T#######TP##P#####TP###TP#T##TT####P###T###TP#T###P"
+ ],
  "legend": {
   ".": "snow",
-  ",": "stones",
-  ":": "snow",
+  "=": "stones",
+  "~": "water",
+  "b": "bridge_h",
   "#": "cliff",
-  "A": {
+  "L": "snow",
+  "T": {
+   "ground": "snow",
+   "deco": "tree"
+  },
+  "P": {
    "ground": "snow",
    "deco": "pine"
   },
-  "B": {
+  "R": {
    "ground": "snow",
    "deco": "boulder"
-  }
+  },
+  "r": {
+   "ground": "snow",
+   "deco": "rocks"
+  },
+  "u": {
+   "ground": "snow",
+   "deco": "bush"
+  },
+  "s": {
+   "ground": "snow",
+   "deco": "mushrooms",
+   "solid": false
+  },
+  "w": "snow"
  },
  "solid": [
   "#",
-  "A",
-  "B"
+  "T",
+  "P",
+  "R",
+  "r",
+  "u",
+  "L",
+  "~"
  ],
- "spawns": {
-  "default": [
-   3.5,
-   16,
-   "right"
-  ],
-  "world": [
-   3.5,
-   16,
-   "right"
-  ]
- },
  "objects": [
   {
    "type": "exit",
    "x": 0,
-   "y": 13,
+   "y": 15,
    "w": 1,
    "h": 6,
    "to": "world",
@@ -64,126 +115,372 @@
   {
    "type": "sign",
    "x": 4,
-   "y": 12,
+   "y": 14,
    "text": "8지역 · 설산 뇌전 탑\n← 월드맵"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_field08_0",
+   "x": 45,
+   "y": 19,
+   "name": "뇌전 첨탑"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_field08_1",
+   "x": 22,
+   "y": 12,
+   "name": "얼어붙은 석주"
+  },
+  {
+   "type": "landmark",
+   "id": "lm_field08_2",
+   "x": 35,
+   "y": 23,
+   "name": "눈 덮인 감시탑"
   },
   {
    "type": "spawn",
    "mob": "a8_06_thundercloud_bird",
    "x": 42,
-   "y": 20,
+   "y": 23,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_06_thundercloud_bird",
-   "x": 38,
-   "y": 22,
+   "x": 46,
+   "y": 27,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_06_thundercloud_bird",
-   "x": 35,
-   "y": 16,
+   "x": 48,
+   "y": 18,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_06_thundercloud_bird",
-   "x": 34,
-   "y": 24,
+   "x": 5,
+   "y": 4,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_07_ice_turtle",
-   "x": 18,
-   "y": 20,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a8_07_ice_turtle",
-   "x": 40,
-   "y": 7,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a8_07_ice_turtle",
-   "x": 28,
-   "y": 12,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a8_07_ice_turtle",
-   "x": 12,
-   "y": 17,
-   "respawn": 30
-  },
-  {
-   "type": "spawn",
-   "mob": "a8_08_storm_gargoyle",
    "x": 30,
+   "y": 23,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a8_07_ice_turtle",
+   "x": 20,
+   "y": 13,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a8_07_ice_turtle",
+   "x": 36,
+   "y": 5,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a8_07_ice_turtle",
+   "x": 41,
    "y": 19,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_08_storm_gargoyle",
-   "x": 28,
-   "y": 25,
+   "x": 26,
+   "y": 14,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_08_storm_gargoyle",
-   "x": 23,
-   "y": 21,
+   "x": 26,
+   "y": 19,
    "respawn": 30
   },
   {
    "type": "spawn",
    "mob": "a8_08_storm_gargoyle",
-   "x": 21,
-   "y": 7,
+   "x": 51,
+   "y": 20,
+   "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "a8_08_storm_gargoyle",
+   "x": 30,
+   "y": 6,
    "respawn": 30
   }
  ],
- "ground": [
-  "####################################################",
-  "####################################################",
-  "##............................,,,,,,..............##",
-  "##................,,..........,,,,,,..............##",
-  "##.............,,,,,,..........,,,,,,.............##",
-  "##.............A,,,,,...........,.........A.A.....##",
-  "##.............A,,,,,,.................,.......,..##",
-  "##.................,..................,,,,,..,,,,,##",
-  "##................C...C..............A,,,,,,.,,,,,##",
-  "##...................C........,....A.A,,,,,,.,,,,,##",
-  "##...................C.....,,,,,,...A...,......,,.##",
-  "##.....A.A.................,,,,,,,........,,,.....##",
-  "##.......A..................,,,,,,.......,,,,,....##",
-  ".........A............A.A...,..,,........,,,,,,...##",
-  "..............CC.....A.A.................,,,,,.::.##",
-  ".....................A....................C,C:::::##",
-  "...............C.............................:::::##",
-  "..............................................::::##",
-  "....A......................................AA.A.::##",
-  "##..A.....................................AA......##",
-  "##.....A,,,.......................................##",
-  "##.....,,,,,,.............,,..A...................##",
-  "##....,,,,,,,............,,,,,....................##",
-  "##.....,,,,,............,,,,,,,.A.................##",
-  "##...C...C...............,,,,,...........A........##",
-  "##........................,.,...........A.A.......##",
-  "##.............................,,.................##",
-  "##...........................,,,,,,,..............##",
-  "##............................,,,,,,..............##",
-  "##............................,,,,,,..............##",
-  "####################################################",
-  "####################################################"
- ]
+ "spawns": {
+  "default": [
+   2.5,
+   18.5,
+   "right"
+  ],
+  "world": [
+   2.5,
+   18.5,
+   "right"
+  ]
+ },
+ "hd": {
+  "D": 3,
+  "ground": "assets/world/fields_hd/field08_ground.png",
+  "decoArt": {
+   "T": [
+    {
+     "img": "assets/world/fields_hd/pine_snow_0.png",
+     "ax": 35,
+     "ay": 141
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_1.png",
+     "ax": 35,
+     "ay": 134
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_2.png",
+     "ax": 42,
+     "ay": 138
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_3.png",
+     "ax": 34,
+     "ay": 129
+    }
+   ],
+   "P": [
+    {
+     "img": "assets/world/fields_hd/pine_snow_0.png",
+     "ax": 35,
+     "ay": 141
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_1.png",
+     "ax": 35,
+     "ay": 134
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_2.png",
+     "ax": 42,
+     "ay": 138
+    },
+    {
+     "img": "assets/world/fields_hd/pine_snow_3.png",
+     "ax": 34,
+     "ay": 129
+    }
+   ],
+   "R": [
+    {
+     "img": "assets/world/fields_hd/snowrock_0.png",
+     "ax": 45,
+     "ay": 75
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_1.png",
+     "ax": 49,
+     "ay": 74
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_2.png",
+     "ax": 34,
+     "ay": 76
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_3.png",
+     "ax": 47,
+     "ay": 71
+    }
+   ],
+   "r": [
+    {
+     "img": "assets/world/fields_hd/snowrock_0.png",
+     "ax": 45,
+     "ay": 75
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_1.png",
+     "ax": 49,
+     "ay": 74
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_2.png",
+     "ax": 34,
+     "ay": 76
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_3.png",
+     "ax": 47,
+     "ay": 71
+    }
+   ],
+   "u": [
+    {
+     "img": "assets/world/fields_hd/snowrock_0.png",
+     "ax": 45,
+     "ay": 75
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_1.png",
+     "ax": 49,
+     "ay": 74
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_2.png",
+     "ax": 34,
+     "ay": 76
+    },
+    {
+     "img": "assets/world/fields_hd/snowrock_3.png",
+     "ax": 47,
+     "ay": 71
+    }
+   ],
+   "s": [
+    {
+     "img": "assets/world/field_felt_hd/stump.png",
+     "ax": 25,
+     "ay": 46
+    }
+   ]
+  },
+  "props": [
+   {
+    "img": "assets/world/fields_hd/lm_frosttower_0.png",
+    "ax": 44,
+    "ay": 142,
+    "D": 1.5,
+    "x": 45.5,
+    "y": 19.0,
+    "shadow": 1,
+    "id": "lm_field08_0"
+   },
+   {
+    "img": "assets/world/felt/rubble.png",
+    "ax": 27,
+    "ay": 32,
+    "x": 22.5,
+    "y": 9.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/field_felt_hd/ruin_pillar.png",
+    "ax": 38,
+    "ay": 143,
+    "x": 24.5,
+    "y": 10.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/field_felt_hd/ruin_pillar.png",
+    "ax": 38,
+    "ay": 143,
+    "x": 20.5,
+    "y": 11.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/field_felt_hd/ruin_pillar.png",
+    "ax": 38,
+    "ay": 143,
+    "x": 25.5,
+    "y": 12.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/field_felt_hd/ruin_pillar.png",
+    "ax": 38,
+    "ay": 143,
+    "x": 20.5,
+    "y": 12.9,
+    "shadow": 1,
+    "flip": false
+   },
+   {
+    "img": "assets/world/field_felt_hd/ruin_pillar.png",
+    "ax": 38,
+    "ay": 143,
+    "x": 23.5,
+    "y": 13.9,
+    "shadow": 1,
+    "flip": true
+   },
+   {
+    "img": "assets/world/fields_hd/lm_frosttower_3.png",
+    "ax": 46,
+    "ay": 128,
+    "D": 1.5,
+    "x": 35.99,
+    "y": 23.69,
+    "shadow": 1,
+    "id": "lm_field08_2"
+   }
+  ],
+  "water": [
+   [
+    21,
+    16,
+    18
+   ],
+   [
+    22,
+    14,
+    18
+   ],
+   [
+    23,
+    14,
+    18
+   ],
+   [
+    24,
+    12,
+    18
+   ],
+   [
+    25,
+    11,
+    20
+   ],
+   [
+    26,
+    10,
+    20
+   ],
+   [
+    27,
+    11,
+    20
+   ],
+   [
+    28,
+    16,
+    18
+   ]
+  ],
+  "tufts": [],
+  "fx": {
+   "particles": "snow",
+   "tuft": null,
+   "water": "lake"
+  }
+ }
 }
