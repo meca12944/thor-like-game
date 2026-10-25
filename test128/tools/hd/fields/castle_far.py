@@ -87,6 +87,7 @@ def patch_maps(meta):
         p = rel(f); j = json.load(open(p)); h = j['hd'] if 'hd' in j else j['hds'][0]
         old = h.get('backdrop') or {}; nb = backdrop(kind, meta)
         for k in ('x', 'px', 'fit', 'clipY'): nb[k] = old.get(k, nb[k])   # keep the map's own placement (set by its build script)
+        if isinstance(old.get('front'), list): nb['front'] = [nb['front']] + old['front'][1:]   # 무명 무덤가: 펠트 마을 띠 등 덧붙인 앞 띠는 지킴 (팀장 10-25)
         h['backdrop'] = nb; json.dump(j, open(p, 'w'), ensure_ascii=False, indent=1); print('patched', f)
 
 if __name__ == '__main__':
