@@ -938,6 +938,7 @@
   function enterScene(to, spawnName) {
     if (S.intro && !S.intro.ctl) S.intro = null; // left the grave mid-intro (tests / ?go=): drop it so input and HUD never stay locked
     S.roomP2 = undefined; S.cocoonGone = []; S.zones = []; S.tether = null; S.webs = null; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    if (S.banner && S.banner.small) S.banner = null; // 작은 알림(「발견 — 루카의 모닥불」 등)은 그 맵 것: 맵을 바꾸면 지움 (2번방 10-26: 펠트 발견 글이 베틀방에 따라옴)
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
