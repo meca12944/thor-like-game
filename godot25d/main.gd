@@ -2,7 +2,7 @@ extends Node3D
 # 필멸자 2.5D 시험 (Godot 4.3, gl_compatibility): 그록 그림 바닥(2D 그대로) + 3D 인형 주인공.
 # 1 단위 = 지도 1칸(16px). 카메라 45도 아래로 → 바닥 세로를 KZ배로 늘려 2D 그림 비율을 그대로 보이게 함.
 
-const PITCH := 45.0
+const PITCH := 35.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
 const SECS := 33.0
@@ -27,7 +27,7 @@ var phase := 0            # 공격: 0 준비, 1 휘두름, 2 멈춤, 3 회복
 var hold_t := 0.0
 var shake := 0.0
 var skel: Skeleton3D
-const CHIBI := {"Head": 1.75, "LeftUpLeg": 0.82, "RightUpLeg": 0.82, "Spine01": 0.9, "LeftArm": 0.92, "RightArm": 0.92}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
+const CHIBI := {"Head": 1.45, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
 var step_acc := 0.0
 const STEP := 1.0 / 12.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
@@ -127,7 +127,7 @@ func _ready() -> void:
 	model = load_glb("actions.glb")
 	hero.add_child(model)
 	var sc := base_sc()
-	model.scale = Vector3(sc, sc, sc)
+	model.scale = Vector3(sc * 1.1, sc, sc * 1.1)
 	anim = model.find_child("AnimationPlayer", true, false)
 	anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	var lib: AnimationLibrary = anim.get_animation_library("")
@@ -217,7 +217,6 @@ func _ready() -> void:
 		cm.billboard_keep_scale = true
 		core.material_override = cm
 		core.position = Vector3(0, 6, 14)
-		cb.add_child(core)
 
 	# 4) 청록 궤적
 	var tr := MeshInstance3D.new()
@@ -292,7 +291,7 @@ func _ready() -> void:
 	label.position = Vector2(10, 6)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "시험 5 · 2D 느낌(시험 4) + 미니 귀여운 비율 + 옛 주인공 동작 전부"
+	sub.text = "시험 6 · 옛 주인공 비율(약 4.5등신·큰 머리·큰 장화·넓은 몸) · 가슴 빛 뺌 · 카메라 35도(얼굴 보이게)"
 	sub.add_theme_font_override("font", f)
 	sub.add_theme_font_size_override("font_size", 10)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -310,7 +309,7 @@ func play(n: String, spd: float) -> void:
 	if cur_anim != n:
 		anim.play(n, 0.12)
 		cur_anim = n
-		model.scale = Vector3.ONE * base_sc()
+		model.scale = Vector3(1.1, 1.0, 1.1) * base_sc()
 	if n.find("Slash") < 0:
 		anim.speed_scale = spd
 
@@ -384,12 +383,12 @@ func punch(dt: float) -> void:
 	match phase:
 		0:
 			anim.speed_scale = 0.8
-			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(1.03, 0.96, 1.03), 0.2)
+			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc() * Vector3(1.03, 0.96, 1.03), 0.2)
 			if v > 9.0:
 				phase = 1
 		1:
 			anim.speed_scale = 2.1
-			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(0.97, 1.05, 0.97), 0.4)
+			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc() * Vector3(0.97, 1.05, 0.97), 0.4)
 			if v < 5.0:
 				phase = 2
 				hold_t = 0.09
@@ -401,10 +400,10 @@ func punch(dt: float) -> void:
 				phase = 3
 		3:
 			anim.speed_scale = 1.35
-			model.scale = model.scale.lerp(Vector3.ONE * base_sc(), 0.2)
+			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc(), 0.2)
 
 func base_sc() -> float:
-	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8 * 1.08
+	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8 * 1.05
 
 func update_trail(dt: float, on: bool) -> void:
 	if on and tip:
