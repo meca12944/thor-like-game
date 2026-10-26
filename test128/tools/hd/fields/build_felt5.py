@@ -305,7 +305,8 @@ for i, (x, y) in [('f_clue_gate', (79, 30)), ('f_clue_moat', (40, 31)), ('f_hid_
         put(o, x, y, adjust=(o['type'] != 'clue'))
 for i, (x, y) in [('lm_felt_castle', (75, 32)), ('lm_felt_fountain', (75, 76)), ('lm_felt_grave', (138, 47))]:
     if i in OB: put(OB[i], x, y)
-put(dict(OB['felt_gate'], zoom=.24, pan=20.5, hold=1,   # a11: the hero stays on screen (feet ~88% down) under the castle
+put(dict(OB['felt_gate'], zoom=.24, pan=20.5, hold=1, tilt={'z0': .3, 'z1': .45, 'pan': 22},   # 틸트 업 + 줌인 (사장님 10-26)
+            # a11: the hero stays on screen (feet ~88% down) under the castle
      r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
 # 토비의 숯 낙서 5개 (사장님 10-25 확정 「토비의 숯 낙서 찾기」, 3번방): 벽 옆 바닥, 다 찾으면 토비가 선물 (quests.json q_felt_doodle)
 put(dict(type='clue', id='f_doodle_1', name='숯 낙서 — 이장 집 담벼락', flag='toby_doodle_1', text="벽에 숯으로 그린 그림: 등 굽은 할아버지가 지팡이를 휘두르며 화내고 있다.\n옆에 삐뚤빼뚤한 글씨 — \"이장님 무서움\"."), 37, 55)

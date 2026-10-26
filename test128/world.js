@@ -1080,7 +1080,7 @@
     if (S.freezeT > 0 && !(hero.hp > 0 && !hero.roll && !(hero.rollCd > 0) && codesOf('dash').some(c => queue.includes(c)))) { S.freezeT -= dt; updateCam(dt); return; } if (S.freezeT > 0) S.freezeT = 0; // 회피대시는 멈춤(히트스톱) 중에도 바로 (보고서 3-9 「맞은 직후부터 언제든」, 모션연구방 10-24) // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
-    if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
+    if (S.msg && !S.vfx && (S.msg.t -= dt) <= 0) S.msg = null; // 전망 장면 동안엔 안내 글 시간이 멈춤 (숨겼다가 끝나면 다시)
     if (S.qs) { const Q = S.qs; Q.flash = Math.max(0, (Q.flash || 0) - dt * 2.5); Q.shake = Math.max(0, (Q.shake || 0) - dt * 4); Q.noteT = Math.max(0, (Q.noteT || 0) - dt); }
     if (S.feed) { for (const f of S.feed) f.t += dt; S.feed = S.feed.filter(f => f.t < f.life); }
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -1379,12 +1379,29 @@
   // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
   // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
   const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
+  // [틸트 업 + 줌인] 사장님 10-26 「주인공이 성 바라볼 때 틸트 기법으로 줌인」: vista.tilt = { z0 (넓게), z1 (성 쪽으로 다가감), pan (타일, 기본 vista.pan) } 이 있는 전망의 첫 방문 장면만.
+  // 주인공 뒷모습 hold초 -> tilt초 동안 위로(dir 쪽) 젖히며 z0 -> z1 (inOutSine) -> 성에서 stay초 머문 뒤 지명 글자 -> 입력·끝나면 보통 카메라로 부드럽게 돌아옴. blur = 화면 위·아래 흐림 띠 (틸트시프트, 0 = 끔, ?notiltblur)
+  const VISTA_TILT = { hold: .3, tilt: 1.8, stay: .8, text: 1.6, blur: Q.has('notiltblur') ? 0 : .2 };
+  const tiltT = V => V && V.tilt ? VISTA_TILT.hold + VISTA_TILT.tilt + VISTA_TILT.stay + VISTA_TILT.text : VISTA.fx; // scene length
+  const inOutSine = p => .5 - .5 * Math.cos(Math.PI * Math.max(0, Math.min(1, p)));
+  function tiltCam() { const f = S.vfx, V = f && f.v; if (!V || !V.tilt) return; const C = VISTA_TILT, Tl = V.tilt, T = M().T;
+    if (!f.c0) f.c0 = { vz: S.vz, lx: S.look[0], ly: S.look[1] }; const c0 = f.c0, z0 = Tl.z0 || V.zoom || .6, z1 = Tl.z1 || z0 * 1.5, pan = (Tl.pan ?? V.pan ?? 8) * T, va = (V.dir ?? 270) * Math.PI / 180;
+    const a = inOutSine(f.t / C.hold), e = inOutSine((f.t - C.hold) / C.tilt); // hold: settle on the hero (zoom to z0) · tilt: rise toward the castle + zoom in
+    S.vz = f.t < C.hold ? c0.vz + (z0 - c0.vz) * a : z0 + (z1 - z0) * e; S.look[0] = c0.lx * (1 - a) + Math.cos(va) * pan * e; S.look[1] = c0.ly * (1 - a) + Math.sin(va) * pan * e;
+    EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); }
+  let tiltCv = null; // 위·아래 흐림 띠: 띠를 1/20 크기로 줄였다 늘려 그림 (화면 px 기준, 세상 그림은 이미 3~4배 커서 크게 줄여야 흐려 보임) (흐림 필터 없이 가볍게), 가장자리일수록 진하게
+  function drawTiltBlur(ox, oy, SW, SH, a) { const C = VISTA_TILT; if (!C.blur || a <= 0) return; const bh = Math.round(SH * C.blur), sc = 20, w = Math.max(1, Math.round(SW / sc)), h = Math.max(1, Math.round(bh / sc));
+    tiltCv = tiltCv || document.createElement('canvas'); if (tiltCv.width !== w || tiltCv.height !== h * 2) { tiltCv.width = w; tiltCv.height = h * 2; } const g = tiltCv.getContext('2d'); g.imageSmoothingEnabled = true;
+    g.drawImage(ctx.canvas, ox, oy, SW, bh, 0, 0, w, h); g.drawImage(ctx.canvas, ox, oy + SH - bh, SW, bh, 0, h, w, h);
+    ctx.save(); ctx.imageSmoothingEnabled = true; const n = 8; for (let i = 0; i < n; i++) { const y0 = i / n, y1 = (i + 1) / n; ctx.globalAlpha = a * (1 - y0) * .9; // strip i from the edge inward
+      ctx.drawImage(tiltCv, 0, y0 * h, w, (y1 - y0) * h, ox, oy + y0 * bh, SW, (y1 - y0) * bh + 1); ctx.drawImage(tiltCv, 0, h + (1 - y1) * h, w, (y1 - y0) * h, ox, oy + SH - y1 * bh, SW, (y1 - y0) * bh + 1); }
+    ctx.restore(); }
   function vistaNow() { const m = M(); if (!m || m.type === 'world' || S.dialog || S.engaged || (S.bossRef && !S.bossRef.dead) || hero.hp <= 0) return null; const T = m.T;
     const V = (m.objects || []).find(o => o.type === 'vista' && Math.hypot(hero.x / T - o.x - .5, hero.y / T - o.y - .5) < (o.r || 3)); if (!V) return null;
     return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
-    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
+    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > tiltT(f.v) || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
     const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
   // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles), top/zmin/hp (see zoneZL)}] -> the zoom eases toward zone.zoom and the view looks up/down
@@ -1414,6 +1431,7 @@
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + zoneZL(m, z)[0] * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && (S.vfx || V.hold) ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+    tiltCam(); // 전망 첫 장면 틸트 업 + 줌인 (S.vz·S.look 를 직접 정함)
     { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = zoneZL(m, z)[1] * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
@@ -2263,9 +2281,9 @@
       ctx.fillStyle = on ? 'rgba(60,18,22,.95)' : 'rgba(10,8,14,.9)'; ctx.fillRect(cx, cy, cw, 19 * u); ctx.strokeStyle = on ? '#b04a3a' : '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(cx, cy, cw, 19 * u); textOut((on ? '▶ ' : '   ') + c.t, cx + 9 * u, cy + 14 * u, 12 * u, on ? '#ffe2c8' : '#a99c8c', '#000', 'left'); });
     if (done && !(d.choices && d.pi === P.length - 1)) { const bob = Math.round(Math.sin(d.t * 6) * 1.5 * u); textOut(d.pi < P.length - 1 ? '▼' : '■', x + w - 16 * u, y + h - 10 * u + bob, Math.max(10 * u, fs * .7), '#b04a3a', '#000', 'right'); }
     if (P.length > 1) textOut((d.pi + 1) + '/' + P.length, x + w - 18 * u - fs * .8, y + h - 10 * u, Math.max(9 * u, fs * .6), '#6e6458', '#000', 'right'); }
-  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, a = Math.max(0, Math.min(1, f.t / .4, (VISTA.fx - f.t) / .4)), bh = Math.round(SH * .06 * a);
+  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, L = tiltT(V), a = Math.max(0, Math.min(1, f.t / .4, (L - f.t) / .4)), bh = Math.round(SH * .06 * a); if (V.tilt) drawTiltBlur(ox, oy, SW, SH, a);
     ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh);
-    const ta = Math.max(0, Math.min(1, (f.t - .3) / .5, (VISTA.fx - f.t) / .4)); if (ta <= 0) return; ctx.globalAlpha = ta;
+    const t0 = V.tilt ? VISTA_TILT.hold + VISTA_TILT.tilt + VISTA_TILT.stay : .3, ta = Math.max(0, Math.min(1, (f.t - t0) / .5, (L - f.t) / .4)); if (ta <= 0) return; // tilt: 성에서 머문 뒤 지명 ctx.globalAlpha = ta;
     const n1 = Math.max(24 * u, SH * .09), n2 = Math.max(12 * u, SH * .042); textOut(V.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (V.sub) textOut(V.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.2, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
   function keyHint(a) { if (S.lastInput === 'pad' && PAD_LABEL[a]) return PAD_LABEL[a]; const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
@@ -2310,7 +2328,7 @@
     }
     if (NAV() && m.type !== 'world') { ctx.globalAlpha = S.hudA == null ? 1 : S.hudA; NAV().drawHud(k, ox, oy, u); ctx.globalAlpha = 1; }
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
-    if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
+    if (S.msg && !S.vfx) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
     if (S.intro) drawIntro(ox, oy, SW, SH);
