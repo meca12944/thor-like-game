@@ -848,7 +848,7 @@
   function ultSafe(h, x, y) { const b = h.owner; for (const d of M().decos) { if (d.spr !== 'pillar') continue;
       const px = d.x, py = d.y - 6, vx = x - b.x, vy = y - b.y, L = Math.hypot(vx, vy); if (L < 1) continue;
       const u = ((px - b.x) * vx + (py - b.y) * vy) / (L * L); if (u <= 0 || u >= 1) continue;
-      if (Math.hypot(b.x + vx * u - px, b.y + vy * u - py) < 10) return true; } return false; }
+      if (Math.hypot(b.x + vx * u - px, b.y + vy * u - py) < (M().w > 60 ? 18 : 10)) return true; } return false; } // 베틀방 기둥은 2 타일 굵기 (4번방 10-26)
 
   // ---------------- mobs ----------------
   function spawn(kind, x, y, o = {}) {

@@ -445,10 +445,10 @@
   // (walks in to ~60px, the pounce closes long gaps). Phase 2 (HP 50%): + 실 감옥 / 바늘 비, 3 clones, 5 threads. Body = PixelLab strips drawn by drawFeltHi (felt: true).
   const ARA = { rest: { chop: .35, bind: .7, clone: .6, pounce: 1.0, cage: .8, rain: .7, brood: .5, cocoon: .9, trap: .6, orb: .8, pull: .9, stitch: .8, ult: 1.2 }, name: { chop: '뼈 다리 칼끝 찍기', bind: '강철 실 봉인', clone: '실 분신 기습', pounce: '거미 덮치기', cage: '실 감옥', rain: '바늘 비', brood: '새끼 풀기', cocoon: '고치 비', trap: '실타래 덫', orb: '붉은 실타래 구체', pull: '붉은 실 당기기', stitch: '영혼 꿰매기', ult: '천 갈래 붉은 실' }, broodMax: 6, ceil: [[6, 9], [11, 7], [17, 7], [22, 9], [10.5, 12.5], [17.5, 12.5]] /* arachne_boss ceiling cocoons (3번방 hd.phase2) */ };
   function spinWebs(m, W) { const map = W.map, P = (map.decos || []).filter(d => d.spr === 'pillar'), L = []; // 붉은 베틀 실: threads strung between the room's pillars (and to the walls if few pillars)
-    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const a = P[i], b = P[j], dd = Math.hypot(a.x - b.x, a.y - b.y); if (dd > 40 && dd < 200) L.push({ x: a.x, y: a.y - 6, x2: b.x, y2: b.y - 6, dd }); }
-    L.sort((p, q) => p.dd - q.dd); let ws = L.slice(0, 6); if (ws.length < 4) { const cx = map.pw / 2, cy = map.ph / 2; ws = ws.concat([0, 1, 2, 3].map(k => { const a = k * Math.PI / 4 + .3; return { x: cx + Math.cos(a) * 150, y: cy + Math.sin(a) * 100, x2: cx - Math.cos(a) * 150, y2: cy - Math.sin(a) * 100 }; })).slice(0, 6); }
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const a = P[i], b = P[j], dd = Math.hypot(a.x - b.x, a.y - b.y); if (dd > 40 && dd < 320) L.push({ x: a.x, y: a.y - 6, x2: b.x, y2: b.y - 6, dd }); }
+    L.sort((p, q) => p.dd - q.dd); let ws = L.slice(0, 8); if (ws.length < 4) { const cx = map.pw / 2, cy = map.ph / 2; ws = ws.concat([0, 1, 2, 3].map(k => { const a = k * Math.PI / 4 + .3; return { x: cx + Math.cos(a) * 150, y: cy + Math.sin(a) * 100, x2: cx - Math.cos(a) * 150, y2: cy - Math.sin(a) * 100 }; })).slice(0, 6); }
     W.webs(ws.map(w => ({ x: w.x, y: w.y, x2: w.x2, y2: w.y2, cut: false }))); W.banner('붉은 실이 방 전체에 쳐진다 — 칼로 베어 길을 열어라', 1.6, true); }
-  def.arachne = { name: '아라크네', title: '실타래의 재단사', boss: true, felt: true, style: 'boss', col: '#c8c2d0', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 1500, h: 110, r: 30, kb: 0, sp: 26, dmgMul(m) { return m.st === 'rest' || m.anim === 'hurt' ? 1 : .45; }, // 팀장 10-24 플레이 점검: 연타만으로 20초 → 빈틈(rest)에 베야 제대로 들어간다
+  def.arachne = { name: '아라크네', title: '실타래의 재단사', boss: true, felt: true, style: 'boss', col: '#c8c2d0', aff: { weak: ['slash'], resist: ['pierce'] }, hp: 1500, h: 110, r: 30, kb: 0, sp: 34, /* 베틀방 지름 40 (4번방 10-26): 26 → 34 */ dmgMul(m) { return m.st === 'rest' || m.anim === 'hurt' ? 1 : .45; }, // 팀장 10-24 플레이 점검: 연타만으로 20초 → 빈틈(rest)에 베야 제대로 들어간다
     // 그록판 (새 주인공 H128FIG 34의 3.2배 = F184·h110·r30, 10-25) (사장님 10-24 「아라크네도 이걸로」, handoff/claude/arachne_grok_v1): 그록 4면·엎드린 거미형 + PixelLab 걷기 8장·핵심 자세 4장. 사이 장은 그리지 않고
     // (그림 도구가 칼 빛줄기를 구워 넣음) 같은 장을 map 으로 붙잡고, 웅크림·늘임·흔들림은 drawFeltHi 코드가 맡는다. 2페이즈 = 엎드린 거미형(rage·ragewalk).
     anim: { src: 'assets/mobs_felt/c1_boss_arachne', F: 184, walk: { n: 8, ticks: [6, 6, 6, 6, 6, 6, 6, 6] }, attack: { n: 12, ticks: [6, 5, 5, 4, 4, 4, 9, 6, 8, 14, 6, 5], hit: 6, map: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0] }, // 뼈 다리 칼끝: 찍고 → 박힌 채 빈틈 → 뽑기
@@ -487,7 +487,7 @@
       if (!P2 && !m.ult1 && m.hp < m.maxHp * .75 && m.st === 'idle' && W.ult) { m.ult1 = true; m.last = 'ult'; W.banner(ARA.name.ult, .9, true); W.ult(m, 2.6, { text: '필살 — 천 갈래 붉은 실!  기둥 뒤로 숨거나, 조이는 순간 회피대시', pct: .35 }); startAnim(m, 'prison', A.prison, A.prison.release, 1.2); set(m, 'ult'); return; }
       if (m.cd > 0) return;
       const webOn = P2 && W.webs && W.webs() && W.webs().some(w => !w.cut);
-      const O = [['trap', P2 ? .8 : 1.4], ['orb', d >= 60 ? 1.6 : .7]].concat(P2 ? [['pull', webOn ? 1.6 : 0], ['stitch', h.ccCd > 0 ? 0 : 1.2]] : []).concat([['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 90 ? 3 : d >= 55 ? 1 : 0], ['brood', (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax - 1 ? (P2 ? 2 : 1.1) : 0]].concat(P2 ? [['cage', 1.2], ['rain', d >= 60 ? 1.3 : .6], ['cocoon', 1.4]] : []));
+      const O = [['trap', P2 ? .8 : 1.4], ['orb', d >= 60 ? 1.6 : .7]].concat(P2 ? [['pull', webOn ? 1.6 : 0], ['stitch', h.ccCd > 0 ? 0 : 1.2]] : []).concat([['chop', d < 70 ? 3 : 0], ['bind', d >= 50 ? 2 : .8], ['clone', 1.4], ['pounce', d >= 192 ? 8 : d >= 90 ? 3 : d >= 55 ? 1 : 0] /* 12 타일 넘게 멀면 덮치기로 간격 좁힘 */, ['brood', (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax - 1 ? (P2 ? 2 : 1.1) : 0]].concat(P2 ? [['cage', 1.2], ['rain', d >= 60 ? 1.3 : .6], ['cocoon', 1.4]] : []));
       for (const o of O) if (o[0] === m.last) o[1] = 0; // never the same move twice in a row
       let t = O.reduce((a, o) => a + o[1], 0) * Math.random(), k = O[0][0]; for (const o of O) { if (o[1] <= 0) continue; k = o[0]; t -= o[1]; if (t <= 0) break; }
       m.last = k; m.cd = (P2 ? 1.0 : 1.3) / agg(W); W.banner(ARA.name[k], .9, true); const a = ang(m, h.x, h.y); look(); m.hold = 0;
@@ -495,7 +495,7 @@
         const z = W.hazard({ shape: 'circle', x, y, r: 22, warn: .7, act: .05, dmg: HP(.1), kind: 'web', owner: m, onEnd: () => { if (!m.dead && W.zone) W.zone({ x, y, r: 24, life: 4, k: .7 }); } });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, z.warn); set(m, 'atk'); return; }
       if (k === 'orb') { const n = P2 ? 2 : 1; let tw = .65; for (let i = 0; i < n; i++) tw = lineTele(W, m, a + (i - (n - 1) / 2) * .5, 150, .65, 12); // 붉은 실타래 구체 (정본 7-0): aimed, slow, follows a little (outrun it or just-dodge it)
-        W.after(tw, () => { if (m.dead) return; for (let i = 0; i < n; i++) W.shot({ x: m.x, y: m.y - 32, a: ang(m, W.hero.x, W.hero.y) + (i - (n - 1) / 2) * .5, sp: 72, r: 7, dmg: HP(.35), life: 3.2, home: 1.1, homeAfter: .3, kind: 'bloodorb', owner: m }); });
+        W.after(tw, () => { if (m.dead) return; for (let i = 0; i < n; i++) W.shot({ x: m.x, y: m.y - 32, a: ang(m, W.hero.x, W.hero.y) + (i - (n - 1) / 2) * .5, sp: 72, r: 7, dmg: HP(.35), life: 3.7, home: 1.1, homeAfter: .3, kind: 'bloodorb', owner: m }); });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); m.hold = tw + .3; return; }
       if (k === 'pull') { const ws = (W.webs() || []).filter(w => !w.cut); let tw = .7; // 베틀 당기기 (정본 2페이즈 「멀리서 실로 끌어당김」): every web lights up, then snaps (on a web = hit), then the hero is yanked toward her
         for (const w of ws) { w.hot = true; tw = W.hazard({ shape: 'line', x: w.x, y: w.y, x2: w.x2, y2: w.y2, width: 10, warn: .7, act: .05, dmg: HP(.15), kind: 'web', owner: m }).warn; }
@@ -509,8 +509,8 @@
         if (P2) W.hazard({ shape: 'circle', x: m.x + Math.cos(a) * reach * 1.9, y: m.y + Math.sin(a) * reach * 1.5, r: 20, warn: z.warn + .35, act: .05, dmg: HP(.3), kind: 'swipe', owner: m }); // phase 2: a second, longer snip
         startAnim(m, 'attack', A.attack, A.attack.hit, z.warn + (P2 ? .35 : 0)); set(m, 'atk'); return; }
       if (k === 'bind') { const n = P2 ? 5 : 3, sp = .3, dirs = Array.from({ length: n }, (_, i) => a + (i - (n - 1) / 2) * sp); let tw = .6;
-        for (const b of dirs) tw = lineTele(W, m, b, 170, .6, 6);
-        W.after(tw, () => { if (m.dead) return; for (const b of dirs) W.shot({ x: m.x, y: m.y - 30, a: b, sp: 125, r: 4, dmg: HP(.12), life: 1.6, slow: 1.2, pull: 14, root: .6, kind: 'threadball', owner: m }); });
+        for (const b of dirs) tw = lineTele(W, m, b, 220, .6, 6);
+        W.after(tw, () => { if (m.dead) return; for (const b of dirs) W.shot({ x: m.x, y: m.y - 30, a: b, sp: 125, r: 4, dmg: HP(.12), life: 1.9, slow: 1.2, pull: 14, root: .6, kind: 'threadball', owner: m }); });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); return; }
       if (k === 'clone') { const n = P2 ? 3 : 2, gap = .45; let last = 0; // thread clones appear beside the hero and dash through it one after another; she stands channelling (the big opening)
         for (let i = 0; i < n; i++) { const ca = a + Math.PI / 2 * (i % 2 ? -1 : 1) + (i === 2 ? Math.PI / 2 : 0), R = 78, cx = h.x + Math.cos(ca) * R, cy = h.y + Math.sin(ca) * R * .8,
@@ -518,7 +518,7 @@
           const z = W.hazard({ shape: 'line', x: cx, y: cy, x2: x1, y2: y1, width: 16, warn: w, act: .05, dmg: HP(.28), kind: 'swipe', owner: m });
           W.fx('tclone', cx, cy, { x1, y1, warn: z.warn, dash: .16, life: z.warn + .5, src: A.src, F: A.F * .85, face: x1 > cx ? 1 : -1 }); last = z.warn; }
         startAnim(m, 'shoot', A.shoot, A.shoot.release, .5); set(m, 'atk'); m.hold = last + .2; return; }
-      if (k === 'pounce') { const L = Math.min(d, 120); m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * L; m.ty = m.y + Math.sin(a) * L; m.landed = false; // lands on the marked spot
+      if (k === 'pounce') { const L = Math.min(d, 160); m.sx = m.x; m.sy = m.y; m.tx = m.x + Math.cos(a) * L; m.ty = m.y + Math.sin(a) * L; m.landed = false; // lands on the marked spot
         const z = W.hazard({ shape: 'circle', x: m.tx, y: m.ty, r: 26, warn: .85, act: .05, dmg: HP(.38), kind: 'quake', owner: m }); m.warn = z.warn;
         startAnim(m, 'pounce', A.pounce, A.pounce.hit, z.warn); set(m, 'pounce'); return; }
       if (k === 'brood') { const n = P2 ? 3 : 2, z = W.hazard({ shape: 'circle', x: m.x - m.face * 14, y: m.y - 4, r: 20, warn: .6, act: 0, dmg: 0, kind: 'web' }); m.swell = z.warn; // 사장님 10-24 「몸통에서 새끼 거미가 계속 나와서 주인공을 공격」: the spool-belly swells (warning), then spiderlings burst out
@@ -526,22 +526,22 @@
           for (let i = 0; i < n; i++) { if ((W.mobs || []).filter(o => !o.dead && o.mom === m).length >= ARA.broodMax) break; const b = rnd(0, TAU), c = W.spawn('c1_pin_stuffing', m.x - m.face * 14 + Math.cos(b) * 14, m.y + Math.sin(b) * 10);
             if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .3 + i * .25; c.spawnT = .25; } } });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, z.warn); set(m, 'atk'); return; }
-      if (k === 'cage') { const R = W.map && W.map.pw ? Math.min(170, W.map.pw * .4) : 150; // 실 감옥 (팀장 10-24): a thread wall closes in from the room edge around the hero, one gap; escape through it before the centre crushes
+      if (k === 'cage') { const R = W.map && W.map.pw ? Math.min(240, W.map.pw * .4) : 150; // 실 감옥 (팀장 10-24): a thread wall closes in from the room edge around the hero, one gap; escape through it before the centre crushes
         m.cg = { cx: h.x, cy: h.y, R0: R, R1: 24, t: 0, T: 2.6, gap: ang(m, h.x, h.y) + rnd(-1.2, 1.2) };
         const z = W.hazard({ shape: 'circle', x: h.x, y: h.y, r: 34, warn: m.cg.T, act: .05, dmg: HP(.4), kind: 'web', owner: m }); m.cg.T = z.warn;
         W.hazard({ shape: 'ring', x: h.x, y: h.y, r0: R - 4, r: R + 4, warn: .5, act: 0, dmg: 0, kind: 'web' }); // where the wall rises
         startAnim(m, 'prison', A.prison, A.prison.release, .6); set(m, 'cage'); return; }
       if (k === 'cocoon') { const n = 5; // 고치 비 (팀장 10-24): cocoons drop from the ceiling onto where the hero is, shadow first; landed ones stay as obstacles, some hatch
         for (let i = 0; i < n; i++) W.after(i * .45, () => { if (m.dead) return; const H = W.hero, x = H.x, y = H.y, T = (W.map && W.map.T) || 16, U = m.ccUsed || (m.ccUsed = {}); // 3번방: the room's 6 ceiling cocoons drop first, nearest to the hero (still aimed at the hero), then plain drops
-          let ci = -1, bd = 1e9; ARA.ceil.forEach(([cx, cy], j) => { if (U[j]) return; const dd = Math.hypot(cx * T - x, cy * T - y); if (dd < bd) { bd = dd; ci = j; } });
-          const from = ci >= 0 ? { fx: ARA.ceil[ci][0] * T, fy: ARA.ceil[ci][1] * T } : {}; if (ci >= 0) { U[ci] = 1; try { dispatchEvent(new CustomEvent('cocoon-drop', { detail: { i: ci } })); } catch (e) { } }
+          const CEIL = (W.map && W.map.hd && W.map.hd.phase2 && W.map.hd.phase2.cocoons) || ARA.ceil; let ci = -1, bd = 1e9; CEIL.forEach(([cx, cy], j) => { if (U[j]) return; const dd = Math.hypot(cx * T - x, cy * T - y); if (dd < bd) { bd = dd; ci = j; } });
+          const from = ci >= 0 ? { fx: CEIL[ci][0] * T, fy: CEIL[ci][1] * T } : {}; if (ci >= 0) { U[ci] = 1; try { dispatchEvent(new CustomEvent('cocoon-drop', { detail: { i: ci } })); } catch (e) { } }
           const z = W.hazard({ shape: 'circle', x, y, r: 15, warn: .9, act: .05, dmg: HP(.3), kind: 'quake', owner: m }); W.fx('cocoonfall', x, y, Object.assign({ life: z.warn + .05, warn: z.warn }, from));
           W.after(z.warn, () => { if (m.dead) return; W.shake(2); W.fx('fluff', x, y - 4, { life: .5, col: '#e8e2d4', n: 8 }); W.tempSolid(x, y, 7, 4, 'cocoon');
             if (Math.random() < .3 && (W.mobs || []).filter(o => !o.dead && o.mom === m).length < ARA.broodMax) { const c = W.spawn('c1_pin_stuffing', x, y + 8); if (c) { c.mom = m; c.noDrop = true; c.alerted = true; c.cd = .8; c.spawnT = .25; } } }); });
         startAnim(m, 'rain', A.rain, A.rain.release, .6); set(m, 'atk'); m.hold = .45 * 4 + .9 + .1; return; }
       if (k === 'rain') { let tw = .55; for (let w = 0; w < 3; w++) W.after(w * .5, () => { if (m.dead) return; const b = ang(m, W.hero.x, W.hero.y); // 3 aimed pin fans, each with its own line
-          for (const s of [-.22, 0, .22]) lineTele(W, m, b + s, 150, tw, 5);
-          W.after(tw, () => { if (m.dead) return; for (const s of [-.22, 0, .22]) W.shot({ x: m.x, y: m.y - 30, a: b + s, sp: 150, r: 2, dmg: HP(.1), life: 1.3, kind: 'pin', owner: m }); }); });
+          for (const s of [-.22, 0, .22]) lineTele(W, m, b + s, 220, tw, 5);
+          W.after(tw, () => { if (m.dead) return; for (const s of [-.22, 0, .22]) W.shot({ x: m.x, y: m.y - 30, a: b + s, sp: 150, r: 2, dmg: HP(.1), life: 1.6, kind: 'pin', owner: m }); }); });
         startAnim(m, 'shoot', A.shoot, A.shoot.release, tw); set(m, 'atk'); m.hold = 1.0 + tw + .1; return; }
     },
     onDeath(m, W) { const D = this.anim.death; W.fx('strip', m.x, m.y, { src: this.anim.src + '_death', ticks: D.ticks, F: this.anim.F, face: m.face, life: D.ticks.reduce((a, v) => a + v, 0) / 60 + 1.6 }); W.fx('fluff', m.x, m.y - 30, { life: 1.2, col: '#c8c2d0', n: 26 }); W.fx('unravel', m.x, m.y - 30, { life: 2.2, n: 26 }); W.shake(5); try { dispatchEvent(new CustomEvent('boss-dead', { detail: { kind: 'arachne' } })); } catch (e) { } /* collapse: the threads holding her together unravel */ for (const o of W.mobs || []) if (!o.dead && o.mom === m) { o.dead = true; W.fx('fluff', o.x, o.y - 6, { life: .5, col: '#3a2a40', n: 6 }); } } }; // her brood dies with her
