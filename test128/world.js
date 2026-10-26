@@ -767,7 +767,7 @@
   function bossCineKill(B, m) { S.killSlow = 1.3; S.cine = { kind: 'kill', t: 0, dur: 4.2, text: (m.D.title || B.name) + josa(m.D.title || B.name, '을', '를') + ' 쓰러뜨렸다', sub: m.D.title ? B.name : '' }; after(.35, () => flash(.35, '255,255,255', .9)); }
   function cineBars(ox, oy, SW, SH, u, k) { const bh = Math.round(SH * .11 * k); if (bh < 1) return; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh); ctx.fillStyle = 'rgba(140,20,30,.55)'; ctx.fillRect(ox, oy + bh - Math.max(1, u), SW, Math.max(1, u)); ctx.fillRect(ox, oy + SH - bh, SW, Math.max(1, u)); }
   function drawBossCine(ox, oy, SW, SH, u) { const C = S.cine, b = S.bossRef;
-    const want = C ? 1 : (S.introT > 0 || (S.dialog && b && !b.dead && b.st === 'intro')) ? 1 : 0; S.barK = (S.barK || 0) + (want - (S.barK || 0)) * .18; cineBars(ox, oy, SW, SH, u, S.barK);
+    const want = C ? 1 : (S.introT > 0 || S.bpush || (S.dialog && b && !b.dead && b.st === 'intro')) ? 1 : 0; S.barK = (S.barK || 0) + (want - (S.barK || 0)) * .18; cineBars(ox, oy, SW, SH, u, S.barK);
     if (C && C.kind === 'intro' && C.img) { const im = splashImg(C.img), t = C.t, a = Math.min(1, Math.max(0, (t - .25) / .3)) * (t > 2.0 ? Math.max(0, 1 - (t - 2.0) / .3) : 1);
       if (im && a > 0) { const sc = 1 + .04 * Math.min(1, t / 2.0), w = SW * sc, h = SH * sc; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, SH); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.imageSmoothingEnabled = false;
         ctx.drawImage(im, ox + (SW - w) / 2, oy + (SH - h) / 2, w, h); const pa = Math.min(1, Math.max(0, (t - .6) / .35)); ctx.globalAlpha = a * pa; const px = ox + SW * .04, py = oy + SH * .78;
@@ -955,7 +955,7 @@
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
         if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id, loot: o.loot }); // o.loot = the champion's drop (map data)
       }
-      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; bossCineIntro(m.boss, b); playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
+      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; if (Math.abs(b.y - hero.y) + Math.abs(b.x - hero.x) * .5 > LH / (m.viewZoom || 1) * BOSS_PUSH.far) { S.introT = 0; const pf = 'bpush_' + (m.boss.id || m.boss.kind); if (!SAVE.flags[pf]) { SAVE.flags[pf] = true; S.bpush = { t: 0, b, B: m.boss, m }; } } bossCineIntro(m.boss, b); playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
@@ -1039,7 +1039,7 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl)) return [0, 0]; return rawDir(); }
+  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl) || S.bpush) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy && S.padDir) { const [px, py] = S.padDir, l = Math.hypot(px, py); ix = px / l; iy = py / l; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
@@ -1373,7 +1373,7 @@
 
   // ---------------- camera ----------------
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
-  function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1] + (b ? 0 : S.zl || 0), ty = fy - EH / 2; return [clampC(fx - EW / 2, m.pw - EW), m.skyTop && m.ph > EH ? Math.max(-m.skyTop * m.T, Math.min(m.ph - EH, ty)) : clampC(ty, m.ph - EH)]; } // skyTop: the camera may rise above the map top (the sky + far backdrop up there) // boss intro: the camera looks at the boss first (art room 10-23)
+  function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], pw = bossPushW(), pb = S.bpush && S.bpush.b; let fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1] + (b ? 0 : S.zl || 0); if (pw > 0) { fx += (pb.x - fx) * pw; fy += (pb.y - 30 - fy) * pw; } const ty = fy - EH / 2; return [clampC(fx - EW / 2, m.pw - EW), m.skyTop && m.ph > EH ? Math.max(-m.skyTop * m.T, Math.min(m.ph - EH, ty)) : clampC(ty, m.ph - EH)]; } // skyTop: the camera may rise above the map top (the sky + far backdrop up there) // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { const m = M(); if (!m) return; S.zl = 0; if (m.camZones) { const [w, z] = camZoneW(m); if (z) S.zl = zoneZL(m, z)[1] * w; } S.cam = camTarget(); }
   // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
   // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
@@ -1381,6 +1381,14 @@
   const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
   // [틸트 업 + 줌인] 사장님 10-26 「주인공이 성 바라볼 때 틸트 기법으로 줌인」: vista.tilt = { z0 (넓게), z1 (성 쪽으로 다가감), pan (타일, 기본 vista.pan) } 이 있는 전망의 첫 방문 장면만.
   // 주인공 뒷모습 hold초 -> tilt초 동안 위로(dir 쪽) 젖히며 z0 -> z1 (inOutSine) -> 성에서 stay초 머문 뒤 지명 글자 -> 입력·끝나면 보통 카메라로 부드럽게 돌아옴. blur = 화면 위·아래 흐림 띠 (틸트시프트, 0 = 끔, ?notiltblur)
+  // [보스 등장 카메라 밀기] 팀장 10-26 (4번방 큰 아라크네 방): 보스가 화면 밖 멀리 있으면 첫 만남 때 주인공 → go초 보스 쪽으로 미끄러져 → stay초 머물며 이름 → back초 주인공으로. skip초 뒤 입력 = 건너뜀(바로 돌아옴).
+  const BOSS_PUSH = { go: .9, stay: .9, back: .7, skip: .4, far: .45 }; // far = 화면 높이의 몇 배보다 멀면 밀기
+  function bossPushW() { const P = S.bpush, C = BOSS_PUSH; if (!P) return 0; const t = P.t; return t < C.go ? inOutSine(t / C.go) : t < C.go + C.stay ? 1 : 1 - inOutSine((t - C.go - C.stay) / C.back); }
+  function stepBossPush(dt) { const P = S.bpush, C = BOSS_PUSH; if (!P) return; if (!P.b || P.b.dead || M() !== P.m) { S.bpush = null; return; } if ((S.cine && S.cine.hold) || S.dialog) return;
+    P.t += dt; const [ix, iy] = rawDir(); if (P.t > C.skip && P.t < C.go + C.stay && (ix || iy || queue.length)) { P.t = C.go + C.stay; queue.length = 0; } if (P.t >= C.go + C.stay + C.back) S.bpush = null; }
+  function drawBossPush(ox, oy, SW, SH, u) { const P = S.bpush, C = BOSS_PUSH; if (!P) return; const a = Math.max(0, Math.min(1, (P.t - C.go + .1) / .3, (C.go + C.stay + .2 - P.t) / .3)); if (a <= 0) return;
+    const D = P.b.D || {}, n1 = Math.max(24 * u, SH * .08), n2 = Math.max(12 * u, SH * .036); ctx.globalAlpha = a;
+    if (D.title) textOut(D.title, ox + SW / 2, oy + SH * .3 - n1 * .9, n2, '#d8cbb0'); textOut(P.B.name || D.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (P.B.sub) textOut(P.B.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.1, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
   const VISTA_TILT = { hold: .3, tilt: 1.8, stay: .8, text: 1.6, blur: Q.has('notiltblur') ? 0 : .2 };
   const tiltT = V => V && V.tilt ? VISTA_TILT.hold + VISTA_TILT.tilt + VISTA_TILT.stay + VISTA_TILT.text : VISTA.fx; // scene length
   const inOutSine = p => .5 - .5 * Math.cos(Math.PI * Math.max(0, Math.min(1, p)));
@@ -1402,7 +1410,7 @@
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
     if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > tiltT(f.v) || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
-    const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    const ht = S.vfx || S.bpush || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
   // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles), top/zmin/hp (see zoneZL)}] -> the zoom eases toward zone.zoom and the view looks up/down
   function camZoneW(m) { let w = 0, z = null; for (const c of m.camZones || []) { const f = c.f || 4, hx = hero.x / m.T, hy = hero.y / m.T, d = Math.max(c.x0 - hx, hx - c.x1, c.y0 - hy, hy - c.y1, 0), q = Math.max(0, 1 - d / f), wq = q * q * (3 - 2 * q); if (wq > w) { w = wq; z = c; } } return [w, z]; }
@@ -1431,6 +1439,7 @@
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + zoneZL(m, z)[0] * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && (S.vfx || V.hold) ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+    stepBossPush(dt);
     tiltCam(); // 전망 첫 장면 틸트 업 + 줌인 (S.vz·S.look 를 직접 정함)
     { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = zoneZL(m, z)[1] * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
@@ -2320,7 +2329,7 @@
         else textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, col, '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
-      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u);
+      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u); if (S.bpush) drawBossPush(ox, oy, SW, SH, u);
       const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
