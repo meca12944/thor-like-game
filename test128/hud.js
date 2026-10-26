@@ -106,13 +106,16 @@
     if (o.note) txt(c, o.note, cx + R + 8 * u, cy + 4 * u, 10 * u, 'rgba(225,230,240,.85)', 'left', 600);
     c.restore(); return o.y + R * 2 + 10 * u; }
   // ---- pickup feed (right side, stacks upward, merges repeats, fades): small and quiet, never blocks the play area centre
+  const feedIcons = {}; function feedIcon(url) { let im = feedIcons[url]; if (!im) { im = feedIcons[url] = new Image(); im.src = url; } return im.complete && im.naturalWidth ? im : null; }
   function drawFeed(c, o) { // o { x (right edge), y (bottom), u, items:[{name,n,col,t,life}] }
     const u = o.u; c.save(); c.setTransform(1, 0, 0, 1, 0, 0); let y = o.y;
     for (let i = o.items.length - 1; i >= 0; i--) { const it = o.items[i], age = it.t, a = Math.min(1, age * 6, (it.life - age) * 2.5); if (a <= 0) continue;
-      const label = it.name + (it.n > 1 ? '  ×' + it.n : ''); c.font = `600 ${Math.round(11 * u)}px ${FONT}`; const w = c.measureText(label).width + 26 * u, h = 20 * u, slide = (1 - Math.min(1, age * 6)) * 14 * u;
+      const label = it.name + (it.n > 1 ? '  ×' + it.n : ''); c.font = `600 ${Math.round(11 * u)}px ${FONT}`; const w = c.measureText(label).width + (it.icon ? 34 : 26) * u, h = 20 * u, slide = (1 - Math.min(1, age * 6)) * 14 * u;
       c.globalAlpha = a; rr(c, o.x - w + slide, y - h, w, h, h / 2); c.fillStyle = 'rgba(8,10,18,.55)'; c.fill();
-      c.beginPath(); c.arc(o.x - w + slide + 10 * u, y - h / 2, 4 * u, 0, Math.PI * 2); c.fillStyle = it.col || '#ffe08a'; c.fill();
-      txt(c, label, o.x - w + slide + 18 * u, y - 6 * u, 11 * u, '#f2f0ea', 'left', 600); c.globalAlpha = 1; y -= h + 4 * u; }
+      const im = it.icon && feedIcon(it.icon);
+      if (im) c.drawImage(im, o.x - w + slide + 1 * u, y - h / 2 - 11 * u, 22 * u, 22 * u); // item icon (grok set) instead of the dot
+      else { c.beginPath(); c.arc(o.x - w + slide + 10 * u, y - h / 2, 4 * u, 0, Math.PI * 2); c.fillStyle = it.col || '#ffe08a'; c.fill(); }
+      txt(c, label, o.x - w + slide + (im ? 26 : 18) * u, y - 6 * u, 11 * u, '#f2f0ea', 'left', 600); c.globalAlpha = 1; y -= h + 4 * u; }
     c.restore(); }
   window.HUD = { drawPlayer, drawUlt, drawQuick, drawFeed, CFG, reset() { for (const k in st) delete st[k]; } };
 })();

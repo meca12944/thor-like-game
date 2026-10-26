@@ -177,14 +177,42 @@
   //  updraft: 구덩이 둘레(타원 x,y,w,h)에서 위로 빨려 오르는 재                                        [0]
   //  thread : 붉은 실 (x,y) -> (x+w, y+h), 흔들림 + 심장 박동 빛 + 실 끝 반짝임 (threadLine·heartbeat 재사용) [1]
   //  lake   : 검은 호수(타원 x,y,w,h)에 거꾸로 비친 왕성 탑 + 물결 (탑 그림이 오기 전 임시 실루엣)          [0]
-  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0 };
+  //  lakeart: 그림 호수(img = 호수 그림, x,y,w,h = 그 그림 자리) 물 부분에만 거꾸로 비친 왕성 + 잔물결 줄 + 물가 반짝임 (1장 동쪽 검은 호수, 10-25)  [0]
+  //  bell   : 물에 잠긴 종탑 끝(x,y) 둘레로 퍼지는 물결 고리 + per 초마다 종 3번(빛 고리·먼 종소리 bell_far, 가까울수록 크게)          [0]
+  //  mistband: 상자(x,y,w,h) 안을 옆으로 흐르는 안개 두 겹 (낭떠러지 아래 안개)
+  //  pitmist: 꺼진 지반(타원 x,y,w,h) — 가운데 어둡게 + 가장자리에서 안으로 가라앉는 낮은 안개 덩어리 (ashfall 은 drift [dx,dy] 흩날림 · edges 무너진 끝 돌가루 선택)                                                      [1]
+  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0, lakeart: 0, bell: 0, mistband: 1, pitmist: 1 };
   function drawSceneObjs(g, m, cx, cy, layer) { if (!m.sfxObjs) m.sfxObjs = m.objs.filter(o => o.type === 'scenefx'); if (!m.sfxObjs.length) return; const T = m.T;
     for (const o of m.sfxObjs) { if ((SFX_LAYER[o.kind] ?? 1) !== layer) continue; const x = o.tx * T, y = o.ty * T, w = (o.w || 1) * T, h = (o.h || 1) * T, pad = o.kind === 'updraft' ? 40 : o.kind === 'thread' ? 12 : 4;
       const x0 = Math.min(x, x + w), x1 = Math.max(x, x + w), y0 = Math.min(y, y + h), y1 = Math.max(y, y + h); if (x1 + pad < cx || x0 - pad > cx + EW || y1 + pad < cy || y0 - pad - (o.kind === 'updraft' ? 60 : 0) > cy + EH) continue; // off screen
       const f = SFX[o.kind]; if (f) { g.save(); f(g, o, x, y, w, h); g.restore(); } } }
   const sh = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+  function lakeArt(o, W, H) { if (o._la) return o._la; const im = HDIMG[o.img], ci = castleIm(); if (!im || !im.complete || !im.naturalWidth || !ci) return null; // made once: water mask (dark, opaque pixels of the lake picture), reflection, rim
+    const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; }, M = mk(), m = M.getContext('2d', { willReadFrequently: true }); m.drawImage(im, 0, 0, W, H);
+    const d = m.getImageData(0, 0, W, H), D = d.data, wet = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) { const j = i * 4; wet[i] = D[j + 3] > 200 && D[j] + D[j + 1] + D[j + 2] < 130 ? 1 : 0; }
+    const er = new Uint8Array(W * H), E = 4; for (let y = E; y < H - E; y++) for (let x = E; x < W - E; x++) { const i = y * W + x; er[i] = wet[i] && wet[i - E] && wet[i + E] && wet[i - E * W] && wet[i + E * W] ? 1 : 0; } // water a few px in from the shore
+    for (let i = 0; i < W * H; i++) { const j = i * 4; D[j] = D[j + 1] = D[j + 2] = 255; D[j + 3] = er[i] ? 255 : 0; } m.putImageData(d, 0, 0); // M = water mask
+    const R = mk(), r = R.getContext('2d'); { const gr = r.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(92,86,104,.42)'); gr.addColorStop(.6, 'rgba(60,56,70,.16)'); gr.addColorStop(1, 'rgba(40,36,48,0)'); r.fillStyle = gr; r.fillRect(0, 0, W, H); } // the grey sky on the water
+    { let y0 = 0; for (; y0 < H && !er.subarray(y0 * W, y0 * W + W).some(v => v); y0++); const tw = Math.round(W * (o.cw || .62)), th = Math.round(H * (o.ch || .8)), T = lakeTower(tw, th); const tx = Math.round((W - T.width) / 2 + (o.cx || 0) * W); r.drawImage(T, tx, y0 - 2); r.globalCompositeOperation = 'lighter'; r.globalAlpha = o.lift ?? .15; r.drawImage(T, tx, y0 - 2); r.globalAlpha = 1; r.globalCompositeOperation = 'source-over'; } // lift: the stone shows on black water (the shared tower is pressed dark) // castle (north) mirrored from the north shore down
+    { r.globalCompositeOperation = 'destination-out'; const gr = r.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.55, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,1)'); r.fillStyle = gr; r.fillRect(0, 0, W, H); } // the reflection fades toward the near shore
+    r.globalCompositeOperation = 'destination-in'; r.drawImage(M, 0, 0);
+    const Rm = mk(), q = Rm.getContext('2d'); { const id = q.createImageData(W, H), Q = id.data; for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; if (!er[i] || (er[i - 1] && er[i + 1] && er[i - W] && er[i + W])) continue; const j = i * 4; Q[j] = 196; Q[j + 1] = 206; Q[j + 2] = 222; Q[j + 3] = 200; } q.putImageData(id, 0, 0); } // shore line
+    return (o._la = { R, Rm, M }); }
+  const _bellK = new WeakMap();
   let _rayC = null; // one soft light ray (8x64) drawn once, stretched per arch
   const SFX = {
+    lakeart(g, o, x, y, w, h) { const L = lakeArt(o, Math.round(w), Math.round(h)); if (!L) return; const t = S.t, st = 3, y0 = Math.max(0, Math.floor((S.cam[1] - y) / st) * st), y1 = Math.min(h, S.cam[1] + EH - y + st); // only the rows on screen
+      g.globalAlpha = o.a ?? .65; for (let r = y0; r < y1; r += st) { const off = Math.sin(t * 1.3 + r * .21) * (.6 + r / h * 1.6) + Math.sin(t * .37 + r * .05) * .8; g.drawImage(L.R, 0, r, w, st, Math.round(x + off), y + r, w, st); } // reflection in rippled rows (deeper = wobblier)
+      g.globalCompositeOperation = 'lighter'; for (let b = 0; b < 4; b++) { const ph = .5 + .5 * Math.sin(t * .9 + b * 1.7); g.globalAlpha = .12 + .3 * ph * ph; g.drawImage(L.Rm, b * w / 4, 0, w / 4, h, x + b * w / 4, y, w / 4, h); } // shore glints, 4 slow bands
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; },
+    bell(g, o, x, y) { const t = S.t, per = o.per || 20, n = Math.floor(t / per), w = t - n * per, k = Math.floor(w / 2.4), u = (w - k * 2.4) / 2.4; // a toll of 3 strokes, 2.4 s apart, every per s
+      g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const q = ((t / 2.2 + i / 3) % 1), R = 4 + q * (o.r || 3) * 16; g.strokeStyle = `rgba(190,200,220,${(.35 * (1 - q)).toFixed(3)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(x, y, R, R * .42, 0, 0, TAU); g.stroke(); } // water rings around the drowned tip
+      if (k < 3) { const key = n * 3 + k; if (_bellK.get(o) !== key && u < .3) { _bellK.set(o, key); const dist = Math.hypot(hero.x - x, hero.y - y) / M().T; if (dist < 60 && !S.engaged) sfx('bell_far', Math.max(.25, 1 - dist / 60)); }
+        const a = Math.exp(-u * 1.8), R = (o.r || 3) * 16 * (1 + u * 3); g.strokeStyle = `rgba(255,226,176,${(.4 * a).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, R, R * .42, 0, 0, TAU); g.stroke();
+        const G = sfxGlow(o, 'bell', 26, 'rgba(255,220,170,.5)'); g.globalAlpha = a; g.drawImage(G, x - 26, y - 30); g.globalAlpha = 1; }
+      g.globalCompositeOperation = 'source-over'; },
+    mistband(g, o, x, y, w, h) { const ft = bdFogTex(), t = S.t; for (const [sp, a, sc] of [[o.sp || 6, o.a ?? .35, 1], [-(o.sp || 6) * .6, (o.a ?? .35) * .7, 1.6]]) { const hh = h * sc, ww = hh / 96 * 512 * 2.2, off = ((t * sp) % ww + ww) % ww; g.globalAlpha = Math.min(1, a); // two drifting layers, opposite ways
+        for (let X = x - ww + off; X < x + w; X += ww) g.drawImage(ft, X, y + (h - hh) / 2, ww, hh); } g.globalAlpha = 1; },
     shade(g, o, x, y, w, h) { g.globalCompositeOperation = 'multiply'; g.drawImage(sfxCan(o, 'band', w, h, (t, W, H) => { t.fillStyle = `rgba(70,62,84,${o.a ?? .55})`; t.fillRect(0, 3, W, H - 6); t.fillStyle = 'rgba(110,100,120,.5)'; t.fillRect(0, 0, W, 3); t.fillRect(0, H - 3, W, 3); }), x, y); // the bridge's shadow band, soft edges (made once)
       if (!_rayC) { _rayC = document.createElement('canvas'); _rayC.width = 8; _rayC.height = 64; const r = _rayC.getContext('2d'), gr = r.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,226,180,0)'); gr.addColorStop(.35, 'rgba(255,226,180,.9)'); gr.addColorStop(1, 'rgba(255,226,180,0)'); r.fillStyle = gr; r.fillRect(0, 0, 8, 64); }
       g.globalCompositeOperation = 'lighter'; const n = o.arches || Math.max(2, Math.round(w / 160)), sl = o.slant ?? .5;
@@ -192,7 +220,14 @@
       for (let i = 0; i < n; i++) { const ax = x + (i + .5) * w / n, br = .5 + .5 * Math.sin(S.t * .7 + i * 1.9); g.globalAlpha = (o.ray ?? .22) * (.55 + .45 * br); g.drawImage(_rayC, ax - w / n * .18, y - 10, w / n * .36, h + 20); } },
     ashfall(g, o, x, y, w, h) { const P = sfxParts(o, Math.min(120, o.n || Math.round(w * h / 50))); for (let pass = 0; pass < 2; pass++) { g.fillStyle = pass ? 'rgba(255,190,140,.75)' : 'rgba(200,194,208,.7)'; // two colour passes (no fillStyle switching per flake)
         for (let i = 0; i < P.n; i += pass ? 6 : 1) { if (!pass && i % 6 === 0) continue; const py = y + ((P.b[i] * h + S.t * (70 + P.b[i] * 60)) % h); g.fillRect(Math.round(x + P.a[i] * w + Math.sin(S.t * 3 + i) * 1.5), Math.round(py), 1, i % 3 ? 2 : 3); } }
-      const R = w * 1.6; g.drawImage(sfxGlow(o, 'mist', R, 'rgba(190,184,198,.45)'), x + w / 2 - R, y + h - R); }, // ash mist where it lands (made once)
+      const R = w * 1.6; g.drawImage(sfxGlow(o, 'mist', R, 'rgba(190,184,198,.45)'), x + w / 2 - R, y + h - R); // ash mist where it lands (made once)
+      if (o.drift) { const [dx, dy] = o.drift, T = M().T, Q = sfxParts(o, 40, 'd'); g.fillStyle = 'rgba(206,200,212,.6)'; // drift: some ash is blown on along the ground toward [dx, dy] tiles (중앙 들판: 모닥불 쪽)
+        for (let i = 0; i < Q.n; i++) { const q = ((S.t * (.18 + Q.a[i] * .12) + Q.b[i]) % 1), e = q * (2 - q); g.globalAlpha = (1 - q) * .9; g.fillRect(Math.round(x + w / 2 + dx * T * e + (Q.c[i] - .5) * 18 * (.3 + q)), Math.round(y + h + dy * T * e - Math.sin(q * Math.PI) * 10 * Q.c[i]), 1, 1); } g.globalAlpha = 1; }
+      if (o.edges) for (const ex of [x - 1, x + w + 1]) { const P2 = sfxParts(o, 10, 'e' + ex); g.fillStyle = 'rgba(160,150,140,.75)'; for (let i = 0; i < P2.n; i++) { const q = (S.t * (.6 + P2.a[i] * .5) + P2.b[i]) % 1; g.fillRect(Math.round(ex + (P2.c[i] - .5) * 4), Math.round(y - 2 + q * h * .6), 1, 1 + (i % 2)); } } }, // edges: stone dust trickling from the broken ends L/R
+    pitmist(g, o, x, y, w, h) { const t = S.t, cx = x + w / 2, cy = y + h / 2, P = sfxParts(o, o.n || 26), M = MISTS || (drawMist(0, 1), MISTS); // 꺼진 지반 안개: soft banks creep from the rim toward the middle and sink (fade), the middle stays darkest
+      g.globalCompositeOperation = 'multiply'; g.drawImage(sfxPit(o, w / 2, h / 2), x, y); g.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < P.n; i++) { const a = P.a[i] * TAU, q = ((t * .05 + P.b[i]) % 1), r = 1 - q * .75, px = cx + Math.cos(a) * w / 2 * r, py = cy + Math.sin(a) * h / 2 * r, R = (Math.min(w, h) * (.12 + P.c[i] * .16)) * (1 - q * .4);
+        g.globalAlpha = (o.a ?? .5) * Math.sin(q * Math.PI); g.drawImage(M, px - R, py - R * .5, R * 2, R); } g.globalAlpha = 1; },
     updraft(g, o, x, y, w, h) { const ex = x + w / 2, ey = y + h / 2, rx = w / 2, ry = h / 2, P = sfxParts(o, Math.min(60, o.n || Math.round((w + h) / 3))), rise = o.rise || 42;
       g.globalCompositeOperation = 'multiply'; g.drawImage(sfxPit(o, rx, ry), ex - rx, ey - ry); g.globalCompositeOperation = 'source-over'; // the drop under it reads darker (made once, until the pit art comes)
       const B = [[], [], []]; for (let i = 0; i < P.n; i++) { const life = 2.2 + P.c[i] * 1.6, q = ((S.t + P.b[i] * life) % life) / life, s1 = Math.sin(q * Math.PI), r = 1 - q * .35; // rise, lean inward, fade (3 brightness steps)
@@ -205,7 +240,7 @@
       g.drawImage(sfxLake(o, w, h), x, y); g.globalAlpha = o.a ?? .8; const st = 5; // water + mirrored grey sky (made once), then the upside-down tower in rippled rows
       for (let r = 0; r < im.height; r += st) { const off = Math.sin(S.t * 1.6 + r * .35) * (1 + r / im.height * 2); g.drawImage(im, 0, r, im.width, st, Math.round(bx + off), by + r, im.width, st); }
       g.globalAlpha = .18; g.fillStyle = '#d8d2e6'; for (let i = 0; i < 4; i++) { const ly = y + h * (.2 + .13 * i) + Math.sin(S.t * .8 + i) * 1.5; g.fillRect(Math.round(x + w * (.25 + .1 * Math.sin(i * 2.3))), Math.round(ly), Math.round(w * .3), 1); } } }; // glints
-  function sfxParts(o, n) { if (o._p && o._p.n === n) return o._p; const P = { n, a: [], b: [], c: [], cx: [], cy: [] }; for (let i = 0; i < n; i++) { P.a.push(sh(i)); P.b.push(sh(i + 77)); P.c.push(sh(i + 9)); const an = sh(i) * TAU; P.cx.push(Math.cos(an)); P.cy.push(Math.sin(an)); } return (o._p = P); } // random numbers made once per object
+  function sfxParts(o, n, key = 'p') { const C = o._ps || (o._ps = {}); if (C[key] && C[key].n === n) return C[key]; const P = { n, a: [], b: [], c: [], cx: [], cy: [] }; for (let i = 0; i < n; i++) { P.a.push(sh(i)); P.b.push(sh(i + 77)); P.c.push(sh(i + 9)); const an = sh(i) * TAU; P.cx.push(Math.cos(an)); P.cy.push(Math.sin(an)); } return (C[key] = P); } // random numbers made once per object
   const UPD_COL = ['rgba(210,204,222,.3)', 'rgba(210,204,222,.6)', 'rgba(230,214,220,.9)'];
   // per-object pictures made once (objects never move): soft glow, pit shade, lake water
   function sfxCan(o, key, W, H, draw) { o._c = o._c || {}; if (o._c[key]) return o._c[key]; const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(W)); c.height = Math.max(1, Math.ceil(H)); draw(c.getContext('2d'), c.width, c.height); return (o._c[key] = c); }
@@ -740,7 +775,7 @@
   function bossCineKill(B, m) { S.killSlow = 1.3; S.cine = { kind: 'kill', t: 0, dur: 4.2, text: (m.D.title || B.name) + josa(m.D.title || B.name, '을', '를') + ' 쓰러뜨렸다', sub: m.D.title ? B.name : '' }; after(.35, () => flash(.35, '255,255,255', .9)); }
   function cineBars(ox, oy, SW, SH, u, k) { const bh = Math.round(SH * .11 * k); if (bh < 1) return; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh); ctx.fillStyle = 'rgba(140,20,30,.55)'; ctx.fillRect(ox, oy + bh - Math.max(1, u), SW, Math.max(1, u)); ctx.fillRect(ox, oy + SH - bh, SW, Math.max(1, u)); }
   function drawBossCine(ox, oy, SW, SH, u) { const C = S.cine, b = S.bossRef;
-    const want = C ? 1 : (S.introT > 0 || (S.dialog && b && !b.dead && b.st === 'intro')) ? 1 : 0; S.barK = (S.barK || 0) + (want - (S.barK || 0)) * .18; cineBars(ox, oy, SW, SH, u, S.barK);
+    const want = C ? 1 : (S.introT > 0 || S.bpush || (S.dialog && b && !b.dead && b.st === 'intro')) ? 1 : 0; S.barK = (S.barK || 0) + (want - (S.barK || 0)) * .18; cineBars(ox, oy, SW, SH, u, S.barK);
     if (C && C.kind === 'intro' && C.img) { const im = splashImg(C.img), t = C.t, a = Math.min(1, Math.max(0, (t - .25) / .3)) * (t > 2.0 ? Math.max(0, 1 - (t - 2.0) / .3) : 1);
       if (im && a > 0) { const sc = 1 + .04 * Math.min(1, t / 2.0), w = SW * sc, h = SH * sc; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, SH); ctx.beginPath(); ctx.rect(ox, oy, SW, SH); ctx.clip(); ctx.imageSmoothingEnabled = false;
         ctx.drawImage(im, ox + (SW - w) / 2, oy + (SH - h) / 2, w, h); const pa = Math.min(1, Math.max(0, (t - .6) / .35)); ctx.globalAlpha = a * pa; const px = ox + SW * .04, py = oy + SH * .78;
@@ -769,11 +804,10 @@
   function shake(v) { const g = window.__game; if (g && g.shakeScale) v = g.shakeScale(v); S.shake = Math.max(S.shake, v); } // [hitfeel] capped ≤3px + '화면 흔들림' option (game.template.html)
   function shakeMul() { const g = window.__game, v = g && g.shakeMul; return typeof v === 'number' ? v : 1; } // '화면 흔들림' 끔/약/보통 = 0 / .67 / 1 — also scales the directional hit kick (보고서 3-3)
   function addFx(type, x, y, o = {}) { S.fx.push(Object.assign({ type, x, y, t: 0, life: o.life || 0.5 }, o)); }
-  const NAMES = { potion: '물약', antidote: '해독초', heart_piece: '하트 조각', spirit_drop: '정령의 이슬', m_hardwood: '단단한 목재', m_a1_shared: '숲의 정수', bomb: '폭탄', m_spore: '독 포자',
-    m_rabbit_horn: '토끼 뿔', m_wasp_sting: '말벌 독침', m_boar_hide: '멧돼지 가죽', m_pumpkin_vine: '호박 덩굴', m_forest_gel: '숲 젤리', m_acorn_shell: '도토리 껍질', m_sprout_wood: '새싹 목재', m_leather_strap: '질긴 가죽끈', riceball: '주먹밥' };
-  const itemName = id => NAMES[id] || id;
+  const NAMES = {}; // 이름은 가방 데이터(__game.IT) 에서 (옛 데모 아이템 이름 삭제 10-25)
+  const itemName = id => { const d = window.__game && __game.IT && __game.IT[id]; return NAMES[id] || (d && d.n) || id; }; // pickup feed: item names from the bag data (was showing raw ids)
   function giveLoot(list) { const g = window.__game; const names = [];
-    for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff'); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
+    for (const [id, n] of list) { if (id === 'gold') { if (g && g.addGold && g.addGold(n)) { names.push('금화 ' + n); feedAdd('금화', n, '#ffd84a'); } continue; } feedAdd(itemName(id), n, id === 'potion' ? '#ff7a7a' : '#cfe8ff', g && g.iconUrl && g.iconUrl(id)); try { if (id === 'potion' && g) g.potions = (g.potions || 0) + n; else if (g && g.invAdd) g.invAdd(id, n); } catch (e) {}
       names.push(itemName(id) + (n > 1 ? ' ×' + n : '')); }
     return names.join(', '); }
 
@@ -822,7 +856,7 @@
   function ultSafe(h, x, y) { const b = h.owner; for (const d of M().decos) { if (d.spr !== 'pillar') continue;
       const px = d.x, py = d.y - 6, vx = x - b.x, vy = y - b.y, L = Math.hypot(vx, vy); if (L < 1) continue;
       const u = ((px - b.x) * vx + (py - b.y) * vy) / (L * L); if (u <= 0 || u >= 1) continue;
-      if (Math.hypot(b.x + vx * u - px, b.y + vy * u - py) < 10) return true; } return false; }
+      if (Math.hypot(b.x + vx * u - px, b.y + vy * u - py) < (M().w > 60 ? 18 : 10)) return true; } return false; } // 베틀방 기둥은 2 타일 굵기 (4번방 10-26)
 
   // ---------------- mobs ----------------
   function spawn(kind, x, y, o = {}) {
@@ -912,6 +946,7 @@
   function enterScene(to, spawnName) {
     if (S.intro && !S.intro.ctl) S.intro = null; // left the grave mid-intro (tests / ?go=): drop it so input and HUD never stay locked
     S.roomP2 = undefined; S.cocoonGone = []; S.zones = []; S.tether = null; S.webs = null; S.mobs = []; S.hazards = []; S.shots = []; S.fx = []; S.temp = []; S.timers = []; S.ult = null; S.engaged = null; S.dialog = null; S.bossRef = null; S.pause = false;
+    if (S.banner && S.banner.small) S.banner = null; // 작은 알림(「발견 — 루카의 모닥불」 등)은 그 맵 것: 맵을 바꾸면 지움 (2번방 10-26: 펠트 발견 글이 베틀방에 따라옴)
     if (to === 'town') { S.scene = 'town'; S.map = null; return Promise.resolve(); }
     return loadMap(to).then(m => {
       S.map = m; S.scene = m.type === 'world' ? 'world' : 'map'; S.bgm = m.bgm;
@@ -929,7 +964,7 @@
         if (o.type === 'spawn') { o.timer = 0; const mm = spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T); if (mm) { mm.spawnRef = o; o.mob = mm; } }
         if (o.type === 'champion' && !SAVE.flags[o.id]) spawn(o.mob, (o.x + .5) * m.T, (o.y + .5) * m.T, { flag: o.id, loot: o.loot }); // o.loot = the champion's drop (map data)
       }
-      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; bossCineIntro(m.boss, b); playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
+      if (m.boss && !SAVE.flags[m.boss.flag]) { const b = spawn(m.boss.kind, m.boss.x * m.T, m.boss.y * m.T, { flag: m.boss.flag }); S.bossRef = b; S.engaged = b; if (m.boss.intro) S.introT = m.boss.intro; if (Math.abs(b.y - hero.y) + Math.abs(b.x - hero.x) * .5 > LH / (m.viewZoom || 1) * BOSS_PUSH.far) { S.introT = 0; const pf = 'bpush_' + (m.boss.id || m.boss.kind); if (!SAVE.flags[pf]) { SAVE.flags[pf] = true; S.bpush = { t: 0, b, B: m.boss, m }; } } bossCineIntro(m.boss, b); playScene('boss_pre:' + (m.boss.id || m.boss.kind), (m.boss.intro || 0) + .6); }
       if (m.boss && SAVE.flags[m.boss.flag]) addWarp(m);
       for (const o of m.objs) { if ((o.type === 'door_locked' || o.type === 'gate') && SAVE.opened[o.key]) o.open = true; if (o.type === 'lever' && SAVE.levers[o.key]) o.on = true;
         if (o.type === 'door_locked' || o.type === 'gate' || o.type === 'boss_door') m.solidG[o.ty * m.w + o.tx] = o.open ? 0 : 1; }
@@ -1013,7 +1048,7 @@
   }
 
   // ---------------- update ----------------
-  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl)) return [0, 0]; return rawDir(); }
+  function dirInput() { if ((S.vfx && S.vfx.t < VISTA.lock) || (S.intro && !S.intro.ctl) || S.bpush) return [0, 0]; return rawDir(); }
   function rawDir() { let ix = (isHeld('right') ? 1 : 0) - (isHeld('left') ? 1 : 0), iy = (isHeld('down') ? 1 : 0) - (isHeld('up') ? 1 : 0); if (ix && iy) { ix *= .7071; iy *= .7071; }
     if (!ix && !iy && S.padDir) { const [px, py] = S.padDir, l = Math.hypot(px, py); ix = px / l; iy = py / l; }
     if (!ix && !iy) { const st = window.__game && window.__game.stick; if (st && st.id !== null && Math.hypot(st.dx, st.dy) >= .18) { const l = Math.hypot(st.dx, st.dy); ix = st.dx / l; iy = st.dy / l; } } return [ix, iy]; }
@@ -1023,7 +1058,7 @@
     const G = h.dg; if (G && ((ix && !iy && Math.sign(ix) === G.x) || (iy && !ix && Math.sign(iy) === G.y)) && (G.t += dt) < 6 / 60 - 1e-6) return; h.dg = null; setFace(ix, iy); }
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
   const DIR8 = ['right', 'downright', 'down', 'downleft', 'left', 'upleft', 'up', 'upright']; // test128 hero8: 8-way facing for the new hero frames (hitboxes stay 4-way FACEV)
-  // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_silmamul,c1_unrotting_hound*2[&tough=1][&ult=full]
+  // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_thread_scarecrow,c1_quilted_boar*2[&tough=1][&ult=full]
   //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
   const AQ = new URLSearchParams(location.search), ARENA = (AQ.get('arena') || '').split(',').filter(Boolean).flatMap(t => { const [k, n] = t.split('*'); return Array(Math.max(1, Math.min(8, +n || 1))).fill(k); }), TOUGH = AQ.get('tough') === '1';
   // ?at=tx,ty: start tile on the first map entered (?go= / bots / mob_check), with or without ?arena (was arena-only → 펠트 v5 뒤 봇이 늘 29,3에서 시작)
@@ -1057,7 +1092,7 @@
     if (S.freezeT > 0 && !(hero.hp > 0 && !hero.roll && !(hero.rollCd > 0) && codesOf('dash').some(c => queue.includes(c)))) { S.freezeT -= dt; updateCam(dt); return; } if (S.freezeT > 0) S.freezeT = 0; // 회피대시는 멈춤(히트스톱) 중에도 바로 (보고서 3-9 「맞은 직후부터 언제든」, 모션연구방 10-24) // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
-    if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
+    if (S.msg && !S.vfx && (S.msg.t -= dt) <= 0) S.msg = null; // 전망 장면 동안엔 안내 글 시간이 멈춤 (숨겼다가 끝나면 다시)
     if (S.qs) { const Q = S.qs; Q.flash = Math.max(0, (Q.flash || 0) - dt * 2.5); Q.shake = Math.max(0, (Q.shake || 0) - dt * 4); Q.noteT = Math.max(0, (Q.noteT || 0) - dt); }
     if (S.feed) { for (const f of S.feed) f.t += dt; S.feed = S.feed.filter(f => f.t < f.life); }
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -1244,7 +1279,7 @@
     if (!n) return deny('물약 없음', 1); if (hero.hp >= hero.maxHp) return deny('체력 가득', .6); if (g.potionCd > 0) return deny('', .6);
     const hv = Math.ceil(hero.maxHp * POT.heal / 100); g.potions = n - 1; g.potionCd = POT.cd; hero.hp = Math.min(hero.maxHp, hero.hp + hv); syncTownHp(); addFx('heal', hero.x, hero.y - 20);
     addFx('text', hero.x, hero.y - HERO_H - 2, { text: '+' + hv, life: .9, color: '#8fffa0' }); Q.flash = 1; Q.noteT = 0; sfx('quaff', .7); }
-  function feedAdd(name, n, col) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
+  function feedAdd(name, n, col, icon) { const F = S.feed || (S.feed = []), o = F.find(f => f.name === name && f.t < 1.6); if (o) { o.n += n; o.t = Math.min(o.t, .2); return; } F.push({ name, n, col, icon, t: 0, life: 2.6 }); if (F.length > 5) F.shift(); }
   // 대화창 v2 (2번방 10-23, 1장 어두운 톤): pages ('\n\n' or 3 lines), typewriter DLG.cps with a soft blip, skip = show the page, choices [{t, f}] picked with up/down
   const DLG = { cps: 60, lines: 3, guard: .45 }; // 점검 10-24: 글자 38→60자/초, 닫힌 뒤 0.45초는 조사 키·Esc 무시 (같은 키로 바로 다시 열리던 것)
   function dlgWrap(line, W) { if (!W) return [line]; const out = []; let cur = ''; // fit one line to the box (UI_GUIDE 8): break at a space when it is past half, else at any letter
@@ -1350,19 +1385,44 @@
 
   // ---------------- camera ----------------
   function clampC(v, max) { return max <= 0 ? max / 2 : Math.max(0, Math.min(max, v)); }
-  function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1] + (b ? 0 : S.zl || 0), ty = fy - EH / 2; return [clampC(fx - EW / 2, m.pw - EW), m.skyTop && m.ph > EH ? Math.max(-m.skyTop * m.T, Math.min(m.ph - EH, ty)) : clampC(ty, m.ph - EH)]; } // skyTop: the camera may rise above the map top (the sky + far backdrop up there) // boss intro: the camera looks at the boss first (art room 10-23)
+  function camTarget() { const m = M(), b = S.introT > 0 && S.bossRef, L = !b && FEEL2 && S.look ? S.look : [0, 0], pw = bossPushW(), pb = S.bpush && S.bpush.b; let fx = b ? b.x : hero.x + L[0], fy = b ? b.y - 20 : hero.y - 10 + L[1] + (b ? 0 : S.zl || 0); if (pw > 0) { fx += (pb.x - fx) * pw; fy += (pb.y - 30 - fy) * pw; } const ty = fy - EH / 2; return [clampC(fx - EW / 2, m.pw - EW), m.skyTop && m.ph > EH ? Math.max(-m.skyTop * m.T, Math.min(m.ph - EH, ty)) : clampC(ty, m.ph - EH)]; } // skyTop: the camera may rise above the map top (the sky + far backdrop up there) // boss intro: the camera looks at the boss first (art room 10-23)
   function snapCam() { const m = M(); if (!m) return; S.zl = 0; if (m.camZones) { const [w, z] = camZoneW(m); if (z) S.zl = zoneZL(m, z)[1] * w; } S.cam = camTarget(); }
   // [경관 시제품] 전망 자리 (팀장 10-24 「엘든링처럼 웅장하게」): map object {type:'vista', id, x, y, r, zoom, dir(0=동 90=남), pan(타일), name, sub}.
   // Standing in it (no boss, no mob within mobR tiles): the camera eases out (zoom) and the HUD fades; during the first-visit scene it also drifts toward dir by pan tiles.
   // First visit only (SAVE.flags['vista_<id>']): ~3s scene — letterbox + place name, any move input after `lock` ends it.
   const VISTA = { mobR: 12, fx: 3.2, lock: .7, hudMin: .35, panK: .9 };
+  // [틸트 업 + 줌인] 사장님 10-26 「주인공이 성 바라볼 때 틸트 기법으로 줌인」: vista.tilt = { z0 (넓게), z1 (성 쪽으로 다가감), pan (타일, 기본 vista.pan) } 이 있는 전망의 첫 방문 장면만.
+  // 주인공 뒷모습 hold초 -> tilt초 동안 위로(dir 쪽) 젖히며 z0 -> z1 (inOutSine) -> 성에서 stay초 머문 뒤 지명 글자 -> 입력·끝나면 보통 카메라로 부드럽게 돌아옴. blur = 화면 위·아래 흐림 띠 (틸트시프트, 0 = 끔, ?notiltblur)
+  // [보스 등장 카메라 밀기] 팀장 10-26 (4번방 큰 아라크네 방): 보스가 화면 밖 멀리 있으면 첫 만남 때 주인공 → go초 보스 쪽으로 미끄러져 → stay초 머물며 이름 → back초 주인공으로. skip초 뒤 입력 = 건너뜀(바로 돌아옴).
+  const BOSS_PUSH = { go: .9, stay: .9, back: .7, skip: .4, far: .45 }; // far = 화면 높이의 몇 배보다 멀면 밀기
+  function bossPushW() { const P = S.bpush, C = BOSS_PUSH; if (!P) return 0; const t = P.t; return t < C.go ? inOutSine(t / C.go) : t < C.go + C.stay ? 1 : 1 - inOutSine((t - C.go - C.stay) / C.back); }
+  function stepBossPush(dt) { const P = S.bpush, C = BOSS_PUSH; if (!P) return; if (!P.b || P.b.dead || M() !== P.m) { S.bpush = null; return; } if ((S.cine && S.cine.hold) || S.dialog) return;
+    P.t += dt; const [ix, iy] = rawDir(); if (P.t > C.skip && P.t < C.go + C.stay && (ix || iy || queue.length)) { P.t = C.go + C.stay; queue.length = 0; } if (P.t >= C.go + C.stay + C.back) S.bpush = null; }
+  function drawBossPush(ox, oy, SW, SH, u) { const P = S.bpush, C = BOSS_PUSH; if (!P) return; const a = Math.max(0, Math.min(1, (P.t - C.go + .1) / .3, (C.go + C.stay + .2 - P.t) / .3)); if (a <= 0) return;
+    const D = P.b.D || {}, n1 = Math.max(24 * u, SH * .08), n2 = Math.max(12 * u, SH * .036); ctx.globalAlpha = a;
+    if (D.title) textOut(D.title, ox + SW / 2, oy + SH * .3 - n1 * .9, n2, '#d8cbb0'); textOut(P.B.name || D.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (P.B.sub) textOut(P.B.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.1, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
+  const VISTA_TILT = { hold: .3, tilt: 1.8, stay: .8, text: 1.6, blur: Q.has('notiltblur') ? 0 : .2 };
+  const tiltT = V => V && V.tilt ? VISTA_TILT.hold + VISTA_TILT.tilt + VISTA_TILT.stay + VISTA_TILT.text : VISTA.fx; // scene length
+  const inOutSine = p => .5 - .5 * Math.cos(Math.PI * Math.max(0, Math.min(1, p)));
+  function tiltCam() { const f = S.vfx, V = f && f.v; if (!V || !V.tilt) return; const C = VISTA_TILT, Tl = V.tilt, T = M().T;
+    if (!f.c0) f.c0 = { vz: S.vz, lx: S.look[0], ly: S.look[1] }; const c0 = f.c0, z0 = Tl.z0 || V.zoom || .6, z1 = Tl.z1 || z0 * 1.5, pan = (Tl.pan ?? V.pan ?? 8) * T, va = (V.dir ?? 270) * Math.PI / 180;
+    const a = inOutSine(f.t / C.hold), e = inOutSine((f.t - C.hold) / C.tilt); // hold: settle on the hero (zoom to z0) · tilt: rise toward the castle + zoom in
+    S.vz = f.t < C.hold ? c0.vz + (z0 - c0.vz) * a : z0 + (z1 - z0) * e; S.look[0] = c0.lx * (1 - a) + Math.cos(va) * pan * e; S.look[1] = c0.ly * (1 - a) + Math.sin(va) * pan * e;
+    EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); }
+  let tiltCv = null; // 위·아래 흐림 띠: 띠를 1/20 크기로 줄였다 늘려 그림 (화면 px 기준, 세상 그림은 이미 3~4배 커서 크게 줄여야 흐려 보임) (흐림 필터 없이 가볍게), 가장자리일수록 진하게
+  function drawTiltBlur(ox, oy, SW, SH, a) { const C = VISTA_TILT; if (!C.blur || a <= 0) return; const bh = Math.round(SH * C.blur), sc = 20, w = Math.max(1, Math.round(SW / sc)), h = Math.max(1, Math.round(bh / sc));
+    tiltCv = tiltCv || document.createElement('canvas'); if (tiltCv.width !== w || tiltCv.height !== h * 2) { tiltCv.width = w; tiltCv.height = h * 2; } const g = tiltCv.getContext('2d'); g.imageSmoothingEnabled = true;
+    g.drawImage(ctx.canvas, ox, oy, SW, bh, 0, 0, w, h); g.drawImage(ctx.canvas, ox, oy + SH - bh, SW, bh, 0, h, w, h);
+    ctx.save(); ctx.imageSmoothingEnabled = true; const n = 8; for (let i = 0; i < n; i++) { const y0 = i / n, y1 = (i + 1) / n; ctx.globalAlpha = a * (1 - y0) * .9; // strip i from the edge inward
+      ctx.drawImage(tiltCv, 0, y0 * h, w, (y1 - y0) * h, ox, oy + y0 * bh, SW, (y1 - y0) * bh + 1); ctx.drawImage(tiltCv, 0, h + (1 - y1) * h, w, (y1 - y0) * h, ox, oy + SH - y1 * bh, SW, (y1 - y0) * bh + 1); }
+    ctx.restore(); }
   function vistaNow() { const m = M(); if (!m || m.type === 'world' || S.dialog || S.engaged || (S.bossRef && !S.bossRef.dead) || hero.hp <= 0) return null; const T = m.T;
     const V = (m.objects || []).find(o => o.type === 'vista' && Math.hypot(hero.x / T - o.x - .5, hero.y / T - o.y - .5) < (o.r || 3)); if (!V) return null;
     return S.mobs.some(mm => !mm.dead && Math.hypot(mm.x - hero.x, mm.y - hero.y) < VISTA.mobR * T) ? null : V; }
   function stepVista(dt) { S.vista = vistaNow(); const V = S.vista, id = V && 'vista_' + (V.id || V.x + '_' + V.y);
     if (V && !S.vfx && !SAVE.flags[id]) { SAVE.flags[id] = true; save(); S.vfx = { v: V, t: 0 }; }
-    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > VISTA.fx || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
-    const ht = S.vfx || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
+    if (S.vfx) { const f = S.vfx, [ix, iy] = rawDir(); f.t += dt; if ((f.t > VISTA.lock && (ix || iy)) || f.t > tiltT(f.v) || !V) S.vfx = null; } /* !V: a live mob came within mobR, a boss/dialog started or the hero left */
+    const ht = S.vfx || S.bpush || (S.intro && !S.intro.ctl) ? 0 : V ? VISTA.hudMin : 1; S.hudA = S.hudA == null ? 1 : S.hudA + (ht - S.hudA) * Math.min(1, dt * 6);
     const vb = !!(S.vfx || (S.intro && !S.intro.ctl)); if (document.body.classList.contains('wvista') !== vb) document.body.classList.toggle('wvista', vb); }
   // 카메라 구역 (owner 10-25 성벽·성 올려다보기): map.camZones [{x0,y0,x1,y1 (tiles), zoom, look (tiles, - = up), f (soft edge tiles), top/zmin/hp (see zoneZL)}] -> the zoom eases toward zone.zoom and the view looks up/down
   function camZoneW(m) { let w = 0, z = null; for (const c of m.camZones || []) { const f = c.f || 4, hx = hero.x / m.T, hy = hero.y / m.T, d = Math.max(c.x0 - hx, hx - c.x1, c.y0 - hy, hy - c.y1, 0), q = Math.max(0, 1 - d / f), wq = q * q * (3 - 2 * q); if (wq > w) { w = wq; z = c; } } return [w, z]; }
@@ -1391,6 +1451,8 @@
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill(); }
   function viewZoomOf(m) { if (S.vista) return S.vista.zoom || .72; if (m && m.camZones) { const [w, z] = camZoneW(m); if (z && z.zoom) return ((m.viewZoom || 1) * (1 - w) + zoneZL(m, z)[0] * w); } if (m && m.compose) { const a = areaOf(m, hero.x, hero.y); return (a && a.zoom) || 1; } return (m && m.viewZoom) || 1; }
   function updateCam(dt) { if (!M()) return; stepVista(dt); { const v = FACEV[hero.face] || [0, 0], d = hero.moving && !hero.atk ? (hero.run ? LOOK.run : LOOK.walk) : 0, V = S.vista; S.look = S.look || [0, 0]; const far = V || Math.hypot(S.look[0], S.look[1]) > 48, k = Math.min(1, dt * (far ? VISTA.panK : LOOK.k)), va = V ? (V.dir || 0) * Math.PI / 180 : 0, vp = V && (S.vfx || V.hold) ? (V.pan || 0) * M().T : 0, lx = V ? Math.cos(va) * vp : v[0] * d, ly = V ? Math.sin(va) * vp : v[1] * d * .7; S.look[0] += (lx - S.look[0]) * k; S.look[1] += (ly - S.look[1]) * k; if (S.kick && !(S.freezeT > 0) && !(S.heroStopT > 0)) S.kick.t -= dt; } /* look-ahead + hit kick clock (was a // that also hid the zoom code after it: felt viewZoom 1.3 · 전망 줌이 안 먹던 원인) */ { const t = viewZoomOf(M()); S.vz = S.vz || t; S.vz += (t - S.vz) * Math.min(1, dt * 2.5); if (Math.abs(t - S.vz) < .002) S.vz = t; EW = Math.ceil(LW / S.vz); EH = Math.ceil(LH / S.vz); } // town view: a little wider, eased at the area seam
+    stepBossPush(dt);
+    tiltCam(); // 전망 첫 장면 틸트 업 + 줌인 (S.vz·S.look 를 직접 정함)
     { const m = M(); let tz = 0; if (m.camZones && !S.vista) { const [w, z] = camZoneW(m); if (z) tz = zoneZL(m, z)[1] * w; } S.zl = (S.zl || 0) + (tz - (S.zl || 0)) * Math.min(1, dt * 2.2); }
     if (S.introT > 0) S.introT -= dt; const [tx, ty] = camTarget(); const k = 1 - Math.pow(S.introT > 0 ? .02 : .0005, dt); S.cam[0] += (tx - S.cam[0]) * k; S.cam[1] += (ty - S.cam[1]) * k; }
 
@@ -1456,7 +1518,7 @@
       if (o.type === 'npc' && o.anim && npcAnim(o.anim)) list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill();
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } });
       else if (o.type === 'npc' && o.art === 'linette8') list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill(); if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } }); // body = Linette's 8-way atlas (drawNpcHi)
-      else if (o.type === 'npc') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art);
+      else if (o.type === 'npc' && o.art !== 'hd') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art); /* art:'hd' = the person is part of the map's hd picture (1장 정문 베르디) */
         if (im && im.complete && im.naturalWidth) { const h = o.h || 26, w = im.naturalWidth * h / im.naturalHeight; g.drawImage(im, Math.round(o.x - w / 2), Math.round(o.y + 7 - h), w, h); }
         else drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7);
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - (o.h || 26)) - 4, 2, 2); } } });
@@ -1496,6 +1558,9 @@
   let _dark = null; function darkLayer() { if (!_dark) _dark = document.createElement('canvas'); if (_dark.width !== EW + 1 || _dark.height !== EH + 1) { _dark.width = EW + 1; _dark.height = EH + 1; } return _dark; }
   let _ultC = null;
   function drawWaystone(g, o) { const on = SAVE.waystones[o.id], p = .5 + .5 * Math.sin(S.t * 3);
+    if (o.art === 'camp') { g.fillStyle = 'rgba(0,0,0,.32)'; g.beginPath(); g.ellipse(o.x, o.y + 3, 11, 4, 0, 0, TAU); g.fill(); // 모닥불 쉼터 (1장 동쪽, 10-25): 돌 둘레 + 엇갈린 장작, 불·연기는 hd.fires / smoke (코드)
+      for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, x = Math.round(o.x + Math.cos(a) * 9), y = Math.round(o.y + 1 + Math.sin(a) * 3.6); g.fillStyle = i % 2 ? '#5d5a60' : '#77737a'; g.fillRect(x - 2, y - 2, 4, 3); g.fillStyle = '#3c3a40'; g.fillRect(x - 2, y + 1, 4, 1); }
+      g.fillStyle = '#3a2618'; g.fillRect(o.x - 7, o.y - 1, 14, 3); g.fillStyle = '#4e3220'; g.fillRect(o.x - 5, o.y - 3, 10, 3); g.fillStyle = on ? `rgba(255,150,60,${.5 + .3 * p})` : 'rgba(150,70,30,.6)'; g.fillRect(o.x - 3, o.y - 2, 6, 2); return; }
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(o.x, o.y + 6, 8, 3, 0, 0, TAU); g.fill();
     g.fillStyle = '#6c6f7a'; g.fillRect(o.x - 5, o.y - 12, 10, 18); g.fillStyle = '#8d909c'; g.fillRect(o.x - 5, o.y - 12, 10, 3); g.fillStyle = '#4a4c55'; g.fillRect(o.x + 3, o.y - 9, 2, 15);
     g.fillStyle = on ? `rgba(120,230,255,${.7 + .3 * p})` : '#3a5060'; g.fillRect(o.x - 2, o.y - 8, 4, 8); g.fillRect(o.x - 1, o.y - 10, 2, 12);
@@ -1970,7 +2035,7 @@
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
-    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
+    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && A.walk.dirs && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue; // 위·아래 걷기 그림은 anim.walk.dirs 있는 몹만 (그록 마물은 아직 옆 걷기만 → 없는 그림을 부르지 않음, 콘솔 404 0)
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
@@ -1981,6 +2046,10 @@
       if (mm.hitT > .18) { const e = .3 - mm.hitT, hk = mm.hitK || 1, q = e < .034 ? 1 : Math.max(0, 1 - (e - .034) / .086); bx *= 1 + .2 * hk * q; by *= 1 - .17 * hk * q; } // squash: full for 2 ticks, eases back by 0.12 s (finisher x1.5)
       if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
+      if (mm.blockT > 0) mm.blockT -= 1 / 60;
+      if (A[name] && A[name].bob && A[name].bob.drag) { const B = A[name].bob; if (mm.moving) { rot += Math.sin(ph * B.drag) * .045; oy -= Math.abs(Math.sin(ph * B.drag)) * B.amp * k; } } // 철장 간수: 무겁게 좌우로 끌며 걸음
+      else if (name === 'walk' && A.walk.bob) { const B = A.walk.bob; if (B.hop) { if (mm.moving) { const q4 = Math.abs(Math.sin(ph * B.hop)); oy -= q4 * B.amp * k; bx *= 1 - (q4 - .5) * .08; by *= 1 + (q4 - .5) * .12; } } else oy -= (1 + Math.sin(ph * B.float)) * B.amp * .5 * k; } // 걷기 그림 없는 몹 (솜뭉치 통통 · 고치 어미 떠다님)
+      if (mm.st === 'leap' && A.attack && A.attack.air && mm.t < mm.warn) { const q3 = Math.min(1, mm.t / mm.warn), e3 = q3 * q3 * (3 - 2 * q3); if (e3 > .04) { oy -= Math.sin(Math.PI * e3) * A.attack.air * k; bx = .96; by = 1.06; } } // 실패 거미: 폴짝 높이(코드), 공중에선 웅크림 대신 살짝 늘림
       if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
       const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0) + stopJit(mm), mm.y);
       if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry
@@ -2286,9 +2355,9 @@
       ctx.fillStyle = on ? 'rgba(60,18,22,.95)' : 'rgba(10,8,14,.9)'; ctx.fillRect(cx, cy, cw, 19 * u); ctx.strokeStyle = on ? '#b04a3a' : '#5c4a38'; ctx.lineWidth = 2 * u; ctx.strokeRect(cx, cy, cw, 19 * u); textOut((on ? '▶ ' : '   ') + c.t, cx + 9 * u, cy + 14 * u, 12 * u, on ? '#ffe2c8' : '#a99c8c', '#000', 'left'); });
     if (done && !(d.choices && d.pi === P.length - 1)) { const bob = Math.round(Math.sin(d.t * 6) * 1.5 * u); textOut(d.pi < P.length - 1 ? '▼' : '■', x + w - 16 * u, y + h - 10 * u + bob, Math.max(10 * u, fs * .7), '#b04a3a', '#000', 'right'); }
     if (P.length > 1) textOut((d.pi + 1) + '/' + P.length, x + w - 18 * u - fs * .8, y + h - 10 * u, Math.max(9 * u, fs * .6), '#6e6458', '#000', 'right'); }
-  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, a = Math.max(0, Math.min(1, f.t / .4, (VISTA.fx - f.t) / .4)), bh = Math.round(SH * .06 * a);
+  function drawVista(ox, oy, SW, SH, u) { const f = S.vfx, V = f.v, L = tiltT(V), a = Math.max(0, Math.min(1, f.t / .4, (L - f.t) / .4)), bh = Math.round(SH * .06 * a); if (V.tilt) drawTiltBlur(ox, oy, SW, SH, a);
     ctx.fillStyle = '#000'; ctx.fillRect(ox, oy, SW, bh); ctx.fillRect(ox, oy + SH - bh, SW, bh);
-    const ta = Math.max(0, Math.min(1, (f.t - .3) / .5, (VISTA.fx - f.t) / .4)); if (ta <= 0) return; ctx.globalAlpha = ta;
+    const t0 = V.tilt ? VISTA_TILT.hold + VISTA_TILT.tilt + VISTA_TILT.stay : .3, ta = Math.max(0, Math.min(1, (f.t - t0) / .5, (L - f.t) / .4)); if (ta <= 0) return; // tilt: 성에서 머문 뒤 지명 ctx.globalAlpha = ta;
     const n1 = Math.max(24 * u, SH * .09), n2 = Math.max(12 * u, SH * .042); textOut(V.name || '', ox + SW / 2, oy + SH * .3, n1, '#f4ead2'); if (V.sub) textOut(V.sub, ox + SW / 2, oy + SH * .3 + n1 * .5 + n2 * 1.2, n2, '#d8cbb0'); ctx.globalAlpha = 1; }
   function keyHint(a) { if (S.lastInput === 'pad' && PAD_LABEL[a]) return PAD_LABEL[a]; const c = codesOf(a)[0] || ''; return c.replace(/^Key/, '').replace(/^Digit/, ''); }
   function drawHiRes(k, ox, oy) {
@@ -2325,7 +2394,7 @@
         else textOut(S.saved ? '✔ ' + S.saved.text : fc ? '● 전투 중 — 저장 불가' : `● 저장 가능 [${keyHint('save') || 'F5'}]`, ox + SW - 10 * u, oy + SH - 20 * u, 10 * u, col, '#000', 'right'); }
       if (m.area && /^(field0[01]|dungeon01|boss01)/.test(m.id)) { const n = ['champ_boar', 'champ_wasp'].filter(f => SAVE.flags[f]).length; textOut(`챔피언 ${n}/2` + (SAVE.flags.boss01 ? '  ·  골렘 격파 ✓' : ''), ox + SW - 10 * u, oy + 35 * u, 10 * u, n === 2 ? '#8f8' : '#fff', '#000', 'right'); }
       if (m.type === 'dungeon') { const keys = Object.keys(SAVE.keys).filter(k2 => SAVE.keys[k2] === true && !k2.endsWith(':used') && !SAVE.keys[k2 + ':used']).length; if (keys) textOut('열쇠 ×' + keys, ox + SW - 10 * u, oy + 50 * u, 10 * u, '#ffe08a', '#000', 'right'); }
-      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u);
+      ctx.globalAlpha = 1; if (S.vfx) drawVista(ox, oy, SW, SH, u); if (S.bpush) drawBossPush(ox, oy, SW, SH, u);
       const b = S.bossRef; if (b && !b.dead && !(S.cine && S.cine.hold)) drawBossBar(b, cxs, oy, SH, u);
       if (S.ult && S.ult.t < S.ult.warn) { ctx.strokeStyle = `rgba(255,30,20,${.5 + .4 * Math.sin(S.t * 18)})`; ctx.lineWidth = 10 * u; ctx.strokeRect(ox + 5 * u, oy + 5 * u, SW - 10 * u, SH - 10 * u);
         textOut('필살 · 대지 붕괴  ' + Math.max(0, S.ult.warn - S.ult.t).toFixed(1), cxs, oy + 62 * u, 17 * u, '#ff6040'); }
@@ -2333,7 +2402,7 @@
     }
     if (NAV() && m.type !== 'world') { ctx.globalAlpha = S.hudA == null ? 1 : S.hudA; NAV().drawHud(k, ox, oy, u); ctx.globalAlpha = 1; }
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
-    if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
+    if (S.msg && !S.vfx) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
     if (S.intro) drawIntro(ox, oy, SW, SH);

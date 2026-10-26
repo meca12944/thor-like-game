@@ -1,0 +1,72 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m04_side_stand.png",
+  "size": [
+   188,
+   455
+  ],
+  "game_file": "m04_side_stand_game.png",
+  "game_size": [
+   20,
+   48
+  ],
+  "game_body_h": 46.8
+ },
+ {
+  "name": "front_stand",
+  "file": "m04_front_stand.png",
+  "size": [
+   281,
+   428
+  ],
+  "game_file": "m04_front_stand_game.png",
+  "game_size": [
+   30,
+   45
+  ],
+  "game_body_h": 44.0
+ },
+ {
+  "name": "shield_guard",
+  "file": "m04_shield_guard.png",
+  "size": [
+   258,
+   431
+  ],
+  "game_file": "m04_shield_guard_game.png",
+  "game_size": [
+   27,
+   45
+  ],
+  "game_body_h": 44.3
+ },
+ {
+  "name": "slam_raise",
+  "file": "m04_slam_raise.png",
+  "size": [
+   286,
+   511
+  ],
+  "game_file": "m04_slam_raise_game.png",
+  "game_size": [
+   30,
+   54
+  ],
+  "game_body_h": 52.7
+ },
+ {
+  "name": "slam_down",
+  "file": "m04_slam_down.png",
+  "size": [
+   265,
+   345
+  ],
+  "game_file": "m04_slam_down_game.png",
+  "game_size": [
+   28,
+   36
+  ],
+  "game_body_h": 35.3
+ }
+]

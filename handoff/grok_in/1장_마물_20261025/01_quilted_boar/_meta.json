@@ -1,0 +1,58 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m01_side_stand.png",
+  "size": [
+   357,
+   335
+  ],
+  "game_file": "m01_side_stand_game.png",
+  "game_size": [
+   37,
+   35
+  ],
+  "game_body_h": 34.0
+ },
+ {
+  "name": "front_stand",
+  "file": "m01_front_stand.png",
+  "size": [
+   201,
+   340
+  ],
+  "game_file": "m01_front_stand_game.png",
+  "game_size": [
+   21,
+   36
+  ],
+  "game_body_h": 34.4
+ },
+ {
+  "name": "crouch",
+  "file": "m01_crouch.png",
+  "size": [
+   327,
+   295
+  ],
+  "game_file": "m01_crouch_game.png",
+  "game_size": [
+   34,
+   31
+  ],
+  "game_body_h": 29.7
+ },
+ {
+  "name": "charge",
+  "file": "m01_charge.png",
+  "size": [
+   411,
+   274
+  ],
+  "game_file": "m01_charge_game.png",
+  "game_size": [
+   43,
+   29
+  ],
+  "game_body_h": 27.5
+ }
+]

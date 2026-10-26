@@ -1,0 +1,58 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m05_side_stand.png",
+  "size": [
+   217,
+   507
+  ],
+  "game_file": "m05_side_stand_game.png",
+  "game_size": [
+   15,
+   35
+  ],
+  "game_body_h": 34.2
+ },
+ {
+  "name": "front_stand",
+  "file": "m05_front_stand.png",
+  "size": [
+   311,
+   504
+  ],
+  "game_file": "m05_front_stand_game.png",
+  "game_size": [
+   21,
+   35
+  ],
+  "game_body_h": 34.0
+ },
+ {
+  "name": "slash1",
+  "file": "m05_slash1.png",
+  "size": [
+   447,
+   456
+  ],
+  "game_file": "m05_slash1_game.png",
+  "game_size": [
+   31,
+   31
+  ],
+  "game_body_h": 30.7
+ },
+ {
+  "name": "slash2",
+  "file": "m05_slash2.png",
+  "size": [
+   463,
+   457
+  ],
+  "game_file": "m05_slash2_game.png",
+  "game_size": [
+   32,
+   31
+  ],
+  "game_body_h": 30.8
+ }
+]

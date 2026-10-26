@@ -1,0 +1,48 @@
+# B1_torture 16px atlas, 8 tiles per row, left->right, top->bottom. index: name
+# floor_rRcC: floor pattern block 4x4 tiles. Place tile (r=y%4, c=x%4) at map tile (x,y) -> seamless any size.
+# wall_rRcC: wall face 3 tiles high x 5 wide. r0=top row (under cap), r2=bottom row (touching floor). Repeat columns c=x%5.
+# cap_*: wall top seen from above (dark). letters = which edges get an ink border (S = edge above the wall face).
+# floor_shadow_under_wall_overlay: transparent shadow, draw on the floor row right under a wall face.
+0: floor_r0c0
+1: floor_r0c1
+2: floor_r0c2
+3: floor_r0c3
+4: floor_r1c0
+5: floor_r1c1
+6: floor_r1c2
+7: floor_r1c3
+8: floor_r2c0
+9: floor_r2c1
+10: floor_r2c2
+11: floor_r2c3
+12: floor_r3c0
+13: floor_r3c1
+14: floor_r3c2
+15: floor_r3c3
+16: wall_r0c0
+17: wall_r0c1
+18: wall_r0c2
+19: wall_r0c3
+20: wall_r0c4
+21: wall_r1c0
+22: wall_r1c1
+23: wall_r1c2
+24: wall_r1c3
+25: wall_r1c4
+26: wall_r2c0
+27: wall_r2c1
+28: wall_r2c2
+29: wall_r2c3
+30: wall_r2c4
+31: cap_fill
+32: cap_S
+33: cap_N
+34: cap_E
+35: cap_W
+36: cap_NE
+37: cap_NW
+38: cap_SE
+39: cap_SW
+40: cap_NS
+41: cap_EW
+42: floor_shadow_under_wall_overlay

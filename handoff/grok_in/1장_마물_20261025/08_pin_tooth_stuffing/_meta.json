@@ -1,0 +1,44 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m08_side_stand.png",
+  "size": [
+   321,
+   328
+  ],
+  "game_file": "m08_side_stand_game.png",
+  "game_size": [
+   17,
+   18
+  ],
+  "game_body_h": 17.0
+ },
+ {
+  "name": "front_stand",
+  "file": "m08_front_stand.png",
+  "size": [
+   308,
+   330
+  ],
+  "game_file": "m08_front_stand_game.png",
+  "game_size": [
+   16,
+   18
+  ],
+  "game_body_h": 17.1
+ },
+ {
+  "name": "bite",
+  "file": "m08_bite.png",
+  "size": [
+   472,
+   330
+  ],
+  "game_file": "m08_bite_game.png",
+  "game_size": [
+   25,
+   18
+  ],
+  "game_body_h": 17.2
+ }
+]

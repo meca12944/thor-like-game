@@ -1,0 +1,58 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m02_side_stand.png",
+  "size": [
+   201,
+   498
+  ],
+  "game_file": "m02_side_stand_game.png",
+  "game_size": [
+   14,
+   35
+  ],
+  "game_body_h": 34.1
+ },
+ {
+  "name": "front_stand",
+  "file": "m02_front_stand.png",
+  "size": [
+   261,
+   496
+  ],
+  "game_file": "m02_front_stand_game.png",
+  "game_size": [
+   18,
+   35
+  ],
+  "game_body_h": 34.0
+ },
+ {
+  "name": "throw_windup",
+  "file": "m02_throw_windup.png",
+  "size": [
+   322,
+   485
+  ],
+  "game_file": "m02_throw_windup_game.png",
+  "game_size": [
+   22,
+   34
+  ],
+  "game_body_h": 33.2
+ },
+ {
+  "name": "throw_release",
+  "file": "m02_throw_release.png",
+  "size": [
+   429,
+   485
+  ],
+  "game_file": "m02_throw_release_game.png",
+  "game_size": [
+   30,
+   34
+  ],
+  "game_body_h": 33.1
+ }
+]

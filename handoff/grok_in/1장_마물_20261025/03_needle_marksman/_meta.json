@@ -1,0 +1,58 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m03_side_stand.png",
+  "size": [
+   291,
+   389
+  ],
+  "game_file": "m03_side_stand_game.png",
+  "game_size": [
+   23,
+   31
+  ],
+  "game_body_h": 30.5
+ },
+ {
+  "name": "front_stand",
+  "file": "m03_front_stand.png",
+  "size": [
+   280,
+   395
+  ],
+  "game_file": "m03_front_stand_game.png",
+  "game_size": [
+   22,
+   32
+  ],
+  "game_body_h": 31.0
+ },
+ {
+  "name": "aim",
+  "file": "m03_aim.png",
+  "size": [
+   380,
+   375
+  ],
+  "game_file": "m03_aim_game.png",
+  "game_size": [
+   31,
+   30
+  ],
+  "game_body_h": 29.3
+ },
+ {
+  "name": "fire",
+  "file": "m03_fire.png",
+  "size": [
+   340,
+   391
+  ],
+  "game_file": "m03_fire_game.png",
+  "game_size": [
+   27,
+   31
+  ],
+  "game_body_h": 30.6
+ }
+]
