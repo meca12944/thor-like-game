@@ -5,7 +5,7 @@ extends Node3D
 const PITCH := 45.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
-const SECS := 30.0
+const SECS := 28.0
 
 var hero: Node3D
 var model: Node3D
@@ -21,23 +21,24 @@ var cur_anim := ""
 
 # (이름, 방향, 초, 빠르기 칸/초) — 빠르기 0 = 서기
 var plan := [
-	["서기", Vector2(0, 1), 1.2, 0.0],
-	["걷기 →", Vector2(1, 0), 1.6, 3.2],
-	["걷기 ↘", Vector2(1, 1), 1.2, 3.2],
-	["걷기 ↓", Vector2(0, 1), 1.2, 3.2],
-	["걷기 ←", Vector2(-1, 0), 1.6, 3.2],
-	["걷기 ↖", Vector2(-1, -1), 1.2, 3.2],
-	["걷기 ↑", Vector2(0, -1), 1.4, 3.2],
-	["서기 (멈춤)", Vector2(0, -1), 0.8, 0.0],
-	["달리기 →", Vector2(1, 0), 2.0, 7.5],
-	["달리기 ↗", Vector2(1, -1), 1.2, 7.5],
-	["달리기 ← (180° 꺾기)", Vector2(-1, 0), 2.2, 7.5],
-	["달리기 ↙", Vector2(-1, 1), 1.0, 7.5],
-	["달리기 ↓", Vector2(0, 1), 1.0, 7.5],
-	["멈춤", Vector2(0, 1), 1.0, 0.0],
-	["달리기 → (긴 거리)", Vector2(1, 0), 3.0, 7.5],
-	["8방향 돌기", Vector2(1, 0), 3.2, -1.0],
-	["서기", Vector2(0, 1), 3.0, 0.0],
+	["서기", Vector2(0, 1), 1.4, 0.0, ""],
+	["걷기 →", Vector2(1, 0), 1.6, 3.2, ""],
+	["걷기 ↘ (대각선도 자연스럽게)", Vector2(1, 1), 1.4, 3.2, ""],
+	["걷기 ↓", Vector2(0, 1), 1.2, 3.2, ""],
+	["걷기 ←", Vector2(-1, 0), 1.4, 3.2, ""],
+	["걷기 ↑", Vector2(0, -1), 1.2, 3.2, ""],
+	["달리기 →", Vector2(1, 0), 2.0, 7.5, ""],
+	["달리기 ← (180° 꺾기)", Vector2(-1, 0), 1.8, 7.5, ""],
+	["달리기 ↓", Vector2(0, 1), 1.0, 7.5, ""],
+	["멈춤", Vector2(1, 0), 0.8, 0.0, ""],
+	["베기 1타", Vector2(1, 0), 1.1, 0.0, "Left_Slash"],
+	["베기 2타", Vector2(1, 0), 1.1, 0.0, "Right_Hand_Sword_Slash"],
+	["베기 3타 (모아 베기)", Vector2(1, 0), 2.2, 0.0, "Charged_Slash"],
+	["회피대시 (구르기)", Vector2(1, 0), 1.4, 0.0, "Roll_Dodge"],
+	["회피대시 (선 채로 피하기)", Vector2(-1, 0), 1.2, 0.0, "Stand_Dodge"],
+	["맞기", Vector2(0, 1), 1.4, 0.0, "Hit_Reaction"],
+	["8방향 돌기", Vector2(1, 0), 3.2, -1.0, ""],
+	["서기", Vector2(0, 1), 2.0, 0.0, ""],
 ]
 
 func tex(p: String) -> ImageTexture:
@@ -69,14 +70,14 @@ func _ready() -> void:
 	e.background_color = Color(0.2, 0.2, 0.2)
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.70, 0.70, 0.74)
-	e.ambient_light_energy = 0.32
+	e.ambient_light_energy = 0.55
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment = e
 	add_child(env)
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55, -35, 0)
-	sun.light_energy = 0.62
+	sun.light_energy = 0.85
 	sun.light_color = Color(1.0, 0.93, 0.85)
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 80.0
@@ -109,33 +110,39 @@ func _ready() -> void:
 	# 주인공 = 3D 인형 (무료 공개 모델, 시험용)
 	hero = Node3D.new()
 	add_child(hero)
-	var doc := GLTFDocument.new()
-	var st := GLTFState.new()
-	doc.append_from_file(ProjectSettings.globalize_path("res://art/Soldier.glb"), st)
-	model = doc.generate_scene(st)
+	model = load_glb("actions.glb")
 	hero.add_child(model)
 	var sc := HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8
 	model.scale = Vector3(sc, sc, sc)
 	anim = model.find_child("AnimationPlayer", true, false)
+	var lib: AnimationLibrary = anim.get_animation_library("")
+	for extra in [["walking.glb", "Walk"], ["running.glb", "Run"]]:
+		var m2 := load_glb(extra[0])
+		var p2: AnimationPlayer = m2.find_child("AnimationPlayer", true, false)
+		var nm: String = p2.get_animation_list()[0]
+		lib.add_animation(extra[1], p2.get_animation(nm).duplicate())
 	for n in ["Idle", "Walk", "Run"]:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+	for n in ["Left_Slash", "Right_Hand_Sword_Slash", "Charged_Slash", "Roll_Dodge", "Stand_Dodge", "Hit_Reaction"]:
+		if anim.has_animation(n):
+			anim.get_animation(n).loop_mode = Animation.LOOP_NONE
 	# 칼 (손에 붙임)
 	var skel: Skeleton3D = model.find_child("Skeleton3D", true, false)
 	if skel:
 		var ba := BoneAttachment3D.new()
-		ba.bone_name = "mixamorig:RightHand"
+		ba.bone_name = "RightHand"
 		skel.add_child(ba)
 		var blade := MeshInstance3D.new()
 		var bm := BoxMesh.new()
-		bm.size = Vector3(4, 95, 1.5)
+		bm.size = Vector3(3.0, 1.2, 95.0)
 		blade.mesh = bm
 		var bmat := StandardMaterial3D.new()
 		bmat.albedo_color = Color(0.78, 0.82, 0.86)
 		bmat.metallic = 0.8
 		bmat.roughness = 0.3
 		blade.material_override = bmat
-		blade.position = Vector3(0, 55, 4)
+		blade.position = Vector3(0, 9.0, 47.0)
 		ba.add_child(blade)
 
 	# 발밑 그림자 (둥근 반투명)
@@ -199,13 +206,19 @@ func _ready() -> void:
 	label.position = Vector2(24, 18)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "고도 2.5D 시험 · 배경 = 그록 그림 그대로 · 주인공 = 3D 인형(무료 공개 모델, 시험용)"
+	sub.text = "고도 2.5D 시험 · 배경 = 그록 그림 그대로 · 주인공 = 그록 설정화 → Meshy 3D 인형"
 	sub.add_theme_font_override("font", f)
 	sub.add_theme_font_size_override("font_size", 18)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
 	sub.add_theme_constant_override("outline_size", 6)
 	sub.position = Vector2(24, 680)
 	ui.add_child(sub)
+
+func load_glb(f: String) -> Node3D:
+	var doc := GLTFDocument.new()
+	var st := GLTFState.new()
+	doc.append_from_file(ProjectSettings.globalize_path("res://art/" + f), st)
+	return doc.generate_scene(st)
 
 func play(n: String, spd: float) -> void:
 	if cur_anim != n:
@@ -229,6 +242,7 @@ func _process(dt: float) -> void:
 		acc += s[2]
 	label.text = seg[0]
 	var spd: float = seg[3]
+	var act: String = seg[4]
 	var d: Vector2 = (seg[1] as Vector2).normalized()
 	if spd < 0.0:
 		# 제자리 8방향 돌기: 0.4초마다 45도
@@ -242,11 +256,13 @@ func _process(dt: float) -> void:
 	hero.position = pos
 	model.rotation.y = face
 	var target_lean := 0.0
-	if spd > 5.0:
-		play("Run", spd / 6.2)
+	if act != "":
+		play(act, 1.0)
+	elif spd > 5.0:
+		play("Run", spd / 6.0)
 		target_lean = 0.0
 	elif spd > 0.0:
-		play("Walk", spd / 2.4)
+		play("Walk", spd / 2.6)
 	else:
 		play("Idle", 1.0)
 	lean = lerp(lean, target_lean, clamp(dt * 8.0, 0.0, 1.0))
