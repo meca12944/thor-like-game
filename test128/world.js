@@ -1046,7 +1046,7 @@
   const FACEV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
   const DIR8 = ['right', 'downright', 'down', 'downleft', 'left', 'upleft', 'up', 'upright']; // test128 hero8: 8-way facing for the new hero frames (hitboxes stay 4-way FACEV)
-  // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_silmamul,c1_unrotting_hound*2[&tough=1][&ult=full]
+  // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_thread_scarecrow,c1_quilted_boar*2[&tough=1][&ult=full]
   //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
   const AQ = new URLSearchParams(location.search), ARENA = (AQ.get('arena') || '').split(',').filter(Boolean).flatMap(t => { const [k, n] = t.split('*'); return Array(Math.max(1, Math.min(8, +n || 1))).fill(k); }), TOUGH = AQ.get('tough') === '1';
   // ?at=tx,ty: start tile on the first map entered (?go= / bots / mob_check), with or without ?arena (was arena-only → 펠트 v5 뒤 봇이 늘 29,3에서 시작)
@@ -1943,7 +1943,7 @@
       t -= m.keyT; for (i = key; i < a.n; i++) { t -= a.ticks[i] / 60 * (m.D.rec || 1); if (t < 0) return i; } return a.n - 1; }
     if (!m.moving) return 0; const i = ((Math.floor((m.wph !== undefined ? m.wph : S.t) * 60 / a.ticks[0] + m.home[0]) % a.n) + a.n) % a.n; return m.back ? a.n - 1 - i : i; } // wph = distance-based walk clock
   function drawFeltHi(k, pick) { const m = S.map; if (!m || m.type === 'world') return;
-    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue;
+    for (const mm of S.mobs) { if (mm.dead || !pick(mm)) continue; if (mm.D.s47) { drawS47(mm, k); continue; } if (!mm.D.felt) continue; const A = mm.D.anim, name = mm.anim || 'walk', wd = name === 'walk' && A.walk.dirs && mm.wdir && mm.wdir !== 'side' ? mm.wdir : '', im = feltImg(A.src + '_' + name + (wd ? '_' + wd : '')); if (!im.complete || !im.naturalWidth) continue; // 위·아래 걷기 그림은 anim.walk.dirs 있는 몹만 (그록 마물은 아직 옆 걷기만 → 없는 그림을 부르지 않음, 콘솔 404 0)
       const sc = (mm.scale || 1) * (mm.spawnT > 0 ? Math.max(0, 1 - mm.spawnT * 1.8) : 1); if (sc <= 0) continue;
       const f = feltFrame(mm), idle = name === 'walk' && !mm.moving, sz = A.F * k * sc, P = mm.D.style, ph = S.t + mm.home[0];
       // body language (code, owner 10-23 "생동감"): wind-up squash + shiver before the hit, stretch on release, squash when hit, hop on first sight, per-mob idle habit
@@ -1954,6 +1954,10 @@
       if (mm.hitT > .18) { const e = .3 - mm.hitT, hk = mm.hitK || 1, q = e < .034 ? 1 : Math.max(0, 1 - (e - .034) / .086); bx *= 1 + .2 * hk * q; by *= 1 - .17 * hk * q; } // squash: full for 2 ticks, eases back by 0.12 s (finisher x1.5)
       if (mm.pushX || mm.pushY) { ox += mm.pushX * k; oy += mm.pushY * k; } if (mm.shudT > 0) ox += (Math.random() - .5) * 2.4 * k; // boss / mid-attack: jolt + shiver instead of knockback
       if (mm.alertT > 0) oy = -Math.sin(Math.PI * (1 - mm.alertT / .45)) * 6 * k;
+      if (mm.blockT > 0) mm.blockT -= 1 / 60;
+      if (A[name] && A[name].bob && A[name].bob.drag) { const B = A[name].bob; if (mm.moving) { rot += Math.sin(ph * B.drag) * .045; oy -= Math.abs(Math.sin(ph * B.drag)) * B.amp * k; } } // 철장 간수: 무겁게 좌우로 끌며 걸음
+      else if (name === 'walk' && A.walk.bob) { const B = A.walk.bob; if (B.hop) { if (mm.moving) { const q4 = Math.abs(Math.sin(ph * B.hop)); oy -= q4 * B.amp * k; bx *= 1 - (q4 - .5) * .08; by *= 1 + (q4 - .5) * .12; } } else oy -= (1 + Math.sin(ph * B.float)) * B.amp * .5 * k; } // 걷기 그림 없는 몹 (솜뭉치 통통 · 고치 어미 떠다님)
+      if (mm.st === 'leap' && A.attack && A.attack.air && mm.t < mm.warn) { const q3 = Math.min(1, mm.t / mm.warn), e3 = q3 * q3 * (3 - 2 * q3); if (e3 > .04) { oy -= Math.sin(Math.PI * e3) * A.attack.air * k; bx = .96; by = 1.06; } } // 실패 거미: 폴짝 높이(코드), 공중에선 웅크림 대신 살짝 늘림
       if (idle && !tele) { if (P === 'duel') rot = Math.sin(ph * 2.6) * .05; else if (P === 'skirm') ox += (Math.floor(ph * 3) % 4 === 0 ? 1 : 0) * k * .6; else if (P === 'lunge') { by *= 1 + .03 * Math.sin(ph * 7); rot = Math.sin(ph * .9) > .8 ? .04 : 0; } else by *= 1 + .02 * Math.sin(ph * 4); }
       const [x, y] = W2S(mm.x + (mm.shake ? (Math.random() - .5) * 2 : 0) + stopJit(mm), mm.y);
       if (tele || mm.rage) { ctx.save(); ctx.globalAlpha = tele ? .15 + .35 * q : .12 + .08 * Math.sin(S.t * 8); ctx.fillStyle = '#ff3c28'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), sz * .28, sz * .09, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } // red ground glow = "about to strike" / angry
