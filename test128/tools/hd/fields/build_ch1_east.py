@@ -257,8 +257,8 @@ objs.append({'type': 'clue', 'id': 'ce_belltower', 'x': 127, 'y': 85, 'name': '�
              'text': '검은 물 위로 종탑 지붕 끝만 솟아 있다. 물이 너무 잔잔해서 바닥이 보이지 않는다.\n…아주 멀리서, 종소리가 한 번.', 'textDone': '물 위로 솟은 종탑 끝.'})
 objs.append({'type': 'clue', 'id': 'ce_lift', 'x': 162, 'y': 216, 'name': '낡은 승강기', 'flag': 'ce_look_lift',
              'text': '나무 틀과 도르래, 끊어진 사슬. 위에서 누군가 내려 줘야 움직일 것 같다.', 'textDone': '위에서 내려 줘야 움직이는 승강기.'})
-objs.append({'type': 'sign', 'x': 3, 'y': 207, 'text': '길이 무너져 있다. 서쪽 들판 중앙으로는 아직 갈 수 없다.'})
-rect(0, 200, 2, 222, '#')
+objs.append({'type': 'exit', 'x': 0, 'y': 200, 'w': 1, 'h': 21, 'to': 'ch1_field_c', 'spawn': 'east', 'label': '← 들판 중앙 · 수도교'})   # 들판 중앙 (build_ch1_center.py, 10-26)
+rect(0, 200, 1, 221, '.')
 rect(176, 20, W, 31, '.'); rect(W - 1, 20, W, 31, '#')
 objs.append({'type': 'sign', 'x': 186, 'y': 25, 'text': '부서진 이정표. 「철혈의 가도 →」\n길 끝이 무너진 성벽 잔해로 막혀 있다.'})
 objs.append({'type': 'sign', 'x': 186, 'y': 130, 'text': '돌무더기로 막힌 좁은 샛길. 누군가 일부러 막아 둔 것 같다.'})
@@ -294,7 +294,7 @@ mp = {
     'ground': [''.join(r) for r in grid],
     'objects': objs,
     'camZones': [{'x0': 0, 'y0': 12, 'x1': W, 'y1': 34, 'zoom': 0.8, 'look': -7.5, 'f': 8}],   # 북쪽 끝에선 위를 올려다봄 (무덤가와 같은 값) → 낭떠러지 너머 왕성
-    'spawns': {'default': [75.5, 243.5, 'up'], 'felt': [75.5, 243.5, 'up']},
+    'spawns': {'default': [75.5, 243.5, 'up'], 'felt': [75.5, 243.5, 'up'], 'west': [3.5, 210.5, 'right']},
     'hd': {'D': 1, 'ground': f'{OUT}/ground.webp', 'props': under + props, 'backdrop': bd, 'grade': 'ash', 'decoArt': {k: felt_deco[k] for k in ('T', 'R', 's') if k in felt_deco}, 'fx': {},   # 마른 나무·돌무더기·그루터기 = 펠트와 같은 그림
            # 모닥불 2곳 (거인 손바닥 30,115 / 가도 들머리 120,80): 불·연기·깜빡이는 빛은 코드 (효과 담당 10-25)
            'fires': [[30.5, 115.4, 1.1], [120.5, 80.4, 1.0]], 'smoke': [[30.5, 115.0, 1.0], [120.5, 80.0, 0.9]], 'flick': [[30.5, 115.4, 48, '#ff8a3a', 1], [120.5, 80.4, 44, '#ff8a3a', 1]]},
