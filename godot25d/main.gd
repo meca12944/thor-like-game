@@ -27,9 +27,9 @@ var phase := 0            # 공격: 0 준비, 1 휘두름, 2 멈춤, 3 회복
 var hold_t := 0.0
 var shake := 0.0
 var skel: Skeleton3D
-const CHIBI := {"Head": 1.3, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
+const CHIBI := {} # 회의: 뼈 키우기 안 함 (옛 값 "Head": 1.3, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
 var step_acc := 0.0
-const STEP := 1.0 / 12.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
+const STEP := 0.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
 # (이름, 방향, 초, 빠르기 칸/초) — 빠르기 0 = 서기
 var plan := [
@@ -85,7 +85,7 @@ func _ready() -> void:
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.70, 0.70, 0.74)
 	e.ambient_light_energy = 0.45
-	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	env.environment = e
 	add_child(env)
 
@@ -127,7 +127,7 @@ func _ready() -> void:
 	model = load_glb("actions.glb")
 	hero.add_child(model)
 	var sc := base_sc()
-	model.scale = Vector3(sc * 1.1, sc, sc * 1.1)
+	model.scale = Vector3(sc, sc, sc)
 	anim = model.find_child("AnimationPlayer", true, false)
 	anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	var lib: AnimationLibrary = anim.get_animation_library("")
@@ -151,6 +151,7 @@ func _ready() -> void:
 	var toon := load("res://toon.gdshader")
 	var outl := load("res://outline.gdshader")
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		add_face_mask(mi)
 		for si in mi.mesh.get_surface_count():
 			var om = mi.get_active_material(si)
 			var sm := ShaderMaterial.new()
@@ -293,13 +294,51 @@ func _ready() -> void:
 	label.position = Vector2(24, 18)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "시험 7 · 그록 작은그림 v3 → Meshy 새 인형(해진 망토) · 옛 주인공 비율 · 옛 동작 전부 · 도트 없이, 동작 1초 12장"
+	sub.text = "시험 8 · 회의 결론 4~6: 2칸 빛·보랏빛 그림자·얼굴 평평하게 / 외곽선 몸 둘레만 / 부드러운 움직임 + 공격만 멈칫"
 	sub.add_theme_font_override("font", f)
 	sub.add_theme_font_size_override("font_size", 18)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
 	sub.add_theme_constant_override("outline_size", 3)
 	sub.position = Vector2(24, 680)
 	ui.add_child(sub)
+
+# 얼굴 표시: Head 뼈 무게 × 앞쪽(+Z) 법선 → 정점 색 R (회의 결론 3)
+func add_face_mask(mi: MeshInstance3D) -> void:
+	var sk: Skin = mi.skin
+	if sk == null:
+		return
+	var head := -1
+	for i in sk.get_bind_count():
+		if sk.get_bind_name(i) == "Head":
+			head = i
+	if head < 0:
+		return
+	var old: ArrayMesh = mi.mesh
+	var nm := ArrayMesh.new()
+	for si in old.get_surface_count():
+		var arr := old.surface_get_arrays(si)
+		var bones: PackedInt32Array = arr[Mesh.ARRAY_BONES]
+		var wts: PackedFloat32Array = arr[Mesh.ARRAY_WEIGHTS]
+		var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+		var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var vc: int = verts.size()
+		var per: int = bones.size() / max(vc, 1)
+		var cols := PackedColorArray()
+		cols.resize(vc)
+		for v in vc:
+			var w := 0.0
+			for k in per:
+				if bones[v * per + k] == head:
+					w += wts[v * per + k]
+			var fr: float = clamp((nrm[v].z - 0.15) * 2.5, 0.0, 1.0)
+			cols[v] = Color(clamp(w * 1.4, 0.0, 1.0) * fr, 0, 0, 1)
+		arr[Mesh.ARRAY_COLOR] = cols
+		var fl := 0
+		if per == 8:
+			fl = Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
+		nm.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], {}, fl)
+		nm.surface_set_material(si, old.surface_get_material(si))
+	mi.mesh = nm
 
 func load_glb(f: String) -> Node3D:
 	var doc := GLTFDocument.new()
@@ -311,7 +350,7 @@ func play(n: String, spd: float) -> void:
 	if cur_anim != n:
 		anim.play(n, 0.12)
 		cur_anim = n
-		model.scale = Vector3(1.1, 1.0, 1.1) * base_sc()
+		model.scale = Vector3.ONE * base_sc()
 	if n.find("Slash") < 0:
 		anim.speed_scale = spd
 
@@ -388,15 +427,15 @@ func punch(dt: float) -> void:
 	match phase:
 		0:
 			anim.speed_scale = 0.8
-			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc() * Vector3(1.03, 0.96, 1.03), 0.2)
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(1.03, 0.96, 1.03), 0.2)
 			if v > 9.0:
 				phase = 1
 		1:
 			anim.speed_scale = 2.1
-			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc() * Vector3(0.97, 1.05, 0.97), 0.4)
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(0.97, 1.05, 0.97), 0.4)
 			if v < 5.0:
 				phase = 2
-				hold_t = 0.09
+				hold_t = 0.06
 				shake = 0.12
 		2:
 			anim.speed_scale = 0.04
@@ -405,7 +444,7 @@ func punch(dt: float) -> void:
 				phase = 3
 		3:
 			anim.speed_scale = 1.35
-			model.scale = model.scale.lerp(Vector3(1.1, 1.0, 1.1) * base_sc(), 0.2)
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc(), 0.2)
 
 func base_sc() -> float:
 	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8 * 1.05

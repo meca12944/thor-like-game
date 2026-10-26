@@ -1,23 +1,26 @@
 shader_type spatial;
-render_mode specular_disabled;
-// 시험 3: 만화풍 빛(3단) + 테두리 빛 + 붉은 안감·채도 올림
+render_mode specular_disabled, ambient_light_disabled;
+// 회의 결론 4·5: 2칸 빛 + 색 있는 그림자, 얼굴(COLOR.r = Head 뼈 무게×앞쪽)은 평평하게·테두리 빛 없음
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap;
-uniform float sat = 1.05;
-uniform vec3 rim_col : source_color = vec3(0.70, 0.93, 1.0);
-uniform float rim_pow = 2.6;
-uniform float rim_str = 0.2;
+uniform vec3 shade_tint : source_color = vec3(0.7, 0.64, 0.8);
+uniform vec3 face_tint : source_color = vec3(0.97, 0.93, 0.92);
+uniform vec3 rim_col : source_color = vec3(0.75, 0.9, 1.0);
+uniform float rim_pow = 3.0;
+uniform float rim_str = 0.25;
+varying float face;
+void vertex() {
+	face = COLOR.r;
+}
 void fragment() {
 	vec3 c = texture(albedo_tex, UV).rgb;
-	float l = dot(c, vec3(0.299, 0.587, 0.114));
-	c = mix(vec3(l), c, sat);
-	float red = clamp((c.r / (max(c.g, c.b) + 0.03) - 1.9) * 1.5, 0.0, 1.0);
-	c = mix(c, c * vec3(1.3, 0.85, 0.85), red * 0.3);
-	ALBEDO = c;
+	ALBEDO = min(c, vec3(0.95));
 	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), rim_pow);
-	EMISSION = rim_col * rim * rim_str;
+	EMISSION = rim_col * rim * rim_str * (1.0 - face) * ALBEDO;
 }
 void light() {
-	float nd = dot(NORMAL, LIGHT);
-	float b = nd > 0.3 ? 1.0 : (nd > -0.15 ? 0.6 : 0.32);
-	DIFFUSE_LIGHT += LIGHT_COLOR / PI * b * mix(0.55, 1.0, ATTENUATION);
+	float nl = dot(NORMAL, LIGHT);
+	float lit = smoothstep(0.0, 0.06, nl) * mix(0.35, 1.0, step(0.5, ATTENUATION));
+	vec3 ramp = mix(shade_tint, vec3(1.0), lit);
+	ramp = mix(ramp, face_tint, face);
+	DIFFUSE_LIGHT += ramp * min(LIGHT_COLOR / PI, vec3(1.0));
 }
