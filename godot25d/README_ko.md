@@ -66,3 +66,8 @@
 - 회피대시: 몸은 적을 본 채, 코드가 0.22초 동안 휙 옮김(블러드본 스텝). 3연속 베기는 칼이 빨라질 때마다 멈칫 다시.
 - 발밑 그림자가 몸(엉덩이 뼈)을 따라감(3D·아틀라스 둘 다).
 - 후보 미리보기 영상(무료 GIF 모음)은 팀장 작업 폴더에만 둠.
+
+## 2시간 결과 (10-26, `ATLAS=1 PLAN=new2`)
+- 새 인형(앞모습 한 장으로, 망토·머리 설정화처럼) + 설정화로 다시 칠함(art_bake.py → art/art_bake.png) + 머리 둥근 빛 + 아틀라스(2배로 찍고 줄임) + 움직임 회의 결론(공격 15장·과장·타마다 멈칫·꺾기 브레이크·잔상). 자세한 것: handoff/claude/CHARACTER_3D_TEXTBOOK_ko.md 4장, MOTION_TEXTBOOK_ko.md 2-2-3D.
+- 크레딧 116 (잔액 704). walking/running.glb(각 37MB)는 저장소에서 뺌(새 계획에서 안 씀, 없으면 건너뜀).
+- 아틀라스 다시 만들기: `BAKE=1 BAKE2X=1 BAKEDIRS=down PLAN=new2 ...` (방향 4개 동시) → `PACK_SCALE=0.5 python3 pack_atlas.py godot25d`

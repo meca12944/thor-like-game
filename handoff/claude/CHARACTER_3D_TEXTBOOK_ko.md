@@ -34,3 +34,18 @@
 - 그래서 베기 동작을 고르는 기준 = **칼이 그리는 길이 크고 시원한가**(위→아래, 옆으로 쓸기, 한 바퀴 등). 동작만 바꾸면 검흔도 저절로 맞는다.
 - 아틀라스로 굳혀도 같다: 찍을 때 칸마다 칼끝·칼밑 자리를 함께 저장(atlas.json tips) → 게임에서 그 자리로 검흔을 그림.
 - 칼 길이·굵기·색·남는 시간·멈칫 때 번쩍임은 숫자로 조절. 날아가는 검기(멀리 베기)만 따로 만든다.
+
+## 4. 2시간 회의·연구·개발 (2026-10-26, 사장님 「팀원들하고 회의·연구·검색·개발 2시간, 크레딧 200 안에서 주인공 자유롭게, 설정화처럼 최대한 2D 작화처럼」)
+- 참석: 팀장 + 조사 팀원 3 (그림 표현 / 움직임 / 3D 인형). 팀원 방 연결이 끊겨 조사 팀원을 새로 불러 진행.
+- 크레딧: 새 인형 2개 시험 70 + 몸 줄이기 5 + 관절 5 + 동작 12개 36 = **116** (잔액 704).
+
+### 결론 (순서 = 효과 큰 순)
+1. **설정화로 다시 칠하기 (가장 큰 효과, 크레딧 0)**: `godot25d/art_bake.py <인형.glb> <앞> <옆(오른쪽 봄)> <뒤> <출력.png>` — 인형이 그림과 같은 T자세라서, 색 그림 칸마다 앞·뒤·양옆 그림에서 그 자리 색을 가져옴(깊이로 가려진 곳 거름, 법선 방향 무게). 20초. 설정화의 붓 자국·주름·테두리가 그대로 올라감 → `art/art_bake.png`. 그림에 그림자가 이미 있으니 게임 그림자는 얕게(shade_tint 0.84,0.8,0.9).
+2. **새 인형 = 한 장(앞모습) 그림으로 만들기**: Image-to-3D, meshy-7.1, `should_remesh:false`, `geometry_resolution:"2k"`(35), 입력은 같은 크기·여백 10%·1024px 정사각. 앞·옆·뒤 3장보다 **망토 폭·머리숱이 설정화와 비슷**. 그 뒤 Remesh 40000(5) → 관절(5) → 동작. 뒷면이 짐작이어도 1번으로 다시 칠하니 괜찮음.
+3. **머리·머리카락 둥근 빛**: 머리 뼈 무게(COLOR.b)만큼 법선을 머리 가운데에서 바깥 방향으로 → AI 인형의 울퉁불퉁한 그림자 조각이 사라짐(head_c 매 프레임).
+4. **아틀라스로 굳히기**: 2배 크기(1600px)로 찍고 묶을 때 절반으로 줄임 → 테두리가 그림처럼 부드러움. 방향 4개를 동시에 찍어 8분(`BAKE=1 BAKE2X=1 BAKEDIRS=down` …, `PACK_SCALE=0.5 python3 pack_atlas.py`). 그림판은 비스듬히 서 있어 발끝이 땅에 잘림 → `no_depth_test`.
+5. **칼**: 임시 막대 → 쇠색 날·구리색 코등이·짙은 가죽 손잡이(설정화 색). 진짜 칼 인형은 다음.
+- 안 하기로 한 것: 셰이더에서 그림을 실시간으로 비추기(움직이면 미끄러짐 — 얼굴만 예외로 유지), 길티기어식 UV 선(UV를 다시 펴야 함), 실시간 화면 외곽선 후처리(무거움).
+
+### 출처
+- 길티기어 Xrd GDC https://www.ggxrd.com/Motomura_Junya_GuiltyGearXrd.pdf · 하데스 3D→2D https://steamcommunity.com/app/1145360/discussions/0/1738883810796606862 · 그랑블루 릴링크 https://blogs.autodesk.com/media-and-entertainment/2024/11/27/granblue-fantasy-relink-brings-iconic-2d-aesthetics-into-3d-with-flexible-creative-tools/ · 하이파이 러쉬 https://80.lv/articles/the-making-of-hi-fi-rush-s-3d-toon-rendering-style · Meshy 문서 https://docs.meshy.ai/api/image-to-3d.md , https://docs.meshy.ai/api/remesh.md , https://docs.meshy.ai/api/pricing.md

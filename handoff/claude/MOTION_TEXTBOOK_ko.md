@@ -600,6 +600,16 @@
 - `hero_updown_v1/` — hero_updown v1 (owner 2026-10-20 "저장 세팅해")
 - `hero_zoom_v1/` — hero_zoom v1 + 샌드박스 모션 일치 (2026-10-20, 사장님 OK · 인게임 세팅)
 
+### 2-2-3D. 주인공 3D(고도) 움직임 회의 결론 (2026-10-26, 팀장 + 조사 팀원 3, 사장님 「우리 게임이랑 잘 맞게 모션 표현」)
+- 사장님 확정 동작(Meshy 창고): 서기 = Combat Stance(89) · 달리기 = Run Fast(16) · 1·2·3타 = Weapon Combo 2(241) 하나를 칼끝 빠르기로 나눔(꼭대기 1.17·2.03·2.97초, 자르는 곳 0.55/1.6/2.42/3.9초) · 모아베기(꾹) = Axe Spin Attack(238, 0~0.5초를 0.45배로 모으고 떨림, 떼면 회전) · 회피대시 후보 Crouch and Step Back(404)·Stand Dodge 1(157)·E9 옆으로 뛰기(379) — 사장님 고르는 중.
+- 공격만 **1초 15장 끊기**(움직임·궤적·화면은 부드럽게). 타마다 시간 다시 맞추기: 준비 0.85배 → 휘두름 2배 → **멈칫 1타 0.05·2타 0.066·3타 0.11·모아베기 0.15초** + 화면 흔들림 → 회복 1.15배.
+- 자세 과장(쉴 때 자세 기준 회전 키우기): 등 1.3 · 팔 1.25 · 엉덩이 1.15 · 머리 0.8, 휘두름 앞뒤에서만 최대, 110도 넘지 않기. 몸통만 따로 늘리지 않음(뼈가 찌그러짐) — 늘림은 전체 크기·궤적으로.
+- 달리기: Run Fast에 숙임이 이미 커서 출발 0.18초만 +8도. 달리다 120도 넘게 꺾으면 0.14초 브레이크(뒤로 12도·속도 40%·먼지) 뒤 휙 돌기. 꺾을 때 안쪽으로 기울기(최대 14도).
+- 회피대시: 몸은 적을 본 채 코드가 0.22초에 3칸(처음에 빠르게). 0.045초마다 잔상, 밝은 푸른빛 더하기, 0.25초에 사라짐.
+- 검흔 = 칼끝이 지나간 길(3D), 멈칫 동안 궤적도 멈춤, 0.1초에 사라짐.
+- 다음: 입력 버퍼 0.18초, 다음 타 받는 창(멈칫 끝~회복 끝), 회피대시가 공격보다 우선, 저스트 회피 판정(무적 0.016~0.19초 중 앞 0.12초).
+- 출처: https://www.ggxrd.com/Motomura_Junya_GuiltyGearXrd.pdf · https://www.ssbwiki.com/Hitlag · https://www.gamedeveloper.com/pc/combat-canceled-i-god-of-war-i-action-game-design · https://eldenring.wiki.gg/wiki/Skill:_Quickstep · https://www.gamedeveloper.com/programming/video-sprucing-up-cameras-with-math
+
 ## 2-3. 주인공2 (망토 없는 새 디자인, **봉인** — 사장님 10-22 "새주인공은 봉인이야")
 - 위치: 브랜치 `claude/linette-8dir`의 `handoff/claude/hero_v6_mini/` (게임 미연결). 서기·걷기·달리기 5방향 완성.
 #### 디자인

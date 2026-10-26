@@ -4,15 +4,20 @@ render_mode specular_disabled, ambient_light_disabled;
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap;
 // 설정화 앞모습(COLOR.g = 머리 앞쪽, UV2 = 그림 자리)을 그대로 입힘
 uniform sampler2D art_tex : source_color, filter_linear, repeat_disable;
-uniform vec3 shade_tint : source_color = vec3(0.7, 0.64, 0.8);
+uniform vec3 shade_tint : source_color = vec3(0.84, 0.8, 0.9);  // 설정화로 칠한 색에 이미 그림자가 있어 얕게
 uniform vec3 face_tint : source_color = vec3(0.97, 0.93, 0.92);
 uniform vec3 rim_col : source_color = vec3(0.75, 0.9, 1.0);
 uniform float rim_pow = 3.0;
 uniform float rim_str = 0.25;
 varying float face;
 varying float proj;
+// 머리·머리카락은 머리 가운데에서 바깥으로 둥근 법선 (AI 인형의 울퉁불퉁 그림자 없앰)
+uniform vec3 head_c = vec3(0.0, 1.6, 0.0);
+uniform float head_round = 0.85;
 void vertex() {
 	proj = COLOR.g;
+	vec3 sph = normalize((VERTEX - head_c) * vec3(1.0, 0.85, 1.0));
+	NORMAL = normalize(mix(NORMAL, sph, COLOR.b * head_round));
 	face = max(COLOR.r, proj);
 }
 void fragment() {
