@@ -28,3 +28,9 @@
 - SDF 얼굴 그림자: https://destiny-fine-0ac.notion.site/SDF-Shadowmap-9527f23116aa42dc89e3c9e17a54ddf3
 - 고도 4.3 spatial 셰이더: https://docs.godotengine.org/en/4.3/tutorials/shaders/shader_reference/spatial_shader.html
 - Meshy Multi-Image: https://docs.meshy.ai/api/multi-image-to-3d.md · 변경 기록 https://docs.meshy.ai/api/changelog · 관절 https://docs.meshy.ai/en/webapp/guides/3d-model/rigging
+
+## 3. 검흔 = 칼이 지나간 길 (사장님 10-26 「3D니까 검흔이 따로 나올 필요 없잖아, 이제 자유롭게 표현되니까」)
+- 주인공 보통 공격의 검흔은 따로 그린 2D 베기 그림을 쓰지 않는다. 3D 칼끝·칼밑이 실제로 지나간 길을 띠로 그린다(코드, 그림에 굽지 않음).
+- 그래서 베기 동작을 고르는 기준 = **칼이 그리는 길이 크고 시원한가**(위→아래, 옆으로 쓸기, 한 바퀴 등). 동작만 바꾸면 검흔도 저절로 맞는다.
+- 아틀라스로 굳혀도 같다: 찍을 때 칸마다 칼끝·칼밑 자리를 함께 저장(atlas.json tips) → 게임에서 그 자리로 검흔을 그림.
+- 칼 길이·굵기·색·남는 시간·멈칫 때 번쩍임은 숫자로 조절. 날아가는 검기(멀리 베기)만 따로 만든다.
