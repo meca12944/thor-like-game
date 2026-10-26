@@ -1,0 +1,494 @@
+<title>필멸자 주인공 시험판</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 한 화면 게임: 잿빛 들판 위 캔버스 + 얇은 글자판. 단색(어두운) 한 가지 모습 */
+:root {
+  --bg: #15141a;
+  --ink: #ece6da;
+  --dim: #a59f95;
+  --copper: #c8924a;
+  --ult: #7fd6ff;
+  --hurt: #e0574a;
+  --panel: rgba(16, 15, 22, 0.72);
+  --f-title: "Gowun Batang", "Nanum Myeongjo", serif;
+  --f-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-ui); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+#game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: var(--bg); }
+.hud { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; pointer-events: none; }
+.card { background: var(--panel); border-radius: 6px; padding: 10px 14px; max-width: min(520px, 100%); min-width: 0; }
+.card h1 { margin: 0 0 4px; font-family: var(--f-title); font-size: 20px; letter-spacing: 0.02em; text-wrap: balance; }
+.card p { margin: 0; color: var(--dim); font-size: 13px; line-height: 1.55; }
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin-top: 6px; font-size: 13px; }
+.keys b { color: var(--copper); font-weight: 600; white-space: nowrap; }
+.gauge { width: 220px; }
+.gauge .lab { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.gauge .bar { height: 10px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.gauge .fill { height: 100%; width: 0%; background: var(--ult); transition: width 0.15s; }
+#msg { position: fixed; left: 50%; top: 22%; transform: translateX(-50%); font-family: var(--f-title); font-size: 30px; color: var(--ult); text-shadow: 0 2px 0 #000; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+#loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 15px; color: var(--dim); background: var(--bg); }
+.touch { position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); right: max(18px, env(safe-area-inset-right, 0px)); display: none; gap: 14px; }
+.touch button { width: 76px; height: 76px; border-radius: 50%; border: 2px solid rgba(236,230,218,0.35); background: rgba(16,15,22,0.55); color: var(--ink); font: 600 15px var(--f-ui); }
+.touch button:active { background: rgba(200,146,74,0.45); }
+.coarse .touch { display: flex; }
+.coarse .keys { display: none; }
+@media (max-width: 560px) { .card p.long { display: none; } .gauge { width: 160px; } }
+@media (prefers-reduced-motion: reduce) { #msg { transition: none; } }
+</style>
+
+<canvas id="game" aria-label="주인공 시험 들판"></canvas>
+<div class="hud">
+  <div class="card">
+    <h1>필멸자 · 주인공 시험판</h1>
+    <p class="long">3D 인형 동작을 4방향 그림으로 굳힌 주인공. 허수아비가 내려찍기 전에 붉은 원이 나오면 맞기 직전에 회피대시 하세요.</p>
+    <div class="keys">
+      <b>WASD · 방향키</b><span>달리기</span>
+      <b>J · 왼쪽 클릭</b><span>베기 1·2·3타 (연타)</span>
+      <b>꾹 누르기</b><span>모아베기 (떼면 회전)</span>
+      <b>Space · K</b><span>회피대시 (방향키 쪽, 없으면 뒤로)</span>
+      <b>게임패드</b><span>왼스틱 이동 · X 베기 · A 회피</span>
+    </div>
+  </div>
+  <div class="card gauge">
+    <div class="lab"><span>필살 게이지</span><span id="gv">0</span></div>
+    <div class="bar"><div class="fill" id="gf"></div></div>
+  </div>
+</div>
+<div id="msg"></div>
+<div class="touch"><button id="bDodge" type="button">회피</button><button id="bAtk" type="button">베기</button></div>
+<div id="loading">그림 불러오는 중…</div>
+
+<script>
+(() => {
+'use strict';
+const cv = document.getElementById('game');
+const cx = cv.getContext('2d');
+if (matchMedia('(pointer: coarse)').matches) document.documentElement.classList.add('coarse');
+
+// ── 숫자 (Godot 시험판·회의 결론과 같은 값) ──
+const VIEW_TILES = 11;          // 화면 세로에 보이는 칸
+const RUN = 7.5;                // 칸/초
+const COMBO = 'Weapon_Combo_2';
+const HITS = [                  // [시작, 끝, 휘두름 꼭대기, 멈칫 초]
+  [0.55, 1.6, 1.17, 0.05],
+  [1.6, 2.42, 2.03, 0.066],
+  [2.42, 3.9, 2.97, 0.11],
+];
+const CHARGE_HOLD = 0.25;       // 이만큼 누르면 모아베기
+const DODGE_T = 0.22, DODGE_D = 3.0;
+const ATK_FPS = 15;             // 공격은 1초 15장 끊기
+const BUFFER = 0.18;
+const ULT = { near: 0.8, hit: 5, just: 15, max: 100 };
+
+const files = { json: 'hero.json', ground: 'ground.webp' };
+const props = [ // 이름, 칸 x, 칸 y, 줄임
+  ['giant_knight', 26, 96, 1.6], ['giant_helmet', 96, 122, 1], ['giant_sword', 30, 150, 1.6],
+  ['12a_collapsed_tower_back', 92, 128, 1], ['12d_ash_mound_hill_back', 30, 140, 1], ['12c_petrified_grove_back', 84, 140, 1],
+];
+
+const loadImg = (src) => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error(src)); i.src = src; });
+
+let A, pages = [], ground, propImgs = {};
+let W = 0, H = 0, DPR = 1, S = 1;
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = H / VIEW_TILES;
+}
+addEventListener('resize', resize);
+
+// ── 입력 ──
+const keys = new Set();
+let atkDown = false, atkDownT = 0, atkPressed = false, atkReleased = false, dodgePressed = false;
+addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const k = e.key.toLowerCase();
+  keys.add(k);
+  if (k === 'j') { atkDown = true; atkPressed = true; }
+  if (k === ' ' || k === 'k' || k === 'shift') { dodgePressed = true; e.preventDefault(); }
+  if (k.startsWith('arrow')) e.preventDefault();
+});
+addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  keys.delete(k);
+  if (k === 'j') { atkDown = false; atkReleased = true; }
+});
+cv.addEventListener('mousedown', (e) => { if (e.button === 0) { atkDown = true; atkPressed = true; } });
+addEventListener('mouseup', (e) => { if (e.button === 0 && atkDown) { atkDown = false; atkReleased = true; } });
+addEventListener('blur', () => { keys.clear(); if (atkDown) { atkDown = false; atkReleased = true; } });
+
+// 폰 시험용: 왼쪽 끌기 = 이동, 오른쪽 버튼
+let stick = null; // {id, x0, y0, x, y}
+cv.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse') return;
+  if (e.clientX < W * 0.5 && !stick) stick = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY };
+});
+cv.addEventListener('pointermove', (e) => { if (stick && e.pointerId === stick.id) { stick.x = e.clientX; stick.y = e.clientY; } });
+const endStick = (e) => { if (stick && e.pointerId === stick.id) stick = null; };
+cv.addEventListener('pointerup', endStick); cv.addEventListener('pointercancel', endStick);
+const bAtk = document.getElementById('bAtk'), bDodge = document.getElementById('bDodge');
+bAtk.addEventListener('pointerdown', (e) => { e.preventDefault(); atkDown = true; atkPressed = true; });
+bAtk.addEventListener('pointerup', () => { atkDown = false; atkReleased = true; });
+bAtk.addEventListener('pointercancel', () => { atkDown = false; atkReleased = true; });
+bDodge.addEventListener('pointerdown', (e) => { e.preventDefault(); dodgePressed = true; });
+
+let padPrev = {};
+function readPad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  for (const p of pads) {
+    if (!p) continue;
+    const x = p.buttons[2]?.pressed, a = p.buttons[0]?.pressed;
+    if (x && !padPrev.x) { atkDown = true; atkPressed = true; }
+    if (!x && padPrev.x) { atkDown = false; atkReleased = true; }
+    if (a && !padPrev.a) dodgePressed = true;
+    padPrev = { x, a };
+    let dx = p.axes[0] || 0, dy = p.axes[1] || 0;
+    if (p.buttons[14]?.pressed) dx = -1; if (p.buttons[15]?.pressed) dx = 1;
+    if (p.buttons[12]?.pressed) dy = -1; if (p.buttons[13]?.pressed) dy = 1;
+    if (Math.hypot(dx, dy) > 0.3) return [dx, dy];
+    return null;
+  }
+  return null;
+}
+function moveInput() {
+  let dx = 0, dy = 0;
+  if (keys.has('a') || keys.has('arrowleft')) dx -= 1;
+  if (keys.has('d') || keys.has('arrowright')) dx += 1;
+  if (keys.has('w') || keys.has('arrowup')) dy -= 1;
+  if (keys.has('s') || keys.has('arrowdown')) dy += 1;
+  const p = readPad(); if (p) { dx = p[0]; dy = p[1]; }
+  if (stick) {
+    const sx = stick.x - stick.x0, sy = stick.y - stick.y0, l = Math.hypot(sx, sy);
+    if (l > 14) { dx = sx / l; dy = sy / l; }
+  }
+  const l = Math.hypot(dx, dy);
+  return l > 0.01 ? [dx / l, dy / l] : null;
+}
+
+// ── 주인공 ──
+const DIRV = { down: [0, 1], up: [0, -1], right: [1, 0], left: [-1, 0] };
+const hero = {
+  x: 62, y: 121, face: 'down', state: 'idle', anim: 'Combat_Stance', clip: 0, show: 0, stepAcc: 0,
+  hit: 0, hitDone: false, hs: 0, buf: 0, bufKind: '', segEnd: 0, linger: 0,
+  dodgeT: 0, dodgeV: [0, 0], ghostAcc: 0, skid: 0, lastMove: null, tilt: 0, chargeT: 0, invuln: 0,
+};
+function dirOf(v, cur) {
+  // 4방향 + 경계 ±20도 머뭇: 지금 방향과 가까우면 유지
+  const ang = Math.atan2(v[1], v[0]);
+  const want = Math.abs(v[0]) >= Math.abs(v[1]) ? (v[0] > 0 ? 'right' : 'left') : (v[1] > 0 ? 'down' : 'up');
+  if (cur && cur !== want) {
+    const c = DIRV[cur], ca = Math.atan2(c[1], c[0]);
+    let d = Math.abs(ang - ca); if (d > Math.PI) d = 2 * Math.PI - d;
+    if (d < (45 + 20) * Math.PI / 180) return cur;
+  }
+  return want;
+}
+function frameOf(anim, dir, t, loop) {
+  const a = A.anims[anim]; const n = a.frames;
+  let f = Math.floor(t * A.fps + 1e-4);
+  f = loop ? ((f % n) + n) % n : Math.max(0, Math.min(n - 1, f));
+  return a.dirs[dir][f];
+}
+function startHit(i) {
+  hero.state = 'attack'; hero.anim = COMBO; hero.hit = i; hero.hitDone = false; hero.hs = 0;
+  hero.clip = HITS[i][0]; hero.show = hero.clip; hero.stepAcc = 1;
+  hero.linger = 0; trail.length = 0;
+}
+function startCharge() { hero.state = 'charge'; hero.anim = 'Axe_Spin_Attack'; hero.clip = 0; hero.show = 0; hero.chargeT = 0; trail.length = 0; }
+function startSpin() { hero.state = 'spin'; hero.clip = 0.5; hero.hitDone = false; hero.hs = 0; hero.stepAcc = 1; }
+function startDodge(mv) {
+  const back = DIRV[hero.face];
+  hero.dodgeV = mv ? mv : [-back[0], -back[1]];
+  hero.state = 'dodge'; hero.anim = 'Crouch_and_Step_Back'; hero.clip = 0; hero.show = 0; hero.dodgeT = 0; hero.ghostAcc = 0;
+  hero.invuln = 0.19; hero.dodgeStart = now;
+  trail.length = 0;
+}
+
+// ── 효과 (코드로 그림) ──
+const trail = [];   // [base x,y, tip x,y (세계 칸), age]
+const ghosts = [];  // {canvas, x, y, age}
+const dust = [];
+let trauma = 0, slow = 0, now = 0;
+const popups = [];
+function addTrauma(v) { trauma = Math.min(1, trauma + v); }
+
+function makeGhost(fr) {
+  const [pg, x, y, w, h] = fr;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  g.drawImage(pages[pg], x, y, w, h, 0, 0, w, h);
+  g.globalCompositeOperation = 'source-in';
+  g.fillStyle = 'rgb(120, 205, 255)'; g.fillRect(0, 0, w, h);
+  ghosts.push({ c, fr, x: hero.x, y: hero.y, age: 0 });
+}
+
+// ── 허수아비 (조준 → 경고 → 한 박자에 내려찍기 → 빈틈) ──
+const dummy = { x: 66, y: 118, hp: 0, shake: 0, flash: 0, t: 0, phase: 'wait', tx: 0, ty: 0, warn: 0 };
+let ult = 0;
+function dummyUpdate(dt) {
+  dummy.t += dt; dummy.shake = Math.max(0, dummy.shake - dt); dummy.flash = Math.max(0, dummy.flash - dt);
+  const dist = Math.hypot(hero.x - dummy.x, hero.y - dummy.y);
+  if (dist < 7) ult = Math.min(ULT.max, ult + ULT.near * dt);
+  if (dummy.phase === 'wait' && dummy.t > 2.6 && dist < 9) { dummy.phase = 'aim'; dummy.t = 0; dummy.tx = hero.x; dummy.ty = hero.y; }
+  if (dummy.phase === 'aim') {
+    dummy.tx += (hero.x - dummy.tx) * Math.min(1, dt * 6); dummy.ty += (hero.y - dummy.ty) * Math.min(1, dt * 6);
+    if (dummy.t > 0.45) { dummy.phase = 'warn'; dummy.t = 0; }
+  }
+  if (dummy.phase === 'warn' && dummy.t > 0.75) {
+    dummy.phase = 'gap'; dummy.t = 0; addTrauma(0.35);
+    for (let i = 0; i < 10; i++) dust.push({ x: dummy.tx + (Math.random() - 0.5) * 1.6, y: dummy.ty + (Math.random() - 0.5) * 1.0, vx: (Math.random() - 0.5) * 2, vy: -Math.random(), age: 0, life: 0.6 });
+    const inside = Math.hypot(hero.x - dummy.tx, (hero.y - dummy.ty) * 1.4) < 1.5;
+    if (inside && hero.invuln <= 0) {
+      ult = Math.min(ULT.max, ult + ULT.hit); popup('맞음 +5', hero.x, hero.y - 2.6, 'var(--hurt)', '#e0574a');
+      hero.hurt = 0.25;
+    } else if (hero.state === 'dodge' && now - hero.dodgeStart < 0.12 + 0.016 + 0.02 && Math.hypot(hero.x - dummy.tx, hero.y - dummy.ty) < 4) {
+      ult = Math.min(ULT.max, ult + ULT.just); slow = 0.25; showMsg('저스트 회피! +15');
+    }
+  }
+  if (dummy.phase === 'gap' && dummy.t > 1.1) { dummy.phase = 'wait'; dummy.t = 0; }
+}
+function popup(text, x, y, _v, col) { popups.push({ text, x, y, age: 0, col }); }
+let msgT = 0;
+const msgEl = document.getElementById('msg');
+function showMsg(t) { msgEl.textContent = t; msgEl.style.opacity = 1; msgT = 1.0; }
+
+function tryHitDummy(power) {
+  const f = DIRV[hero.face];
+  const px = hero.x + f[0] * 1.2, py = hero.y + f[1] * 1.2;
+  if (Math.hypot(dummy.x - px, dummy.y - py) < 1.9) {
+    dummy.shake = 0.18; dummy.flash = 0.08; dummy.hp += power;
+    popup(String(power), dummy.x + (Math.random() - 0.5), dummy.y - 3, '', '#ece6da');
+    return true;
+  }
+  return false;
+}
+
+// ── 한 프레임 ──
+function update(rdt) {
+  const dt = rdt * (slow > 0 ? 0.3 : 1);
+  slow = Math.max(0, slow - rdt);
+  now += dt;
+  const mv = moveInput();
+  if (atkPressed) { hero.buf = BUFFER; hero.bufKind = 'atk'; }
+  if (dodgePressed) { hero.buf = BUFFER; hero.bufKind = 'dodge'; }
+  if (atkDown) atkDownT += dt; else if (!atkReleased) atkDownT = 0;
+  hero.buf = Math.max(0, hero.buf - dt);
+  hero.invuln = Math.max(0, hero.invuln - dt);
+  hero.hurt = Math.max(0, (hero.hurt || 0) - dt);
+
+  const free = hero.state === 'idle' || hero.state === 'run';
+  // 회피대시가 공격보다 먼저
+  if (hero.buf > 0 && hero.bufKind === 'dodge' && (free || (hero.state === 'attack' && hero.hitDone && hero.hs <= 0) || hero.state === 'spin' && hero.clip > 1.3)) {
+    hero.buf = 0; startDodge(mv);
+  }
+  if (free && atkDown && atkDownT >= CHARGE_HOLD) { hero.buf = 0; startCharge(); }
+  if (free && atkReleased && hero.bufKind === 'atk' && hero.buf > 0) { hero.buf = 0; startHit(0); }
+  if (hero.state === 'attack' && hero.hitDone && hero.hs <= 0 && hero.buf > 0 && hero.bufKind === 'atk' && hero.hit < 2 && hero.clip >= HITS[hero.hit][2] + 0.12) {
+    hero.buf = 0; startHit(hero.hit + 1);
+  }
+  if (atkReleased) { atkReleased = false; atkDownT = 0; }
+  atkPressed = false; dodgePressed = false;
+
+  // 상태별
+  let spd = 0;
+  if (hero.state === 'idle' || hero.state === 'run') {
+    if (mv) {
+      const nd = dirOf(mv, hero.face);
+      if (hero.state === 'run' && hero.lastMove && (hero.lastMove[0] * mv[0] + hero.lastMove[1] * mv[1]) < -0.5 && hero.skid <= 0) {
+        hero.skid = 0.14; // 반대로 꺾기: 브레이크
+        for (let i = 0; i < 6; i++) dust.push({ x: hero.x, y: hero.y, vx: hero.lastMove[0] * (1 + Math.random() * 2), vy: (Math.random() - 0.8), age: 0, life: 0.5 });
+      }
+      if (hero.skid > 0) { spd = RUN * 0.4; }
+      else { hero.face = nd; spd = RUN; hero.lastMove = mv; }
+      if (hero.state !== 'run') { hero.state = 'run'; hero.clip = 0; }
+      hero.anim = 'RunFast';
+    } else {
+      hero.state = 'idle'; hero.anim = 'Combat_Stance'; hero.lastMove = null;
+    }
+    hero.skid = Math.max(0, hero.skid - dt);
+    const dvec = hero.skid > 0 && hero.lastMove ? hero.lastMove : mv;
+    if (dvec) { hero.x += dvec[0] * spd * dt; hero.y += dvec[1] * spd * dt; }
+    hero.clip += dt;
+    hero.show = hero.clip;
+    if (spd > 0 && Math.random() < dt * 14) dust.push({ x: hero.x - (dvec ? dvec[0] : 0) * 0.3, y: hero.y, vx: (Math.random() - 0.5) * 0.6, vy: -Math.random() * 0.5, age: 0, life: 0.45 });
+  } else if (hero.state === 'attack' || hero.state === 'spin') {
+    const h = hero.state === 'attack' ? HITS[hero.hit] : [0.5, 2.1, 1.0, 0.15];
+    const [from, to, hp, stop] = h;
+    if (!hero.hitDone && hero.clip >= hp + 0.07) {
+      hero.hitDone = true; hero.hs = stop;
+      const hitIt = tryHitDummy([12, 14, 22, 40][hero.state === 'attack' ? hero.hit : 3]);
+      addTrauma([0.15, 0.25, 0.45, 0.7][hero.state === 'attack' ? hero.hit : 3] * (hitIt ? 1 : 0.6));
+    }
+    let rate;
+    if (hero.hs > 0) { hero.hs -= dt; rate = 0; }
+    else if (hero.clip < hp - 0.2) rate = 0.85;
+    else if (hero.clip < hp + 0.07) rate = 2.0;
+    else rate = 1.15;
+    hero.clip = Math.min(to, hero.clip + dt * rate);
+    // 휘두를 때 앞으로 반 걸음
+    if (rate === 2.0) { const f = DIRV[hero.face]; hero.x += f[0] * 2.2 * dt; hero.y += f[1] * 2.2 * dt; }
+    // 1초 15장 끊기
+    hero.stepAcc += dt;
+    if (hero.stepAcc >= 1 / ATK_FPS || rate === 0) { if (rate !== 0) hero.stepAcc = 0; if (rate !== 0) hero.show = hero.clip; }
+    if (hero.clip >= to) {
+      hero.linger += dt;
+      if (hero.linger > 0.22 || mv) { hero.state = 'idle'; hero.clip = 0; }
+    }
+    // 검흔: 휘두름 창에서만, 멈칫 동안 멈춤
+    const on = hero.clip > hp - 0.22 && hero.clip < hp + 0.12;
+    if (on && hero.hs <= 0) pushTrail();
+  } else if (hero.state === 'charge') {
+    hero.chargeT += dt;
+    hero.clip = Math.min(0.5, hero.clip + dt * 0.45);
+    hero.show = hero.clip;
+    addTrauma(dt * 0.25);
+    if (!atkDown) startSpin();
+  } else if (hero.state === 'dodge') {
+    hero.dodgeT += dt;
+    const u = Math.min(1, hero.dodgeT / DODGE_T);
+    const prev = Math.min(1, (hero.dodgeT - dt) / DODGE_T);
+    const ease = (x) => 1 - Math.pow(1 - x, 2.2); // 처음에 빠르게 (앞 40%에 약 70%)
+    const d = (ease(u) - ease(Math.max(0, prev))) * DODGE_D;
+    hero.x += hero.dodgeV[0] * d; hero.y += hero.dodgeV[1] * d;
+    hero.clip = Math.min(0.8, hero.dodgeT * 2.3);
+    hero.show = hero.clip;
+    hero.ghostAcc += dt;
+    if (hero.dodgeT < DODGE_T && hero.ghostAcc >= 0.045) { hero.ghostAcc = 0; makeGhost(frameOf(hero.anim, hero.face, hero.show, false)); }
+    if (hero.dodgeT > 0.35) { hero.state = 'idle'; hero.clip = 0; }
+  }
+  hero.x = Math.max(2, Math.min(188, hero.x)); hero.y = Math.max(3, Math.min(258, hero.y));
+
+  // 기울기: 브레이크 때 옆모습만 뒤로 젖힘
+  const wantTilt = hero.skid > 0 && (hero.face === 'left' || hero.face === 'right') ? (hero.face === 'right' ? -0.16 : 0.16) : 0;
+  hero.tilt += (wantTilt - hero.tilt) * Math.min(1, rdt * 14);
+
+  for (const t of trail) if (hero.hs <= 0) t[4] += dt;
+  while (trail.length && trail[0][4] > 0.1) trail.shift();
+  for (const g of ghosts) g.age += dt;
+  while (ghosts.length && ghosts[0].age > 0.25) ghosts.shift();
+  for (const p of dust) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; }
+  while (dust.length && dust[0].age > dust[0].life) dust.shift();
+  for (const p of popups) p.age += rdt;
+  while (popups.length && popups[0].age > 0.8) popups.shift();
+  trauma = Math.max(0, trauma - rdt * 1.5);
+  msgT -= rdt; if (msgT <= 0) msgEl.style.opacity = 0;
+  dummyUpdate(dt);
+  document.getElementById('gv').textContent = Math.floor(ult);
+  document.getElementById('gf').style.width = (ult / ULT.max * 100) + '%';
+}
+function pushTrail() {
+  const fr = frameOf(hero.anim, hero.face, hero.clip, false);
+  const k = 1 / A.ppu;
+  trail.push([hero.x + fr[7] * k, hero.y + fr[8] * k, hero.x + fr[9] * k, hero.y + fr[10] * k, 0]);
+}
+
+// ── 그리기 ──
+let camX = hero.x, camY = hero.y;
+function draw() {
+  const ctx = cx;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#15141a'; ctx.fillRect(0, 0, W, H);
+  camX += (hero.x - camX) * 0.18; camY += (hero.y - camY) * 0.18;
+  const sh = trauma * trauma * 8;
+  const ox = W / 2 - camX * S + (Math.random() - 0.5) * sh, oy = H / 2 - camY * S + (Math.random() - 0.5) * sh;
+  const P = (x, y) => [ox + x * S, oy + y * S];
+  // 바닥
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(ground, ox, oy, ground.width / 16 * S, ground.height / 16 * S);
+  for (const [n, tx, ty, d] of props) {
+    const im = propImgs[n]; const [x, y] = P(tx, ty);
+    ctx.drawImage(im, x, y, im.width / 16 / d * S, im.height / 16 / d * S);
+  }
+  // 허수아비 경고 원
+  if (dummy.phase === 'aim' || dummy.phase === 'warn') {
+    const [x, y] = P(dummy.tx, dummy.ty);
+    const k = dummy.phase === 'warn' ? Math.min(1, dummy.t / 0.75) : 0;
+    ctx.save(); ctx.translate(x, y); ctx.scale(1, 1 / 1.4);
+    ctx.strokeStyle = 'rgba(224, 87, 74, 0.9)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, 0, 1.5 * S, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = `rgba(224, 87, 74, ${0.15 + 0.35 * k})`;
+    ctx.beginPath(); ctx.arc(0, 0, 1.5 * S * k, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  // 그림자
+  const shadow = (x, y, r) => { const [sx, sy] = P(x, y); ctx.fillStyle = 'rgba(10, 8, 8, 0.38)'; ctx.beginPath(); ctx.ellipse(sx, sy, r * S, r * S * 0.45, 0, 0, Math.PI * 2); ctx.fill(); };
+  // 깊이 순서: y 작은 것 먼저
+  const drawDummy = () => {
+    shadow(dummy.x, dummy.y, 0.7);
+    const [x, y] = P(dummy.x + (dummy.shake > 0 ? Math.sin(now * 90) * 0.06 : 0), dummy.y);
+    const u = S / 16;
+    ctx.fillStyle = dummy.flash > 0 ? '#fff' : '#6b4b2e';
+    ctx.fillRect(x - 1.5 * u, y - 34 * u, 3 * u, 34 * u);
+    ctx.fillRect(x - 10 * u, y - 26 * u, 20 * u, 3 * u);
+    ctx.fillStyle = dummy.flash > 0 ? '#fff' : '#a8875a';
+    ctx.beginPath(); ctx.ellipse(x, y - 20 * u, 6 * u, 9 * u, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y - 35 * u, 5 * u, 0, Math.PI * 2); ctx.fill();
+    if (dummy.phase === 'warn') { ctx.fillStyle = '#e0574a'; ctx.font = `700 ${Math.round(S * 0.5)}px "IBM Plex Sans KR", sans-serif`; ctx.textAlign = 'center'; ctx.fillText('!', x, y - 42 * u); }
+  };
+  const drawHero = () => {
+    shadow(hero.x, hero.y, 0.85);
+    for (const g of ghosts) {
+      const [pg, , , w, h, fx, fy] = g.fr; const k = S / A.ppu; const [x, y] = P(g.x, g.y);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.5 * (1 - g.age / 0.25);
+      ctx.drawImage(g.c, x - fx * k, y - fy * k, w * k, h * k); ctx.restore();
+    }
+    const loop = hero.state === 'idle' || hero.state === 'run';
+    const fr = frameOf(hero.anim, hero.face, hero.show, loop);
+    const [pg, sx, sy, w, h, fx, fy] = fr; const k = S / A.ppu; const [x, y] = P(hero.x, hero.y);
+    ctx.save(); ctx.translate(x, y); ctx.rotate(hero.tilt);
+    if (hero.state === 'charge') { const c = Math.min(1, hero.chargeT / 0.9); ctx.shadowColor = `rgba(127, 214, 255, ${0.5 * c})`; ctx.shadowBlur = 18 * c; }
+    if (hero.hurt > 0) ctx.filter = 'brightness(1.8) saturate(0.6)';
+    ctx.drawImage(pages[pg], sx, sy, w, h, -fx * k, -fy * k, w * k, h * k);
+    ctx.restore();
+  };
+  if (dummy.y < hero.y) { drawDummy(); drawHero(); } else { drawHero(); drawDummy(); }
+  // 검흔
+  if (trail.length > 1) {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (let i = 1; i < trail.length; i++) {
+      const a = trail[i - 1], b = trail[i];
+      const al = Math.max(0, 1 - b[4] / 0.1) * (i / trail.length);
+      const [a0x, a0y] = P(a[0], a[1]), [a1x, a1y] = P(a[2], a[3]), [b0x, b0y] = P(b[0], b[1]), [b1x, b1y] = P(b[2], b[3]);
+      const gr = ctx.createLinearGradient((a0x + b0x) / 2, (a0y + b0y) / 2, (a1x + b1x) / 2, (a1y + b1y) / 2);
+      gr.addColorStop(0, `rgba(199, 245, 255, ${0.04 * al})`); gr.addColorStop(1, `rgba(199, 245, 255, ${0.6 * al})`);
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(a0x, a0y); ctx.lineTo(a1x, a1y); ctx.lineTo(b1x, b1y); ctx.lineTo(b0x, b0y); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+  // 먼지
+  for (const p of dust) { const [x, y] = P(p.x, p.y); ctx.fillStyle = `rgba(160, 152, 146, ${0.35 * (1 - p.age / p.life)})`; ctx.beginPath(); ctx.arc(x, y, (0.12 + p.age * 0.4) * S, 0, Math.PI * 2); ctx.fill(); }
+  // 숫자
+  ctx.textAlign = 'center';
+  for (const p of popups) { const [x, y] = P(p.x, p.y - p.age * 1.2); ctx.globalAlpha = 1 - p.age / 0.8; ctx.font = `700 ${Math.round(S * 0.42)}px "IBM Plex Sans KR", sans-serif`; ctx.lineWidth = 4; ctx.strokeStyle = '#000'; ctx.strokeText(p.text, x, y); ctx.fillStyle = p.col; ctx.fillText(p.text, x, y); ctx.globalAlpha = 1; }
+  // 폰 막대
+  if (stick) { ctx.strokeStyle = 'rgba(236,230,218,0.4)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(stick.x0, stick.y0, 46, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = 'rgba(236,230,218,0.3)'; ctx.beginPath(); ctx.arc(stick.x, stick.y, 22, 0, Math.PI * 2); ctx.fill(); }
+}
+
+let last = 0;
+function frame(t) {
+  const dt = Math.min(0.05, (t - last) / 1000 || 0.016); last = t;
+  update(dt); draw();
+  requestAnimationFrame(frame);
+}
+
+(async () => {
+  try {
+    A = await (await fetch(files.json)).json();
+    const imgs = await Promise.all([...A.pages.map(loadImg), loadImg(files.ground), ...props.map((p) => loadImg(p[0] + '.webp'))]);
+    pages = imgs.slice(0, A.pages.length); ground = imgs[A.pages.length];
+    props.forEach((p, i) => { propImgs[p[0]] = imgs[A.pages.length + 1 + i]; });
+    resize();
+    document.getElementById('loading').hidden = true;
+    requestAnimationFrame((t) => { last = t; frame(t); });
+  } catch (e) {
+    document.getElementById('loading').textContent = '그림을 못 불러왔어요: ' + e.message + ' — 새로고침해 주세요.';
+  }
+})();
+})();
+</script>
