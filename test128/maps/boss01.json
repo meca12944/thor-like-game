@@ -107,11 +107,7 @@
   "absorb": "대지의 수정 (quake)",
   "reward": [
    [
-    "m_a1_shared",
-    5
-   ],
-   [
-    "heart_piece",
+    "potion",
     1
    ]
   ],

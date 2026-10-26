@@ -9,7 +9,7 @@ from playwright.async_api import async_playwright
 from PIL import Image, ImageDraw, ImageFont
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8931'
 OUT = sys.argv[2] if len(sys.argv) > 2 else '/tmp/mob_check.png'
-KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound'])
+KINDS = (sys.argv[3].split(',') if len(sys.argv) > 3 else ['c1_quilted_boar', 'c1_spool_spider', 'c1_shear_tailor', 'c1_thread_scarecrow', 'c1_pin_stuffing', 'champ_c1_cocoon', 'c1_needle_marksman', 'c1_iron_warden', 'c1_time_echo', 'champ_c1_loom', 'champ_c1_hound'])  # 그록 1장 마물 (4번방 10-26)
 # MOBCHECK_Q = 주소 뒤에 붙일 것 (예: '&noscene'), MOBCHECK_AT = 시작 칸 'x,y' (지도가 바뀌면 몹 자리 가운데로)
 # MOBCHECK_MAP = 점검할 맵 (기본 lab_open = 벽·나무 없는 트인 시험 판, 4번방 10-25: 들판에선 무리 1마리가 벽 뒤에서 시야가 막혀 「등 돌림」이 튐). 'field_felt' = 예전 자리
 MAP = os.environ.get('MOBCHECK_MAP', 'lab_open'); AT = os.environ.get('MOBCHECK_AT') or ('20,15' if MAP == 'lab_open' else '')

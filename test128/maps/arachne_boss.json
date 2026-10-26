@@ -95,7 +95,15 @@
   "intro": 1.8,
   "reward": [
    [
-    "heart_piece",
+    "w_ara_spine",
+    1
+   ],
+   [
+    "c_ara_silk",
+    1
+   ],
+   [
+    "k_last_thread",
     1
    ]
   ],

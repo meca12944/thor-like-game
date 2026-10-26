@@ -87,9 +87,9 @@ objs += [{'type': 'waystone', 'id': 'ws_arachne_in', 'x': 9, 'y': 6, 'name': '�
           'text': '「다 끝내면, 쉬어도 되겠지.」', 'textDone': '「다 끝내면, 쉬어도 되겠지.」'},
          {'type': 'clue', 'id': 'ar_clue_felix', 'x': 12, 'y': 54, 'name': '펠릭스의 목도리', 'flag': 'felt_felix_items', 'textIdle': '고치 사이에 무언가 굴러다닌다.', 'cg': 'cg/cg_felix_scarf.png',
           'text': '……(말없이 챙긴다)', 'textDone': '펠릭스의 공과 목도리를 챙겼다.'}]   # 토비 퀘스트 「사라진 아이의 실타래」
-for m, x, y in (('c1_thread_puppet', 21, 6), ('c1_thread_puppet', 28, 7), ('c1_needle_spider', 6, 19), ('c1_thread_puppet', 8, 22), ('c1_needle_spider', 41, 20),
-                ('c1_silmamul', 18, 19), ('c1_needle_spider', 30, 20),
-                ('c1_needle_spider', 10, 37), ('c1_silmamul', 36, 37), ('c1_needle_spider', 14, 44), ('c1_silmamul', 40, 43), ('c1_thread_puppet', 8, 52), ('c1_needle_spider', 14, 51)):
+for m, x, y in (('c1_shear_tailor', 21, 6), ('c1_shear_tailor', 28, 7), ('c1_spool_spider', 6, 19), ('c1_shear_tailor', 8, 22), ('c1_spool_spider', 41, 20),
+                ('c1_thread_scarecrow', 18, 19), ('c1_spool_spider', 30, 20),
+                ('c1_spool_spider', 10, 37), ('c1_thread_scarecrow', 36, 37), ('c1_spool_spider', 14, 44), ('c1_thread_scarecrow', 40, 43), ('c1_shear_tailor', 8, 52), ('c1_spool_spider', 14, 51)):
     mob(m, x, y)
 AREAS = [{'id': 'ar_b1', 'name': '아라크네의 폐공방 · 지하 1층', 'sub': '실 공방', 'x': 0, 'y': 0, 'w': W, 'h': 30},
          {'id': 'ar_b2', 'name': '아라크네의 폐공방 · 지하 2층', 'sub': '고치 저장고', 'x': 0, 'y': 30, 'w': W, 'h': 30}]
