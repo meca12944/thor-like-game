@@ -179,8 +179,9 @@
   //  lake   : 검은 호수(타원 x,y,w,h)에 거꾸로 비친 왕성 탑 + 물결 (탑 그림이 오기 전 임시 실루엣)          [0]
   //  lakeart: 그림 호수(img = 호수 그림, x,y,w,h = 그 그림 자리) 물 부분에만 거꾸로 비친 왕성 + 잔물결 줄 + 물가 반짝임 (1장 동쪽 검은 호수, 10-25)  [0]
   //  bell   : 물에 잠긴 종탑 끝(x,y) 둘레로 퍼지는 물결 고리 + per 초마다 종 3번(빛 고리·먼 종소리 bell_far, 가까울수록 크게)          [0]
-  //  mistband: 상자(x,y,w,h) 안을 옆으로 흐르는 안개 두 겹 (낭떠러지 아래 안개)                                                      [1]
-  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0, lakeart: 0, bell: 0, mistband: 1 };
+  //  mistband: 상자(x,y,w,h) 안을 옆으로 흐르는 안개 두 겹 (낭떠러지 아래 안개)
+  //  pitmist: 꺼진 지반(타원 x,y,w,h) — 가운데 어둡게 + 가장자리에서 안으로 가라앉는 낮은 안개 덩어리 (ashfall 은 drift [dx,dy] 흩날림 · edges 무너진 끝 돌가루 선택)                                                      [1]
+  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0, lakeart: 0, bell: 0, mistband: 1, pitmist: 1 };
   function drawSceneObjs(g, m, cx, cy, layer) { if (!m.sfxObjs) m.sfxObjs = m.objs.filter(o => o.type === 'scenefx'); if (!m.sfxObjs.length) return; const T = m.T;
     for (const o of m.sfxObjs) { if ((SFX_LAYER[o.kind] ?? 1) !== layer) continue; const x = o.tx * T, y = o.ty * T, w = (o.w || 1) * T, h = (o.h || 1) * T, pad = o.kind === 'updraft' ? 40 : o.kind === 'thread' ? 12 : 4;
       const x0 = Math.min(x, x + w), x1 = Math.max(x, x + w), y0 = Math.min(y, y + h), y1 = Math.max(y, y + h); if (x1 + pad < cx || x0 - pad > cx + EW || y1 + pad < cy || y0 - pad - (o.kind === 'updraft' ? 60 : 0) > cy + EH) continue; // off screen
@@ -219,7 +220,14 @@
       for (let i = 0; i < n; i++) { const ax = x + (i + .5) * w / n, br = .5 + .5 * Math.sin(S.t * .7 + i * 1.9); g.globalAlpha = (o.ray ?? .22) * (.55 + .45 * br); g.drawImage(_rayC, ax - w / n * .18, y - 10, w / n * .36, h + 20); } },
     ashfall(g, o, x, y, w, h) { const P = sfxParts(o, Math.min(120, o.n || Math.round(w * h / 50))); for (let pass = 0; pass < 2; pass++) { g.fillStyle = pass ? 'rgba(255,190,140,.75)' : 'rgba(200,194,208,.7)'; // two colour passes (no fillStyle switching per flake)
         for (let i = 0; i < P.n; i += pass ? 6 : 1) { if (!pass && i % 6 === 0) continue; const py = y + ((P.b[i] * h + S.t * (70 + P.b[i] * 60)) % h); g.fillRect(Math.round(x + P.a[i] * w + Math.sin(S.t * 3 + i) * 1.5), Math.round(py), 1, i % 3 ? 2 : 3); } }
-      const R = w * 1.6; g.drawImage(sfxGlow(o, 'mist', R, 'rgba(190,184,198,.45)'), x + w / 2 - R, y + h - R); }, // ash mist where it lands (made once)
+      const R = w * 1.6; g.drawImage(sfxGlow(o, 'mist', R, 'rgba(190,184,198,.45)'), x + w / 2 - R, y + h - R); // ash mist where it lands (made once)
+      if (o.drift) { const [dx, dy] = o.drift, T = M().T, Q = sfxParts(o, 40, 'd'); g.fillStyle = 'rgba(206,200,212,.6)'; // drift: some ash is blown on along the ground toward [dx, dy] tiles (중앙 들판: 모닥불 쪽)
+        for (let i = 0; i < Q.n; i++) { const q = ((S.t * (.18 + Q.a[i] * .12) + Q.b[i]) % 1), e = q * (2 - q); g.globalAlpha = (1 - q) * .9; g.fillRect(Math.round(x + w / 2 + dx * T * e + (Q.c[i] - .5) * 18 * (.3 + q)), Math.round(y + h + dy * T * e - Math.sin(q * Math.PI) * 10 * Q.c[i]), 1, 1); } g.globalAlpha = 1; }
+      if (o.edges) for (const ex of [x - 1, x + w + 1]) { const P2 = sfxParts(o, 10, 'e' + ex); g.fillStyle = 'rgba(160,150,140,.75)'; for (let i = 0; i < P2.n; i++) { const q = (S.t * (.6 + P2.a[i] * .5) + P2.b[i]) % 1; g.fillRect(Math.round(ex + (P2.c[i] - .5) * 4), Math.round(y - 2 + q * h * .6), 1, 1 + (i % 2)); } } }, // edges: stone dust trickling from the broken ends L/R
+    pitmist(g, o, x, y, w, h) { const t = S.t, cx = x + w / 2, cy = y + h / 2, P = sfxParts(o, o.n || 26), M = MISTS || (drawMist(0, 1), MISTS); // 꺼진 지반 안개: soft banks creep from the rim toward the middle and sink (fade), the middle stays darkest
+      g.globalCompositeOperation = 'multiply'; g.drawImage(sfxPit(o, w / 2, h / 2), x, y); g.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < P.n; i++) { const a = P.a[i] * TAU, q = ((t * .05 + P.b[i]) % 1), r = 1 - q * .75, px = cx + Math.cos(a) * w / 2 * r, py = cy + Math.sin(a) * h / 2 * r, R = (Math.min(w, h) * (.12 + P.c[i] * .16)) * (1 - q * .4);
+        g.globalAlpha = (o.a ?? .5) * Math.sin(q * Math.PI); g.drawImage(M, px - R, py - R * .5, R * 2, R); } g.globalAlpha = 1; },
     updraft(g, o, x, y, w, h) { const ex = x + w / 2, ey = y + h / 2, rx = w / 2, ry = h / 2, P = sfxParts(o, Math.min(60, o.n || Math.round((w + h) / 3))), rise = o.rise || 42;
       g.globalCompositeOperation = 'multiply'; g.drawImage(sfxPit(o, rx, ry), ex - rx, ey - ry); g.globalCompositeOperation = 'source-over'; // the drop under it reads darker (made once, until the pit art comes)
       const B = [[], [], []]; for (let i = 0; i < P.n; i++) { const life = 2.2 + P.c[i] * 1.6, q = ((S.t + P.b[i] * life) % life) / life, s1 = Math.sin(q * Math.PI), r = 1 - q * .35; // rise, lean inward, fade (3 brightness steps)
@@ -232,7 +240,7 @@
       g.drawImage(sfxLake(o, w, h), x, y); g.globalAlpha = o.a ?? .8; const st = 5; // water + mirrored grey sky (made once), then the upside-down tower in rippled rows
       for (let r = 0; r < im.height; r += st) { const off = Math.sin(S.t * 1.6 + r * .35) * (1 + r / im.height * 2); g.drawImage(im, 0, r, im.width, st, Math.round(bx + off), by + r, im.width, st); }
       g.globalAlpha = .18; g.fillStyle = '#d8d2e6'; for (let i = 0; i < 4; i++) { const ly = y + h * (.2 + .13 * i) + Math.sin(S.t * .8 + i) * 1.5; g.fillRect(Math.round(x + w * (.25 + .1 * Math.sin(i * 2.3))), Math.round(ly), Math.round(w * .3), 1); } } }; // glints
-  function sfxParts(o, n) { if (o._p && o._p.n === n) return o._p; const P = { n, a: [], b: [], c: [], cx: [], cy: [] }; for (let i = 0; i < n; i++) { P.a.push(sh(i)); P.b.push(sh(i + 77)); P.c.push(sh(i + 9)); const an = sh(i) * TAU; P.cx.push(Math.cos(an)); P.cy.push(Math.sin(an)); } return (o._p = P); } // random numbers made once per object
+  function sfxParts(o, n, key = 'p') { const C = o._ps || (o._ps = {}); if (C[key] && C[key].n === n) return C[key]; const P = { n, a: [], b: [], c: [], cx: [], cy: [] }; for (let i = 0; i < n; i++) { P.a.push(sh(i)); P.b.push(sh(i + 77)); P.c.push(sh(i + 9)); const an = sh(i) * TAU; P.cx.push(Math.cos(an)); P.cy.push(Math.sin(an)); } return (C[key] = P); } // random numbers made once per object
   const UPD_COL = ['rgba(210,204,222,.3)', 'rgba(210,204,222,.6)', 'rgba(230,214,220,.9)'];
   // per-object pictures made once (objects never move): soft glow, pit shade, lake water
   function sfxCan(o, key, W, H, draw) { o._c = o._c || {}; if (o._c[key]) return o._c[key]; const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(W)); c.height = Math.max(1, Math.ceil(H)); draw(c.getContext('2d'), c.width, c.height); return (o._c[key] = c); }

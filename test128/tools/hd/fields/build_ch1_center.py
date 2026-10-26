@@ -100,6 +100,8 @@ O.append({'type': 'sign', 'x': 121, 'y': 206, 'text': '남쪽 들판으로 가�
 O.append({'type': 'hint', 'id': 'cc_h_arch', 'x': 161, 'y': 132, 'r': 3, 'text': '수도교 아치 밑으로 지나갈 수 있다'})
 F.mobs('field_c', skip=lambda x, y: x > 236 and 140 < y < 180)
 
+# 코드 효과 (효과 담당 10-26, world.js scenefx): 잿가루 폭포(모닥불 쪽 흩날림·끊긴 끝 돌가루) / 꺼진 지반 안개 / 첨탑 붉은 실 기둥·구덩이로 걸린 실 / 북쪽 비탈 안개 띠
+O += [{"type": "scenefx", "kind": "ashfall", "x": 117.9, "y": 108, "w": 3, "h": 14, "n": 120, "drift": [5, 11], "edges": 1}, {"type": "scenefx", "kind": "pitmist", "x": 6, "y": 84, "w": 75, "h": 70, "n": 34, "a": 0.7}, {"type": "scenefx", "kind": "thread", "x": 24, "y": 62, "w": 0.3, "h": 12, "sway": 4}, {"type": "scenefx", "kind": "thread", "x": 24.5, "y": 70, "w": 19, "h": 46, "sway": 8}, {"type": "scenefx", "kind": "thread", "x": 23.5, "y": 71, "w": 12, "h": 40, "sway": 6}, {"type": "scenefx", "kind": "thread", "x": 25, "y": 69, "w": 28, "h": 38, "sway": 7}, {"type": "scenefx", "kind": "mistband", "x": 0, "y": 7, "w": 260, "h": 9, "a": 1, "sp": 7}]
 prol = json.load(open(os.path.join(T128, 'maps/prologue_grave.json')))
 bd = dict(prol['hd']['backdrop']); bd['x'] = 140; bd['clipY'] = 10.6; bd.pop('front', None)
 mp = F.write({
