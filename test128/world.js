@@ -1080,7 +1080,7 @@
     if (S.freezeT > 0 && !(hero.hp > 0 && !hero.roll && !(hero.rollCd > 0) && codesOf('dash').some(c => queue.includes(c)))) { S.freezeT -= dt; updateCam(dt); return; } if (S.freezeT > 0) S.freezeT = 0; // 회피대시는 멈춤(히트스톱) 중에도 바로 (보고서 3-9 「맞은 직후부터 언제든」, 모션연구방 10-24) // hitstop when a mob lands a hit (owner 10-23 "생동감 있게 공격")
     if (S.slowmo > 0) { S.slowmo -= dt; dt *= .3; } // just-dodge: a short slow-motion beat (like the town's Flash Move)
     for (let i = S.timers.length - 1; i >= 0; i--) { const tm = S.timers[i]; tm.t -= dt; if (tm.t <= 0) { S.timers.splice(i, 1); tm.f(); } }
-    if (S.msg && (S.msg.t -= dt) <= 0) S.msg = null;
+    if (S.msg && !S.vfx && (S.msg.t -= dt) <= 0) S.msg = null; // 전망 장면 동안엔 안내 글 시간이 멈춤 (숨겼다가 끝나면 다시)
     if (S.qs) { const Q = S.qs; Q.flash = Math.max(0, (Q.flash || 0) - dt * 2.5); Q.shake = Math.max(0, (Q.shake || 0) - dt * 4); Q.noteT = Math.max(0, (Q.noteT || 0) - dt); }
     if (S.feed) { for (const f of S.feed) f.t += dt; S.feed = S.feed.filter(f => f.t < f.life); }
     if (S.banner && (S.banner.t -= dt) <= 0) S.banner = null;
@@ -2328,7 +2328,7 @@
     }
     if (NAV() && m.type !== 'world') { ctx.globalAlpha = S.hudA == null ? 1 : S.hudA; NAV().drawHud(k, ox, oy, u); ctx.globalAlpha = 1; }
     if (S.banner) { const bn = S.banner, a = Math.max(0, Math.min(1, bn.t * 3, (bn.max - bn.t) * 6 + .2)); ctx.globalAlpha = a; textOut(bn.text, cxs, oy + (bn.small ? 82 : 90) * u, Math.max((bn.small ? 14 : 19) * u, TOUCH() ? (bn.small ? 16 : 20) * ctx.canvas.width / Math.max(1, innerWidth) : 0), bn.small ? '#ffd0a0' : '#ffe08a'); ctx.globalAlpha = 1; }
-    if (S.msg) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
+    if (S.msg && !S.vfx) { ctx.globalAlpha = Math.min(1, S.msg.t * 3); ctx.font = font(12 * u); const tw = Math.max(300 * u, ctx.measureText(S.msg.text).width + 30 * u); panel(cxs - tw / 2, oy + SH - 90 * u, tw, 28 * u); textOut(S.msg.text, cxs, oy + SH - 71 * u, 12 * u, '#fff'); ctx.globalAlpha = 1; }
     if (M() && M().type !== 'world') drawBossCine(ox, oy, SW, SH, u);
     drawCgOut(ox, oy, SW, SH);
     if (S.intro) drawIntro(ox, oy, SW, SH);
