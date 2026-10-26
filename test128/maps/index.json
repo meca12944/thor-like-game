@@ -5,6 +5,7 @@
   "felt",
   "field_felt",
   "ch1_field_e",
+  "ch1_field_c",
   "arachne",
   "arachne_boss",
   "field00",
@@ -27,7 +28,8 @@
     "prologue_grave",
     "felt",
     "field_felt",
-    "ch1_field_e"
+    "ch1_field_e",
+    "ch1_field_c"
    ]
   },
   "area1": {
