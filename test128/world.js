@@ -1574,7 +1574,7 @@
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
     else if (h.roll) { const L = A('dash'); e = seq(L, h.roll.t / rollDur() * tot(L)); }
     else if (hero.inv > .67 && S.scene !== 'world') { const L = A(H.anims.hurtys_right ? 'hurtys' : 'hurt'); e = seq(L, (1 - hero.inv) * 60); }
-    else if (h.moving) { const L = A(h.run && !(fc === 'up' && f8 !== 'up' && h.atk && swordHidden()) ? 'run' : 'walk'); /* ↗↖ 달리기 그림은 칼 쥔 손이 몸 뒤라 코드 칼날이 몸을 가로지름 → 칼 숨긴 4.5틱만 걷기 그림(손이 앞) (모션연구방 10-24) */ e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
+    else if (h.moving) { const L = A(h.run ? 'run' : 'walk'); e = L[Math.floor((h.gp || 0) * L.length) % L.length]; }
     else if (h.stopT != null && S.t - h.stopT < .2 && !h.atk && !h.roll && !h.charge) { const dd = ((.28 - (h.gp || 0)) % .5 + .5) % .5, adv = Math.min(dd, Math.max(0, S.t - (h.stopU ?? S.t)) * 3); h.stopU = S.t; h.gp = ((h.gp || 0) + adv) % 1;
       if (dd - adv < .01) { h.stopT = null; const L = A('idle'); e = H.v4 ? seq(L, (S.t * 60) % tot(L)) : L[0]; } else { const L = A(h.stopRun ? 'run' : 'walk'); e = L[Math.floor(h.gp * L.length) % L.length]; } } // finish the step onto the legs-together frame
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
@@ -1833,6 +1833,9 @@
     breath: { T: 72, amp: .008 },
     /* 달리기 상체 숙임 (사장님 10-26 「달리기 때 상체 앞으로 숙이는 과장, 교본 안 보나」 — 교과서 부록 A-3 「Torso leaning slightly forward」): 옛 주인공 그림 숙임 − 새 그림 숙임(머리−엉덩이 x / 높이, leanm.py)을
        발을 축으로 기울여(shear) 보탬. 도(°) = 옆·↘·↗, 정면↓·뒷면↑은 키 눌림(옛 달리기 키/걷기 키 차) */
+    /* 달리기 과장 (사장님 10-26 「좀 더 과장 기법 안 쓰나?」): 걸음마다 디딤 눌림 → 차고 오를 때 늘림·몸 띄움, 숙임 앞뒤 흔들림, 출발 첫 2걸음 더 크게, 멈출 때 뒤로 젖힘.
+       디딤 = 다리 한 바퀴(gp)의 0.19·0.69 (달리기 → 그림에서 보폭이 가장 넓은 1·5번 장). 세로 sq: 눌림 −7%(가로 +4%) / 늘림 +5%, bob = 공중에서 몸 띄우는 그림 px(머리 오르내림 4~6 → 약 8) */
+    runEx: { land: .07, push: .05, bob: 3, sway: 1.5, contact: .19, startT: .45, startLean: 5, startSq: .03, stopBack: 4 },
     runLean: { side: 5.5, dr: 1.4, ur: 16, downSq: .034, upSq: .05, walk: { side: 0, dr: .7, ur: 1.9 }, tau: 6 }, /* 서기 숨쉬기: 옛 주인공 8장 × 9틱 = 72틱 주기, 키 0.8% 오르내림 (새 그림은 서기 1장이라 코드로) */
     dustJump: 3, dustLand: 6, /* 옛 값 (전 6·8) */ /* 점프 먼지 알갱이 수 (교과서 13-1) */ dashGhostN: 8, dashGhostA: .8 /* 옛 값 8장·80% (전 4·.5) */ /* 회피대시 잔상 장 수·처음 진하기 (8장·80%는 겹쳐 검게 번짐) */ };
   const KICK3 = [1, 1.35, 2], GHOST3 = { n: 2, gap: 7, a: .45, life: .16 }; // 3타 잔상: 몸 뒤로 파란 몸 2장 (gap 그림px 간격), 0.16초에 사라짐
@@ -1867,10 +1870,8 @@
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   const heroBlinkA = () => hero.inv > 0 && Math.floor(hero.inv * 20) % 2 && !hero.roll && S.deadT <= 0 && !S.ultFx ? 0 : 1; /* 사장님 10-25 「예전 주인공과 똑같이」: 옛처럼 3틱마다 0% — 칼도 같은 값이라 같이 사라짐(칼만 떠 있음 없음) */ // no blink / white wash during an ultimate (the hero is the star of the shot)
-  // 다리 빠르기 (사장님 10-26): 걷기 = B 82 고정(아틀라스 gait.walkCyc, 옛 112보다 빠르고 지금 74.4보다 느림, 미끄럼 10% 안).
-  // 달리기 비교 (고른 뒤 하나만 남기고 지움): ?run=A 옛 174(미끄러짐) / ?run=B 96(미끄럼 10% 안) / 없음 = 아틀라스 87.3. 그림 px, 한 바퀴 이동 = 값 × 46/119 필드 px
-  const RUN_AB = { A: 174, B: 96 };
-  function gaitCyc(H, run) { const G = H.gait || {}; if (run) return RUN_AB[Q.get('run')] || G.runCyc || 119; return G.walkCyc || 84; }
+  // 다리 빠르기 (사장님 10-26): 걷기 B 82 · 달리기 B 96 (아틀라스 gait, 옛보다 빠르고 미끄럼 10% 안). 그림 px, 한 바퀴 이동 = 걷기 × 32/84 · 달리기 × 46/119 필드 px
+  function gaitCyc(H, run) { const G = H.gait || {}; return run ? (G.runCyc || 119) : (G.walkCyc || 84); }
   function hairLag(h) { const HR = EXAG.hair, now = S.t; let dt = Math.min(.1, Math.max(0, now - (h.hrT ?? now))); h.hrT = now; // 머리카락 스프링 (그림 px, + = 오른쪽)
     const vx = h.hrX == null || !dt ? 0 : (h.x - h.hrX) / dt; h.hrX = h.x; if (dt) h.hrVx = vx; const tg = Math.max(-HR.max, Math.min(HR.max, -(h.hrVx || 0) * HR.drag));
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.hrV = (h.hrV || 0) + (-HR.w * HR.w * ((h.hrL || 0) - tg) - 2 * HR.z * HR.w * (h.hrV || 0)) * d; h.hrL = (h.hrL || 0) + h.hrV * d; }
@@ -1885,7 +1886,10 @@
     let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     sq *= heroExag(h); { const RL = EXAG.runLean, f8 = h.f8 || h.face || 'down', sx = /left/.test(f8) ? -1 : 1, kind = /^(down|up)(left|right)$/.test(f8) ? (f8.startsWith('down') ? 'dr' : 'ur') : f8 === 'left' || f8 === 'right' ? 'side' : f8;
       const mv = h.moving && !h.roll && !h.atk && !h.jump, T = !mv ? null : h.run ? RL : RL.walk, deg = T && T[kind] || 0, sqT = mv && h.run ? (kind === 'down' ? RL.downSq : kind === 'up' ? RL.upSq : 0) : 0, now = S.t, dt = Math.min(.1, Math.max(0, now - (h.rlT ?? now))), q = Math.min(1, dt * 60 / RL.tau); h.rlT = now; // 달리기 숙임: 6틱에 걸쳐 들어가고 빠짐
-      h.rlD = (h.rlD || 0) + (sx * deg - (h.rlD || 0)) * q; h.rlS = (h.rlS || 0) + (sqT - (h.rlS || 0)) * q; lean += Math.tan(h.rlD * Math.PI / 180) * H128FIG * k; sq *= 1 - h.rlS; } if (!h.moving && !h.atk && !h.roll && !h.jump && !(h.inv > .67) && S.deadT <= 0) sq *= 1 + EXAG.breath.amp * Math.sin(S.t * 60 / EXAG.breath.T * Math.PI * 2); { const LN = h8Lean(h); if (LN) { const f = H128FIG / ART_FIG; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
+      const RX = EXAG.runEx; if (mv && h.run && !h.wasRun) h.runT0 = now; if (!mv && h.wasRun) h.rlD = -sx * RX.stopBack; h.wasRun = mv && h.run; // 출발 시각 · 멈추면 바로 뒤로 젖혔다(아래 스프링으로) 섬
+      const st = mv && h.run && now - (h.runT0 ?? -9) < RX.startT ? 1 - (now - h.runT0) / RX.startT : 0; // 출발 첫 2걸음(0.45초) 더 크게
+      h.rlD = (h.rlD || 0) + (sx * (deg + (deg ? RX.startLean * st : 0)) - (h.rlD || 0)) * q; h.rlS = (h.rlS || 0) + (sqT - (h.rlS || 0)) * q; lean += Math.tan(h.rlD * Math.PI / 180) * H128FIG * k; sq *= 1 - h.rlS;
+      if (mv && h.run) { const c = Math.cos((h.gp - RX.contact) * 4 * Math.PI), f = H128FIG / ART_FIG; sq *= 1 - RX.land * Math.max(0, c) + (RX.push + RX.startSq * st) * Math.max(0, -c); ky -= RX.bob * f * Math.max(0, -c); lean += Math.tan(sx * RX.sway * Math.sin((h.gp - RX.contact) * 4 * Math.PI) * Math.PI / 180) * H128FIG * k; } } if (!h.moving && !h.atk && !h.roll && !h.jump && !(h.inv > .67) && S.deadT <= 0) sq *= 1 + EXAG.breath.amp * Math.sin(S.t * 60 / EXAG.breath.T * Math.PI * 2); { const LN = h8Lean(h); if (LN) { const f = H128FIG / ART_FIG; lean += LN.v[0] * LN.L * f * k; if (LN.v[1]) sq *= 1 - Math.abs(LN.v[1]) * LN.L * .006; } } // start / stop weight (motion lab 10-23)
     if (h.atk && h.atk.i === 2 && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; const gt = K.t != null ? K.t - 1 / 60 : -1; if (gt >= 0 && gt < GHOST3.life) { const q = 1 - gt / GHOST3.life, c = h128Cell(); for (let j = GHOST3.n; j >= 1; j--) drawH128(c, h.x + kx - v[0] * GHOST3.gap * j * f, h.y + ky - v[1] * GHOST3.gap * j * f * .5 - (h.z || 0), k, GHOST3.a * q * q / j, 'dodge'); } } // 3타 잔상 (모션연구방 10-24)
     { const SM = EXAG.smear; if (h.atk && atkArt() && !SLASH_BODY) { /* 팀장 10-25 smear4 비교에서 ④ 모션+청색 고름 (검흔 SMEAR·?smear 스위치 지움) */ const tk = h.atk.t * 60, hit = atkT(h.atk.i).a0 * 60; if (tk >= hit - SM.t && tk < hit) { const v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG, c = h128Cell(); // 스미어: 휘두르는 3틱 동안 몸이 앞으로 번져 보임 (그림 0)
       for (let j = SM.n; j >= 1; j--) { const wx = h.x + kx + v[0] * SM.gap * j * f, wy = h.y + ky + v[1] * SM.gap * j * f * .5 - (h.z || 0), [sx, sy] = W2S(wx, wy); ctx.save(); ctx.translate(sx, sy); ctx.scale(v[0] ? 1 + SM.st : 1, v[1] ? 1 + SM.st * .6 : 1); ctx.translate(-sx, -sy); drawH128(c, wx, wy, k, SM.a * BA / j, 'slash'); ctx.restore(); } } } }
