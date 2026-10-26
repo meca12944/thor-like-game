@@ -4,6 +4,7 @@
   "prologue_grave",
   "felt",
   "field_felt",
+  "ch1_field_e",
   "arachne",
   "arachne_boss",
   "field00",
@@ -23,9 +24,10 @@
    "name": "1장 · 펠트",
    "worldNode": "area1",
    "maps": [
-   "prologue_grave",
+    "prologue_grave",
     "felt",
-    "field_felt"
+    "field_felt",
+    "ch1_field_e"
    ]
   },
   "area1": {

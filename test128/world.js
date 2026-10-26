@@ -177,14 +177,41 @@
   //  updraft: 구덩이 둘레(타원 x,y,w,h)에서 위로 빨려 오르는 재                                        [0]
   //  thread : 붉은 실 (x,y) -> (x+w, y+h), 흔들림 + 심장 박동 빛 + 실 끝 반짝임 (threadLine·heartbeat 재사용) [1]
   //  lake   : 검은 호수(타원 x,y,w,h)에 거꾸로 비친 왕성 탑 + 물결 (탑 그림이 오기 전 임시 실루엣)          [0]
-  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0 };
+  //  lakeart: 그림 호수(img = 호수 그림, x,y,w,h = 그 그림 자리) 물 부분에만 거꾸로 비친 왕성 + 잔물결 줄 + 물가 반짝임 (1장 동쪽 검은 호수, 10-25)  [0]
+  //  bell   : 물에 잠긴 종탑 끝(x,y) 둘레로 퍼지는 물결 고리 + per 초마다 종 3번(빛 고리·먼 종소리 bell_far, 가까울수록 크게)          [0]
+  //  mistband: 상자(x,y,w,h) 안을 옆으로 흐르는 안개 두 겹 (낭떠러지 아래 안개)                                                      [1]
+  const SFX_LAYER = { shade: 1, ashfall: 1, updraft: 0, thread: 1, lake: 0, lakeart: 0, bell: 0, mistband: 1 };
   function drawSceneObjs(g, m, cx, cy, layer) { if (!m.sfxObjs) m.sfxObjs = m.objs.filter(o => o.type === 'scenefx'); if (!m.sfxObjs.length) return; const T = m.T;
     for (const o of m.sfxObjs) { if ((SFX_LAYER[o.kind] ?? 1) !== layer) continue; const x = o.tx * T, y = o.ty * T, w = (o.w || 1) * T, h = (o.h || 1) * T, pad = o.kind === 'updraft' ? 40 : o.kind === 'thread' ? 12 : 4;
       const x0 = Math.min(x, x + w), x1 = Math.max(x, x + w), y0 = Math.min(y, y + h), y1 = Math.max(y, y + h); if (x1 + pad < cx || x0 - pad > cx + EW || y1 + pad < cy || y0 - pad - (o.kind === 'updraft' ? 60 : 0) > cy + EH) continue; // off screen
       const f = SFX[o.kind]; if (f) { g.save(); f(g, o, x, y, w, h); g.restore(); } } }
   const sh = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+  function lakeArt(o, W, H) { if (o._la) return o._la; const im = HDIMG[o.img], ci = castleIm(); if (!im || !im.complete || !im.naturalWidth || !ci) return null; // made once: water mask (dark, opaque pixels of the lake picture), reflection, rim
+    const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; }, M = mk(), m = M.getContext('2d', { willReadFrequently: true }); m.drawImage(im, 0, 0, W, H);
+    const d = m.getImageData(0, 0, W, H), D = d.data, wet = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) { const j = i * 4; wet[i] = D[j + 3] > 200 && D[j] + D[j + 1] + D[j + 2] < 130 ? 1 : 0; }
+    const er = new Uint8Array(W * H), E = 4; for (let y = E; y < H - E; y++) for (let x = E; x < W - E; x++) { const i = y * W + x; er[i] = wet[i] && wet[i - E] && wet[i + E] && wet[i - E * W] && wet[i + E * W] ? 1 : 0; } // water a few px in from the shore
+    for (let i = 0; i < W * H; i++) { const j = i * 4; D[j] = D[j + 1] = D[j + 2] = 255; D[j + 3] = er[i] ? 255 : 0; } m.putImageData(d, 0, 0); // M = water mask
+    const R = mk(), r = R.getContext('2d'); { const gr = r.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(92,86,104,.42)'); gr.addColorStop(.6, 'rgba(60,56,70,.16)'); gr.addColorStop(1, 'rgba(40,36,48,0)'); r.fillStyle = gr; r.fillRect(0, 0, W, H); } // the grey sky on the water
+    { let y0 = 0; for (; y0 < H && !er.subarray(y0 * W, y0 * W + W).some(v => v); y0++); const tw = Math.round(W * (o.cw || .62)), th = Math.round(H * (o.ch || .8)), T = lakeTower(tw, th); const tx = Math.round((W - T.width) / 2 + (o.cx || 0) * W); r.drawImage(T, tx, y0 - 2); r.globalCompositeOperation = 'lighter'; r.globalAlpha = o.lift ?? .15; r.drawImage(T, tx, y0 - 2); r.globalAlpha = 1; r.globalCompositeOperation = 'source-over'; } // lift: the stone shows on black water (the shared tower is pressed dark) // castle (north) mirrored from the north shore down
+    { r.globalCompositeOperation = 'destination-out'; const gr = r.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.55, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,1)'); r.fillStyle = gr; r.fillRect(0, 0, W, H); } // the reflection fades toward the near shore
+    r.globalCompositeOperation = 'destination-in'; r.drawImage(M, 0, 0);
+    const Rm = mk(), q = Rm.getContext('2d'); { const id = q.createImageData(W, H), Q = id.data; for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; if (!er[i] || (er[i - 1] && er[i + 1] && er[i - W] && er[i + W])) continue; const j = i * 4; Q[j] = 196; Q[j + 1] = 206; Q[j + 2] = 222; Q[j + 3] = 200; } q.putImageData(id, 0, 0); } // shore line
+    return (o._la = { R, Rm, M }); }
+  const _bellK = new WeakMap();
   let _rayC = null; // one soft light ray (8x64) drawn once, stretched per arch
   const SFX = {
+    lakeart(g, o, x, y, w, h) { const L = lakeArt(o, Math.round(w), Math.round(h)); if (!L) return; const t = S.t, st = 3, y0 = Math.max(0, Math.floor((S.cam[1] - y) / st) * st), y1 = Math.min(h, S.cam[1] + EH - y + st); // only the rows on screen
+      g.globalAlpha = o.a ?? .65; for (let r = y0; r < y1; r += st) { const off = Math.sin(t * 1.3 + r * .21) * (.6 + r / h * 1.6) + Math.sin(t * .37 + r * .05) * .8; g.drawImage(L.R, 0, r, w, st, Math.round(x + off), y + r, w, st); } // reflection in rippled rows (deeper = wobblier)
+      g.globalCompositeOperation = 'lighter'; for (let b = 0; b < 4; b++) { const ph = .5 + .5 * Math.sin(t * .9 + b * 1.7); g.globalAlpha = .12 + .3 * ph * ph; g.drawImage(L.Rm, b * w / 4, 0, w / 4, h, x + b * w / 4, y, w / 4, h); } // shore glints, 4 slow bands
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; },
+    bell(g, o, x, y) { const t = S.t, per = o.per || 20, n = Math.floor(t / per), w = t - n * per, k = Math.floor(w / 2.4), u = (w - k * 2.4) / 2.4; // a toll of 3 strokes, 2.4 s apart, every per s
+      g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const q = ((t / 2.2 + i / 3) % 1), R = 4 + q * (o.r || 3) * 16; g.strokeStyle = `rgba(190,200,220,${(.35 * (1 - q)).toFixed(3)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(x, y, R, R * .42, 0, 0, TAU); g.stroke(); } // water rings around the drowned tip
+      if (k < 3) { const key = n * 3 + k; if (_bellK.get(o) !== key && u < .3) { _bellK.set(o, key); const dist = Math.hypot(hero.x - x, hero.y - y) / M().T; if (dist < 60 && !S.engaged) sfx('bell_far', Math.max(.25, 1 - dist / 60)); }
+        const a = Math.exp(-u * 1.8), R = (o.r || 3) * 16 * (1 + u * 3); g.strokeStyle = `rgba(255,226,176,${(.4 * a).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, R, R * .42, 0, 0, TAU); g.stroke();
+        const G = sfxGlow(o, 'bell', 26, 'rgba(255,220,170,.5)'); g.globalAlpha = a; g.drawImage(G, x - 26, y - 30); g.globalAlpha = 1; }
+      g.globalCompositeOperation = 'source-over'; },
+    mistband(g, o, x, y, w, h) { const ft = bdFogTex(), t = S.t; for (const [sp, a, sc] of [[o.sp || 6, o.a ?? .35, 1], [-(o.sp || 6) * .6, (o.a ?? .35) * .7, 1.6]]) { const hh = h * sc, ww = hh / 96 * 512 * 2.2, off = ((t * sp) % ww + ww) % ww; g.globalAlpha = Math.min(1, a); // two drifting layers, opposite ways
+        for (let X = x - ww + off; X < x + w; X += ww) g.drawImage(ft, X, y + (h - hh) / 2, ww, hh); } g.globalAlpha = 1; },
     shade(g, o, x, y, w, h) { g.globalCompositeOperation = 'multiply'; g.drawImage(sfxCan(o, 'band', w, h, (t, W, H) => { t.fillStyle = `rgba(70,62,84,${o.a ?? .55})`; t.fillRect(0, 3, W, H - 6); t.fillStyle = 'rgba(110,100,120,.5)'; t.fillRect(0, 0, W, 3); t.fillRect(0, H - 3, W, 3); }), x, y); // the bridge's shadow band, soft edges (made once)
       if (!_rayC) { _rayC = document.createElement('canvas'); _rayC.width = 8; _rayC.height = 64; const r = _rayC.getContext('2d'), gr = r.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,226,180,0)'); gr.addColorStop(.35, 'rgba(255,226,180,.9)'); gr.addColorStop(1, 'rgba(255,226,180,0)'); r.fillStyle = gr; r.fillRect(0, 0, 8, 64); }
       g.globalCompositeOperation = 'lighter'; const n = o.arches || Math.max(2, Math.round(w / 160)), sl = o.slant ?? .5;
@@ -1452,7 +1479,7 @@
       if (o.type === 'npc' && o.anim && npcAnim(o.anim)) list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill();
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } });
       else if (o.type === 'npc' && o.art === 'linette8') list.push({ y: o.y + 6, f: () => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(o.x, o.y + 7, 5, 2, 0, 0, TAU); g.fill(); if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - 34), 2, 2); } } }); // body = Linette's 8-way atlas (drawNpcHi)
-      else if (o.type === 'npc') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art);
+      else if (o.type === 'npc' && o.art !== 'hd') list.push({ y: o.y + 6, f: () => { const im = o.art && npcImg(o.art); /* art:'hd' = the person is part of the map's hd picture (1장 정문 베르디) */
         if (im && im.complete && im.naturalWidth) { const h = o.h || 26, w = im.naturalWidth * h / im.naturalHeight; g.drawImage(im, Math.round(o.x - w / 2), Math.round(o.y + 7 - h), w, h); }
         else drawSpr(g, o.sprite || 'npc_bard', o.x, o.y + 7);
         if (o.main) { g.fillStyle = '#ffe08a'; g.fillRect(Math.round(o.x) - 1, Math.round(o.y + 7 - (o.h || 26)) - 4, 2, 2); } } });
@@ -1492,6 +1519,9 @@
   let _dark = null; function darkLayer() { if (!_dark) _dark = document.createElement('canvas'); if (_dark.width !== EW + 1 || _dark.height !== EH + 1) { _dark.width = EW + 1; _dark.height = EH + 1; } return _dark; }
   let _ultC = null;
   function drawWaystone(g, o) { const on = SAVE.waystones[o.id], p = .5 + .5 * Math.sin(S.t * 3);
+    if (o.art === 'camp') { g.fillStyle = 'rgba(0,0,0,.32)'; g.beginPath(); g.ellipse(o.x, o.y + 3, 11, 4, 0, 0, TAU); g.fill(); // 모닥불 쉼터 (1장 동쪽, 10-25): 돌 둘레 + 엇갈린 장작, 불·연기는 hd.fires / smoke (코드)
+      for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, x = Math.round(o.x + Math.cos(a) * 9), y = Math.round(o.y + 1 + Math.sin(a) * 3.6); g.fillStyle = i % 2 ? '#5d5a60' : '#77737a'; g.fillRect(x - 2, y - 2, 4, 3); g.fillStyle = '#3c3a40'; g.fillRect(x - 2, y + 1, 4, 1); }
+      g.fillStyle = '#3a2618'; g.fillRect(o.x - 7, o.y - 1, 14, 3); g.fillStyle = '#4e3220'; g.fillRect(o.x - 5, o.y - 3, 10, 3); g.fillStyle = on ? `rgba(255,150,60,${.5 + .3 * p})` : 'rgba(150,70,30,.6)'; g.fillRect(o.x - 3, o.y - 2, 6, 2); return; }
     g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(o.x, o.y + 6, 8, 3, 0, 0, TAU); g.fill();
     g.fillStyle = '#6c6f7a'; g.fillRect(o.x - 5, o.y - 12, 10, 18); g.fillStyle = '#8d909c'; g.fillRect(o.x - 5, o.y - 12, 10, 3); g.fillStyle = '#4a4c55'; g.fillRect(o.x + 3, o.y - 9, 2, 15);
     g.fillStyle = on ? `rgba(120,230,255,${.7 + .3 * p})` : '#3a5060'; g.fillRect(o.x - 2, o.y - 8, 4, 8); g.fillRect(o.x - 1, o.y - 10, 2, 12);
