@@ -307,6 +307,148 @@ func _ready() -> void:
 	sub.add_theme_constant_override("outline_size", 3)
 	sub.position = Vector2(24, 680)
 	ui.add_child(sub)
+	if OS.get_environment("BAKE") != "":
+		bake()
+	elif OS.get_environment("ATLAS") != "":
+		setup_sprite()
+		sub.text = "시험 10 · 아틀라스: 3D 인형 동작을 4방향 그림으로 미리 찍어 그림으로 움직임 (1초 20장, 방향 4개)"
+
+# ── 아틀라스 보여 주기: 숨긴 3D 인형과 같은 시간·방향의 그림 칸을 Sprite3D로 ──
+var spr: Sprite3D
+var atlas := {}
+var atlas_tex := {}
+var sprite_mode := false
+const DIR_ORDER := ["down", "right", "up", "left"]
+
+func setup_sprite() -> void:
+	var fj := FileAccess.open("res://atlas/atlas.json", FileAccess.READ)
+	atlas = JSON.parse_string(fj.get_as_text())
+	for n in atlas["anims"]:
+		var img := Image.load_from_file("res://atlas/" + n + ".png")
+		img.generate_mipmaps()
+		atlas_tex[n] = ImageTexture.create_from_image(img)
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		mi.visible = false
+	spr = Sprite3D.new()
+	spr.pixel_size = atlas["cam_size"] / atlas["px"]
+	spr.region_enabled = true
+	spr.shaded = false
+	spr.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	spr.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	spr.rotation_degrees = Vector3(-PITCH, 0, 0)
+	hero.add_child(spr)
+	sprite_mode = true
+
+func snap4(a: float) -> float:
+	return round(a / (PI / 2.0)) * (PI / 2.0)
+
+func update_sprite() -> void:
+	if not atlas["anims"].has(cur_anim):
+		return
+	var a: Dictionary = atlas["anims"][cur_anim]
+	var nf: int = a["frames"]
+	var f := int(anim.current_animation_position * float(atlas["fps"]) + 0.001)
+	if cur_anim in ["Idle", "Walk", "Run"]:
+		f = posmod(f, nf)
+	else:
+		f = clamp(f, 0, nf - 1)
+	var k := int(round(wrapf(model.rotation.y, -PI, PI) / (PI / 2.0)))
+	var dn: String = {0: "down", 1: "right", 2: "up", -2: "up", -1: "left"}[k]
+	var cols: int = a["cols"]
+	var rpd: int = a["rows_per_dir"]
+	var w: float = a["w"]
+	var h: float = a["h"]
+	var row: int = DIR_ORDER.find(dn) * rpd + f / cols
+	spr.texture = atlas_tex[cur_anim]
+	spr.region_rect = Rect2((f % cols) * w, row * h, w, h)
+	spr.offset = Vector2(w / 2.0 - float(a["ox"]), float(a["oy"]) - h / 2.0)
+	var rs := root_shift(false)
+	spr.position = Vector3(rs.x, 0, rs.z)
+	for c in hero.get_children():
+		if c is MeshInstance3D:
+			c.position = Vector3(rs.x, 0.06, rs.z)   # 발밑 그림자도 같이
+	var sq: Vector3 = model.scale / base_sc()
+	spr.scale = Vector3(sq.x, sq.y, 1.0)
+
+# ── 아틀라스: 3D 인형 동작을 4방향 그림으로 미리 찍기 (하데스식) ──
+const BAKE_PX := 800
+const BAKE_FPS := 20.0
+const BAKE_SIZE := 8.125    # 1080p 게임 화면과 같은 1칸 = 98px
+const DIRS := {"down": 0.0, "right": PI / 2.0, "up": PI, "left": -PI / 2.0}
+
+func head_fix() -> void:
+	var hb := skel.find_bone("Head")
+	if hb >= 0:
+		skel.set_bone_pose_rotation(hb, skel.get_bone_pose_rotation(hb).slerp(skel.get_bone_rest(hb).basis.get_rotation_quaternion() * Quaternion(Vector3.RIGHT, deg_to_rad(HEAD_UP)), 0.85))
+
+# 엉덩이(뿌리 뼈)의 바닥 방향 이동: 그림은 제자리로 찍고, 게임에서 그림을 그만큼 옮김
+func root_shift(lock: bool) -> Vector3:
+	var hb := skel.find_bone("Hips")
+	if hb < 0:
+		return Vector3.ZERO
+	var p := skel.get_bone_pose_position(hb)
+	var r := skel.get_bone_rest(hb).origin
+	var q := Vector3(r.x, p.y, r.z)
+	var d := skel.to_global(p) - skel.to_global(q)
+	if lock:
+		skel.set_bone_pose_position(hb, q)
+	return d
+
+func bake() -> void:
+	set_process(false)
+	for c in get_children():
+		if c is MeshInstance3D:
+			c.visible = false
+	for c in hero.get_children():
+		if c != model:
+			c.visible = false
+	var sv := SubViewport.new()
+	sv.size = Vector2i(BAKE_PX, BAKE_PX)
+	sv.transparent_bg = true
+	sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(sv)
+	var bc := Camera3D.new()
+	bc.projection = Camera3D.PROJECTION_ORTHOGONAL
+	bc.size = BAKE_SIZE
+	sv.add_child(bc)
+	bc.rotation_degrees = Vector3(-PITCH, 0, 0)
+	bc.global_position = hero.global_position + bc.global_transform.basis.z * 60.0 + bc.global_transform.basis.y * 0.9
+	bc.current = true
+	var out := ProjectSettings.globalize_path("res://bake")
+	DirAccess.make_dir_recursive_absolute(out)
+	var names := ["Idle", "Walk", "Run"]
+	for sg in plan:
+		if sg[4] != "" and not names.has(sg[4]):
+			names.append(sg[4])
+	await RenderingServer.frame_post_draw
+	var o := bc.unproject_position(hero.global_position)
+	var meta := {"fps": BAKE_FPS, "px": BAKE_PX, "cam_size": BAKE_SIZE, "origin": [o.x, o.y], "anims": {}}
+	for n in names:
+		var ln: float = anim.get_animation(n).length
+		var nf: int = max(1, int(floor(ln * BAKE_FPS + 0.5)))
+		anim.play(n, 0.0)
+		anim.speed_scale = 1.0
+		var am := {"frames": nf, "len": ln, "tips": {}}
+		for dn in DIRS:
+			model.rotation.y = DIRS[dn]
+			var tips := []
+			for f in nf:
+				anim.seek(min(f / BAKE_FPS, ln), true)
+				head_fix()
+				root_shift(true)
+				await RenderingServer.frame_post_draw
+				await RenderingServer.frame_post_draw
+				sv.get_texture().get_image().save_png("%s/%s_%s_%03d.png" % [out, n, dn, f])
+				var pb := bc.unproject_position(base.global_position)
+				var pt := bc.unproject_position(tip.global_position)
+				tips.append([pb.x, pb.y, pt.x, pt.y])
+			am["tips"][dn] = tips
+		meta["anims"][n] = am
+		print("BAKED ", n, " ", nf)
+	var fj := FileAccess.open(out + "/bake.json", FileAccess.WRITE)
+	fj.store_string(JSON.stringify(meta))
+	fj.close()
+	get_tree().quit()
 
 # 얼굴 표시: Head 뼈 무게 × 앞쪽(+Z) 법선 → 정점 색 R (회의 결론 3)
 func add_face_mask(mi: MeshInstance3D) -> void:
@@ -417,7 +559,7 @@ func _process(dt: float) -> void:
 	face = lerp_angle(face, want, clamp(dt * 14.0, 0.0, 1.0))
 	pos += Vector3(d.x, 0, d.y * KZ) * spd * dt
 	hero.position = pos
-	model.rotation.y = face
+	model.rotation.y = snap4(face) if sprite_mode else face
 	var target_lean := 0.0
 	var is_slash := act.find("Slash") >= 0
 	if act != "":
@@ -448,6 +590,8 @@ func _process(dt: float) -> void:
 		if hb >= 0:
 			skel.set_bone_pose_rotation(hb, skel.get_bone_pose_rotation(hb).slerp(skel.get_bone_rest(hb).basis.get_rotation_quaternion() * Quaternion(Vector3.RIGHT, deg_to_rad(HEAD_UP)), 0.85))
 	update_trail(dt, is_slash and (phase == 1 or phase == 2))
+	if sprite_mode:
+		update_sprite()
 	shake = max(0.0, shake - dt)
 	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6
 	cam.position = pos + sk + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0 + Vector3(0, OS.get_environment("CAMY").to_float(), 0)
