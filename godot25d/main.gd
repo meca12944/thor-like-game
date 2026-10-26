@@ -29,13 +29,16 @@ var shake := 0.0
 var skel: Skeleton3D
 const CHIBI := {} # 회의: 뼈 키우기 안 함 (옛 값 "Head": 1.3, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
 var step_acc := 0.0
+const ART_W := 815.0
+const ART_H := 918.0
+const ART_CX := 406.5
+var HEAD_UP := OS.get_environment("HEADUP").to_float() if OS.get_environment("HEADUP") != "" else -15.0  # 위에서 내려다보는 카메라라 고개를 살짝 듦
 const STEP := 0.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
 # (이름, 방향, 초, 빠르기 칸/초) — 빠르기 0 = 서기
 var plan := [
 	["서기 (숨쉬기)", Vector2(0, 1), 1.6, 0.0, ""],
 	["걷기 →", Vector2(1, 0), 1.4, 3.2, ""],
-	["걷기 ↘", Vector2(1, 1), 1.2, 3.2, ""],
 	["걷기 ↓", Vector2(0, 1), 1.0, 3.2, ""],
 	["걷기 ↑", Vector2(0, -1), 1.0, 3.2, ""],
 	["달리기 →", Vector2(1, 0), 1.6, 7.5, ""],
@@ -160,6 +163,7 @@ func _ready() -> void:
 				sm.set_shader_parameter("albedo_tex", tex("base4k"))
 			elif om is BaseMaterial3D and om.albedo_texture:
 				sm.set_shader_parameter("albedo_tex", om.albedo_texture)
+			sm.set_shader_parameter("art_tex", tex("art_front"))
 			var ol := ShaderMaterial.new()
 			ol.shader = outl
 			sm.next_pass = ol
@@ -278,6 +282,8 @@ func _ready() -> void:
 	cam = Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.size = 11.0
+	if OS.get_environment("CAMSZ") != "":
+		cam.size = OS.get_environment("CAMSZ").to_float()
 	cam.rotation_degrees = Vector3(-PITCH, 0, 0)
 	add_child(cam)
 	cam.current = true
@@ -294,7 +300,7 @@ func _ready() -> void:
 	label.position = Vector2(24, 18)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "시험 8 · 회의 결론 4~6: 2칸 빛·보랏빛 그림자·얼굴 평평하게 / 외곽선 몸 둘레만 / 부드러운 움직임 + 공격만 멈칫"
+	sub.text = "시험 9 · 설정화(7~8등신) 그대로 새 인형: 그림 모습 지키기 켬 + 앞·옆·뒤 그림으로 색칠"
 	sub.add_theme_font_override("font", f)
 	sub.add_theme_font_size_override("font_size", 18)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -307,13 +313,37 @@ func add_face_mask(mi: MeshInstance3D) -> void:
 	var sk: Skin = mi.skin
 	if sk == null:
 		return
+	var sk_node := mi.get_node_or_null(mi.skeleton) as Skeleton3D
 	var head := -1
 	for i in sk.get_bind_count():
-		if sk.get_bind_name(i) == "Head":
+		var bn: String = sk.get_bind_name(i)
+		if bn == "" and sk_node:
+			bn = sk_node.get_bone_name(sk.get_bind_bone(i))
+		if bn == "Head":
 			head = i
 	if head < 0:
 		return
 	var old: ArrayMesh = mi.mesh
+	# 설정화 앞모습을 앞에서 비춰 입히기: 인형 키 = 그림 키(918px), 머리 가운데 = 그림 머리 가운데
+	var y0 := 1e9
+	var y1 := -1e9
+	var hx := 0.0
+	var hn := 0.0
+	for si in old.get_surface_count():
+		var a0 := old.surface_get_arrays(si)
+		var vs: PackedVector3Array = a0[Mesh.ARRAY_VERTEX]
+		var bs: PackedInt32Array = a0[Mesh.ARRAY_BONES]
+		var ws: PackedFloat32Array = a0[Mesh.ARRAY_WEIGHTS]
+		var pr: int = bs.size() / max(vs.size(), 1)
+		for v in vs.size():
+			y0 = min(y0, vs[v].y)
+			y1 = max(y1, vs[v].y)
+			for k in pr:
+				if bs[v * pr + k] == head and ws[v * pr + k] > 0.5:
+					hx += vs[v].x
+					hn += 1.0
+	hx /= max(hn, 1.0)
+	var s_px: float = ART_H / max(y1 - y0, 1e-4)
 	var nm := ArrayMesh.new()
 	for si in old.get_surface_count():
 		var arr := old.surface_get_arrays(si)
@@ -325,14 +355,19 @@ func add_face_mask(mi: MeshInstance3D) -> void:
 		var per: int = bones.size() / max(vc, 1)
 		var cols := PackedColorArray()
 		cols.resize(vc)
+		var uv2 := PackedVector2Array()
+		uv2.resize(vc)
 		for v in vc:
 			var w := 0.0
 			for k in per:
 				if bones[v * per + k] == head:
 					w += wts[v * per + k]
 			var fr: float = clamp((nrm[v].z - 0.15) * 2.5, 0.0, 1.0)
-			cols[v] = Color(clamp(w * 1.4, 0.0, 1.0) * fr, 0, 0, 1)
+			var pj: float = clamp(w * 1.6 - 0.2, 0.0, 1.0) * clamp(nrm[v].z * 2.5, 0.0, 1.0)
+			cols[v] = Color(clamp(w * 1.4, 0.0, 1.0) * fr, pj, 0, 1)
+			uv2[v] = Vector2((ART_CX + (verts[v].x - hx) * s_px) / ART_W, (ART_H - (verts[v].y - y0) * s_px) / (ART_H + 1.0))
 		arr[Mesh.ARRAY_COLOR] = cols
+		arr[Mesh.ARRAY_TEX_UV2] = uv2
 		var fl := 0
 		if per == 8:
 			fl = Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
@@ -411,11 +446,11 @@ func _process(dt: float) -> void:
 				skel.set_bone_pose_scale(bi, Vector3.ONE * CHIBI[bn])
 		var hb := skel.find_bone("Head")
 		if hb >= 0:
-			skel.set_bone_pose_rotation(hb, skel.get_bone_pose_rotation(hb).slerp(skel.get_bone_rest(hb).basis.get_rotation_quaternion(), 0.85))
+			skel.set_bone_pose_rotation(hb, skel.get_bone_pose_rotation(hb).slerp(skel.get_bone_rest(hb).basis.get_rotation_quaternion() * Quaternion(Vector3.RIGHT, deg_to_rad(HEAD_UP)), 0.85))
 	update_trail(dt, is_slash and (phase == 1 or phase == 2))
 	shake = max(0.0, shake - dt)
 	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6
-	cam.position = pos + sk + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0
+	cam.position = pos + sk + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0 + Vector3(0, OS.get_environment("CAMY").to_float(), 0)
 
 # 5) 동작에 힘: 준비는 느리게, 휘두름은 빠르게, 휘두른 뒤 잠깐 멈춤(+화면 흔들림), 회복
 func punch(dt: float) -> void:
