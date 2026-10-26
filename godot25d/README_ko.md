@@ -24,3 +24,8 @@
 - 화면을 640×360으로 그려 가장 가까운 칸으로 2배 키움(도트 느낌), MSAA 끔
 - 움직임을 1초 12장으로 끊어 재생(AnimationPlayer 수동 advance, 이동·궤적은 부드럽게)
 - 외곽선 1px
+
+## 시험 5: 사장님 「4번으로, 모션은 기존 미니 귀여운 버전 캐릭 모션 다 가지고 와」 (10-26)
+- 옛 주인공(7093980f) 동작: 서기·걷기·달리기·멈춤·회피대시·점프·달리기 점프·베기 1~3·맞기·크게 맞기·쓰러짐·기술 S1~S3
+- Meshy 움직임 8개 추가(24크레딧, 잔액 1020): Regular_Jump(466), Jump_Run(13), Sprint_and_Sudden_Stop(531), dying_backwards(189), BeHit_FlyUp(7), Charged_Spell_Cast(125), mage_soell_cast(129), mage_soell_cast_3(132) → art/actions2.glb
+- 미니 비율: 뼈 크기로(크레딧 0) CHIBI = 머리 1.75, 허벅지 0.82, 등 0.9, 팔 0.92 — 진짜 귀여운 얼굴은 미니 설정화로 인형을 다시 만들어야 함

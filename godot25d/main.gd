@@ -5,7 +5,7 @@ extends Node3D
 const PITCH := 45.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
-const SECS := 29.0
+const SECS := 33.0
 
 var hero: Node3D
 var model: Node3D
@@ -26,29 +26,33 @@ var last_tip := Vector3.ZERO
 var phase := 0            # 공격: 0 준비, 1 휘두름, 2 멈춤, 3 회복
 var hold_t := 0.0
 var shake := 0.0
+var skel: Skeleton3D
+const CHIBI := {"Head": 1.75, "LeftUpLeg": 0.82, "RightUpLeg": 0.82, "Spine01": 0.9, "LeftArm": 0.92, "RightArm": 0.92}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
 var step_acc := 0.0
 const STEP := 1.0 / 12.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
 # (이름, 방향, 초, 빠르기 칸/초) — 빠르기 0 = 서기
 var plan := [
-	["서기", Vector2(0, 1), 1.4, 0.0, ""],
-	["걷기 →", Vector2(1, 0), 1.6, 3.2, ""],
-	["걷기 ↘ (대각선도 자연스럽게)", Vector2(1, 1), 1.4, 3.2, ""],
-	["걷기 ↓", Vector2(0, 1), 1.2, 3.2, ""],
-	["걷기 ←", Vector2(-1, 0), 1.4, 3.2, ""],
-	["걷기 ↑", Vector2(0, -1), 1.2, 3.2, ""],
-	["달리기 →", Vector2(1, 0), 2.0, 7.5, ""],
-	["달리기 ← (180° 꺾기)", Vector2(-1, 0), 1.8, 7.5, ""],
-	["달리기 ↓", Vector2(0, 1), 1.0, 7.5, ""],
-	["멈춤", Vector2(1, 0), 0.8, 0.0, ""],
+	["서기 (숨쉬기)", Vector2(0, 1), 1.6, 0.0, ""],
+	["걷기 →", Vector2(1, 0), 1.4, 3.2, ""],
+	["걷기 ↘", Vector2(1, 1), 1.2, 3.2, ""],
+	["걷기 ↓", Vector2(0, 1), 1.0, 3.2, ""],
+	["걷기 ↑", Vector2(0, -1), 1.0, 3.2, ""],
+	["달리기 →", Vector2(1, 0), 1.6, 7.5, ""],
+	["달리기 ← (180° 꺾기)", Vector2(-1, 0), 1.6, 7.5, ""],
+	["달리다 멈춤", Vector2(-1, 0), 1.3, 0.0, "Sprint_and_Sudden_Stop"],
 	["베기 1타", Vector2(1, 0), 2.3, 0.0, "Left_Slash"],
 	["베기 2타", Vector2(1, 0), 1.3, 0.0, "Right_Hand_Sword_Slash"],
 	["베기 3타 (모아 베기)", Vector2(1, 0), 1.9, 0.0, "Charged_Slash"],
 	["회피대시 (구르기)", Vector2(1, 0), 1.4, 0.0, "Roll_Dodge"],
-	["회피대시 (선 채로 피하기)", Vector2(-1, 0), 1.2, 0.0, "Stand_Dodge"],
-	["맞기", Vector2(0, 1), 1.4, 0.0, "Hit_Reaction"],
-	["8방향 돌기", Vector2(1, 0), 3.2, -1.0, ""],
-	["서기", Vector2(0, 1), 2.0, 0.0, ""],
+	["점프", Vector2(0, 1), 1.4, 0.0, "Regular_Jump"],
+	["달리기 점프", Vector2(1, 0), 1.3, 0.0, "Jump_Run"],
+	["맞기", Vector2(0, 1), 1.3, 0.0, "Hit_Reaction"],
+	["크게 맞기 (날아감)", Vector2(0, 1), 1.8, 0.0, "BeHit_FlyUp"],
+	["기술 1 (모아 쏘기)", Vector2(0, 1), 2.2, 0.0, "Charged_Spell_Cast"],
+	["기술 2", Vector2(1, 0), 1.8, 0.0, "mage_soell_cast"],
+	["기술 3", Vector2(0, 1), 1.8, 0.0, "mage_soell_cast_3"],
+	["쓰러짐", Vector2(0, 1), 2.6, 0.0, "dying_backwards"],
 ]
 
 func tex(p: String) -> ImageTexture:
@@ -122,7 +126,7 @@ func _ready() -> void:
 	add_child(hero)
 	model = load_glb("actions.glb")
 	hero.add_child(model)
-	var sc := HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8
+	var sc := base_sc()
 	model.scale = Vector3(sc, sc, sc)
 	anim = model.find_child("AnimationPlayer", true, false)
 	anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
@@ -135,9 +139,14 @@ func _ready() -> void:
 	for n in ["Idle", "Walk", "Run"]:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
-	for n in ["Left_Slash", "Right_Hand_Sword_Slash", "Charged_Slash", "Roll_Dodge", "Stand_Dodge", "Hit_Reaction"]:
-		if anim.has_animation(n):
-			anim.get_animation(n).loop_mode = Animation.LOOP_NONE
+	var m3 := load_glb("actions2.glb")
+	var p3: AnimationPlayer = m3.find_child("AnimationPlayer", true, false)
+	for nm3 in p3.get_animation_list():
+		lib.add_animation(nm3, p3.get_animation(nm3).duplicate())
+	for n in anim.get_animation_list():
+		if n in ["Idle", "Walk", "Run"]:
+			continue
+		anim.get_animation(n).loop_mode = Animation.LOOP_NONE
 	# 3) 만화풍 빛 + 외곽선 + 테두리 빛
 	var toon := load("res://toon.gdshader")
 	var outl := load("res://outline.gdshader")
@@ -153,7 +162,7 @@ func _ready() -> void:
 			sm.next_pass = ol
 			mi.set_surface_override_material(si, sm)
 	# 칼 (손에 붙임)
-	var skel: Skeleton3D = model.find_child("Skeleton3D", true, false)
+	skel = model.find_child("Skeleton3D", true, false)
 	if skel:
 		var ba := BoneAttachment3D.new()
 		ba.bone_name = "RightHand"
@@ -283,7 +292,7 @@ func _ready() -> void:
 	label.position = Vector2(10, 6)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "시험 4 · 3D인데 2D 느낌: 화면을 도트(640×360)로 그리고 · 동작은 1초 12장으로 끊어서"
+	sub.text = "시험 5 · 2D 느낌(시험 4) + 미니 귀여운 비율 + 옛 주인공 동작 전부"
 	sub.add_theme_font_override("font", f)
 	sub.add_theme_font_size_override("font_size", 10)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -356,6 +365,10 @@ func _process(dt: float) -> void:
 	if step_acc >= STEP:
 		anim.advance(step_acc)
 		step_acc = 0.0
+		for bn in CHIBI:
+			var bi := skel.find_bone(bn)
+			if bi >= 0:
+				skel.set_bone_pose_scale(bi, Vector3.ONE * CHIBI[bn])
 	update_trail(dt, is_slash and (phase == 1 or phase == 2))
 	shake = max(0.0, shake - dt)
 	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6
@@ -391,7 +404,7 @@ func punch(dt: float) -> void:
 			model.scale = model.scale.lerp(Vector3.ONE * base_sc(), 0.2)
 
 func base_sc() -> float:
-	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8
+	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8 * 1.08
 
 func update_trail(dt: float, on: bool) -> void:
 	if on and tip:
