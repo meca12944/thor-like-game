@@ -1867,10 +1867,10 @@
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.lnV += (-LEAN.w * LEAN.w * (h.lnL || 0) - 2 * LEAN.z * LEAN.w * h.lnV) * d; h.lnL = (h.lnL || 0) + h.lnV * d; }
     const L = Math.max(-LEAN.max, Math.min(LEAN.max, h.lnL || 0)); return Math.abs(L) < .05 ? null : { L, v: h.lnDir || FACEV[h.face] || [1, 0] }; }
   const heroBlinkA = () => hero.inv > 0 && Math.floor(hero.inv * 20) % 2 && !hero.roll && S.deadT <= 0 && !S.ultFx ? 0 : 1; /* 사장님 10-25 「예전 주인공과 똑같이」: 옛처럼 3틱마다 0% — 칼도 같은 값이라 같이 사라짐(칼만 떠 있음 없음) */ // no blink / white wash during an ultimate (the hero is the star of the shot)
-  // 다리 빠르기 비교 (사장님 10-25 「예전 주인공과 똑같이」, 고른 뒤 하나만 남기고 지움): ?gait=A 옛 그대로(걷기 112·달리기 174 = 옛과 같은 1초당 걸음, 새 그림은 보폭이 작아 발 미끄러짐) /
-  // ?gait=B 중간(82·96 = 미끄럼 10% 안) / 없음 = 지금(74.4·87.3, 미끄럼 0). 그림 px 단위, 한 바퀴 이동 = 값 × 32/84(걷기)·46/119(달리기) 필드 px
-  const GAIT_AB = { A: [112, 174], B: [82, 96] };
-  function gaitCyc(H, run) { const g = GAIT_AB[Q.get('gait')]; if (g) return g[run]; const G = H.gait || {}; return run ? (G.runCyc || 119) : (G.walkCyc || 84); }
+  // 다리 빠르기 (사장님 10-26): 걷기 = B 82 고정(아틀라스 gait.walkCyc, 옛 112보다 빠르고 지금 74.4보다 느림, 미끄럼 10% 안).
+  // 달리기 비교 (고른 뒤 하나만 남기고 지움): ?run=A 옛 174(미끄러짐) / ?run=B 96(미끄럼 10% 안) / 없음 = 아틀라스 87.3. 그림 px, 한 바퀴 이동 = 값 × 46/119 필드 px
+  const RUN_AB = { A: 174, B: 96 };
+  function gaitCyc(H, run) { const G = H.gait || {}; if (run) return RUN_AB[Q.get('run')] || G.runCyc || 119; return G.walkCyc || 84; }
   function hairLag(h) { const HR = EXAG.hair, now = S.t; let dt = Math.min(.1, Math.max(0, now - (h.hrT ?? now))); h.hrT = now; // 머리카락 스프링 (그림 px, + = 오른쪽)
     const vx = h.hrX == null || !dt ? 0 : (h.x - h.hrX) / dt; h.hrX = h.x; if (dt) h.hrVx = vx; const tg = Math.max(-HR.max, Math.min(HR.max, -(h.hrVx || 0) * HR.drag));
     for (; dt > 1e-6; dt -= 1 / 120) { const d = Math.min(dt, 1 / 120); h.hrV = (h.hrV || 0) + (-HR.w * HR.w * ((h.hrL || 0) - tg) - 2 * HR.z * HR.w * (h.hrV || 0)) * d; h.hrL = (h.hrL || 0) + h.hrV * d; }
