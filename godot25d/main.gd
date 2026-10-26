@@ -5,7 +5,7 @@ extends Node3D
 const PITCH := 30.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
-const SECS := 33.0
+var SECS := 33.0
 
 var hero: Node3D
 var model: Node3D
@@ -80,7 +80,31 @@ func flat(p: String, tx: float, ty: float, d: float, h: float) -> void:
 	m.position = Vector3(tx + w / 2.0, h, (ty + hh / 2.0) * KZ)
 	add_child(m)
 
+# 새 동작 맛보기 (PLAN=new): Meshy 창고 동작 7개 (사장님 10-26)
+var IDLE_ANIM := "Idle"
+var RUN_ANIM := "Run"
+var plan_new := [
+	["A1 서기 = 전투 자세 (칼 든 채)", Vector2(1, 0), 2.2, 0.0, ""],
+	["B1 달리기 = 앞으로 숙여 질주 →", Vector2(1, 0), 1.8, 7.5, ""],
+	["B1 달리기 ↓", Vector2(0, 1), 1.2, 7.5, ""],
+	["B1 달리기 ← (꺾기)", Vector2(-1, 0), 1.4, 7.5, ""],
+	["C6 회피대시: 웅크려 뒤로 스텝 + 코드로 휙 (적 보며 뒤로)", Vector2(1, 0), 1.6, 0.0, "Crouch_and_Step_Back", {"slide": Vector2(-1, 0), "v": 15.0, "dur": 0.22}],
+	["C2 회피대시: 선 채 피하기 1 + 코드로 휙 (적 보며 옆으로)", Vector2(1, 0), 1.3, 0.0, "Stand_Dodge_1", {"slide": Vector2(0, 1), "v": 15.0, "dur": 0.22}],
+	["D1 3타 = 3연속 베기 (1·2·3타로 나눠 씀)", Vector2(1, 0), 4.4, 0.0, "Triple_Combo_Attack"],
+	["점프: 달리다 점프 (새)", Vector2(1, 0), 2.3, 0.0, "Run_and_Jump", {"slide": Vector2(1, 0), "v": 4.0, "dur": 1.6}],
+	["점프: 달리다 멀리 뛰기 (새)", Vector2(-1, 0), 2.6, 0.0, "Run_and_Leap", {"slide": Vector2(-1, 0), "v": 4.0, "dur": 1.8}],
+	["점프: 제자리 점프 (지금 것)", Vector2(0, 1), 1.4, 0.0, "Regular_Jump"],
+	["A1 서기", Vector2(0, 1), 1.0, 0.0, ""],
+]
+
 func _ready() -> void:
+	if OS.get_environment("PLAN") == "new":
+		plan = plan_new
+		IDLE_ANIM = "Combat_Stance"
+		RUN_ANIM = "Lean_Forward_Sprint"
+	SECS = 0.0
+	for sg in plan:
+		SECS += sg[2]
 	var env := WorldEnvironment.new()
 	var e := Environment.new()
 	e.background_mode = Environment.BG_COLOR
@@ -142,12 +166,16 @@ func _ready() -> void:
 	for n in ["Idle", "Walk", "Run"]:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
-	var m3 := load_glb("actions2.glb")
-	var p3: AnimationPlayer = m3.find_child("AnimationPlayer", true, false)
-	for nm3 in p3.get_animation_list():
-		lib.add_animation(nm3, p3.get_animation(nm3).duplicate())
+	for gf in ["actions2.glb", "actions3.glb"]:
+		if not FileAccess.file_exists("res://art/" + gf):
+			continue
+		var m3 := load_glb(gf)
+		var p3: AnimationPlayer = m3.find_child("AnimationPlayer", true, false)
+		for nm3 in p3.get_animation_list():
+			lib.add_animation(nm3, p3.get_animation(nm3).duplicate())
 	for n in anim.get_animation_list():
-		if n in ["Idle", "Walk", "Run"]:
+		if n in ["Idle", "Walk", "Run", "Combat_Stance", "Lean_Forward_Sprint"]:
+			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
 			continue
 		anim.get_animation(n).loop_mode = Animation.LOOP_NONE
 	# 3) 만화풍 빛 + 외곽선 + 테두리 빛
@@ -307,6 +335,8 @@ func _ready() -> void:
 	sub.add_theme_constant_override("outline_size", 3)
 	sub.position = Vector2(24, 680)
 	ui.add_child(sub)
+	if OS.get_environment("PLAN") == "new":
+		sub.text = "새 동작 맛보기 · Meshy 창고 7개 (21크레딧): 전투 자세 · 숙여 질주 · 회피대시 2종 · 3연속 베기 · 점프 2종"
 	if OS.get_environment("BAKE") != "":
 		bake()
 	elif OS.get_environment("ATLAS") != "":
@@ -558,10 +588,15 @@ func _process(dt: float) -> void:
 	var want := atan2(d.x, d.y)
 	face = lerp_angle(face, want, clamp(dt * 14.0, 0.0, 1.0))
 	pos += Vector3(d.x, 0, d.y * KZ) * spd * dt
+	# 회피대시·점프: 몸은 d 방향을 본 채 slide 방향으로 코드가 옮김 (블러드본 스텝처럼 짧고 빠르게)
+	if seg.size() > 5 and seg[5].has("slide") and lt < seg[5]["dur"]:
+		var sl: Vector2 = seg[5]["slide"]
+		var k2: float = 1.0 - lt / seg[5]["dur"]
+		pos += Vector3(sl.x, 0, sl.y * KZ) * float(seg[5]["v"]) * (0.4 + 1.2 * k2) * dt
 	hero.position = pos
 	model.rotation.y = snap4(face) if sprite_mode else face
 	var target_lean := 0.0
-	var is_slash := act.find("Slash") >= 0
+	var is_slash := act.find("Slash") >= 0 or act.find("Combo") >= 0
 	if act != "":
 		if cur_anim != act:
 			phase = 0
@@ -569,12 +604,12 @@ func _process(dt: float) -> void:
 		if is_slash:
 			punch(dt)
 	elif spd > 5.0:
-		play("Run", spd / 6.0)
+		play(RUN_ANIM, spd / 6.0 if RUN_ANIM == "Run" else spd / 7.5)
 		target_lean = 0.0
 	elif spd > 0.0:
 		play("Walk", spd / 2.6)
 	else:
-		play("Idle", 1.0)
+		play(IDLE_ANIM, 1.0)
 	lean = lerp(lean, target_lean, clamp(dt * 8.0, 0.0, 1.0))
 	dust.emitting = spd > 5.0
 	dust.position = Vector3(0, 0.1, 0)
@@ -592,6 +627,11 @@ func _process(dt: float) -> void:
 	update_trail(dt, is_slash and (phase == 1 or phase == 2))
 	if sprite_mode:
 		update_sprite()
+	else:
+		var rs3 := root_shift(false)
+		for c in hero.get_children():
+			if c is MeshInstance3D:
+				c.position = Vector3(rs3.x, 0.06, rs3.z)   # 발밑 그림자가 몸을 따라감
 	shake = max(0.0, shake - dt)
 	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6
 	cam.position = pos + sk + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0 + Vector3(0, OS.get_environment("CAMY").to_float(), 0)
@@ -623,6 +663,8 @@ func punch(dt: float) -> void:
 				phase = 3
 		3:
 			anim.speed_scale = 1.35
+			if v > 9.0:
+				phase = 1   # 연속 베기: 다음 타
 			model.scale = model.scale.lerp(Vector3.ONE * base_sc(), 0.2)
 
 func base_sc() -> float:
