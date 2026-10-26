@@ -1558,11 +1558,11 @@
   const atkArt = () => { const G = h128(), H = G && G.H8, L = H && H.anims && H.anims.hit1_right; return !!(L && bareSheet(H, L[0][0])); }; // 빈 손 공격 그림을 쓰는 중
   const bareSheet = (H, i) => !!(H && H.bare && H.bare.includes(i)); // H8.bare = 칼이 그림에 없는 시트 (새 그록 주인공): 공격 내내 코드 칼
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h8Turn(h, h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down'));
-    // same choice as the town (index.html heroCell8, owner 10-23 "합본"): facing up/down -> the front / back art (diagonals too, mirrored when heading left), else the side art
+    // 4방향 그림 (사장님 10-26 「앞으로 대각선은 뺀다」): 대각선 입력 → 옆 그림(좌우 따라, 왼쪽 = 뒤집기), 위·아래 → 뒷면·정면. 이동·공격·검기 방향은 8방향 그대로(f8). 마을 heroCell8 과 같은 규칙
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
-    const fc = H.diag && h.vd != null ? (f8.includes('down') ? 'down' : f8.includes('up') ? 'up' : f8) : /^(right|left|up|down)$/.test(h.face) ? h.face : 'down', vert = !!H.diag && (fc === 'down' || fc === 'up'), hl = vert ? (f8.includes('left') || (!f8.includes('right') && h.hz === 'left')) : fc === 'left';
-    const sd = vert ? (hl ? 'left' : 'right') : fc, L8 = H.left && sd === 'left'; let fl = sd === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : sd;
-    const DIAG8 = /^(idle|walk|run|dash|jump|hit1|hit2|hit3)$/, pick = k => { const dk = fc === 'down' && f8 !== 'down' && H.anims[k + '_dr'] ? 'dr' : fc === 'up' && f8 === 'up' && H.anims[k + '_n'] ? 'n' : fc; /* ↘/↙ = *_dr art (mirrored for ↙), ↑ = *_n straight back (never mirrored), motion lab 10-23 */ if (vert && DIAG8.test(k) && H.anims[k + '_' + dk]) { fl = dk === 'n' ? false : hl; d = dk; } else { fl = sd === 'left' && !L8; d = L8 ? 'left' : fl ? 'right' : sd; } return H.anims[k + '_' + d]; };
+    const fc = /^(down|up)(left|right)$/.test(f8) ? (f8.endsWith('left') ? 'left' : 'right') : /^(right|left|up|down)$/.test(f8) ? f8 : 'down', vert = fc === 'down' || fc === 'up', hl = fc === 'left';
+    const L8 = H.left && fc === 'left'; let fl = fc === 'left' && !L8, d = L8 ? 'left' : fl ? 'right' : fc;
+    const pick = k => H.anims[k + '_' + d];
     let LL = null; const A = k => (LL = pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')]), /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     // 출발·멈춤 (모션연구방 10-23, 걷기 박자 연구): 서 있다 출발하면 다리 모인 장(한 바퀴의 0.28)부터, 멈추면 다음 다리 모인 장까지 빠르게 마저 디딘 뒤 서기
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
