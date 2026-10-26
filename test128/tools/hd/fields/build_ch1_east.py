@@ -245,6 +245,8 @@ objs.append({'type': 'npc', 'id': 'f_verdi', 'x': 65, 'y': 243, 'name': '베르�
              'idle': '오늘도 적을 것이 없군. 다행인지 불행인지.'})
 objs.append({'type': 'waystone', 'id': 'ws_giant_palm', 'x': 30, 'y': 115, 'name': '거인 손바닥 모닥불'})
 objs.append({'type': 'waystone', 'id': 'ws_road_head', 'x': 120, 'y': 80, 'name': '가도 들머리 모닥불'})
+objs.append({'type': 'vista', 'id': 'ce_cliff', 'x': 95, 'y': 15, 'r': 3, 'zoom': 0.6, 'dir': 270, 'pan': 10, 'hold': 1, 'tilt': {'z0': 0.6, 'z1': 0.9, 'pan': 12},   # 북쪽 낭떠러지: 틸트 업 + 줌인 (사장님 10-26)
+            'name': '북쪽 낭떠러지', 'sub': '안개 너머 — 왕성'})
 objs.append({'type': 'vista', 'id': 'ce_giant', 'x': 64, 'y': 142, 'r': 3.5, 'zoom': 0.27, 'dir': 270, 'pan': 24, 'hold': 1,
              'name': '쓰러진 거인', 'sub': '성문의 맹세를 지키다 누운 기사'})
 objs.append({'type': 'vista', 'id': 'ce_lake', 'x': 126, 'y': 89, 'r': 3, 'zoom': 0.62, 'dir': 270, 'pan': 24, 'hold': 1,   # 효과 담당 lakeart(반사 왕성·잔물결) 뒤 다시 켬
