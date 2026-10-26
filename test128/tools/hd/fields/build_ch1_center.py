@@ -86,8 +86,8 @@ O = F.objs
 O.append({'type': 'exit', 'x': W - 1, 'y': 150, 'w': 1, 'h': 21, 'to': 'ch1_field_e', 'spawn': 'west', 'label': '→ 동쪽 들판 · 1장 정문'})
 O.append({'type': 'waystone', 'id': 'ws_ash_falls', 'x': 124, 'y': 134, 'name': '잿가루 폭포 아래 모닥불', 'art': 'camp'})
 O.append({'type': 'waystone', 'id': 'ws_mound_camp', 'x': 168, 'y': 90, 'name': '잿더미 쉼터 모닥불', 'art': 'camp'})
-O.append({'type': 'vista', 'id': 'cc_aqueduct', 'x': 128, 'y': 140, 'r': 3.5, 'zoom': 0.42, 'dir': 270, 'pan': 18, 'hold': 1, 'name': '무너진 수도교', 'sub': '물 대신 재가 흐르는 다리'})
-O.append({'type': 'vista', 'id': 'cc_spire', 'x': 46, 'y': 82, 'r': 3.5, 'zoom': 0.24, 'dir': 270, 'pan': 38, 'hold': 1, 'name': '붉은 실의 첨탑', 'sub': '폐공방 지붕에서 하늘로 묶인 실'})
+O.append({'type': 'vista', 'id': 'cc_aqueduct', 'x': 128, 'y': 140, 'r': 3.5, 'zoom': 0.42, 'dir': 270, 'pan': 18, 'hold': 1, 'tilt': {'z0': 0.4, 'z1': 0.55, 'pan': 18}, 'name': '무너진 수도교', 'sub': '물 대신 재가 흐르는 다리'})
+O.append({'type': 'vista', 'id': 'cc_spire', 'x': 46, 'y': 82, 'r': 3.5, 'zoom': 0.24, 'dir': 270, 'pan': 38, 'hold': 1, 'tilt': {'z0': 0.2, 'z1': 0.3, 'pan': 38}, 'name': '붉은 실의 첨탑', 'sub': '폐공방 지붕에서 하늘로 묶인 실'})
 O.append({'type': 'vista', 'id': 'cc_pit', 'x': 88, 'y': 104, 'r': 3, 'zoom': 0.45, 'dir': 180, 'pan': 22, 'hold': 1, 'name': '꺼진 지반', 'sub': '땅 밑으로 가라앉은 옛 거리'})
 O.append({'type': 'clue', 'id': 'cc_remains', 'x': 200, 'y': 150, 'name': '쓰러진 탈영병', 'flag': 'cc_look_remains', 'loot': [['k_void_drop', 1]],
           'text': '빈 망토와 가죽 팔토시. 성벽 쪽으로 손을 뻗은 채 굳어 있다.\n손끝 아래 바닥에 검붉은 방울 하나가 굳지 않고 떨린다. …주워 들었다.', 'textDone': '성벽 쪽으로 손을 뻗은 빈 망토.'})
