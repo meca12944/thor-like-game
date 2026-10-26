@@ -129,8 +129,8 @@
    "spawn": "boss"
   },
   "stairs_down": {
-   "to": "felt",
-   "spawn": "arachne"
+   "to": "prologue_grave",
+   "spawn": "resume"
   }
  },
  "boss": {
@@ -161,7 +161,7 @@
   },
   "splash": "assets/boss/arachne_splash.png",
   "sub": "영혼을 실에 꿰매는 자",
-  "exitMsg": "동쪽 뒷문이 열렸다 — 빛의 문이나 뒷문으로 나가면 펠트로 돌아간다"
+  "exitMsg": "동쪽 뒷문이 열렸다 — 뒷문은 무명 무덤가로, 빛의 문은 펠트로 이어진다"
  },
  "arena": {
   "cx": 60,

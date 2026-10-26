@@ -2,7 +2,7 @@
 Replaces the old 28×20 「재단사의 방」 under the same map id `arachne_boss` (the 폐공방 boss door, quest targets and scene keys keep working;
 the id moves to ch1_ws_boss when the story room's new 4-floor workshop lands).
 - 싸움 원: 지름 40 타일 (rx 20, ry 16 — top-down, 화면에서 둥글게), 가운데 지름 16은 비움. 북쪽 들어간 자리 = 베틀·고치 왕좌(아라크네 시작),
-  남쪽 = 폐공방에서 들어오는 계단, 동쪽 복도 끝 = 17d 뒷문(보스를 쓰러뜨려야 열림: stairs_down 은 보스가 살아 있으면 막힘).
+  남쪽 = 폐공방에서 들어오는 계단, 동쪽 복도 끝 = 17d 뒷문 → 무명 무덤가 (설계도 지름길①, 보스를 쓰러뜨려야 열림: stairs_down 은 보스가 살아 있으면 막힘).
 - 기둥 5개: 원 가운데에서 반지름 13 타일 고리, 2 타일 굵기 → 필살 「천 갈래 붉은 실」 숨을 곳, 2페이즈 붉은 실은 기둥 사이에 쳐짐.
 - 고치 8개(hd.phase2.cocoons) = 「고치 비」가 떨어지는 천장 자리 (world_mobs.js ARA.ceil 이 지도에서 읽음).
 - 바닥 = 그록 B2 고치실 16px 타일 (바닥 8×8 무늬, 벽면 3줄) × 0.8 어둡게, 원 가장자리는 픽셀 단위로 둥글게.
@@ -118,8 +118,8 @@ b = {'id': 'arachne_boss', 'type': 'boss', 'region': 'ch1', 'area': 1, 'mapPos':
      'legend': {'#': 'wall', '.': 'floor', 'U': {'ground': 'floor', 'obj': 'stairs_up'}, 'D': {'ground': 'floor', 'obj': 'stairs_down'},
                 'p': {'ground': 'floor', 'deco': 'pillar', 'solid': True}, 'q': {'ground': 'floor', 'solid': True}},
      'solid': ['#'], 'ground': rows, 'spawns': {'default': [60.5, 48.5, 'up'], 'back': [114.5, 33.5, 'left']},
-     'links': {'stairs_up': {'to': 'arachne', 'spawn': 'boss'}, 'stairs_down': {'to': 'felt', 'spawn': 'arachne'}},
-     'boss': dict(old['boss'], x=60.5, y=21.5, exitMsg='동쪽 뒷문이 열렸다 — 빛의 문이나 뒷문으로 나가면 펠트로 돌아간다'),
+     'links': {'stairs_up': {'to': 'arachne', 'spawn': 'boss'}, 'stairs_down': {'to': 'prologue_grave', 'spawn': 'resume'}},   # 설계도 지름길① 베틀방 뒷문 → 무명 무덤가 (스토리 10-26; 남쪽 들판이 생기면 spawn 'loom_back')
+     'boss': dict(old['boss'], x=60.5, y=21.5, exitMsg='동쪽 뒷문이 열렸다 — 뒷문은 무명 무덤가로, 빛의 문은 펠트로 이어진다'),
      'arena': {'cx': CX, 'cy': CY, 'rx': RX, 'ry': RY},
      'objects': [],
      'hd': {'D': 1, 'ground': 'assets/world/arachne/arachne_boss_ground.webp', 'props': props,
