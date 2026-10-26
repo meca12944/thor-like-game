@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode unshaded, cull_front;
 // 굵은 외곽선(뒤집은 껍질, 화면 픽셀 두께)
-uniform float width_px = 1.0;
+uniform float width_px = 1.8;
 void vertex() {
 	vec4 clip = PROJECTION_MATRIX * (MODELVIEW_MATRIX * vec4(VERTEX, 1.0));
 	vec3 n = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);

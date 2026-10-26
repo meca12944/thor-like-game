@@ -2,7 +2,7 @@ extends Node3D
 # 필멸자 2.5D 시험 (Godot 4.3, gl_compatibility): 그록 그림 바닥(2D 그대로) + 3D 인형 주인공.
 # 1 단위 = 지도 1칸(16px). 카메라 45도 아래로 → 바닥 세로를 KZ배로 늘려 2D 그림 비율을 그대로 보이게 함.
 
-const PITCH := 35.0
+const PITCH := 30.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
 const SECS := 33.0
@@ -27,7 +27,7 @@ var phase := 0            # 공격: 0 준비, 1 휘두름, 2 멈춤, 3 회복
 var hold_t := 0.0
 var shake := 0.0
 var skel: Skeleton3D
-const CHIBI := {"Head": 1.45, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
+const CHIBI := {"Head": 1.3, "LeftUpLeg": 0.86, "RightUpLeg": 0.86, "Spine01": 0.95, "LeftArm": 0.95, "RightArm": 0.95, "LeftFoot": 1.25, "RightFoot": 1.25}   # 미니 귀여운 비율(뼈 크기, 크레딧 0)
 var step_acc := 0.0
 const STEP := 1.0 / 12.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
@@ -155,7 +155,9 @@ func _ready() -> void:
 			var om = mi.get_active_material(si)
 			var sm := ShaderMaterial.new()
 			sm.shader = toon
-			if om is BaseMaterial3D and om.albedo_texture:
+			if FileAccess.file_exists("res://art/base4k.png"):
+				sm.set_shader_parameter("albedo_tex", tex("base4k"))
+			elif om is BaseMaterial3D and om.albedo_texture:
 				sm.set_shader_parameter("albedo_tex", om.albedo_texture)
 			var ol := ShaderMaterial.new()
 			ol.shader = outl
@@ -285,18 +287,18 @@ func _ready() -> void:
 	var f := FontFile.new()
 	f.load_dynamic_font("res://art/NanumGothic.ttf")
 	label.add_theme_font_override("font", f)
-	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_font_size_override("font_size", 26)
 	label.add_theme_color_override("font_outline_color", Color.BLACK)
 	label.add_theme_constant_override("outline_size", 4)
-	label.position = Vector2(10, 6)
+	label.position = Vector2(24, 18)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "시험 6 · 옛 주인공 비율(약 4.5등신·큰 머리·큰 장화·넓은 몸) · 가슴 빛 뺌 · 카메라 35도(얼굴 보이게)"
+	sub.text = "시험 7 · 그록 작은그림 v3 → Meshy 새 인형(해진 망토) · 옛 주인공 비율 · 옛 동작 전부 · 도트 없이, 동작 1초 12장"
 	sub.add_theme_font_override("font", f)
-	sub.add_theme_font_size_override("font_size", 10)
+	sub.add_theme_font_size_override("font_size", 18)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
 	sub.add_theme_constant_override("outline_size", 3)
-	sub.position = Vector2(10, 342)
+	sub.position = Vector2(24, 680)
 	ui.add_child(sub)
 
 func load_glb(f: String) -> Node3D:
@@ -368,6 +370,9 @@ func _process(dt: float) -> void:
 			var bi := skel.find_bone(bn)
 			if bi >= 0:
 				skel.set_bone_pose_scale(bi, Vector3.ONE * CHIBI[bn])
+		var hb := skel.find_bone("Head")
+		if hb >= 0:
+			skel.set_bone_pose_rotation(hb, skel.get_bone_pose_rotation(hb).slerp(skel.get_bone_rest(hb).basis.get_rotation_quaternion(), 0.85))
 	update_trail(dt, is_slash and (phase == 1 or phase == 2))
 	shake = max(0.0, shake - dt)
 	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6

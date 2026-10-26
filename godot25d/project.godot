@@ -5,8 +5,8 @@ config/name="pilmyeolja_25d_test"
 run/main_scene="res://main.tscn"
 
 [display]
-window/size/viewport_width=640
-window/size/viewport_height=360
+window/size/viewport_width=1280
+window/size/viewport_height=720
 
 [rendering]
 renderer/rendering_method="gl_compatibility"
