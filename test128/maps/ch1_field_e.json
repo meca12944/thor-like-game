@@ -466,220 +466,227 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 30,
    "y": 31,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 31,
    "y": 32,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_needle_marksman",
    "x": 28,
    "y": 28,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 60,
    "y": 20,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 58,
    "y": 19,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_needle_marksman",
    "x": 60,
    "y": 18,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 175,
    "y": 25,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 69,
    "y": 79,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 67,
    "y": 79,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 121,
    "y": 132,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 119,
    "y": 128,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 150,
    "y": 116,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 153,
    "y": 116,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 30,
    "y": 152,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 65,
    "y": 154,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 63,
    "y": 154,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 35,
    "y": 209,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 31,
    "y": 207,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 55,
    "y": 196,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 118,
    "y": 196,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 118,
    "y": 196,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 171,
    "y": 215,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 174,
    "y": 218,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_needle_marksman",
    "x": 177,
    "y": 214,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 14,
    "y": 244,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 79,
    "y": 144,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 82,
    "y": 139,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_needle_marksman",
    "x": 82,
    "y": 144,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 73,
    "y": 70,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 132,
    "y": 33,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 177,
    "y": 81,
    "respawn": 30
+  },
+  {
+   "type": "spawn",
+   "mob": "c1_iron_warden",
+   "x": 120,
+   "y": 20,
+   "respawn": 60
   },
   {
    "type": "scenefx",

@@ -265,7 +265,7 @@ objs.append({'type': 'sign', 'x': 186, 'y': 130, 'text': '돌무더기로 막힌
 objs.append({'type': 'hint', 'id': 'ce_h_palm', 'x': 31, 'y': 121, 'r': 3, 'text': '거인의 손바닥 위로 올라갈 수 있다'})
 
 # 몹 무리: 설계도 자리 → 지금 1장 몹 4종을 돌려 씀
-MOBS = ['c1_silmamul', 'c1_thread_puppet', 'c1_needle_spider', 'c1_unrotting_hound']
+MOBS = ['c1_thread_scarecrow', 'c1_shear_tailor', 'c1_spool_spider', 'c1_quilted_boar']
 M = json.load(open(os.path.join(REPO, 'docs_maps/ch1/ch1_map.json')))
 gi = 0
 for mk in M['markers']:
@@ -278,7 +278,12 @@ for mk in M['markers']:
             if 0 < sx < W and 14 < sy < 246 and grid[int(sy)][int(sx)] == '.': break
         else: continue
         objs.append({'type': 'spawn', 'mob': MOBS[(gi + k) % 4], 'x': round(sx), 'y': round(sy), 'respawn': 30})
+    if n == 3:   # 큰 무리: 맨 뒤 1마리 = 바늘 사수 (그록 03, 4번방 10-26 「설계도 자리」)
+        last = [o for o in objs if o['type'] == 'spawn' and abs(o['x'] - x) <= 4 and abs(o['y'] - y) <= 4]
+        if last: last[-1]['mob'] = 'c1_needle_marksman'
     gi += 1
+for mk in M['markers']:   # 들판 챔피언 자리 = 철장 간수 (그록 04, 들판 정예 후보)
+    if mk['zone'] == 'field_e' and mk['type'] == 'elite': ex, ey = L(mk['x'], mk['y']); objs.append({'type': 'spawn', 'mob': 'c1_iron_warden', 'x': ex, 'y': ey, 'respawn': 60})
 
 prol = json.load(open(os.path.join(T128, 'maps/prologue_grave.json')))
 bd = dict(prol['hd']['backdrop']); bd['x'] = 60; bd['clipY'] = 12.6; bd.pop('front', None)   # 앞 띠(펠트 마을 지붕)는 빼기: 여긴 펠트 북쪽

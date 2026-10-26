@@ -241,35 +241,35 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 31,
    "y": 11,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 34,
    "y": 22,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 31,
    "y": 21,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 33,
    "y": 12,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 30,
    "y": 13,
    "respawn": 30
