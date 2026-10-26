@@ -35,18 +35,20 @@ F.big.append((PX, PY, 75, 70))
 
 # ---- 무너진 수도교 (동서, 상판 위 y 108) ----
 AQ = f'{G1}/04_aqueduct'; TOP = 108
-def aq(name, x, k):
-    p, im = F.img(f'{AQ}/04_aqueduct_{name}_full_ref.png', 'aqueduct_' + name)
-    h = im.height / TS; F.prop(f'aq_{k}', p, x, TOP + h, ax=0, ay=im.height, shadow=0)
+AQC = Image.new('RGBA', (W * TS, 240))       # 조각을 한 장으로 이어 붙임 (팀장 10-26 「아치 밑 밝은 네모」: 조각마다 따로 반투명이 걸려 경계가 보였음)
+def aq(name, x):
+    im = Image.open(f'{AQ}/04_aqueduct_{name}_full_ref.png').convert('RGBA'); h = im.height / TS
+    AQC.alpha_composite(im, (round(x * TS), 0)) if x >= 0 else None
     F.alpha_mask(im, int(x), TOP, 'X', thr=.55, keep=lambda tx, ty: ty < int(h) - 2)   # 기둥 밑동 2줄만 막힘 (아치 밑은 지나감)
     return im.width / TS
 x = 0
-for k in range(4): x += aq('repeat', x, k)
-x += aq('end_L', x, 4)                       # 서쪽 토막의 무너진 끝
+for k in range(4): x += aq('repeat', x)
+x += aq('end_L', x)                          # 서쪽 토막의 무너진 끝
 GAP0 = x; x += 2                             # 틈 2칸 (팀장 10-25) — 잿가루 폭포가 떨어지는 자리
-GAP1 = x; x += aq('end_R', x, 5)
-k = 6
-while x < W: x += aq('repeat', x, k); k += 1
+GAP1 = x; x += aq('end_R', x)
+while x < W: x += aq('repeat', x)
+AQC = AQC.crop((0, 0, W * TS, AQC.getbbox()[3])); _p = f'{F.OUT}/aqueduct.webp'; AQC.save(os.path.join(T128, _p), 'WEBP', quality=88, method=6)
+F.prop('aqueduct', _p, 0, TOP + AQC.height / TS, ax=0, ay=AQC.height, shadow=0)
 F.big.append((0, TOP, W, 14))
 
 # ---- 붉은 실의 첨탑 = 폐공방 (설계도 폐공방 정문 160,90 쪽 → 들판 북서쪽) ----
@@ -85,7 +87,7 @@ O.append({'type': 'exit', 'x': W - 1, 'y': 150, 'w': 1, 'h': 21, 'to': 'ch1_fiel
 O.append({'type': 'waystone', 'id': 'ws_ash_falls', 'x': 124, 'y': 134, 'name': '잿가루 폭포 아래 모닥불', 'art': 'camp'})
 O.append({'type': 'waystone', 'id': 'ws_mound_camp', 'x': 168, 'y': 90, 'name': '잿더미 쉼터 모닥불', 'art': 'camp'})
 O.append({'type': 'vista', 'id': 'cc_aqueduct', 'x': 128, 'y': 140, 'r': 3.5, 'zoom': 0.42, 'dir': 270, 'pan': 18, 'hold': 1, 'name': '무너진 수도교', 'sub': '물 대신 재가 흐르는 다리'})
-O.append({'type': 'vista', 'id': 'cc_spire', 'x': 46, 'y': 82, 'r': 3.5, 'zoom': 0.4, 'dir': 270, 'pan': 16, 'hold': 1, 'name': '붉은 실의 첨탑', 'sub': '폐공방 지붕에서 하늘로 묶인 실'})
+O.append({'type': 'vista', 'id': 'cc_spire', 'x': 46, 'y': 82, 'r': 3.5, 'zoom': 0.24, 'dir': 270, 'pan': 38, 'hold': 1, 'name': '붉은 실의 첨탑', 'sub': '폐공방 지붕에서 하늘로 묶인 실'})
 O.append({'type': 'vista', 'id': 'cc_pit', 'x': 88, 'y': 104, 'r': 3, 'zoom': 0.45, 'dir': 180, 'pan': 22, 'hold': 1, 'name': '꺼진 지반', 'sub': '땅 밑으로 가라앉은 옛 거리'})
 O.append({'type': 'clue', 'id': 'cc_remains', 'x': 200, 'y': 150, 'name': '쓰러진 탈영병', 'flag': 'cc_look_remains', 'loot': [['k_void_drop', 1]],
           'text': '빈 망토와 가죽 팔토시. 성벽 쪽으로 손을 뻗은 채 굳어 있다.\n손끝 아래 바닥에 검붉은 방울 하나가 굳지 않고 떨린다. …주워 들었다.', 'textDone': '성벽 쪽으로 손을 뻗은 빈 망토.'})

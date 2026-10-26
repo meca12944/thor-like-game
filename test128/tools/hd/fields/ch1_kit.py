@@ -148,13 +148,14 @@ class Field:
             for cx in range(0, self.W - 10, cw):
                 if any(bx - 6 < cx + cw / 2 < bx + bw + 6 and by - 4 < cy + ch / 2 < by + bh + 4 for bx, by, bw, bh in self.big): continue
                 kind = rnd.random(); x, y = cx + rnd.uniform(6, cw - 6), cy + rnd.uniform(4, ch - 4)
-                if kind < .32: self.chars_near(x, y, 'T', rnd.randint(4, 7), 6); self.chars_near(x, y, 's', 2, 7)
-                elif kind < .62:
+                if kind < .25: self.chars_near(x, y, 'T', rnd.randint(4, 7), 6); self.chars_near(x, y, 's', 2, 7)
+                elif kind < .7:                               # 그록 작은 경관 (팀장 10-26 「잘 안 보임」 → 비율 올리고 자리 3번까지 찾음)
                     nm = rnd.choice(list(SMALLS)); w0, h0 = SMALLS[nm][2:]
-                    x0, y0_ = min(self.W - w0 - 2, max(2, x - w0 / 2)), min(y1 - h0, max(y0, y - h0 / 2))
-                    if all(self.free(x0 + i * w0 / 3, y0_ + j * h0 / 2, 1) for i in range(4) for j in range(3)): self.small(nm, round(x0), round(y0_), fl=rnd.random() < .5)
+                    for _t in range(4):
+                        x0, y0_ = min(self.W - w0 - 2, max(2, cx + rnd.uniform(0, cw) - w0 / 2)), min(y1 - h0, max(y0, cy + rnd.uniform(0, ch) - h0 / 2))
+                        if all(self.free(x0 + i * w0 / 3, y0_ + j * h0 / 2, 0) for i in range(4) for j in range(3)): self.small(nm, round(x0), round(y0_), fl=rnd.random() < .5); break
                     else: self.chars_near(x, y, 'T', 4, 6)
-                elif kind < .82:
+                elif kind < .87:
                     rp, ri = self.rocks()[rnd.randrange(2)]
                     if self.free(x, y - 1, 2): self.prop(f'rock_c{len(self.props)}', rp, x, y); self.rect(int(x - 2), int(y - 1), int(x + 2), int(y), 'X')
                     self.chars_near(x, y, 'R', rnd.randint(3, 5), 6)
