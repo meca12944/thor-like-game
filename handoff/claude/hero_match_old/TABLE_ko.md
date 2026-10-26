@@ -128,3 +128,8 @@
 | 디딤 먼지 | 원래 값(걸음 1/4마다) 그대로 |
 - 영상 `run_exag_1x.mp4` / `_03x.mp4` (왼쪽 옛 · 오른쪽 지금): 달리기 →←↓↑, 대각 ↘↗ 달리기·↖ 걷기, 출발·멈춤, 180°·90° 꺾기.
 - hero_check(4방향) 빨간 칸 14(그림 모자람 10 + 옛 맞춤 예외 4), test_openworld 18/18, 연습장 다시 뽑음.
+
+## K. 옛 주인공 시트 지움 (팀장 10-26 「인게임 = 최신만」)
+- `resheet.py`: sheets 24개 → **2개 [0 새 그록 주인공, 1 시전 마법진 castfx]** (+ 실행 때 index.html CFIRE가 castfire를 2번으로 붙임). 동작·시전 층·grip 키(100개)·bare 번호 다시 매김, 준비 확인 H8img(0) = 새 시트. 옛 메모 키 정리, `_doc` 새로.
+- 지운 파일: `assets/anim/hero8_*.webp` 21개(castfx·castfire 빼고), `hero8.json`(아무도 안 읽음), `assets/anim/ns/` 칼 없는 옛 사본 8개.
+- 확인: 게임 열 때 404·오류 0(sheets = 새 주인공·castfx·castfire), hero_check 14(같음), test_openworld 18/18, 연습장 다시 뽑음.
