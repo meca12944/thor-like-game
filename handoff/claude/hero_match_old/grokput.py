@@ -40,7 +40,7 @@ PAR={'01_hit_down':(1.25,1.12),'02_hit_right':(1.18,1.0),'06_dash_ur':(1.35,1.15
 c01=addcell(make('01_hit_down',*PAR['01_hit_down']));c02=addcell(make('02_hit_right',*PAR['02_hit_right']));c06=addcell(make('06_dash_ur',*PAR['06_dash_ur']))
 log={}
 for n,c in [('hurt_down',c01),('hurt_right',c02)]:
-    L=H['anims'][n];cur=L[0][1];H['anims'][n]=[[base,cur,2],[base,c,8],[base,cur,10]];log[n]=H['anims'][n]
+    L=H['anims'][n];cur=L[0][1];H['anims'][n]=[[base,cur,3],[base,c,7],[base,cur,10]];log[n]=H['anims'][n]
 L=H['anims']['dash_up'];L[2][1]=c06;log['dash_up']=L
 H['_grok81_note']='10-26 그록 일러스트 01·02·06(81f8303f): 머리·가로 배율 %s(원본에서)·0.143배·우리 64색, 맞기 ↓→ [지금 2 · 그록 8 · 지금 10], 대시 ↗ 가운데 장'%PAR
 S.save(SP,lossless=True);save(R,s,j,k,H);print(json.dumps(log))
