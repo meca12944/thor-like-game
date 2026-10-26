@@ -5,7 +5,7 @@ extends Node3D
 const PITCH := 45.0
 var KZ := 1.0 / sin(deg_to_rad(PITCH))
 const HERO_SCREEN_H := 42.0 / 16.0           # 화면 키 42px = 2.625칸
-const SECS := 28.0
+const SECS := 29.0
 
 var hero: Node3D
 var model: Node3D
@@ -18,6 +18,16 @@ var pos := Vector3(62, 0, 121)
 var face := 0.0
 var lean := 0.0
 var cur_anim := ""
+var tip: Node3D
+var base: Node3D
+var trail_mesh := ImmediateMesh.new()
+var trail := []           # [base, tip, age]
+var last_tip := Vector3.ZERO
+var phase := 0            # 공격: 0 준비, 1 휘두름, 2 멈춤, 3 회복
+var hold_t := 0.0
+var shake := 0.0
+var step_acc := 0.0
+const STEP := 1.0 / 12.0   # 2D 느낌: 그림을 1초에 12장만 바꿈
 
 # (이름, 방향, 초, 빠르기 칸/초) — 빠르기 0 = 서기
 var plan := [
@@ -31,9 +41,9 @@ var plan := [
 	["달리기 ← (180° 꺾기)", Vector2(-1, 0), 1.8, 7.5, ""],
 	["달리기 ↓", Vector2(0, 1), 1.0, 7.5, ""],
 	["멈춤", Vector2(1, 0), 0.8, 0.0, ""],
-	["베기 1타", Vector2(1, 0), 1.1, 0.0, "Left_Slash"],
-	["베기 2타", Vector2(1, 0), 1.1, 0.0, "Right_Hand_Sword_Slash"],
-	["베기 3타 (모아 베기)", Vector2(1, 0), 2.2, 0.0, "Charged_Slash"],
+	["베기 1타", Vector2(1, 0), 2.3, 0.0, "Left_Slash"],
+	["베기 2타", Vector2(1, 0), 1.3, 0.0, "Right_Hand_Sword_Slash"],
+	["베기 3타 (모아 베기)", Vector2(1, 0), 1.9, 0.0, "Charged_Slash"],
 	["회피대시 (구르기)", Vector2(1, 0), 1.4, 0.0, "Roll_Dodge"],
 	["회피대시 (선 채로 피하기)", Vector2(-1, 0), 1.2, 0.0, "Stand_Dodge"],
 	["맞기", Vector2(0, 1), 1.4, 0.0, "Hit_Reaction"],
@@ -70,14 +80,14 @@ func _ready() -> void:
 	e.background_color = Color(0.2, 0.2, 0.2)
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.70, 0.70, 0.74)
-	e.ambient_light_energy = 0.55
+	e.ambient_light_energy = 0.45
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment = e
 	add_child(env)
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55, -35, 0)
-	sun.light_energy = 0.85
+	sun.light_energy = 1.0
 	sun.light_color = Color(1.0, 0.93, 0.85)
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 80.0
@@ -115,6 +125,7 @@ func _ready() -> void:
 	var sc := HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8
 	model.scale = Vector3(sc, sc, sc)
 	anim = model.find_child("AnimationPlayer", true, false)
+	anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	var lib: AnimationLibrary = anim.get_animation_library("")
 	for extra in [["walking.glb", "Walk"], ["running.glb", "Run"]]:
 		var m2 := load_glb(extra[0])
@@ -127,23 +138,89 @@ func _ready() -> void:
 	for n in ["Left_Slash", "Right_Hand_Sword_Slash", "Charged_Slash", "Roll_Dodge", "Stand_Dodge", "Hit_Reaction"]:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_NONE
+	# 3) 만화풍 빛 + 외곽선 + 테두리 빛
+	var toon := load("res://toon.gdshader")
+	var outl := load("res://outline.gdshader")
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		for si in mi.mesh.get_surface_count():
+			var om = mi.get_active_material(si)
+			var sm := ShaderMaterial.new()
+			sm.shader = toon
+			if om is BaseMaterial3D and om.albedo_texture:
+				sm.set_shader_parameter("albedo_tex", om.albedo_texture)
+			var ol := ShaderMaterial.new()
+			ol.shader = outl
+			sm.next_pass = ol
+			mi.set_surface_override_material(si, sm)
 	# 칼 (손에 붙임)
 	var skel: Skeleton3D = model.find_child("Skeleton3D", true, false)
 	if skel:
 		var ba := BoneAttachment3D.new()
 		ba.bone_name = "RightHand"
 		skel.add_child(ba)
-		var blade := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(3.0, 1.2, 95.0)
-		blade.mesh = bm
+		var blade_root := Node3D.new()
+		blade_root.position = Vector3(0, 9.0, 0)
+		ba.add_child(blade_root)
 		var bmat := StandardMaterial3D.new()
-		bmat.albedo_color = Color(0.78, 0.82, 0.86)
-		bmat.metallic = 0.8
-		bmat.roughness = 0.3
-		blade.material_override = bmat
-		blade.position = Vector3(0, 9.0, 47.0)
-		ba.add_child(blade)
+		bmat.albedo_color = Color(0.86, 0.9, 0.95)
+		bmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		bmat.emission_enabled = true
+		bmat.emission = Color(0.45, 0.85, 1.0)
+		bmat.emission_energy_multiplier = 0.35
+		for part in [[Vector3(3.2, 1.2, 105.0), Vector3(0, 0, 58.0), bmat], [Vector3(20.0, 3.0, 3.0), Vector3(0, 0, 6.0), null], [Vector3(3.0, 3.0, 14.0), Vector3(0, 0, -4.0), null]]:
+			var mi2 := MeshInstance3D.new()
+			var bx := BoxMesh.new()
+			bx.size = part[0]
+			mi2.mesh = bx
+			if part[2]:
+				mi2.material_override = part[2]
+			else:
+				var gm := StandardMaterial3D.new()
+				gm.albedo_color = Color(0.55, 0.38, 0.18)
+				mi2.material_override = gm
+			mi2.position = part[1]
+			blade_root.add_child(mi2)
+		base = Node3D.new()
+		base.position = Vector3(0, 0, 14.0)
+		blade_root.add_child(base)
+		tip = Node3D.new()
+		tip.position = Vector3(0, 0, 110.0)
+		blade_root.add_child(tip)
+		# 2) 가슴 코어 푸른빛
+		var cb := BoneAttachment3D.new()
+		cb.bone_name = "Spine02"
+		skel.add_child(cb)
+		var gimg := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		for yy in 64:
+			for xx in 64:
+				var rr := Vector2(xx - 31.5, yy - 31.5).length() / 32.0
+				gimg.set_pixel(xx, yy, Color(0.5, 0.9, 1.0, pow(clamp(1.0 - rr, 0.0, 1.0), 2.0)))
+		var core := MeshInstance3D.new()
+		var cq := QuadMesh.new()
+		cq.size = Vector2(26, 26)
+		core.mesh = cq
+		var cm := StandardMaterial3D.new()
+		cm.albedo_texture = ImageTexture.create_from_image(gimg)
+		cm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		cm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		cm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		cm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		cm.billboard_keep_scale = true
+		core.material_override = cm
+		core.position = Vector3(0, 6, 14)
+		cb.add_child(core)
+
+	# 4) 청록 궤적
+	var tr := MeshInstance3D.new()
+	tr.mesh = trail_mesh
+	var tm := StandardMaterial3D.new()
+	tm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	tm.vertex_color_use_as_albedo = true
+	tm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	tm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	tm.cull_mode = BaseMaterial3D.CULL_DISABLED
+	tr.material_override = tm
+	add_child(tr)
 
 	# 발밑 그림자 (둥근 반투명)
 	var gi := Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -189,7 +266,7 @@ func _ready() -> void:
 
 	cam = Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 17.0
+	cam.size = 11.0
 	cam.rotation_degrees = Vector3(-PITCH, 0, 0)
 	add_child(cam)
 	cam.current = true
@@ -200,18 +277,18 @@ func _ready() -> void:
 	var f := FontFile.new()
 	f.load_dynamic_font("res://art/NanumGothic.ttf")
 	label.add_theme_font_override("font", f)
-	label.add_theme_font_size_override("font_size", 26)
+	label.add_theme_font_size_override("font_size", 14)
 	label.add_theme_color_override("font_outline_color", Color.BLACK)
-	label.add_theme_constant_override("outline_size", 8)
-	label.position = Vector2(24, 18)
+	label.add_theme_constant_override("outline_size", 4)
+	label.position = Vector2(10, 6)
 	ui.add_child(label)
 	var sub := Label.new()
-	sub.text = "고도 2.5D 시험 · 배경 = 그록 그림 그대로 · 주인공 = 그록 설정화 → Meshy 3D 인형"
+	sub.text = "시험 4 · 3D인데 2D 느낌: 화면을 도트(640×360)로 그리고 · 동작은 1초 12장으로 끊어서"
 	sub.add_theme_font_override("font", f)
-	sub.add_theme_font_size_override("font_size", 18)
+	sub.add_theme_font_size_override("font_size", 10)
 	sub.add_theme_color_override("font_outline_color", Color.BLACK)
-	sub.add_theme_constant_override("outline_size", 6)
-	sub.position = Vector2(24, 680)
+	sub.add_theme_constant_override("outline_size", 3)
+	sub.position = Vector2(10, 342)
 	ui.add_child(sub)
 
 func load_glb(f: String) -> Node3D:
@@ -222,9 +299,11 @@ func load_glb(f: String) -> Node3D:
 
 func play(n: String, spd: float) -> void:
 	if cur_anim != n:
-		anim.play(n, 0.18)
+		anim.play(n, 0.12)
 		cur_anim = n
-	anim.speed_scale = spd
+		model.scale = Vector3.ONE * base_sc()
+	if n.find("Slash") < 0:
+		anim.speed_scale = spd
 
 func _process(dt: float) -> void:
 	t += dt
@@ -256,8 +335,13 @@ func _process(dt: float) -> void:
 	hero.position = pos
 	model.rotation.y = face
 	var target_lean := 0.0
+	var is_slash := act.find("Slash") >= 0
 	if act != "":
+		if cur_anim != act:
+			phase = 0
 		play(act, 1.0)
+		if is_slash:
+			punch(dt)
 	elif spd > 5.0:
 		play("Run", spd / 6.0)
 		target_lean = 0.0
@@ -268,4 +352,63 @@ func _process(dt: float) -> void:
 	lean = lerp(lean, target_lean, clamp(dt * 8.0, 0.0, 1.0))
 	dust.emitting = spd > 5.0
 	dust.position = Vector3(0, 0.1, 0)
-	cam.position = pos + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0
+	step_acc += dt
+	if step_acc >= STEP:
+		anim.advance(step_acc)
+		step_acc = 0.0
+	update_trail(dt, is_slash and (phase == 1 or phase == 2))
+	shake = max(0.0, shake - dt)
+	var sk := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)) * shake * 0.6
+	cam.position = pos + sk + Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH))) * 60.0
+
+# 5) 동작에 힘: 준비는 느리게, 휘두름은 빠르게, 휘두른 뒤 잠깐 멈춤(+화면 흔들림), 회복
+func punch(dt: float) -> void:
+	if not tip:
+		return
+	var tp := tip.global_position
+	var v: float = (tp - last_tip).length() / max(dt, 1e-4) / max(anim.speed_scale, 0.05)
+	last_tip = tp
+	match phase:
+		0:
+			anim.speed_scale = 0.8
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(1.03, 0.96, 1.03), 0.2)
+			if v > 9.0:
+				phase = 1
+		1:
+			anim.speed_scale = 2.1
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc() * Vector3(0.97, 1.05, 0.97), 0.4)
+			if v < 5.0:
+				phase = 2
+				hold_t = 0.09
+				shake = 0.12
+		2:
+			anim.speed_scale = 0.04
+			hold_t -= dt
+			if hold_t <= 0.0:
+				phase = 3
+		3:
+			anim.speed_scale = 1.35
+			model.scale = model.scale.lerp(Vector3.ONE * base_sc(), 0.2)
+
+func base_sc() -> float:
+	return HERO_SCREEN_H / cos(deg_to_rad(PITCH)) / 1.8
+
+func update_trail(dt: float, on: bool) -> void:
+	if on and tip:
+		trail.push_front([base.global_position, tip.global_position, 0.0])
+	for e in trail:
+		e[2] += dt
+	while trail.size() > 0 and trail[trail.size() - 1][2] > 0.16:
+		trail.pop_back()
+	trail_mesh.clear_surfaces()
+	if trail.size() < 2:
+		return
+	trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+	for i in trail.size():
+		var e = trail[i]
+		var a: float = clamp(1.0 - e[2] / 0.16, 0.0, 1.0) * (1.0 - float(i) / trail.size())
+		trail_mesh.surface_set_color(Color(0.78, 0.96, 1.0, 0.1 * a))
+		trail_mesh.surface_add_vertex(e[0])
+		trail_mesh.surface_set_color(Color(0.78, 0.96, 1.0, 0.95 * a))
+		trail_mesh.surface_add_vertex(e[1])
+	trail_mesh.surface_end()
