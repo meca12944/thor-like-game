@@ -11,6 +11,11 @@
 
 > **표정은 하나 — 모든 캐릭터 (사장님 10-27 「주인공 얼굴 표정 변화 없이 하나로 간다. 여러 가지 표정이 변하니까 힘든데 하나로 가면 되잖아. 모든 캐릭 표정은 하나로 간다」)**: 주인공·동료·NPC·몹·보스 모두 **얼굴 1개**. 공격·맞기·쓰러짐·기술에도 표정을 바꾸지 않는다(힘줌·아픔·깜빡임·웃음 그림 만들지 않음). 동작마다 얼굴이 달라지면 기준 얼굴(걷기 첫 장)을 **도장으로 찍어** 같게 한다(`handoff/claude/team/face_stamp_v3/stamp3.py`, 고개가 크게 돈 장만 빼고). 감정은 얼굴 대신 몸짓·효과·대사로.
 
+> **도트 얼굴을 배율 맞춰 넣기가 힘든 까닭과 해결 (팀장 조사 10-27, 사장님 「왜 이렇게 힘든지 검색, 해결 방안도」)**
+> - 까닭: ① 도트는 칸 하나하나가 그린 사람이 고른 색 — 0.9배·1.1배처럼 정수가 아닌 배율이면 칸이 고르지 않게 늘거나 빠지고, 부드럽게 줄이면 없던 색이 섞여 흐려짐(1칸 눈이 사라짐). ② 우리 장은 AI가 장마다 따로 그려 **얼굴 크기·위치가 장마다 다름**(정면 공격 얼굴 11~16% 큼) → 같은 도장을 넣으려면 배율을 바꿔야 하고 ①이 생김. ③ 고개가 기울면 돌려야 하는데 도트 돌리기(RotSprite)도 칸이 모자라 모양이 깨짐(90도 배수만 안전). ④ 장마다 살색이 달라 붙인 자리가 티 남. ⑤ 얼굴이 6~14칸이라 1칸 차이가 표정을 바꿈.
+> - 해결(효과 큰 순): **(1) 머리 층 따로 + 장마다 자리표** — 몸 그림에서 머리를 빼고, 방향별 머리(얼굴 포함) 그림을 **게임 크기 그대로 한 번만** 그려 장마다 자리(dx, dy)만 표로 옮김 = Stardew 농부(7층, 자리표 126개)·Mana Seed 방식. 배율·돌리기가 아예 없음. 기울기는 미리 그린 「숙인 머리」 1장으로. (2) 지금 장에서는 **얼굴을 늘리거나 줄이지 않고** 같은 크기 도장을 찍고, 안 맞는 턱·머리카락 가장자리만 손으로 칸 고침. (3) 꼭 줄여야 하면 한 번만, 도트용 줄이기(K-Centroid·PixelOE)로 하고 눈은 손으로 다시 찍음 — 여러 번 줄이기 금지. (4) 살색은 정해진 색표(6색)로 묶어 장마다 같은 색. (5) 처음부터 같은 머리 크기의 한 그림에서 모든 동작을 출발(0부 규칙).
+> - 출처: 정수 배율 https://tanalin.com/en/articles/integer-scaling/ · 늘림 흐림 https://divoom.com/blogs/setup-ideas/scale-pixel-art-without-blur · 도트 돌리기 한계 https://community.aseprite.org/t/rotating-is-causing-distortion-to-the-sprite-solved/4380 · K-Centroid https://astropulse.gumroad.com/l/K-Centroid · PixelOE https://gitee.com/dkori/PixelOE · 내용 맞춤 줄이기 논문 https://johanneskopf.de/publications/downscaling/paper/downscaling.pdf · Stardew 층·자리표 https://blakecrosley.com/blog/pixel-art-characters-on-iphone · SpriteBat 층 합치기 https://fatbatstudio.itch.io/spritebat
+
 > **4방향만 (사장님 10-26 「앞으로 대각선은 뺀다」, 10-27 「2d 주인공 대각선 방향 전부 없애」)**: 그림은 아래·위·옆(왼쪽 = 옆 뒤집기)만 그린다. 바라보기·공격·회피대시도 4방향(`hero.f8 = hero.face`, 대각 겨냥 끔). 움직임만 8방향. 이 교과서의 대각선 그림 설명(부록 A·0부 4·5)은 옛 기록 — 새로 그리지 않는다. (main #197)
 
 # 0부. 캐릭터 만들기 교본 — 처음부터 끝까지 순서대로
