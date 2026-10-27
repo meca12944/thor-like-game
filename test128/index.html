@@ -1015,10 +1015,10 @@ const DIRV={down:[0,1],up:[0,-1],right:[1,0],left:[-1,0]};
 // test128 hero8: 8-direction facing (hero.f8) kept next to the 4-way hero.face (all old code keeps using face). Attacks / dash use face8V().
 const R2=Math.SQRT1_2,DIRV8={right:[1,0],downright:[R2,R2],down:[0,1],downleft:[-R2,R2],left:[-1,0],upleft:[-R2,-R2],up:[0,-1],upright:[R2,-R2]};
 function dir8(dx,dy){const a=Math.atan2(dy,dx),k=((Math.round(a/(Math.PI/4))%8)+8)%8;return ['right','downright','down','downleft','left','upleft','up','upright'][k];}
-function setFace(dx,dy){if(!dx&&!dy)return;if(Math.abs(dx)>Math.abs(dy)*0.9){hero.face=dx>0?'right':'left';hero.hz=hero.face;}else hero.face=dy>0?'down':'up';hero.f8=dir8(dx,dy);}
+function setFace(dx,dy){if(!dx&&!dy)return;if(Math.abs(dx)>Math.abs(dy)*0.9){hero.face=dx>0?'right':'left';hero.hz=hero.face;}else hero.face=dy>0?'down':'up';hero.f8=hero.face;} // 사장님 10-27 「대각선 방향 전부 없애」: 바라보기·공격·회피대시 = 4방향만 (움직임은 8방향 그대로)
 function face8(){const f=hero.f8;return f&&f.includes(hero.face)?f:hero.face;} // f8 only while it agrees with face (other code may set face directly)
 function face8V(){return H8?DIRV8[face8()]:DIRV[hero.face];}
-function atkVert(){return !!(H8&&H8.diag)&&(face8()==='down'||face8()==='up');}
+function atkVert(){return false;} // 4방향만 (10-27): 위·아래 공격도 곧게, 대각 겨냥 없음
 function atkV(){if(!atkVert())return face8V();const f=face8(),hl=hero.hz==='left';return [hl?-R2:R2,f==='down'?R2:-R2];} // diagonal art: straight up/down attacks aim along the drawn ↘↗ (↙↖) swing
 const hero={x:456,y:438,vx:0,vy:0,face:'right',f8:'right',hz:'right',walkT:0,moving:false,hp:50,maxHp:50,inv:0,kx:0,ky:0,
  atk:null,combo:0,chainT:0,buffered:false,cool:0,sk:null,swim:null,ghost:false,hidden:false};

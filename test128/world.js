@@ -1056,7 +1056,7 @@
   // 대각선 유지 (교과서 13-1, 4번방 G4): 대각선으로 걷다가 두 키 중 하나를 먼저 떼도 6틱 안에는 대각선 얼굴 그대로 (둘 다 떼면 대각선으로 멈춤). 남은 키가 그 대각선의 키일 때만.
   function diagFace(ix, iy, dt) { const h = hero; if (ix && iy) { h.dg = { x: Math.sign(ix), y: Math.sign(iy), t: 0 }; setFace(ix, iy); return; }
     const G = h.dg; if (G && ((ix && !iy && Math.sign(ix) === G.x) || (iy && !ix && Math.sign(iy) === G.y)) && (G.t += dt) < 6 / 60 - 1e-6) return; h.dg = null; setFace(ix, iy); }
-  function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = DIR8[((Math.round(Math.atan2(iy, ix) / (Math.PI / 4)) % 8) + 8) % 8]; }
+  function setFace(ix, iy) { if (Math.abs(ix) > Math.abs(iy)) hero.face = ix > 0 ? 'right' : 'left'; else if (iy) hero.face = iy > 0 ? 'down' : 'up'; if (ix || iy) hero.f8 = hero.face; } // 4방향만 (사장님 10-27 「대각선 방향 전부 없애」)
   const DIR8 = ['right', 'downright', 'down', 'downleft', 'left', 'upleft', 'up', 'upright']; // test128 hero8: 8-way facing for the new hero frames (hitboxes stay 4-way FACEV)
   // ---- 몹 시험장 (owner 10-23 "플레이 한번 해보게 / 주소 만들고"): ?go=field01&arena=c1_thread_scarecrow,c1_quilted_boar*2[&tough=1][&ult=full]
   //   [&at=17,18 start tile] clears the map's own mobs, spawns the listed group around the hero and brings it back 1.5s after it is wiped. tough=1: the hero never dies. test128/lab.html = buttons.
