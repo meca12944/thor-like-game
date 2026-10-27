@@ -1,0 +1,405 @@
+{
+"idle_down_00.png": {
+"iou": 1.0,
+"ok": true
+},
+"walk_down_00.png": {
+"iou": 1.0,
+"ok": true
+},
+"walk_down_01.png": {
+"iou": 0.76,
+"ok": true
+},
+"walk_down_02.png": {
+"iou": 0.82,
+"ok": true
+},
+"walk_down_03.png": {
+"iou": 0.72,
+"ok": true
+},
+"walk_down_04.png": {
+"iou": 0.68,
+"ok": true
+},
+"walk_down_05.png": {
+"iou": 0.72,
+"ok": true
+},
+"walk_down_06.png": {
+"iou": 0.87,
+"ok": true
+},
+"walk_down_07.png": {
+"iou": 0.73,
+"ok": true
+},
+"run_down_00.png": {
+"iou": 0.82,
+"ok": true
+},
+"run_down_01.png": {
+"iou": 0.7,
+"ok": true
+},
+"run_down_02.png": {
+"iou": 0.7,
+"ok": true
+},
+"run_down_03.png": {
+"iou": 0.72,
+"ok": true
+},
+"run_down_04.png": {
+"iou": 0.74,
+"ok": true
+},
+"run_down_05.png": {
+"iou": 0.74,
+"ok": true
+},
+"run_down_06.png": {
+"iou": 0.79,
+"ok": true
+},
+"run_down_07.png": {
+"iou": 0.78,
+"ok": true
+},
+"dash_down_00.png": {
+"iou": 0.74,
+"ok": true
+},
+"dash_down_01.png": {
+"iou": 0.74,
+"ok": true
+},
+"dash_down_02.png": {
+"iou": 0.77,
+"ok": true
+},
+"dash_down_03.png": {
+"iou": 0.69,
+"ok": true
+},
+"dash_down_04.png": {
+"iou": 0.71,
+"ok": true
+},
+"dash_down_05.png": {
+"iou": 0.69,
+"ok": true
+},
+"jump_down_00.png": {
+"iou": 0.72,
+"ok": true
+},
+"jump_down_01.png": {
+"iou": 0.76,
+"ok": true
+},
+"jump_down_02.png": {
+"iou": 0.52,
+"ok": true
+},
+"jump_down_03.png": {
+"iou": 0.23,
+"ok": false
+},
+"jump_down_04.png": {
+"iou": 0.64,
+"ok": true
+},
+"jump_down_05.png": {
+"iou": 0.86,
+"ok": true
+},
+"jump_down_06.png": {
+"iou": 0.78,
+"ok": true
+},
+"hit1_down_00.png": {
+"iou": 0.73,
+"ok": true
+},
+"hit1_down_01.png": {
+"iou": 0.73,
+"ok": true
+},
+"hit1_down_02.png": {
+"iou": 0.73,
+"ok": true
+},
+"hit1_down_03.png": {
+"iou": 1.0,
+"ok": true
+},
+"hit2_down_00.png": {
+"iou": 0.72,
+"ok": true
+},
+"hit2_down_01.png": {
+"iou": 0.72,
+"ok": true
+},
+"hit2_down_02.png": {
+"iou": 0.72,
+"ok": true
+},
+"hit2_down_03.png": {
+"iou": 1.0,
+"ok": true
+},
+"hit3_down_00.png": {
+"iou": 0.71,
+"ok": true
+},
+"hit3_down_01.png": {
+"iou": 0.66,
+"ok": true
+},
+"hit3_down_02.png": {
+"iou": 0.73,
+"ok": true
+},
+"hit3_down_03.png": {
+"iou": 1.0,
+"ok": true
+},
+"idle_right_00.png": {
+"iou": 0.78,
+"ok": true
+},
+"walk_right_00.png": {
+"iou": 1.0,
+"ok": true
+},
+"walk_right_01.png": {
+"iou": 0.78,
+"ok": true
+},
+"walk_right_02.png": {
+"iou": 0.8,
+"ok": true
+},
+"walk_right_03.png": {
+"iou": 0.78,
+"ok": true
+},
+"walk_right_04.png": {
+"iou": 0.83,
+"ok": true
+},
+"walk_right_05.png": {
+"iou": 0.82,
+"ok": true
+},
+"walk_right_06.png": {
+"iou": 0.76,
+"ok": true
+},
+"walk_right_07.png": {
+"iou": 0.82,
+"ok": true
+},
+"run_right_00.png": {
+"iou": 0.85,
+"ok": true
+},
+"run_right_01.png": {
+"iou": 0.76,
+"ok": true
+},
+"run_right_02.png": {
+"iou": 0.87,
+"ok": true
+},
+"run_right_03.png": {
+"iou": 0.7,
+"ok": true
+},
+"run_right_04.png": {
+"iou": 0.78,
+"ok": true
+},
+"run_right_05.png": {
+"iou": 0.8,
+"ok": true
+},
+"run_right_06.png": {
+"iou": 0.78,
+"ok": true
+},
+"run_right_07.png": {
+"iou": 0.76,
+"ok": true
+},
+"dash_right_00.png": {
+"iou": 0.8,
+"ok": true
+},
+"dash_right_01.png": {
+"iou": 0.75,
+"ok": true
+},
+"dash_right_02.png": {
+"iou": 0.79,
+"ok": true
+},
+"dash_right_03.png": {
+"iou": 0.53,
+"ok": true
+},
+"dash_right_04.png": {
+"iou": 0.79,
+"ok": true
+},
+"dash_right_05.png": {
+"iou": 0.74,
+"ok": true
+},
+"hurt_right_00.png": {
+"iou": 0.58,
+"ok": true
+},
+"hurt_right_01.png": {
+"iou": 0.48,
+"ok": false
+},
+"hurt_right_02.png": {
+"iou": 0.58,
+"ok": true
+},
+"jump_right_00.png": {
+"iou": 0.76,
+"ok": true
+},
+"jump_right_01.png": {
+"iou": 0.85,
+"ok": true
+},
+"jump_right_02.png": {
+"iou": 0.76,
+"ok": true
+},
+"jump_right_03.png": {
+"iou": 0.82,
+"ok": true
+},
+"jump_right_04.png": {
+"iou": 0.8,
+"ok": true
+},
+"jump_right_05.png": {
+"iou": 0.77,
+"ok": true
+},
+"jump_right_06.png": {
+"iou": 0.73,
+"ok": true
+},
+"hit1_right_00.png": {
+"iou": 0.8,
+"ok": true
+},
+"hit1_right_01.png": {
+"iou": 0.8,
+"ok": true
+},
+"hit1_right_02.png": {
+"ok": false
+},
+"hit1_right_03.png": {
+"iou": 0.3,
+"ok": false
+},
+"hit1_right_04.png": {
+"iou": 0.78,
+"ok": true
+},
+"hit2_right_00.png": {
+"iou": 0.65,
+"ok": true
+},
+"hit2_right_01.png": {
+"iou": 0.67,
+"ok": true
+},
+"hit2_right_02.png": {
+"iou": 0.67,
+"ok": true
+},
+"hit2_right_03.png": {
+"iou": 0.78,
+"ok": true
+},
+"hit3_right_00.png": {
+"iou": 0.66,
+"ok": true
+},
+"hit3_right_01.png": {
+"iou": 0.72,
+"ok": true
+},
+"hit3_right_02.png": {
+"iou": 0.72,
+"ok": true
+},
+"hit3_right_03.png": {
+"iou": 0.78,
+"ok": true
+},
+"rec1_right_00.png": {
+"iou": 0.67,
+"ok": true
+},
+"rec2_right_00.png": {
+"iou": 0.72,
+"ok": true
+},
+"hold_right_00.png": {
+"iou": 0.3,
+"ok": false
+},
+"hurtys_right_00.png": {
+"iou": 0.58,
+"ok": true
+},
+"rjump_right_00.png": {
+"iou": 0.83,
+"ok": true
+},
+"rjump_right_01.png": {
+"iou": 0.75,
+"ok": true
+},
+"rjump_right_02.png": {
+"iou": 0.77,
+"ok": true
+},
+"rjump_right_03.png": {
+"iou": 0.78,
+"ok": true
+},
+"rjump_right_04.png": {
+"iou": 0.75,
+"ok": true
+},
+"rjump_right_05.png": {
+"iou": 0.63,
+"ok": true
+},
+"hurt_down_00.png": {
+"iou": 0.75,
+"ok": true
+},
+"hurt_down_01.png": {
+"iou": 0.75,
+"ok": true
+},
+"hurt_down_02.png": {
+"iou": 0.75,
+"ok": true
+}
+}
