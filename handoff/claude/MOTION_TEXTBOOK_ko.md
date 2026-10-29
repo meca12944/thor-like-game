@@ -29,7 +29,7 @@
 |---|---|---|---|---|
 | 0 | 준비 — 묻기·있는 그림 찾기·견적 | 질문 답, 견적 | 0 | 답 |
 | 1 | 기준 그림 3방향 (정면·옆·뒷면) | `ref/down.png` `ref/right.png` `ref/up.png` | 0~30 | 디자인·크기 사진 |
-| 2 | **얼굴 정답**: 고픽셀 얼굴 A(초상화) → A 보고 게임 얼굴 | A + 머리 바꾼 서기 그림 | 약 20 × 방향 | 게임 화면 사진 |
+| 2 | **얼굴 정답**: 고픽셀 얼굴 A(초상화) → 게임 얼굴 = A하프 | A + 머리 바꾼 서기 그림 | 10 × 방향 | 게임 화면 사진 |
 | 3 | 색표 (몸 전체 48색, 살색 묶음) | `palette.json` | 0 | — (2와 같이) |
 | 4 | 서기 3방향 | 서기 장 | 0~9 | 영상 |
 | 5 | 걷기·달리기 — **옆 먼저 1개** | 옆 달리기 8장 | 약 18 | 영상(1배·2배) |
@@ -71,16 +71,13 @@
    - PixelLab `edit-images-v2`, `edit_with_reference`, 128×128, seed 5. **기준 그림 = 작은그림(그록 일러스트) 원본의 같은 방향 머리**를 128로 줄인 것 → 그림체는 글이 아니라 그림으로 맞춘다.
    - 글: `Redraw only the face in finer, more detailed pixel art matching the reference illustration: the same young man, calm serious expression, clear almond eyes with dark brown irises, upper eyelid lines and small catchlight, thin straight eyebrows, small nose with a soft shadow, small closed mouth, smooth warm skin with soft two-tone shading, clean pixel outlines. Keep the hair, shoulders, armor, colors, position and size exactly the same. No effects.`
    - A는 칸이 2배 촘촘 → **대화창 초상화**로 그대로(크게 할 때는 2배·3배 정수 배율만).
-2. **게임 속 얼굴 = A를 보고 지금 칸 크기에 다시 그림** (PixelLab 10, 방향마다)
-   - 서기 그림에서 머리 둘레 128×128칸을 **1배 그대로** 잘라 → `edit-images-v2`, 기준 그림 = A.
-   - 글: `Redraw only the face to look like the reference face as closely as possible at this pixel size: same almond eyes with dark brown irises and upper eyelid lines, same eyebrows, small nose shadow, small closed mouth, same skin tones and soft shading. Keep the hair, shoulders, armor, colors, position and size exactly the same. No effects.`
-   - 결과의 머리 부분(위 80줄)만 서기 그림에 붙임 → 이 그림이 **모든 동작의 첫 장**. 옆도 같은 순서(옆 A → 옆 게임 얼굴), 왼쪽은 옆 뒤집기.
-3. **왜**: 게임은 주인공 그림 1칸 = 화면 1점(PC 1080p). A를 반으로 줄이면 부드럽게는 흐리고 도트 방식은 거칠다 → 게임 칸에 맞춰 **다시 그려야** 선명. A 느낌은 대화창에서 산다.
-   - 그림 2벌(1440p·4K용 2배 그림)은 나중에 필요할 때만(동작 그림 2벌 = 일·크레딧 약 2배). 주인공 전체 2배(키 436)는 화면 높이 40%라 안 씀.
+2. **게임 속 얼굴 = A하프** (사장님 10-29 「얼굴을 A만 쓰라구」 「A하프로 쓰라니까」): A를 **반으로 한 번만 줄인 것**(`pxscale(A, 0.5)` = 부드럽게 줄인 뒤 A에 있는 색으로만 맞춤, 새로 그리지 않음, 크레딧 0). 서기 그림의 같은 자리(머리 64×64칸)에 통째로 붙임 → 이 그림이 **모든 동작의 첫 장**. 옆도 같은 순서(옆 A → 옆 A하프), 왼쪽은 옆 뒤집기.
+   - A를 보고 다시 그린 얼굴(옛 1번)은 「A와 다른 얼굴」이라 안 씀. 도트 방식 줄이기(2×2에서 진한 칸 고르기)는 거칠어 안 씀.
+3. **왜 A를 그대로 못 넣나**: 게임은 주인공 그림 1칸 = 화면 1점(PC 1080p)이고 A는 칸이 2배 촘촘 → 그대로면 주인공이 화면에서 2배(키 436, 화면 높이 40%). 그래서 게임 = A하프, 대화창 = A 원본.
 4. **표정은 하나 — 모든 캐릭터** (사장님 10-27): 게임 속 얼굴은 공격·맞기·쓰러짐에도 같은 얼굴. 감정은 몸짓·효과·대사, 표정 변화는 대화창 초상화로.
 5. 동작 장마다 얼굴이 달라지면 이 게임 얼굴을 판으로 찍어 같게 한다(9번 4).
 - 보일 것: **실제 게임 화면(1080p)**에 새 서기 그림 + 대화창 A를 놓은 사진 → OK 받으면 확정.
-- 예(주인공 v3, 10-29, 사장님 OK 정면·옆 「옆얼굴 만든 거도 좋네」): A 정면 `handoff/claude/hero3_v1/face/hiface_2x.png`·옆 `face/side_A.png`, 게임 얼굴 `ref/down_face.png`·`ref/right_face.png`(옆 살색은 정면 살색에 밝기 맞춤), 화면 사진 `opt/opt1_screen.png`.
+- 예(주인공 v3, 10-29): A 정면 `handoff/claude/hero3_v1/face/hiface_2x.png`·옆 `face/side_A.png`(사장님 「옆얼굴 만든 거도 좋네」), 게임 얼굴 = A하프 `face/A_half_front.png`·`face/A_half_side.png` → 서기 `ref/down_face.png`·`ref/right_face.png`.
 
 ## 3. 색표 (0)
 - 기준 그림 3장 + 얼굴판에서 **몸 전체 48색 이하** 색표 하나(`palette.json`). 살색은 얼굴판의 살색 묶음 그대로.
@@ -169,7 +166,7 @@
 | 13 | 컵·악기·종을 든 캐릭터 서기(숨쉬기)를 프롬프트만 세게 써서 다시 뽑기 (펠트 NPC 32) | "NO steam, smoke"라고 써도 컵 김·악기 음표·종 반짝이를 또 그림 | 효과 없는 장만 골라 쓰고(흰 점 개수로 거름), 모자라면 **코드 숨쉬기**: 허리 위를 1~2px 내렸다 올림(0 크레딧, `felt_npc_v2/assemble_npc.py breathe`) |
 | 14 | (추천, 사장님 10-23 "교본에 넣어라") 컵·악기·종·바구니처럼 **김·빛이 날 만한 소품을 든 캐릭터의 서기**를 그림 도구로 뽑기 | 그림 도구가 소품을 보면 김·연기·음표·반짝이를 자꾸 그려 넣음 → 장을 버리고 다시 뽑느라 크레딧 낭비 | **처음부터 코드 숨쉬기**(허리 위 1~2px 내렸다 올림, 0 크레딧, `felt_npc_v2/assemble_npc.py breathe`). 소품 없는 캐릭터만 그림 도구 서기(4)를 쓴다 |
 | 15 | **공격 사이 장을 animate-with-text로 뽑기** (아라크네 그록판 10-24, 12 버림) | "no effects, no slash trails"라고 써도 휘두르는 동작이면 흰 칼 빛줄기·잔상을 그림에 구워 넣음 (2번 다 그럼) | 공격은 **핵심 자세(edit)만** 뽑고 사이 장 없이 `anim.map`으로 장을 붙잡음 → 웅크림·늘임·흔들림·칼 빛은 코드 (`handoff/claude/arachne_grok_v1`) |
-| 16 | **얼굴 그림체를 글로만 부탁하거나, 등신이 다른 그림(10~11등신 실사 얼굴)을 참고로 얼굴 다시 그리기** (주인공 10-27~29, 160) | 글이면 매번 만화처럼 밝은 얼굴, 실사 참고면 어른 실사 얼굴 → 5등신 몸과 안 맞음(사장님 「10~11등신 얼굴」) | **0부 2 얼굴 정답**(고픽셀 A → A 보고 게임 얼굴) |
+| 16 | **얼굴 그림체를 글로만 부탁하거나, 등신이 다른 그림(10~11등신 실사 얼굴)을 참고로 얼굴 다시 그리기** (주인공 10-27~29, 160) | 글이면 매번 만화처럼 밝은 얼굴, 실사 참고면 어른 실사 얼굴 → 5등신 몸과 안 맞음(사장님 「10~11등신 얼굴」) | **0부 2 얼굴 정답**(고픽셀 A → 게임 = A하프) |
 
 - 시험은 언제나 **가장 싼 단위 하나**(한 방향·4장)로. 통과하면 나머지를 한꺼번에(병렬) 돌린다.
 - 실패하면: 사장님께 "○○ 방법은 안 됐고 ○ 크레딧 버렸다"고 바로 말하고, 이 표에 한 줄 적는다.
