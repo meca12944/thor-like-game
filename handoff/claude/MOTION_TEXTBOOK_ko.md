@@ -80,7 +80,7 @@
 4. **표정은 하나 — 모든 캐릭터** (사장님 10-27): 게임 속 얼굴은 공격·맞기·쓰러짐에도 같은 얼굴. 감정은 몸짓·효과·대사, 표정 변화는 대화창 초상화로.
 5. 동작 장마다 얼굴이 달라지면 이 게임 얼굴을 판으로 찍어 같게 한다(9번 4).
 - 보일 것: **실제 게임 화면(1080p)**에 새 서기 그림 + 대화창 A를 놓은 사진 → OK 받으면 확정.
-- 예(주인공 v3, 10-29): A `handoff/claude/hero3_v1/face/hiface_2x.png`, 게임 얼굴 `opt/B2.png` → `opt/hero1x_B2.png`, 화면 사진 `opt/opt1_screen.png`.
+- 예(주인공 v3, 10-29, 사장님 OK 정면·옆 「옆얼굴 만든 거도 좋네」): A 정면 `handoff/claude/hero3_v1/face/hiface_2x.png`·옆 `face/side_A.png`, 게임 얼굴 `ref/down_face.png`·`ref/right_face.png`(옆 살색은 정면 살색에 밝기 맞춤), 화면 사진 `opt/opt1_screen.png`.
 
 ## 3. 색표 (0)
 - 기준 그림 3장 + 얼굴판에서 **몸 전체 48색 이하** 색표 하나(`palette.json`). 살색은 얼굴판의 살색 묶음 그대로.
@@ -382,6 +382,7 @@
 4. **사이 장** — `linette_ns_keys_v1/tween.py` (animate-with-text-v3, first_frame + last_frame, 4프레임 = 4, 결과 5장).
    R→L 한 번, L→R 한 번. 두 번 다 같은 시드.
 5. **주기 조립** — `cycle_ns.py <d> <out> [rise]`: R, RL1, RL2, RL3, L, LR1, LR2, LR3 (8장).
+   - **핵심 자세 하나를 좌우 뒤집어 썼다면 몸 자리도 뒤집힌다**(주인공 v3 정면 달리기, 장마다 옆으로 74칸 미끄러짐) → 장마다 정면 = 얼굴 가운데, 뒷면 = 어깨 띠 가운데를 출발 그림에 맞춘다(`hero3_v1/run/cycle.py`).
    사이 장은 ~5% 크게 그려지고 두 핵심 자세도 몇 % 다를 수 있어서 **모든 장을 발 기준으로 같은 키로 맞추고**, 중간 장만 1~3px 높게(몸 올라옴).
 6. **아틀라스** — `linette_final_v1/assemble.py`의 `SRC[...]['south'|'north']`(방향 키 south/north, 좌우 반전 없음),
    틱: 걷기 [6]*8, 달리기 [4]*8. `polish.py`: 달리기는 공중 높이를 4px까지로 제한(그 이상은 깡충으로 보임). 걷기는 그린 땅 그대로.

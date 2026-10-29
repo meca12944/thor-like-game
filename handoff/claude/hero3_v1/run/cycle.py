@@ -19,4 +19,14 @@ for i, f in enumerate(seq):
     if b2[3] < GROUND - AIR:                       # 공중 4px까지 (깡충 방지)
         c = Image.new('RGBA', (256, 256)); c.paste(im, (0, GROUND - AIR - b2[3]), im); im = c
     if b2[3] > GROUND: c = Image.new('RGBA', (256, 256)); c.paste(im, (0, GROUND - b2[3]), im); im = c
-    im.save(f'{out}/{i:03d}.png'); print(d, i, os.path.basename(os.path.dirname(f)) + '/' + os.path.basename(f), 'h', hh, '->', bb(im)[3] - bb(im)[1], 'bottom', bb(im)[3])
+    import numpy as np                            # 머리(맨 위 40줄) 가운데를 출발 그림 머리 가운데에 맞춤 → 장마다 옆으로 미끄러지지 않게
+    def headx(im):     # 정면 = 얼굴 살색 가운데, 뒷면 = 어깨 띠(머리끝+45~75줄) 가운데 (날리는 머리카락·망토에 안 끌리게)
+        a = np.asarray(im).astype(int); al = a[..., 3] > 8; t = np.nonzero(al.any(1))[0].min()
+        if d == 's':
+            r, g, b = a[..., 0], a[..., 1], a[..., 2]; m = al & (r > g) & (g > b) & (r - b > 45) & (r > 120); m[90:] = False
+            return np.nonzero(m)[1].mean()
+        ys, xs = np.nonzero(al[t + 45:t + 75]); return xs.mean()
+    if not hasattr(sys, '_hx'): sys._hx = headx(Image.open('start_' + d + '.png').convert('RGBA'))
+    dx = round(sys._hx - headx(im))
+    if dx: c = Image.new('RGBA', (256, 256)); c.paste(im, (dx, 0), im); im = c
+    im.save(f'{out}/{i:03d}.png'); print(d, i, os.path.basename(os.path.dirname(f)) + '/' + os.path.basename(f), 'h', hh, '->', bb(im)[3] - bb(im)[1], 'bottom', bb(im)[3], 'dx', dx)
