@@ -5,6 +5,7 @@ import sys, glob, os, numpy as np
 from PIL import Image
 frames_dir, start, period, ref, out = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), sys.argv[4], sys.argv[5]
 HT = int(sys.argv[6]) if len(sys.argv) > 6 else 144   # 게임 그림 키 (사장님 10-30 「작아져야지」 → 144, 옛 218)
+ZOOM = float(sys.argv[7]) if len(sys.argv) > 7 else 1.0   # 영상이 슬쩍 확대된 만큼 되돌리기 (zoomfit.py: 한 바퀴 윗몸을 첫 장 서기와 겹쳐 잼, 정면 걷기 0.93)
 fs = sorted(glob.glob(frames_dir + '/*.png'))
 def key(f):
     a = np.asarray(Image.open(f).convert('RGB')).astype(np.float32)
@@ -15,7 +16,7 @@ def key(f):
     rgba = np.dstack([r, g2, b, alpha * 255])
     return rgba
 A0 = key(fs[0]); ys = np.nonzero(A0[..., 3] > 128)[0]; H0 = ys.max() - ys.min()
-s = HT / H0
+s = HT / H0 * ZOOM
 pal = np.asarray(Image.open(ref).convert('RGBA')).reshape(-1, 4); pal = np.unique(pal[pal[:, 3] > 0][:, :3], axis=0).astype(np.float32)
 def shrink(rgba):
     al = rgba[..., 3:4] / 255; pm = np.concatenate([rgba[..., :3] * al, rgba[..., 3:4]], 2)
