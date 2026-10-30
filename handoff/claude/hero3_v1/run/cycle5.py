@@ -5,8 +5,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pxscale import pxscale
 d, out = sys.argv[1], sys.argv[2]; RISE = 2; GROUND = 246; AIR = 4
 # v2(정면): 핵심 자세 4장 R·P1·L·P2(P = 두 다리가 엉덩이 밑에 모인 지나가는 자세) + 사이 장 4묶음의 가운데 1장씩
-T = lambda n: sorted(glob.glob(f't4_{n}/*.png'))[2]
-seq = [f'key_{d}_R.png', T('RP1'), f'key_{d}_P1.png', T('P1L'), f'key_{d}_L.png', T('LP2'), f'key_{d}_P2.png', T('P2R')]
+# v3(정면, 깊이): 디딤 CR(오른발 앞·아래·크게) · 지나감 PA · 디딤 CL · 지나감 PB(=PA 뒤집어 고침) + 사이 장 가운데 1장씩
+T = lambda n: sorted(glob.glob(f't5_{n}/*.png'))[2]
+seq = [f'key_{d}_CR.png', T('CRPA'), f'key_{d}_PA.png', T('PACL'), f'key_{d}_CL2.png', T('CLPB'), f'key_{d}_PB2.png', T('PBCR')]
 RL = [seq[0]]; LR = [seq[4]]
 def bb(im): return im.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
 keyH = sum(bb(Image.open(f).convert('RGBA'))[3] - bb(Image.open(f).convert('RGBA'))[1] for f in (RL[0], LR[0])) / 2
