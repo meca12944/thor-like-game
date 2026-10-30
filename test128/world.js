@@ -1596,7 +1596,7 @@
   // 주인공 크기 (팀장·4번방 10-25): 전에는 ART_FIG = (window.H8 && H8.figH) || 117 이었는데 H8이 const라 window에 없어 늘 117로 떨어졌음(우연).
   // 사장님이 계속 본 그 크기를 정식으로: 그림 1px = 34/117 필드px → 새 주인공(그림 키 144) 화면 키 = 144 × 34/117 ≈ **42 필드px**(타일 16의 2.6칸).
   const H128FIG = 34, ART_FIG = 117; // 그림 px → 필드 px 배율 (H128FIG / ART_FIG). H128FIG = 배율 단위(옛 주인공 키), 몸 키가 아님
-  const HERO_H = 42; // 새 주인공 화면 키 (필드 px): 가림 상자·머리 위 글자 높이
+  const HERO_H = 63; // 주인공 화면 키 (필드 px): 가림 상자·머리 위 글자 높이. v3(10-30) 그림 키 218 × 34/117 ≈ 63 (옛 144 → 42의 1.5배, 사장님 10-29 「218칸」)
   function h128() { const g = window.__game; return g && g.H128 && g.H128img && g.H128img.complete ? g : null; }
   // ---- 자연스러운 방향 전환 (모션연구방 10-23, 사장님 "누가 봐도 자연스러운 방향전환"): 그림 방향은 45°씩 돌아감(90° 이상 꺾으면 사이 방향을 0.04초씩 거침,
   // 뒤로 돌 때는 화면 쪽(↓)으로 돎) + 동작이 바뀌는 순간 머리가 순간이동하지 않게 그 차이를 0.06초에 걸쳐 풀어 줌(H8POP). 그림만 바뀌고 이동·공격 방향은 그대로.
@@ -1622,6 +1622,7 @@
     h.popL = L; h.popF = fl; h.popTg = tg; return Math.abs(h.pop) < .5 ? 0 : h.pop; }
   const atkArt = () => { const G = h128(), H = G && G.H8, L = H && H.anims && H.anims.hit1_right; return !!(L && bareSheet(H, L[0][0])); }; // 빈 손 공격 그림을 쓰는 중
   const bareSheet = (H, i) => !!(H && H.bare && H.bare.includes(i)); // H8.bare = 칼이 그림에 없는 시트 (새 그록 주인공): 공격 내내 코드 칼
+  function stepSfx(h) { const k = Math.floor((h.gp || 0) * 2); if (!h.moving) { h.stepK = k; return; } if (h.stepK != null && k !== h.stepK) { h.stepN = (h.stepN || 0) + 1; sfx('step_run_' + (1 + h.stepN % 4), h.run ? .55 : .35); } h.stepK = k; }
   function h8Cell() { const G = h128(), H = G.H8, h = hero; if (!H || !G.H8img(0) || (S.deadT > 0 && !H.anims.death_down)) return null; const f8 = h8Turn(h, h.f8 && h.f8.includes(h.face) ? h.f8 : (h.face || 'down'));
     // 4방향 그림 (사장님 10-26 「앞으로 대각선은 뺀다」): 대각선 입력 → 옆 그림(좌우 따라, 왼쪽 = 뒤집기), 위·아래 → 뒷면·정면. 이동·공격·검기 방향은 8방향 그대로(f8). 마을 heroCell8 과 같은 규칙
     if (f8.includes('left')) h.hz = 'left'; else if (f8.includes('right')) h.hz = 'right';
@@ -1631,7 +1632,8 @@
     let LL = null; const A = k => (LL = pick(k) || H.anims[k + '_' + (hl && H.anims[k + '_left'] ? 'left' : 'right')]), /* hurt has side views only: facing up/down used to crash */ seq = (L, t) => { let i = 0; for (; i < L.length - 1; i++) { if (t < L[i][2]) break; t -= L[i][2]; } return L[i]; }, tot = L => L.reduce((a, f) => a + f[2], 0); let e;
     // 출발·멈춤 (모션연구방 10-23, 걷기 박자 연구): 서 있다 출발하면 다리 모인 장(한 바퀴의 0.28)부터, 멈추면 다음 다리 모인 장까지 빠르게 마저 디딘 뒤 서기
     if (h.moving && !h.wasMov) { h.gp = .28; h.stopT = null; } if (!h.moving && h.wasMov) { h.stopT = S.t; h.stopRun = h.run; h.stopU = S.t; } h.wasMov = h.moving;
-    { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? gaitCyc(H, 1) * 46 / 119 : gaitCyc(H, 0) * 32 / 84)) % 1; } // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
+    { const dx = h.x - (h.gx ?? h.x), dy = h.y - (h.gy ?? h.y); let m = Math.hypot(dx, dy); h.gx = h.x; h.gy = h.y; const dtg = Math.min(.1, S.t - (h.gT ?? S.t)); h.gT = S.t; if (h.moving && dtg > 0) m = Math.max(m, HERO_SPEED * (h.run ? RUN.mul : 1) * dtg * .7); /* blocked: walk / run in place (owner 10-23 「장애물 부딪히면 모션이 안나오고」) */ if (m < 20 && h.moving) h.gp = ((h.gp || 0) + m * (h.gaitK || 1) / (h.run ? gaitCyc(H, 1) * 46 / 119 : gaitCyc(H, 0) * 32 / 84)) % 1; }
+    stepSfx(h); // 걸음 소리 (사장님 10-30 「걸음 소리도 이거 쓰자」: 그록 뒷면 달리기 영상에서 자른 4개, 발 닿는 곳 gp 0·0.5) // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && h.atk.i <= 2 && bareSheet(H, (A(h.atk.i === 2 ? 'hit3' : h.atk.i === 1 ? 'hit2' : 'hit1') || [[]])[0][0])) { e = seq(LL, h.atk.t * 60); } // 빈 손 그록 공격 그림 (회의 2차 10-25): 아틀라스 틱 그대로(절대 틱, 합 30/30/45 = 코드 길이), 치는 장 시작 = 판정 틱 8/8/11 — H8._atk_note
     else if (h.atk && (SLASH_BODY || (ATK_BODY && h.atk.i <= 2))) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
