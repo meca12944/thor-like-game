@@ -32,8 +32,8 @@
 | 2 | **얼굴 정답**: 고픽셀 얼굴 A(초상화) → 게임 얼굴 = A하프 스무스 | A + 머리 바꾼 서기 그림 | 10 × 방향 | 게임 화면 사진 |
 | 3 | 색표 (몸 전체 48색, 살색 묶음) | `palette.json` | 0 | — (2와 같이) |
 | 4 | 서기 3방향 | 서기 장 | 0~9 | 영상 |
-| 5 | 걷기·달리기 — **옆 먼저 1개** | 옆 달리기 8장 | 약 18 | 영상(1배·2배) |
-| 6 | 걷기·달리기 나머지 | 3방향 × 걷기·달리기 | 약 90 | 영상 |
+| 5 | 걷기·달리기 = **그록 영상 방식** (사장님 영상 → 잘라 도트) | 한 바퀴 장(정면 달리기 13장) | 0 | 게임 화면 영상(1배·2배) |
+| 6 | 걷기·달리기 나머지 (그록 영상) | 3방향 × 걷기·달리기 | 0 | 영상 |
 | 7 | 회피대시·맞기·쓰러짐·점프 | 각 3방향 | 약 40 | 영상 |
 | 8 | 공격 1·2·3타 (+모아베기) | 몸 장 + **검흔은 코드** | 0~40 | 판정 사진 + 영상 |
 | 9 | 마무리 처리 (모든 동작 같은 순서) | 다듬은 장 | 0 | 줄 세우기 그림 |
@@ -88,14 +88,40 @@
 - 기준 그림 1장 + **코드 숨쉬기**가 기본 — 지금 코드 `EXAG.breath` = 몸 전체 키 0.8%, 72틱 주기(옛 주인공 맞춤, 머리도 약 1칸 움직임). 그림이 필요하면 PixelLab 4장 → 왕복(1-2-3-2-1).
 - 이음새: 마지막 장 → 첫 장 변화가 다른 장 평균의 1.8배 넘으면 끊김(`audit2.py`).
 
-## 5. 걷기·달리기 — 옆 1개 먼저 (약 18)
-- 방법 A(기본): **핵심 자세 1장(이미지 편집, 10) + 한 주기 8장(animate-with-text, 8)**, 시작 그림 = 칸 1의 옆 그림. 프롬프트는 부록 A-3·A-8 그대로.
-- 방법 B(**정면·뒷면은 이것 먼저**, 주인공 v3 정면 달리기 10-30 성공): **그림 1장 → 그록 이매진 영상 → 장면 고르기**(sprite-gen B 길, `video-frames`·`video-loop`). 사장님이 영상을 만들어 드라이브에 올림 → 우리가 자름. 한 색 배경·둘레 넉넉히·동작 이름만·보간 끔. 얼굴이 처음부터 안 바뀌는지 A와 나란히 비교 후 정함.
-- 장 넘기기는 틱이 아니라 **걸은 거리**(gait): 사장님 고른 값 걷기 `walkCyc` 82 · 달리기 `runCyc` 96(B) — 다리 한 바퀴 이동이 이 거리, 발 미끄럼 10% 안. 머리 오르내림 4~6px, 발 흔들림 15px↑(hero_check 기준).
-- **옆 달리기 하나를 영상(1배·2배)으로 보이고 OK → 칸 6.**
+## 5. 걷기·달리기 = 그록 영상 방식 (기본, 사장님 10-30 「교본에 지금 방법 저장해라」, 크레딧 0)
+> 한 줄: **서기 그림 1장 → 사장님이 그록 이매진으로 「제자리 달리기」 영상 → 우리가 한 바퀴 잘라 도트로 → 얼굴 한 장 찍기 → 점검.**
+> 왜: PixelLab으로 장마다 그리면 장마다 몸을 새로 그려 다리 자리·길이가 달라짐(정면 달리기 허벅지 31칸 차이, 크레딧 358 쓰고도 계속 틀어짐). 영상은 한 몸이 이어 움직여 다리·팔이 일정하고 부드러움. 예: 주인공 v3 정면 달리기 `hero3_v1/grok_video/`.
 
-## 6. 걷기·달리기 나머지 (약 90)
-- 정면·뒷면 걷기·달리기 + 옆 걷기. 뒷면은 「STRICT back view」, 팔 흔들기·옷 뒷모습을 빠뜨리지 않는다.
+1. **입력 그림 만들기**(팀장, 0): 칸 2까지 끝난 그 방향 서기 그림(얼굴 = A하프 스무스)을 **정수 배(3배)**로 키워 1024×1024 **초록(#00FF00) 바탕 가운데**, 둘레 넉넉히. → `<캐릭터>/grok_video/그록_입력_<방향>.png`.
+2. **부탁 글**(팀장, 그대로 복사해 방향·동작만 바꿈):
+   ```
+   The same pixel-art warrior from the image runs IN PLACE toward the camera, like on a treadmill.
+   Fixed camera, straight front view the whole time, no camera movement, no zoom, no turning.
+   Keep his exact look: face, long black hair, dark navy coat, bronze shoulder armor, belt, tattered dark cape, brown boots, pixel-art style.
+   Powerful masculine action-hero running: torso leaning slightly forward, knees driving forward toward the camera, the front foot landing closer to the camera, the back foot kicking up behind;
+   arms pumping forward and back along the sides of the body, elbows bent about 90 degrees, normal-sized clenched fists rising to chest height in front of the same shoulder and swinging back past the hip, never crossing the chest.
+   The cape flows behind him. Steady even rhythm, a smooth loop.
+   Plain solid bright green background the whole time, no shadow, no ground, no dust, no effects, full body always inside the frame.
+   ```
+   - 바꿀 곳: 정면 `runs IN PLACE toward the camera … straight front view` / 뒷면 `runs IN PLACE away from the camera … straight back view, we see his back, hair and cape` / 옆 `runs IN PLACE to the right … strict side view facing right`. 걷기는 `walks` + `calm natural arm swing`.
+   - 꼭 넣을 것: **제자리(러닝머신)·고정 카메라·한 방향 계속·한 색 바탕·그림자/효과 없음·몸 전체가 화면 안**.
+3. **사장님**: 그록 이매진에 그림 + 글 → mp4를 채팅(또는 드라이브 「그록」)에 올림.
+4. **장면 꺼내기**(팀장): 받은 영상은 따로 폴더에 → `ffmpeg -i run.mp4 frames/%04d.png`. 처음 부분(서기 → 출발)은 버림.
+5. **한 바퀴 찾기**: 달리는 구간에서 실루엣(초록 아닌 칸) 차이로 주기 찾기 → 장 i와 i+주기의 차이가 가장 작은 시작 장. (주인공 정면 달리기: 24장/초에서 **13장 = 두 걸음 0.54초**, 시작 47번째 장)
+6. **도트로**(`hero3_v1/grok_video/tools/vid2sprite.py <장 폴더> <시작> <주기> <서기 그림> <출력>`):
+   - 초록 빼기 + 가장자리 초록 번짐 빼기.
+   - **영상 전체에 배율 하나**(첫 장 서기 키 → 우리 키 218). 장마다 배율을 바꾸지 않음.
+   - 미리곱 LANCZOS로 **한 번만** 줄이고, 서기 그림에 있는 색으로 맞춤.
+   - 한 바퀴 장들을 **한꺼번에 같은 만큼만** 옮김(장마다 따로 옮기면 영상의 자연스러운 흔들림이 사라짐). 가장 낮은 발 = 246, 가로는 한 바퀴 평균 가운데 = 128.
+7. **얼굴 한 장 찍기**(`hero3_v1/grok_video/tools/stamp_one.py <서기 그림> <장 폴더> <출력>`): 0부 2 정답 얼굴(A하프 스무스 + 앞머리)을 판으로. 영상은 머리 자리가 장마다 달라서 **얼굴 살색 가운데를 먼저 맞추고 ±4칸**에서 겹침이 가장 큰 자리. 겹침 0.4 아래인 장은 눈으로 확인.
+8. **점검**(그림 한 장에, 다리 확대 + 얼굴 가운데 세로선): ① 두 발 높이 차(앞발 아래) ② 발끝 방향 ③ 다리가 옆으로 안 벌어짐 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같음 ⑥ 제자리 ⑦ 무릎 아래 곧음 ⑧ 팔이 몸 옆선 앞뒤, 주먹 = 서기 손 크기 ⑨ 장마다 고르게(튀는 장 없음).
+9. **보이기**: 실제 게임 화면(1080p) 위에 1배·2배, 영상 24장/초 → 게임은 장당 약 2.5틱(3·2 번갈아).
+10. **기록**: 13번 규칙대로 2부에 모션 기록(입력·글·주기·시작 장·도구·틀린 것·크레딧).
+- 그록 영상이 안 되는 동작(공격 핵심 자세 등)만 아래 **방법 A(PixelLab)**: 핵심 자세 이미지 편집 + 사이 장 animate-with-text(부록 A, 2부 「2-2v3」 정면 달리기 PixelLab 기록의 틀린 것 11가지를 먼저 읽음).
+- 장 넘기기 거리(gait): 걷기 `walkCyc` 82 · 달리기 `runCyc` 96 — 다리 한 바퀴 이동이 이 거리, 발 미끄럼 10% 안.
+
+## 6. 걷기·달리기 나머지 (그록 영상 방식, 0)
+- 5번과 같은 순서로 방향(정면·뒷면·옆)·동작(걷기·달리기)마다 영상 1개씩. 뒷면은 「away from the camera, straight back view」, 팔 흔들기·옷 뒷모습을 빠뜨리지 않는다. 왼쪽 = 옆 뒤집기.
 - 각 동작이 끝날 때마다 칸 9 마무리 처리 → 줄 세우기 그림.
 
 ## 7. 회피대시·맞기·쓰러짐·점프 (약 40)
