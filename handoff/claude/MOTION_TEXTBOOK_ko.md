@@ -5,7 +5,7 @@
 > - 새로 배운 것은 1부(모두 지킬 규칙)나 2부(캐릭터별 기록)에 바로 덧붙인다. 작업 폴더의 README는 "무엇을 만들었나"만 짧게.
 > - 옛 문서 `CHARACTER_PIPELINE_ko.md`, `MOTION_NS_KEYPOSE_ko.md`의 내용은 모두 여기로 옮겼다(그 파일들은 이곳을 가리키는 안내만 남음).
 
-목차: **0부 캐릭터 만들기 교본 v2(10-27, 4방향·표정 하나, 순서대로)** / 1부 공통 규칙·최종 순서 / 부록 A 정면·뒷면·대각선 핵심 자세 상세 / 2부 캐릭터별 기록(리네트·주인공·주인공2·몬스터) / 3부 찾아보기
+목차: **0부 캐릭터 만들기 교본 v2(10-27, 4방향·표정 하나, 순서대로)** / 1부 공통 규칙·최종 순서 / 2부 캐릭터별 기록(리네트·주인공·주인공2·몬스터) / 3부 찾아보기
 
 ---
 
@@ -15,7 +15,7 @@
 > - 우리 문제와 맞는 점: ① **얼굴·몸이 장마다 안 바뀜** — 모든 장이 같은 그림 1장(B는 한 영상)에서 나옴 = 우리 「같은 그림에서 출발」 규칙과 같음. ② **AI 도트는 진짜 도트가 아님**(칸이 흔들리고 테두리가 번짐) → 「Backbone Lattice」: 동작 전체에서 칸 크기 하나를 재서 모든 장을 그 칸에 맞춤 + 동작 전체가 **같은 색표 하나**(`palette_size`, 장마다 색 깜빡임 없앰) + 정수 배율만(늘림·줄임 없음) + 1칸 눈·테두리는 「어두운 소수 색 우선」으로 살림. ③ 줄일 때는 K-Centroid(칸마다 가장 많은 색). ④ 발 기준 맞춤(`foot-centroid`): 망토·머리카락이 몸 가운데를 끌지 않게 다리로 자리 맞춤 → 장마다 좌우 떨림 없음. ⑤ **한쪽 손 소품**(우리 칼): 오른쪽 그림을 뒤집으면 칼 손이 바뀜 → 왼쪽을 따로 그리거나 「칼=오른손」 확인(handed-check). ⑥ 서기에 숨쉬기 층(Breathe)을 코드로 얹음.
 > - 바로 쓸 것(크레딧 0): **몸 전체 색표 하나**(동작 하나 = 색 48개 이하 공유) + 발 기준 자리 맞춤을 우리 도구에. 시험할 것(그록 구독): 주인공 그림 1장 → 사장님이 그록 이매진으로 「달리기·공격」 영상 → mp4를 드라이브에 → 우리가 장 잘라 루프(sprite-gen B와 같은 방법). **설치함 (사장님 10-27 「설치 해라」)**: 팀장 작업 폴더 venv(세션마다 다시 설치 필요: `git clone --depth 1 https://github.com/aldegad/sprite-gen && python3 -m venv .venv && .venv/bin/pip install -e .`). 이 작업실에는 그록·codex 로그인이 없어 **그리기·영상 만들기는 안 됨** → 사장님이 그록 이매진으로 만든 mp4를 드라이브에 올리면 `video-frames`·`video-loop`로 자름(ffmpeg 있음, img2webp 없음 → GIF·스트립으로).
 
-> **4방향만 (사장님 10-26 「앞으로 대각선은 뺀다」, 10-27 「2d 주인공 대각선 방향 전부 없애」)**: 그림은 아래·위·옆(왼쪽 = 옆 뒤집기)만 그린다. 바라보기·공격·회피대시도 4방향(`hero.f8 = hero.face`, 대각 겨냥 끔). 움직임만 8방향. 이 교과서의 대각선 그림 설명(부록 A·0부 4·5)은 옛 기록 — 새로 그리지 않는다. (main #197)
+> **4방향만 (사장님 10-26 「앞으로 대각선은 뺀다」, 10-27 「2d 주인공 대각선 방향 전부 없애」)**: 그림은 아래·위·옆(왼쪽 = 옆 뒤집기)만 그린다. 바라보기·공격·회피대시도 4방향(`hero.f8 = hero.face`, 대각 겨냥 끔). 움직임만 8방향. 이 교과서의 대각선 그림 설명은 옛 기록 — 새로 그리지 않는다. (main #197)
 
 # 0부. 캐릭터 만들기 교본 v2 — 처음부터 끝까지 순서대로 (10-27 다시 씀)
 
@@ -90,7 +90,7 @@
 
 ## 5. 걷기·달리기 = 그록 영상 방식 (기본, 사장님 10-30 「교본에 지금 방법 저장해라」, 크레딧 0)
 > 한 줄: **서기 그림 1장 → 사장님이 그록 이매진으로 「제자리 달리기」 영상 → 우리가 한 바퀴 잘라 도트로 → 얼굴 한 장 찍기 → 점검.**
-> 왜: PixelLab으로 장마다 그리면 장마다 몸을 새로 그려 다리 자리·길이가 달라짐(정면 달리기 허벅지 31칸 차이, 크레딧 358 쓰고도 계속 틀어짐). 영상은 한 몸이 이어 움직여 다리·팔이 일정하고 부드러움. 예: 주인공 v3 정면 달리기 `hero3_v1/grok_video/`.
+> 왜: PixelLab으로 장마다 그리면 장마다 몸을 새로 그려 다리 자리·길이가 달라짐(주인공 v3 정면 달리기: 게다리·제자리걸음·발 옆 보기·무릎 아래 휨·여자 같은 팔·허벅지 31칸 흔들림, 크레딧 358 쓰고도 계속 틀어짐). 영상은 한 몸이 이어 움직여 다리·팔이 일정하고 부드러움. 예: 주인공 v3 정면 달리기 `hero3_v1/grok_video/`.
 
 1. **입력 그림 만들기**(팀장, 0): 칸 2까지 끝난 그 방향 서기 그림(얼굴 = A하프 스무스)을 **정수 배(3배)**로 키워 1024×1024 **초록(#00FF00) 바탕 가운데**, 둘레 넉넉히. → `<캐릭터>/grok_video/그록_입력_<방향>.png`.
 2. **부탁 글**(팀장, 그대로 복사해 방향·동작만 바꿈):
@@ -117,7 +117,7 @@
 8. **점검**(그림 한 장에, 다리 확대 + 얼굴 가운데 세로선): ① 두 발 높이 차(앞발 아래) ② 발끝 방향 ③ 다리가 옆으로 안 벌어짐 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같음 ⑥ 제자리 ⑦ 무릎 아래 곧음 ⑧ 팔이 몸 옆선 앞뒤, 주먹 = 서기 손 크기 ⑨ 장마다 고르게(튀는 장 없음).
 9. **보이기**: 실제 게임 화면(1080p) 위에 1배·2배, 영상 24장/초 → 게임은 장당 약 2.5틱(3·2 번갈아).
 10. **기록**: 13번 규칙대로 2부에 모션 기록(입력·글·주기·시작 장·도구·틀린 것·크레딧).
-- 그록 영상이 안 되는 동작(공격 핵심 자세 등)만 아래 **방법 A(PixelLab)**: 핵심 자세 이미지 편집 + 사이 장 animate-with-text(부록 A, 2부 「2-2v3」 정면 달리기 PixelLab 기록의 틀린 것 11가지를 먼저 읽음).
+- **걷기·달리기는 무조건 이 방법** (사장님 10-30 「다른 거 다 지우고 무조건 이렇게 하는 걸로」). PixelLab 핵심 자세·사이 장·뼈대 방식으로 걷기·달리기를 만들지 않는다.
 - 장 넘기기 거리(gait): 걷기 `walkCyc` 82 · 달리기 `runCyc` 96 — 다리 한 바퀴 이동이 이 거리, 발 미끄럼 10% 안.
 
 ## 6. 걷기·달리기 나머지 (그록 영상 방식, 0)
@@ -179,9 +179,9 @@
 
 | # | 하지 말 것 (버린 크레딧) | 왜 실패했나 | 대신 이렇게 |
 |---|---|---|---|
-| 1 | 글(텍스트)만으로 동작 세트 한꺼번에 뽑기 (리네트 약 288) | 얼굴·옷·크기가 장마다 달라지고 다리가 엉망 | 원본 8방향 그림 → 동작마다 **핵심 자세 1장 + 한 주기 8장** (0부 4번) |
-| 2 | 정면·뒷면 걷기·달리기를 뼈대(스켈레톤)로 (리네트 약 70, 5번 실패) | 정면에서 다리가 게다리·강아지처럼 됨 | 핵심 자세 방식 (부록 A) |
-| 3 | **서 있는 그림을 시작·끝으로 걷기 한 주기 뽑기** (펠트 NPC 8) | 시작·끝이 차렷이라 다리가 거의 안 움직임(제자리 서기처럼 보임) | 반드시 **보폭이 벌어진 핵심 자세**(이미지 편집 10)를 먼저 만들고 그 자세 → 같은 자세 8장 |
+| 1 | 글(텍스트)만으로 동작 세트 한꺼번에 뽑기 (리네트 약 288) | 얼굴·옷·크기가 장마다 달라지고 다리가 엉망 | 걷기·달리기 = **0부 5 그록 영상 방식** |
+| 2 | 정면·뒷면 걷기·달리기를 뼈대(스켈레톤)로 (리네트 약 70, 5번 실패) | 정면에서 다리가 게다리·강아지처럼 됨 | 걷기·달리기 = **0부 5 그록 영상 방식** |
+| 3 | **서 있는 그림을 시작·끝으로 걷기 한 주기 뽑기** (펠트 NPC 8) | 시작·끝이 차렷이라 다리가 거의 안 움직임(제자리 서기처럼 보임) | 걷기·달리기 = **0부 5 그록 영상 방식** |
 | 4 | **남의 동작 뼈대를 그대로 입히기** (리네트 정면 대시 3.1) | 주인공의 망토 휘날리는 팔 벌림까지 따라옴 → "리네트 폼대로" | 팔·자세가 그 캐릭터와 맞을 때만. 아니면 그 캐릭터 자세로 핵심 자세 |
 | 5 | 옆 동작 사이 장을 한 번에 길게 (리네트 시전 16) | 중간에 몸이 정면으로 돌아감 | "STRICT side view" + **중간 핵심 자세를 하나 더** 넣고 짧게 두 번 이어 붙이기 |
 | 6 | 뒷모습 키 자세를 다른 방향 그림에서 출발 (리네트 뒷면 던지기 10) | 몸이 옆으로 틀어짐 | 출발 그림을 **같은 뒷모습**으로, "STRICT straight back view, symmetric" |
@@ -222,7 +222,7 @@
 - **발 미끄러짐은 실제 게임 속도로 잰다**: 게임이 한 장 넘길 때 땅이 가는 거리 vs 디딘 발이 그림 안에서 뒤로 가는 거리. 1배가 정답.
   주인공은 그림 1px = 들판 30/117px, 걷기 1.37 들판px/틱 → 그림 5.3px/틱, 달리기 10.1px/틱(`game_walk.py`로 실제 게임에서 잼).
   옛 주인공은 걷기 3.7배·달리기 2배 미끄러졌음(걸음 폭이 속도에 비해 좁음). 리네트는 1배(맞음).
-- 미끄러짐이 2배 넘으면 **코드(다리 빠르기)로는 못 고친다** → 걸음 폭 넓게 다시 그리고(핵심 자세 1장 + 한 주기 8장), 남는 차이는 `gait`(walkCyc·runCyc)로 맞춤.
+- 미끄러짐이 2배 넘으면 **코드(다리 빠르기)로는 못 고친다** → 걸음 폭 넓게 다시 그리고(0부 5 그록 영상 — 부탁 글에 「longer strides」), 남는 차이는 `gait`(walkCyc·runCyc)로 맞춤.
 - 조금 미끄러지면 코드로: **박자 다시 나누기**(발이 많이 가는 장은 길게, 적게 가는 장은 짧게, `retime`) + 남은 1~3px는 장마다 좌우로 살짝(`footlock`).
 - **몸 오르내림**: 걷기는 디딜 때(다리 가장 벌어짐) 내려가고 다리 모일 때 올라감, 허리 위만 움직이고 발은 땅에(`warp`). 정면·뒷면 걷기는 디딘 발 쪽으로 몸무게 ±2px(한 바퀴에 한 번).
 - **서기 숨쉬기**: 가슴 위만 1px(`breathe`). 단 주인공은 게임 코드가 이미 숨쉬기를 함(`H8T.breathPx`) → 그림에 넣지 않음.
@@ -259,18 +259,8 @@
 - 옆: 위 2번 결과. 바늘이 튀는 장은 빼고 앞 장들을 왕복.
 - 대각선: 주인공 대각선 서기 뼈대 + 팔은 옆 서기 팔(몸에 붙이고 바늘 아래, `diag_arms_like_side.py`), 3.
 
-### 4. 걷기·달리기 8방향 (동작당 약 18) — 핵심 자세 1장 + 한 주기 8장
-방향 5개(→ 옆, ↓ 정면, ↑ 뒷면, ↘, ↗) × 걷기·달리기 = 10개.
-1. 핵심 자세 1장: `linette_thrust_v1/edit_pose.py <원본> <out> <tag> "<프롬프트>"` (edit-images-v2, 10).
-   - 다리: 걷기 = 앞발 뒤꿈치 닿고 뒷발 발끝, 달리기 = 앞 무릎 올라가고 뒷발 차고 나감. 정면·뒷면 = `feet hip width apart, not crossed`.
-   - 팔: 걷기 `arms swing naturally opposite to the legs (one arm forward, the other back), each hand holding its thin silver needle`,
-     달리기 `arms pump energetically opposite to the legs (one arm forward with the elbow bent, the other back)`, 정면 달리기 `neither hand is raised above the chest`.
-   - 뒷모습 `the red bikini top and its thin back strap are clearly visible across her back`.
-   - 꼬리 `Keep the exact same character design, colors, face, outfit, size and the two thin silver needles, full body, no effects, same facing direction.`
-2. 한 주기 8장: `linette_ns_keys_v1/tween.py key.png key.png <out> 8 "one complete natural human walking|running cycle … ending back in this exact starting pose; legs alternate cleanly, one crossing per step, arms …"` (animate-with-text-v3, 8). 결과 9장 중 0~7.
-   - 대각선 뒷모습: `STRICT three-quarter BACK view … her face is never visible, she never turns to a side view`.
-3. 걷기는 `cycle8.py`로 장마다 키 맞춤(pxscale), 달리기는 원본 그대로(웅크림이 자연스러움).
-4. 틱 걷기 [6]*8, 달리기 [4]*8.
+### 4. 걷기·달리기
+- **0부 5 그록 영상 방식만** 쓴다(사장님 10-30 「다른 거 다 지우고 무조건 이렇게」).
 
 ### 5. 짧은 동작 (대시·맞기·사망, 약 25)
 - 옆: `linette_skel_v1/pose_keys.py`(몸 숙임·허벅지·무릎·팔 각도를 숫자로) → animate-with-skeleton-v3(3).
@@ -379,113 +369,6 @@
 
 ---
 
-# 부록 A. 정면·뒷면·대각선 걷기·달리기 — 핵심 자세 방식 상세 (옛 MOTION_NS_KEYPOSE_ko.md)
-
-### 0. 결론 한 줄
-정면·뒷면 이동은 **뼈대(스켈레톤)로 만들지 않는다.** PixelLab 이미지 편집으로 **핵심 자세 2장**(오른발 앞 / 왼발 앞)을 정확히 그리고,
-그 사이를 PixelLab `animate-with-text-v3`(첫 장 + 마지막 장)로 이어 8장 주기를 만든다.
-
-### 1. 왜 뼈대가 실패했나 (반복하지 말 것)
-| 시도 | 결과 | 원인 |
-|---|---|---|
-| 주인공 정면·뒷면 그림에서 뼈대 추출 → 오프셋 이식 | "다리가 왜이래" | 다리 폭을 억지로 좁힘(LEGX), 정면 걷기는 발이 거의 안 들림 |
-| 주인공 다리 각도(뼈 방향)만 이식 | 발 드는 동작이 사라짐 | 정면·뒷면에서 든 발은 **짧아 보이는 것**(원근)인데 뼈 길이를 고정해서 없어짐 |
-| 주인공 다리 모양 그대로 + 길이 비율 | 뼈대는 맞는데 그림이 어색 | PixelLab 뼈대 도구는 평면 좌표만 받음 → "앞으로 나온 다리"를 짧은 다리·든 다리로 그림 |
-| 모션캡처(CMU 07_01 걷기, 09_01 달리기)를 정면에서 본 뼈대 | 게다리 / 다리 꼬임 / "강아지처럼 달린다" | 발이 한 줄로 모이면 꼬이고, 엉덩이 밑에 일자로 고정하면 로봇 같고, 두 다리가 같이 굽으면 깡충 |
-| PixelLab 자체 글 애니메이션(정면 걷기 8장) | 다리가 앞뒤로 자연스럽게 안 움직임 | 정면 걷기를 글만으로는 제대로 못 그림 |
-
-핵심 원인: **정면·뒷면 걸음은 다리가 카메라 쪽으로 움직여서 2D 좌표로는 표현이 안 된다.** 사람이 그린 것 같은 "디딤·밑창·무릎 앞으로" 같은
-자세는 그림(이미지 편집)으로 직접 지정해야 나온다.
-
-### 2. 성공한 순서 (방향마다, 걷기·달리기 각각)
-1. **시작 그림**: 캐릭터 정면/뒷면 원본(8방향 rotation의 south / north, 256 캔버스, 발 y≈189). 리네트: `linette_skel_v1/start_idle_south.png`, `start_idle_north.png`.
-2. **핵심 자세 2장** — `linette_thrust_v1/edit_pose.py` (edit-images-v2 edit_with_text, 장당 10).
-   - 같은 시드(7)로 오른발 앞(R) / 왼발 앞(L) 두 장. 아래 프롬프트를 그대로 쓴다(좌우 단어만 바꿈).
-   - 화면 기준 좌우를 꼭 적는다: 정면에서 그녀의 RIGHT 다리 = 그림 왼쪽, 뒷면에서 RIGHT = 그림 오른쪽.
-3. **확인**(크레딧 0): 두 장을 나란히 확대해서 본다. 팔이 꼬였거나 한 장만 다르면 **그 장만** 편집으로 고친다
-   ("Keep this exact pose … Only change the arms …", 10). 리네트 정면 달리기 R은 팔이 몸 앞에서 꼬여서 1번 고쳤다.
-4. **사이 장** — `linette_ns_keys_v1/tween.py` (animate-with-text-v3, first_frame + last_frame, 4프레임 = 4, 결과 5장).
-   R→L 한 번, L→R 한 번. 두 번 다 같은 시드.
-5. **주기 조립** — `cycle_ns.py <d> <out> [rise]`: R, RL1, RL2, RL3, L, LR1, LR2, LR3 (8장).
-   - **핵심 자세 하나를 좌우 뒤집어 썼다면 몸 자리도 뒤집힌다**(주인공 v3 정면 달리기, 장마다 옆으로 74칸 미끄러짐) → 장마다 정면 = 얼굴 가운데, 뒷면 = 어깨 띠 가운데를 출발 그림에 맞춘다(`hero3_v1/run/cycle.py`).
-   - **정면 달리기는 다리가 앞뒤로(카메라 쪽으로) 보여야 한다** (사장님 10-29 「정면 걷기가 게다리」 → 10-30 「앞뒤로 다리가 움직여야지, 교본 봤나」):
-     - 디딤(R·L)과 지나감(P)을 **둘 다 깊이로** 그린다: 디딤 = 「앞발은 그림에서 가장 아래·조금 더 크게(가까움), 뒷발은 더 위·작게·발끝으로 서서 밑창」, 지나감 = 「디딘 다리는 몸 밑, 다른 무릎이 카메라 쪽으로 와서 허벅지가 짧아 보이고 발은 무릎 밑에 매달림」. 「다리 모아 나란히, 발을 뒤로 듦」만 쓰면 제자리걸음, 디딤 둘만 길게 이으면 가운데가 게다리.
-     - **순서**: 디딤 R → 지나감(R로 버티고 L 무릎이 앞으로) → 디딤 L → 지나감(L로 버티고 R 무릎) → R. 디딘 발을 바로 들면 깡충(스킵).
-     - PixelLab은 글의 왼쪽·오른쪽을 자주 무시함(10-29~30에 핵심 자세 3번 틀림) → 키 4장을 **얼굴 가운데 세로선**과 함께 다리만 확대해 확인(`hero3_v1/run/legs_center6.png`), 틀린 장은 맞는 장을 좌우 뒤집고 「이 자세 그대로, 망토 무늬·얼굴만 기준대로」 편집(10). 뒤집은 장은 몸 자리 맞춤.
-     - 사이 장은 4묶음(최소 4장)에서 가운데 1장씩 → 8장(`hero3_v1/run/cycle5.py`). 순서가 거꾸로 됐으면 8장을 거꾸로 틀면 됨(사이 장은 거꾸로도 맞음, 0 크레딧).
-   사이 장은 ~5% 크게 그려지고 두 핵심 자세도 몇 % 다를 수 있어서 **모든 장을 발 기준으로 같은 키로 맞추고**, 중간 장만 1~3px 높게(몸 올라옴).
-6. **아틀라스** — `linette_final_v1/assemble.py`의 `SRC[...]['south'|'north']`(방향 키 south/north, 좌우 반전 없음),
-   틱: 걷기 [6]*8, 달리기 [4]*8. `polish.py`: 달리기는 공중 높이를 4px까지로 제한(그 이상은 깡충으로 보임). 걷기는 그린 땅 그대로.
-   `build_atlas.py` DIRS에 'south','north' 포함.
-7. **게임**: 위·아래로 움직일 때 `walk_south / walk_north / run_south / run_north`, 멈추면 대각선 서기.
-8. **확인 영상**: 오른쪽·왼쪽에서 위 걷기 → 서기 → 아래 걷기 → 서기 → 위·아래 달리기 (playud.js). 시트도 같이 보낸다.
-
-### 3. 프롬프트 (그대로 복사, 좌우만 바꿈)
-공통 꼬리: `Keep the exact same character design, colors, outfit, size and the two thin silver needles, full body, no effects.`
-- 정면 걷기 R: `Natural human walking pose toward the viewer, mid-stride contact: her RIGHT leg (on the left side of the image) steps forward toward the viewer with the heel touching the ground, that foot slightly lower in the image and slightly bigger; her LEFT leg is behind her, knee slightly bent, standing on the toes. Feet about hip width apart, not crossed. Hips level, torso upright, a slight natural arm swing: left arm a little forward, right arm a little back, needles still pointing down.`
-- 뒷면 걷기 R: `Natural human walking pose walking AWAY from the viewer, back view, seen from behind, we see her back and ponytail, mid-stride contact: her RIGHT leg (on the right side of the image) steps forward away from the viewer, heel touching the ground, that foot slightly higher in the image; her LEFT leg is behind her nearer the viewer, knee slightly bent, heel lifted so we see the sole of the boot. Feet about hip width apart, not crossed. Hips level, slight natural arm swing, needles pointing down.`
-- 정면 달리기 R: `Natural human RUNNING pose toward the viewer, front view facing the viewer, face visible: her RIGHT knee (left side of the image) drives up and forward toward the viewer, thigh raised, foot off the ground under the knee; her LEFT leg pushes off behind, nearly straight, only the toes touching the ground. Torso leaning slightly forward, both arms at her sides slightly pulled back holding the needles. Not crossed, human proportions.`
-  (처음엔 "arms pulled back behind the hips"로 썼다가 팔이 몸 앞에서 꼬였다 → "arms at her sides"로 쓴다)
-- 뒷면 달리기 R: `Natural human RUNNING pose running AWAY from the viewer, back view …: her RIGHT knee (right side of the image) drives up and forward away from the viewer; her LEFT leg behind her nearer the viewer is bent with the heel kicked up high so we see the sole of the boot. Torso leaning slightly forward, both arms at her sides slightly pulled back holding the needles pointing down. Not crossed, human proportions.`
-- 사이 장(걷기): `natural human walk toward the viewer (/ away from the viewer, back view the whole time): the back leg swings forward past the standing leg, knee bends as it passes, body rises slightly at the passing moment, gentle opposite arm swing, front view the whole time, no effects`
-- 사이 장(달리기): `natural human run toward the viewer, front view the whole time: the pushing leg swings through and its knee drives up while the other leg comes down and pushes off, brief moment with both feet off the ground, arms at her sides holding the needles, no effects`
-  (뒷면: `… the kicked-up heel swings through and that knee drives forward while the other leg pushes off and its heel kicks up showing the sole …`)
-
-### 4. 비용 (리네트 실측, 이 방식만)
-- 동작 1개(한 방향) = 핵심 자세 2×10 + 사이 장 2×4 = **28**. 고칠 장이 있으면 +10.
-- 정면·뒷면 걷기·달리기 4개 = 112 (+팔 고침 10 = 122).
-- 뼈대 시도로 버린 비용 약 70 — 다음엔 쓰지 않는다.
-
-### 5. 체크리스트 (보내기 전)
-- [ ] 두 다리가 번갈아 움직이나 (같이 굽으면 강아지)
-- [ ] 발이 꼬이지 않나, 다리가 벌어지지 않나 (게다리)
-- [ ] 뒷발 밑창/뒤꿈치가 보이나 (뒷면)
-- [ ] 장마다 키가 같나 (cycle_ns 출력 h 값), 얼굴·디자인이 원본과 같나
-- [ ] 달리기 공중 높이 4px 이하, 걷기는 땅에서 안 뜨나
-- [ ] 크레딧은 잔액 앞뒤로 확인, 다른 방 사용분과 구분해서 보고
-
-### 6. 대각선(3/4) 추가 교훈 (2026-10-21)
-- 대각선도 같은 방식으로 된다(↘/↗ 원본에서 "the leg nearer to the viewer / the far leg"로 2장, 좌우 단어 대신 near/far).
-- **함정**: 대각선 **달리기**는 near/far 두 장이 사실상 같은 자세로 나오는 경우가 있다 → 반 주기마다 다리가 한 바퀴씩 돌아 교차 장이 이상해진다(사장님 "다리교차 프레임 이상").
-  확인법: 두 핵심 자세를 나란히 놓고 **뒤로 간 다리가 서로 반대인지** 본다. 같으면 →
-  `tween.py key.png key.png tw8_<d> 8 "one complete natural human running cycle … ends back in this exact starting pose; legs alternate cleanly, one crossing per step …"` (8) 한 번으로
-  한 주기 8장을 받고 `cycle8.py`로 키를 맞춘다. 이쪽이 더 싸다(8 vs 8+사이장).
-- 대각선 걷기는 아래로 걸을 때 몇 장이 7px 뜬다 → polish에서 걷기는 발을 땅선에 붙임(1px 출렁임). 달리기는 4px 이상 뜨지 않게, 땅 아래로 묻히지 않게.
-- 리네트 대각선: 핵심 자세 8장 80 + 사이 장 32 + 달리기 한 주기 2회 16 = 128.
-
-### 7. 크기·위치 맞추기 (2026-10-21, 사장님 "동그라미 그려서 봐봐")
-- 크기는 **전체 키로 맞추지 않는다**(웅크린 달리기가 커진다). 머리(파란 리본 위) → 치마 아랫단(빨강 최하단) 길이로 모든 서기·걷기·달리기를 옆 서기와 같게(polish.py).
-- 위치는 발이 아니라 **몸(치마 가운데)** 기준으로 클립마다 한 번만 x 이동 → 방향 바꿀 때 옆으로 튀지 않는다.
-- 확인: `linette_final_v1/circle_check.py frames_polished out.png` — 모든 클립을 같은 원 안에 그려서 크기·튀어나온 곳을 본다.
-
-### 8. 최종 확정본 (2026-10-21 사장님 "이거 좋다")
-- **8방향 걷기·달리기 전부 같은 방식**: 방향마다 핵심 자세 1장(팔 흔들기 포함) + `tween.py key key … 8`로 한 주기 8장(`cycle8.py`). 좌우·정면·뒷면·대각선 모두.
-  - 핵심 자세 프롬프트에 팔: 걷기 `arms swing naturally opposite to the legs (one arm forward, the other back), each hand holding its thin silver needle`,
-    달리기 `arms pump energetically opposite to the legs (one arm forward with the elbow bent, the other back)` + 정면은 `neither hand is raised above the chest`.
-  - 뒷모습은 `the red bikini top and its thin back strap are clearly visible across her back` (안 쓰면 위로 뛸 때 브라가 사라짐).
-  - 대각선 뒷모습 주기는 `STRICT three-quarter BACK view … her face is never visible, she never turns to a side view` (안 쓰면 옆모습으로 돌아감).
-- **크기**: 머리→치마 길이로 옆 서기와 같게, **위치**: 치마 가운데 기준(7절). 확인은 `circle_check.py`.
-- **크기 바꿀 때는 무조건 `pxscale.py`** (부드럽게 줄인 뒤 원래 색으로 맞춤). 가장 가까운 픽셀 복사(NEAREST)는 도트 줄이 겹치거나 빠져 "도트가 부드럽지 않다".
-- 비용 감각: 동작 1개(한 방향) ≈ 18 (핵심 자세 10 + 한 주기 8). 리네트 8방향 걷기·달리기 + 수정까지 이번 이틀 약 550.
-
-### 9. 크기·위치 맞출 때 움직임을 지우지 말 것 (2026-10-23, 4번방, 사장님 "수정전보다 뻣뻣하다")
-- **실수**: 주인공 정면 걷기·달리기를 맞추면서 **장마다** 키를 같게 맞추고 발·몸 가운데를 **장마다** 고정했다.
-  → 걷기는 몸이 오르내리던 것(머리 1px만 남음)과 좌우 흔들림이 사라져 로봇처럼 미끄러졌고,
-  달리기는 발을 땅에 붙이자 몸이 뛰어오르는 대신 머리가 거꾸로 13px 출렁였다.
-- **규칙**
-  1. 크기·위치는 **동작 하나에 한 번만** 맞춘다(같은 배율, 같은 이동). 장마다 따로 맞추지 않는다.
-  2. 땅 아래로 파고드는 장만 들어 올리되, 그 때문에 머리가 튀면 들지 말고 원래대로 둔다.
-  3. 보내기 전에 **움직임 숫자를 수정 전과 비교**한다: 머리 오르내림, 발 오르내림, 몸 좌우 흔들림, 키 변화.
-     자연스러운 값: 걷기 머리 3~9px · 몸 좌우 2~4px / 달리기 머리 4~6px · 발 15~25px.
-     수정 후 숫자가 크게 줄었으면 뻣뻣해진 것이다.
-  4. AI가 그린 걷기에 좌우 흔들림이 거의 없으면(1px대) 한 바퀴에 한 번 ±2px 몸무게 옮김을 코드로 더한다.
-- 도구: `tools/anim/motioncheck/audit2.py`(움직임 숫자), `handoff/claude/hero8_front_v1/assemble.py`의 `keep()`(동작 단위로 맞추기), `sway()`.
-- 같은 날 추가 규칙(사장님 "이럴거면 왜 새로 그린거야"):
-  5. 그리기·고치기 **전에** 모습(정면/비스듬/옆)을 사장님께 먼저 확인한다. 주인공 "아래쪽"은 원래 비스듬한 그림이라 그대로 따라 그렸다가 정면이 아니어서 버렸다(18크레딧).
-  6. 다듬기는 **비교 영상을 먼저 보여 주고** 허락받은 뒤 넣는다. 정면 달리기 다듬기(튀는 높이 줄이기)가 오히려 뻣뻣해져서 되돌렸다.
-
----
-
 # 2부. 캐릭터별 기록
 
 ## 2-1. 리네트 (2번방, 2026-10-21)
@@ -510,10 +393,6 @@
 10. "좀더 앞으로 찌르는 듯한 검흔" → 창끝 모양으로 쭉 뻗고 꼬리가 따라붙는 찌르기 줄기(0).
 11. "대각선 방향이 왜 없지" → 대각선 입력이면 대각선 그림 + 45° 검흔(0).
 
-### D. 달리기 팔
-1. "달릴때 팔과 무기를 뒤로빼고" → 4가지 후보 → "1번" → 이후 "리네트는 두팔다 뒤로" → "팔위치를 허리위 기존 모션처럼" → 손 허리·팔 뒤 버전(`arms_back.py`).
-2. (최종) **"모든 모션 팔을 흔드는걸로 가자"** → 2부 L 참고.
-
 ### E. 방향 규칙 변화
 1. "남북 방향은 전부 안쓴다, 대각선으로 대신" → 위·아래는 대각선 + 마지막 좌우로 반전, 맞기·사망은 옆.
 2. (이후) "아래위 북쪽 남쪽 걷기 뛰기 만들라고" → 정면·뒷면 다시 도입 → 2부 J~K. 결국 **8방향 전부** 사용.
@@ -532,29 +411,6 @@
 1. "밑으로 대각선 양 방향 팔위치 좌우랑 틀리다" → 대각선은 팔을 벌리거나 처짐 → 옆 동작 팔 뼈대를 대각선에 이식(`diag_arms_like_side.py`)해서 서기·걷기·달리기 다시(9.3).
 2. 위 대각선도 같은 방식(9.3) → 사장님 "머야 이거 삭제해, 내말은 남북" → 롤백(미리보기 되돌림). 나중에 대각선 입력 도입 때 다시 씀.
    - 교훈: 요청 단어("아래위")를 **정면·뒷면인지 대각선인지** 먼저 확인.
-
-### J. 정면·뒷면 걷기·달리기 — 뼈대 방식 실패 5번 (약 70 버림)
-1. 주인공 정면·뒷면 그림에서 뼈대 추출 → 오프셋 이식 + 다리 폭 좁힘(LEGX) + 정면 걷기 인위적 발 들기 → **"다리가 왜이래, 주인공 다리모션 참조"** (18.2)
-2. 주인공 다리 **각도**(뼈 방향)만 이식 → 정면·뒷면에서 발 드는 동작이 사라짐(든 발 = 짧아 보이는 다리인데 뼈 길이를 고정) → 버림(12)
-3. 주인공 다리 **모양 그대로** + 길이 비율 → 발 들기는 살았지만 달리기에서 몸이 뜨고(11px) 묻힘(15px) → 땅 맞춤(12)
-4. **"그냥 스켈레톤 써서 걷는 프레임시트"** → CMU 모캡 걷기(07_01)를 정면에서 본 뼈대(주기 감지가 달리기용이라 0.3초로 잘못 잘림 → 수동 1.08초) → **"게다리 수정해"** (발이 한 줄로 모여 꼬임) → 발을 엉덩이 밑 일자로 → **"이상하다 픽셀랩에 고쳐라"** (6+3)
-5. PixelLab 글 애니(정면 걷기 8장) → **"다리가 앞뒤로 자연스럽게 안움직임"** → 모캡 + 깊이 기울기 키움 → 걸음은 보이지만 → **"강아지처럼 달린다"** (8+3+9)
-   - 원인 분석(사장님 "원인 분석"): ① 정면·뒷면 걸음은 다리가 카메라 쪽으로 움직여 2D로 표현이 안 됨 ② PixelLab 뼈대 도구는 깊이를 모름 ③ 팔·몸 고정 ④ 다리를 억지로 일자/좁게 ⑤ 장마다 다르게 그림 ⑥ 이동 속도·보폭 불일치.
-
-### K. 정면·뒷면 — 핵심 자세 방식 성공 (122)
-1. "2번 해라, 인간의 자연스러운 움직임, 꼭 해내라" → 핵심 자세 2장(오른발 앞/왼발 앞, edit 10) + 사이 장(animate-with-text-v3 first+last, 4) → 8장 주기.
-2. 정면 달리기 한 장이 팔이 몸 앞에서 꼬임("arms pulled back behind the hips"가 원인) → 그 장만 "arms at her sides"로 다시(10).
-3. 사이 장이 5% 크게 그려짐 → 발 기준으로 키 맞춤. 뒷면 달리기 10px 뜸 → 4px로 제한.
-4. **"너무 잘했다, 이거 성공이야"** → 방법 문서화 + 전 방 전파.
-
-### L. 대각선·옆도 같은 방식으로 (128 + 36 + 160 + 18)
-1. "대각선이 이상한데, 최신 맞아?" → 대각선만 옛 뼈대 방식이라 정면·뒷면과 이어 보면 어색 → 대각선 걷기·달리기도 핵심 자세 방식(112).
-2. **"대각선 달리기 다리교차가 프레임이 이상"** → near/far 두 핵심 자세가 **같은 자세로 그려져** 반 주기마다 다리가 한 바퀴씩 돎 → **같은 장→같은 장 한 주기 8장**(8×2=16). 이 방식이 더 싸서 이후 표준.
-3. **"좌우 캐릭터 도트 화질이 크기 차이 나고 자연스럽지 않음"** → 좌우만 옛 뼈대 방식이라 그림체가 다르고 달리기가 108px로 작음 → 좌우도 핵심 자세 1장 + 한 주기(36).
-4. **"캐릭 크기가 방향별로 틀려지네 / 위로 뛸때 브라가 없어지고 / 좌우는 팔을 흔드는데 나머지는 팔이 뒤에 → 모든 모션 팔을 흔드는걸로"** → 8개 다시(팔 흔들기 + 뒷모습 비키니 끈 명시), ↗는 주기 중 옆모습으로 돌아가 "STRICT back view"로 재생성(160).
-5. **"리네트를 기준으로 동그라미를 그려서 봐봐, 뛸때 좌우 크기가 훨씬커"** → 원인: 전체 키로 맞춰서 웅크린 달리기가 확대됨 + 발 기준 정렬로 몸이 좌우로 치우침(최대 32px) → **머리→치마 길이로 크기, 치마 가운데로 위치** + `circle_check.py`(0).
-6. **"아래로 뛸때 한쪽팔 고정 / 아래 위 도트가 좌우만큼 부드럽지 않아"** → 정면 달리기 한 손이 바늘 든 채 굳음 → 양팔 다시(18). 도트: 크기 맞추며 NEAREST로 2~3번 늘이고 줄여 도트 줄이 겹치거나 빠짐 → **pxscale**(부드럽게 줄인 뒤 원래 색으로)(0).
-7. **"어 이거 좋다, 결국에는 크레딧 써서 만들어야 자연스러워 지는구나"** → 세팅(PR #49).
 
 ### M. 조작
 1. "조작 키보드로" → Shift 달리기, Z/X/C 대체키, 스크롤 막기, 키 눌림 해제, 터치 패드 자동 숨김.
@@ -665,30 +521,6 @@
 - **좋아진 것**: 장마다 몸이 이어져 다리 위치·길이가 일정, 팔·다리가 고르게 움직임, 픽셀랩 크레딧 0.
 - **다음엔**: 깊이 있는 걸음(정면·뒷면)은 이 방법을 먼저. 그록 부탁 글 꼴은 그대로 쓰고 방향·동작만 바꿈.
 
-### 모션 기록: 정면 달리기 — PixelLab 방식 기록(그록 영상 방식으로 다시 만드는 중)
-- **최종 파일**: `hero3_v1/run/run_s_face/000~007.png`(얼굴 찍은 8장, 256판, 발 y 246) · 자리표 `face_table.json` · 묶기 전 `run_s/` · 무릎 아래 확인 `run/legs_check.png` · 8장 판 `run/run_s_8/`·12장 판 `run/run_s_12/`(사장님 고르기 기다림) · 줄 세우기 `run/r8f_strip.png`·`run/r12f_strip.png` · 영상 `run/정면달리기_8장_12장.mp4`.
-- **핵심 자세 4장** (`edit-images-v2` `edit_with_reference`, 편집·기준 그림 = 서기 정면 `ref/down_face.png`, seed 7, 장당 10). 공통 꼬리: `Keep the exact same character design, face, hair, colors, outfit, armor, tattered cape and size, full body, empty hands, no effects, no shadow.`
-  - 디딤 CR: `Natural human RUNNING stride toward the viewer, front view facing the viewer, face visible, seen with depth: his RIGHT leg (left side of the image) reaches FORWARD toward the viewer and lands on the heel, so that RIGHT boot is the LOWEST point in the image and looks slightly BIGGER because it is closer; his LEFT leg (right side of the image) is stretched BEHIND him, pushing off on the toes, so that LEFT boot is clearly HIGHER in the image, smaller and partly hidden behind the right leg, we see the sole of the left boot. Feet about hip width apart, not crossed, not spread sideways. Torso leaning forward, opposite arm swing: left fist forward, right arm back, the cape flowing behind.`
-  - 지나감 PA: `Natural human RUNNING passing pose toward the viewer, front view facing the viewer, seen with depth: his RIGHT leg (left side of the image) is under the body carrying the weight, foot on the ground; his LEFT knee (right side of the image) swings FORWARD toward the viewer, so the left thigh looks short and the knee is in front of the body, the left boot hangs just under the knee off the ground. Legs under the hips, not spread sideways. Torso leaning forward, arms at his sides, cape flowing behind.`
-  - 디딤 CL2·지나감 PB2: 글로 좌우를 바꿔 뽑으면 **같은 발이 나옴** → CR·PA를 좌우 뒤집고 `Keep this exact running pose and leg positions (…). Only fix the details to match the reference character exactly: the same face, hair parting, the cape patches and tears on the same sides as the reference, the same armor and belt.`(기준 = 서기 정면).
-- **사이 장**: `animate-with-text-v3` first/last, frame_count 4(최소 4, 결과 5장), seed 7, 묶음당 4. 글: `natural human run toward the viewer, front view the whole time, face visible, legs moving forward and back with depth: the front foot comes down lower and closer to the viewer, the back foot pushes off higher and further away, the swinging knee comes forward toward the viewer, legs stay under the hips, feet never spread sideways, arms swinging at his sides, cape flowing behind, no effects`.
-- **순서(최종)**: 핵심 hero3_CR(디딤) · hero_PB2(지나감) · hero3_CL(디딤) · hero_PA2(지나감), 사이 장 `t7_*`. 8장 판 = 핵심 + 각 묶음 2번 장(`run/cycle_v8.py`, 4틱씩). 12장 판 = 핵심 + 묶음마다 2장(CR→PB 2·3, PB→CL 1·2, CL→PA 2·(CR→PB 3 뒤집기), PA→CR (PB→CL 1 뒤집기)·2) (`run/cycle_v12.py`, 3틱씩). CL·PB는 CR·PA를 좌우 뒤집어 「이 자세 그대로, 무늬·얼굴만」 다듬음.(키 맞춤 pxscale·발 기준, 지나가는 장 +2px, 공중 4px까지, 정면 = 얼굴 가운데로 제자리) → `run/stamp_one.py`(얼굴 한 장 통째로).
-- **틀린 것 → 알아챈 법 → 고친 법** (순서대로):
-  1. 정면 R·L 핵심 자세가 같은 발 → 다리 확대 → L을 뒤집어 고침. 그런데 **뒤집은 장은 몸 자리도 뒤집혀** 장마다 옆으로 74칸 미끄러짐(영상에서 봄) → 얼굴 가운데로 제자리 맞춤.
-  2. 사장님 「정면 얼굴을 한 개만 써야 되는데」 → 얼굴 판을 그 장 살색 안쪽에만 붙였던 것 → 얼굴+앞머리 한 장 통째로(장끼리 다른 칸 0 확인).
-  3. 사장님 「정면 걷기가 게다리」 → 디딤 둘 사이를 사이 장 4장으로 길게 이으면 가운데에서 다리가 옆으로 벌어짐 → 지나가는 자세 2장 추가(4자세).
-  4. 사장님 「앞뒤로 다리가 움직여야지, 교본 봤나」 → 지나가는 자세를 「다리 모아 나란히」로 써서 제자리걸음 → 디딤·지나감 둘 다 **깊이**(앞발 아래·크게, 뒷발 위·발끝, 무릎이 카메라 쪽)로 다시. 1장 시험 먼저.
-  5. 디딤 2장·지나감 2장이 또 같은 발 → 얼굴 가운데 세로선 그은 다리 확대(`legs_center6.png`)로 찾음 → 뒤집어 고침.
-  6. 묶은 순서가 「디딘 발을 바로 듦」(스킵) → 8장을 거꾸로(0).
-  7. 사장님 「중간에 다리가 다른 방향으로 보인다」 → 사이 장 2장(2·6번째)에서 디딘 장화가 옆을 봄(발끝이 옆) → 사이 장 묶음 5장을 다 펼쳐 봄(`tween_feet.png`) → 발이 앞을 보는 장으로 바꾸고, 맞는 장이 없는 자리는 반대쪽 사이 장을 좌우 뒤집어 씀. 두 발 나란히 선 장(멈춘 듯)도 다리가 갈라진 장으로 바꿈(0).
-  8. 사장님 「무릎 밑 다리가 아직도 간헐적으로 휜다」 → 무릎 아래만 4배 확대(`legs_check.png`)로 3·4·7·8번째 장화 목 휨·발목 꺾임 찾음. 코드로 줄마다 옮겨 펴기 → 가장자리 계단처럼 깨짐(버림), 서기 장화 옮겨 붙이기 → 장화가 다 안 잡혀 깨짐(버림). → 사이 장 2장은 같은 묶음의 곧은 장(1번 장)으로, 지나가는 자세 2장은 편집 「Keep this exact running pose … Only fix the supporting leg on the RIGHT/LEFT side of the image: the lower leg and the boot below the knee must be perfectly STRAIGHT and vertical, no bend or kink at the ankle, the boot standing flat on the ground with the toe pointing toward the viewer.」(장당 10, 편집 그림 = 그 장, 기준 = 서기 정면).
-  9. 사장님 「팔 위치·굽힘이 너무 뻣뻣」 「팔을 액션 주인공처럼 흔들어야지, 무슨 여자처럼 흔들어」 → 주먹이 가슴 가운데로 모이고 팔꿈치가 몸에 붙음. 「팔 크게·무릎 높게」 편집은 팔이 그대로거나 만세처럼 됨(버림 40). → 팔만 편집(장당 10, 1장 시험 먼저): 디딤 `Change only the arms to a powerful masculine ACTION-HERO sprint arm swing, like a warrior charging: shoulders squared and broad, torso leaning forward, both fists clenched tight; the arm on the LEFT side of the image drives straight FORWARD along the side of the body, elbow bent about 90 degrees, its big fist punched forward toward the viewer at shoulder height; the arm on the RIGHT side of the image drives straight BACK, the elbow pulled far back and out to the side, its fist behind the hip. The arms swing forward and back in straight lines beside the body and never cross in front of the chest, no dainty or feminine pose.` / 지나감 `… both arms hang LOW beside the body with elbows bent, both clenched fists DOWN AT THE SIDES next to the hips, … The fists are NOT raised to the chest and NOT in front of the body center …`(「가운데로 오는 중」이라 쓰면 다시 가슴으로 모임). 꼬리: 얼굴·옷·**다리·장화는 이 그림 그대로**. 반대쪽은 뒤집어 다듬기. 사이 장은 주먹이 가슴 가운데로 온 장·손 편 장은 빼고 고름(`t6_all.png`).
-  10. 사장님 「손이 너무 커지고 부드러운 모션이 아닌데」 → 주먹을 카메라 쪽으로 뻗게 해서 커짐(원근), 주먹 뻗은 장이 1장뿐이라 다음 장에 뚝 떨어짐. → 디딤 팔 다시: `… both fists clenched and NORMAL SIZE, the same size as the hands in the reference (not enlarged, not pointing at the viewer); the arm on the LEFT side of the image swings forward with the elbow bent about 90 degrees, its fist raised to chest height directly in front of its OWN shoulder (left side of the chest), not in the middle; the arm on the RIGHT side of the image swings back with the elbow bent and pulled back, its fist beside and slightly behind the hip. Arms move along the sides of the body, never crossing the chest center.` + 사이 장 글에 「arms swing smoothly … rising to chest height in front of their own shoulder and coming back down beside the hip」 → 장 수를 늘려(12장) 팔이 올라가는·내려가는 중간을 넣음. 16장은 발 겹침·한 다리만 보이는 장이 4장 나와 뺌(`full16.png`).
-  11. 사장님 「아니 다리가 또 왜 이상하게 돼? 문제가 뭐야?」 → **근본 원인**: PixelLab은 장마다 몸을 새로 그려서 머리에 대한 허벅지 자리가 장마다 다름(12장 판, 얼굴 맞춘 채 허벅지 가로 82~113 = **31칸 차이**). 하나를 고치려고 다시 뽑으면 다른 곳이 틀어지고, 사이 장을 새로 뽑을 때마다 다리가 새로 망가짐 = 「장마다 따로 그려 이어 붙이기」의 한계. → 사장님 「그록 영상으로 한 번에」: 0부 5번 방법 B(그록 이매진 영상 → 장면 자르기, sprite-gen B 길). 입력 그림·부탁 글 `hero3_v1/grok_video/`.
-  - 다음엔: 정면·뒷면처럼 깊이가 있는 걸음은 **처음부터 영상(방법 B)**으로 해 보고, PixelLab 핵심 자세 방식은 영상이 안 될 때만. 장마다 그릴 땐 「얼굴 맞춘 채 허벅지 가로 자리 차이」를 숫자로 재서 8칸 넘는 장은 쓰지 않는다.
-- **확인할 것(다음엔 처음부터)**: 장마다 ① 두 발의 높이 차(앞발 아래) ② 발끝이 앞을 보나 ③ 다리가 옆으로 안 벌어지나 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같나 ⑥ 제자리인가 ⑦ **무릎 아래(장화 목)가 곧은가**(4배 확대) ⑧ **팔이 몸 옆선을 따라 앞뒤로, 주먹이 가슴 가운데로 안 모이나, 주먹 크기 = 서기 손** ⑨ **팔·다리가 장마다 고르게 움직이나**(한 장만 튀는 자세 없나) — 다리 확대 + 얼굴 가운데 세로선 그림 한 장으로 본다.
-- **크레딧**: 처음 핵심 4 + 고침 1 + 사이 장 = 66 → 게다리 고침 36 → 깊이 다시 84 → 발 방향 0 → 무릎 아래 20 → 액션 팔 40(시험 버림) + 60 + 사이 장 16. → 주먹·부드럽게 36. 합계 **358**(그중 버린 것: 같은 발로 나온 핵심 자세 4장 40, 쓰지 않게 된 옛 핵심·사이 장 약 80).
-
 ## 2-3. 주인공2 (망토 없는 새 디자인, **봉인** — 사장님 10-22 "새주인공은 봉인이야")
 - 위치: 브랜치 `claude/linette-8dir`의 `handoff/claude/hero_v6_mini/` (게임 미연결). 서기·걷기·달리기 5방향 완성.
 #### 디자인
@@ -698,14 +530,6 @@
 - **옆·북동** (`anim.py` → `seam.py`/`pick_seam.py` 이음새 보간 → `post_run.py` → `check_run.py`): 바닥선 189 고정, 몸통 x 5프레임 원형 평균, 틱은 디딘 발 이동 거리 ÷ 속도. 옆 달리기 발 미끄러짐 51.8 → 8.6px.
 - **정면·뒷면·남동** (핵심 자세 방식, `handoff/claude/MOTION_NS_KEYPOSE_ko.md`): `ns_keys.py` 오른발·왼발 자세 2장 → `ns_tween.py` 사이 프레임 → `ns_cycle.py` 8프레임 → `ns_polish2.py`.
 - **대기**: `idle_pingpong.py` (0-1-2-3-2-1 왕복).
-
-##### 정면 달리기·정면 대각 수정 기록
-원인:
-1. 정면 달리기 키 포즈의 왼손이 허리에 붙어 있고 사이 프레임은 팔을 흔들어서, 키 프레임마다 팔이 튐. 칼 각도 ±7°.
-2. 예전 `ns_polish.py`가 프레임마다 따로 높이를 잘라서 머리가 박자 없이 최대 6px 출렁임.
-3. 남동은 글자 지시 애니메이션이 옆모습 쪽으로 돌아가며 칼이 뒤집히고(-80° → +27°) 달리기가 뻣뻣함.
-
-해결: `ns_polish2.py`(클립 단위 바닥 맞춤 + 걸음 박자 머리 높이, 걷기 1px·달리기 2px), `ns_pixfix.py`로 정면 달리기 키의 팔만 고쳐(R s71, L s72) 다시 생성(칼 ±4°), 남동은 핵심 자세 방식으로 새로 만듦.
 
 #### 남은 것
 - 북동 걷기·달리기는 글자 지시 방식이라 옆모습 쪽으로 도는 경향이 있을 수 있음. 리네트 방 최종 방식(동작당 약 18)으로 다시 하면 약 36.
