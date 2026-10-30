@@ -171,7 +171,7 @@
 1. 작업 가지 폴더에서 `python3 -m http.server <포트>` → 주소 `test128/index.html?nosave&worldreset&noscene&go=<맵>`(최신 main + 깨끗한 저장).
 2. `node tools/anim/hero_play/play_run.js <포트> <폴더>`(들판, 몹 있음): ↓↑→← 달리기·걷기·공격·점프 → **오류 0**, 걸음 소리 수·간격.
 3. `node tools/anim/hero_play/play_side.js <포트> <폴더> go=felt`(몹 없는 펠트, ↓로 트인 곳에 먼저 나감) → 옆 달리기·평소 이동.
-4. 영상: 녹화(webm)는 스크립트 시각보다 1~2초 늦게 시작 → **장면 모아 보기(0.2초마다)로 구간을 찾고** 자름. 주인공 둘레 640×360을 잘라 2배(neighbor) + 글자, 실제 빠르기 + 0.4배(또는 4배) 느리게, 전·후는 나란히(hstack). PC 16:9 MP4.
+4. **사장님께 보낼 영상 = 고른 녹화** (사장님 10-30 「움직일 때 왜 화면이 턱턱 끊기면서 부드럽지가 않니」 — 게임은 60장/초로 고른데 Playwright 녹화(25장/초)가 장을 건너뛰어 영상만 끊겼음): `node tools/anim/hero_play/smooth_rec.js <포트> <장 폴더> go=felt <turns|side|run>` → 게임 시계를 1/60초씩 넘기며 한 장씩 찍음 → `ffmpeg -framerate 60 -i <장 폴더>/f%05d.jpg … mp4`(60장/초, 전·후는 같은 장면을 두 판에서 찍어 나란히 = 장 번호가 같아 시간 맞추기 필요 없음). 주인공 둘레를 잘라 2배(neighbor) + 글자, 느리게는 `setpts`. `recordVideo`(webm)는 오류·소리 확인용만(시작이 1~2초 어긋나고 장이 튐).
 5. 점검표: `test128/tools/hero_check.py`(장 수·틱·치는 장, 빨간 칸 0 — 옛 맞춤 예외 4칸 회색은 빼고), 머리 크기(동작끼리 ±5%), 얼굴 자리(`face_table.json`).
 
 ## 12. 짧은 동작·공격 — 회피대시·맞기·쓰러짐·점프·1·2·3타 (주인공 v3는 아직, 지금은 서기 장)
