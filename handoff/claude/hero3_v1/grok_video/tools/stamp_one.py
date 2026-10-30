@@ -4,32 +4,36 @@ import sys, glob, os, json, numpy as np
 from PIL import Image
 from scipy import ndimage
 ref, src, out = sys.argv[1], sys.argv[2], sys.argv[3]
+HT = int(sys.argv[4]) if len(sys.argv) > 4 else 144     # 게임 그림 키 (판 자리·줄 수는 키 218 기준 숫자를 발 기준 (128, 246)에서 같은 비율로)
+SC = HT / 218
+X = lambda x: round(128 + (x - 128) * SC); Y = lambda y: round(246 - (246 - y) * SC); N = lambda n: max(1, round(n * SC))
 def skin(a):
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     return (a[..., 3] > 0) & (r > g) & (g > b) & (r - b > 45) & (r > 120)
 R = np.asarray(Image.open(ref).convert('RGBA')).astype(int)
-X0, Y0, X1, Y1 = 76, 26, 126, 88
+X0, Y0, X1, Y1 = X(76), Y(26), X(126), Y(88)
 plate = R[Y0:Y1, X0:X1]
-sk = skin(plate); sk[56:] = False
+sk = skin(plate); sk[N(56):] = False
 face = ndimage.binary_fill_holes(ndimage.binary_closing(sk, iterations=2))
-pm = ndimage.binary_dilation(face, iterations=2)
+pm = ndimage.binary_dilation(face, iterations=N(2))
 ys, xs = np.nonzero(face); top = ys.min()
-for y in range(max(0, top - 8), top):                     # 앞머리: 얼굴 너비만큼 이마 위 8줄
+for y in range(max(0, top - N(8)), top):                  # 앞머리: 얼굴 너비만큼 이마 위 8줄(키 218 기준)
     pm[y, xs.min() - 1:xs.max() + 2] = True
 pm &= plate[..., 3] > 0
 h, w = pm.shape; os.makedirs(out, exist_ok=True); table = {}
 pal = np.unique(plate[sk][:, :3], axis=0); PL = pal @ [.299, .587, .114]
 for f in sorted(glob.glob(src + '/*.png')):
     A = np.asarray(Image.open(f).convert('RGBA')).astype(int); O = A.copy()
-    tm = skin(A); tm[90:] = False; tz = ndimage.binary_fill_holes(ndimage.binary_closing(tm, iterations=2))
+    tm = skin(A); tm[Y(90):] = False; tz = ndimage.binary_fill_holes(ndimage.binary_closing(tm, iterations=2))
     # 얼굴 살색 가운데를 먼저 맞추고(영상은 머리 자리가 장마다 다름), 그 둘레 ±4칸에서 겹침이 가장 큰 자리
-    fy, fx = np.nonzero(face); ty_, tx_ = np.nonzero(tz[:100])
-    sel = ty_ < ty_.min() + 40 if len(ty_) else ty_
+    fy, fx = np.nonzero(face); ty_, tx_ = np.nonzero(tz[:Y(100)])
+    sel = ty_ < ty_.min() + N(40) if len(ty_) else ty_
     cdy = int(round(ty_[sel].mean() - (Y0 + fy.mean()))) if len(ty_) else 0
     cdx = int(round(tx_[sel].mean() - (X0 + fx.mean()))) if len(ty_) else 0
     best = (-1, 0, 0)
-    for dy in range(cdy - 4, cdy + 5):
-        for dx in range(cdx - 4, cdx + 5):
+    R4 = N(4)
+    for dy in range(cdy - R4, cdy + R4 + 1):
+        for dx in range(cdx - R4, cdx + R4 + 1):
             if Y0 + dy < 0 or X0 + dx < 0 or Y0 + dy + h > 256 or X0 + dx + w > 256: continue
             t2 = tz[Y0 + dy:Y0 + dy + h, X0 + dx:X0 + dx + w]
             iou = (t2 & face).sum() / max((t2 | face).sum(), 1)
@@ -37,7 +41,7 @@ for f in sorted(glob.glob(src + '/*.png')):
     iou, dx, dy = best; y0, x0 = Y0 + dy, X0 + dx
     O[y0:y0 + h, x0:x0 + w][pm] = plate[pm]
     full = np.zeros(A.shape[:2], bool); full[y0:y0 + h, x0:x0 + w] = pm
-    rest = skin(O) & ~full; rest[:y0 + top] = False; rest[100:] = False            # 판 밖 목 살색 → 판 살색
+    rest = skin(O) & ~full; rest[:y0 + top] = False; rest[Y(100):] = False            # 판 밖 목 살색 → 판 살색
     if rest.any():
         l = O[rest][:, :3] @ [.299, .587, .114]; O[rest, :3] = pal[np.abs(l[:, None] - PL[None]).argmin(1)]
     Image.fromarray(O.astype(np.uint8)).save(f'{out}/{os.path.basename(f)}')
