@@ -26,6 +26,11 @@ export PW_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome
 ## 테스트 API (window.__world)
 `setManual(true)` 후 `advance(초)` 로 시간 진행, `go(맵,'default')`, `setHeroTile(x,y,face)`, `spawn(종류,x,y)`, `mobs`, `hazards`, `S`(상태), `tap('KeyJ')`/`key(code,down)` 입력. 무적: 매 프레임 `hero.hp = hero.maxHp`.
 
+## 주인께 보낼 움직임 영상 = 고른 녹화 (주인 10-30 「움직일 때 왜 화면이 턱턱 끊기면서 부드럽지가 않니」)
+- Playwright `recordVideo`는 1초 25장으로 찍으면서 이 클라우드 컴퓨터에선 **같은 장을 두 번 찍거나 건너뜀** → 게임은 60장/초로 고른데 **영상만 턱턱** 끊김(장마다 화면 이동 16·17칸이어야 할 곳이 9·34, 8·25).
+- 움직임·손맛·화면 흐름을 보여 줄 영상은 **`node tools/anim/hero_play/smooth_rec.js <포트> <장 폴더> go=<맵> <장면 turns|side|run> [1=60장/초, 2=30장/초]`**: 게임 시계(requestAnimationFrame·performance.now)를 손으로 1/60초씩 넘기며 한 장씩 찍음 → `ffmpeg -framerate 60 -i <장 폴더>/f%05d.jpg -c:v libx264 -crf 18 -pix_fmt yuv420p out.mp4`. 10초 ≈ 45초 걸림. 새 장면은 파일 안 `S` 표에 키 누름 순서(장 수)로 추가.
+- `recordVideo`는 오류·소리 확인, 대충 보기에만. 끊김을 의심하면 먼저 게임 안에서 잼(rAF 간격 16.7ms인지, 주인공 108/초·카메라 장마다 고른지) — `node tools/anim/hero_play/smooth_probe.js <포트> go=felt`.
+
 ## 확인할 것
 - `errors: []` (pageerror 0) 인지. 에러 나면 고치고 다시.
 - 스크린샷 몇 장을 직접 보고(Read) 그림 위치·크기·빈칸 확인 후 SendUserFile 로 MP4 전송.
