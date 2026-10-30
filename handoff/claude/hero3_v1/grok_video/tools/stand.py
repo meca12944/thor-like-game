@@ -1,5 +1,5 @@
 # 서기 3방향을 키 H로 (한 번만 줄임): 2배 판에 몸(그대로 2배)+머리 A(2배 판 그대로)를 붙이고 → LANCZOS 한 번 → 몸은 서기 색표로, 머리 칸(A)은 색 맞추기 없이(A하프 스무스와 같은 방식)
-# 쓰는 법: python3 stand.py <hero3_v1 폴더> <H> <출력 폴더>   (주인공: H 144 → game144/)
+# 쓰는 법: python3 stand.py <hero3_v1 폴더> <H> <출력 폴더>   (주인공: H 144 → game144/ · H 218 = 원본 키 그대로 + A하프 스무스 얼굴 = 그록 입력용)
 import sys, os, numpy as np
 from PIL import Image
 V3, H, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
@@ -15,6 +15,12 @@ def snap(rgb, pal):
     for i in range(0, len(flat), 8192): idx[i:i + 8192] = ((flat[i:i + 8192, None] - pal[None]) ** 2).sum(2).argmin(1)
     return pal[idx].reshape(rgb.shape)
 def make(body, head, hx, hy):
+    if H == 218:   # 원본 키 그대로(그록 입력용): 몸은 원본 칸 그대로, 머리 칸에 A를 LANCZOS 반(= A하프 스무스, 투명 가장자리 단단히)으로 통째로
+        c = Image.open(body).convert('RGBA').copy()
+        if head:
+            A = Image.open(head).convert('RGBA'); h2 = A.resize((A.width // 2, A.height // 2), Image.LANCZOS); a = np.asarray(h2).copy(); a[..., 3] = np.where(a[..., 3] > 110, 255, 0)
+            c.paste(Image.fromarray(a), (hx, hy))
+        return c
     B = np.asarray(Image.open(body).convert('RGBA'))
     pal = np.unique(B[B[..., 3] > 0][:, :3], axis=0).astype(np.float32)
     big = np.repeat(np.repeat(B, 2, 0), 2, 1).copy()            # 몸 2배 (칸 그대로)

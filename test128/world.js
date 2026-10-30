@@ -1604,6 +1604,9 @@
   const TURN_STEP = .04, /* 옛 주인공 값 (10-25 「예전과 똑같이」) */ POP_TAU = .06, H8HX = new Map(); let h8HXcv = null;
   // 방향 전환 연구 (모션연구방 10-24, 사장님 "방향 전환 시 모션이 있어야 부드럽고 역동적"): 달리며 크게 꺾으면 한 칸씩 더 천천히 돌고(TURN_RUN),
   // 135° 이상 꺾으면 브레이크 = 발밑 먼지 + 몸이 원래 가던 쪽으로 쏠렸다 돌아옴(h8Lean 반동). 그림·이동 방향은 그대로 바로.
+  // 도는 동안 잔상 (사장님 10-30 「방향 전환시 잔상 남기고 교본대로 해야지」): 그림 방향이 한 칸 돌 때마다 직전 모습을 그 자리에 남김 = 주인공 그림 그대로(색 덮기 없음, 회피대시 잔상과 같은 규칙).
+  // 180° = 옆 → (대각 = 옆 그림) → 정면 → 반대 옆, 칸마다 1장 → 3~4장이 부채처럼 남았다 0.25초에 사라짐. 걸을 때는 0.6배.
+  const TURN_GHOST = { a: .65, life: .25, walk: .6 }; // 회피대시 잔상처럼 0.25초에 사라짐
   const TURN_RUN = .07, BRAKE_KICK = 170; // 달리기 돌기도 45°마다 3틱 (교과서 13-1, 4번방 재검수 10-25: .07 = 4.2틱이라 180°가 약 17틱)
   function h8Turn(h, f8) { const T = DIR8.indexOf(f8), now = S.t; if (T < 0) return f8;
     if (h.vd == null || S.deadT > 0 || h.roll || h.vdSnap || now < (h.vdT ?? now)) { h.vdSnap = false; h.vd = T; h.vdTg = T; h.vdT = now; h.vdAcc = 0; return f8; }
@@ -1647,7 +1650,9 @@
     else if (H.v4) { const L = A('idle'); e = seq(L, (S.t * 60) % tot(L)); }
     else e = A('idle')[0];
     h.gaitK = h8GaitK(H, LL); // per-clip leg speed (H8.gaitMul): clips drawn with a shorter stride step a little faster so the planted foot slides less (motion lab 10-24)
-    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.ci = e[1]; c.fl = fl; /* ci = cell index for H8.grip (c is a copy: indexOf(c) never found it) */ c.ox = h8Pop(h, c, LL, fl); return c; }
+    if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.ci = e[1]; c.fl = fl; /* ci = cell index for H8.grip (c is a copy: indexOf(c) never found it) */ c.ox = h8Pop(h, c, LL, fl);
+    if (h.tgVd != null && h.vd !== h.tgVd && h.moving && h.tgC && !h.roll && !h.atk && !h.jump && S.deadT <= 0) { S.trail = S.trail || []; S.trail.push({ c128: h.tgC, x: h.tgX, y: h.tgY, t: 0, life: TURN_GHOST.life, a: TURN_GHOST.a * (h.run ? 1 : TURN_GHOST.walk) }); } // 도는 동안 잔상
+    h.tgVd = h.vd; h.tgC = c; h.tgX = h.x; h.tgY = h.y; return c; }
   function h8GaitK(H, L) { if (!H.gaitMul || !L) return 1; if (!H._gk) { H._gk = new Map(); for (const k in H.gaitMul) if (H.anims[k]) H._gk.set(H.anims[k], H.gaitMul[k]); } return H._gk.get(L) || 1; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
