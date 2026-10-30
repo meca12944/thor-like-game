@@ -1604,21 +1604,23 @@
   const TURN_STEP = .04, /* 옛 주인공 값 (10-25 「예전과 똑같이」) */ POP_TAU = .06, H8HX = new Map(); let h8HXcv = null;
   // 방향 전환 연구 (모션연구방 10-24, 사장님 "방향 전환 시 모션이 있어야 부드럽고 역동적"): 달리며 크게 꺾으면 한 칸씩 더 천천히 돌고(TURN_RUN),
   // 135° 이상 꺾으면 브레이크 = 발밑 먼지 + 몸이 원래 가던 쪽으로 쏠렸다 돌아옴(h8Lean 반동). 그림·이동 방향은 그대로 바로.
-  // 도는 동안 잔상 (사장님 10-30 「방향 전환시 잔상 남기고 교본대로 해야지」): 그림 방향이 한 칸 돌 때마다 직전 모습을 그 자리에 남김 = 주인공 그림 그대로(색 덮기 없음, 회피대시 잔상과 같은 규칙).
-  // 180° = 옆 → (대각 = 옆 그림) → 정면 → 반대 옆, 칸마다 1장 → 3~4장이 부채처럼 남았다 0.25초에 사라짐. 걸을 때는 0.6배.
-  const TURN_GHOST = { a: .65, life: .25, walk: .6 }; // 회피대시 잔상처럼 0.25초에 사라짐
   const TURN_RUN = .07, BRAKE_KICK = 170; // 달리기 돌기도 45°마다 3틱 (교과서 13-1, 4번방 재검수 10-25: .07 = 4.2틱이라 180°가 약 17틱)
+  const art4 = v => v === 2 ? 'down' : v === 6 ? 'up' : v === 0 || v === 1 || v === 7 ? 'right' : 'left'; // 4방향 그림(사장님 10-27): 대각 = 옆 그림
   function h8Turn(h, f8) { const T = DIR8.indexOf(f8), now = S.t; if (T < 0) return f8;
     if (h.vd == null || S.deadT > 0 || h.roll || h.vdSnap || now < (h.vdT ?? now)) { h.vdSnap = false; h.vd = T; h.vdTg = T; h.vdT = now; h.vdAcc = 0; return f8; }
     const dt = Math.min(.1, now - h.vdT); h.vdT = now; let diff = ((T - h.vd) % 8 + 8) % 8;
     if (T !== h.vdTg) { h.vdTg = T; if (diff === 1 || diff === 7) { h.vd = T; return f8; } h.vdAcc = TURN_STEP; if (h.run && h.moving && diff >= 3 && diff <= 5 && !h.atk) { h.brake = 1; addFx('dust', h.x, h.y, { life: .35 }); } h.vdDir = diff < 4 ? 1 : diff > 4 ? 7 : [1, 2, 3].some(i => (h.vd + i) % 8 === 2) ? 1 : [1, 2, 3].some(i => (h.vd + 8 - i) % 8 === 2) ? 7 : (h.vd === 2) === (h.hz === 'left') ? 1 : 7; } else h.vdAcc += dt;
-    const st = h.run && h.moving ? TURN_RUN : TURN_STEP; while (diff && h.vdAcc >= st) { h.vdAcc -= st; h.vd = (h.vd + (h.vdDir || 1)) % 8; diff = ((T - h.vd) % 8 + 8) % 8; }
+    const st = h.run && h.moving ? TURN_RUN : TURN_STEP; while (diff && h.vdAcc >= st) { h.vdAcc -= st; const a0 = art4(h.vd); h.vd = (h.vd + (h.vdDir || 1)) % 8; diff = ((T - h.vd) % 8 + 8) % 8; if (diff && art4(h.vd) === a0) h.vdAcc += st; } // 그림이 그대로인 칸(4방향 그림의 대각 = 옆 그림)은 기다리지 않음 → → ↓ ← 가 칸마다 바뀜 (사장님 10-30 「부드럽게 전환」)
     return DIR8[h.vd]; }
   function h8HeadX(c) { const key = c.h8 + ':' + c[0] + ':' + c[1]; if (H8HX.has(key)) return H8HX.get(key); const im = h128().H8img(c.h8); if (!im || !im.complete || !im.naturalWidth) return null; let v = 0;
     try { const w = c[2], hh = c[3]; h8HXcv = h8HXcv || document.createElement('canvas'); h8HXcv.width = w; h8HXcv.height = hh; const g = h8HXcv.getContext('2d', { willReadFrequently: true }); g.clearRect(0, 0, w, hh); g.drawImage(im, c[0], c[1], w, hh, 0, 0, w, hh); const d = g.getImageData(0, 0, w, hh).data;
       const on = (x, y) => { const i = (y * w + x) * 4, r = d[i], gg = d[i + 1], b = d[i + 2], mn = Math.min(r, gg, b), mx = Math.max(r, gg, b); return d[i + 3] > 40 && !(mn > 150 && mx - mn < 40); }; // body pixels, not the sword blade
-      let top = -1; for (let y = 0; y < hh && top < 0; y++) { let n = 0; for (let x = 0; x < w; x++) if (on(x, y)) n++; if (n >= 2) top = y; }
-      let sx = 0, n = 0; for (let y = top; y >= 0 && y < Math.min(hh, top + 10); y++) for (let x = 0; x < w; x++) if (on(x, y)) { sx += x; n++; } v = n ? sx / n - c[4] : 0; } catch (e) { v = 0; }
+      // 몸통 가운데(키의 30~50% 줄, 줄마다 왼끝~오른끝 가운데의 중간값) — 머리로 재면 달리기 옆모습(앞으로 숙임)에서 몸 전체가 옆으로 34~48칸 끌려 미끄러졌음
+      // (사장님 10-30 「부드럽게 전환」). 아틀라스가 동작마다 몸통을 발 기준에 맞춰 두어(hero3_atlas.py) 동작이 바뀌어도 몸통은 제자리, 머리만 자세대로 움직임.
+      let top = -1, bot = -1; for (let y = 0; y < hh && top < 0; y++) { let n = 0; for (let x = 0; x < w; x++) if (on(x, y)) n++; if (n >= 2) top = y; }
+      for (let y = hh - 1; y >= 0 && bot < 0; y--) { for (let x = 0; x < w; x++) if (on(x, y)) { bot = y; break; } }
+      const cs = []; for (let k = 0; k < 5; k++) { const y = Math.round(top + (bot - top) * (.3 + k * .05)); let l = -1, r = -1; for (let x = 0; x < w; x++) if (on(x, y)) { if (l < 0) l = x; r = x; } if (l >= 0) cs.push((l + r) / 2); }
+      cs.sort((p, q) => p - q); v = cs.length ? cs[cs.length >> 1] - c[4] : 0; } catch (e) { v = 0; }
     H8HX.set(key, v); return v; }
   function h8Pop(h, c, L, fl) { const hx = h8HeadX(c), now = S.t; if (hx == null) return h.pop || 0; const tg = fl ? -hx : hx, dt = Math.min(.1, Math.max(0, now - (h.popT ?? now))); h.popT = now;
     h.pop = (h.pop || 0) * Math.exp(-dt / POP_TAU); if (h.popL && (h.popL !== L || h.popF !== fl) && !(S.deadT > 0)) h.pop = Math.max(-60, Math.min(60, h.pop + h.popTg - tg));
@@ -1651,8 +1653,7 @@
     else e = A('idle')[0];
     h.gaitK = h8GaitK(H, LL); // per-clip leg speed (H8.gaitMul): clips drawn with a shorter stride step a little faster so the planted foot slides less (motion lab 10-24)
     if (!e) return null; const c = H.cells[e[0]][e[1]].slice(); c.h8 = e[0]; c.ci = e[1]; c.fl = fl; /* ci = cell index for H8.grip (c is a copy: indexOf(c) never found it) */ c.ox = h8Pop(h, c, LL, fl);
-    if (h.tgVd != null && h.vd !== h.tgVd && h.moving && h.tgC && !h.roll && !h.atk && !h.jump && S.deadT <= 0) { S.trail = S.trail || []; S.trail.push({ c128: h.tgC, x: h.tgX, y: h.tgY, t: 0, life: TURN_GHOST.life, a: TURN_GHOST.a * (h.run ? 1 : TURN_GHOST.walk) }); } // 도는 동안 잔상
-    h.tgVd = h.vd; h.tgC = c; h.tgX = h.x; h.tgY = h.y; return c; }
+    return c; }
   function h8GaitK(H, L) { if (!H.gaitMul || !L) return 1; if (!H._gk) { H._gk = new Map(); for (const k in H.gaitMul) if (H.anims[k]) H._gk.set(H.anims[k], H.gaitMul[k]); } return H._gk.get(L) || 1; }
   function h128Cell() { { const c8 = h8Cell(); if (c8) return c8; } const G = h128(), H = G.H128, h = hero, dir = h.face || 'down'; let an = 'idle', p = null, tick = S.t * 60 / 8;
     if (S.deadT > 0) { an = 'death'; p = Math.min(1, S.deadT / 1.2); }
@@ -1924,15 +1925,14 @@
     return 1; }
 
   // ---- 방향 꺾기 효과 (사장님 10-24 「방향 전환 시 모션이 있어야 부드럽고 역동적」, 이펙트 담당; 몸 돌기 그림은 모션 담당):
-  // 달리던 방향에서 꺾으면 135°+ = 브레이크(흙 튐 크게 + 미끄러진 자국 + 옛 방향으로 쏠림 + 망토가 늦게 따라오는 잔상 1장), 45~90° = 발밑 먼지 작게 + 살짝 쏠림.
-  const TURN = { big: 120, small: 40, minT: .12, cd: .14, leanBig: 1.4, leanSmall: .55, ghost: .32, ghostLife: .11 };
+  // 달리던 방향에서 꺾으면 135°+ = 브레이크(흙 튐 크게 + 미끄러진 자국 + 옛 방향으로 쏠림), 45~90° = 발밑 먼지 작게 + 살짝 쏠림. 잔상은 없음(사장님 10-30).
+  const TURN = { big: 120, small: 40, minT: .12, cd: .14, leanBig: 1.4, leanSmall: .55 };
   function heroTurnFx(ix, iy, dt) { const a = Math.atan2(iy, ix), h = hero; h.turnCd = Math.max(0, (h.turnCd || 0) - dt);
     if (h.mvA == null || !h.wasMv) { h.mvA = a; h.mvT = 0; h.wasMv = true; return; }
     let d = Math.abs(a - h.mvA) * 180 / Math.PI; if (d > 180) d = 360 - d; const old = [Math.cos(h.mvA), Math.sin(h.mvA)];
     if (d >= TURN.small && h.mvT >= TURN.minT && h.turnCd <= 0 && !h.atk && !h.roll && !(h.jump && h.jump.air)) { const big = d >= TURN.big, run = h.run ? 1 : .6; h.turnCd = TURN.cd;
       h.lnDir = old; h.lnV = (h.lnV || 0) + LEAN.kick * (big ? TURN.leanBig : TURN.leanSmall) * run; // the body keeps going the old way for a beat (same spring as start/stop)
-      if (big) { for (let i = 0; i < 3; i++) addFx('dust', h.x + old[0] * (2 + i * 4), h.y + old[1] * (1 + i * 2), { life: .32 + i * .06 }); addFx('skid', h.x, h.y, { life: .45, dx: old[0], dy: old[1] }); sfx('roll', .35);
-        if (h128()) { S.trail = S.trail || []; S.trail.push({ c128: h128Cell(), x: h.x - old[0] * 1.5, y: h.y - old[1] * 1.5, t: 0, life: TURN.ghostLife, a: TURN.ghost * run }); } } // cape/hair lag: one faint copy of the old pose
+      if (big) { for (let i = 0; i < 3; i++) addFx('dust', h.x + old[0] * (2 + i * 4), h.y + old[1] * (1 + i * 2), { life: .32 + i * .06 }); addFx('skid', h.x, h.y, { life: .45, dx: old[0], dy: old[1] }); sfx('roll', .35); } // 잔상은 뺌 (사장님 10-30 「잔상이 아니라 부드럽게 전환되도록 해야지」)
       else addFx('dust', h.x + old[0] * 2, h.y, { life: .22 }); h.mvT = 0; }
     h.mvA = a; h.mvT += dt; }
   function h8Lean(h) { const now = S.t, sp = h.moving && !h.roll ? (h.run ? RUN.mul : 1) : 0; let dt = Math.min(.1, Math.max(0, now - (h.lnT ?? now))); h.lnT = now;

@@ -21,13 +21,23 @@ frames['stand_down'] = [f'{G}/down_face.png']; frames['stand_right'] = [f'{G}/ri
 frames['run_down'] = sorted(glob.glob(f'{G}/run13_face/0*.png')); frames['run_up'] = sorted(glob.glob(f'{G}/run13_back/0*.png'))
 frames['run_right'] = sorted(glob.glob(f'{G}/run_side_face/0*.png'))
 assert len(frames['run_down']) == 13 and len(frames['run_up']) == 13 and len(frames['run_right']) == 17
-# 장 자르기(빈 곳), 발 기준 = (128, 246) 판 기준
-cells, crops, idx = [], [], {}
+# 몸통 가운데 줄 맞추기 (교본 1부 1-0 「모든 방향을 같은 몸 가운데 줄로」, 사장님 10-30 「부드럽게 전환」): 동작 하나에 한 번,
+# 그 동작 장들의 몸통(키의 30~50% 줄) 가운데 평균을 발 기준 x(128)에 둠. 서기 원본은 몸이 왼쪽으로 23~27칸 비켜 있어 출발·멈춤·돌기 때마다 몸이 옆으로 미끄러졌음.
+import numpy as np
+def torso_x(im):
+    a = np.asarray(im)[..., 3] > 0; ys = np.nonzero(a.any(1))[0]; t, b = ys.min(), ys.max(); xs = []
+    for fr in (.3, .35, .4, .45, .5):
+        r = np.nonzero(a[int(t + (b - t) * fr)])[0]
+        if len(r): xs.append((r.min() + r.max()) / 2)
+    return float(np.median(xs))
+# 장 자르기(빈 곳), 발 기준 = (128, 246) 판 기준 + 동작마다 몸통 가운데로 옮김(sx)
+cells, crops, idx, shift = [], [], {}, {}
 for nm, fl in frames.items():
-    idx[nm] = []
-    for f in fl:
-        im = Image.open(f).convert('RGBA'); bb = im.getbbox(); c = im.crop(bb)
-        crops.append(c); idx[nm].append(len(crops) - 1); cells.append([0, 0, c.width, c.height, 128 - bb[0], 246 - bb[1]])
+    idx[nm] = []; ims = [Image.open(f).convert('RGBA') for f in fl]
+    sx = round(float(np.mean([torso_x(im) for im in ims])) - 128); shift[nm] = sx
+    for im in ims:
+        bb = im.getbbox(); c = im.crop(bb)
+        crops.append(c); idx[nm].append(len(crops) - 1); cells.append([0, 0, c.width, c.height, 128 + sx - bb[0], 246 - bb[1]])
 # 줄 맞춰 깔기 (가로 2048)
 W = 2048; x = y = rowh = 0
 for n, c in enumerate(crops):
@@ -66,4 +76,4 @@ H['_doc'] = ('주인공 v3 (10-30 사장님 「일단 이거 전부 메인에 �
 js = json.dumps(H, ensure_ascii=False, separators=(',', ':'))
 s2 = s[:j] + js + s[k + 1:]
 open(html, 'w', encoding='utf-8').write(s2)
-print('장', len(cells), '시트', sheet.size, round(os.path.getsize(out) / 1e3), 'KB', '동작', len(new))
+print('장', len(cells), '시트', sheet.size, round(os.path.getsize(out) / 1e3), 'KB', '동작', len(new), '몸통 맞춤(칸)', shift)
