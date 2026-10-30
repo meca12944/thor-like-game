@@ -1,0 +1,27 @@
+{
+ "drop_at": 99,
+ "keep_gap": 0,
+ "foot": 245,
+ "frames": [
+  {
+   "from": 0,
+   "gap": 1,
+   "down": 1
+  },
+  {
+   "from": 1,
+   "gap": 1,
+   "down": 1
+  },
+  {
+   "from": 2,
+   "gap": 0,
+   "down": 0
+  },
+  {
+   "from": 3,
+   "gap": 1,
+   "down": 1
+  }
+ ]
+}

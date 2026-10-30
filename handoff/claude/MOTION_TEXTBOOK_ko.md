@@ -110,7 +110,8 @@
    Plain solid bright green background the whole time, no shadow, no ground, no dust, no effects, full body always inside the frame.
    ```
    - 방향 줄: 정면 `runs IN PLACE toward the camera … straight front view` / 뒷면 `runs IN PLACE away from the camera … straight back view, we see his back, long black hair and tattered cape` (+ 뒷발 밑창이 보이게, 머리·망토가 카메라 쪽으로) / 옆 `runs IN PLACE to the right … strict side view facing right, we see his right side profile … no turning toward the camera`.
-   - 동작 줄: **달리기**(두 번 눌러 달리기) = 위 그대로 / **가볍게 뛰기**(평소 이동) = `jogs IN PLACE … Relaxed steady masculine jog at about two-thirds of a full sprint … medium knee lift … a short moment with both feet off the ground` / 걷기(천천히 걷기 — 평소 이동 아님) = `walks … calm natural arm swing`.
+   - 동작 줄: **달리기**(두 번 눌러 달리기) = 위 그대로 / **가볍게 뛰기**(평소 이동) = `jogs IN PLACE … Relaxed steady masculine jog at about two-thirds of a full sprint … medium knee lift … feet staying close to the ground with almost no hop (one foot is nearly always touching the ground, the body does not bounce up)` / 걷기(천천히 걷기 — 평소 이동 아님) = `walks … calm natural arm swing`.
+   - **바닥에서**(사장님 10-30 「바닥에서 달려야지」): 그록은 달리기에 두 발이 높이 뜨는 장을 잘 넣음 → 부탁 글에 「발이 땅 가까이, 한 발은 거의 늘 땅에, 몸이 튀어 오르지 않음」을 넣고, 받은 뒤에도 칸 6-7 `ground.py`.
    - 꼭 넣을 것: **제자리(러닝머신)·고정 카메라·한 방향 계속·확대 없음·한 색 바탕·그림자/땅/먼지/효과 없음·몸 전체가 화면 안**.
    - 전체 글: 주인공 `grok_video/그록_부탁글.md`(정면 달리기)·`그록_부탁글_뒷면.md`·`그록_부탁글_걷기달리기4.md`(옆 달리기·걷기 3)·`그록_부탁글_가볍게뛰기3.md`.
 3. **사장님**: 그록 이매진에 그림 + 글 → mp4(960×960, 24장/초, 6초)를 채팅에. **방향을 한꺼번에** 받으면 박자를 한 번에 맞춘다(칸 7).
@@ -130,7 +131,8 @@
    - 옆 `python3 …/tools/stamp_one.py game144/right_face.png <장 폴더> <출력> 144 118,26,152,88 -16,-14,-12,-10,-8,-6,-4,-2,0,2,4`
    - 하는 일: 서기 그림 얼굴 = 얼굴 살색(구멍 채움) + 둘레 + 이마 위 앞머리를 **판 하나**로, 판 안 칸은 모두 판 그대로 모든 장에 찍음(장마다 자리만, `face_table.json`). 찾기 = 그 장의 **가장 위 살색 덩어리**(앞에 든 주먹 살색은 뺌) 가운데를 먼저 맞추고 ±3칸(키 144)·기울기에서 겹침이 가장 큰 자리. 판 밖 목 살색은 판 살색으로.
    - 확인: 겹침 표 0.4 아래 장은 눈으로, `python3 …/tools/heads.py <찍기 전> <찍은 뒤> <장 수> <출력.png>`로 머리 크게 전·후. 「얼굴 두 개」면 기울기 범위를 넓힘.
-7. **점검**(`python3 …/tools/strip.py <장 폴더> <출력.png> 2 9` 줄 세우기, 회색 줄 = 발 246): ① 두 발 높이 차 ② 발끝 방향 ③ 다리가 옆으로 안 벌어짐 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같음 ⑥ 제자리 ⑦ 무릎 아래 곧음 ⑧ 팔이 몸 옆선 앞뒤, 주먹 = 서기 손 크기 ⑨ 장마다 고르게(튀는 장 없음).
+7. **바닥에서 달리기**(사장님 10-30 「캐릭이 뛸 때 점프하듯이 이상하다」 「바닥에서 달려야지」): 그록 달리기는 두 발이 다 뜨는 장이 있어(정면 최대 20칸 = 키의 14%, 옆 13칸) 게임에선 그림자 위로 깡충깡충 뜀. `python3 …/tools/ground.py <장 폴더> <출력> [뺄 뜸=10] [남길 뜸=0]` → 가장 낮은 발이 10칸 넘게 뜬 장은 **빼고**, 남은 장은 발이 땅에 닿게 그 장만 내림(크게 뜬 장을 내리기만 하면 그 장에서 머리가 거꾸로 푹 꺼짐 — 정면 19칸). 주인공: 정면 13→10장(3·4·10 뺌, 머리 들썩임 8칸), 옆 17→14장(6·7·15 뺌, 7칸), 뒷면 13장 그대로 2칸 안으로, 돌기 장도 땅에 붙임. 코드 들썩임(`EXAG.runEx` bob·디딤 눌림·밀기 늘림)은 영상 그림(`bodyAligned`)이면 끔.
+8. **점검**(`python3 …/tools/strip.py <장 폴더> <출력.png> 2 9` 줄 세우기, 회색 줄 = 발 246): ① 두 발 높이 차 ② 발끝 방향 ③ 다리가 옆으로 안 벌어짐 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같음 ⑥ 제자리 ⑦ 무릎 아래 곧음 ⑧ 팔이 몸 옆선 앞뒤, 주먹 = 서기 손 크기 ⑨ 장마다 고르게(튀는 장 없음).
 
 ## 7. 빠르기·박자 맞추기 (팀장, 0)
 1. **러닝머신 재기**(옆 영상은 꼭): `python3 …/tools/feet.py <장 폴더>` → 땅(244~246)에 닿은 발 x가 장마다 뒤로 가는 칸 = 영상 속 빠르기(칸/장). × 24 = 그림칸/초.
@@ -552,6 +554,13 @@
 
 ## 2-2v3. 주인공 v3 (작은그림 작화, 키 144, 10-29~) — 모션 기록
 작업 폴더 `handoff/claude/hero3_v1/` (README에 날짜순 전부). 얼굴 = 0부 3 정답(A를 게임 키로 한 번 줄임). 게임 그림 = `game144/`.
+
+### 모션 기록: 바닥에서 달리기 (10-30, 사장님 「캐릭이 뛸 때 점프하듯이 이상하다」 「바닥에서 달려야지」)
+- **잰 것**: 가장 낮은 발이 땅에서 뜬 칸 — 정면 [1,4,6,19,13,0,1,4,6,8,20,3,0], 옆 최대 13, 뒷면 최대 9. 머리 위 y 범위는 정면 5·옆 8로 작음 → 몸은 거의 그대로인데 **두 발이 높이 들려 그림자 위로 뜬 장**이 깡충깡충으로 보임. 코드 들썩임(bob 3·눌림 7%·늘림 5%)이 한 번 더 얹힘.
+- **비교**: 다 내리기(100%) = 정면 머리 들썩임 19칸(뜬 장에서 머리가 거꾸로 꺼짐) / 10칸 넘게 뜬 장 빼고 내리기 = 8칸 → 이것으로.
+- **고침**: `grok_video/tools/ground.py` → 정면 10장·옆 14장·뒷면 13장(2칸 안)·돌기 장 땅에 붙임, `world.js` 영상 그림이면 코드 bob·눌림·늘림 끔. 걸음 소리 자리(반 바퀴)·옆 걸음 거리(gaitMul)는 그대로(뺀 장은 공중이라 디딘 발 이동 거리가 같음).
+- 가볍게 뛰기 부탁 글도 「두 발이 뜨는 순간」 → 「발이 땅 가까이, 한 발은 거의 늘 땅에」로 고침.
+- 전·후 영상 `달리기_바닥에서_전후.mp4`(고른 녹화 60장/초, 같은 장 번호 = 같은 게임 시각).
 
 ### 모션 기록: 방향 전환 — 잔상 → 부드럽게 → 몸 돌리는 장 (10-30)
 - 사장님 「방향 전환시 잔상 남기고 교본대로 해야지」 → **잘못 알아들어** 도는 칸마다 잔상을 넣음 → 「잔상이 아니라 부드럽게 전환되도록 해야지」 → 잔상 모두 뺌.
