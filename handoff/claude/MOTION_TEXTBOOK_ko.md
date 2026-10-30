@@ -631,13 +631,13 @@
 작업 폴더 `handoff/claude/hero3_v1/` (README에 날짜순 전부). 얼굴 = 0부 2 정답(A하프 스무스).
 
 ### 모션 기록: 정면 달리기 (8장) — 사장님 확인 기다림
-- **최종 파일**: `hero3_v1/run/run_s_face/000~007.png`(얼굴 찍은 8장, 256판, 발 y 246) · 자리표 `face_table.json` · 묶기 전 `run_s/` · 영상 `run/정면달리기_발방향고침.mp4`.
+- **최종 파일**: `hero3_v1/run/run_s_face/000~007.png`(얼굴 찍은 8장, 256판, 발 y 246) · 자리표 `face_table.json` · 묶기 전 `run_s/` · 무릎 아래 확인 `run/legs_check.png` · 영상 `run/정면달리기_무릎아래고침.mp4`.
 - **핵심 자세 4장** (`edit-images-v2` `edit_with_reference`, 편집·기준 그림 = 서기 정면 `ref/down_face.png`, seed 7, 장당 10). 공통 꼬리: `Keep the exact same character design, face, hair, colors, outfit, armor, tattered cape and size, full body, empty hands, no effects, no shadow.`
   - 디딤 CR: `Natural human RUNNING stride toward the viewer, front view facing the viewer, face visible, seen with depth: his RIGHT leg (left side of the image) reaches FORWARD toward the viewer and lands on the heel, so that RIGHT boot is the LOWEST point in the image and looks slightly BIGGER because it is closer; his LEFT leg (right side of the image) is stretched BEHIND him, pushing off on the toes, so that LEFT boot is clearly HIGHER in the image, smaller and partly hidden behind the right leg, we see the sole of the left boot. Feet about hip width apart, not crossed, not spread sideways. Torso leaning forward, opposite arm swing: left fist forward, right arm back, the cape flowing behind.`
   - 지나감 PA: `Natural human RUNNING passing pose toward the viewer, front view facing the viewer, seen with depth: his RIGHT leg (left side of the image) is under the body carrying the weight, foot on the ground; his LEFT knee (right side of the image) swings FORWARD toward the viewer, so the left thigh looks short and the knee is in front of the body, the left boot hangs just under the knee off the ground. Legs under the hips, not spread sideways. Torso leaning forward, arms at his sides, cape flowing behind.`
   - 디딤 CL2·지나감 PB2: 글로 좌우를 바꿔 뽑으면 **같은 발이 나옴** → CR·PA를 좌우 뒤집고 `Keep this exact running pose and leg positions (…). Only fix the details to match the reference character exactly: the same face, hair parting, the cape patches and tears on the same sides as the reference, the same armor and belt.`(기준 = 서기 정면).
 - **사이 장**: `animate-with-text-v3` first/last, frame_count 4(최소 4, 결과 5장), seed 7, 묶음당 4. 글: `natural human run toward the viewer, front view the whole time, face visible, legs moving forward and back with depth: the front foot comes down lower and closer to the viewer, the back foot pushes off higher and further away, the swinging knee comes forward toward the viewer, legs stay under the hips, feet never spread sideways, arms swinging at his sides, cape flowing behind, no effects`.
-- **순서(최종)**: CR → (PB2→CR 1번 장) → PB2 → (CL2→PB2 3번 장) → CL2 → (PB2→CR 1번 장 좌우 뒤집기) → PA → (CR→PA 3번 장). `run/cycle7.py`(키 맞춤 pxscale·발 기준, 지나가는 장 +2px, 공중 4px까지, 정면 = 얼굴 가운데로 제자리) → `run/stamp_one.py`(얼굴 한 장 통째로).
+- **순서(최종)**: CR → (PB2→CR 1번 장) → PB2_s → (CL2→PB2 1번 장) → CL2 → (PB2→CR 1번 장 좌우 뒤집기) → PA_s → (CR→PA 1번 장). `_s` = 디딘 다리 무릎 아래만 곧게 고친 장. `run/cycle8.py`(키 맞춤 pxscale·발 기준, 지나가는 장 +2px, 공중 4px까지, 정면 = 얼굴 가운데로 제자리) → `run/stamp_one.py`(얼굴 한 장 통째로).
 - **틀린 것 → 알아챈 법 → 고친 법** (순서대로):
   1. 정면 R·L 핵심 자세가 같은 발 → 다리 확대 → L을 뒤집어 고침. 그런데 **뒤집은 장은 몸 자리도 뒤집혀** 장마다 옆으로 74칸 미끄러짐(영상에서 봄) → 얼굴 가운데로 제자리 맞춤.
   2. 사장님 「정면 얼굴을 한 개만 써야 되는데」 → 얼굴 판을 그 장 살색 안쪽에만 붙였던 것 → 얼굴+앞머리 한 장 통째로(장끼리 다른 칸 0 확인).
@@ -646,8 +646,9 @@
   5. 디딤 2장·지나감 2장이 또 같은 발 → 얼굴 가운데 세로선 그은 다리 확대(`legs_center6.png`)로 찾음 → 뒤집어 고침.
   6. 묶은 순서가 「디딘 발을 바로 듦」(스킵) → 8장을 거꾸로(0).
   7. 사장님 「중간에 다리가 다른 방향으로 보인다」 → 사이 장 2장(2·6번째)에서 디딘 장화가 옆을 봄(발끝이 옆) → 사이 장 묶음 5장을 다 펼쳐 봄(`tween_feet.png`) → 발이 앞을 보는 장으로 바꾸고, 맞는 장이 없는 자리는 반대쪽 사이 장을 좌우 뒤집어 씀. 두 발 나란히 선 장(멈춘 듯)도 다리가 갈라진 장으로 바꿈(0).
-- **확인할 것(다음엔 처음부터)**: 장마다 ① 두 발의 높이 차(앞발 아래) ② 발끝이 앞을 보나 ③ 다리가 옆으로 안 벌어지나 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같나 ⑥ 제자리인가 — 다리 확대 + 얼굴 가운데 세로선 그림 한 장으로 본다.
-- **크레딧**: 처음 핵심 4 + 고침 1 + 사이 장 = 66 → 게다리 고침 36 → 깊이 다시 84 → 발 방향 0. 합계 **186**(그중 버린 것: 같은 발로 나온 핵심 자세 4장 40, 쓰지 않게 된 옛 핵심·사이 장 약 80).
+  8. 사장님 「무릎 밑 다리가 아직도 간헐적으로 휜다」 → 무릎 아래만 4배 확대(`legs_check.png`)로 3·4·7·8번째 장화 목 휨·발목 꺾임 찾음. 코드로 줄마다 옮겨 펴기 → 가장자리 계단처럼 깨짐(버림), 서기 장화 옮겨 붙이기 → 장화가 다 안 잡혀 깨짐(버림). → 사이 장 2장은 같은 묶음의 곧은 장(1번 장)으로, 지나가는 자세 2장은 편집 「Keep this exact running pose … Only fix the supporting leg on the RIGHT/LEFT side of the image: the lower leg and the boot below the knee must be perfectly STRAIGHT and vertical, no bend or kink at the ankle, the boot standing flat on the ground with the toe pointing toward the viewer.」(장당 10, 편집 그림 = 그 장, 기준 = 서기 정면).
+- **확인할 것(다음엔 처음부터)**: 장마다 ① 두 발의 높이 차(앞발 아래) ② 발끝이 앞을 보나 ③ 다리가 옆으로 안 벌어지나 ④ 디딘 발 → 그 발로 버티기 순서 ⑤ 얼굴 같나 ⑥ 제자리인가 ⑦ **무릎 아래(장화 목)가 곧은가**(4배 확대) — 다리 확대 + 얼굴 가운데 세로선 그림 한 장으로 본다.
+- **크레딧**: 처음 핵심 4 + 고침 1 + 사이 장 = 66 → 게다리 고침 36 → 깊이 다시 84 → 발 방향 0 → 무릎 아래 20. 합계 **206**(그중 버린 것: 같은 발로 나온 핵심 자세 4장 40, 쓰지 않게 된 옛 핵심·사이 장 약 80).
 
 ## 2-3. 주인공2 (망토 없는 새 디자인, **봉인** — 사장님 10-22 "새주인공은 봉인이야")
 - 위치: 브랜치 `claude/linette-8dir`의 `handoff/claude/hero_v6_mini/` (게임 미연결). 서기·걷기·달리기 5방향 완성.

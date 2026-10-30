@@ -7,7 +7,7 @@ d, out = sys.argv[1], sys.argv[2]; RISE = 2; GROUND = 246; AIR = 4
 # v2(정면): 핵심 자세 4장 R·P1·L·P2(P = 두 다리가 엉덩이 밑에 모인 지나가는 자세) + 사이 장 4묶음의 가운데 1장씩
 # v3(정면, 깊이): 디딤 CR(오른발 앞·아래·크게) · 지나감 PA · 디딤 CL · 지나감 PB(=PA 뒤집어 고침) + 사이 장 가운데 1장씩
 # v4(정면, 깊이, 발 앞 보기): 디딤 CR → 사이(PB2 쪽, 발 앞) → 지나감 PB2 → 사이 → 디딤 CL2 → 사이(= 2번째 사이 장 좌우 뒤집기) → 지나감 PA → 사이
-seq = ['key_s_CR.png', 't5_PBCR/001.png', 'key_s_PB2.png', 't5_CLPB/003.png', 'key_s_CL2.png', 'pbcr1_mirror.png', 'key_s_PA.png', 't5_CRPA/003.png']
+seq = ['key_s_CR.png', 't5_PBCR/001.png', 'key_s_PB2_s.png', 't5_CLPB/001.png', 'key_s_CL2.png', 'pbcr1_mirror.png', 'key_s_PA_s.png', 't5_CRPA/001.png']
 RL = [seq[0]]; LR = [seq[4]]
 def bb(im): return im.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
 keyH = sum(bb(Image.open(f).convert('RGBA'))[3] - bb(Image.open(f).convert('RGBA'))[1] for f in (RL[0], LR[0])) / 2
