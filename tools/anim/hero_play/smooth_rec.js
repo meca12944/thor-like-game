@@ -1,6 +1,6 @@
 // 고른 녹화 (사장님 10-30 「움직일 때 왜 화면이 턱턱 끊기면서 부드럽지가 않니」): 게임은 60장/초로 고른데, 클라우드 녹화(Playwright recordVideo 25장/초)가
 // 같은 장을 두 번 찍거나 건너뛰어 영상만 턱턱 끊겼음(장마다 화면 이동 16·17칸이어야 할 곳이 9·34, 8·25). → 게임 시계를 직접 1/60초씩 넘기며 한 장씩 찍음.
-// 쓰는 법: node smooth_rec.js <포트> <출력 폴더> [주소 뒤 go=felt] [장면 turns|side|run] [찍기 배수 1=60장/초, 2=30장/초]
+// 쓰는 법: node smooth_rec.js <포트> <출력 폴더> [주소 뒤 go=felt] [장면 turns|side|run|dash] [찍기 배수 1=60장/초, 2=30장/초]
 //   → <출력 폴더>/f00000.jpg … (그 다음 ffmpeg -framerate 60 -i f%05d.jpg … mp4)
 const { chromium } = require('playwright'); const fs = require('fs');
 (async () => {
@@ -25,6 +25,8 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const S = {
     turns: async () => { await tap('s'); await down('s'); await frames(60); await sw('s', 'd', 78); await sw('d', 'a', 72); await sw('a', 'w', 54); await sw('w', 's', 54); await sw('s', 'd', 54); await up('d'); await frames(36); await down('a'); await frames(60); await sw('a', 'd', 60); await up('d'); await frames(30); },
     side: async () => { await tap('s'); await down('s'); await frames(90); await up('s'); await frames(30); await tap('d'); await down('d'); await frames(130); await up('d'); await frames(30); await tap('a'); await down('a'); await frames(130); await up('a'); await frames(30); await down('d'); await frames(90); await up('d'); await frames(30); },
+    dash: async () => { const dsh = async (dir) => { await down(dir); await frames(10); await down('Shift'); await frames(2); await up('Shift'); await frames(28); await up(dir); await frames(30); };
+      await tap('s'); await down('s'); await frames(70); await up('s'); await frames(30); await dsh('d'); await dsh('a'); await dsh('s'); await dsh('w'); await dsh('d'); },
     run: async () => { await tap('s'); await down('s'); await frames(100); await sw('s', 'd', 100); await sw('d', 'w', 100); await sw('w', 'a', 100); await up('a'); await frames(40); },
   };
   await S[scene]();
