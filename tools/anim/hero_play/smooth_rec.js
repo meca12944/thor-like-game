@@ -27,10 +27,10 @@ const { chromium } = require('playwright'); const fs = require('fs');
     side: async () => { await tap('s'); await down('s'); await frames(90); await up('s'); await frames(30); await tap('d'); await down('d'); await frames(130); await up('d'); await frames(30); await tap('a'); await down('a'); await frames(130); await up('a'); await frames(30); await down('d'); await frames(90); await up('d'); await frames(30); },
     dash: async () => { const dsh = async (dir) => { await down(dir); await frames(10); await down('Shift'); await frames(2); await up('Shift'); await frames(28); await up(dir); await frames(30); };
       await tap('s'); await down('s'); await frames(70); await up('s'); await frames(30); await dsh('d'); await dsh('a'); await dsh('s'); await dsh('w'); await dsh('d'); },
-    outfit: async () => { // 옷 전체 색 = 망토 색 (사장님 10-31): 달리며 망토를 바꿔 입힘, 위에 망토 이름
+    outfit: async () => { // 옷 = 장착 망토의 그록 옷 디자인 색 + 06 불티 (사장님 10-31): 달리며 망토를 바꿔 입힘, 위에 망토 이름
       const put = async (id, name) => { await p.evaluate(([id, name]) => { INV.equip.cloak = id ? { id, plus: 0 } : null; let d = document.getElementById('__lbl'); if (!d) { d = document.createElement('div'); d.id = '__lbl'; d.style.cssText = 'position:fixed;left:0;right:0;top:18px;text-align:center;font:bold 30px sans-serif;color:#ffe9a0;text-shadow:0 0 6px #000,0 0 3px #000;z-index:99999;pointer-events:none'; document.body.appendChild(d); } d.textContent = name; }, [id, name]); };
       const loop = async () => { await tap('s'); await down('s'); await frames(34); await sw('s', 'd', 34); await sw('d', 'w', 34); await sw('w', 'a', 34); await up('a'); await frames(20); };
-      for (const [id, name] of [[null, '망토 없음 = 원래 옷'], ['c_ash_cloak', '닳아빠진 잿빛 망토 (처음 망토)'], ['c_ara_silk', '아라크네의 실크 망토'], ['c_archive_parch', '대서고의 양피지 망토'], ['c_king', '박제된 군주의 망토'], ['c_shadow_thief', '그림자 도둑의 망토'], ['c_ian_red', '이안의 붉은 소년 망토']]) { await put(id, name); await loop(); } },
+      for (const [id, name] of [[null, '망토 없음 = 원래 옷'], ['c_ash_cloak', '01 닳아빠진 잿빛 망토 (처음 망토)'], ['c_ian_red', '10 이안의 붉은 소년 망토'], ['c_iron_knight', '04 철혈기사의 무쇠망토'], ['c_burning_noble', '06 불타는 귀족의 외투 (불티 효과)'], ['c_archive_parch', '05 대서고의 양피지 망토'], ['c_alch_lime', '13 연금술사의 석회 망토']]) { await put(id, name); await loop(); } },
     run: async () => { await tap('s'); await down('s'); await frames(100); await sw('s', 'd', 100); await sw('d', 'w', 100); await sw('w', 'a', 100); await up('a'); await frames(40); },
   };
   await S[scene]();

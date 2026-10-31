@@ -37,6 +37,9 @@
   - 같은 것의 예전 판(비교용 옛 그림·옛 코드 경로·옛 맵)은 인게임에 남기지 않는다. 필요하면 git 기록에서 찾는다.
   - 인게임 실행(시험·녹화)은 항상 **최신 main + 깨끗한 저장**으로 한다: 주소에 `?nosave&worldreset` 를 붙이거나 시작할 때 localStorage 를 비운다.
 
+## 그록
+- 그록과 파일(부탁 문서·넣을 그림·결과 영상)은 **드라이브 폴더 하나로만** 주고받는다 (주인 10-31 「앞으로 그록하고 파일은 지금 주고 받는 그 폴더로 고정해라」): https://drive.google.com/drive/folders/1oLU_ZqNds0Og-XEb9zSWwjqcmifLo9gb (자세한 방법: 팀 회의 교본 9-1).
+
 ## PixelLab
 - 키는 `$PIXELLAB_API_KEY` / `source ~/.config/pixellab/env` 로만 쓴다. 출력하거나 커밋하지 않는다.
 - 계정을 같이 쓰므로 작업마다 쓴 크레딧을 보고하고 아껴 쓴다.
