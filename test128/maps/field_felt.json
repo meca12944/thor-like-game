@@ -148,91 +148,91 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 9,
    "y": 26,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 24,
    "y": 16,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 47,
    "y": 9,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 22,
    "y": 27,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 10,
    "y": 14,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 47,
    "y": 17,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 36,
    "y": 27,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 7,
    "y": 23,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 13,
    "y": 18,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 13,
    "y": 6,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 33,
    "y": 23,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 15,
    "y": 11,
    "respawn": 30
   },
   {
    "type": "spawn",
-   "mob": "c1_unrotting_hound",
+   "mob": "c1_quilted_boar",
    "x": 20,
    "y": 17,
    "respawn": 30
@@ -271,10 +271,6 @@
     [
      "potion",
      2
-    ],
-    [
-     "bomb",
-     1
     ]
    ]
   },
@@ -294,7 +290,7 @@
    "type": "sign",
    "x": 51,
    "y": 20,
-   "text": "폐허가 된 왕도 쪽 길. 아직 갈 수 없다."
+   "text": "폐허가 된 성 쪽 길. 아직 갈 수 없다."
   },
   {
    "type": "champion",

@@ -1,0 +1,58 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m06_side_stand.png",
+  "size": [
+   274,
+   260
+  ],
+  "game_file": "m06_side_stand_game.png",
+  "game_size": [
+   29,
+   28
+  ],
+  "game_body_h": 27.0
+ },
+ {
+  "name": "front_stand",
+  "file": "m06_front_stand.png",
+  "size": [
+   314,
+   271
+  ],
+  "game_file": "m06_front_stand_game.png",
+  "game_size": [
+   34,
+   29
+  ],
+  "game_body_h": 28.1
+ },
+ {
+  "name": "airborne",
+  "file": "m06_airborne.png",
+  "size": [
+   344,
+   284
+  ],
+  "game_file": "m06_airborne_game.png",
+  "game_size": [
+   37,
+   31
+  ],
+  "game_body_h": 29.5
+ },
+ {
+  "name": "crouch",
+  "file": "m06_crouch.png",
+  "size": [
+   349,
+   218
+  ],
+  "game_file": "m06_crouch_game.png",
+  "game_size": [
+   38,
+   23
+  ],
+  "game_body_h": 22.5
+ }
+]

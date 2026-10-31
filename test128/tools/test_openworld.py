@@ -11,7 +11,7 @@ def check(name, cond, info=None):
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=os.environ.get('PW_CHROME') or None); pg = b.new_page(viewport={'width': 1280, 'height': 720}); errs = []
     pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto(B + '?worldreset&nosave&noscene'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
+    pg.goto(B + '?worldreset&nosave&noscene&start=field00'); pg.wait_for_function('window.__world&&window.__game&&__world.ready', timeout=30000); pg.wait_for_timeout(1200)
     ev = pg.evaluate; adv = lambda s: ev(f'()=>__world.advance({s})')
     def settle():  # the map load is async (fetch): advance in separate evaluates so the promise can resolve
         for _ in range(80):
@@ -85,9 +85,32 @@ with sync_playwright() as p:
     ev("()=>{__world.killAll();__world.setHeroTile(2,70,'left')}")
     c1 = walk('ArrowLeft', 'field_felt'); pg.screenshot(path=O + '/10_felt_west_gate.png')
     check('felt west gate -> ash field', c1['map'] == 'field_felt' and c1['tr'] and c1['card'] == '잿빛 들판' and c1['bgm'] == 'area01_forest' and abs(c1['t'][0] - 28) <= 2 and c1['t'][1] <= 5, c1)
+    pn = ev("()=>{const a=__world.placeText('잿빛 들판'),b=__world.placeText('1장 · 펠트');__world.learnPlaces('talk:f_bart');return [a,b,__world.placeText('잿빛 들판')]}")  # 기억 없는 주인공 (사장님 10-25): 바르트 전 = 보이는 대로, 뒤 = 이름
+    check('place names before/after Bart', pn == ['재로 덮인 들', '1장', '잿빛 들판'], pn)
     ev("()=>{__world.killAll();__world.setHeroTile(28,2,'up')}")
     ff = walk('ArrowUp', 'felt')
     check('ash field -> felt west gate', ff['map'] == 'felt' and ff['tr'] and abs(ff['t'][0] - 3) <= 2 and abs(ff['t'][1] - 70) <= 2, ff)
+    # 새 1장 동쪽 들판 (조립표 10-25): 펠트 1장 정문(북쪽) → ch1_field_e, 정문 밖 베르디와 말하기
+    ev("()=>{__world.killAll();__world.setHeroTile(75,27,'up')}")
+    ce = walk('ArrowUp', 'ch1_field_e')
+    check('felt north gate -> east field', ce['map'] == 'ch1_field_e' and ce['tr'] and abs(ce['t'][0] - 75) <= 3 and ce['t'][1] >= 238, ce)
+    ev("()=>{__world.killAll();__world.setHeroTile(65,242,'down')}"); ev("()=>__world.tap('KeyL')"); adv(.1)
+    vd = ev("()=>{const d=__world.S.dialog;return d&&(d.text||'').slice(0,60)}")
+    check('Verdi talks at the gate', bool(vd) and '돌기둥' in vd, vd)
+    ev("()=>{for(let i=0;i<40&&__world.S.dialog;i++){__world.advance(.15);__world.tap('KeyL');__world.advance(.02);}}")
+    # 들판 중앙 (10-26): 동쪽 들판 서쪽 끝 → ch1_field_c, 첨탑 폐공방 문 → arachne
+    ev("()=>{__world.killAll();__world.setHeroTile(2,210,'left')}")
+    cc = walk('ArrowLeft', 'ch1_field_c')
+    check('east field -> center field', cc['map'] == 'ch1_field_c' and cc['tr'] and cc['t'][0] >= 250 and 150 <= cc['t'][1] <= 171, cc)
+    ev("()=>{__world.killAll();__world.setHeroTile(13,76,'up')}")
+    ca = walk('ArrowUp', 'arachne')
+    check('spire door -> workshop', ca['tr'] and ca['card'] == '아라크네의 폐공방', ca)  # 폐공방 들어가는 자리 = 나가는 문 위라 계속 누르면 펠트로 나감 (그대로)
+    settle(); ev("()=>__world.go('ch1_field_e','felt')"); settle(); adv(.3)
+    ev("()=>{for(let i=0;i<40&&__world.S.dialog;i++){__world.advance(.15);__world.tap('KeyL');__world.advance(.02);}}")
+    ev("()=>{__world.killAll();__world.setHeroTile(75,246,'down')}")
+    cb = walk('ArrowDown', 'felt')
+    check('east field -> felt north gate', cb['map'] == 'felt' and cb['tr'], cb)
+    ev("()=>{__world.killAll();__world.setHeroTile(3,70,'left')}"); walk('ArrowLeft', 'field_felt'); ev("()=>{__world.killAll();__world.setHeroTile(28,2,'up')}"); walk('ArrowUp', 'felt')  # 다음 검사(이어하기)는 펠트 서문 자리 기준
     # resume after a reload: last save = here
     ev("()=>{__world.killAll();__world.tap('F5')}"); adv(.1); sv = ev("()=>__world.SAVE.resume")
     pg.goto(B + '?noscene'); pg.wait_for_function('window.__world&&__world.ready&&__world.scene!=="town"&&!__world.trans', timeout=30000); pg.wait_for_timeout(600)

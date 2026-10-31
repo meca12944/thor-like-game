@@ -305,7 +305,8 @@ for i, (x, y) in [('f_clue_gate', (79, 30)), ('f_clue_moat', (40, 31)), ('f_hid_
         put(o, x, y, adjust=(o['type'] != 'clue'))
 for i, (x, y) in [('lm_felt_castle', (75, 32)), ('lm_felt_fountain', (75, 76)), ('lm_felt_grave', (138, 47))]:
     if i in OB: put(OB[i], x, y)
-put(dict(OB['felt_gate'], zoom=.24, pan=20.5, hold=1,   # a11: the hero stays on screen (feet ~88% down) under the castle
+put(dict(OB['felt_gate'], zoom=.24, pan=20.5, hold=1, tilt={'z0': .3, 'z1': .45, 'pan': 22},   # 틸트 업 + 줌인 (사장님 10-26)
+            # a11: the hero stays on screen (feet ~88% down) under the castle
      r=3.5, sub='왕도의 성벽 — 펠트는 그 그늘 아래에 있다'), 75, 38)
 # 토비의 숯 낙서 5개 (사장님 10-25 확정 「토비의 숯 낙서 찾기」, 3번방): 벽 옆 바닥, 다 찾으면 토비가 선물 (quests.json q_felt_doodle)
 put(dict(type='clue', id='f_doodle_1', name='숯 낙서 — 이장 집 담벼락', flag='toby_doodle_1', text="벽에 숯으로 그린 그림: 등 굽은 할아버지가 지팡이를 휘두르며 화내고 있다.\n옆에 삐뚤빼뚤한 글씨 — \"이장님 무서움\"."), 37, 55)
@@ -313,12 +314,17 @@ put(dict(type='clue', id='f_doodle_2', name='숯 낙서 — 여관 담벼락', f
 put(dict(type='clue', id='f_doodle_3', name='숯 낙서 — 공방 담벼락', flag='toby_doodle_3', text="숯 그림: 긴 머리 누나가 커다란 바늘을 칼처럼 들고 있다. 둘레에 별이 반짝반짝.\n\"리네트 누나 = 바늘 기사\"."), 45, 99)
 put(dict(type='clue', id='f_doodle_4', name='숯 낙서 — 고물상 거리 벽', flag='toby_doodle_4', text="숯 그림: 아이 둘이 공을 차고 있다. 한 아이 목에는 길게 늘어진 목도리.\n\"나랑 펠릭스. 펠릭스가 맨날 이김\"."), 96, 100)
 put(dict(type='clue', id='f_doodle_5', name='숯 낙서 — 무너진 옛 성문 돌', flag='toby_doodle_5', text="숯 그림: 검은 망토를 두른 키 큰 사람. 가슴에 동그라미가 그려져 있다.\n옆에 커다란 물음표 — \"괴물 아저씨?\""), 70, 33)
+# 낙서 그림 (그록 21, 팀장 10-25 「토비 낙서는 지금 사용」): 4배판(128px)을 D=4 = 2x2타일, 85% 불투명, 단서 자리 바로 위 벽에
+for _i, (_n, (_x, _y)) in enumerate(zip(['21a_angry_grandpa', '21b_apron_lady_tankard', '21c_sister_needle_star', '21d_two_kids_ball_scarf', '21e_black_cape_circle'], [(37, 55), (103, 56), (45, 99), (96, 100), (70, 33)])):
+    _im = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../../handoff/grok_in/16-22_소품_인물_주인공동작_20261025/21_tobi_doodles', _n + '_128x128_4x.png')).convert('RGBA')
+    _im.putalpha(_im.split()[3].point(lambda v: int(v * .85))); _p = f'assets/world/felt5/doodle_{_i + 1}.webp'; _im.save(rel(_p), 'WEBP', quality=90)
+    props.append({'id': f'doodle_{_i + 1}', 'img': _p, 'x': _x + .5, 'y': round(_y - .05, 2), 'ax': 64, 'ay': 128, 'D': 4, 'fade': 0, 'shadow': 0})
 # clue tiles placed inside rubble keep their tile; make sure a neighbour is floor
 for o in objs:
     if o['type'] == 'clue' and grid[o['y'], o['x']] not in '.=':
         if grid[o['y'] + 1, o['x']] not in '.=': grid[o['y'] + 1, o['x']] = '.'
 # exits + spawns
-objs.append({'type': 'exit', 'x': 72, 'y': 24, 'w': 7, 'h': 1, 'to': 'field_felt', 'spawn': 'felt', 'label': '↑ 1장 정문'})
+objs.append({'type': 'exit', 'x': 72, 'y': 24, 'w': 7, 'h': 1, 'to': 'ch1_field_e', 'spawn': 'felt', 'label': '↑ 1장 정문'})  # 새 1장 동쪽 들판 (build_ch1_east.py)
 objs.append({'type': 'exit', 'x': 0, 'y': 68, 'w': 1, 'h': 5, 'to': 'field_felt', 'spawn': 'felt', 'label': '← 펠트 서문 · 잿빛 들판'})
 spawns.update({'default': [75.5, 80.0, 'up'], 'world': [75.5, 80.0, 'up'], 'field': [3.6, 70.5, 'right'], 'gate': [GATE_X, WALL_Y + 1.8, 'down']})
 # campfire / smoke / ash fx

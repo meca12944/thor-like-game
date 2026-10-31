@@ -1,0 +1,162 @@
+[
+ {
+  "name": "dash_right",
+  "frames": 6,
+  "ticks": [
+   2,
+   2,
+   5,
+   3,
+   3,
+   2
+  ],
+  "sum": 17,
+  "code": 20,
+  "shown": [
+   2.4,
+   2.4,
+   5.9,
+   3.5,
+   3.5,
+   2.4
+  ],
+  "minshown": 2.4,
+  "src": "DG durTicks 20 (world.js 27줄, 엘든링식 0.33초) — seq(L, t/rollDur·tot) 비례 재생"
+ },
+ {
+  "name": "jump_right",
+  "frames": 7,
+  "ticks": [
+   3,
+   3,
+   3,
+   12,
+   3,
+   3,
+   4
+  ],
+  "sum": 31,
+  "code": 42,
+  "shown": [
+   4.1,
+   4.1,
+   4.1,
+   16.3,
+   4.1,
+   4.1,
+   5.4
+  ],
+  "minshown": 4.1,
+  "src": "JUMP pre 4 + T 30 + land 8 = 42 (1620줄) — 비례 재생"
+ },
+ {
+  "name": "hit1_right",
+  "frames": 4,
+  "ticks": [
+   1,
+   1,
+   1,
+   11
+  ],
+  "sum": 14,
+  "code": 30,
+  "shown": [
+   2.1,
+   2.1,
+   2.1,
+   23.6
+  ],
+  "minshown": 2.1,
+  "src": "ATK.dur 0.50초 = 30 (50줄) — 비례 재생, 단 ATK_BODY(?atkbody=1)일 때만"
+ },
+ {
+  "name": "hit2_right",
+  "frames": 2,
+  "ticks": [
+   1,
+   17
+  ],
+  "sum": 18,
+  "code": 30,
+  "shown": [
+   1.7,
+   28.3
+  ],
+  "minshown": 1.7,
+  "src": "ATK.dur 30"
+ },
+ {
+  "name": "hit3_right",
+  "frames": 2,
+  "ticks": [
+   1,
+   26
+  ],
+  "sum": 27,
+  "code": 45,
+  "shown": [
+   1.7,
+   43.3
+  ],
+  "minshown": 1.7,
+  "src": "ATK3.dur 0.75초 = 45"
+ },
+ {
+  "name": "hit1_down",
+  "frames": 1,
+  "ticks": [
+   14
+  ],
+  "sum": 14,
+  "code": 30,
+  "shown": [
+   30.0
+  ],
+  "minshown": 30.0,
+  "src": "ATK.dur 30"
+ },
+ {
+  "name": "hurt_right",
+  "frames": 1,
+  "ticks": [
+   14
+  ],
+  "sum": 14,
+  "code": 20,
+  "shown": [
+   20.0
+  ],
+  "minshown": 20.0,
+  "src": "hero.inv > .67 동안 = 0.33초 = 20틱, 절대 틱(1561줄)"
+ },
+ {
+  "name": "death_right",
+  "frames": 9,
+  "ticks": [
+   3,
+   3,
+   3,
+   3,
+   3,
+   4,
+   4,
+   6,
+   60
+  ],
+  "sum": 89,
+  "code": null,
+  "shown": [
+   3,
+   3,
+   3,
+   3,
+   3,
+   4,
+   4,
+   6,
+   60
+  ],
+  "minshown": 3,
+  "src": "S.deadT×60 절대 틱"
+ }
+]

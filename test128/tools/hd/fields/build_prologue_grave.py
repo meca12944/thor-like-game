@@ -206,7 +206,7 @@ objs = [
  {'type': 'waystone', 'id': 'ws_prologue_grave', 'x': FIRE[0], 'y': FIRE[1], 'name': '무덤가 모닥불(꺼짐)', 'art': 'hd'},
  {'type': 'clue', 'id': 'pg_footprints', 'x': 33, 'y': 15, 'name': '재 위의 발자국', 'flag': 'pg_look_steps',
   'text': '언덕 위로 난 발자국. 반쯤 재에 덮였다.\n내 신발과 크기가 같다.', 'textDone': '반쯤 덮인 발자국.'},
- {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.0, 'zoom': .6, 'dir': 270, 'pan': 10, 'hold': 1, 'name': '잿빛 들판', 'sub': '저 성벽 너머, 펠트 — 그리고 왕성'},
+ {'type': 'vista', 'id': 'pg_vista_crest', 'x': CREST[0], 'y': CREST[1], 'r': 3.0, 'zoom': .6, 'dir': 270, 'pan': 10, 'hold': 1, 'tilt': {'z0': .6, 'z1': .9, 'pan': 12}, 'name': '잿빛 들판', 'sub': '저 성벽 너머, 펠트 — 그리고 왕성'},
  {'type': 'breakable', 'id': 'pg_bramble', 'x': BR_X[0], 'y': RY, 'w': len(BR_X), 'h': 5, 'flag': 'pg_bramble', 'name': '마른 가시덤불', 'text': '마른 가시덤불을 베어 길을 텄다'},
 ] + [{'type': 'pit', 'id': f'pg_crack_{y}', 'x': CRACK_X, 'y': y, 'soft': 1, 'text': '발밑이 꺼진다 — 뛰어넘자'} for y in range(RY, RY + 5)] + [
  {'type': 'sign', 'x': SIGN[0], 'y': SIGN[1], 'text': '기울어진 이정표.\n「펠트 서문 →」'},

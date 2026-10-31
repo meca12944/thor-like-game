@@ -151,10 +151,6 @@
    "id": "ar_secret",
    "loot": [
     [
-     "heart_piece",
-     1
-    ],
-    [
      "potion",
      1
     ]
@@ -174,10 +170,6 @@
    "loot": [
     [
      "potion",
-     1
-    ],
-    [
-     "bomb",
      1
     ]
    ]
@@ -239,10 +231,6 @@
     [
      "potion",
      2
-    ],
-    [
-     "bomb",
-     2
     ]
    ]
   },
@@ -256,10 +244,6 @@
     [
      "potion",
      2
-    ],
-    [
-     "antidote",
-     1
     ]
    ]
   },
@@ -373,91 +357,91 @@
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 21,
    "y": 6,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 28,
    "y": 7,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 6,
    "y": 19,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 8,
    "y": 22,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 41,
    "y": 20,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 18,
    "y": 19,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 30,
    "y": 20,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 10,
    "y": 37,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 36,
    "y": 37,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 14,
    "y": 44,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_silmamul",
+   "mob": "c1_thread_scarecrow",
    "x": 40,
    "y": 43,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_thread_puppet",
+   "mob": "c1_shear_tailor",
    "x": 8,
    "y": 52,
    "respawn": 0
   },
   {
    "type": "spawn",
-   "mob": "c1_needle_spider",
+   "mob": "c1_spool_spider",
    "x": 14,
    "y": 51,
    "respawn": 0

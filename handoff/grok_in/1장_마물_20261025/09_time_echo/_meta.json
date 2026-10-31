@@ -1,0 +1,86 @@
+[
+ {
+  "name": "side_stand",
+  "file": "m09_side_stand.png",
+  "size": [
+   371,
+   664
+  ],
+  "game_file": "m09_side_stand_game.png",
+  "game_size": [
+   25,
+   44
+  ],
+  "game_body_h": 43.3
+ },
+ {
+  "name": "front_stand",
+  "file": "m09_front_stand.png",
+  "size": [
+   328,
+   675
+  ],
+  "game_file": "m09_front_stand_game.png",
+  "game_size": [
+   22,
+   45
+  ],
+  "game_body_h": 44.0
+ },
+ {
+  "name": "statue",
+  "file": "m09_statue.png",
+  "size": [
+   372,
+   563
+  ],
+  "game_file": "m09_statue_game.png",
+  "game_size": [
+   25,
+   37
+  ],
+  "game_body_h": 36.6
+ },
+ {
+  "name": "awaken",
+  "file": "m09_awaken.png",
+  "size": [
+   533,
+   535
+  ],
+  "game_file": "m09_awaken_game.png",
+  "game_size": [
+   35,
+   35
+  ],
+  "game_body_h": 34.7
+ },
+ {
+  "name": "slam_raise",
+  "file": "m09_slam_raise.png",
+  "size": [
+   403,
+   755
+  ],
+  "game_file": "m09_slam_raise_game.png",
+  "game_size": [
+   27,
+   50
+  ],
+  "game_body_h": 49.4
+ },
+ {
+  "name": "slam_down",
+  "file": "m09_slam_down.png",
+  "size": [
+   725,
+   458
+  ],
+  "game_file": "m09_slam_down_game.png",
+  "game_size": [
+   48,
+   30
+  ],
+  "game_body_h": 29.6
+ }
+]

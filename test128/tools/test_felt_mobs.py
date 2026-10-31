@@ -9,7 +9,7 @@ with sync_playwright() as p:
     pg.goto(B); pg.wait_for_function('window.__world&&window.__game',timeout=30000); pg.wait_for_timeout(1500)
     pg.evaluate("()=>{const W=__world;W.setManual(true);W.go('field00');}"); pg.evaluate("()=>__world.advance(2)");pg.evaluate("()=>{for(let i=0;i<20&&__world.trans;i++)__world.advance(.5)}")
     pg.evaluate('''()=>{const W=__world,h=W.hero,M=W.S.map;W.god=true;let best=null;for(let y=6;y<M.h-6;y++)for(let x=8;x<M.w-8;x++){let ok=true;for(let dy=-3;dy<=3&&ok;dy++)for(let dx=-5;dx<=5;dx++)if(M.solidG[(y+dy)*M.w+x+dx]){ok=false;break;}if(ok){best=[x,y];break;}}if(best)W.setHeroTile(best[0],best[1],'down');W.killAll();W.advance(.6);W.S.fx.length=0;
-      [['c1_silmamul',-60,-25],['c1_thread_puppet',60,-25],['c1_needle_spider',-60,30],['c1_unrotting_hound',60,30]].forEach(([k,dx,dy])=>{const m=W.spawn(k,h.x+dx,h.y+dy);m.noDrop=true;});}''')
+      [['c1_thread_scarecrow',-60,-25],['c1_shear_tailor',60,-25],['c1_spool_spider',-60,30],['c1_quilted_boar',60,30]].forEach(([k,dx,dy])=>{const m=W.spawn(k,h.x+dx,h.y+dy);m.noDrop=true;});}''')
     seen={'shots':set(),'haz':0,'anims':set()}
     for i in range(420):
         r=pg.evaluate('''()=>{const W=__world;W.advance(1/30);return {s:W.S.shots.map(s=>s.kind),h:W.hazards.length,a:W.mobs.map(m=>m.kind+':'+(m.anim||'')),hp:W.mobs.map(m=>m.hp)}}''')
