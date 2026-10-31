@@ -2608,6 +2608,7 @@
     const dt = Math.min(.1, (t - last) / 1000 || 0); last = t;
     if (FPSEL) { fpsN++; fpsW = Math.max(fpsW, dt * 1000); if (t - fpsT > 1000) { FPSEL.textContent = Math.round(fpsN * 1000 / (t - fpsT)) + ' fps · 최악 ' + Math.round(fpsW) + 'ms'; fpsN = 0; fpsT = t; fpsW = 0; } }
     if (!manual) { if (S.scene === 'town' && !S.trans) watchTown(); else { acc += dt; let n = 0; while (acc >= DT && n < 6) { step(DT); acc -= DT; n++; } if (n >= 6) acc = 0; } }
+    { const G = window.__game; if (G && G.syncOutfit) G.syncOutfit(); } // 옷 전체 색 = 장착 망토 색 (사장님 10-31): 들판도 마을과 같은 주인공 그림판을 씀 → 망토가 바뀌면 그림판을 바꿔 칠함
     if (S.scene !== 'town' || S.trans) render();
     publish();
     requestAnimationFrame(frame);
