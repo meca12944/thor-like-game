@@ -22,6 +22,8 @@ frames['run_down'] = sorted(glob.glob(f'{G}/run13_face/0*.png')); frames['run_up
 frames['run_right'] = sorted(glob.glob(f'{G}/run_side_face/0*.png'))
 # 돌기 장 (사장님 10-30 「잔상이 아니라 부드럽게 전환되도록」, 그록 뒤돌기 영상 2개): 돌 때만 씀(바라보기는 4방향 그대로). 왼쪽 쪽은 뒤집기, 반대로 돌기는 거꾸로 — world.js TURN_CLIP
 for tk in ('turn_rd', 'turn_dl', 'turn_ur'): frames[tk] = sorted(glob.glob(f'{G}/{tk}/0*.png'))   # (k는 위 JSON 끝 자리라 쓰면 안 됨)
+# 회피대시 (사장님 10-31 가안 「괜찮네」 → 그록 회피대시 영상 3개): 웅크림·밀기·낮게 내딛기·디딤·일어섬 5장 + 그 방향 서기, 틱은 옛 값 그대로(2·2·3·4·5·4)
+for tk in ('dash_side', 'dash_front', 'dash_back'): frames[tk] = sorted(glob.glob(f'{G}/{tk}/0*.png'))
 assert all(len(frames[k]) >= 8 for k in ('run_down', 'run_up', 'run_right'))   # 바닥에서 달리기(ground.py)로 높이 뜬 장을 빼서 정면 10·뒷면 13·옆 14장
 # 몸통 가운데 줄 맞추기 (교본 1부 1-0 「모든 방향을 같은 몸 가운데 줄로」, 사장님 10-30 「부드럽게 전환」): 동작 하나에 한 번,
 # 그 동작 장들의 몸통(키의 30~50% 줄) 가운데 평균을 발 기준 x(128)에 둠. 서기 원본은 몸이 왼쪽으로 23~27칸 비켜 있어 출발·멈춤·돌기 때마다 몸이 옆으로 미끄러졌음.
@@ -38,7 +40,7 @@ for nm, fl in frames.items():
     idx[nm] = []; ims = [Image.open(f).convert('RGBA') for f in fl]
     sx = round(float(np.mean([torso_x(im) for im in ims])) - 128); shift[nm] = sx
     for im in ims:
-        if nm.startswith('turn_'): sx = round(torso_x(im) - 128)   # 돌기 장은 장마다(한 장 1틱, 앞뒤 두 동작에 다 이어져야 해서): 몸이 제자리에서 돎
+        if nm.startswith('turn_') or nm.startswith('dash_'): sx = round(torso_x(im) - 128)   # 돌기·회피대시 장은 장마다: 몸이 제자리에서 돎·영상의 제자리 내딛기에서 몸이 앞뒤로 오가던 것을 없애고 이동은 코드만
         bb = im.getbbox(); c = im.crop(bb)
         crops.append(c); idx[nm].append(len(crops) - 1); cells.append([0, 0, c.width, c.height, 128 + sx - bb[0], 246 - bb[1]])
 # 줄 맞춰 깔기 (가로 2048)
@@ -61,6 +63,10 @@ for key, L in old.items():
         new[key] = [[0, stand.get(dr, stand['right'])] + e[2:] for e in L]
 for tk in ('turn_rd', 'turn_dl', 'turn_ur'):
     new[tk] = [[0, c, 1] for c in idx[tk]]
+for dr, tk in (('right', 'dash_side'), ('left', 'dash_side'), ('down', 'dash_front'), ('up', 'dash_back')):
+    tick = [e[2] for e in old.get('dash_' + dr, [])] or [2, 2, 3, 4, 5, 4]
+    cs = idx[tk] + [stand[dr]]
+    new['dash_' + dr] = [[0, c, t] for c, t in zip(cs, tick)]
 for dr in ('down', 'up', 'right', 'left'):
     for nm in ('run', 'walk'):
         new.setdefault(f'{nm}_{dr}', [[0, c, 3] for c in idx['run_' + ('right' if dr == 'left' else dr)]])
@@ -77,8 +83,9 @@ H['gaitMul'] = {k: SIDE for k in ('run_right', 'run_left', 'walk_right', 'walk_l
 for kk in [q for q in list(H) if q.startswith("_") and q != "_doc"]: del H[kk]
 H['_doc'] = ('주인공 v3 (10-30 사장님 「일단 이거 전부 메인에 올려라, 플레이 가능하게」 → 「작아져야지」): 그록 작은그림 작화, 키 144(옛 주인공과 같은 화면 키), 얼굴 = A를 키에 맞춰 한 번 줄임. '
              'sheets 0 = v3 그림(서기 3방향 + 달리기 정면·뒷면 13장(발 닿는 장 0·6.5) + 옆 17장(발 닿는 장 0·9, gaitMul로 옆만 걸음 거리 187), 그록 영상 → 도트), 1 = 시전 마법진(옛 그대로). '
-             '아직 안 그린 동작(회피대시·점프·공격·맞기·쓰러짐·시전)은 그 방향 서기 장(틱 그대로). 걷기(평소 이동) = 달리기 장(가볍게 뛰기 영상 전까지). '
+             '아직 안 그린 동작(점프·공격·맞기·쓰러짐·시전)은 그 방향 서기 장(틱 그대로). 걷기(평소 이동) = 달리기 장(가볍게 뛰기 영상 전까지). '
              'turn_rd(옆→정면)·turn_dl(정면→옆←)·turn_ur(뒷면→옆) = 돌 때만 쓰는 돌기 장(그록 뒤돌기 영상, world.js TURN_CLIP). '
+             'dash_* = 회피대시 5장(웅크림·밀기·낮게 내딛기·디딤·일어섬, 그록 회피대시 영상) + 서기, 틱 2·2·3·4·5·4. '
              '만든 과정 handoff/claude/hero3_v1(game144) · 교본 0부 2(얼굴)·5(그록 영상). 도구 tools/anim/hero3_atlas.py')
 js = json.dumps(H, ensure_ascii=False, separators=(',', ':'))
 s2 = s[:j] + js + s[k + 1:]
