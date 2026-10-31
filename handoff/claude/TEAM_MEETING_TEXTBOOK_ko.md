@@ -473,6 +473,7 @@
 # 9. 그록 부탁 방법
 
 ## 9-1. 어디에 두나
+- **그록과 파일 주고받기 = 이 폴더 하나로 고정** (사장님 10-31 「앞으로 그록하고 파일은 지금 주고 받는 그 폴더로 고정해라」): 「그록 할 일 (필멸자)」 안 **「★ 그록 부탁 (10-31): 공격 4타 — 분홍 임시 칼」** https://drive.google.com/drive/folders/1oLU_ZqNds0Og-XEb9zSWwjqcmifLo9gb (폴더 id `1oLU_ZqNds0Og-XEb9zSWwjqcmifLo9gb`). 클로드 → 그록 부탁 문서·넣을 그림, 그록 → 결과 영상·전달 문서 모두 여기. 이름은 그록이 찾는 이름이라 바꾸지 않음. 그림은 문서 안에 넣고(깃허브 고정 주소 `raw.githubusercontent.com/.../<커밋>/...` 를 `<img>`로) 주소도 같이 적음 — 드라이브에 그림 파일을 글자로 바꿔 직접 올리면 깨짐(10-31). 받은 영상은 `download_file_content`로 받아 `handoff/claude/hero3_v1/grok_video/`에 둠.
 - 드라이브 **「그록 할 일」 폴더**: https://drive.google.com/drive/folders/1JD2SE0FTdbZljYMiitpstFWCvGeyYASZ (사장님 10-25 「드라이브에서 볼수 있게 사진이랑 글 남겨」, 「드라이브에 그록이 해줘야되는 폴더를 만들어」).
 - 그록에 붙여 넣는 진행 상황 문서는 `handoff/GROK_BRIEFING_ko.md` **한 곳만** 고친다 (2번방 10-24).
 - 사장님이 그록 채팅에 **한 번에 복사해 붙일 수 있게** 정리해 드린다 (사장님 10-24 「아니 한방에 복사해서 줄수 있도록 말이ㅑ」).
