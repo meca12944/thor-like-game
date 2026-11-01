@@ -1646,6 +1646,7 @@
     stepSfx(h); // 걸음 소리 (사장님 10-30 「걸음 소리도 이거 쓰자」: 그록 뒷면 달리기 영상에서 자른 4개, 발 닿는 곳 gp 0·0.5) // gait phase by distance (town 84 / 119 px per cycle x 30/78 field scale)
     if (S.deadT > 0) e = seq(A('death'), S.deadT * 60);
     else if (h.atk && h.atk.i <= 2 && bareSheet(H, (A(h.atk.i === 2 ? 'hit3' : h.atk.i === 1 ? 'hit2' : 'hit1') || [[]])[0][0])) { e = seq(LL, h.atk.t * 60); } // 빈 손 그록 공격 그림 (회의 2차 10-25): 아틀라스 틱 그대로(절대 틱, 합 30/30/45 = 코드 길이), 치는 장 시작 = 판정 틱 8/8/11 — H8._atk_note
+    else if (h.atk && h.atk.i === 3 && !vert && H.anims.thrust_right) { e = seq(A('thrust'), h.atk.t * 60); } // 달리다 공격 = 찌르기 (사장님 11-01 「칼이 길어지는 게 아니라 찌르고 다시 빼야」, 그록 영상): 절대 틱, 다 뻗는 장 = 판정 틱 4 (dash a0)
     else if (h.atk && (SLASH_BODY || (ATK_BODY && h.atk.i <= 2))) { const i = h.atk.i, AT = atkT(i), L = A(i === 3 ? 'hit1' : i >= 4 || i === 2 ? 'hit3' : i === 1 ? 'hit2' : 'hit1'); e = seq(L, Math.min(.999, h.atk.t / AT.dur) * tot(L)); }
     else if (h.charge) e = A('hold')[0];
     else if (h.jump && H.anims.jump_right) { const J = h.jump, L = J.run && !vert && H.anims['rjump_' + d] ? H.anims['rjump_' + d] : A('jump'); e = seq(L, Math.min(.999, J.t / (J.pre + J.T + J.land)) * tot(L)); }
@@ -1855,11 +1856,20 @@
     const g = H.grip[c.h8 + ':' + c.ci]; if (!g) return null; const fl = !!c.fl, d = (fl ? 180 - g[2] : g[2]) * Math.PI / 180; return [(fl ? -g[0] : g[0]) + (c.ox || 0), g[1], Math.cos(d), Math.sin(d)]; }
   function carryBlade(ctx, cg) { const [gx, gy, ux, uy] = cg, L = 17 * ART_FIG / H128FIG; /* 들고 다닐 때는 조금 짧게 (휘두를 때 21) */ ctx.save(); ctx.lineCap = 'round'; const seg = (c, w, a0) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(gx + ux * a0, gy + uy * a0); ctx.lineTo(gx + ux * L, gy + uy * L); ctx.stroke(); };
     seg('#0d0f13', 3.2, 0); seg('#9aa3ad', 1.8, 2); seg('#cfd5db', .7, 4); ctx.strokeStyle = '#a07c34'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(gx - uy * 4, gy + ux * 4); ctx.lineTo(gx + uy * 4, gy - ux * 4); ctx.stroke(); ctx.restore(); } // heroBlade 와 같은 칼 모양
-  function gkDraw(k) { const cg = carryGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg) return; const sc = k * H128FIG / ART_FIG, [hx0, hy0] = W2S(hero.x, hero.y);
+  // 공격 영상 장(사장님 11-01 「좋아 올려」): 칸마다 손 자리·칼 각도(H8.grip "시트:칸" = [x, y, 각도, 몸 뒤]) → 장착 칼 그림(index.html drawHandSword). 코드 칼(heroBlade) 대신
+  function atkVidGrip(c) { const G = h128(), H = G && G.H8; if (!H || !H.atkVid || !H.grip) return null; c = c || h128Cell(); if (!c || c.h8 === undefined) return null; const g = H.grip[c.h8 + ':' + c.ci]; return g && g.length >= 4 ? { g, fl: !!c.fl, ox: c.ox || 0, key: c.h8 + ':' + c.ci } : null; }
+  function heroSwordVid(ctx, sg) { const G = window.__game; if (!G || !G.drawHandSword) return; ctx.save(); ctx.translate(sg.ox, 0); if (sg.fl) ctx.scale(-1, 1);
+    const w = G.drawHandSword(ctx, sg.g[0], sg.g[1], sg.g[2]), a = hero.atk;
+    if (w && a) { const L = (w.im.naturalHeight - w.gy) * .95, d = sg.g[2] * Math.PI / 180, tx = sg.g[0] + Math.cos(d) * L, ty = sg.g[1] + Math.sin(d) * L, B = a._sv || (a._sv = []); // 휘두르는 칼 잔상: 칼이 크게 돈 장 사이를 옅은 띠로 메움(그림 사이 중간 동작)
+      if (!B.length || B[B.length - 1][5] !== sg.key) B.push([sg.g[0], sg.g[1], tx, ty, sg.g[2], sg.key]); if (B.length > 4) B.shift();
+      ctx.globalCompositeOperation = 'lighter'; for (let n = B.length - 2; n >= 0; n--) { const P = B[n], N = B[n + 1]; if (Math.abs(((N[4] - P[4] + 540) % 360) - 180) < 12) continue; ctx.fillStyle = `rgba(150,220,235,${(.3 * (n + 1) / B.length).toFixed(3)})`;
+        ctx.beginPath(); ctx.moveTo(P[0], P[1]); ctx.lineTo(P[2], P[3]); ctx.lineTo(N[2], N[3]); ctx.lineTo(N[0], N[1]); ctx.closePath(); ctx.fill(); } }
+    ctx.restore(); }
+  function gkDraw(k) { const cg = carryGrip(), sg = atkVidGrip(); if ((!S.gk || !S.gk.length) && (!S.gkImp || !S.gkImp.length) && !(comboBlade() && swordC()) && !cg && !sg) return; const sc = k * H128FIG / ART_FIG, [hx0, hy0] = W2S(hero.x, hero.y);
     ctx.save(); ctx.translate(Math.round(hx0), Math.round(hy0)); ctx.scale(sc, sc); ctx.imageSmoothingEnabled = false;
     for (const f of S.gk || []) gkArcDraw(ctx, f);
     ctx.globalAlpha = heroBlinkA(); if (cg) carryBlade(ctx, cg);
-    if (comboBlade() && swordC()) heroBlade(ctx); // 콤보 당김·끝에 멈춤 동안 코드 칼 (모션연구방 10-24 「칼이 안사라지는데?」)
+    if (sg) heroSwordVid(ctx, sg); else if (comboBlade() && swordC()) heroBlade(ctx); // 영상 공격 장 = 장착 칼 그림 / 그 밖 콤보 당김·끝에 멈춤 동안 코드 칼 (모션연구방 10-24 「칼이 안사라지는데?」)
     ctx.globalAlpha = 1;
     ctx.restore();
     for (const m of S.gkImp || []) { const a = m.t, al = Math.max(0, 1 - a / 10); if (a >= 14) continue; const [x, y] = W2S(m.x, m.y); ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(sc, sc); // impact: ring + cross flash
@@ -1960,7 +1970,7 @@
   function drawHeroHi(k) { if (!h128() || !S.map || S.map.type === 'world') return; const h = hero; nsPreload();
     if (S.trail) for (const a of S.trail) if (a.c128) { const q = 1 - a.t / a.life; drawH128(a.c128, a.x, a.y, k, q * q * a.a, null); } // 잔상 = 주인공 모습 그대로 (색 덮기 없음)
     const BA = heroBlinkA(); // 무적 깜빡임 = 몸·칼 모두 45 % (전: 몸을 통째로 안 그려서 칼만 떠 있었음, 회의 2차 10-25)
-    let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
+    let kx = 0, ky = 0, sq = 1, lean = 0; if (h.atk && !SLASH_BODY && !atkVidGrip()) { const K = gkKick(h.atk), v = FACEV[h.face] || [1, 0], f = H128FIG / ART_FIG; kx = v[0] * K.step * f; ky = v[1] * K.step * f * .5; sq = K.sq; lean = v[0] * K.lean * f * k; if (v[1]) sq *= 1 - v[1] * K.lean * .006; } // side: shear (head leans, feet stay); up/down: lean shows as a slight squash/stretch
     sq *= heroExag(h); { const RL = EXAG.runLean, f8 = h.f8 || h.face || 'down', sx = /left/.test(f8) ? -1 : 1, kind = /^(down|up)(left|right)$/.test(f8) ? (f8.startsWith('down') ? 'dr' : 'ur') : f8 === 'left' || f8 === 'right' ? 'side' : f8;
       const mv = h.moving && !h.roll && !h.atk && !h.jump, T = !mv ? null : h.run ? RL : RL.walk, deg = T && T[kind] || 0, sqT = mv && h.run ? (kind === 'down' ? RL.downSq : kind === 'up' ? RL.upSq : 0) : 0, now = S.t, dt = Math.min(.1, Math.max(0, now - (h.rlT ?? now))), q = Math.min(1, dt * 60 / RL.tau); h.rlT = now; // 달리기 숙임: 6틱에 걸쳐 들어가고 빠짐
       const RX = EXAG.runEx; if (mv && h.run && !h.wasRun) h.runT0 = now; if (!mv && h.wasRun) h.rlD = -sx * RX.stopBack; h.wasRun = mv && h.run; // 출발 시각 · 멈추면 바로 뒤로 젖혔다(아래 스프링으로) 섬
