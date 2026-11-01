@@ -1,6 +1,5 @@
 # 정면 콤보 가안 영상 (그록 11-01 「정면 콤보 넘김」: 2타를 천천히 감았다가 한 번에 지나가는 진짜 베기로, 칼 길이·먼지 색·이음새 고치기)
-# 영상 1 (2타 비교): 원래 빠르기 / 먼저 고친 판(장을 건너뛰고 멈췄다 휙 → 사장님 11-01 「2타가 끊긴다 부드럽지 않아」) / 새로 고친 판(모든 장을 쓰고 빠르기가 매끄럽게 올랐다 내려감)
-# 영상 2 (전체 콤보): 그록 원본 / 게임 칼 원래 빠르기 / 게임 칼 새로 고친 판
+# 2타 비교 영상: 원래 빠르기 / 부드럽게 판(모든 장 + 빠르기 곡선 → 사장님 「베는 게 아니라 칼이 움직이는 거 같다」) / 베기 판(감기 → 3장에 휙 + 코드로 그린 검기 → 끝 자세 멈춤)
 # 칼 길이: 분홍 칼을 지우고 게임 칼 그림을 손 자리·각도에 그려서 늘 같은 길이. 먼지: 초록빛 먼지를 흙색으로(front_proc.py).
 # 쓰는 법: python3 front_render.py <작업 폴더(body/, grip.json, w/)>
 import numpy as np, json, os, shutil, subprocess, importlib.util, sys
@@ -69,8 +68,15 @@ o0=Image.open(D+'body/000.png').getbbox(); b0=orig(0).getbbox(); ox,oy=o0[0]-b0[
 F1=ImageFont.truetype(of.FONT,26); F2=ImageFont.truetype(of.FONT,22)
 H1=hand('w_loop_long'); RA=of.ramp('c_ash_cloak')
 cache={}
+import cv2
+def clean(im,k):
+    """몸 덩어리와 떨어진 조각 = 그록 분홍 칼이 흐려 남은 흙색 자국 → 지움 (내려찍기 흙먼지가 나는 198장부터는 그대로)"""
+    if k>=198: return im
+    a=np.array(im); n_,lab,st,_=cv2.connectedComponentsWithStats((a[...,3]>0).astype(np.uint8),connectivity=8)
+    if n_>2: main=1+int(np.argmax(st[1:,4])); a[(lab!=main)&(lab>0),3]=0
+    return Image.fromarray(a)
 def game(k):
-    if k not in cache: cache[k]=comp(Image.open(f'{D}body/{k:03d}.png'),FR[k],H1,RA)
+    if k not in cache: cache[k]=comp(clean(Image.open(f'{D}body/{k:03d}.png'),k),FR[k],H1,RA)
     return cache[k]
 def grok(k):
     og=Image.new('RGBA',(300,300)); im=orig(k); og.paste(im,(ox,oy),im); return og
@@ -81,22 +87,46 @@ def render(panels,seq,name,K=3,note=''):
         C=Image.new('RGB',(1920,1080),(58,66,52)); d=ImageDraw.Draw(C); d.rectangle([0,858,1920,1080],fill=(84,74,58))
         for j,((fn,title),k) in enumerate(zip(panels,ks)):
             z=fn(k).resize((300*K,300*K),Image.NEAREST); C.paste(z,(640*j+320-150*K,858-J['foot']*K),z)
-            d.text((640*j+36,28),title,font=F1,fill=(255,235,150)); d.text((640*j+36,1010),f'{part(k)} · {k}장',font=F2,fill=(235,235,235))
+            d.text((640*j+36,28),title,font=F1,fill=(255,235,150)); kk=k[0] if isinstance(k,tuple) else k; d.text((640*j+36,1010),f'{part(kk)} · {kk}장',font=F2,fill=(235,235,235))
         if note: d.text((36,70),note(n) if callable(note) else note,font=F2,fill=(200,220,255))
         C.save(out+f'{n:04d}.jpg',quality=92)
     subprocess.run(['ffmpeg','-v','error','-y','-framerate','60','-i',out+'%04d.jpg','-c:v','libx264','-pix_fmt','yuv420p','-crf','20',D+name],check=True)
 def pad(*L):
     m=max(len(x) for x in L); return [x+[x[-1]]*(m-len(x)) for x in L]
+# 베기 판 (사장님 11-01 「2타는 아직 끊긴다 · 베는 게 아니라 칼이 움직이는 거 같다」): 도트 게임식 — 감기(살짝 멈춤) → 3장에 휙 + 코드로 그린 검기 부채꼴 → 끝 자세에서 멈춤
+H2_SLASH=[(72,3),(73,2),(74,3),(75,2),(76,3),(77,3),(78,3),(79,3),(80,4), (83,1),(86,1),(90,2),(91,2), (92,3),(94,2),(97,2),(100,2),(103,2),(106,2),(108,10)]
+SLASH=[x for x in ORIG if x[0]<72]+H2_SLASH+rest(108)
+from PIL import ImageDraw as _ID
+def trails(seq):
+    """틱마다 그릴 검기: 장이 바뀔 때 칼 각도가 12° 넘게 돌면 '휙' — 휙 시작 각도부터 지금 각도까지 이은 부채꼴 하나. 휙이 멈추면 6틱 동안 옅어짐"""
+    out=[]; act=None; last=None   # act=[시작각, 돈 각, 손 자리, 끝난 틱 or None]
+    for n,k in enumerate(seq):
+        if n and seq[n-1]!=k:
+            a0,a1=FR[seq[n-1]]['ang'],FR[k]['ang']; da=(a1-a0+180)%360-180
+            if abs(da)>12:
+                if act and act[3] is None and np.sign(da)==np.sign(act[1]): act[1]+=da; act[2]=tuple(FR[k]['guard'])
+                else: act=[a0,da,tuple(FR[k]['guard']),None]
+            elif act and act[3] is None: act[3]=n
+        if act and act[3] is not None and n-act[3]>=len(FADE): act=None
+        out.append(None if act is None else (act[0],act[1],act[2],0 if act[3] is None else n-act[3]))
+    return out
+FADE=[1,.75,.5,.32,.18,.08]
+def draw_trail(im,seg,L):
+    if seg is None: return im
+    a0,da,(gx,gy),age=seg; f=FADE[min(age,len(FADE)-1)]
+    lay=Image.new('RGBA',im.size); d=_ID.Draw(lay); st=max(3,int(abs(da)/8)); angs=[a0+da*i/st for i in range(st+1)]
+    for r0,r1,col,al in [(.34,.80,(160,200,255),95),(.80,1.04,(235,245,255),210)]:   # 안쪽 옅은 파랑 · 칼끝 길은 밝게
+        pts=[(gx+np.cos(np.radians(t))*L*r1,gy+np.sin(np.radians(t))*L*r1) for t in angs]+[(gx+np.cos(np.radians(t))*L*r0,gy+np.sin(np.radians(t))*L*r0) for t in reversed(angs)]
+        d.polygon(pts,fill=col+(int(al*f),))
+    out=im.copy(); out.alpha_composite(lay); return out
 if __name__=='__main__':
-    print('2타 새 칸 수',sum(n for _,n in H2_NEW),H2_NEW)
-    # 영상 1: 2타만 (60~120장) — 제 빠르기 두 번, 반 빠르기 한 번
+    # 영상: 2타만 (60~120장) — 원래 / 부드럽게(어제 판) / 베기 판 · 제 빠르기 두 번, 반 빠르기 한 번
     cut=lambda L:[k for k in expand(L) if 60<=k<=120]
-    a,b,c=pad(cut(ORIG),cut(OLD),cut(NEW))
-    one=list(zip(a,b,c)); slow=[x for x in one for _ in range(2)]
-    seq=one+[one[-1]]*20+one+[one[-1]]*20+slow
+    a,b,c=pad(cut(ORIG),cut(NEW),cut(SLASH)); TR=trails(c)
+    one=list(range(len(a))); slow=[x for x in one for _ in range(2)]
+    idx=one+[one[-1]]*20+one+[one[-1]]*20+slow
+    seq=[(a[i],b[i],(c[i],i)) for i in idx]
+    slash=lambda kc: draw_trail(game(kc[0]),TR[kc[1]],H1[3])
     lab=lambda n:'제 빠르기' if n<2*(len(one)+20) else '반 빠르기(천천히 보기)'
-    render([(game,'원래 빠르기 (그록 그대로)'),(game,'먼저 고친 판 (끊김)'),(game,'새로 고친 판 (부드럽게)')],seq,'정면콤보_2타_부드럽게_비교.mp4',note=lab)
-    # 영상 2: 전체 콤보
-    a,c=pad(expand(ORIG),expand(NEW)); seq=list(zip(a,a,c)); seq=seq+[seq[-1]]*30+seq
-    render([(grok,'그록 원본 (분홍 칼 · 원래 빠르기)'),(game,'게임 칼 · 원래 빠르기'),(game,'게임 칼 · 새로 고친 판')],seq,'정면콤보_새로고친판.mp4')
-    print('ok')
+    render([(game,'원래 빠르기 (그록 그대로)'),(game,'부드럽게 판 (칼이 움직이는 느낌)'),(slash,'베기 판 (감기 → 휙 + 검기 → 멈춤)')],seq,'정면콤보_2타_베기판_비교.mp4',note=lab)
+    print('ok',sum(n for _,n in H2_SLASH),'칸')
