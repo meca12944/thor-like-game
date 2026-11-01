@@ -11,21 +11,26 @@ OF='/home/user/thor-like-game/handoff/claude/hero3_v1/outfit/outfit.py'
 spec=importlib.util.spec_from_file_location('of',OF); of=importlib.util.module_from_spec(spec); spec.loader.exec_module(of)
 def hand(n):
     im=Image.open(WH+n+'_hand.png').convert('RGBA'); a=np.array(im); w=(a[...,3]>100).sum(1)
-    gy=int(np.argmax(w)); xs=np.nonzero(a[gy,:,3]>100)[0]; return im,(xs.min()+xs.max())/2,gy
-def sword(hd,gx,gy,ang,size=300):
-    im,hx,hy=hd; R=max(im.size)*2+4; c=Image.new('RGBA',(R,R)); c.paste(im,(int(R/2-hx),int(R/2-hy)),im)
+    gy=int(np.argmax(w)); xs=np.nonzero(a[gy,:,3]>100)[0]; top=int(np.nonzero(w)[0][0]); return im,(xs.min()+xs.max())/2,gy,gy-top
+def sword(hd,gx,gy,ang,size=300,s=1.0):
+    im,hx,hy,_=hd
+    if s<.999: im=im.resize((im.width,max(1,round(im.height*s))),Image.NEAREST); hy=hy*s
+    R=max(im.size)*2+4; c=Image.new('RGBA',(R,R)); c.paste(im,(int(R/2-hx),int(R/2-hy)),im)
     c=c.rotate(-(ang+90),resample=Image.NEAREST); L=Image.new('RGBA',(size,size)); L.paste(c,(int(round(gx-R/2)),int(round(gy-R/2))),c); return L
 def comp(body,fr,hd,R=None):
     b=np.array(body)
     if R is not None: b=of.recolor(b,R)[0]
-    B=Image.fromarray(b); sw=sword(hd,fr['guard'][0],fr['guard'][1],fr['ang']); out=Image.new('RGBA',B.size)
+    # 칼끝이 발 높이 밑으로 가면(땅에 꽂힌 것처럼 보임) 칼을 카메라 쪽으로 기운 것처럼 짧게: 칼끝 = 발 4칸 위 (그록 「검을 땅에 꽂지 않음」)
+    dy=np.sin(np.radians(fr['ang']))*hd[3]; lim=FOOT-4; s=1.0
+    if dy>0 and fr['guard'][1]+dy>lim: s=max(.5,(lim-fr['guard'][1])/dy)
+    B=Image.fromarray(b); sw=sword(hd,fr['guard'][0],fr['guard'][1],fr['ang'],s=s); out=Image.new('RGBA',B.size)
     if fr['behind']: out.alpha_composite(sw); out.alpha_composite(B)
     else:
         out.alpha_composite(B); out.alpha_composite(sw)
         a=np.array(B); r,g,bb=[a[...,i].astype(int) for i in range(3)]; skin=(a[...,3]>100)&(r>110)&(r>bb+30)&(g>70)
         yy,xx=np.mgrid[0:a.shape[0],0:a.shape[1]]; m=skin&((xx-fr['guard'][0])**2+(yy-fr['guard'][1])**2<81); o=np.array(out); o[m]=a[m]; out=Image.fromarray(o)
     return out
-J=json.load(open(D+'grip.json')); FR=J['frames']; S=144/569
+J=json.load(open(D+'grip.json')); FR=J['frames']; S=144/569; FOOT=J['foot']
 # 원래 빠르기: 24장/초 → 60장/초 (3,2,3,2…)
 ORIG=[(k,3 if j%2==0 else 2) for j,k in enumerate(range(len(FR)))]
 # 2타(72~108장) 고친 빠르기 (60장/초 칸 수): 천천히 감기 → 80장에서 잠깐 멈춤 → 한 번에 지나감(5칸) → 천천히 멈춤
