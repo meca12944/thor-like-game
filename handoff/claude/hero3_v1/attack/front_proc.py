@@ -20,7 +20,7 @@ def shrink(rgb,al,S):
     A=np.clip(ch[3],0,255); c=np.stack([np.clip(ch[k]/np.maximum(A,1e-3)*255,0,255) for k in range(3)],2)
     return c,A
 def one(job):
-    vid,res,k=job; S=144/HEAD0*960/res   # 720 영상(그록 2타 다시)도 같은 크기로
+    vid,res,k=job[:3]; S=job[3] if len(job)>3 else 144/HEAD0*960/res   # 720 영상(그록 2타 다시)도 같은 크기로 · 뒷면은 배율을 따로(4번째 값)
     a=np.asarray(Image.open(f'{D}{vid}/{k:04d}.png').convert('RGB')).astype(np.float32)
     r,g,b=a[...,0],a[...,1],a[...,2]; gx=g-np.maximum(r,b)
     mg0=(r-g>60)&(b-g>50); mg=cv2.dilate(mg0.astype(np.uint8),cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(7,7)))>0
@@ -43,7 +43,10 @@ def one(job):
     out=np.zeros(c.shape[:2]+(4,),np.uint8)
     out[...,:3]=np.where(body_px[...,None],snap(c),np.where(dust_px[...,None],dc,0)).astype(np.uint8); out[...,3]=((body_px|dust_px)*255).astype(np.uint8)
     # 칼: 축 → 코등이(가장 넓은 곳) → 칼끝
-    ys,xs=np.nonzero(mg0); P=np.stack([xs,ys],1).astype(float); cc=P.mean(0)
+    ys,xs=np.nonzero(mg0)
+    if len(xs)<30:   # 칼이 몸에 가려 안 보이는 장 → 칼 자리는 나중에 앞뒤 장 사이로 이음(칼날 0)
+        print(vid,k,'칼 안 보임',flush=True); return dict(src=vid,k=k,guard=[float('nan')]*2,ang=float('nan'),blade=0.0,behind=True,dust=int(dust_px.sum())),out
+    P=np.stack([xs,ys],1).astype(float); cc=P.mean(0)
     w,v=np.linalg.eigh(np.cov((P-cc).T)); u=v[:,1]; t=(P-cc)@u; p=(P-cc)@np.array([-u[1],u[0]])
     st=4*res/540; bins=np.arange(t.min(),t.max()+st,st); wid=[]
     for i in range(len(bins)-1):
