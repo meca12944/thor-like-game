@@ -1859,8 +1859,8 @@
   // 공격 영상 장(사장님 11-01 「좋아 올려」): 칸마다 손 자리·칼 각도(H8.grip "시트:칸" = [x, y, 각도, 몸 뒤]) → 장착 칼 그림(index.html drawHandSword). 코드 칼(heroBlade) 대신
   function atkVidGrip(c) { const G = h128(), H = G && G.H8; if (!H || !H.atkVid || !H.grip) return null; c = c || h128Cell(); if (!c || c.h8 === undefined) return null; const g = H.grip[c.h8 + ':' + c.ci]; return g && g.length >= 4 ? { g, fl: !!c.fl, ox: c.ox || 0, key: c.h8 + ':' + c.ci } : null; }
   function heroSwordVid(ctx, sg) { const G = window.__game; if (!G || !G.drawHandSword) return; ctx.save(); ctx.translate(sg.ox, 0); if (sg.fl) ctx.scale(-1, 1);
-    const w = G.drawHandSword(ctx, sg.g[0], sg.g[1], sg.g[2]), a = hero.atk;
-    if (w && a) { const L = (w.im.naturalHeight - w.gy) * .95, d = sg.g[2] * Math.PI / 180, tx = sg.g[0] + Math.cos(d) * L, ty = sg.g[1] + Math.sin(d) * L, B = a._sv || (a._sv = []); // 휘두르는 칼 잔상: 칼이 크게 돈 장 사이를 옅은 띠로 메움(그림 사이 중간 동작)
+    const w = G.drawHandSword(ctx, sg.g[0], sg.g[1], sg.g[2], sg.g[4]), a = hero.atk; // g[4] = 정면 칼 길이 배율
+    if (w && a) { const L = (w.im.naturalHeight - w.gy) * .95 * (w.s ?? 1), d = sg.g[2] * Math.PI / 180, tx = sg.g[0] + Math.cos(d) * L, ty = sg.g[1] + Math.sin(d) * L, B = a._sv || (a._sv = []); // 휘두르는 칼 잔상: 칼이 크게 돈 장 사이를 옅은 띠로 메움(그림 사이 중간 동작)
       if (!B.length || B[B.length - 1][5] !== sg.key) B.push([sg.g[0], sg.g[1], tx, ty, sg.g[2], sg.key]); if (B.length > 4) B.shift();
       ctx.globalCompositeOperation = 'lighter'; for (let n = B.length - 2; n >= 0; n--) { const P = B[n], N = B[n + 1]; if (Math.abs(((N[4] - P[4] + 540) % 360) - 180) < 12) continue; ctx.fillStyle = `rgba(150,220,235,${(.3 * (n + 1) / B.length).toFixed(3)})`;
         ctx.beginPath(); ctx.moveTo(P[0], P[1]); ctx.lineTo(P[2], P[3]); ctx.lineTo(N[2], N[3]); ctx.lineTo(N[0], N[1]); ctx.closePath(); ctx.fill(); } }

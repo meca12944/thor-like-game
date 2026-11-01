@@ -28,6 +28,9 @@ for tk in ('dash_side', 'dash_front', 'dash_back'): frames[tk] = sorted(glob.glo
 #  → 게임이 장착한 칼 그림(assets/weapons_hand/<아이템>_hand.png)을 그 자리·각도로 그림(world.js heroSprite). 틱 표 = game144/atk_anims.json
 for tk in ('atk_side', 'thrust_side'): frames[tk] = sorted(glob.glob(f'{G}/{tk}/0*.png'))
 ATKA = json.load(open(f'{G}/atk_anims.json'))
+# 정면 공격 3타 (사장님 11-01 「옆모습이랑 똑같이 맞춰」 → 「게임에 연결해」, 그록 정면 콤보 + 2타 다시 → hero3_v1/attack/make_front_frames.py): 틱 30/30/45 · 치는 장 8/8/11 = 옆과 같음
+frames['atk_front'] = sorted(glob.glob(f'{G}/atk_front/0*.png'))
+ATKF = json.load(open(f'{G}/atk_anims_front.json'))
 assert all(len(frames[k]) >= 8 for k in ('run_down', 'run_up', 'run_right'))   # 바닥에서 달리기(ground.py)로 높이 뜬 장을 빼서 정면 10·뒷면 13·옆 14장
 # 몸통 가운데 줄 맞추기 (교본 1부 1-0 「모든 방향을 같은 몸 가운데 줄로」, 사장님 10-30 「부드럽게 전환」): 동작 하나에 한 번,
 # 그 동작 장들의 몸통(키의 30~50% 줄) 가운데 평균을 발 기준 x(128)에 둠. 서기 원본은 몸이 왼쪽으로 23~27칸 비켜 있어 출발·멈춤·돌기 때마다 몸이 옆으로 미끄러졌음.
@@ -71,14 +74,17 @@ for dr, tk in (('right', 'dash_side'), ('left', 'dash_side'), ('down', 'dash_fro
     tick = [e[2] for e in old.get('dash_' + dr, [])] or [2, 2, 3, 4, 5, 4]
     cs = idx[tk] + [stand[dr]]
     new['dash_' + dr] = [[0, c, t] for c, t in zip(cs, tick)]
-for ak, L in ATKA.items():   # (k 는 JSON 끝 자리라 쓰면 안 됨) 옆(오른쪽 = 그림, 왼쪽 = 뒤집기)만. 위·아래 공격은 그 방향 서기 + 코드 칼 그대로
+for ak, L in ATKA.items():   # (k 는 JSON 끝 자리라 쓰면 안 됨) 옆(오른쪽 = 그림, 왼쪽 = 뒤집기). 뒷면(위) 공격은 아직 서기 + 코드 칼
     new[ak + '_right'] = [[0, idx[g][c], t] for g, c, t in L]
+for ak, L in ATKF.items():   # 정면(아래) 공격 3타
+    new[ak + '_down'] = [[0, idx[g][c], t] for g, c, t in L]
 GRIP = {}
-for g in ('atk_side', 'thrust_side'):
+for g in ('atk_side', 'thrust_side', 'atk_front'):
     gj = json.load(open(f'{G}/{g}/grip.json'))
     for n, f in enumerate(frames[g]):
         q = gj[os.path.basename(f)]; ci = idx[g][n]; ax = 128 + shift[g]   # 손 자리 = 발 기준(그 동작 몸통 맞춤 옮김 sx 반영) 그림 칸
         GRIP[f'0:{ci}'] = [round(q['guard'][0] - ax, 1), round(q['guard'][1] - 246, 1), q['ang'], 1 if q['behind'] else 0]
+        if 's' in q: GRIP[f'0:{ci}'].append(q['s'])   # 정면: 칼 길이 배율(칼끝이 카메라 쪽 = 짧게) — 5번째 값이 있으면 칼끝이 발 밑으로 안 가게도 함(drawHandSword)
 for dr in ('down', 'up', 'right', 'left'):
     for nm in ('run', 'walk'):
         new.setdefault(f'{nm}_{dr}', [[0, c, 3] for c in idx['run_' + ('right' if dr == 'left' else dr)]])
@@ -86,7 +92,7 @@ H['anims'] = new
 H['cells'] = [cells, H['cells'][1]]
 H['sheets'] = ['anim/hero3_0.webp', H['sheets'][1]]
 bb = Image.open(frames['stand_down'][0]).getbbox(); H['figH'] = bb[3] - bb[1]   # 서기 키 (144)
-H['grip'] = GRIP   # "시트:칸" → [손 x, 손 y(발 기준 그림 칸), 칼 각도(°, 0 = 오른쪽, -90 = 위), 몸 뒤 1/0] — 공격 장만
+H['grip'] = GRIP   # "시트:칸" → [손 x, 손 y(발 기준 그림 칸), 칼 각도(°, 0 = 오른쪽, -90 = 위), 몸 뒤 1/0, (정면만) 칼 길이 배율] — 공격 장만
 H['atkVid'] = True   # 공격 몸이 영상 그림(움직임이 그림에 있음) → world.js 공격 몸 반동(gkKick)·코드 칼 끄고 칼 그림
 H['bodyAligned'] = True   # 동작마다 몸통 맞춤을 했다는 표시 → world.js h8Pop(튐 맞추기) 끔
 H['gait'] = {'walkCyc': 123, 'runCyc': 150}   # 달리기 한 바퀴 ≈ 0.5초 = 그록 영상 박자(걸음 0.26초). 키를 줄여도 그대로(사장님 「발걸음 똑같이」, 빠르기 같음)
@@ -99,7 +105,7 @@ H['_doc'] = ('주인공 v3 (10-30 사장님 「일단 이거 전부 메인에 �
              '아직 안 그린 동작(점프·공격·맞기·쓰러짐·시전)은 그 방향 서기 장(틱 그대로). 걷기(평소 이동) = 달리기 장(가볍게 뛰기 영상 전까지). '
              'turn_rd(옆→정면)·turn_dl(정면→옆←)·turn_ur(뒷면→옆) = 돌 때만 쓰는 돌기 장(그록 뒤돌기 영상, world.js TURN_CLIP). '
              'dash_* = 회피대시 5장(웅크림·밀기·낮게 내딛기·디딤·일어섬, 그록 회피대시 영상) + 서기, 틱 2·2·3·4·5·4. '
-             'hit1~3_right = 옆 공격 3타(그록 영상: 내려벰 · 올려벰 · 크게 내려침, 틱 30/30/45, 치는 장 8/8/11틱), thrust_right = 달리다 찌르기(26틱, 다 뻗음 4틱, 빼기). grip = 공격 장 손 자리·칼 각도 → 장착 칼 그림(atkVid). '
+             'hit1~3_right = 옆 공격 3타(그록 영상: 내려벰 · 올려벰 · 크게 내려침, 틱 30/30/45, 치는 장 8/8/11틱), thrust_right = 달리다 찌르기(26틱, 다 뻗음 4틱, 빼기). hit1~3_down = 정면 공격 3타(그록: 내려베기 · 칼끝이 카메라 쪽으로 쭉 + 되돌려베기 · 내려찍기, 옆과 같은 틱). grip = 공격 장 손 자리·칼 각도(·정면 칼 길이 배율) → 장착 칼 그림(atkVid). '
              '만든 과정 handoff/claude/hero3_v1(game144) · 교본 0부 2(얼굴)·5(그록 영상). 도구 tools/anim/hero3_atlas.py')
 js = json.dumps(H, ensure_ascii=False, separators=(',', ':'))
 s2 = s[:j] + js + s[k + 1:]
