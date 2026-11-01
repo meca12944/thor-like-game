@@ -103,12 +103,30 @@ if __name__ == '__main__':
         i2 = e.index('c2_013'); i3 = next(i for i, k in enumerate(e) if isinstance(k, int) and k >= 150)
         return [round(i2 / 60, 2), round((i3 - i2) / 60, 2), round((len(e) - i3) / 60, 2), round(len(e) / 60, 2)]
     print('1타 · 2타(가로+되돌려) · 3타(내려찍기) · 전체(초): 지난 판', hits3(NEW4), '→ 같은 길이 판', hits3(NEW5))
-    a2, f2 = fr.pad(fr.expand(NEW4), fr.expand(NEW5)); GA_, GB_ = plan(a2), plan(f2, grow=12)
+    # 옆모습과 똑같이 (사장님 11-01 「옆모습이랑 똑같이 맞춰」): 옆 게임 공격과 같은 길이 1타 30 · 2타 30 · 3타 45틱,
+    #  칼이 맞는 장(판정)도 옆과 같은 틱(8 · 8 · 11)에 시작 — 1타 = 30장(칼이 몸 앞을 가로지름), 2타 = c2 21장(칼끝이 카메라), 3타 = 198장(내려쳐 맞음)
+    S1 = [(6, 1), (10, 1), (14, 1), (18, 1), (22, 2), (26, 1), (28, 1)] + [(30, 1)] \
+         + [(31, 1), (32, 1), (33, 1), (34, 1), (35, 1), (36, 1), (38, 2), (40, 2), (42, 2), (44, 2), (46, 7)]
+    S2 = [('c2_013', 3), ('c2_014', 1), ('c2_015', 1), ('c2_016', 1), ('c2_017', 2)] + [('c2_021', 1)] \
+         + [(f'm_{k:03d}', 1) for k in (29, 31, 32, 33, 34, 36, 38, 42, 48)] \
+         + [(k, 1) for k in (109, 113, 117, 121, 125, 129, 133)] + [(137, 1), (140, 1), (144, 3)]
+    S3 = [(156, 1), (168, 1), (172, 1), (176, 1), (180, 1), (182, 3), (192, 1), (194, 1), (196, 1)] + [(198, 1)] \
+         + [(k, 2) for k in (200, 202, 204, 206, 208, 212, 216, 220, 224, 228, 232, 236, 240, 246)] + [(252, 5)]
+    def hit_tick(L, key):
+        t = 0
+        for k, n in L:
+            if k == key: return t
+            t += n
+    assert (tk(S1), tk(S2), tk(S3)) == (30, 30, 45), (tk(S1), tk(S2), tk(S3))
+    assert (hit_tick(S1, 30), hit_tick(S2, 'c2_021'), hit_tick(S3, 198)) == (8, 8, 11)
+    NEW6 = S1 + S2 + S3
+    print('옆과 같은 판: 1타', tk(S1), '· 2타', tk(S2), '· 3타', tk(S3), '틱, 맞는 장', (8, 8, 11), '틱 · 전체', round(tk(NEW6) / 60, 2), '초')
+    a2, f2 = fr.pad(fr.expand(NEW5), fr.expand(NEW6)); GA_, GB_ = plan(a2, grow=12), plan(f2, grow=8)
     left = lambda kc: fr.draw_ground(game2(kc[0]), GA_[kc[1]]); right = lambda kc: fr.draw_ground(game2(kc[0]), GB_[kc[1]])
     def part3(k):
         if isinstance(k, str): return '2타'
         return '1타' if k < 72 else ('2타' if k < 150 else '3타')
     fr.part = part3
     s2 = [((a2[i], i), (f2[i], i)) for i in range(len(a2))]; one = s2 + [s2[-1]] * 30
-    fr.render([(left, '지난 판 (타마다 길이 다름)'), (right, '3타 모두 같은 길이 (0.7초씩)')], one + one, '../fc2/정면콤보_3타_같은길이.mp4')
+    fr.render([(left, '지난 판 (셋 다 0.7초)'), (right, '옆모습과 같게 (0.5 · 0.5 · 0.75초)')], one + one, '../fc2/정면콤보_옆과같게.mp4')
     print('ok')
