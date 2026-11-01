@@ -58,12 +58,12 @@ if __name__ == '__main__':
            ('m_029', 2), ('m_031', 2), ('m_032', 2), ('m_033', 2), ('m_034', 2), ('m_035', 2), ('m_036', 2), ('m_037', 2), ('m_038', 3),
            ('m_040', 3), ('m_042', 3), ('m_044', 3), ('m_046', 3), ('m_048', 6)]
     NEW2 = [x for x in fr.ORIG if x[0] < 72] + H2N + [x for x in fr.ORIG if 102 < x[0] <= 108] + fr.rest(108)
-    def plan(seq):
+    def plan(seq, grow=24):
         out = []; t0 = None
         for n, k in enumerate(seq):
             if t0 is None and k == 'c2_014': t0 = n
-            if t0 is None or n - t0 >= 34: out.append(None); continue
-            t = n - t0; g = 1 - (1 - min(t + 1, 24) / 24) ** 2; f = 1.0 if t < 24 else 1 - (t - 24) / 10
+            if t0 is None or n - t0 >= grow + 10: out.append(None); continue
+            t = n - t0; g = 1 - (1 - min(t + 1, grow) / grow) ** 2; f = 1.0 if t < grow else 1 - (t - grow) / 10
             out.append((g, f))
         return out
     part0 = fr.part
@@ -84,9 +84,31 @@ if __name__ == '__main__':
         e = [k for k, n in L for _ in range(n)]
         i2 = e.index('c2_014'); i3 = e.index(109); i4 = next(i for i, k in enumerate(e) if isinstance(k, int) and k >= 192)
         return [round(i2 / 60, 2), round((i3 - i2) / 60, 2), round((i4 - i3) / 60, 2), round((len(e) - i4) / 60, 2), round(len(e) / 60, 2)]
-    print('1타 · 2타 · 되돌려베기 · 내려찍기 · 전체(초): 지난 판', hit_secs(NEW3), '→ 새 판', hit_secs(NEW4))
-    a2, f2 = fr.pad(fr.expand(NEW3), fr.expand(NEW4)); GA_, GB_ = plan(a2), plan(f2)
+    # 3타 모두 같은 길이 (사장님 11-01 「3타 전부 똑같은 프레임으로 휘둘러야지」): 1타 = 내려베기, 2타 = 가로베기 + 되돌려베기, 3타 = 내려찍기
+    #  → 세 타 모두 42틱(0.7초), 휘두르는 장은 모두 1틱씩(같은 빠르기), 감기·멈춤만 2~4틱
+    HIT = 42
+    E1 = [(0, 3), (6, 2)] + [(10, 1), (12, 1), (14, 1), (16, 1), (18, 2), (20, 2), (22, 3)] + [(k, 1) for k in range(24, 35)] \
+         + [(35, 1), (36, 2), (38, 1), (40, 2), (42, 2), (44, 2), (46, 5)]
+    E2 = [('c2_013', 3), ('c2_014', 1), ('c2_015', 1), ('c2_016', 1), ('c2_017', 1), ('c2_019', 1), ('c2_021', 2)] \
+         + [(f'm_{k:03d}', 1) for k in (29, 31, 32, 33, 34, 35, 36)] + [('m_038', 2), ('m_042', 2), ('m_048', 2)] \
+         + [(k, 1) for k in range(109, 135, 2)] + [(135, 1), (137, 1), (140, 2), (144, 2)]
+    E3 = [(156, 1), (168, 1)] + [(k, 1) for k in range(170, 182, 2)] + [(182, 4)] \
+         + [(192, 1), (194, 1), (196, 1), (198, 1), (200, 2), (202, 2), (204, 2)] \
+         + [(208, 2), (212, 2), (216, 2), (220, 2), (224, 2), (228, 2), (232, 2), (240, 2), (252, 4)]
+    tk = lambda L: sum(n for _, n in L)
+    assert tk(E1) == tk(E2) == tk(E3) == HIT, (tk(E1), tk(E2), tk(E3))
+    NEW5 = E1 + E2 + E3
+    def hits3(L):
+        e = [k for k, n in L for _ in range(n)]
+        i2 = e.index('c2_013'); i3 = next(i for i, k in enumerate(e) if isinstance(k, int) and k >= 150)
+        return [round(i2 / 60, 2), round((i3 - i2) / 60, 2), round((len(e) - i3) / 60, 2), round(len(e) / 60, 2)]
+    print('1타 · 2타(가로+되돌려) · 3타(내려찍기) · 전체(초): 지난 판', hits3(NEW4), '→ 같은 길이 판', hits3(NEW5))
+    a2, f2 = fr.pad(fr.expand(NEW4), fr.expand(NEW5)); GA_, GB_ = plan(a2), plan(f2, grow=12)
     left = lambda kc: fr.draw_ground(game2(kc[0]), GA_[kc[1]]); right = lambda kc: fr.draw_ground(game2(kc[0]), GB_[kc[1]])
+    def part3(k):
+        if isinstance(k, str): return '2타'
+        return '1타' if k < 72 else ('2타' if k < 150 else '3타')
+    fr.part = part3
     s2 = [((a2[i], i), (f2[i], i)) for i in range(len(a2))]; one = s2 + [s2[-1]] * 30
-    fr.render([(left, '지난 판 (1타 길다)'), (right, '1타도 줄인 판')], one + one, '../fc2/정면콤보_1타도_짧게.mp4')
+    fr.render([(left, '지난 판 (타마다 길이 다름)'), (right, '3타 모두 같은 길이 (0.7초씩)')], one + one, '../fc2/정면콤보_3타_같은길이.mp4')
     print('ok')
