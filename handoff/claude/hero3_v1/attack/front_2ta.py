@@ -71,19 +71,17 @@ if __name__ == '__main__':
         if isinstance(k, str): return '2타 가로베기(그록 다시)'
         return part0(k)
     fr.part = part
-    cut_old = [k for k in fr.expand(fr.ORIG) if 60 <= k <= 120]
-    cut_new = [k for k in fr.expand(NEW2) if isinstance(k, str) or 60 <= k <= 120]
-    a, c = fr.pad(cut_old, cut_new); GP = plan(c)
-    one = list(range(len(a))); slow = [x for x in one for _ in range(2)]
-    idx = one + [one[-1]] * 20 + one + [one[-1]] * 20 + slow
-    seq = [(a[i], (c[i], i), (c[i], i)) for i in idx]
-    plain = lambda kc: game2(kc[0])
-    withA = lambda kc: fr.draw_ground(game2(kc[0]), GP[kc[1]])
-    lab = lambda n: '제 빠르기' if n < 2 * (len(one) + 20) else '반 빠르기(천천히 보기)'
-    fr.render([(game2, '전 2타 (그록 1차)'), (plain, '새 2타 (그록 다시: 칼끝이 카메라 쪽)'), (withA, '새 2타 + 땅 위 큰 검흔(A안)')], seq, '../fc2/정면2타_그록다시_비교.mp4', note=lab)
-    # 전체 콤보 (새 2타 + 검흔)
-    a2, f2 = fr.pad(fr.expand(fr.ORIG), fr.expand(NEW2)); GPf = plan(f2)
-    withAf = lambda kc: fr.draw_ground(game2(kc[0]), GPf[kc[1]])
-    s2 = [(a2[i], (f2[i], i)) for i in range(len(a2))]; s2 = s2 + [s2[-1]] * 30 + s2
-    fr.render([(fr.grok, '그록 원본 콤보 (전 2타)'), (withAf, '새 2타 넣은 콤보 + 2타 검흔')], s2, '../fc2/정면콤보_새2타.mp4')
-    print('ok', '새 2타', sum(n for _, n in H2N), '칸')
+    # 2타 → 3타 사이 짧게 (사장님 11-01 「2타에서 3타까지 너무 길다 짧아야되」): 2타 끝 자세 짧게 → 되돌려베기를 빠르게(1틱씩) →
+    #  되돌려베기 뒤 1초 서 있기(144~168장)를 4틱으로 → 칼 들기(168~182)도 1틱씩 → 머리 위에서 잠깐(6틱) → 내려찍기
+    TAIL = [('m_048', 3)] + [(k, 1) for k in range(109, 135, 2)] + [(135, 2), (137, 2), (140, 2), (144, 2), (156, 2), (168, 1)] \
+           + [(k, 1) for k in range(170, 183, 2)] + [(182, 6)] + [x for x in fr.ORIG if x[0] > 182 and x[0] not in fr.SKIP]
+    NEW3 = [x for x in fr.ORIG if x[0] < 72] + H2N[:-1] + TAIL
+    def secs(L, lo, hi): return sum(n for k, n in L if not isinstance(k, str) and lo <= k <= hi) / 60
+    t2_old = [x for x in NEW2]; i_end = [i for i, x in enumerate(NEW2) if x[0] == 'm_048'][0]; j_end = [i for i, x in enumerate(NEW3) if x[0] == 'm_048'][0]
+    gap = lambda L, i: sum(n for k, n in L[i:] if (k if isinstance(k, int) else 0) < 196) / 60
+    print('2타 끝 → 내려찍기 내려오기 시작까지: 전', round(gap(NEW2, i_end), 2), '초 → 새', round(gap(NEW3, j_end), 2), '초 · 콤보 전체', round(sum(n for _, n in NEW2) / 60, 2), '→', round(sum(n for _, n in NEW3) / 60, 2), '초')
+    a2, f2 = fr.pad(fr.expand(NEW2), fr.expand(NEW3)); GA_, GB_ = plan(a2), plan(f2)
+    left = lambda kc: fr.draw_ground(game2(kc[0]), GA_[kc[1]]); right = lambda kc: fr.draw_ground(game2(kc[0]), GB_[kc[1]])
+    s2 = [((a2[i], i), (f2[i], i)) for i in range(len(a2))]; one = s2 + [s2[-1]] * 30
+    fr.render([(left, '지난 판 (2타 → 3타 길다)'), (right, '짧게 줄인 판')], one + one, '../fc2/정면콤보_2타3타_짧게.mp4')
+    print('ok')
