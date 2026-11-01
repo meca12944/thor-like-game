@@ -20,7 +20,7 @@ def shrink(rgb,al,S):
     A=np.clip(ch[3],0,255); c=np.stack([np.clip(ch[k]/np.maximum(A,1e-3)*255,0,255) for k in range(3)],2)
     return c,A
 def one(job):
-    vid,res,k=job; S=144/HEAD0
+    vid,res,k=job; S=144/HEAD0*960/res   # 720 영상(그록 2타 다시)도 같은 크기로
     a=np.asarray(Image.open(f'{D}{vid}/{k:04d}.png').convert('RGB')).astype(np.float32)
     r,g,b=a[...,0],a[...,1],a[...,2]; gx=g-np.maximum(r,b)
     mg0=(r-g>60)&(b-g>50); mg=cv2.dilate(mg0.astype(np.uint8),cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(7,7)))>0
