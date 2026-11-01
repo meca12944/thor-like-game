@@ -1,6 +1,6 @@
 // 고른 녹화 (사장님 10-30 「움직일 때 왜 화면이 턱턱 끊기면서 부드럽지가 않니」): 게임은 60장/초로 고른데, 클라우드 녹화(Playwright recordVideo 25장/초)가
 // 같은 장을 두 번 찍거나 건너뛰어 영상만 턱턱 끊겼음(장마다 화면 이동 16·17칸이어야 할 곳이 9·34, 8·25). → 게임 시계를 직접 1/60초씩 넘기며 한 장씩 찍음.
-// 쓰는 법: node smooth_rec.js <포트> <출력 폴더> [주소 뒤 go=felt] [장면 turns|side|run|dash|outfit] [찍기 배수 1=60장/초, 2=30장/초]
+// 쓰는 법: node smooth_rec.js <포트> <출력 폴더> [주소 뒤 go=felt] [장면 turns|side|run|dash|outfit|attack] [찍기 배수 1=60장/초, 2=30장/초]
 //   → <출력 폴더>/f00000.jpg … (그 다음 ffmpeg -framerate 60 -i f%05d.jpg … mp4)
 const { chromium } = require('playwright'); const fs = require('fs');
 (async () => {
@@ -31,6 +31,16 @@ const { chromium } = require('playwright'); const fs = require('fs');
       const put = async (id, name) => { await p.evaluate(([id, name]) => { INV.equip.cloak = id ? { id, plus: 0 } : null; let d = document.getElementById('__lbl'); if (!d) { d = document.createElement('div'); d.id = '__lbl'; d.style.cssText = 'position:fixed;left:0;right:0;top:18px;text-align:center;font:bold 30px sans-serif;color:#ffe9a0;text-shadow:0 0 6px #000,0 0 3px #000;z-index:99999;pointer-events:none'; document.body.appendChild(d); } d.textContent = name; }, [id, name]); };
       const loop = async () => { await tap('s'); await down('s'); await frames(34); await sw('s', 'd', 34); await sw('d', 'w', 34); await sw('w', 'a', 34); await up('a'); await frames(20); };
       for (const [id, name] of [[null, '망토 없음 = 원래 옷'], ['c_ash_cloak', '01 닳아빠진 잿빛 망토 (처음 망토)'], ['c_ian_red', '10 이안의 붉은 소년 망토'], ['c_iron_knight', '04 철혈기사의 무쇠망토'], ['c_burning_noble', '06 불타는 귀족의 외투 (불티 효과)'], ['c_archive_parch', '05 대서고의 양피지 망토'], ['c_alch_lime', '13 연금술사의 석회 망토']]) { await put(id, name); await loop(); } },
+    attack: async () => { // 옆 공격 3타 + 달리다 찌르기 + 칼 바꾸기 (사장님 11-01 「좋아 올려」): 위에 무엇을 하는지 글
+      const lbl = async (t) => { await p.evaluate((t) => { let d = document.getElementById('__lbl'); if (!d) { d = document.createElement('div'); d.id = '__lbl'; d.style.cssText = 'position:fixed;left:0;right:0;top:18px;text-align:center;font:bold 30px sans-serif;color:#ffe9a0;text-shadow:0 0 6px #000,0 0 3px #000;z-index:99999;pointer-events:none'; document.body.appendChild(d); } d.textContent = t; }, t); };
+      const combo = async () => { for (let n = 0; n < 3; n++) { await down('j'); await frames(2); await up('j'); await frames(n < 2 ? 22 : 50); } };
+      await lbl('오른쪽 3타 (장검)'); await down('d'); await frames(8); await up('d'); await frames(20); await combo();
+      await lbl('왼쪽 3타'); await down('a'); await frames(8); await up('a'); await frames(20); await combo();
+      await lbl('달리다 찌르기'); await tap('d'); await down('d'); await frames(40); await down('j'); await frames(2); await up('j'); await frames(34); await up('d'); await frames(40);
+      await p.evaluate(() => { INV.equip.weapon = { id: 'w_heretic_great', plus: 0 }; });
+      await lbl('칼 바꿈: 이단자의 대검 · 오른쪽 3타'); await down('d'); await frames(6); await up('d'); await frames(20); await combo();
+      await lbl('대검 달리다 찌르기'); await tap('a'); await down('a'); await frames(40); await down('j'); await frames(2); await up('j'); await frames(34); await up('a'); await frames(40);
+      await lbl('아래 3타 (옛 그대로: 서기 + 코드 칼)'); await down('s'); await frames(8); await up('s'); await frames(20); await combo(); },
     run: async () => { await tap('s'); await down('s'); await frames(100); await sw('s', 'd', 100); await sw('d', 'w', 100); await sw('w', 'a', 100); await up('a'); await frames(40); },
   };
   await S[scene]();
