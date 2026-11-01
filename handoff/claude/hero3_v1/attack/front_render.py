@@ -85,9 +85,10 @@ def render(panels,seq,name,K=3,note=''):
     out=D+'vid/'; shutil.rmtree(out,ignore_errors=True); os.makedirs(out)
     for n,ks in enumerate(seq):
         C=Image.new('RGB',(1920,1080),(58,66,52)); d=ImageDraw.Draw(C); d.rectangle([0,858,1920,1080],fill=(84,74,58))
+        PW=1920//len(panels)
         for j,((fn,title),k) in enumerate(zip(panels,ks)):
-            z=fn(k).resize((300*K,300*K),Image.NEAREST); C.paste(z,(640*j+320-150*K,858-J['foot']*K),z)
-            d.text((640*j+36,28),title,font=F1,fill=(255,235,150)); kk=k[0] if isinstance(k,tuple) else k; d.text((640*j+36,1010),f'{part(kk)} · {kk}장',font=F2,fill=(235,235,235))
+            z=fn(k).resize((300*K,300*K),Image.NEAREST); C.paste(z,(PW*j+PW//2-150*K,858-J['foot']*K),z)
+            d.text((PW*j+36,28),title,font=F1,fill=(255,235,150)); kk=k[0] if isinstance(k,tuple) else k; d.text((PW*j+36,1010),f'{part(kk)} · {kk}장',font=F2,fill=(235,235,235))
         if note: d.text((36,70),note(n) if callable(note) else note,font=F2,fill=(200,220,255))
         C.save(out+f'{n:04d}.jpg',quality=92)
     subprocess.run(['ffmpeg','-v','error','-y','-framerate','60','-i',out+'%04d.jpg','-c:v','libx264','-pix_fmt','yuv420p','-crf','20',D+name],check=True)
@@ -119,14 +120,38 @@ def draw_trail(im,seg,L):
         pts=[(gx+np.cos(np.radians(t))*L*r1,gy+np.sin(np.radians(t))*L*r1) for t in angs]+[(gx+np.cos(np.radians(t))*L*r0,gy+np.sin(np.radians(t))*L*r0) for t in reversed(angs)]
         d.polygon(pts,fill=col+(int(al*f),))
     out=im.copy(); out.alpha_composite(lay); return out
+# A안 (사장님 11-01 「베기 길이도 짧고 앞으로 베는 느낌이 아니네」 → 「추천대로 하자」): 몸 앞 땅 위에 크게 눕힌 반원 검흔
+#  감기(원래 빠르기) → 휙 8틱(칼끝이 지나는 만큼 검흔이 왼쪽→앞→오른쪽으로 자람) → 팔로스루 동안 10틱에 걸쳐 옅어짐. 몸은 그록 2타 그대로(흐림 자국 붙은 84·85·87·88·89장은 안 씀)
+H2_A=[(72,3),(73,2),(74,3),(75,2),(76,3),(77,2),(78,3),(79,2),(80,3), (81,1),(83,2),(86,2),(90,2),(91,1), (92,2),(93,2),(94,2),(96,2),(98,2),(100,2),(102,2),(104,2),(106,2),(108,8)]
+GA=[x for x in ORIG if x[0]<72]+H2_A+rest(108)
+GR=dict(cx=150,cy=FOOT-16,rx=122,ry=50,a0=200,a1=-20)   # 땅 위 타원(게임칸): 몸 가운데 발밑, 몸 앞 = 화면 아래(90°)
+def ground_plan(seq):
+    """틱마다 (자란 정도 0~1, 옅어짐 0~1): 81장에서 시작해 8틱 동안 자라고(빨리 → 천천히), 다 자란 뒤 10틱 동안 옅어짐"""
+    out=[]; t0=None
+    for n,k in enumerate(seq):
+        if t0 is None and k==81: t0=n
+        if t0 is None or n-t0>=18: out.append(None); continue
+        t=n-t0; g=1-(1-min(t+1,8)/8)**2; f=1.0 if t<8 else 1-(t-8)/10
+        out.append((g,f))
+    return out
+def draw_ground(im,st):
+    if st is None: return im
+    g,f=st; a0,a1=GR['a0'],GR['a0']+(GR['a1']-GR['a0'])*g; n=max(4,int(abs(a1-a0)/5))
+    lay=Image.new('RGBA',im.size); d=_ID.Draw(lay)
+    for i in range(n):                       # 앞쪽(칼끝 가까운 쪽)일수록 밝게
+        t0,t1=a0+(a1-a0)*i/n,a0+(a1-a0)*(i+1)/n; w=(i+1)/n
+        for r0,r1,col,al in [(.58,.86,(150,195,255),70+60*w),(.86,1.0,(235,245,255),120+120*w)]:
+            pts=[(GR['cx']+np.cos(np.radians(t))*GR['rx']*r,GR['cy']+np.sin(np.radians(t))*GR['ry']*r) for t,r in [(t0,r1),(t1,r1),(t1,r0),(t0,r0)]]
+            d.polygon(pts,fill=col+(int(al*f),))
+    out=Image.new('RGBA',im.size); out.alpha_composite(lay); out.alpha_composite(im); return out   # 땅에 그림 → 몸이 위
 if __name__=='__main__':
-    # 영상: 2타만 (60~120장) — 원래 / 부드럽게(어제 판) / 베기 판 · 제 빠르기 두 번, 반 빠르기 한 번
+    # 영상: 2타만 (60~120장) — 원래 빠르기 / A안(땅 위 큰 검흔) · 제 빠르기 두 번, 반 빠르기 한 번
     cut=lambda L:[k for k in expand(L) if 60<=k<=120]
-    a,b,c=pad(cut(ORIG),cut(NEW),cut(SLASH)); TR=trails(c)
+    a,c=pad(cut(ORIG),cut(GA)); GP=ground_plan(c)
     one=list(range(len(a))); slow=[x for x in one for _ in range(2)]
     idx=one+[one[-1]]*20+one+[one[-1]]*20+slow
-    seq=[(a[i],b[i],(c[i],i)) for i in idx]
-    slash=lambda kc: draw_trail(game(kc[0]),TR[kc[1]],H1[3])
+    seq=[(a[i],(c[i],i)) for i in idx]
+    aan=lambda kc: draw_ground(game(kc[0]),GP[kc[1]])
     lab=lambda n:'제 빠르기' if n<2*(len(one)+20) else '반 빠르기(천천히 보기)'
-    render([(game,'원래 빠르기 (그록 그대로)'),(game,'부드럽게 판 (칼이 움직이는 느낌)'),(slash,'베기 판 (감기 → 휙 + 검기 → 멈춤)')],seq,'정면콤보_2타_베기판_비교.mp4',note=lab)
-    print('ok',sum(n for _,n in H2_SLASH),'칸')
+    render([(game,'원래 빠르기 (그록 그대로)'),(aan,'A안: 몸 앞 땅 위에 큰 검흔')],seq,'정면콤보_2타_A안_땅검흔.mp4',note=lab)
+    print('ok')
