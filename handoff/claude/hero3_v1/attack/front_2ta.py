@@ -76,12 +76,17 @@ if __name__ == '__main__':
     TAIL = [('m_048', 3)] + [(k, 1) for k in range(109, 135, 2)] + [(135, 2), (137, 2), (140, 2), (144, 2), (156, 2), (168, 1)] \
            + [(k, 1) for k in range(170, 183, 2)] + [(182, 6)] + [x for x in fr.ORIG if x[0] > 182 and x[0] not in fr.SKIP]
     NEW3 = [x for x in fr.ORIG if x[0] < 72] + H2N[:-1] + TAIL
-    def secs(L, lo, hi): return sum(n for k, n in L if not isinstance(k, str) and lo <= k <= hi) / 60
-    t2_old = [x for x in NEW2]; i_end = [i for i, x in enumerate(NEW2) if x[0] == 'm_048'][0]; j_end = [i for i, x in enumerate(NEW3) if x[0] == 'm_048'][0]
-    gap = lambda L, i: sum(n for k, n in L[i:] if (k if isinstance(k, int) else 0) < 196) / 60
-    print('2타 끝 → 내려찍기 내려오기 시작까지: 전', round(gap(NEW2, i_end), 2), '초 → 새', round(gap(NEW3, j_end), 2), '초 · 콤보 전체', round(sum(n for _, n in NEW2) / 60, 2), '→', round(sum(n for _, n in NEW3) / 60, 2), '초')
-    a2, f2 = fr.pad(fr.expand(NEW2), fr.expand(NEW3)); GA_, GB_ = plan(a2), plan(f2)
+    # 1타도 짧게 (사장님 11-01 「1타도 줄여」): 서기 6틱 → 오른 어깨로 감기(1~2틱씩, 22장에서 3틱 버팀) → 머리 위를 넘어 왼쪽 아래로 휙(24~34장 1틱씩) → 멈춤(37~46장) → 1타 끝 자세 버티기(46~72장, 1.1초)는 빼고 바로 2타
+    H1F = [(0, 4), (6, 2)] + [(10, 1), (12, 1), (14, 1), (16, 1), (18, 2), (20, 2), (22, 3)] + [(k, 1) for k in range(24, 35)] \
+          + [(35, 1), (36, 2), (38, 1), (40, 1), (42, 2), (44, 2), (46, 2)]
+    NEW4 = H1F + H2N[:-1] + TAIL
+    def hit_secs(L):
+        e = [k for k, n in L for _ in range(n)]
+        i2 = e.index('c2_014'); i3 = e.index(109); i4 = next(i for i, k in enumerate(e) if isinstance(k, int) and k >= 192)
+        return [round(i2 / 60, 2), round((i3 - i2) / 60, 2), round((i4 - i3) / 60, 2), round((len(e) - i4) / 60, 2), round(len(e) / 60, 2)]
+    print('1타 · 2타 · 되돌려베기 · 내려찍기 · 전체(초): 지난 판', hit_secs(NEW3), '→ 새 판', hit_secs(NEW4))
+    a2, f2 = fr.pad(fr.expand(NEW3), fr.expand(NEW4)); GA_, GB_ = plan(a2), plan(f2)
     left = lambda kc: fr.draw_ground(game2(kc[0]), GA_[kc[1]]); right = lambda kc: fr.draw_ground(game2(kc[0]), GB_[kc[1]])
     s2 = [((a2[i], i), (f2[i], i)) for i in range(len(a2))]; one = s2 + [s2[-1]] * 30
-    fr.render([(left, '지난 판 (2타 → 3타 길다)'), (right, '짧게 줄인 판')], one + one, '../fc2/정면콤보_2타3타_짧게.mp4')
+    fr.render([(left, '지난 판 (1타 길다)'), (right, '1타도 줄인 판')], one + one, '../fc2/정면콤보_1타도_짧게.mp4')
     print('ok')
