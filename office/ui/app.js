@@ -100,11 +100,57 @@ function renderFeed() {
     renderFeed._r = setTimeout(() => { if (tab === 'report' && list.some((r) => !r.read)) api('/api/report/read', { all: true }); }, 4000);
   }
 }
+function companyPack() {
+  const t = S.botTargets;
+  if (t && Array.isArray(t.depts) && Array.isArray(t.bots)) return t;
+  return { all: '전체', depts: [], bots: [] };
+}
+function companySelectHtml() {
+  const pack = companyPack();
+  const opt = (value, label) => `<option value="${esc(value)}"${value === botTarget ? ' selected' : ''}>${label}</option>`;
+  let h = `<select id="botTarget" style="padding:4px 8px;border:1px solid var(--line);background:var(--panel);min-width:260px;max-width:100%;border-radius:4px">`;
+  h += opt('전체', '🏢 전체');
+  if (pack.depts.length) {
+    h += '<optgroup label="부서">';
+    for (const d of pack.depts) h += opt(d.name, d.icon + ' ' + esc(d.name));
+    h += '</optgroup>';
+    for (const d of pack.depts) {
+      h += `<optgroup label="${esc(d.icon + ' ' + d.name)}">`;
+      for (const b of pack.bots.filter((x) => x.dept === d.id)) {
+        const tag = b.lead ? ' · 팀장' : (b.grokLead ? ' · 그록 쪽 대표' : '');
+        h += opt(b.name, d.icon + ' ' + esc(b.name) + tag);
+      }
+      h += '</optgroup>';
+    }
+  }
+  h += '</select>';
+  return h;
+}
+function companyPickBtn(name, label, bold, tip) {
+  const on = botTarget === name;
+  return `<button type="button" data-act="settarget" data-name="${esc(name)}" title="${esc(tip || name)}" style="display:block;width:100%;text-align:left;border:0;background:${on ? 'var(--bg)' : 'transparent'};padding:3px 8px;cursor:pointer;border-radius:6px;${bold ? 'font-weight:700' : ''}">${label}</button>`;
+}
 function renderCompany(box) {
   const hist = S.botHistory || [];
-  box.innerHTML = `<div class="card"><div class="conn-head"><span class="ico">🏢</span><div><b>알들 컴퍼니 그록 봇에게 일 시키기</b><div class="muted small">그록이 만든 「알들 컴퍼니 명령창」과 똑같아요. 👇 아래에서 부서(대상)를 고르고 할 일을 적어 Enter. 결과는 알들 컴퍼니 보고 창에 올라가요.</div></div></div>
-    <div class="row-btns"><button class="btn ghost small" data-act="opencompany">🏢 알들 컴퍼니 보고 창 열기</button>${S.settings.botFrom ? '' : '<button class="btn small" data-act="openconn">🔌 먼저 그록 봇 잇기</button>'}</div></div>
-    ${hist.length ? hist.map((h) => `<div class="card"><div class="card-head"><b>📣 ${esc(h.target)}</b><span class="small" style="color:${h.ok ? 'var(--green)' : 'var(--red)'}">${h.ok ? '✅ 보냄' : '❌ ' + esc(h.result)}</span><time>${ago(h.time)}</time></div><div class="text">${esc(h.command)}</div></div>`).join('') : '<div class="empty">아직 보낸 일이 없어요.</div>'}`;
+  const pack = companyPack();
+  const connected = !!S.settings.botFrom;
+  const groups = pack.depts.map((d) => {
+    const rep = d.grokLead ? ` · 그록 쪽 대표 ${esc(d.grokLead)}` : '';
+    return `<div style="padding:4px 0;border-top:1px solid var(--line)">
+      ${companyPickBtn(d.name, d.icon + ' ' + esc(d.name), true)}
+      <div class="muted small" style="padding:0 8px 2px">${esc(d.sub)} · 팀장 ${esc(d.lead)}${rep}</div>
+    </div>`;
+  }).join('');
+  box.innerHTML = `<div class="card"><div class="conn-head"><span class="ico">🏢</span><div><b>회사 일 시키기</b>
+      <div class="muted small">보내면 그 부서 팀장이 나눠 맡기고, 검수해서 보고 창에 올려요.</div>
+      <div class="small">예: 「제로폰 오늘 정책 확인해서 보고해」</div></div></div>
+    <div class="small" style="margin:4px 0 8px">${connected ? '<span style="color:var(--green)">🟢 그록 봇 연결됨</span>' : '<span class="muted">⚪ 그록 봇이 아직 안 이어졌어요</span>'}</div>
+    <div class="row-btns"><button class="btn ghost small" data-act="opencompany">🏢 알들 컴퍼니 보고 창 열기</button>${connected ? '' : '<button class="btn small" data-act="openconn">🔌 먼저 그록 봇 잇기</button>'}</div>
+    <div style="margin-top:12px"><div class="muted small" style="margin-bottom:4px">보낼 곳. 이름을 누르면 아래 목록에도 골라져요.</div>
+      ${companyPickBtn('전체', '🏢 전체', true)}
+      ${groups}
+    </div></div>
+    ${hist.length ? hist.map((h) => `<div class="card"><div class="card-head"><b>${esc(h.target)}</b><span class="small" style="color:${h.ok ? 'var(--green)' : 'var(--red)'}">${h.ok ? '🟢 보냄' : '🔴 ' + esc(h.result)}</span><time>${ago(h.time)}</time></div><div class="text">${esc(h.command)}</div></div>`).join('') : '<div class="empty">아직 보낸 일이 없어요.</div>'}`;
 }
 function renderChat(box) {
   try { localStorage.setItem('grokSeen', String(Date.now())); } catch (e) { /* */ }
@@ -142,9 +188,9 @@ function renderRelay() {
 function renderSay() {
   const to = $('#sayTo'), ta = $('#sayText');
   if (tab === 'company') {
-    if (document.activeElement && document.activeElement.id === 'botTarget') return; // 적는 중이면 그대로
-    to.innerHTML = `📣 대상: <input id="botTarget" list="botTargets" value="${esc(botTarget)}" style="padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--bg);min-width:220px"><datalist id="botTargets">${(S.botTargets || []).map((t) => `<option value="${esc(t)}">`).join('')}</datalist> <span class="muted small">(부서나 봇 이름 — 눌러서 고르거나 적기)</span>`;
-    ta.placeholder = '그록 봇에게 시킬 일 (예: 블로그 이번 주 글 3개 써 줘)  · Enter 보내기';
+    if (document.activeElement && document.activeElement.id === 'botTarget') return; // 목록 고르는 중이면 그대로
+    to.innerHTML = `📣 보낼 곳 ${companySelectHtml()}<div class="muted small" style="flex-basis:100%">보내면 그 부서 팀장이 나눠 맡기고, 검수해서 보고 창에 올려요.</div>`;
+    ta.placeholder = '예: 제로폰 오늘 정책 확인해서 보고해';
     return;
   }
   if (tab === 'grok') {
@@ -362,6 +408,7 @@ document.addEventListener('click', async (ev) => {
   if (a === 'team') { if (!S.settings.gameRepo) { toast('설정에서 「게임 폴더」를 먼저 정해 주세요'); return settings(); } $('#emps').innerHTML = '<div class="empty">직원 자리를 만드는 중… (1~2분)</div>'; const r = await api('/api/team'); if (!r.ok) alert(r.error); }
   if (a === 'hire') hire();
   if (a === 'gogrok') setTab('grok');
+  if (a === 'settarget') { botTarget = t.getAttribute('data-name') || '전체'; render(); return; }
   if (a === 'opencompany') { if (S.settings.companyUrl) window.open(S.settings.companyUrl, '_blank'); }
   if (a === 'openconn') connOne('bot');
   if (a === 'toall') { target = 'all'; renderSay(); }
@@ -388,10 +435,17 @@ document.addEventListener('click', async (ev) => {
 function setTab(t) { tab = t; $('#relayBox').dataset.id = ''; $('#tabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.t === t)); $('#feed')._once = false; $('#feed')._count = -1; render(); if (t !== 'grok') $('#feed').scrollTop = 0; }
 $('#tabs').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (b) setTab(b.dataset.t); });
 document.addEventListener('input', (ev) => { if (ev.target.id === 'botTarget') botTarget = ev.target.value; });
-document.addEventListener('change', (ev) => { if (ev.target.id === 'allEmp') { allEmp = ev.target.value; renderFeed(); } });
+document.addEventListener('change', (ev) => {
+  if (ev.target.id === 'botTarget') { botTarget = ev.target.value; if (tab === 'company') render(); return; }
+  if (ev.target.id === 'allEmp') { allEmp = ev.target.value; renderFeed(); }
+});
 $('#say').addEventListener('submit', async (ev) => {
   ev.preventDefault();
-  const text = $('#sayText').value.trim(); if (!text) return;
+  const text = $('#sayText').value.trim();
+  if (!text) {
+    if (tab === 'company') alert('할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해');
+    return;
+  }
   let r;
   if (tab === 'company') {
     botTarget = ($('#botTarget') && $('#botTarget').value.trim()) || botTarget;
