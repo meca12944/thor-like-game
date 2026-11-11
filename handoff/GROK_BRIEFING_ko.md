@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 13:55 한국 시각, main `7dd6c549 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 14:03 한국 시각, main `7974c72a 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,6 +42,7 @@
 - 10-26 · #196 1장 중앙 들판 + 아라크네 베틀방 + 성 바라보기 틸트 + 보스 등장 카메라
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `claude/busy-goodall-u5zn4r` — 클로드 작업장: 첫 실행 「연결을 거부했습니다」 고침 + 한국어 규칙 맨 위
 - 11-11 · `grok/office-company-depts` — 회사 일 시키기 부서·팀원 이름을 알들 컴퍼니와 같게
 - 11-06 · `claude/linette-8dir` — 모션 교과서: 정면 3타 게임 반영(PR #205)
 
