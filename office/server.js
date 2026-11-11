@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { spawn, execFile } = require('child_process');
+const { createConnStatus } = require('./conn_status');
 
 const ROOT = __dirname;
 const DATA = process.env.OFFICE_DATA || path.join(ROOT, 'data');
@@ -967,6 +968,14 @@ function openPath(p) {
   else spawn('xdg-open', [p], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref();
 }
 
+const connStatus = createConnStatus({
+  ROOT,
+  getState: () => state,
+  getClaude: () => claude,
+  detectClaude,
+  empDeptName,
+  quoteIf,
+});
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   const p = u.pathname;
@@ -977,6 +986,10 @@ const server = http.createServer(async (req, res) => {
       return sendFile(req, res, full);
     }
     if (p === '/api/state') return json(res, publicState());
+    if (p === '/api/connections' && req.method === 'GET') {
+      try { return json(res, connStatus.snapshot()); }
+      catch (e) { return json(res, { ok: false, error: '연결 목록을 못 읽었어요.', connections: [], features: [] }); }
+    }
     if (p === '/api/coop/chat') { if (u.searchParams.get('refresh')) pollSoon(200); return json(res, { items: coopChat, issueUrl: ISSUE_URL(), at: coopStatus.at }); }
     if (p === '/api/company/reports') {
       // 그록이 사장님 구글 드라이브에 쓰는 회사 보고 (사장님 11-11 「좋아」: 공개 저장소 대신 드라이브)
@@ -1030,6 +1043,10 @@ const server = http.createServer(async (req, res) => {
       if (b.mode === 'meeting') order(team.id, `[대화방 회의] 주제: ${text}\n그록과 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 최대 ${Math.max(2, Math.min(12, Number(b.turns) || 6))}번 주고받으며 회의해. 매번 그록의 답을 읽고, 맞는 건 받아들이고 틀린 건 근거를 들어 반박해. 사장님도 이 대화를 실시간으로 본다. 끝나면 결론·할 일을 쉬운 말로 짧게 보고해.`, '사장님', 0, 'ask', null, { room: true });
       else order(team.id, `[대화방] 사장님: ${text}\n(사장님·그록·너가 함께 있는 대화방이다. 그록 의견이 필요하면 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 물어라. 답은 짧게.)`, '사장님', 0, 'ask', null, { room: true });
       return json(res, { ok: true });
+    }
+    if (p === '/api/connections/check') {
+      try { return json(res, await connStatus.check(b && b.id)); }
+      catch (e) { return json(res, { ok: false, error: '다시 확인하지 못했어요.' }); }
     }
     if (p === '/api/conn/check') {
       const repo = state.settings.gameRepo;
