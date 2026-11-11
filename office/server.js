@@ -27,8 +27,58 @@ let state = {
   grokLog: [],
   botHistory: [],
 };
-// 알들 컴퍼니 명령창(그록 command.ps1)과 같은 대상 목록 — 그록과 같이 고침 (공동 개발)
-const BOT_TARGETS = ["전체", "제로폰", "블로그", "마케팅 홍보", "경영지원", "STCO 온라인 쇼핑몰", "STCO 오프라인", "게임 필멸자", "영상 제작", "AI 협력", "제로폰 홈페이지", "제로폰 홈페이지2", "제로폰 홈페이지3", "제로폰 홈페이지4", "제로폰 개통 안내", "제로폰 홍보 · 제로폰 관리", "네이버 판매자센터", "간판디자인", "폰클매니저 미래 오케이", "알들폰 해피콜 시스템", "알들폰 고객 안내사항 제작", "원오프 셋업 생산", "음봉일지", "철강주 동국제강 이익추정", "STCO 인동점 SEO·홍보", "STCO 인동점 포스&홈페이지", "STCO 인동점 포스&홈페이지 2", "게임만들기", "게임 스토리 작가", "게임 일러스트 작가", "히로인 모션 - 유나"];
+// 알들 컴퍼니 회사 화면과 같은 부서·봇 이름.
+// 중계가 이름을 한 글자까지 맞춰 찾으므로, 여기 이름은 회사 화면의 name 과 같게 둔다.
+// 고르는 곳: 「전체」 → 부서 6개 → 부서별 팀원. 「클로드」는 게임 필멸자 팀장으로 들어 있다.
+const BOT_TARGETS = {
+  all: '전체',
+  depts: [
+    { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드', grokLead: '게임만들기' },
+    { id: 'zero', name: '제로폰', sub: '사이트·정책·개통 안내', icon: '📱', lead: '제로폰 홈페이지' },
+    { id: 'promo', name: '홍보', sub: '블로그·마케팅·영상', icon: '📣', lead: '제로폰 홍보 · 제로폰 관리' },
+    { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
+    { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
+    { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
+  ],
+  bots: [
+    { name: '클로드', dept: 'game', role: '게임 코드·문서·검수 (사장님 구독 클로드 팀)', lead: true },
+    { name: '게임만들기', dept: 'game', role: '그록 쪽 게임 그림·영상 총괄', grokLead: true },
+    { name: '게임 스토리 작가', dept: 'game', role: '스토리와 대사 작성' },
+    { name: '게임 일러스트 작가', dept: 'game', role: '큰그림 일러스트 제작' },
+    { name: '게임 음악 담당', dept: 'game', role: '배경음악과 효과음' },
+    { name: '주인공 모션', dept: 'game', role: '주인공 픽셀 모션 제작' },
+    { name: '히로인 모션 - 이벨린', dept: 'game', role: '히로인 이벨린 캐릭터·모션' },
+    { name: '히로인 모션 - 마렌', dept: 'game', role: '히로인 마렌 캐릭터·모션' },
+    { name: '히로인 모션 - 유나', dept: 'game', role: '히로인 유나 캐릭터·모션' },
+    { name: '히로인 모션 - 베일라', dept: 'game', role: '히로인 베일라 캐릭터·모션' },
+    { name: '히로인 모션 - 로자린드', dept: 'game', role: '히로인 로자린드 캐릭터·모션' },
+    { name: '히로인 모션 - 자이라', dept: 'game', role: '히로인 자이라 캐릭터·모션' },
+    { name: '게임 맵 제작', dept: 'game', role: '마을·던전 맵 제작' },
+    { name: '제로폰 홈페이지', dept: 'zero', role: '사이트 작업 조율과 배포', lead: true },
+    { name: '제로폰 홈페이지2', dept: 'zero', role: 'zeropon.co.kr 화면 작업' },
+    { name: '제로폰 홈페이지3', dept: 'zero', role: '시세표·가격 페이지' },
+    { name: '제로폰 홈페이지4', dept: 'zero', role: '유입경로 분석과 사이트 작업' },
+    { name: '제로폰 개통 안내', dept: 'zero', role: '고객 개통 안내 이미지' },
+    { name: '제로폰 홍보 · 제로폰 관리', dept: 'promo', role: '블로그 글·홍보·영상 관리', lead: true },
+    { name: '네이버 판매자센터', dept: 'promo', role: '네이버 판매자센터 관리' },
+    { name: '간판디자인', dept: 'promo', role: '간판과 홍보 디자인 시안' },
+    { name: '폰클매니저 미래 오케이', dept: 'admin', role: '폰클 관리·개통·정산 확인', lead: true },
+    { name: '알들폰 해피콜 시스템', dept: 'admin', role: '고객 해피콜 관리' },
+    { name: '알들폰 고객 안내사항 제작', dept: 'admin', role: '매장 고객 안내문 제작' },
+    { name: '원오프 셋업 생산', dept: 'admin', role: '원오프 셋업 의류 생산 관리' },
+    { name: '음봉일지', dept: 'admin', role: '주식 매매 일지' },
+    { name: '철강주 동국제강 이익추정', dept: 'admin', role: '동국제강 이익 추정' },
+    { name: 'STCO 인동점 SEO·홍보', dept: 'stco', role: '인동점 쇼핑몰 검색 노출과 홍보', lead: true },
+    { name: 'STCO 인동점 포스&홈페이지', dept: 'stco', role: '인동점 포스와 홈페이지' },
+    { name: 'STCO 인동점 포스&홈페이지 2', dept: 'stco', role: '인동점 포스와 홈페이지 보조' },
+    { name: '그록봇 최적화 예전 이벨린', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
+    { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
+  ],
+};
+function companyTargetOk(name) {
+  if (name === BOT_TARGETS.all || name === '클로드') return true;
+  return BOT_TARGETS.depts.some((d) => d.name === name) || BOT_TARGETS.bots.some((b) => b.name === name);
+}
 try { const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); state = { ...state, ...s, settings: { ...state.settings, ...(s.settings || {}) } }; } catch (e) { /* 처음 */ }
 if (process.env.OFFICE_PORT) state.settings.port = Number(process.env.OFFICE_PORT);
 if (process.env.OFFICE_CLAUDE) state.settings.claudeCmd = process.env.OFFICE_CLAUDE;
@@ -756,11 +806,14 @@ const server = http.createServer(async (req, res) => {
       return json(res, { ok: true });
     }
     if (p === '/api/bot/command') {
-      // 「🏢 회사 일 시키기」: 알들 컴퍼니 명령창과 똑같이 그록 봇에게 보냄 (사장님이 보낸 명령)
-      const cfg = botConfig();
+      // 「🏢 회사 일 시키기」: 바탕화면 명령창과 같은 곳으로 보냄.
+      // 몸: {target, command, source: "알들 컴퍼니 명령창", sentAt}. 접속 정보는 🔌 연결 → 🤖 그록 봇에 저장된 것을 쓴다.
       const target = String(b.target || '').trim(), command = String(b.command || '').trim();
+      if (!command) return json(res, { ok: false, error: '할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해' });
+      if (!target) return json(res, { ok: false, error: '보낼 곳을 골라 주세요.' });
+      if (!companyTargetOk(target)) return json(res, { ok: false, error: '목록에 없는 이름이에요. 부서나 팀원을 골라 주세요.' });
+      const cfg = botConfig();
       if (!cfg) return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' });
-      if (!target || !command) return json(res, { ok: false, error: '대상과 할 일을 적어 주세요.' });
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
       try {
         const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString() }) });
