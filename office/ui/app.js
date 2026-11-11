@@ -317,6 +317,20 @@ function conns() {
       what: '구글 드라이브의 그록 공유 폴더를 PC 폴더로 보이게 해 두면, 새 그림·영상이 올 때 AI협력팀이 저절로 확인하고 보고해요.',
       how: 'PC에 「Google Drive 데스크톱」을 깔고, 그 폴더 주소를 아래에 넣으세요 (예: G:\\내 드라이브\\…).',
       fields: `<div class="field"><label>그록 폴더 (PC 주소)</label><input type="text" name="grokDir" value="${esc(s.grokDir)}"></div>`, act: 'folder' },
+    { id: 'github', ico: '🐙', nm: '깃허브 올리기', ds: '직원이 고친 것을 깃허브에 올려요 (PR)', on: !!(s.ghPush && s.ghPush.ok), lamp: s.ghPush ? (s.ghPush.ok ? '올릴 수 있음' : '로그인 필요') : '확인 안 함',
+      what: '직원(클로드)이 게임을 고치면, 깃허브에 올리고 「합치기 부탁(PR)」을 만들어요. 그러려면 이 PC 가 사장님 깃허브 계정으로 한 번 로그인돼 있어야 해요.',
+      how: `아래 「로그인·확인」을 누르세요. 로그인이 안 돼 있으면 <b>깃허브 로그인 창</b>이 떠요 → 사장님 깃허브 계정으로 로그인 → 다시 「로그인·확인」. 실제로 올리지는 않고 확인만 해요.${s.ghPush ? `<br><br>마지막 확인: <b>${esc(s.ghPush.msg)}</b> (${ago(s.ghPush.at)})${s.ghPush.name ? `<br>커밋 이름: ${esc(s.ghPush.name)} / ${esc(s.ghPush.email || '이메일 없음')}` : '<br>⚠ 커밋 이름이 없어요. 아래에 적어 주세요.'}` : ''}`,
+      fields: `<div class="field"><label>커밋에 남길 이름 (비워 두면 그대로)</label><input type="text" name="gitName" placeholder="${esc((s.ghPush && s.ghPush.name) || '예: meca12944')}"></div>
+        <div class="field"><label>커밋에 남길 이메일 (비워 두면 그대로)</label><input type="text" name="gitEmail" placeholder="${esc((s.ghPush && s.ghPush.email) || '깃허브 계정 이메일')}"></div>`, act: 'github' },
+    { id: 'pixellab', ico: '🎨', nm: 'PixelLab', ds: '직원이 도트 그림을 만들 때 써요', on: !!s.hasPixellab, lamp: s.hasPixellab ? '넣어 둠' : '안 넣음',
+      what: '도트(픽셀) 그림을 만들어 주는 서비스예요. 직원이 몹·주인공 그림을 만들 때 이 키를 써요. <b>쓸 때마다 크레딧(돈)이 줄어요.</b> 직원은 일이 끝나면 쓴 크레딧을 보고해요.',
+      how: 'pixellab.ai 에 로그인 → 계정 설정에서 API 키를 복사 → 아래에 붙여 넣기. 키는 이 PC 의 data 폴더에만 있고 화면·기록에 안 나와요.',
+      fields: `<div class="field"><label>PixelLab 키</label><input type="password" name="pixellabKey" placeholder="${s.hasPixellab ? '들어 있어요 (바꿀 때만 넣기)' : 'PixelLab API 키'}" autocomplete="off"></div>
+        ${s.hasPixellab ? '<div class="field"><label class="check"><input type="checkbox" name="pixellabClear"> 키 지우기</label></div>' : ''}` },
+    { id: 'mcp', ico: '🧩', nm: '클로드 연결 도구', ds: '구글 드라이브·노션 같은 바깥 서비스', on: !!(s.mcpList && s.mcpList.count), lamp: s.mcpList ? (s.mcpList.count ? `${s.mcpList.count}개 연결` : '없음') : '확인 안 함',
+      what: '클로드가 구글 드라이브·노션·깃허브 같은 바깥 서비스를 직접 쓰게 해 주는 연결이에요 (영어로 「MCP 커넥터」). 여기 목록에 나오는 것만 PC 직원들이 쓸 수 있어요.',
+      how: `아래 「목록 보기」로 지금 이어진 것을 확인해요. 더 잇고 싶으면 이 대화방의 클로드에게 「○○ 연결해 줘」라고 말하면 순서를 알려 드려요. 지금 없어도 일하는 데는 문제없어요 (그록과는 🤖 그록 봇으로 이어져 있어요).${s.mcpList ? `<br><br>마지막 확인 (${ago(s.mcpList.at)}):<code style="display:block;white-space:pre-wrap;margin-top:4px">${esc(s.mcpList.text)}</code>` : ''}`,
+      fields: '', act: 'mcp' },
     { id: 'xai', ico: '🔑', nm: '그록 키 (유료)', ds: '돈을 내고 그록과 완전 자동으로', on: s.grokWay === 'api', lamp: s.grokWay === 'api' ? '쓰는 중' : '안 씀',
       what: '그록 회사(xAI)의 유료 키예요. 그록 봇 없이도 완전 자동이지만, 쓴 만큼 돈이 나가요 (말 한 번 약 30원, 그림 1장 약 60원).',
       how: '보통은 필요 없어요. 쓰려면 console.x.ai 에서 키를 만들어 아래에 넣고 「이걸로 쓰기」에 체크하세요.',
@@ -334,20 +348,28 @@ function connections() {
 function connOne(id) {
   const c = conns().find((x) => x.id === id); if (!c) return;
   dialog(`<div class="conn-head"><span class="ico">${c.ico}</span><div><h2 style="margin:0">${c.nm}</h2><span class="lamp ${c.on ? 'on' : 'off'}">${c.on ? '🟢' : '⚪'} ${c.lamp}</span></div></div>
-    <div class="qa"><b>이게 뭐예요?</b>${c.what}</div>
-    <div class="qa"><b>어떻게 해요?</b>${c.how}</div>
+    <div class="qa"><div class="qh">이게 뭐예요?</div>${c.what}</div>
+    <div class="qa"><div class="qh">어떻게 해요?</div>${c.how}</div>
     ${c.fields}
     <div class="err-text"></div>
     <div class="dlg-foot"><button class="btn ghost" value="back" style="margin-right:auto">← 연결 목록</button>
       ${c.act === 'board' ? '<button class="btn" value="board">📋 주소 복사</button>' : ''}
       ${c.act === 'company' ? '<button class="btn ghost" value="company">열기</button>' : ''}
       ${c.act === 'folder' && S.settings.grokDir ? '<button class="btn ghost" value="folder">지금 확인시키기</button>' : ''}
+      ${c.act === 'github' ? '<button class="btn ghost" value="ghcheck">🐙 로그인·확인</button>' : ''}
+      ${c.act === 'mcp' ? '<button class="btn" value="mcpcheck">🧩 목록 보기</button>' : ''}
       ${c.fields ? '<button class="btn" value="ok">저장</button>' : '<button class="btn ghost" value="cancel">닫기</button>'}</div>`,
   async (fd, v) => {
     if (v === 'back') { setTimeout(connections, 30); return; }
     if (v === 'board') { copy('우리 팀 업무 공유판이야. 일하기 전에 꼭 읽고, 여기 적힌 결정과 규칙을 따라 줘: ' + BOARD, '복사했어요. 그록에 붙여 넣으세요'); return ''; }
     if (v === 'company') { window.open(S.settings.companyUrl, '_blank'); return ''; }
     if (v === 'folder') { const r = await api('/api/grokCheck'); if (!r.ok) return r.error; toast('AI협력팀이 그록 폴더를 확인해요'); return; }
+    if (v === 'ghcheck' || v === 'mcpcheck') {
+      toast(v === 'ghcheck' ? '깃허브 확인 중… 로그인 창이 뜨면 로그인해 주세요' : '연결 도구 목록을 보는 중… (최대 1분)');
+      const r = await api('/api/conn/check', { id: v === 'ghcheck' ? 'github' : 'mcp' });
+      if (!r.ok) return r.error;
+      setTimeout(() => connOne(id), 200); return;
+    }
     if (id === 'xai') fd.grokMode = fd.useApi ? 'api' : 'bot';
     const r = await api('/api/settings', fd);
     if (!r.ok) return r.error;
@@ -365,7 +387,7 @@ function guide() {
     <ul class="tips">
       <li>🙋 위에 <b>노란 칸 「해도 될까요?」</b>가 뜨면 <b>허락</b>을 눌러요. 한 번 허락하면 다시 안 물어요.</li>
       <li>💬 <b>그록과 이야기</b> 칸에서 그록에게 말하거나, 클로드와 그록에게 회의를 시킬 수 있어요.</li>
-      <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더 같은 것을 이어요. 아이콘을 누르면 쉬운 설명이 나와요.</li>
+      <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더·깃허브·PixelLab 같은 것을 이어요 (아이콘 11개). 아이콘을 누르면 「이게 뭐예요? / 어떻게 해요?」가 나와요. 🟢 = 이어짐, ⚪ = 아직.</li>
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
       <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
     </ul>
