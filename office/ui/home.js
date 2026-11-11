@@ -31,7 +31,7 @@ const HOME_DEPTS = [
   { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
   { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
   { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
-  { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
+  { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '알들컴퍼니' },
 ];
 function homeDepts(A) {
   const t = A && A.state && A.state.botTargets;
@@ -356,7 +356,7 @@ function homeWhoHtml(A, claude, bots, esc) {
   for (const b of bots) {
     const nick = homeBotNick(A, b.name);
     const label = nick === b.name ? b.name : nick + ' · 원래 ' + b.name;
-    opts.push({ v: 'bot:' + b.name, label: '🤖 ' + label });
+    opts.push({ v: 'bot:' + (b.id || b.name), label: '🤖 ' + label });
   }
   const cur = opts.some((o) => o.v === homeDeptWho) ? homeDeptWho : (opts[0] ? opts[0].v : '');
   homeDeptWho = cur;

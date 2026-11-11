@@ -40,7 +40,7 @@ const BOT_TARGETS = {
     { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
     { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
     { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
-    { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
+    { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '알들컴퍼니' },
   ],
   bots: [
     { name: '클로드', dept: 'game', role: '게임 코드·문서·검수 (사장님 구독 클로드 팀)', lead: true },
@@ -75,15 +75,24 @@ const BOT_TARGETS = {
     { name: 'STCO 인동점 포스&홈페이지 2', dept: 'stco', role: '인동점 포스와 홈페이지 보조' },
     { name: '영상 기획 팀장', dept: 'video', role: '그록 쪽 영상 기획 팀장', lead: true },
     { name: '영상 기획 2', dept: 'video', role: '영상 기획 보조' },
-    { name: '그록봇 최적화 예전 이벨린', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
+    { id: '그록봇 최적화 예전 이벨린', name: '알들컴퍼니', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
     { name: '알들 컴퍼니 보고 담당', dept: 'ai', role: '보고 정리·클로드에게 답 전달' },
     { name: '알들 컴퍼니 개발 담당', dept: 'ai', role: '프로그램 개선 PR' },
     { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
   ],
 };
+function botByTarget(name) {
+  const t = String(name || '').trim();
+  return BOT_TARGETS.bots.find((b) => b.name === t || b.id === t) || null;
+}
+function botDeliverTarget(name) {
+  // 화면 이름이 달라도, 봇에게 넘기는 대상 id 는 그대로 둬요.
+  const bot = botByTarget(name);
+  return bot && bot.id ? bot.id : String(name || '').trim();
+}
 function companyTargetOk(name) {
   if (name === BOT_TARGETS.all || name === '클로드') return true;
-  return BOT_TARGETS.depts.some((d) => d.name === name) || BOT_TARGETS.bots.some((b) => b.name === name);
+  return BOT_TARGETS.depts.some((d) => d.name === name) || !!botByTarget(name);
 }
 try { const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); state = { ...state, ...s, settings: { ...state.settings, ...(s.settings || {}) } }; } catch (e) { /* 처음 */ }
 if (process.env.OFFICE_PORT) state.settings.port = Number(process.env.OFFICE_PORT);
@@ -1202,7 +1211,7 @@ const server = http.createServer(async (req, res) => {
       }
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
       try {
-        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target: botDeliverTarget(target), command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
         h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
       } catch (e) { h.result = '실패: ' + e.message; }
       grokReportSent(reportId, h.ok);
@@ -1445,7 +1454,7 @@ function grokDeptOf(target) {
   let d = BOT_TARGETS.depts.find((x) => x.name === t);
   if (!d) d = BOT_TARGETS.depts.find((x) => x.name.startsWith(t));
   if (!d) {
-    const bot = BOT_TARGETS.bots.find((b) => b.name === t);
+    const bot = botByTarget(t);
     if (bot) d = BOT_TARGETS.depts.find((x) => x.id === bot.dept);
   }
   return d || null;
