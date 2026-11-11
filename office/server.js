@@ -29,7 +29,7 @@ let state = {
 };
 // 알들 컴퍼니 회사 화면과 같은 부서·봇 이름.
 // 중계가 이름을 한 글자까지 맞춰 찾으므로, 여기 이름은 회사 화면의 name 과 같게 둔다.
-// 고르는 곳: 「전체」 → 부서 6개 → 부서별 팀원. 「클로드」는 게임 필멸자 팀장으로 들어 있다.
+// 고르는 곳: 「전체」 → 부서 7개 → 부서별 팀원. 「클로드」는 게임 필멸자 팀장으로 들어 있다.
 const BOT_TARGETS = {
   all: '전체',
   depts: [
@@ -38,6 +38,7 @@ const BOT_TARGETS = {
     { id: 'promo', name: '홍보', sub: '블로그·마케팅·영상', icon: '📣', lead: '제로폰 홍보 · 제로폰 관리' },
     { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
     { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
+    { id: 'video', name: '영상 기획팀', sub: '콘티·대본·자막', icon: '🎬', lead: '영상 기획 팀장' },
     { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
   ],
   bots: [
@@ -71,6 +72,8 @@ const BOT_TARGETS = {
     { name: 'STCO 인동점 SEO·홍보', dept: 'stco', role: '인동점 쇼핑몰 검색 노출과 홍보', lead: true },
     { name: 'STCO 인동점 포스&홈페이지', dept: 'stco', role: '인동점 포스와 홈페이지' },
     { name: 'STCO 인동점 포스&홈페이지 2', dept: 'stco', role: '인동점 포스와 홈페이지 보조' },
+    { name: '영상 기획 팀장', dept: 'video', role: '그록 쪽 영상 기획 팀장', lead: true },
+    { name: '영상 기획 2', dept: 'video', role: '영상 기획 보조' },
     { name: '그록봇 최적화 예전 이벨린', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
     { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
   ],
@@ -109,13 +112,15 @@ const DEPT_CLAUDE_EXTRA = [
   { dept: 'promo', name: '홍보팀장', role: '블로그와 광고를 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'promo', name: '블로그글', role: '블로그에 올릴 글' },
   { dept: 'promo', name: '광고문안', role: '광고에 쓸 짧은 글과 시안' },
-  { dept: 'promo', name: '영상기획', role: '쇼츠·홍보 영상 대본, 자막, 썸네일 문구' },
+  { dept: 'promo', name: '클로드 홍보2', role: '블로그 글 초안 검수·키워드·노출 분석. 결과는 글 제안만, 게시·광고 수정은 안 함' },
   { dept: 'admin', name: '경영팀장', role: '고객 안내와 서류 정리를 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'admin', name: '고객안내', role: '고객에게 보낼 안내 글' },
   { dept: 'admin', name: '서류정리', role: '할 일과 서류 정리' },
   { dept: 'stco', name: 'STCO팀장', role: '쇼핑몰과 검색 노출을 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'stco', name: '쇼핑몰글', role: '상품 글과 쇼핑몰 화면' },
   { dept: 'stco', name: '검색노출', role: '검색에 잘 나오게 제목과 글 정리' },
+  { dept: 'video', name: '영상 기획 팀장', role: '영상 기획·콘티·대본 총괄', lead: true },
+  { dept: 'video', name: '영상 기획 직원', role: '대본·장면 목록·자막' },
 ];
 // 직원 부서. 예전 저장 파일에 dept 가 없으면 게임 필멸자, AI협력팀만 AI 협력·연결.
 function empDeptId(e) {
