@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 21:49 한국 시각, main `d4ff2704 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 21:52 한국 시각, main `fca2cd86 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,7 +42,7 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
-- 11-11 · `grok/office-dashboard` — 현황판을 한 가지 틀로 다시 맞춤
+- 11-11 · `grok/office-dashboard` — 톱니와 부서 화면에 첫 화면으로 돌아가기를 넣음
 - 11-11 · `grok/office-progress` — 명령 번호로 그록 진행 상태를 보고 카드에 보여 줌
 - 11-11 · `claude/office-approval-tab` — 알들 컴퍼니: ✅ 사장님 결재 탭 (결재 기다림 + 보고 한눈에)
 - 11-11 · `claude/busy-goodall-u5zn4r` — 알들 컴퍼니: 🎬 힉스필드 연결 (설치·로그인 단추, 확인, 직원 사용 규칙)
