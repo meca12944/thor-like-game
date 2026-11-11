@@ -1,2 +1,28 @@
-/* 회사 홈에서 조금만 더하는 자리. 색은 theme.css 이름을 그대로 써요. */
+/* 회사 홈에서 조금만 더하는 자리. 색은 theme.css 이름을 그대로 써요. 움직임·네온 없음. */
 .home-wrap section { min-width: 0; }
+.home-page { display: flex; flex-direction: column; gap: 16px; }
+.home-order {
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--blue);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.home-order-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.home-order-head b { font-size: 18px; }
+.home-order-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.home-order-pick { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.home-order-pick select,
+.home-order-row input[type="text"] {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.home-order-pick select { min-width: 11rem; }
+.home-order-row input[type="text"] { flex: 1 1 220px; min-width: 180px; }
+.home-order-row .btn { flex: none; }
+.home-order-note { min-height: 1.4em; margin-top: 6px; font-weight: 700; }
+.home-order-note.ok { color: var(--green); }
+.home-order-note.bad { color: var(--red); }
