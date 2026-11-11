@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 20:05 한국 시각, main `f214375d 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 20:25 한국 시각, main `ef2a93cc 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,6 +42,7 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `grok/office-scroll-fix` — 보고와 팀 목록을 다시 그려도 스크롤이 위로 튀지 않게 함
 - 11-11 · `grok/office-dept-reports` — AI 협력·연결 팀장 표시 이름을 알들컴퍼니로 바꿈
 - 11-11 · `cursor/ai-office-bots-a7f8` — AI 협력·연결에 그록 팀원 둘을 더함
 - 11-11 · `grok/office-connections` — 연결·기능 화면을 넣어 이어진 것과 단추 설명을 보여요
@@ -51,7 +52,6 @@
 - 11-11 · `grok/office-ui-layout` — 회사 홈을 한 화면에 맞게 다시 배치
 - 11-11 · `grok/office-home-command` — 회사 홈 맨 위에 일 시키기 칸을 넣음
 - 11-11 · `grok/office-reports-v2` — 회사 홈과 보고 창을 최신 main에 맞춤
-- 11-11 · `claude/office-coop-chat` — 클로드 작업장: 위험한 일 매번 묻기 넓힘 · 설정에서 허락 하나씩 지우기 · coopChat(el) · 보고 요약/상태
 
 ## 최근 결정 (팀 회의 교본 10장, 새것부터)
 - **11-11 그록 설계안 (#207)** — 알들 컴퍼니 이름·회사 홈·부서 화면, home.js/connectors_grok.js 는 그록, 틀·테마·대화 창·위험 허락은 클로드, 회사 보고 = 사장님 드라이브(공개 저장소 X)
