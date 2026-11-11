@@ -91,20 +91,20 @@ function homeFieldBusy(el) {
 function homeSnap(el) {
   const cmd = el.querySelector('#homeTopCmd');
   const dept = el.querySelector('#homeTopDept');
+  const task = el.querySelector('#homeCmd');
+  const folder = el.querySelector('#homeDeptFolder');
   if (cmd) homeTopDraft = cmd.value;
   if (dept && dept.value) homeTopSave(dept.value);
-  const cmd2 = el.querySelector('#homeCmd');
+  if (task) homeDeptDraft = task.value;
+  if (folder) homeDeptFolder = folder.value;
   const who = el.querySelector('#homeWho');
   const talk = el.querySelector('#homeTalk');
   const addName = el.querySelector('#zAddName');
   const addRole = el.querySelector('#zAddRole');
-  if (cmd2) homeDeptDraft = cmd2.value;
   if (who) homeDeptWho = who.value;
   if (talk) homeTalkDraft = talk.value;
   if (addName) homeAddName = addName.value;
   if (addRole) homeAddRole = addRole.value;
-  const folder = el.querySelector('#homeDeptFolder');
-  if (folder) homeDeptFolder = folder.value;
   if (homeEdit) {
     const en = el.querySelector('#zEditName');
     const er = el.querySelector('#zEditRole');
@@ -431,7 +431,6 @@ async function homeLoadTalk(el, A, d) {
   box.innerHTML = html;
 }
 async function homeDeptAssign(el, A, d, who, command) {
-  const err = el.querySelector('#homeSendErr');
   const show = (ok, text) => {
     homeDeptNote = { id: d.id, ok, text };
     if (homeMode === 'dept' && homeDeptId === d.id) homePaint(el, A);
@@ -509,7 +508,7 @@ function homePaintDept(el, A, pack, esc) {
       <section class="dept-col dept-work">
         <form class="card dept-send" id="homeSend">
           <b>✍️ 일 시키기</b>
-          <div class="muted small">팀장이나 직원을 고르고 할 일을 적어요. 보내면 바로 접수로 보고에 떠요.</div>
+          <div class="muted small">팀장이나 직원을 고르고 할 일을 적어요. 보내면 바로 아래 보고에 접수로 떠요.</div>
           <label class="home-order-pick">받을 사람 <select id="homeWho">${homeWhoHtml(A, claude, bots, esc)}</select></label>
           <textarea id="homeCmd" class="home-text" rows="4" placeholder="예: ${esc(example)}">${esc(homeDeptDraft)}</textarea>
           <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
@@ -579,12 +578,16 @@ function homeBind(el, A) {
     const t = ev.target;
     if (!t || !el.contains(t)) return;
     if (t.id === 'homeDeptFolder') { homeDeptFolder = t.value; return; }
+    if (t.id === 'homeCmd') { homeDeptDraft = t.value; return; }
     if (t.id !== 'homeTopCmd') return;
     homeTopDraft = t.value;
     if (homeTopNote) { homeTopNote = null; homeTopPaintNote(el); }
   });
   el.addEventListener('compositionstart', () => { homeComposing = true; });
-  el.addEventListener('compositionend', () => { homeComposing = false; homeSnap(el); });
+  el.addEventListener('compositionend', () => {
+    homeComposing = false;
+    homeSnap(el);
+  });
   el.addEventListener('focusout', () => {
     if (!homePaintWait) return;
     setTimeout(() => {
