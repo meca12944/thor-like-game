@@ -1,28 +1,218 @@
-/* 회사 홈에서 조금만 더하는 자리. 색은 theme.css 이름을 그대로 써요. 움직임·네온 없음. */
-.home-wrap section { min-width: 0; }
-.home-page { display: flex; flex-direction: column; gap: 16px; }
+/* 회사 홈 배치. 색은 theme.css 이름만 써요. 움직임·네온 없음.
+   맨 위 일 시키기, 그 아래 보고·부서·대화가 창 높이에 맞춰 나뉘고
+   긴 목록만 칸 안에서 스크롤돼요. */
+.home-main:has(.home-fit) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.home-fit {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 일 시키기 — 맨 위 한 줄 */
 .home-order {
+  flex: none;
   background: var(--panel);
   color: var(--text);
-  border: 2px solid var(--blue);
-  border-radius: 14px;
-  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--card-radius);
+  padding: 10px 14px;
 }
-.home-order-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-.home-order-head b { font-size: 18px; }
-.home-order-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-.home-order-pick { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.home-order-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.home-order-title { font-size: 17px; white-space: nowrap; }
+.home-order-pick { display: flex; align-items: center; gap: 6px; font-weight: 700; white-space: nowrap; }
 .home-order-pick select,
 .home-order-row input[type="text"] {
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--input-radius);
   padding: 8px 10px;
 }
 .home-order-pick select { min-width: 11rem; }
-.home-order-row input[type="text"] { flex: 1 1 220px; min-width: 180px; }
+.home-order-row input[type="text"] { flex: 1 1 180px; min-width: 160px; }
 .home-order-row .btn { flex: none; }
-.home-order-note { min-height: 1.4em; margin-top: 6px; font-weight: 700; }
-.home-order-note.ok { color: var(--green); }
-.home-order-note.bad { color: var(--red); }
+.home-order-note { min-height: 1.3em; margin-top: 4px; font-size: 13px; }
+.home-order-note.hint { color: var(--muted); font-weight: 400; }
+.home-order-note.ok { color: var(--green); font-weight: 700; }
+.home-order-note.bad { color: var(--red); font-weight: 700; }
+
+/* 아래 세 칸: 좁으면 보고 | (부서 위, 대화 아래). 넓으면 보고 | 부서 | 대화 */
+.home-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.95fr);
+  grid-template-rows: auto minmax(120px, 1fr);
+}
+.home-col { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.home-col-reports { grid-column: 1; grid-row: 1 / span 2; }
+.home-col-work { grid-column: 2; grid-row: 1; overflow: auto; }
+.home-col-chat { grid-column: 2; grid-row: 2; }
+.home-col .title { margin-bottom: 6px; }
+@media (min-width: 1600px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.9fr) minmax(300px, 0.8fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .home-col-reports,
+  .home-col-work,
+  .home-col-chat { grid-column: auto; grid-row: 1; }
+  .home-col-work {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--card-radius);
+    padding: 12px 14px;
+  }
+  .home-col-work .tile { background: var(--bg); }
+}
+
+/* 부서 아이콘 — 항상 3열 2줄 */
+.home-depts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.home-depts .tile { text-align: center; padding: 10px 8px 8px; background: var(--panel); min-width: 0; }
+.home-depts .tile .ico { font-size: 26px; }
+.home-depts .tile .nm { font-size: 15px; margin-top: 4px; word-break: keep-all; }
+.home-depts .tile .ds {
+  font-size: 12px;
+  line-height: 1.35;
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.home-shortcuts { display: flex; gap: 8px; margin-top: 8px; }
+.home-shortcuts .btn { flex: 1; }
+
+/* 대화는 칸 안에서만 내려가요 */
+.home-col-chat .title .link { margin-left: auto; }
+.home-chat {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  padding: 10px 12px;
+}
+.home-chat .bubble { max-width: 100%; }
+.home-chat .chat { gap: 8px; }
+
+/* 보고 창 */
+#homeReports { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.home-report-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px 14px 10px;
+}
+.home-report-head { flex: none; }
+.home-report-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.home-report-counts { margin: 4px 0; font-weight: 700; }
+.home-report-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.home-report-filters button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: var(--input-radius);
+  padding: 3px 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.home-report-filters button.on { font-weight: 700; background: var(--accent-soft); border-color: var(--accent); }
+.home-report-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-report-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  padding: 12px;
+  gap: 4px;
+}
+.home-report-card { margin: 0; }
+.home-report-card[data-status="완료"] { border-left: 4px solid var(--green); }
+.home-report-card[data-status="문제 있음"] { border-left: 4px solid var(--red); }
+.home-report-card[data-status="접수"] { border-left: 4px solid var(--blue); }
+.home-report-card[data-status="진행 중"] { border-left: 4px solid var(--amber); }
+.home-report-card .rst { font-weight: 700; white-space: nowrap; }
+.home-report-card[data-status="완료"] .rst { color: var(--green); }
+.home-report-card[data-status="문제 있음"] .rst { color: var(--red); }
+.home-report-card[data-status="접수"] .rst { color: var(--blue); }
+.home-report-card[data-status="진행 중"] .rst { color: var(--amber); }
+.home-report-card .boss { color: var(--blue); font-weight: 700; white-space: nowrap; }
+.home-report-card .who { color: var(--muted); font-size: 13px; }
+.home-report-card .sum { margin-top: 2px; }
+
+/* 부서 화면: 왼쪽 팀원, 오른쪽 일 시키기 */
+.dept-bar { display: flex; align-items: center; gap: 12px; flex: none; }
+.dept-name { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.dept-name .ico { font-size: 28px; line-height: 1; }
+.dept-name b { font-size: 18px; }
+.dept-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  gap: 12px;
+}
+.dept-card { min-height: 0; overflow: auto; }
+.dept-send { display: flex; flex-direction: column; gap: 0; }
+.dept-people { margin: 8px 0 0; padding-left: 18px; }
+.dept-people li { margin: 3px 0; }
+.home-text {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: var(--input-radius);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+}
+.dept-send .home-text { flex: 1 1 auto; min-height: 96px; }
+.home-err { color: var(--red); min-height: 1.3em; font-weight: 700; }
+.dept-send .btn { align-self: stretch; }
+
+/* 연결 설명: 왼쪽 아이콘, 오른쪽 설명 */
+.conn-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 12px;
+}
+.home-conn-tiles {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  overflow: auto;
+  min-height: 0;
+}
+.home-conn-tiles .tile.sel { border-color: var(--accent); background: var(--accent-soft); }
+.conn-detail { min-height: 0; overflow: auto; }
+.conn-detail .qa:last-child { margin-bottom: 0; }
+
+@media (max-width: 860px) {
+  .dept-grid, .conn-grid { grid-template-columns: 1fr; }
+  .home-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(160px, 1fr); }
+  .home-col-reports, .home-col-work, .home-col-chat { grid-column: 1; grid-row: auto; }
+}
