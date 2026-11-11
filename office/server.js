@@ -29,7 +29,7 @@ let state = {
 };
 // 알들 컴퍼니 회사 화면과 같은 부서·봇 이름.
 // 중계가 이름을 한 글자까지 맞춰 찾으므로, 여기 이름은 회사 화면의 name 과 같게 둔다.
-// 고르는 곳: 「전체」 → 부서 6개 → 부서별 팀원. 「클로드」는 게임 필멸자 팀장으로 들어 있다.
+// 고르는 곳: 「전체」 → 부서 7개 → 부서별 팀원. 「클로드」는 게임 필멸자 팀장으로 들어 있다.
 const BOT_TARGETS = {
   all: '전체',
   depts: [
@@ -38,6 +38,7 @@ const BOT_TARGETS = {
     { id: 'promo', name: '홍보', sub: '블로그·마케팅·영상', icon: '📣', lead: '제로폰 홍보 · 제로폰 관리' },
     { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
     { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
+    { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
     { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
   ],
   bots: [
@@ -71,6 +72,8 @@ const BOT_TARGETS = {
     { name: 'STCO 인동점 SEO·홍보', dept: 'stco', role: '인동점 쇼핑몰 검색 노출과 홍보', lead: true },
     { name: 'STCO 인동점 포스&홈페이지', dept: 'stco', role: '인동점 포스와 홈페이지' },
     { name: 'STCO 인동점 포스&홈페이지 2', dept: 'stco', role: '인동점 포스와 홈페이지 보조' },
+    { name: '영상 기획 팀장', dept: 'video', role: '그록 쪽 영상 기획 팀장', lead: true },
+    { name: '영상 기획 2', dept: 'video', role: '영상 기획 보조' },
     { name: '그록봇 최적화 예전 이벨린', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
     { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
   ],
@@ -102,7 +105,7 @@ const BASIC_TEAM = [
   ['AI협력팀', '다른 AI(그록 등)와 협력: 부탁 문서 쓰기, 그록 폴더 확인, 받은 것 검사해서 맞는 직원에게 넘기기', true],
 ];
 // 게임·AI 말고 다른 부서의 클로드 기본 팀. 각 부서 맨 앞 사람이 팀장.
-// 사장님 11-11 「팀원에 클로드도 다 배치」. 폴더는 게임 직원과 같은 작업 공간에 만들어요.
+// 사장님 11-11 「팀원에 클로드도 다 배치」. dept 칸은 부서 id. 자리는 켤 때 만들지 않고, 사장님이 만들기를 누르거나 폴더를 고를 때만 만들어요.
 const DEPT_CLAUDE_EXTRA = [
   { dept: 'zero', name: '제로폰팀장', role: '사이트와 정책을 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'zero', name: '제로폰사이트', role: '홈페이지 화면과 안내 글' },
@@ -110,12 +113,15 @@ const DEPT_CLAUDE_EXTRA = [
   { dept: 'promo', name: '홍보팀장', role: '블로그와 광고를 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'promo', name: '블로그글', role: '블로그에 올릴 글' },
   { dept: 'promo', name: '광고문안', role: '광고에 쓸 짧은 글과 시안' },
+  { dept: 'promo', name: '클로드 홍보2', role: '블로그 글 초안 검수·키워드·노출 분석. 결과는 글 제안만, 게시·광고 수정은 안 함' },
   { dept: 'admin', name: '경영팀장', role: '고객 안내와 서류 정리를 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'admin', name: '고객안내', role: '고객에게 보낼 안내 글' },
   { dept: 'admin', name: '서류정리', role: '할 일과 서류 정리' },
   { dept: 'stco', name: 'STCO팀장', role: '쇼핑몰과 검색 노출을 나눠 맡고, 결과를 모아 보고', lead: true },
   { dept: 'stco', name: '쇼핑몰글', role: '상품 글과 쇼핑몰 화면' },
   { dept: 'stco', name: '검색노출', role: '검색에 잘 나오게 제목과 글 정리' },
+  { dept: 'video', name: '영상 기획 팀장', role: '영상 기획·콘티·대본 총괄', lead: true },
+  { dept: 'video', name: '영상 기획 직원', role: '대본·장면 목록·자막' },
 ];
 // 직원 부서. 예전 저장 파일에 dept 가 없으면 게임 필멸자, AI협력팀만 AI 협력·연결.
 function empDeptId(e) {
@@ -670,28 +676,37 @@ function makeFolder(name, cb) {
   });
 }
 
-// 부서에 클로드 직원이 없으면 기본 팀을 만들어요. 게임 폴더가 없으면 조용히 넘어가요 (켜질 때 절대 멈추지 않음).
+// 부서 클로드 팀은 사장님이 「만들기」를 누르거나 폴더를 직접 고를 때만 만들어요. 켤 때는 폴더를 비워 둡니다.
 function workspaceReady() {
   try {
     const repo = state.settings.gameRepo;
     return !!(repo && fs.existsSync(path.join(repo, '.git')));
   } catch (e) { return false; }
 }
-function addClaudeMember(spec) {
+function safeEmpDir(name) {
+  return String(name || '직원').replace(/[\\/:*?"<>|\s]+/g, '_') || '직원';
+}
+function addClaudeMember(spec, picked) {
   return new Promise((resolve) => {
+    const finish = (err, dir) => {
+      if (err) return resolve({ name: spec.name, err });
+      try {
+        state.employees.push({
+          id: uid(), name: spec.name, role: spec.role, dept: spec.dept, partner: !!spec.partner, lead: !!spec.lead,
+          folder: dir, mode: '', model: '', sessionId: crypto.randomUUID(), started: false, queue: [], status: 'idle', now: '',
+        });
+        changed();
+        resolve({ name: spec.name, made: true });
+      } catch (e) { resolve({ name: spec.name, err: e }); }
+    };
     try {
       if (state.employees.some((x) => x.name === spec.name)) return resolve({ name: spec.name, skipped: true });
-      makeFolder(spec.name, (err, dir) => {
-        if (err) return resolve({ name: spec.name, err });
-        try {
-          state.employees.push({
-            id: uid(), name: spec.name, role: spec.role, dept: spec.dept, partner: !!spec.partner, lead: !!spec.lead,
-            folder: dir, mode: '', model: '', sessionId: crypto.randomUUID(), started: false, queue: [], status: 'idle', now: '',
-          });
-          changed();
-          resolve({ name: spec.name, made: true });
-        } catch (e) { resolve({ name: spec.name, err: e }); }
-      });
+      if (picked) {
+        const dir = path.join(picked, safeEmpDir(spec.name));
+        fs.mkdirSync(dir, { recursive: true });
+        return finish(null, dir);
+      }
+      makeFolder(spec.name, finish);
     } catch (e) { resolve({ name: spec.name, err: e }); }
   });
 }
@@ -702,24 +717,32 @@ function ensureDeptClaude(opt) {
   return job;
 }
 async function ensureDeptClaudeNow(opt) {
-  if (!workspaceReady()) {
-    const err = new Error('설정에서 「게임 원본 폴더」를 먼저 정해 주세요.');
-    err.code = 'NO_REPO';
+  const onlyDept = opt && typeof opt.dept === 'string' ? opt.dept.trim() : '';
+  const picked = opt && typeof opt.folder === 'string' ? opt.folder.trim() : '';
+  if (onlyDept && !BOT_TARGETS.depts.some((d) => d.id === onlyDept)) {
+    const err = new Error('없는 부서예요.');
+    err.code = 'NO_DEPT';
     throw err;
   }
-  const onlyEmpty = !!(opt && opt.onlyEmpty);
-  const empty = new Set();
-  if (onlyEmpty) {
-    for (const d of BOT_TARGETS.depts) {
-      if (!state.employees.some((e) => empDeptId(e) === d.id)) empty.add(d.id);
+  if (picked) {
+    let okDir = false;
+    try { okDir = fs.statSync(picked).isDirectory(); } catch (e) { okDir = false; }
+    if (!okDir) {
+      const err = new Error('고른 폴더가 없어요. 폴더 주소를 확인해 주세요.');
+      err.code = 'NO_FOLDER';
+      throw err;
     }
+  } else if (!workspaceReady()) {
+    const err = new Error('설정에서 「게임 폴더」를 먼저 정해 주세요. 또는 폴더 주소를 직접 적으세요.');
+    err.code = 'NO_REPO';
+    throw err;
   }
   const made = [];
   const errors = [];
   for (const spec of claudeRoster()) {
-    if (onlyEmpty && !empty.has(spec.dept)) continue;
+    if (onlyDept && spec.dept !== onlyDept) continue;
     if (state.employees.some((e) => e.name === spec.name)) continue;
-    const r = await addClaudeMember(spec);
+    const r = await addClaudeMember(spec, picked);
     if (r.err) errors.push(r.name + ': ' + (r.err.message || r.err));
     else if (r.made) made.push(r.name);
   }
@@ -784,11 +807,12 @@ function stripRelayHead(text) {
 async function sendToBot(item) {
   const cfg = botConfig(); if (!cfg) return;
   const emp = findEmp(item.emp);
+  // 직원 저장 dept 는 id. 웹훅과 대화방 첫 줄 [부서:…] 는 이름(예: 홍보). 이름이 없을 때만 받는 곳을 'AI 협력'으로 둬요.
   const dept = emp ? empDeptName(emp) : '';
+  const target = dept || 'AI 협력';
   const head = dept ? `[그록] [부서:${dept}] [relay:${item.id}]` : `[그록] [relay:${item.id}]`;
   const command = `${item.relay.paste}\n\n— 답은 깃허브 「AI협력 대화방」 ${ISSUE_URL()} 에 댓글로 달아 주세요. 첫 줄은 ${head} 로 적어 주세요.`;
-  // dept = 부서 이름. 클로드가 #207 에서 넣기로 한 칸.
-  const body = JSON.stringify({ target: state.settings.botTarget || 'AI 협력', command, source: '클로드 회사', sentAt: new Date().toISOString(), relayId: item.id, replyTo: ISSUE_URL(), dept });
+  const body = JSON.stringify({ target, command, source: '클로드 회사', sentAt: new Date().toISOString(), relayId: item.id, replyTo: ISSUE_URL(), dept });
   try {
     const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -868,13 +892,15 @@ async function onBotComment(body) {
 }
 function relays() { return state.grokLog.filter((g) => g.relay && g.relay.state === 'waiting'); }
 function relayCreate({ emp, empName, kind, text, files }) {
-  const speaker = emp === 'boss' ? '[사장님]' : `[클로드 ${empName}]`;
-  let paste = kind === 'image' ? `${speaker} 그림 그려 줘: ${text}` : kind === 'video' ? `${speaker} 영상 만들어 줘: ${text}` : `${speaker} ${text}`;
-  if (!state.relayStarted) { paste = `(우리 팀 업무 공유판이야. 처음이면 먼저 읽고 여기 결정·규칙을 따라 줘: ${BOARD_URL})\n\n` + paste; state.relayStarted = true; }
   const e = findEmp(emp);
+  const deptName = e ? empDeptName(e) : '';
+  const deptTag = deptName ? `[부서:${deptName}] ` : '';
+  const speaker = emp === 'boss' ? '[사장님]' : `[클로드 ${empName}]`;
+  let paste = kind === 'image' ? `${deptTag}${speaker} 그림 그려 줘: ${text}` : kind === 'video' ? `${deptTag}${speaker} 영상 만들어 줘: ${text}` : `${deptTag}${speaker} ${text}`;
+  if (!state.relayStarted) { paste = `(우리 팀 업무 공유판이야. 처음이면 먼저 읽고 여기 결정·규칙을 따라 줘: ${BOARD_URL})\n\n` + paste; state.relayStarted = true; }
   if (e) { e.status = 'waiting'; e.now = '그록 답 기다리는 중 (사장님이 옮겨 주는 중)'; }
   push('relay', {});
-  const item = roomPost({ emp, empName, kind: emp === 'boss' ? 'boss' : 'ask', text: (kind === 'image' ? '🎨 ' : kind === 'video' ? '🎬 ' : '') + text, files: files || [], relay: { state: 'waiting', kind, paste, way: grokWay() } });
+  const item = roomPost({ emp, empName, kind: emp === 'boss' ? 'boss' : 'ask', text: deptTag + (kind === 'image' ? '🎨 ' : kind === 'video' ? '🎬 ' : '') + text, files: files || [], relay: { state: 'waiting', kind, paste, way: grokWay() } });
   if (item.relay.way === 'bot') sendToBot(item);
   return item;
 }
@@ -1283,9 +1309,9 @@ const server = http.createServer(async (req, res) => {
       return json(res, { ok: true });
     }
     if (p === '/api/team') {
-      // 한 번에: 게임 기본 팀 + 직원이 없는 다른 부서의 클로드 팀. 있는 이름은 건너뛰어요.
+      // 사장님이 만들기를 눌렀거나 폴더를 골랐을 때만. dept 가 있으면 그 부서만, 폴더가 있으면 그 안에 만들어요.
       try {
-        const r = await ensureDeptClaude({ onlyEmpty: false });
+        const r = await ensureDeptClaude({ dept: typeof b.dept === 'string' ? b.dept : '', folder: typeof b.folder === 'string' ? b.folder : '' });
         if (r.errors.length) return json(res, { ok: false, error: r.errors[0], made: r.made });
         return json(res, { ok: true, made: r.made });
       } catch (e) { return json(res, { ok: false, error: e.message || '팀을 만들지 못했어요', made: [] }); }
@@ -1333,14 +1359,7 @@ server.on('error', (e) => {
 });
 server.listen(state.settings.port, '127.0.0.1', () => {
   console.log(`클로드 작업장 문 열림: http://127.0.0.1:${state.settings.port}`);
-  // 클로드 직원이 0명인 부서만, 게임 폴더가 있을 때 기본 팀을 만들어요. 폴더가 없어도 문은 그대로 열립니다.
-  ensureDeptClaude({ onlyEmpty: true }).then((r) => {
-    if (r && r.made && r.made.length) console.log('없는 부서에 클로드 직원을 만들었어요: ' + r.made.join(', '));
-    if (r && r.errors && r.errors.length) console.error('[부서 클로드] ' + r.errors.join(' / '));
-  }).catch((e) => {
-    if (!e || e.code === 'NO_REPO') return;
-    console.error('[부서 클로드] ' + (e && e.message || e));
-  });
+  // 켤 때 직원 자리를 만들지 않아요. 부서 화면의 「만들기」나 직접 고른 폴더로만 만들어요.
   detectClaude().then(() => {
     console.log(claude.ok ? `클로드 코드 찾음 (${claude.version})` : '클로드 코드를 못 찾았어요. 설치 안내를 보세요.');
     changed();
