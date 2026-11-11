@@ -5,7 +5,8 @@ http.createServer((q, s) => { let d = ''; q.on('data', (c) => (d += c)); q.on('e
   if (q.url === '/hook' && q.method === 'POST') {
     fs.appendFileSync('hook.log', (q.headers.authorization === 'Bearer hook-key' ? 'AUTH_OK ' : 'AUTH_BAD ') + d + '\n');
     const b = JSON.parse(d); const id = (b.command.match(/\[relay:([0-9a-f]+)\]/) || [])[1];
-    setTimeout(() => comments.push({ id: ++n, body: `[그록] [relay:${id}]\n그록 봇이에요. 망토는 진홍색이 좋아요!` }), 2000);
+    const dept = b.dept ? ' [부서:' + String(b.dept).replace(/[\[\]]/g, '') + ']' : '';
+    setTimeout(() => comments.push({ id: ++n, body: `[그록]${dept} [relay:${id}]\n그록 봇이에요. 망토는 진홍색이 좋아요!` }), 2000);
     s.end('{"ok":true}'); return;
   }
   if (q.url === '/add' && q.method === 'POST') { comments.push({ id: ++n, body: d }); return s.end('ok'); }

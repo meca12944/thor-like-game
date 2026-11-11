@@ -100,7 +100,50 @@ const BASIC_TEAM = [
   ['모션', '그림·움직임 (모션 교과서)'],
   ['AI협력팀', '다른 AI(그록 등)와 협력: 부탁 문서 쓰기, 그록 폴더 확인, 받은 것 검사해서 맞는 직원에게 넘기기', true],
 ];
-for (const e of state.employees) { e.status = e.queue && e.queue.length ? 'idle' : 'idle'; e.now = ''; e.queue = e.queue || []; }
+// 게임·AI 말고 다른 부서의 클로드 기본 팀. 각 부서 맨 앞 사람이 팀장.
+// 사장님 11-11 「팀원에 클로드도 다 배치」. 폴더는 게임 직원과 같은 작업 공간에 만들어요.
+const DEPT_CLAUDE_EXTRA = [
+  { dept: 'zero', name: '제로폰팀장', role: '사이트와 정책을 나눠 맡고, 결과를 모아 보고', lead: true },
+  { dept: 'zero', name: '제로폰사이트', role: '홈페이지 화면과 안내 글' },
+  { dept: 'zero', name: '제로폰정책', role: '요금과 개통 규칙 정리' },
+  { dept: 'promo', name: '홍보팀장', role: '블로그와 광고를 나눠 맡고, 결과를 모아 보고', lead: true },
+  { dept: 'promo', name: '블로그글', role: '블로그에 올릴 글' },
+  { dept: 'promo', name: '광고문안', role: '광고에 쓸 짧은 글과 시안' },
+  { dept: 'admin', name: '경영팀장', role: '고객 안내와 서류 정리를 나눠 맡고, 결과를 모아 보고', lead: true },
+  { dept: 'admin', name: '고객안내', role: '고객에게 보낼 안내 글' },
+  { dept: 'admin', name: '서류정리', role: '할 일과 서류 정리' },
+  { dept: 'stco', name: 'STCO팀장', role: '쇼핑몰과 검색 노출을 나눠 맡고, 결과를 모아 보고', lead: true },
+  { dept: 'stco', name: '쇼핑몰글', role: '상품 글과 쇼핑몰 화면' },
+  { dept: 'stco', name: '검색노출', role: '검색에 잘 나오게 제목과 글 정리' },
+];
+// 직원 부서. 예전 저장 파일에 dept 가 없으면 게임 필멸자, AI협력팀만 AI 협력·연결.
+function empDeptId(e) {
+  if (e && BOT_TARGETS.depts.some((d) => d.id === e.dept)) return e.dept;
+  if (e && (e.partner || e.name === 'AI협력팀')) return 'ai';
+  return 'game';
+}
+function empDeptName(e) {
+  const id = empDeptId(e);
+  const d = BOT_TARGETS.depts.find((x) => x.id === id);
+  return d ? d.name : '게임 필멸자';
+}
+function claudeRoster() {
+  const rows = BASIC_TEAM.map(([name, role, partner]) => {
+    const dept = partner || name === 'AI협력팀' ? 'ai' : 'game';
+    const lead = (dept === 'game' && name === '팀장') || (dept === 'ai' && !!partner);
+    return { name, role, dept, partner: !!partner, lead };
+  });
+  return rows.concat(DEPT_CLAUDE_EXTRA.map((x) => ({ partner: false, lead: false, ...x })));
+}
+let deptTouched = false;
+for (const e of state.employees) {
+  const id = empDeptId(e);
+  if (e.dept !== id) { e.dept = id; deptTouched = true; }
+  if (e.lead == null && ((e.dept === 'game' && e.name === '팀장') || (e.dept === 'ai' && (e.name === 'AI협력팀' || e.partner)))) {
+    e.lead = true; deptTouched = true;
+  }
+  e.status = e.queue && e.queue.length ? 'idle' : 'idle'; e.now = ''; e.queue = e.queue || [];
+}
 
 let saveTimer = null;
 function save() {
@@ -111,6 +154,7 @@ function save() {
     fs.renameSync(tmp, STATE_FILE);
   }, 300);
 }
+if (deptTouched) save(); // 예전 저장에 부서를 채워 넣음 (없으면 게임 필멸자)
 const uid = () => crypto.randomBytes(6).toString('hex');
 const now = () => new Date().toISOString();
 
@@ -331,8 +375,9 @@ function officePrompt(emp) {
 - **업무 공유판**: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md — 그록·다른 AI와 새 대화를 시작할 때 이 주소를 먼저 읽게 한다 (최신 결정·진행이 저절로 채워져 있음).
 - 그 밖의 AI(제미나이·챗GPT 등)와 일할 때도 같은 방식: 부탁 글은 \`\`\` 블록으로, 받은 결과는 검사해서 보고.
 ` : '';
-  return `# 클로드 작업장 (알들 컴퍼니 「게임 필멸자」 부서, 사장님 PC의 업무 화면)
-너는 「클로드 작업장」의 직원 **${emp.name}** 이고, 맡은 일은 **${emp.role}** 이다.
+  const deptName = empDeptName(emp);
+  return `# 클로드 작업장 (알들 컴퍼니 「${deptName}」 부서, 사장님 PC의 업무 화면)
+너는 「클로드 작업장」의 직원 **${emp.name}** 이고, 맡은 일은 **${emp.role}** 이다. 소속 부서는 **${deptName}** 이다.
 같은 회사 직원:
 ${others}
 
@@ -539,6 +584,76 @@ function makeFolder(name, cb) {
   });
 }
 
+// 부서에 클로드 직원이 없으면 기본 팀을 만들어요. 게임 폴더가 없으면 조용히 넘어가요 (켜질 때 절대 멈추지 않음).
+function workspaceReady() {
+  try {
+    const repo = state.settings.gameRepo;
+    return !!(repo && fs.existsSync(path.join(repo, '.git')));
+  } catch (e) { return false; }
+}
+function addClaudeMember(spec) {
+  return new Promise((resolve) => {
+    try {
+      if (state.employees.some((x) => x.name === spec.name)) return resolve({ name: spec.name, skipped: true });
+      makeFolder(spec.name, (err, dir) => {
+        if (err) return resolve({ name: spec.name, err });
+        try {
+          state.employees.push({
+            id: uid(), name: spec.name, role: spec.role, dept: spec.dept, partner: !!spec.partner, lead: !!spec.lead,
+            folder: dir, mode: '', model: '', sessionId: crypto.randomUUID(), started: false, queue: [], status: 'idle', now: '',
+          });
+          changed();
+          resolve({ name: spec.name, made: true });
+        } catch (e) { resolve({ name: spec.name, err: e }); }
+      });
+    } catch (e) { resolve({ name: spec.name, err: e }); }
+  });
+}
+let teamChain = Promise.resolve();
+function ensureDeptClaude(opt) {
+  const job = teamChain.then(() => ensureDeptClaudeNow(opt));
+  teamChain = job.then(() => {}, () => {});
+  return job;
+}
+async function ensureDeptClaudeNow(opt) {
+  if (!workspaceReady()) {
+    const err = new Error('설정에서 「게임 원본 폴더」를 먼저 정해 주세요.');
+    err.code = 'NO_REPO';
+    throw err;
+  }
+  const onlyEmpty = !!(opt && opt.onlyEmpty);
+  const empty = new Set();
+  if (onlyEmpty) {
+    for (const d of BOT_TARGETS.depts) {
+      if (!state.employees.some((e) => empDeptId(e) === d.id)) empty.add(d.id);
+    }
+  }
+  const made = [];
+  const errors = [];
+  for (const spec of claudeRoster()) {
+    if (onlyEmpty && !empty.has(spec.dept)) continue;
+    if (state.employees.some((e) => e.name === spec.name)) continue;
+    const r = await addClaudeMember(spec);
+    if (r.err) errors.push(r.name + ': ' + (r.err.message || r.err));
+    else if (r.made) made.push(r.name);
+  }
+  return { made, errors };
+}
+// 부서로 보낸 일을 그 부서 클로드 팀장 줄에도 넣어요. 그록에게 보내는 것은 그대로 둡니다.
+function claudeLeadFor(target) {
+  const d = grokDeptOf(target);
+  if (!d) return null;
+  const list = state.employees.filter((e) => empDeptId(e) === d.id);
+  return list.find((e) => e.lead) || list.find((e) => /팀장$/.test(String(e.name || ''))) || null;
+}
+function assignDeptToClaude(target, command) {
+  const lead = claudeLeadFor(target);
+  if (!lead) return '';
+  const text = `[${target} 부서 일]\n${String(command || '').trim()}\n너는 이 부서 클로드 팀장이다. 할 일을 나눠 맡고, 끝나면 쉬운 말로 짧게 보고해.`;
+  order(lead.id, text, '사장님');
+  return lead.name;
+}
+
 // ───────── 대화방 (사장님 · 그록 · AI협력팀 실시간) ─────────
 const XAI = (process.env.XAI_BASE_URL || 'https://api.x.ai').replace(/\/$/, '');
 const GROK_SYSTEM = '너는 「필멸자」(PC용 2D 액션 게임)를 만드는 팀과 함께 일하는 그록이다. 이 대화방에는 사장님과 클로드 직원(AI협력팀 등)이 함께 있다. 말머리 [사장님] / [클로드 이름] 으로 누가 말하는지 구분해서 그 사람에게 답한다. 쉬운 한국어로 짧고 분명하게 말한다. 그림·효과 규칙: 빛·불·검기 같은 효과는 그림에 넣지 않는다(게임 코드로 그림).';
@@ -573,10 +688,21 @@ function grokWay() {
   return 'paste';
 }
 const ISSUE_URL = () => `https://github.com/meca12944/thor-like-game/issues/${state.settings.coopIssue}`;
+// 그록 답 첫 줄 [그록] [부서:이름] [relay:번호] 는 본문에서 빼요. 번호 찾기는 원문으로 해요. (#207 에서 맞춘 형식)
+function stripRelayHead(text) {
+  let s = String(text || '').replace(/^\s*\[(?:그록|클로드)\]\s*/, '');
+  const lines = s.split('\n');
+  if (lines.length) lines[0] = lines[0].replace(/\[부서:[^\]]*\]\s*/g, '').replace(/\[relay:[0-9a-f]+\]\s*/ig, '').trim();
+  return lines.join('\n').replace(/\[relay:[0-9a-f]+\]\s*/i, '').trim();
+}
 async function sendToBot(item) {
   const cfg = botConfig(); if (!cfg) return;
-  const command = `${item.relay.paste}\n\n— 답은 깃허브 「AI협력 대화방」 ${ISSUE_URL()} 에 댓글로 달아 주세요. 첫 줄에 [relay:${item.id}] 를 그대로 적어 주세요.`;
-  const body = JSON.stringify({ target: state.settings.botTarget || 'AI 협력', command, source: '클로드 회사', sentAt: new Date().toISOString(), relayId: item.id, replyTo: ISSUE_URL() });
+  const emp = findEmp(item.emp);
+  const dept = emp ? empDeptName(emp) : '';
+  const head = dept ? `[그록] [부서:${dept}] [relay:${item.id}]` : `[그록] [relay:${item.id}]`;
+  const command = `${item.relay.paste}\n\n— 답은 깃허브 「AI협력 대화방」 ${ISSUE_URL()} 에 댓글로 달아 주세요. 첫 줄은 ${head} 로 적어 주세요.`;
+  // dept = 부서 이름. 클로드가 #207 에서 넣기로 한 칸.
+  const body = JSON.stringify({ target: state.settings.botTarget || 'AI 협력', command, source: '클로드 회사', sentAt: new Date().toISOString(), relayId: item.id, replyTo: ISSUE_URL(), dept });
   try {
     const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -622,7 +748,7 @@ async function pollIssue() {
       coopChat = list.map((c) => {
         const body = String(c.body || '');
         const who = /^\s*\[그록\]/.test(body) ? 'grok' : /claude-workshop|^\s*\[클로드\]/.test(body) ? 'claude' : 'boss';
-        const text = body.replace(/<!--[\s\S]*?-->/g, '').replace(/\n---\n_Generated by[\s\S]*$/, '').replace(/^\s*\[(그록|클로드)\]\s*/, '').trim();
+        const text = stripRelayHead(body.replace(/<!--[\s\S]*?-->/g, '').replace(/\n---\n_Generated by[\s\S]*$/, ''));
         return { id: c.id, who, time: c.created_at, text: text.slice(0, 6000), url: c.html_url };
       });
       if (state.coopLastId === undefined) { state.coopLastId = list.length ? list[list.length - 1].id : 0; save(); }
@@ -638,7 +764,7 @@ async function pollIssue() {
 async function onBotComment(body) {
   if (/<!-- claude-workshop -->/.test(body)) return;
   const m = body.match(/\[relay:([0-9a-f]{6,})\]/i);
-  let text = body.replace(/^\s*\[그록\]\s*/, '').replace(/\[relay:[0-9a-f]+\]\s*/i, '').trim();
+  let text = stripRelayHead(body);
   const files = [];
   for (const mm of text.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)|<img[^>]+src="(https?:[^"]+)"|(https:\/\/github\.com\/user-attachments\/assets\/[\w-]+)/g)) {
     const fp = await fetchFile(mm[1] || mm[2] || mm[3]); if (fp) files.push(fp);
@@ -782,7 +908,7 @@ function publicState() {
     rules: state.rules,
     rulesAsk: state.rules.filter(ruleIsDanger), // 목록에 있어도 매번 다시 묻는 규칙 (⚙ 설정에 ⚠ 표시)
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
-    employees: state.employees.map((e) => ({ id: e.id, name: e.name, role: e.role, partner: !!e.partner, folder: e.folder, mode: e.mode, model: e.model, status: e.status, now: e.now, queue: e.queue.length, task: e.task ? e.task.text : '', taskFrom: e.task ? e.task.from : '', startedAt: e.startedAt, hasSession: !!e.started })),
+    employees: state.employees.map((e) => ({ id: e.id, name: e.name, role: e.role, dept: empDeptId(e), lead: !!e.lead, partner: !!e.partner, folder: e.folder, mode: e.mode, model: e.model, status: e.status, now: e.now, queue: e.queue.length, wait: (e.queue && e.queue[0]) ? String(e.queue[0].text).replace(/\s+/g, ' ').slice(0, 160) : '', task: e.task ? e.task.text : '', taskFrom: e.task ? e.task.from : '', startedAt: e.startedAt, hasSession: !!e.started })),
     reports: state.reports.slice(0, 120).map((r) => ({ ...r, files: r.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, danger: p.danger || '', label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
   };
@@ -909,8 +1035,13 @@ const server = http.createServer(async (req, res) => {
       if (!command) return json(res, { ok: false, error: '할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해' });
       if (!target) return json(res, { ok: false, error: '보낼 곳을 골라 주세요.' });
       if (!companyTargetOk(target)) return json(res, { ok: false, error: '목록에 없는 이름이에요. 부서나 팀원을 골라 주세요.' });
+      let claudeLead = '';
+      try { claudeLead = assignDeptToClaude(target, command); } catch (e) { claudeLead = ''; }
       const cfg = botConfig();
-      if (!cfg) return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' });
+      if (!cfg) {
+        const extra = claudeLead ? ' 클로드 팀장 ' + claudeLead + '에게는 일을 넣어 두었어요.' : '';
+        return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' + extra, claudeLead });
+      }
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
       const reportId = grokReportIntake(target, command);
       try {
@@ -920,7 +1051,7 @@ const server = http.createServer(async (req, res) => {
       grokReportSent(reportId, h.ok);
       state.botHistory.unshift(h); if (state.botHistory.length > 100) state.botHistory.length = 100;
       changed();
-      return json(res, { ok: h.ok, error: h.ok ? '' : '못 보냈어요 (' + h.result + ')' });
+      return json(res, { ok: h.ok, error: h.ok ? '' : '못 보냈어요 (' + h.result + ')', claudeLead });
     }
     if (p === '/api/room/relay') {
       const e = findEmp(b.emp);
@@ -971,7 +1102,10 @@ const server = http.createServer(async (req, res) => {
       if (!e && state.employees.some((x) => x.name === name)) return json(res, { ok: false, error: '같은 이름의 직원이 있어요.' });
       const apply = (folder) => {
         if (!e) { e = { id: uid(), sessionId: crypto.randomUUID(), started: false, queue: [], status: 'idle', now: '' }; state.employees.push(e); }
-        Object.assign(e, { name, role: String(b.role || '').trim() || '무엇이든', folder, mode: b.mode || '', model: String(b.model || '').trim(), partner: !!b.partner });
+        let dept = (typeof b.dept === 'string' && BOT_TARGETS.depts.some((d) => d.id === b.dept)) ? b.dept : (e.dept || '');
+        if (!BOT_TARGETS.depts.some((d) => d.id === dept)) dept = b.partner ? 'ai' : 'game';
+        Object.assign(e, { name, role: String(b.role || '').trim() || '무엇이든', folder, mode: b.mode || '', model: String(b.model || '').trim(), partner: !!b.partner, dept });
+        if (e.lead == null && ((dept === 'game' && e.name === '팀장') || (dept === 'ai' && (e.name === 'AI협력팀' || e.partner)))) e.lead = true;
         changed(); json(res, { ok: true, id: e.id });
       };
       if (b.autoFolder && !b.folder) return makeFolder(name, (err, dir) => (err ? json(res, { ok: false, error: err.message }) : apply(dir)));
@@ -987,15 +1121,12 @@ const server = http.createServer(async (req, res) => {
       return json(res, { ok: true });
     }
     if (p === '/api/team') {
-      const made = [];
-      for (const [name, role, partner] of BASIC_TEAM) {
-        if (state.employees.some((x) => x.name === name)) continue;
-        const r = await new Promise((ok) => makeFolder(name, (err, dir) => ok(err ? { err } : { dir })));
-        if (r.err) return json(res, { ok: false, error: r.err.message, made });
-        state.employees.push({ id: uid(), name, role, partner: !!partner, folder: r.dir, mode: '', model: '', sessionId: crypto.randomUUID(), started: false, queue: [], status: 'idle', now: '' });
-        made.push(name); changed();
-      }
-      return json(res, { ok: true, made });
+      // 한 번에: 게임 기본 팀 + 직원이 없는 다른 부서의 클로드 팀. 있는 이름은 건너뛰어요.
+      try {
+        const r = await ensureDeptClaude({ onlyEmpty: false });
+        if (r.errors.length) return json(res, { ok: false, error: r.errors[0], made: r.made });
+        return json(res, { ok: true, made: r.made });
+      } catch (e) { return json(res, { ok: false, error: e.message || '팀을 만들지 못했어요', made: [] }); }
     }
     if (p === '/api/employee/delete') { const e = findEmp(b.id); if (e) { stopEmp(e, true); state.employees = state.employees.filter((x) => x !== e); changed(); } return json(res, { ok: !!e }); }
     if (p === '/api/settings') {
@@ -1040,6 +1171,14 @@ server.on('error', (e) => {
 });
 server.listen(state.settings.port, '127.0.0.1', () => {
   console.log(`클로드 작업장 문 열림: http://127.0.0.1:${state.settings.port}`);
+  // 클로드 직원이 0명인 부서만, 게임 폴더가 있을 때 기본 팀을 만들어요. 폴더가 없어도 문은 그대로 열립니다.
+  ensureDeptClaude({ onlyEmpty: true }).then((r) => {
+    if (r && r.made && r.made.length) console.log('없는 부서에 클로드 직원을 만들었어요: ' + r.made.join(', '));
+    if (r && r.errors && r.errors.length) console.error('[부서 클로드] ' + r.errors.join(' / '));
+  }).catch((e) => {
+    if (!e || e.code === 'NO_REPO') return;
+    console.error('[부서 클로드] ' + (e && e.message || e));
+  });
   detectClaude().then(() => {
     console.log(claude.ok ? `클로드 코드 찾음 (${claude.version})` : '클로드 코드를 못 찾았어요. 설치 안내를 보세요.');
     changed();
@@ -1142,17 +1281,19 @@ function grokClaudeCard(r) {
   const plain = String(r.text || '').replace(/```[\s\S]*?```/g, '\n');
   const lines = given.length ? given : grokCleanLines(plain.split('\n'));
   const found = plain.split('\n').filter((line) => !/@전달/.test(line)).join('\n').match(/https?:\/\/[^\s"'<>)]+/);
+  const emp = state.employees.find((e) => (r.emp && e.id === r.emp) || (r.empName && e.name === r.empName));
+  const deptName = emp ? empDeptName(emp) : '게임 필멸자';
   const card = {
     id: String(r.id || '').slice(0, 80),
     time: grokTimeText(r.time),
-    target: '게임 필멸자',
+    target: deptName,
     command: String(r.task || r.command || '').split('\n')[0].replace(/\s+/g, ' ').trim().slice(0, 500),
     lead: String(r.lead || r.empName || '클로드').slice(0, 80),
     status: grokClaudeStatus(r),
     summary: lines.length ? lines : ['보고가 도착했어요.'],
     result: grokSafeUrl(r.result || r.where || (found ? found[0] : '')),
     source: '클로드',
-    dept: '게임 필멸자',
+    dept: deptName,
   };
   if (r.needBoss === true) card.needBoss = true;
   return card.id ? card : null;
