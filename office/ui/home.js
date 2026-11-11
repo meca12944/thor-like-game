@@ -12,6 +12,9 @@ let homeTopBusy = false;
 let homeTeamBusy = false;
 let homeDeptNote = null;
 let homeDeptFolder = '';
+let homeDeptDraft = '';
+let homeComposing = false;
+let homePaintWait = false;
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -62,11 +65,30 @@ function homeTopPaintNote(root) {
   note.className = 'home-order-note ' + (homeTopNote.ok ? 'ok' : 'bad');
   note.textContent = homeTopNote.text;
 }
+function homeTexting(node) {
+  if (!node || !node.tagName) return false;
+  const tag = node.tagName;
+  if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+  if (tag === 'INPUT') {
+    const t = String(node.type || 'text').toLowerCase();
+    return t === 'text' || t === 'search' || t === 'password' || t === '';
+  }
+  return false;
+}
+function homeFieldBusy(el) {
+  if (homeComposing) return true;
+  const ae = document.activeElement;
+  return !!(el && ae && el.contains(ae) && homeTexting(ae));
+}
 function homeSnap(el) {
   const cmd = el.querySelector('#homeTopCmd');
   const dept = el.querySelector('#homeTopDept');
+  const task = el.querySelector('#homeCmd');
+  const folder = el.querySelector('#homeDeptFolder');
   if (cmd) homeTopDraft = cmd.value;
   if (dept && dept.value) homeTopSave(dept.value);
+  if (task) homeDeptDraft = task.value;
+  if (folder) homeDeptFolder = folder.value;
   const ae = document.activeElement;
   const focusId = ae && el.contains(ae) ? ae.id : '';
   const caret = focusId === 'homeTopCmd' && cmd ? cmd.selectionStart : null;
@@ -194,6 +216,13 @@ async function homeTopSend(el, A) {
   if (typeof renderReports === 'function' && slot) renderReports(slot);
 }
 function homePaint(el, A) {
+  // 글 쓰는 중에는 화면을 통째로 다시 그리지 않아요. 다시 그리면 한글이 조합되다 사라져요.
+  if (homeFieldBusy(el)) {
+    homeSnap(el);
+    homePaintWait = true;
+    return;
+  }
+  homePaintWait = false;
   const snap = homeSnap(el);
   const pack = homeDepts(A);
   const esc = A.esc;
@@ -274,7 +303,7 @@ function homePaintDept(el, A, pack, esc) {
       <form class="card dept-card dept-send" id="homeSend">
         <b>✍️ 이 부서에 일 시키기</b>
         <div class="muted small">${hint}<br>예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
-        <textarea id="homeCmd" class="home-text" rows="4" placeholder="할 일을 적어 주세요"></textarea>
+        <textarea id="homeCmd" class="home-text" rows="4" placeholder="할 일을 적어 주세요">${esc(homeDeptDraft)}</textarea>
         <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
         <button class="btn" type="submit">보내기</button>
       </form>
@@ -296,8 +325,12 @@ function homePaintDept(el, A, pack, esc) {
       text = d.name + '에 보냈어요.' + (r.claudeLead ? ' 클로드 ' + r.claudeLead + '에게도 넣었어요.' : '');
       A.toast(text);
       reportAt = 0;
+      homeDeptDraft = '';
     }
     homeDeptNote = { id: d.id, ok, text };
+    homeComposing = false;
+    const typing = document.activeElement;
+    if (typing && homeTexting(typing)) typing.blur();
     if (homeMode === 'dept' && homeDeptId === d.id) homePaint(el, A);
   });
 }
@@ -344,9 +377,22 @@ function homeBind(el, A) {
     const t = ev.target;
     if (!t || !el.contains(t)) return;
     if (t.id === 'homeDeptFolder') { homeDeptFolder = t.value; return; }
+    if (t.id === 'homeCmd') { homeDeptDraft = t.value; return; }
     if (t.id !== 'homeTopCmd') return;
     homeTopDraft = t.value;
     if (homeTopNote) { homeTopNote = null; homeTopPaintNote(el); }
+  });
+  el.addEventListener('compositionstart', () => { homeComposing = true; });
+  el.addEventListener('compositionend', () => {
+    homeComposing = false;
+    homeSnap(el);
+  });
+  el.addEventListener('focusout', () => {
+    if (!homePaintWait) return;
+    setTimeout(() => {
+      if (!homePaintWait || homeFieldBusy(el)) return;
+      homePaint(el, A);
+    }, 0);
   });
   el.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-home]');
