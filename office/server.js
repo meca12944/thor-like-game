@@ -353,6 +353,7 @@ function startRun(emp, task, isRetry) {
   env[pk] = path.join(ROOT, 'tools', 'bin') + path.delimiter + (env[pk] || '');
   delete env.XAI_API_KEY;
   if (emp.partner && !grokPaste()) env.XAI_API_KEY = state.settings.xaiKey; // 그록 키는 AI협력팀에게만 (키 방식일 때)
+  if (state.settings.pixellabKey) env.PIXELLAB_API_KEY = state.settings.pixellabKey; // 🎨 PixelLab (출력·커밋 금지는 CLAUDE.md 규칙)
   if (emp.partner) { env.BASH_DEFAULT_TIMEOUT_MS = env.BASH_DEFAULT_TIMEOUT_MS || '600000'; env.BASH_MAX_TIMEOUT_MS = env.BASH_MAX_TIMEOUT_MS || '1800000'; }
   const child = spawn(quoteIf(claude.path), args.map(quoteIf), { cwd: emp.folder, shell: claude.useShell, windowsHide: true, env });
   procs.set(emp.id, child);
@@ -718,10 +719,10 @@ pollSoon(5000);
 function publicState() {
   let grokSpent = 0;
   try { grokSpent = JSON.parse(fs.readFileSync(path.join(DATA, 'grok', 'spend.json'), 'utf8'))[new Date().toISOString().slice(0, 10)] || 0; } catch (e) { /* */ }
-  const { xaiKey, botKey, ghToken, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
+  const { xaiKey, botKey, ghToken, pixellabKey, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
   const bc = botConfig();
   return {
-    settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, botFrom: bc ? bc.from : '', grokWay: grokWay(), coop: coopStatus, grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
+    settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, hasPixellab: !!pixellabKey, botFrom: bc ? bc.from : '', grokWay: grokWay(), coop: coopStatus, grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
     botTargets: BOT_TARGETS,
     botHistory: state.botHistory.slice(0, 50),
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
@@ -804,6 +805,29 @@ const server = http.createServer(async (req, res) => {
       if (b.mode === 'meeting') order(team.id, `[대화방 회의] 주제: ${text}\n그록과 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 최대 ${Math.max(2, Math.min(12, Number(b.turns) || 6))}번 주고받으며 회의해. 매번 그록의 답을 읽고, 맞는 건 받아들이고 틀린 건 근거를 들어 반박해. 사장님도 이 대화를 실시간으로 본다. 끝나면 결론·할 일을 쉬운 말로 짧게 보고해.`, '사장님', 0, 'ask', null, { room: true });
       else order(team.id, `[대화방] 사장님: ${text}\n(사장님·그록·너가 함께 있는 대화방이다. 그록 의견이 필요하면 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 물어라. 답은 짧게.)`, '사장님', 0, 'ask', null, { room: true });
       return json(res, { ok: true });
+    }
+    if (p === '/api/conn/check') {
+      const repo = state.settings.gameRepo;
+      const run = (cmd, args, opt) => new Promise((ok) => execFile(cmd, args, { windowsHide: true, timeout: 120000, ...opt }, (err, out, errOut) => ok({ err, out: String(out || ''), errOut: String(errOut || '') })));
+      if (b.id === 'github') {
+        if (!repo || !fs.existsSync(path.join(repo, '.git'))) return json(res, { ok: false, error: '먼저 🎮 게임 폴더를 정해 주세요.' });
+        // 실제로 올리지 않고(--dry-run) 올릴 수 있는지만 봄. 로그인이 안 돼 있으면 깃허브 로그인 창이 떠요.
+        const r = await run('git', ['-C', repo, 'push', '--dry-run', 'origin', 'HEAD:refs/heads/claude/login-check']);
+        const name = (await run('git', ['-C', repo, 'config', 'user.name'])).out.trim();
+        const email = (await run('git', ['-C', repo, 'config', 'user.email'])).out.trim();
+        const okPush = !r.err;
+        const msg = okPush ? '올릴 수 있어요.' : /denied|403|Authentication|could not read|terminal prompts/i.test(r.errOut) ? '깃허브 로그인이 필요해요. 뜬 창에서 로그인한 뒤 다시 눌러 주세요.' : '확인 못 했어요: ' + r.errOut.trim().split('\n').slice(-2).join(' ');
+        state.settings.ghPush = { ok: okPush, at: now(), msg, name, email };
+        changed(); return json(res, { ok: true, result: state.settings.ghPush });
+      }
+      if (b.id === 'mcp') {
+        if (!claude.ok) return json(res, { ok: false, error: '먼저 🧠 클로드 코드가 켜져 있어야 해요.' });
+        const r = await run(claude.path, ['mcp', 'list'], { cwd: repo && fs.existsSync(repo) ? repo : ROOT, shell: claude.useShell, timeout: 60000 });
+        const text = (r.out + r.errOut).trim() || '(답이 없어요)';
+        state.settings.mcpList = { at: now(), text: text.slice(0, 3000), count: (text.match(/^\S.*?:/gm) || []).filter((l) => !/No MCP|Checking/i.test(l)).length };
+        changed(); return json(res, { ok: true, result: state.settings.mcpList });
+      }
+      return json(res, { ok: false, error: '모르는 연결이에요.' });
     }
     if (p === '/api/bot/command') {
       // 「🏢 회사 일 시키기」: 바탕화면 명령창과 같은 곳으로 보냄.
@@ -911,6 +935,14 @@ const server = http.createServer(async (req, res) => {
       if (typeof b.ghToken === 'string' && b.ghToken.trim()) state.settings.ghToken = b.ghToken.trim();
       if (b.botKeyClear) { state.settings.botKey = ''; state.settings.botUrl = ''; }
       if (b.ghTokenClear) state.settings.ghToken = '';
+      if (typeof b.pixellabKey === 'string' && b.pixellabKey.trim()) state.settings.pixellabKey = b.pixellabKey.trim();
+      if (b.pixellabClear) state.settings.pixellabKey = '';
+      // 🐙 깃허브: 직원이 커밋할 때 쓸 이름·이메일 (게임 폴더 설정에 적음)
+      for (const k of ['gitName', 'gitEmail']) {
+        if (typeof b[k] === 'string' && b[k].trim() && state.settings.gameRepo) {
+          execFile('git', ['-C', state.settings.gameRepo, 'config', k === 'gitName' ? 'user.name' : 'user.email', b[k].trim()], { windowsHide: true }, () => {});
+        }
+      }
       pollSoon();
       if (b.maxHops) state.settings.maxHops = Math.max(1, Math.min(30, Number(b.maxHops) || 6));
       if (typeof b.claudeCmd === 'string') await detectClaude();

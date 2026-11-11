@@ -154,7 +154,7 @@ details.more-set { margin-top: 10px; } details.more-set summary { cursor: pointe
 .conn-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .conn-head .ico { font-size: 40px; }
 .qa { background: var(--bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
-.qa > b { display: block; margin-bottom: 2px; }
+.qa .qh { font-weight: 700; margin-bottom: 2px; }
 .guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 6px 0 12px; }
 .guide .g { background: var(--bg); border-radius: 14px; padding: 14px; text-align: center; }
 .guide .g .big { font-size: 40px; }
