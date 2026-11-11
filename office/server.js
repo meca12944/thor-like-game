@@ -792,6 +792,7 @@ const server = http.createServer(async (req, res) => {
       if (!f) { res.writeHead(404); return res.end('없음'); }
       return sendFile(req, res, f);
     }
+    if (p === '/api/company/reports') return await grokReportRoute(req, res); // 그록: 보고 창 (맨 아래)
     if (req.method !== 'POST') { res.writeHead(404); return res.end('없음'); }
     const b = await readBody(req);
     if (p === '/api/room/send') {
@@ -831,7 +832,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (p === '/api/bot/command') {
       // 「🏢 회사 일 시키기」: 바탕화면 명령창과 같은 곳으로 보냄.
-      // 몸: {target, command, source: "알들 컴퍼니 명령창", sentAt}. 접속 정보는 🔌 연결 → 🤖 그록 봇에 저장된 것을 쓴다.
+      // 몸: {target, command, source: "알들 컴퍼니 명령창", sentAt, reportId}. 접속 정보는 🔌 연결 → 🤖 그록 봇에 저장된 것을 쓴다.
       const target = String(b.target || '').trim(), command = String(b.command || '').trim();
       if (!command) return json(res, { ok: false, error: '할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해' });
       if (!target) return json(res, { ok: false, error: '보낼 곳을 골라 주세요.' });
@@ -839,10 +840,12 @@ const server = http.createServer(async (req, res) => {
       const cfg = botConfig();
       if (!cfg) return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' });
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
+      const reportId = grokReportIntake(target, command);
       try {
-        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString() }) });
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
         h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
       } catch (e) { h.result = '실패: ' + e.message; }
+      grokReportSent(reportId, h.ok);
       state.botHistory.unshift(h); if (state.botHistory.length > 100) state.botHistory.length = 100;
       changed();
       return json(res, { ok: h.ok, error: h.ok ? '' : '못 보냈어요 (' + h.result + ')' });
@@ -971,3 +974,223 @@ server.listen(state.settings.port, '127.0.0.1', () => {
     for (const e of state.employees) next(e); // 꺼지기 전에 남아 있던 일 이어서
   });
 });
+
+// ── 그록: 보고 창 ──
+// 사장님이 「회사 일 시키기」로 보낸 일은 접수 → 진행 중 → 완료(또는 문제 있음)로 이어져요.
+// 이 덩어리만 고치면 돼요. 위 요청 처리에는 한 줄 훅만 있어요.
+//   GET /api/company/reports → grokReportRoute
+//   /api/bot/command 안 → grokReportIntake, grokReportSent
+// 클로드 직원 보고(state.reports)는 읽기만 하고, 상태나 글을 바꾸지 않아요.
+// 공개 파일에는 비밀·열쇠·개인정보를 넣지 않아요.
+const GROK_REPORT_STATUSES = new Set(['접수', '진행 중', '완료', '문제 있음']);
+let grokReportCache = { at: 0, ttl: 0, url: '', data: null };
+
+function grokReportsUrl() {
+  return process.env.OFFICE_REPORTS_URL || 'https://raw.githubusercontent.com/meca12944/thor-like-game/main/office/data-public/reports.json';
+}
+function grokReportFile() { return path.join(DATA, 'company-reports.json'); }
+function grokReadArray(file) {
+  try {
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return Array.isArray(data) ? data : [];
+  } catch (e) { return []; }
+}
+function grokWriteLocal(list) {
+  fs.mkdirSync(DATA, { recursive: true });
+  const file = grokReportFile();
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(list, null, 1));
+  fs.renameSync(tmp, file);
+}
+function grokKst(d) {
+  const base = d instanceof Date ? d : new Date(d);
+  const ms = base.getTime();
+  if (Number.isNaN(ms)) return '';
+  const t = new Date(ms + 9 * 60 * 60 * 1000);
+  const p = (n) => String(n).padStart(2, '0');
+  return t.getUTCFullYear() + '-' + p(t.getUTCMonth() + 1) + '-' + p(t.getUTCDate()) + ' ' + p(t.getUTCHours()) + ':' + p(t.getUTCMinutes());
+}
+function grokTimeText(time) {
+  const s = String(time || '').trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) return s.slice(0, 16);
+  return grokKst(s) || grokKst(new Date());
+}
+function grokReportMs(time) {
+  const s = String(time || '').trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
+    let t = s.slice(0, 16).replace(' ', 'T') + ':00+09:00';
+    const ms = Date.parse(t);
+    if (!Number.isNaN(ms)) return ms;
+  }
+  const ms = Date.parse(s);
+  return Number.isNaN(ms) ? 0 : ms;
+}
+function grokSafeUrl(u) {
+  const s = String(u || '').trim();
+  if (!/^https?:\/\//i.test(s)) return '';
+  if (/[\s"'<>]/.test(s)) return '';
+  return s;
+}
+function grokSafeLine(s) {
+  const t = String(s || '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  if (/[A-Za-z]:\\/.test(t) || /\/Users\/|\/home\//.test(t)) return '';
+  if (/bearer\s|api[_-]?key|webhook|비밀번호|암호|시크릿|secret|token/i.test(t)) return '';
+  return t.slice(0, 180);
+}
+function grokDeptOf(target) {
+  const t = String(target || '').trim();
+  if (!t || t === '전체') return null;
+  let d = BOT_TARGETS.depts.find((x) => x.name === t);
+  if (!d) d = BOT_TARGETS.depts.find((x) => x.name.startsWith(t));
+  if (!d) {
+    const bot = BOT_TARGETS.bots.find((b) => b.name === t);
+    if (bot) d = BOT_TARGETS.depts.find((x) => x.id === bot.dept);
+  }
+  return d || null;
+}
+function grokNormalize(r, sourceDefault) {
+  if (!r || r.id === undefined || r.id === null || String(r.id).trim() === '') return null;
+  const summary = (Array.isArray(r.summary) ? r.summary : []).map(grokSafeLine).filter(Boolean).slice(0, 3);
+  const source = r.source === '클로드' || r.source === '그록' ? r.source : (sourceDefault === '클로드' ? '클로드' : '그록');
+  const target = String(r.target || '').trim().slice(0, 80);
+  const deptGiven = String(r.dept || '').trim();
+  const known = BOT_TARGETS.depts.some((d) => d.name === deptGiven);
+  const dept = known ? deptGiven : ((grokDeptOf(target) || {}).name || '');
+  return {
+    id: String(r.id).slice(0, 80),
+    time: grokTimeText(r.time),
+    target,
+    command: String(r.command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: String(r.lead || '').trim().slice(0, 80),
+    status: GROK_REPORT_STATUSES.has(r.status) ? r.status : '진행 중',
+    summary,
+    where: grokSafeUrl(r.where),
+    source,
+    dept,
+  };
+}
+function grokPreferPublic(localItem, pubItem) {
+  // 같은 번호가 공개 보고에 있으면 그 상태·요약·결과가 이김.
+  return {
+    id: pubItem.id,
+    time: pubItem.time || localItem.time,
+    target: pubItem.target || localItem.target,
+    command: pubItem.command || localItem.command,
+    lead: pubItem.lead || localItem.lead,
+    status: pubItem.status || localItem.status,
+    summary: pubItem.summary.length ? pubItem.summary : localItem.summary,
+    where: pubItem.where || localItem.where,
+    source: pubItem.source || localItem.source || '그록',
+    dept: pubItem.dept || localItem.dept,
+  };
+}
+function grokClaudeCard(r) {
+  // 화면용 새 객체만 만들어요. state.reports 항목은 그대로 둡니다.
+  const text = String(r.text || '');
+  const lines = text.split(/\n+/).map(grokSafeLine).filter(Boolean).slice(0, 3);
+  let status = '완료';
+  if (r.isError) status = '문제 있음';
+  else if (r.needBoss) status = '진행 중';
+  const found = text.match(/https?:\/\/[^\s"'<>)]+/);
+  return grokNormalize({
+    id: r.id,
+    time: r.time,
+    target: '게임 필멸자',
+    command: String(r.task || '').split('\n')[0],
+    lead: r.empName || '클로드',
+    status,
+    summary: lines.length ? lines : ['보고가 도착했어요.'],
+    where: found ? found[0] : '',
+    source: '클로드',
+    dept: '게임 필멸자',
+  }, '클로드');
+}
+async function grokPublicReports() {
+  const url = grokReportsUrl();
+  const nowMs = Date.now();
+  if (grokReportCache.data && grokReportCache.url === url && nowMs - grokReportCache.at < grokReportCache.ttl) return grokReportCache.data;
+  let data = null;
+  let ttl = 3 * 60 * 1000;
+  try {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 4000);
+    let resp;
+    try { resp = await fetch(url, { signal: ac.signal, headers: { accept: 'application/json' } }); }
+    finally { clearTimeout(timer); }
+    if (!resp.ok) throw new Error('bad status');
+    const parsed = await resp.json();
+    if (!Array.isArray(parsed)) throw new Error('not array');
+    data = parsed;
+  } catch (e) {
+    data = grokReadArray(path.join(ROOT, 'data-public', 'reports.json'));
+    ttl = 60 * 1000;
+  }
+  grokReportCache = { at: nowMs, ttl, url, data };
+  return data;
+}
+async function grokReportList() {
+  const local = grokReadArray(grokReportFile()).map((r) => grokNormalize(r, '그록')).filter(Boolean);
+  const pub = (await grokPublicReports()).map((r) => grokNormalize(r, '그록')).filter(Boolean);
+  const byId = new Map();
+  for (const r of local) byId.set(r.id, r);
+  for (const r of pub) {
+    const prev = byId.get(r.id);
+    byId.set(r.id, prev ? grokPreferPublic(prev, r) : r);
+  }
+  const seen = new Set(byId.keys());
+  for (const r of state.reports.slice(0, 120)) {
+    if (!r || r.id === undefined || r.id === null || seen.has(String(r.id))) continue;
+    const card = grokClaudeCard(r);
+    if (!card) continue;
+    seen.add(card.id);
+    byId.set(card.id, card);
+  }
+  return [...byId.values()].sort((a, b) => grokReportMs(b.time) - grokReportMs(a.time));
+}
+async function grokReportRoute(req, res) {
+  if (req.method !== 'GET') { res.writeHead(404); res.end('없음'); return; }
+  let list = [];
+  try { list = await grokReportList(); } catch (e) { list = []; }
+  res.writeHead(200, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
+  res.end(JSON.stringify(list));
+}
+function grokReportIntake(target, command) {
+  const id = 'rpt-' + uid();
+  const dept = grokDeptOf(target);
+  const item = {
+    id,
+    time: grokKst(new Date()),
+    target,
+    command: String(command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: dept && dept.lead ? dept.lead : '',
+    status: '접수',
+    summary: ['명령을 받았어요. 팀장이 확인하면 진행으로 바뀌어요.'],
+    where: '',
+    source: '그록',
+    dept: dept ? dept.name : '',
+  };
+  try {
+    const list = grokReadArray(grokReportFile());
+    list.unshift(item);
+    if (list.length > 200) list.length = 200;
+    grokWriteLocal(list);
+  } catch (e) { console.error('[보고 창] 접수 기록을 저장하지 못했어요'); }
+  return id;
+}
+function grokReportPatch(id, patch) {
+  const list = grokReadArray(grokReportFile());
+  const i = list.findIndex((r) => r && r.id === id);
+  if (i < 0) return;
+  list[i] = { ...list[i], ...patch };
+  grokWriteLocal(list);
+}
+function grokReportSent(id, ok) {
+  if (!id || ok) return;
+  try {
+    grokReportPatch(id, {
+      status: '문제 있음',
+      summary: ['그록 봇에게 일을 넘기지 못했어요. 연결을 확인한 뒤 다시 보내 주세요.'],
+    });
+  } catch (e) { console.error('[보고 창] 문제 상태를 저장하지 못했어요'); }
+}

@@ -141,7 +141,7 @@ function renderCompany(box) {
       <div class="muted small" style="padding:0 8px 2px">${esc(d.sub)} · 팀장 ${esc(d.lead)}${rep}</div>
     </div>`;
   }).join('');
-  box.innerHTML = `<div class="card"><div class="conn-head"><span class="ico">🏢</span><div><b>회사 일 시키기</b>
+  box.innerHTML = `<div id="companyReports"></div><div class="card"><div class="conn-head"><span class="ico">🏢</span><div><b>회사 일 시키기</b>
       <div class="muted small">보내면 그 부서 팀장이 나눠 맡기고, 검수해서 보고 창에 올려요.</div>
       <div class="small">예: 「제로폰 오늘 정책 확인해서 보고해」</div></div></div>
     <div class="small" style="margin:4px 0 8px">${connected ? '<span style="color:var(--green)">🟢 그록 봇 연결됨</span>' : '<span class="muted">⚪ 그록 봇이 아직 안 이어졌어요</span>'}</div>
@@ -151,6 +151,8 @@ function renderCompany(box) {
       ${groups}
     </div></div>
     ${hist.length ? hist.map((h) => `<div class="card"><div class="card-head"><b>${esc(h.target)}</b><span class="small" style="color:${h.ok ? 'var(--green)' : 'var(--red)'}">${h.ok ? '🟢 보냄' : '🔴 ' + esc(h.result)}</span><time>${ago(h.time)}</time></div><div class="text">${esc(h.command)}</div></div>`).join('') : '<div class="empty">아직 보낸 일이 없어요.</div>'}`;
+  const reportSlot = box.querySelector('#companyReports');
+  if (reportSlot && typeof renderReports === 'function') renderReports(reportSlot);
 }
 function renderChat(box) {
   try { localStorage.setItem('grokSeen', String(Date.now())); } catch (e) { /* */ }
@@ -387,6 +389,7 @@ function guide() {
     <ul class="tips">
       <li>🙋 위에 <b>노란 칸 「해도 될까요?」</b>가 뜨면 <b>허락</b>을 눌러요. 한 번 허락하면 다시 안 물어요.</li>
       <li>💬 <b>그록과 이야기</b> 칸에서 그록에게 말하거나, 클로드와 그록에게 회의를 시킬 수 있어요.</li>
+      <li>📋 <b>회사 일 시키기</b> 칸 위에 보고 창이 있어요. 접수·진행·완료·문제를 보고, 부서 버튼으로 골라 보세요.</li>
       <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더·깃허브·PixelLab 같은 것을 이어요 (아이콘 11개). 아이콘을 누르면 「이게 뭐예요? / 어떻게 해요?」가 나와요. 🟢 = 이어짐, ⚪ = 아직.</li>
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
       <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
