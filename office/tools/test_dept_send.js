@@ -59,11 +59,14 @@ function checkSource() {
   assert.ok(home.includes("id: 'video'") && home.includes("name: '영상 기획팀'"));
   assert.ok(home.includes('class="who-ico"'));
   const reports = fs.readFileSync(path.join(root, 'ui', 'reports.js'), 'utf8');
-  assert.ok(reports.includes("['영상 기획팀', '🎬 영상']"));
+  assert.ok(!reports.includes('REPORT_DEPTS'), '보고 칸은 적어 둔 부서 목록이 아니라 서버 목록을 읽어요');
+  assert.strictEqual((server.match(/id: '(game|zero|promo|admin|stco|video|ai)'/g) || []).length, 7);
   const sendAt = server.indexOf('async function sendToBot');
   const sendFn = server.slice(sendAt, server.indexOf('function pollSoon'));
   assert.ok(sendFn.includes("const target = dept || 'AI 협력'"));
   assert.ok(!sendFn.includes('settings.botTarget'));
+  assert.ok(home.includes("lead: '알들컴퍼니'"));
+  assert.ok(server.includes("name: '알들컴퍼니'") && server.includes("id: '그록봇 최적화 예전 이벨린'"));
   assert.ok(home.includes('data-home="makedept"'));
   assert.ok(home.includes('＋ 만들기'));
   assert.ok(home.includes('homeDeptFolder'));
@@ -190,6 +193,19 @@ async function main() {
     assert.ok(room && room.text.startsWith('[부서:홍보] '));
     const vroom = after.grokLog.find((g) => String(g.text || '').includes('대본 부탁'));
     assert.ok(vroom && vroom.text.startsWith('[부서:영상 기획팀] '));
+    const aiLead = st2.botTargets.bots.find((b) => b.dept === 'ai' && b.lead);
+    assert.strictEqual(aiLead.name, '알들컴퍼니');
+    assert.strictEqual(aiLead.id, '그록봇 최적화 예전 이벨린');
+    const named = await post(appPort, '/api/bot/command', { target: '알들컴퍼니', command: '팀장 이름 시험', skipClaude: true });
+    assert.strictEqual(named.ok, true, named.error || '');
+    const byId = await post(appPort, '/api/bot/command', { target: '그록봇 최적화 예전 이벨린', command: '팀장 번호 시험', skipClaude: true });
+    assert.strictEqual(byId.ok, true, byId.error || '');
+    for (let i = 0; i < 20 && seen.length < 5; i++) await sleep(50);
+    const show = seen.find((x) => x.body && x.body.command === '팀장 이름 시험');
+    const keep = seen.find((x) => x.body && x.body.command === '팀장 번호 시험');
+    assert.ok(show && keep);
+    assert.strictEqual(show.body.target, '그록봇 최적화 예전 이벨린');
+    assert.strictEqual(keep.body.target, '그록봇 최적화 예전 이벨린');
     console.log('부서 보내기 시험 통과');
   } finally {
     clearTimeout(timer);

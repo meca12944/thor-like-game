@@ -6,7 +6,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { spawn, execFile } = require('child_process');
+const { spawn, execFile, execFileSync } = require('child_process');
 const { createConnStatus } = require('./conn_status');
 
 const ROOT = __dirname;
@@ -40,7 +40,7 @@ const BOT_TARGETS = {
     { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
     { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
     { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
-    { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
+    { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '알들컴퍼니' },
   ],
   bots: [
     { name: '클로드', dept: 'game', role: '게임 코드·문서·검수 (사장님 구독 클로드 팀)', lead: true },
@@ -75,15 +75,24 @@ const BOT_TARGETS = {
     { name: 'STCO 인동점 포스&홈페이지 2', dept: 'stco', role: '인동점 포스와 홈페이지 보조' },
     { name: '영상 기획 팀장', dept: 'video', role: '그록 쪽 영상 기획 팀장', lead: true },
     { name: '영상 기획 2', dept: 'video', role: '영상 기획 보조' },
-    { name: '그록봇 최적화 예전 이벨린', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
+    { id: '그록봇 최적화 예전 이벨린', name: '알들컴퍼니', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
     { name: '알들 컴퍼니 보고 담당', dept: 'ai', role: '보고 정리·클로드에게 답 전달' },
     { name: '알들 컴퍼니 개발 담당', dept: 'ai', role: '프로그램 개선 PR' },
     { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
   ],
 };
+function botByTarget(name) {
+  const t = String(name || '').trim();
+  return BOT_TARGETS.bots.find((b) => b.name === t || b.id === t) || null;
+}
+function botDeliverTarget(name) {
+  // 화면 이름이 달라도, 봇에게 넘기는 대상 id 는 그대로 둬요.
+  const bot = botByTarget(name);
+  return bot && bot.id ? bot.id : String(name || '').trim();
+}
 function companyTargetOk(name) {
   if (name === BOT_TARGETS.all || name === '클로드') return true;
-  return BOT_TARGETS.depts.some((d) => d.name === name) || BOT_TARGETS.bots.some((b) => b.name === name);
+  return BOT_TARGETS.depts.some((d) => d.name === name) || !!botByTarget(name);
 }
 try { const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); state = { ...state, ...s, settings: { ...state.settings, ...(s.settings || {}) } }; } catch (e) { /* 처음 */ }
 if (process.env.OFFICE_PORT) state.settings.port = Number(process.env.OFFICE_PORT);
@@ -91,6 +100,7 @@ if (process.env.OFFICE_CLAUDE) state.settings.claudeCmd = process.env.OFFICE_CLA
 if (!state.rules.includes('Bash(grok:*)')) state.rules.push('Bash(grok:*)');
 state.grokLog = state.grokLog || [];
 state.botHistory = state.botHistory || [];
+state.botNicks = state.botNicks && typeof state.botNicks === 'object' ? state.botNicks : {}; // 그록 봇 화면에 보이는 별명. 예전 저장에 없어도 빈 목록.
 // 11-11 그록 봇 연결이 생김: 예전 기본값(반자동)이던 판은 봇 연결로 (봇 설정이 없으면 저절로 반자동)
 if (!state.settings.grokV2) { if (state.settings.grokMode === 'paste') state.settings.grokMode = 'bot'; state.settings.grokV2 = true; }
 if (!state.settings.gameRepo) {
@@ -441,6 +451,82 @@ function next(emp) {
   const task = emp.queue.shift();
   startRun(emp, task, false);
 }
+const workSnaps = new Map(); // 일이 시작될 때 작업 폴더 모습. 저장 파일에는 안 넣고, 끝나면 바뀐 파일만 결과물로.
+function grokHideWorkFile(rel) {
+  const s = String(rel || '').replace(/\\/g, '/');
+  if (!s || s.includes('..')) return true;
+  if (/(^|\/)(\.git|node_modules)(\/|$)/.test(s)) return true;
+  if (/(^|\/)\.env($|\.)/i.test(s) || /secret|credential|id_rsa|\.pem$|\.key$/i.test(s)) return true;
+  return false;
+}
+function grokWalkWork(folder, map, limit) {
+  const walk = (d, depth) => {
+    if (map.size >= limit) return;
+    let items = [];
+    try { items = fs.readdirSync(d, { withFileTypes: true }); } catch (e) { return; }
+    for (const it of items) {
+      if (it.name === '.git' || it.name === 'node_modules' || it.name.charAt(0) === '.') continue;
+      const abs = path.join(d, it.name);
+      if (it.isDirectory()) { if (depth < 3) walk(abs, depth + 1); continue; }
+      if (!it.isFile()) continue;
+      const rel = path.relative(folder, abs).replace(/\\/g, '/');
+      if (grokHideWorkFile(rel)) continue;
+      try {
+        const st = fs.statSync(abs);
+        if (st.size > 0 && st.size < 20 * 1024 * 1024) map.set(rel, st.mtimeMs + ':' + st.size);
+      } catch (e) { /* 못 읽으면 건너뜀 */ }
+      if (map.size >= limit) return;
+    }
+  };
+  walk(folder, 0);
+}
+function grokSnapFolder(folder) {
+  const map = new Map();
+  if (!folder || !fs.existsSync(folder)) return map;
+  try {
+    const out = execFileSync('git', ['-C', folder, 'status', '--porcelain', '-uall', '--untracked-files=all'], { timeout: 8000, windowsHide: true, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
+    for (const line of String(out || '').split('\n')) {
+      if (line.length < 4) continue;
+      let rel = line.slice(3).trim();
+      const arrow = rel.lastIndexOf(' -> ');
+      if (arrow >= 0) rel = rel.slice(arrow + 4).trim();
+      if (rel.charAt(0) === '"' && rel.charAt(rel.length - 1) === '"') {
+        try { rel = JSON.parse(rel); } catch (e) { rel = rel.slice(1, -1); }
+      }
+      rel = String(rel || '').replace(/\\/g, '/');
+      if (grokHideWorkFile(rel) || map.size >= 4000) continue;
+      const abs = path.join(folder, rel);
+      try {
+        const st = fs.statSync(abs);
+        if (st.isFile() && st.size > 0 && st.size < 20 * 1024 * 1024) map.set(rel, st.mtimeMs + ':' + st.size);
+      } catch (e) { /* 없는 파일 */ }
+    }
+    return map;
+  } catch (e) {
+    grokWalkWork(folder, map, 2500);
+    return map;
+  }
+}
+function grokChangedFiles(folder, before) {
+  if (!folder) return [];
+  const after = grokSnapFolder(folder);
+  const out = [];
+  for (const [rel, sig] of after) {
+    if (before && before.get(rel) === sig) continue;
+    const abs = path.join(folder, rel);
+    try {
+      const st = fs.statSync(abs);
+      if (!st.isFile() || st.size <= 0 || st.size > 20 * 1024 * 1024) continue;
+    } catch (e) { continue; }
+    out.push(abs);
+    if (out.length >= 24) break;
+  }
+  return out;
+}
+function grokTakeSnap(task, folder) {
+  if (!task || !task.id || workSnaps.has(task.id)) return;
+  try { workSnaps.set(task.id, grokSnapFolder(folder)); } catch (e) { workSnaps.set(task.id, new Map()); }
+}
 function startRun(emp, task, isRetry) {
   if (!emp.sessionId) { emp.sessionId = crypto.randomUUID(); emp.started = false; }
   const promptFile = path.join(DATA, 'prompts', emp.id + '.md');
@@ -456,6 +542,8 @@ function startRun(emp, task, isRetry) {
   const child = spawn(quoteIf(claude.path), args.map(quoteIf), { cwd: emp.folder, shell: claude.useShell, windowsHide: true, env });
   procs.set(emp.id, child);
   emp.status = 'working'; emp.now = '일 시작'; emp.task = task; emp.startedAt = now();
+  if (task && task.reportId) grokReportBegin(task.reportId); // 부서 보고를 접수에서 진행 중으로
+  grokTakeSnap(task, emp.folder);
   addLog(emp.id, 'order', `[${task.from}] ${task.text}`);
   changed();
   const run = { text: '', result: null, cost: 0, denials: [], isError: false, stderr: '' };
@@ -540,6 +628,13 @@ function finishRun(emp, task, run) {
   const rep = { id: uid(), emp: emp.id, empName: emp.name, time: now(), from: task.from, kind: task.kind || 'ask', toBoss, task: task.text, text, files: findMedia(emp, text), cost: run.cost, denials: run.denials, isError: run.isError, stopped: !!run.stopped, needBoss: asks.length > 0, asks, read: false, forwards: [],
     summary: text.split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 3), // 보고 글 앞쪽 3줄
     status: run.isError || run.stopped ? '문제 있음' : '완료' };
+  try {
+    const snap = task && task.id ? workSnaps.get(task.id) : null;
+    if (task && task.id) workSnaps.delete(task.id);
+    const changed = grokChangedFiles(emp && emp.folder, snap instanceof Map ? snap : null);
+    rep.artifacts = grokBuildArtifacts(text, changed.concat(rep.files || [])); // 바뀐 파일 + 마지막 답 요약
+  } catch (e) { rep.artifacts = []; }
+  if (task && task.reportId && grokReportFinish(task.reportId, rep.status, rep.artifacts, grokCleanLines(String(text || '').split('\n')))) rep.companyId = task.reportId;
   state.reports.unshift(rep);
   if (state.reports.length > 300) state.reports.length = 300;
   emp.status = run.isError ? 'error' : 'idle'; emp.now = run.isError ? '문제가 생겼어요' : ''; emp.task = null;
@@ -672,11 +767,11 @@ function claudeLeadFor(target) {
   const list = state.employees.filter((e) => empDeptId(e) === d.id);
   return list.find((e) => e.lead) || list.find((e) => /팀장$/.test(String(e.name || ''))) || null;
 }
-function assignDeptToClaude(target, command) {
+function assignDeptToClaude(target, command, reportId) {
   const lead = claudeLeadFor(target);
   if (!lead) return '';
   const text = `[${target} 부서 일]\n${String(command || '').trim()}\n너는 이 부서 클로드 팀장이다. 할 일을 나눠 맡고, 끝나면 쉬운 말로 짧게 보고해.`;
-  order(lead.id, text, '사장님');
+  order(lead.id, text, '사장님', 0, 'ask', null, reportId ? { reportId } : {});
   return lead.name;
 }
 
@@ -933,12 +1028,17 @@ function publicState() {
     settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, hasPixellab: !!pixellabKey, botFrom: bc ? bc.from : '', grokWay: grokWay(), coop: coopStatus, grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
     botTargets: BOT_TARGETS,
     botHistory: state.botHistory.slice(0, 50),
+    botNicks: { ...(state.botNicks || {}) }, // 그록 봇 별명. 명령을 보낼 때 쓰는 원래 이름은 바꾸지 않아요.
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     rules: state.rules,
     rulesAsk: state.rules.filter(ruleIsDanger), // 목록에 있어도 매번 다시 묻는 규칙 (⚙ 설정에 ⚠ 표시)
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
     employees: state.employees.map((e) => ({ id: e.id, name: e.name, role: e.role, dept: empDeptId(e), lead: !!e.lead, partner: !!e.partner, folder: e.folder, mode: e.mode, model: e.model, status: e.status, now: e.now, queue: e.queue.length, wait: (e.queue && e.queue[0]) ? String(e.queue[0].text).replace(/\s+/g, ' ').slice(0, 160) : '', task: e.task ? e.task.text : '', taskFrom: e.task ? e.task.from : '', startedAt: e.startedAt, hasSession: !!e.started })),
-    reports: state.reports.slice(0, 120).map((r) => ({ ...r, files: r.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
+    reports: state.reports.slice(0, 120).map((r) => {
+      const { artifacts, ...rest } = r || {}; // 결과물 경로는 회사 보고 주소로만 보내요 (예전 보고에 artifacts 가 없어도 통과)
+      const files = Array.isArray(r && r.files) ? r.files : [];
+      return { ...rest, files: files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) };
+    }),
     pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, danger: p.danger || '', label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
   };
 }
@@ -969,6 +1069,11 @@ function openPath(p) {
   else if (process.platform === 'darwin') spawn('open', [p], { detached: true }).unref();
   else spawn('xdg-open', [p], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref();
 }
+function openShownFile(p) {
+  // 결과물 파일을 탐색기에서 집거나, 맥·리눅스에서는 그 파일을 열어요.
+  if (IS_WIN) spawn('explorer', ['/select,' + p], { detached: true, windowsHide: false }).unref();
+  else openPath(p);
+}
 
 const connStatus = createConnStatus({
   ROOT,
@@ -995,6 +1100,13 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/coop/chat') { if (u.searchParams.get('refresh')) pollSoon(200); return json(res, { items: coopChat, issueUrl: ISSUE_URL(), at: coopStatus.at }); }
     if (p === '/api/company/reports') {
       // 그록이 사장님 구글 드라이브에 쓰는 회사 보고 (사장님 11-11 「좋아」: 공개 저장소 대신 드라이브)
+      // POST 도 같은 주소예요. 부서(dept)와 결과물(artifacts)을 같이 넣습니다.
+      // 열쇠 확인은 그록 봇에 보낼 때와 같이 요청 머리의 Bearer 입니다. 열쇠 글자는 코드에 적지 않아요.
+      if (req.method === 'POST') {
+        const body = await readBody(req);
+        return grokReportPost(req, res, body);
+      }
+      if (req.method !== 'GET') { res.writeHead(405); return res.end('없음'); }
       const f = state.settings.reportsFile;
       if (!f) return json(res, grokFillCompanyReports({ ok: false, error: '아직 「☁ 회사 보고 폴더」를 정하지 않았어요.', items: [] }));
       try {
@@ -1007,6 +1119,8 @@ const server = http.createServer(async (req, res) => {
           time: str(r.time || r.sentAt || r.at, 40), target: str(r.target || r.dept, 80), command: str(r.command, 500), lead: str(r.lead || r.leader, 80),
           status: str(r.status, 40), summary: (Array.isArray(r.summary) ? r.summary : String(r.summary || '').split('\n')).map((x) => str(x, 300)).filter(Boolean).slice(0, 5),
           result: str(r.result || r.output || r.where, 300),
+          dept: str(r.dept, 80),
+          artifacts: r && r.artifacts,
         })).sort((a, b) => String(b.time).localeCompare(String(a.time)));
         return json(res, grokFillCompanyReports({ ok: true, items, at: st.mtime }));
       } catch (e) { return json(res, grokFillCompanyReports({ ok: false, error: '보고 파일을 못 읽었어요: ' + e.message, items: [] })); }
@@ -1027,6 +1141,12 @@ const server = http.createServer(async (req, res) => {
       return sendFile(req, res, f);
     }
     if (p === '/file') {
+      const cid = u.searchParams.get('c');
+      if (cid) {
+        const art = grokFindArtifact(cid, Number(u.searchParams.get('a')));
+        if (!art || !grokImageFile(art.path)) { res.writeHead(404); return res.end('없음'); }
+        return sendFile(req, res, art.path);
+      }
       const r = state.reports.find((x) => x.id === u.searchParams.get('r'));
       const f = r && r.files[Number(u.searchParams.get('i'))];
       if (!f) { res.writeHead(404); return res.end('없음'); }
@@ -1080,17 +1200,18 @@ const server = http.createServer(async (req, res) => {
       if (!command) return json(res, { ok: false, error: '할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해' });
       if (!target) return json(res, { ok: false, error: '보낼 곳을 골라 주세요.' });
       if (!companyTargetOk(target)) return json(res, { ok: false, error: '목록에 없는 이름이에요. 부서나 팀원을 골라 주세요.' });
+      // 부서에서 시킨 일은 그록 연결이 되기 전에도 바로 접수로 남아요. skipClaude 는 봇만 고른 경우.
+      const reportId = grokReportIntake(target, command);
       let claudeLead = '';
-      try { claudeLead = assignDeptToClaude(target, command); } catch (e) { claudeLead = ''; }
+      try { if (!b.skipClaude) claudeLead = assignDeptToClaude(target, command, reportId); } catch (e) { claudeLead = ''; }
       const cfg = botConfig();
       if (!cfg) {
         const extra = claudeLead ? ' 클로드 팀장 ' + claudeLead + '에게는 일을 넣어 두었어요.' : '';
-        return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' + extra, claudeLead });
+        return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' + extra, claudeLead, reportId });
       }
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
-      const reportId = grokReportIntake(target, command);
       try {
-        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target: botDeliverTarget(target), command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
         h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
       } catch (e) { h.result = '실패: ' + e.message; }
       grokReportSent(reportId, h.ok);
@@ -1131,16 +1252,66 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/perm/ask') return askPermission(b.emp, b.tool_name, b.input || {}, res);
     if (p === '/api/perm/answer') return json(res, { ok: answerPermission(b.id, b.answer) });
     if (p === '/api/order') {
-      const ids = b.to === 'all' ? state.employees.map((e) => e.id) : [b.to];
-      const ok = ids.map((id) => order(id, String(b.text || '').trim())).some(Boolean);
-      return json(res, { ok });
+      const text = String(b.text || '').trim();
+      if (!text) return json(res, { ok: false, error: '할 일을 적어 주세요.' });
+      if (b.to === 'all') {
+        const ok = state.employees.map((e) => order(e.id, text)).some(Boolean);
+        return json(res, { ok });
+      }
+      const emp = findEmp(b.to);
+      if (!emp) return json(res, { ok: false, error: '그 직원을 못 찾았어요.' });
+      let reportId = '';
+      if (b.dept) {
+        const deptName = grokReportDept(b.dept, emp.name);
+        reportId = grokReportIntake(emp.name, text, { dept: deptName, target: deptName, lead: emp.name, source: '클로드' });
+      }
+      const ok = order(emp.id, text, '사장님', 0, 'ask', null, reportId ? { reportId } : {});
+      return json(res, { ok: !!ok, reportId, error: ok ? '' : '일을 넣지 못했어요.' });
     }
     if (p === '/api/stop') { const e = findEmp(b.id); if (e) stopEmp(e, !!b.clear); return json(res, { ok: !!e }); }
     if (p === '/api/stopAll') { state.employees.forEach((e) => stopEmp(e, true)); return json(res, { ok: true }); }
     if (p === '/api/newChat') { const e = findEmp(b.id); if (e && !procs.has(e.id)) { e.sessionId = crypto.randomUUID(); e.started = false; e.status = 'idle'; e.now = ''; logs.set(e.id, []); changed(); } return json(res, { ok: !!e }); }
     if (p === '/api/open') { const e = findEmp(b.id); if (e && e.folder) openPath(e.folder); return json(res, { ok: !!e }); }
-    if (p === '/api/openFile') { const r = state.reports.find((x) => x.id === b.r); const f = r && r.files[b.i]; if (f) openPath(path.dirname(f)); return json(res, { ok: !!f }); }
+    if (p === '/api/openFile') {
+      if (b.c != null && b.c !== '') {
+        const art = grokFindArtifact(String(b.c), Number(b.a));
+        if (art && art.path) {
+          try { if (fs.statSync(art.path).isFile()) { openShownFile(art.path); return json(res, { ok: true }); } } catch (e) { /* 없음 */ }
+        }
+        return json(res, { ok: false, error: '파일을 열지 못했어요.' });
+      }
+      const r = state.reports.find((x) => x.id === b.r); const f = r && r.files[b.i]; if (f) openPath(path.dirname(f)); return json(res, { ok: !!f });
+    }
+    if (p === '/api/bot/nick') {
+      // 그록 봇의 진짜 이름은 목록 그대로 두고, 화면에 보이는 별명만 저장해요. 일을 보낼 때는 원래 이름을 씁니다.
+      const name = String(b.name || '').trim();
+      const bot = BOT_TARGETS.bots.find((x) => x.name === name);
+      if (!bot) return json(res, { ok: false, error: '목록에 없는 팀원이에요.' });
+      const nick = String(b.nick == null ? '' : b.nick).trim().slice(0, 40);
+      state.botNicks = state.botNicks || {};
+      if (!nick || nick === name) { delete state.botNicks[name]; changed(); return json(res, { ok: true, name, nick: '' }); }
+      const used = new Set(BOT_TARGETS.bots.map((x) => x.name));
+      for (const [k, v] of Object.entries(state.botNicks)) if (k !== name && v) used.add(v);
+      if (used.has(nick)) return json(res, { ok: false, error: '이미 쓰는 이름이에요. 다른 별명을 적어 주세요.' });
+      state.botNicks[name] = nick;
+      changed();
+      return json(res, { ok: true, name, nick });
+    }
     if (p === '/api/employee') {
+      if (b.rename) {
+        // 이름·역할만 고칩니다. 아이디·폴더·대화는 그대로 두고, 빈 이름과 겹치는 이름은 막아요.
+        const e = findEmp(b.id);
+        if (!e) return json(res, { ok: false, error: '그 직원을 못 찾았어요.' });
+        const name = String(b.name || '').trim().slice(0, 40);
+        if (!name) return json(res, { ok: false, error: '이름을 적어 주세요.' });
+        if (state.employees.some((x) => x !== e && x.name === name)) return json(res, { ok: false, error: '같은 이름의 직원이 있어요.' });
+        const role = b.role == null ? '' : String(b.role).trim().slice(0, 80);
+        const keep = { id: e.id, folder: e.folder, sessionId: e.sessionId, started: e.started };
+        e.name = name;
+        if (role) e.role = role;
+        changed();
+        return json(res, { ok: true, id: e.id, name: e.name, role: e.role, folder: keep.folder, sessionId: keep.sessionId });
+      }
       const name = String(b.name || '').trim();
       if (!name) return json(res, { ok: false, error: '이름을 적어 주세요.' });
       let e = b.id ? findEmp(b.id) : null;
@@ -1283,16 +1454,139 @@ function grokDeptOf(target) {
   let d = BOT_TARGETS.depts.find((x) => x.name === t);
   if (!d) d = BOT_TARGETS.depts.find((x) => x.name.startsWith(t));
   if (!d) {
-    const bot = BOT_TARGETS.bots.find((b) => b.name === t);
+    const bot = botByTarget(t);
     if (bot) d = BOT_TARGETS.depts.find((x) => x.id === bot.dept);
   }
   return d || null;
 }
+function grokAiDeptName() {
+  const d = BOT_TARGETS.depts.find((x) => x.id === 'ai');
+  return d ? d.name : 'AI 협력·연결';
+}
+function grokReportDept(explicit, target) {
+  // 부서 이름은 서버 목록에서 찾아요. 못 찾으면 AI 협력·연결.
+  const named = String(explicit || '').trim();
+  if (named) {
+    const byName = BOT_TARGETS.depts.find((d) => d.name === named);
+    if (byName) return byName.name;
+    const byId = BOT_TARGETS.depts.find((d) => d.id === named);
+    if (byId) return byId.name;
+    const byOf = grokDeptOf(named);
+    if (byOf) return byOf.name;
+  }
+  const byTarget = grokDeptOf(target);
+  return byTarget ? byTarget.name : grokAiDeptName();
+}
 function grokDeptName(name) {
-  const t = String(name || '').trim();
-  if (BOT_TARGETS.depts.some((d) => d.name === t)) return t;
-  const d = grokDeptOf(t);
-  return d ? d.name : '';
+  return grokReportDept('', name);
+}
+function grokImageFile(p) {
+  if (!/\.(png|jpe?g|gif)$/i.test(String(p || ''))) return false;
+  try {
+    const st = fs.statSync(p);
+    return st.isFile() && st.size > 0 && st.size < 12 * 1024 * 1024;
+  } catch (e) { return false; }
+}
+function grokStoreArtifacts(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  for (const a of list) {
+    if (!a || typeof a !== 'object') continue;
+    if (a.kind === 'text') {
+      const text = grokSafeLine(a.text);
+      if (text) out.push({ kind: 'text', text });
+    } else if (a.kind === 'link') {
+      const url = grokSafeUrl(a.url || a.href);
+      if (url) out.push({ kind: 'link', name: String(a.name || '링크').slice(0, 80), url });
+    } else if (a.kind === 'photo' || a.kind === 'file') {
+      const name = String(a.name || '파일').replace(/[\r\n]/g, '').slice(0, 120) || '파일';
+      const item = { kind: a.kind, name };
+      const url = grokSafeUrl(a.url);
+      if (url) item.url = url;
+      const fp = String(a.path || '').trim();
+      if (fp && fp.length < 400 && !/[\r\n]/.test(fp)) item.path = fp;
+      if (item.url || item.path) out.push(item);
+    }
+    if (out.length >= 24) break;
+  }
+  return out;
+}
+function grokPublicArtifacts(list, id) {
+  const stored = Array.isArray(list) ? list : [];
+  const out = [];
+  stored.forEach((a, i) => {
+    if (!a || typeof a !== 'object') return;
+    if (a.kind === 'text') {
+      const text = grokSafeLine(a.text);
+      if (text) out.push({ kind: 'text', text });
+      return;
+    }
+    if (a.kind === 'link') {
+      const url = grokSafeUrl(a.url);
+      if (url) out.push({ kind: 'link', name: String(a.name || '링크').slice(0, 80), url });
+      return;
+    }
+    if (a.kind !== 'photo' && a.kind !== 'file') return;
+    const item = { kind: a.kind, name: String(a.name || '파일').slice(0, 120), i };
+    const url = grokSafeUrl(a.url);
+    if (url) item.url = url;
+    const fp = typeof a.path === 'string' ? a.path : '';
+    if (fp && !/bearer|api[_-]?key|secret|token/i.test(fp)) item.path = fp.slice(0, 300);
+    if (a.kind === 'photo' && !url && id && grokImageFile(fp)) item.src = '/file?c=' + encodeURIComponent(id) + '&a=' + i;
+    if (item.url || item.path || item.src) out.push(item);
+  });
+  return out;
+}
+function grokBuildArtifacts(text, files) {
+  const arts = [];
+  const lines = grokCleanLines(String(text || '').split('\n'));
+  if (lines.length) arts.push({ kind: 'text', text: lines.join(' ') });
+  const seenUrl = new Set();
+  for (const m of String(text || '').matchAll(/https?:\/\/[^\s"'<>)]+/g)) {
+    const url = grokSafeUrl(m[0]);
+    if (!url || seenUrl.has(url)) continue;
+    seenUrl.add(url);
+    let name = '링크';
+    if (/\/pull\/\d+/.test(url)) name = '합치기 부탁';
+    else if (/\/issues\/\d+/.test(url)) name = '이야기';
+    arts.push({ kind: 'link', name, url });
+    if (seenUrl.size >= 5) break;
+  }
+  const seenPath = new Set();
+  for (const abs of files || []) {
+    const p = String(abs || '');
+    if (!p || seenPath.has(p) || grokHideWorkFile(p)) continue;
+    seenPath.add(p);
+    try { if (!fs.statSync(p).isFile()) continue; } catch (e) { continue; }
+    const name = path.basename(p);
+    const kind = /\.(png|jpe?g|gif)$/i.test(name) ? 'photo' : 'file';
+    arts.push({ kind, name, path: p });
+    if (arts.length >= 24) break;
+  }
+  return grokStoreArtifacts(arts);
+}
+function grokFindArtifact(id, index) {
+  if (!id || !Number.isInteger(index) || index < 0) return null;
+  const pools = [];
+  const local = grokReadArray(grokReportFile()).find((r) => r && r.id === id);
+  if (local && Array.isArray(local.artifacts)) pools.push(local.artifacts);
+  const rep = state.reports.find((r) => r && r.id === id);
+  if (rep && Array.isArray(rep.artifacts)) pools.push(rep.artifacts);
+  for (const list of pools) {
+    const a = list[index];
+    if (a && typeof a.path === 'string') return a;
+  }
+  return null;
+}
+function grokHookOk(req) {
+  const key = String(state.settings.botKey || '');
+  if (!key) return false;
+  const got = String((req && req.headers && req.headers.authorization) || '');
+  const want = 'Bearer ' + key;
+  const a = Buffer.from(got);
+  const b = Buffer.from(want);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 function grokCleanLines(lines) {
   const out = [];
@@ -1314,15 +1608,16 @@ function grokClaudeStatus(r) {
   return '완료';
 }
 function grokClaudeCard(r) {
-  if (!r || r.toBoss !== true) return null;
+  if (!r || r.toBoss !== true || r.companyId) return null;
   const given = grokCleanLines(Array.isArray(r.summary) ? r.summary : []);
   const plain = String(r.text || '').replace(/```[\s\S]*?```/g, '\n');
   const lines = given.length ? given : grokCleanLines(plain.split('\n'));
   const found = plain.split('\n').filter((line) => !/@전달/.test(line)).join('\n').match(/https?:\/\/[^\s"'<>)]+/);
   const emp = state.employees.find((e) => (r.emp && e.id === r.emp) || (r.empName && e.name === r.empName));
-  const deptName = emp ? empDeptName(emp) : '게임 필멸자';
+  const deptName = emp ? empDeptName(emp) : (r.dept ? grokReportDept(r.dept, r.target) : '게임 필멸자');
+  const id = String(r.id || '').slice(0, 80);
   const card = {
-    id: String(r.id || '').slice(0, 80),
+    id,
     time: grokTimeText(r.time),
     target: deptName,
     command: String(r.task || r.command || '').split('\n')[0].replace(/\s+/g, ' ').trim().slice(0, 500),
@@ -1332,6 +1627,7 @@ function grokClaudeCard(r) {
     result: grokSafeUrl(r.result || r.where || (found ? found[0] : '')),
     source: '클로드',
     dept: deptName,
+    artifacts: grokPublicArtifacts(r.artifacts, id),
   };
   if (r.needBoss === true) card.needBoss = true;
   return card.id ? card : null;
@@ -1339,18 +1635,21 @@ function grokClaudeCard(r) {
 function grokLocalCard(r) {
   if (!r || !r.id) return null;
   const target = String(r.target || '').trim().slice(0, 80);
-  const dept = grokDeptOf(target);
+  const id = String(r.id).slice(0, 80);
+  const deptName = grokReportDept(r.dept, target);
+  const known = grokDeptOf(target);
   return {
-    id: String(r.id).slice(0, 80),
+    id,
     time: grokTimeText(r.time),
     target,
     command: String(r.command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
-    lead: String(r.lead || (dept && dept.lead) || '').slice(0, 80),
+    lead: String(r.lead || (known && known.lead) || '').slice(0, 80),
     status: GROK_REPORT_STATUSES.has(r.status) ? r.status : '접수',
     summary: grokCleanLines(Array.isArray(r.summary) ? r.summary : []).slice(0, 3),
     result: grokSafeUrl(r.result || r.where),
-    source: '그록',
-    dept: dept ? dept.name : '',
+    source: r.source === '클로드' ? '클로드' : '그록',
+    dept: deptName,
+    artifacts: grokPublicArtifacts(r.artifacts, id),
   };
 }
 function grokPublicItem(r) {
@@ -1367,20 +1666,29 @@ function grokPublicItem(r) {
     summary: grokCleanLines(Array.isArray(r.summary) ? r.summary : String(r.summary || '').split('\n')),
     result: grokSafeUrl(r.result),
     source: r.source === '클로드' ? '클로드' : '그록',
-    dept: grokDeptName(target),
+    dept: grokReportDept(r.dept, target),
+    artifacts: grokPublicArtifacts(r.artifacts, id),
   };
   if (id) item.id = id;
   if (r.needBoss === true) item.needBoss = true;
   return item;
 }
+function grokDeptPayload() {
+  return BOT_TARGETS.depts.map((d) => ({ id: d.id, name: d.name, icon: d.icon || '🏢', sub: d.sub || '' }));
+}
 function grokFillCompanyReports(payload) {
+  const base = payload && typeof payload === 'object' ? { ...payload } : { ok: false, items: [] };
   try {
-    const base = payload && typeof payload === 'object' ? { ...payload } : { ok: false, items: [] };
     const items = (Array.isArray(base.items) ? base.items : []).map(grokPublicItem).filter(Boolean);
     const ids = new Set(items.map((it) => it.id).filter(Boolean));
     for (const raw of grokReadArray(grokReportFile())) {
       const card = grokLocalCard(raw);
-      if (!card || ids.has(card.id)) continue;
+      if (!card) continue;
+      if (ids.has(card.id)) {
+        const prev = items.find((it) => it.id === card.id);
+        if (prev && (!prev.artifacts || !prev.artifacts.length) && card.artifacts && card.artifacts.length) prev.artifacts = card.artifacts;
+        continue;
+      }
       ids.add(card.id);
       items.push(card);
     }
@@ -1392,25 +1700,29 @@ function grokFillCompanyReports(payload) {
     }
     items.sort((a, b) => grokReportMs(b.time) - grokReportMs(a.time));
     base.items = items;
-    return base;
   } catch (e) {
-    return payload || { ok: false, items: [] };
+    if (!Array.isArray(base.items)) base.items = [];
   }
+  base.depts = grokDeptPayload();
+  return base;
 }
-function grokReportIntake(target, command) {
+function grokReportIntake(target, command, opt) {
   const id = 'rpt-' + uid();
-  const dept = grokDeptOf(target);
+  const extra = opt && typeof opt === 'object' ? opt : {};
+  const deptName = grokReportDept(extra.dept, target);
+  const known = grokDeptOf(extra.target || target);
   const item = {
     id,
     time: grokKst(new Date()),
-    target,
+    target: String(extra.target || target || deptName).slice(0, 80),
     command: String(command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
-    lead: dept && dept.lead ? dept.lead : '',
+    lead: String(extra.lead || (known && known.lead) || '').slice(0, 80),
     status: '접수',
-    summary: ['명령을 받았어요. 팀장이 확인하면 진행으로 바뀌어요.'],
+    summary: ['명령을 받았어요. 일을 시작하면 진행으로 바뀌어요.'],
     result: '',
-    source: '그록',
-    dept: dept ? dept.name : '',
+    source: extra.source === '클로드' ? '클로드' : '그록',
+    dept: deptName,
+    artifacts: [],
   };
   try {
     const list = grokReadArray(grokReportFile());
@@ -1420,13 +1732,81 @@ function grokReportIntake(target, command) {
   } catch (e) { console.error('[보고 창] 접수 기록을 저장하지 못했어요'); }
   return id;
 }
+function grokReportPatch(id, patch) {
+  try {
+    const list = grokReadArray(grokReportFile());
+    const i = list.findIndex((r) => r && r.id === id);
+    if (i < 0) return false;
+    list[i] = { ...list[i], ...patch };
+    grokWriteLocal(list);
+    return true;
+  } catch (e) {
+    console.error('[보고 창] 상태를 저장하지 못했어요');
+    return false;
+  }
+}
+function grokReportBegin(id) {
+  if (!id) return false;
+  const cur = grokReadArray(grokReportFile()).find((r) => r && r.id === id);
+  if (!cur || cur.status === '완료' || cur.status === '문제 있음' || cur.status === '진행 중') return false;
+  return grokReportPatch(id, { status: '진행 중', summary: ['일을 하고 있어요.'] });
+}
+function grokReportFinish(id, status, artifacts, lines) {
+  if (!id) return false;
+  const st = GROK_REPORT_STATUSES.has(status) ? status : '완료';
+  return grokReportPatch(id, {
+    status: st,
+    summary: lines && lines.length ? lines : ['일을 마쳤어요.'],
+    artifacts: grokStoreArtifacts(artifacts),
+  });
+}
 function grokReportSent(id, ok) {
   if (!id || ok) return;
   try {
     const list = grokReadArray(grokReportFile());
     const i = list.findIndex((r) => r && r.id === id);
     if (i < 0) return;
+    if (list[i].status && list[i].status !== '접수') return;
     list[i] = { ...list[i], status: '문제 있음', summary: ['그록 봇에게 일을 넘기지 못했어요. 연결을 확인한 뒤 다시 보내 주세요.'] };
     grokWriteLocal(list);
   } catch (e) { console.error('[보고 창] 문제 상태를 저장하지 못했어요'); }
+}
+function grokReportPost(req, res, b) {
+  if (!grokHookOk(req)) return json(res, { ok: false, error: '열쇠가 맞지 않아요.' }, 401);
+  const body = b && typeof b === 'object' ? b : {};
+  const rows = Array.isArray(body.items) ? body.items : [body.report && typeof body.report === 'object' ? body.report : body];
+  let list = [];
+  try { list = grokReadArray(grokReportFile()); } catch (e) { list = []; }
+  const saved = [];
+  for (const row of rows.slice(0, 20)) {
+    if (!row || typeof row !== 'object') continue;
+    const command = String(row.command || row.text || '').replace(/\s+/g, ' ').trim().slice(0, 500);
+    const id = String(row.id || ('rpt-' + uid())).slice(0, 80);
+    const i = list.findIndex((r) => r && r.id === id);
+    if (!command && i < 0) continue;
+    const target = String(row.target || row.dept || '').trim().slice(0, 80);
+    const deptName = grokReportDept(row.dept, target);
+    const status = GROK_REPORT_STATUSES.has(row.status) ? row.status : '완료';
+    const summary = grokCleanLines(Array.isArray(row.summary) ? row.summary : String(row.summary || '').split('\n'));
+    const artifacts = grokStoreArtifacts(row.artifacts);
+    const item = {
+      id,
+      time: grokTimeText(row.time || new Date()),
+      target: target || deptName,
+      command: command || (i >= 0 ? list[i].command : ''),
+      lead: String(row.lead || (i >= 0 ? list[i].lead : '') || '').slice(0, 80),
+      status,
+      summary: summary.length ? summary : (i >= 0 && Array.isArray(list[i].summary) ? list[i].summary : []),
+      result: grokSafeUrl(row.result || row.url || (i >= 0 ? list[i].result : '')),
+      source: row.source === '클로드' ? '클로드' : '그록',
+      dept: deptName,
+      artifacts,
+    };
+    if (i >= 0) list[i] = { ...list[i], ...item };
+    else list.unshift(item);
+    saved.push(id);
+  }
+  if (list.length > 200) list.length = 200;
+  try { grokWriteLocal(list); } catch (e) { return json(res, { ok: false, error: '보고를 저장하지 못했어요.' }, 500); }
+  return json(res, { ok: true, ids: saved });
 }

@@ -11,8 +11,16 @@ let homeTopNote = null;
 let homeTopBusy = false;
 let homeTeamBusy = false;
 let homeDeptNote = null;
-let homeDeptFolder = '';
 let homeDeptDraft = '';
+let homeDeptWho = '';
+let homeTalkDraft = '';
+let homeGallery = false;
+let homeEdit = null;
+let homeAddOpen = false;
+let homeAddName = '';
+let homeAddRole = '';
+let homeAPI = null;
+let homeDeptFolder = '';
 let homeComposing = false;
 let homePaintWait = false;
 
@@ -23,7 +31,7 @@ const HOME_DEPTS = [
   { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
   { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
   { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
-  { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
+  { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '알들컴퍼니' },
 ];
 function homeDepts(A) {
   const t = A && A.state && A.state.botTargets;
@@ -89,17 +97,33 @@ function homeSnap(el) {
   if (dept && dept.value) homeTopSave(dept.value);
   if (task) homeDeptDraft = task.value;
   if (folder) homeDeptFolder = folder.value;
+  const who = el.querySelector('#homeWho');
+  const talk = el.querySelector('#homeTalk');
+  const addName = el.querySelector('#zAddName');
+  const addRole = el.querySelector('#zAddRole');
+  if (who) homeDeptWho = who.value;
+  if (talk) homeTalkDraft = talk.value;
+  if (addName) homeAddName = addName.value;
+  if (addRole) homeAddRole = addRole.value;
+  if (homeEdit) {
+    const en = el.querySelector('#zEditName');
+    const er = el.querySelector('#zEditRole');
+    const nick = el.querySelector('#zEditNick');
+    if (en) homeEdit.name = en.value;
+    if (er) homeEdit.role = er.value;
+    if (nick) homeEdit.nick = nick.value;
+  }
   const ae = document.activeElement;
-  const focusId = ae && el.contains(ae) ? ae.id : '';
-  const caret = focusId === 'homeTopCmd' && cmd ? cmd.selectionStart : null;
+  const focusId = ae && el.contains(ae) && ae.id ? ae.id : '';
+  const caret = ae && (ae.selectionStart || ae.selectionStart === 0) ? ae.selectionStart : null;
   return { focusId, caret };
 }
 function homeRestoreFocus(el, snap) {
-  if (!snap || (snap.focusId !== 'homeTopCmd' && snap.focusId !== 'homeTopDept')) return;
-  const node = el.querySelector('#' + snap.focusId);
+  if (!snap || !snap.focusId) return;
+  const node = el.querySelector('#' + (window.CSS && CSS.escape ? CSS.escape(snap.focusId) : snap.focusId));
   if (!node || typeof node.focus !== 'function') return;
   node.focus();
-  if (snap.focusId === 'homeTopCmd' && snap.caret != null && node.setSelectionRange) {
+  if (snap.caret != null && node.setSelectionRange && typeof node.value === 'string') {
     const n = Math.min(snap.caret, node.value.length);
     node.setSelectionRange(n, n);
   }
@@ -216,10 +240,15 @@ async function homeTopSend(el, A) {
   if (typeof renderReports === 'function' && slot) renderReports(slot);
 }
 function homePaint(el, A) {
-  // 글 쓰는 중에는 화면을 통째로 다시 그리지 않아요. 다시 그리면 한글이 조합되다 사라져요.
+  // 글 쓰는 중에는 입력칸을 다시 만들지 않아요. 보고 목록만 조용히 새로고침합니다.
   if (homeFieldBusy(el)) {
     homeSnap(el);
     homePaintWait = true;
+    const slot = el.querySelector('#zDeptReports') || el.querySelector('#homeReports');
+    if (slot && typeof renderReports === 'function') {
+      const opt = slot.id === 'zDeptReports' ? { dept: homeCurrentDept(A).name, title: '📋 이 부서 보고' } : undefined;
+      renderReports(slot, opt);
+    }
     return;
   }
   homePaintWait = false;
@@ -261,78 +290,236 @@ function homePaint(el, A) {
   if (chat && typeof A.chatWidget === 'function') A.chatWidget(chat, 4);
   else if (chat && typeof A.coopChat === 'function') A.coopChat(chat);
 }
+function homeCurrentDept(A, pack) {
+  const list = (pack || homeDepts(A)).depts || [];
+  return list.find((x) => x.id === homeDeptId) || { id: homeDeptId, name: '부서', icon: '🏢', sub: '' };
+}
+function homeBotNick(A, name) {
+  const map = (A && A.state && A.state.botNicks) || {};
+  const nick = map && map[name];
+  return nick ? String(nick) : name;
+}
+function homeStatusWord(e) {
+  if (!e) return '';
+  if (e.status === 'working') return '일하는 중';
+  if (e.status === 'waiting') return '답 기다리는 중';
+  if (e.status === 'error') return '문제';
+  if (e.queue) return '일 기다리는 중';
+  return '쉬는 중';
+}
+function homeArtCount(deptName) {
+  const items = (typeof reportPack !== 'undefined' && reportPack && reportPack.items) || [];
+  let n = 0;
+  for (const r of items) if (typeof reportInDept === 'function' && reportInDept(r, deptName)) n += (r.artifacts || []).length;
+  return n;
+}
+function homeGalleryInner(deptName, esc) {
+  const items = (typeof reportPack !== 'undefined' && reportPack && reportPack.items) || [];
+  const photos = [];
+  const rest = [];
+  for (const r of items) {
+    if (typeof reportInDept === 'function' && !reportInDept(r, deptName)) continue;
+    for (const a of r.artifacts || []) {
+      if (!a) continue;
+      const row = { a, id: r.id || '' };
+      if (a.kind === 'photo' && (a.src || a.url)) photos.push(row);
+      else rest.push(row);
+    }
+  }
+  if (!photos.length && !rest.length) return '<div class="muted small">이 부서 결과물이 아직 없어요. 일이 끝나면 사진과 파일이 여기에 모입니다.</div>';
+  const grid = photos.length ? `<div class="art-photos">${photos.map((row) => `<figure class="art-photo"><img src="${esc(row.a.src || row.a.url)}" alt="${esc(row.a.name || '사진')}"><figcaption>${esc(row.a.name || '사진')}</figcaption></figure>`).join('')}</div>` : '';
+  const list = rest.map((row) => {
+    const a = row.a;
+    if (a.kind === 'photo') return `<div class="art-file">🖼 ${esc(a.name || '사진')}</div>`;
+    if (a.kind === 'file') return `<button type="button" class="art-file" data-art-open="1" data-id="${esc(row.id)}" data-a="${esc(a.i)}">📄 ${esc(a.path || a.name || '파일')}</button>`;
+    if (a.kind === 'link' && /^https?:\/\//i.test(String(a.url || ''))) return `<a class="art-link" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">🔗 ${esc(a.name || '링크')}</a>`;
+    if (a.kind === 'text' && a.text) return `<div class="art-text">📝 ${esc(a.text)}</div>`;
+    return '';
+  }).join('');
+  return `${grid}<div class="art-files">${list}</div>`;
+}
+function homeAfterReports() {
+  try {
+    const el = document.getElementById('home');
+    if (!el || homeMode !== 'dept' || !homeAPI) return;
+    const d = homeCurrentDept(homeAPI);
+    const n = el.querySelector('#zArtCount');
+    if (n) n.textContent = String(homeArtCount(d.name));
+    const g = el.querySelector('#zArtGallery');
+    if (g && homeGallery) g.innerHTML = homeGalleryInner(d.name, homeAPI.esc);
+  } catch (e) { /* 결과물 칸만 비워 두고 화면은 유지 */ }
+}
+function homeWhoHtml(A, claude, bots, esc) {
+  const opts = [];
+  const sorted = claude.slice().sort((a, b) => (b.lead === true) - (a.lead === true) || String(a.name).localeCompare(String(b.name), 'ko'));
+  for (const e of sorted) opts.push({ v: 'emp:' + e.id, label: '👤 ' + e.name + (e.lead ? ' (팀장)' : ' (직원)') });
+  for (const b of bots) {
+    const nick = homeBotNick(A, b.name);
+    const label = nick === b.name ? b.name : nick + ' · 원래 ' + b.name;
+    opts.push({ v: 'bot:' + (b.id || b.name), label: '🤖 ' + label });
+  }
+  const cur = opts.some((o) => o.v === homeDeptWho) ? homeDeptWho : (opts[0] ? opts[0].v : '');
+  homeDeptWho = cur;
+  if (!opts.length) return '<option value="">팀원이 없어요</option>';
+  return opts.map((o) => `<option value="${esc(o.v)}"${o.v === cur ? ' selected' : ''}>${esc(o.label)}</option>`).join('');
+}
+function homeEmpRows(claude, esc) {
+  if (!claude.length) {
+    return '<p class="muted small">아직 클로드 직원이 없어요. 아래 「만들기」를 눌러요.</p>';
+  }
+  const sorted = claude.slice().sort((a, b) => (b.lead === true) - (a.lead === true) || String(a.name).localeCompare(String(b.name), 'ko'));
+  return `<ul class="dept-people">${sorted.map((e) => {
+    if (homeEdit && homeEdit.kind === 'emp' && homeEdit.id === e.id) {
+      return `<li class="dept-edit"><b>이름 고치기</b>
+        <input id="zEditName" value="${esc(homeEdit.name)}" placeholder="예: 안내담당" autocomplete="off">
+        <input id="zEditRole" value="${esc(homeEdit.role || '')}" placeholder="맡은 일 (예: 고객 안내 글)" autocomplete="off">
+        <div class="dept-edit-row"><button type="button" class="btn small" data-home="edit-save">저장</button><button type="button" class="btn ghost small" data-home="edit-cancel">취소</button></div>
+        <div class="muted small">폴더와 하던 대화는 그대로예요.</div></li>`;
+    }
+    return `<li><div class="dept-row"><div><b>${esc(e.name)}</b>${e.lead ? ' <span class="muted small">(팀장)</span>' : ''} <span class="muted small">${esc(homeStatusWord(e))}</span><div class="muted small">${esc(e.role || '')}</div>${homeJobLine(e, esc)}</div><button type="button" class="btn ghost small" data-home="edit" data-id="${esc(e.id)}">수정</button></div></li>`;
+  }).join('')}</ul>`;
+}
+function homeBotRows(A, bots, esc) {
+  if (!bots.length) return '<p class="muted small">아직 그록 봇이 없어요.</p>';
+  return `<ul class="dept-people">${bots.map((b) => {
+    const nick = homeBotNick(A, b.name);
+    if (homeEdit && homeEdit.kind === 'bot' && homeEdit.origin === b.name) {
+      return `<li class="dept-edit"><b>화면에 보일 이름</b>
+        <div class="muted small">일을 보낼 때는 원래 이름 「${esc(b.name)}」을 써요.</div>
+        <input id="zEditNick" value="${esc(homeEdit.nick || '')}" placeholder="예: 폰팀" autocomplete="off">
+        <div class="dept-edit-row"><button type="button" class="btn small" data-home="nick-save" data-name="${esc(b.name)}">저장</button><button type="button" class="btn ghost small" data-home="edit-cancel">취소</button></div></li>`;
+    }
+    const shown = nick === b.name ? esc(b.name) : esc(nick) + ' <span class="muted small">원래 ' + esc(b.name) + '</span>';
+    return `<li><div class="dept-row"><div><b>${shown}</b>${b.lead ? ' <span class="muted small">(팀장)</span>' : ''}<div class="muted small">${esc(b.role || '')}</div></div><button type="button" class="btn ghost small" data-home="nick" data-name="${esc(b.name)}">별명</button></div></li>`;
+  }).join('')}</ul>`;
+}
+function homeAddHtml(esc) {
+  if (!homeAddOpen) return '<button type="button" class="btn ghost small" data-home="add">＋ 직원 추가</button>';
+  return `<div class="dept-edit">
+    <b>이 부서에 직원 추가</b>
+    <input id="zAddName" value="${esc(homeAddName)}" placeholder="이름 (예: 안내담당)" autocomplete="off">
+    <input id="zAddRole" value="${esc(homeAddRole)}" placeholder="맡은 일 (예: 고객 안내 글)" autocomplete="off">
+    <div class="dept-edit-row"><button type="button" class="btn small" data-home="add-save">저장</button><button type="button" class="btn ghost small" data-home="add-cancel">취소</button></div>
+    <div class="muted small">게임 폴더가 있어야 자리를 만들 수 있어요.</div>
+  </div>`;
+}
+async function homeLoadTalk(el, A, d) {
+  const names = homeClaudeList(A, d.id).map((e) => e.name);
+  let coop = [];
+  try {
+    const data = await fetch('/api/coop/chat', { cache: 'no-store' }).then((r) => r.json());
+    coop = ((data && data.items) || []).filter((c) => {
+      const t = String(c && c.text || '');
+      if (t.indexOf('[부서:' + d.name + ']') >= 0 || t.indexOf(d.name) >= 0) return true;
+      return names.some((n) => n && t.indexOf(n) >= 0);
+    }).slice(-6);
+  } catch (e) { coop = []; }
+  const local = ((A.state && A.state.reports) || []).filter((r) => names.indexOf(r.empName) >= 0).slice(0, 6);
+  const esc = A.esc;
+  const lines = [];
+  for (const c of coop) {
+    const who = c.who === 'grok' ? '그록' : c.who === 'claude' ? '클로드' : '사장님';
+    lines.push(`<div class="dept-line"><b>${esc(who)}</b> <span class="muted small">${esc(String(c.text || '').replace(/\s+/g, ' ').slice(0, 160))}</span></div>`);
+  }
+  for (const r of local) {
+    const text = String(r.text || r.task || '').split('\n').map((s) => s.trim()).filter(Boolean)[0] || '';
+    lines.push(`<div class="dept-line"><b>${esc(r.empName || '직원')} 답</b> <span class="muted small">${esc(text.slice(0, 160))}</span></div>`);
+  }
+  const html = lines.length ? lines.join('') : '<div class="muted small">아직 이 부서 대화가 없어요. 아래에 적으면 고른 사람에게 가요.</div>';
+  const box = el.querySelector('#zTalkList');
+  if (!box || homeMode !== 'dept' || homeDeptId !== d.id) return;
+  box.innerHTML = html;
+}
+async function homeDeptAssign(el, A, d, who, command) {
+  const show = (ok, text) => {
+    homeDeptNote = { id: d.id, ok, text };
+    if (homeMode === 'dept' && homeDeptId === d.id) homePaint(el, A);
+  };
+  if (!who) return show(false, '받을 사람을 골라 주세요.');
+  if (!command) return show(false, '할 일을 적어 주세요.');
+  let r = null;
+  try {
+    if (who.indexOf('emp:') === 0) r = await A.api('/api/order', { to: who.slice(4), text: command, dept: d.name });
+    else if (who.indexOf('bot:') === 0) r = await A.api('/api/bot/command', { target: who.slice(4), command, skipClaude: true });
+    else r = { ok: false, error: '받을 사람을 골라 주세요.' };
+  } catch (e) {
+    r = { ok: false, error: '못 보냈어요. 회사 프로그램이 켜져 있는지 봐 주세요.' };
+  }
+  const ok = !!(r && r.ok);
+  const text = ok ? '넣었어요. 바로 아래 보고에 접수로 떠요.' : ((r && r.error) || '못 보냈어요');
+  if (ok) {
+    homeDeptDraft = '';
+    homeTalkDraft = '';
+    const cmd = el.querySelector('#homeCmd');
+    const talk = el.querySelector('#homeTalk');
+    if (cmd) cmd.value = '';
+    if (talk) talk.value = '';
+    reportAt = 0;
+    if (A.toast) A.toast(d.name + '에 넣었어요');
+  }
+  homeComposing = false;
+  const typing = document.activeElement;
+  if (typing && el.contains(typing) && homeTexting(typing)) typing.blur();
+  show(ok, text);
+}
 function homePaintDept(el, A, pack, esc) {
-  const d = pack.depts.find((x) => x.id === homeDeptId) || { id: homeDeptId, name: '부서', icon: '🏢', sub: '' };
+  const d = homeCurrentDept(A, pack);
   const bots = (pack.bots || []).filter((b) => b.dept === d.id);
   const claude = homeClaudeList(A, d.id);
-  const lead = claude.find((e) => e.lead) || claude.find((e) => /팀장$/.test(e.name));
-  const claudeHtml = claude.length
-    ? homePeopleHtml(claude, esc, true)
-    : '<p class="muted">아직 클로드 직원이 없어요. 아래 「만들기」를 눌러요.</p>';
   const makeHtml = `<div class="dept-make">
       <button type="button" class="btn" data-home="makedept">＋ 만들기</button>
-      <div class="muted small">이 부서에 없는 클로드 직원을 만들어요. 폴더를 비우면 게임 폴더 옆에 자리를 만들어요.</div>
+      <div class="muted small">이 부서에 없는 클로드 직원을 만들어요. 폴더를 비우면 게임 폴더 옆에 자리를 만들어요. 켤 때 저절로 만들지 않아요.</div>
       <label class="dept-folder-label">폴더 주소 (직접 고를 때)
         <input id="homeDeptFolder" class="dept-folder" type="text" autocomplete="off" placeholder="예: D:\\일\\홍보" value="${esc(homeDeptFolder)}">
       </label>
-      <div class="muted small">주소를 적으면 그 폴더 안에 직원마다 자리를 만들어요. 게임 폴더는 필요 없어요.</div>
+      <div class="muted small">주소를 적으면 그 폴더 안에 직원마다 자리를 만들어요.</div>
     </div>`;
-  const botHtml = bots.length ? homePeopleHtml(bots, esc, false) : '<p class="muted">아직 그록 봇 목록이 없어요.</p>';
-  const game = d.id === 'game';
   const note = homeDeptNote && homeDeptNote.id === d.id ? homeDeptNote : null;
-  const hint = lead
-    ? `보내면 그록 팀장에게 가고, 클로드 팀장(${esc(lead.name)})에게도 같은 일이 들어가요.`
-    : '보내면 그록 팀장에게 가요. 클로드 팀장이 있으면 그 사람에게도 넣어요.';
+  const example = d.id === 'game' ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해';
+  const galleryBtn = homeGallery ? '결과물 접기' : '결과물 모아 보기';
   el.innerHTML = `<div class="dept-page home-fit">
     <div class="dept-bar">
       <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
       <div class="dept-name"><span class="ico">${d.icon || '🏢'}</span><div><b>${esc(d.name)}</b><div class="muted small">${esc(d.sub || '')} · 클로드 ${claude.length}명 · 그록 ${bots.length}명</div></div></div>
-      ${game ? '<button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>' : ''}
+      <button type="button" class="btn" data-home="gallery">🗂 ${galleryBtn} <span id="zArtCount">${homeArtCount(d.name)}</span></button>
     </div>
+    ${homeGallery ? `<div class="art-gallery" id="zArtGallery">${homeGalleryInner(d.name, esc)}</div>` : '<div id="zArtGallery" hidden></div>'}
     <div class="dept-grid">
-      <section class="card dept-card">
-        <div class="dept-block"><b>🧠 클로드 직원</b> <span class="muted small">${claude.length}명</span>
-          <div class="muted small">${game ? '게임 일을 직접 보려면 오른쪽 위 「클로드 작업장」을 눌러요.' : '이 부서의 클로드 팀이에요. 일을 보내면 팀장이 받아요.'}</div>
-          ${claudeHtml}
+      <section class="card dept-col">
+        <div class="dept-block"><b>👤 팀원 · 클로드</b> <span class="muted small">${claude.length}명</span>
+          ${homeEmpRows(claude, esc)}
           ${makeHtml}
+          ${homeAddHtml(esc)}
         </div>
-        <div class="dept-block"><b>🤖 그록 봇</b> <span class="muted small">${bots.length}명</span>
-          ${botHtml}
+        <div class="dept-block"><b>🤖 팀원 · 그록 봇</b> <span class="muted small">${bots.length}명</span>
+          <div class="muted small">별명은 이 화면에서만 바뀝니다. 일을 보낼 때는 원래 이름을 써요.</div>
+          ${homeBotRows(A, bots, esc)}
+        </div>
+        <div class="card dept-talk">
+          <b>💬 이 부서 대화·답</b>
+          <div class="muted small">이 부서 이야기와 직원 답을 여기 모아요.</div>
+          <div id="zTalkList" class="dept-talk-list"><div class="muted small">불러오는 중…</div></div>
+          <form id="homeTalkSend" class="dept-talk-send">
+            <input id="homeTalk" type="text" autocomplete="off" placeholder="짧은 말 (예: 오늘 할 일만 먼저 해 줘)" value="${esc(homeTalkDraft)}">
+            <button class="btn small" type="submit">보내기</button>
+          </form>
         </div>
       </section>
-      <form class="card dept-card dept-send" id="homeSend">
-        <b>✍️ 이 부서에 일 시키기</b>
-        <div class="muted small">${hint}<br>예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
-        <textarea id="homeCmd" class="home-text" rows="4" placeholder="할 일을 적어 주세요">${esc(homeDeptDraft)}</textarea>
-        <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
-        <button class="btn" type="submit">보내기</button>
-      </form>
+      <section class="dept-col dept-work">
+        <form class="card dept-send" id="homeSend">
+          <b>✍️ 일 시키기</b>
+          <div class="muted small">팀장이나 직원을 고르고 할 일을 적어요. 보내면 바로 아래 보고에 접수로 떠요.</div>
+          <label class="home-order-pick">받을 사람 <select id="homeWho">${homeWhoHtml(A, claude, bots, esc)}</select></label>
+          <textarea id="homeCmd" class="home-text" rows="4" placeholder="예: ${esc(example)}">${esc(homeDeptDraft)}</textarea>
+          <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
+          <button class="btn" type="submit">보내기</button>
+        </form>
+        <section class="dept-reports" id="zDeptReports"></section>
+      </section>
     </div>
   </div>`;
-  const form = el.querySelector('#homeSend');
-  if (form) form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    const command = (el.querySelector('#homeCmd').value || '').trim();
-    const err = el.querySelector('#homeSendErr');
-    if (!command) { if (err) err.textContent = '할 일을 적어 주세요.'; return; }
-    const r = await A.api('/api/bot/command', { target: d.name, command });
-    let text = '';
-    let ok = !!(r && r.ok);
-    if (!ok) {
-      text = (r && r.error) || '못 보냈어요';
-      if (r && r.claudeLead && text.indexOf(r.claudeLead) < 0) text += ' 클로드 팀장 ' + r.claudeLead + '에게는 넣어 두었어요.';
-    } else {
-      text = d.name + '에 보냈어요.' + (r.claudeLead ? ' 클로드 ' + r.claudeLead + '에게도 넣었어요.' : '');
-      A.toast(text);
-      reportAt = 0;
-      homeDeptDraft = '';
-    }
-    homeDeptNote = { id: d.id, ok, text };
-    homeComposing = false;
-    const typing = document.activeElement;
-    if (typing && homeTexting(typing)) typing.blur();
-    if (homeMode === 'dept' && homeDeptId === d.id) homePaint(el, A);
-  });
+  if (typeof renderReports === 'function') renderReports(el.querySelector('#zDeptReports'), { dept: d.name, title: '📋 이 부서 보고' });
+  homeLoadTalk(el, A, d);
 }
 function homePaintConn(el, A, esc) {
   const list = window.AldeulGrokConnectors || [];
@@ -364,9 +551,23 @@ function homeBind(el, A) {
   el.dataset.homeBound = '1';
   el.addEventListener('submit', (ev) => {
     const form = ev.target;
-    if (!form || form.id !== 'homeTopSend' || !el.contains(form)) return;
+    if (!form || !el.contains(form)) return;
+    if (form.id === 'homeTopSend') { ev.preventDefault(); homeTopSend(el, A); return; }
+    if (form.id !== 'homeSend' && form.id !== 'homeTalkSend') return;
     ev.preventDefault();
-    homeTopSend(el, A);
+    const d = homeCurrentDept(A);
+    const who = (el.querySelector('#homeWho') || {}).value || homeDeptWho;
+    if (form.id === 'homeTalkSend') {
+      const talk = el.querySelector('#homeTalk');
+      const command = talk ? String(talk.value || '').trim() : '';
+      homeTalkDraft = command;
+      homeDeptAssign(el, A, d, who, command);
+      return;
+    }
+    const cmd = el.querySelector('#homeCmd');
+    const command = cmd ? String(cmd.value || '').trim() : '';
+    homeDeptDraft = command;
+    homeDeptAssign(el, A, d, who, command);
   });
   el.addEventListener('change', (ev) => {
     const t = ev.target;
@@ -395,15 +596,34 @@ function homeBind(el, A) {
     }, 0);
   });
   el.addEventListener('click', (ev) => {
+    const art = ev.target.closest('[data-art-open]');
+    if (art && el.contains(art)) {
+      ev.preventDefault();
+      fetch('/api/openFile', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ c: art.getAttribute('data-id') || '', a: Number(art.getAttribute('data-a')) }) }).catch(() => {});
+      return;
+    }
     const b = ev.target.closest('[data-home]');
     if (!b || !el.contains(b)) return;
     const act = b.getAttribute('data-home');
-    if (act === 'back') { homeMode = 'home'; homeConn = -1; }
-    else if (act === 'dept') { homeMode = 'dept'; homeDeptId = b.getAttribute('data-id') || ''; }
+    if (act === 'back') { homeMode = 'home'; homeConn = -1; homeEdit = null; }
+    else if (act === 'dept') { homeMode = 'dept'; homeDeptId = b.getAttribute('data-id') || ''; homeEdit = null; homeGallery = false; }
     else if (act === 'workshop') { if (A.openWorkshop) A.openWorkshop(); return; }
     else if (act === 'conn') { homeMode = 'conn'; homeConn = -1; }
     else if (act === 'connone') { homeMode = 'conn'; homeConn = Number(b.getAttribute('data-i')); }
     else if (act === 'team') { homeMakeTeams(A); return; }
+    else if (act === 'gallery') { homeGallery = !homeGallery; }
+    else if (act === 'edit') {
+      const id = b.getAttribute('data-id') || '';
+      const emp = homeClaudeList(A, homeDeptId).find((e) => e.id === id);
+      if (emp) homeEdit = { kind: 'emp', id: emp.id, name: emp.name, role: emp.role || '' };
+    } else if (act === 'edit-cancel' || act === 'add-cancel') { homeEdit = null; homeAddOpen = false; }
+    else if (act === 'edit-save') { homeSaveEmp(el, A); return; }
+    else if (act === 'nick') {
+      const name = b.getAttribute('data-name') || '';
+      homeEdit = { kind: 'bot', origin: name, nick: homeBotNick(A, name) === name ? '' : homeBotNick(A, name) };
+    } else if (act === 'nick-save') { homeSaveNick(el, A, b.getAttribute('data-name') || ''); return; }
+    else if (act === 'add') { homeAddOpen = true; }
+    else if (act === 'add-save') { homeAddEmp(el, A); return; }
     else if (act === 'makedept') {
       const inp = el.querySelector('#homeDeptFolder');
       if (inp) homeDeptFolder = inp.value;
@@ -414,9 +634,62 @@ function homeBind(el, A) {
     homePaint(el, A);
   });
 }
+async function homeSaveEmp(el, A) {
+  const d = homeCurrentDept(A);
+  const name = String((el.querySelector('#zEditName') || {}).value || '').trim();
+  const role = String((el.querySelector('#zEditRole') || {}).value || '').trim();
+  const id = homeEdit && homeEdit.id;
+  let r = null;
+  try { r = await A.api('/api/employee', { id, rename: true, name, role }); }
+  catch (e) { r = { ok: false, error: '저장하지 못했어요.' }; }
+  if (!r || !r.ok) homeDeptNote = { id: d.id, ok: false, text: (r && r.error) || '이름을 못 고쳤어요.' };
+  else {
+    homeEdit = null;
+    homeDeptNote = { id: d.id, ok: true, text: '이름을 ' + r.name + '으로 고쳤어요.' };
+    if (A.toast) A.toast('이름을 고쳤어요');
+  }
+  if (homeMode === 'dept') homePaint(el, A);
+}
+async function homeSaveNick(el, A, origin) {
+  const d = homeCurrentDept(A);
+  const nick = String((el.querySelector('#zEditNick') || {}).value || '').trim();
+  const name = origin || (homeEdit && homeEdit.origin) || '';
+  let r = null;
+  try { r = await A.api('/api/bot/nick', { name, nick }); }
+  catch (e) { r = { ok: false, error: '별명을 못 고쳤어요.' }; }
+  if (!r || !r.ok) homeDeptNote = { id: d.id, ok: false, text: (r && r.error) || '별명을 못 고쳤어요.' };
+  else {
+    homeEdit = null;
+    homeDeptNote = { id: d.id, ok: true, text: nick ? '화면 이름을 ' + nick + '으로 바꿨어요. 보낼 때는 원래 이름을 써요.' : '원래 이름으로 돌려놨어요.' };
+  }
+  if (homeMode === 'dept') homePaint(el, A);
+}
+async function homeAddEmp(el, A) {
+  const d = homeCurrentDept(A);
+  const name = String((el.querySelector('#zAddName') || {}).value || '').trim();
+  const role = String((el.querySelector('#zAddRole') || {}).value || '').trim();
+  if (!name) {
+    homeDeptNote = { id: d.id, ok: false, text: '이름을 적어 주세요.' };
+    homePaint(el, A);
+    return;
+  }
+  let r = null;
+  try { r = await A.api('/api/employee', { name, role, dept: d.id, autoFolder: true }); }
+  catch (e) { r = { ok: false, error: '직원을 못 만들었어요.' }; }
+  if (!r || !r.ok) homeDeptNote = { id: d.id, ok: false, text: (r && r.error) || '직원을 못 만들었어요.' };
+  else {
+    homeAddOpen = false;
+    homeAddName = '';
+    homeAddRole = '';
+    homeDeptNote = { id: d.id, ok: true, text: name + ' 직원을 이 부서에 넣었어요.' };
+    if (A.toast) A.toast(name + ' 직원을 넣었어요');
+  }
+  if (homeMode === 'dept') homePaint(el, A);
+}
 window.AldeulHome = {
   render(el, A) {
     if (!el || !A) return;
+    homeAPI = A;
     homeBind(el, A);
     homePaint(el, A);
   },
