@@ -351,6 +351,10 @@ function conns() {
       how: 'pixellab.ai 에 로그인 → 계정 설정에서 API 키를 복사 → 아래에 붙여 넣기. 키는 이 PC 의 data 폴더에만 있고 화면·기록에 안 나와요.',
       fields: `<div class="field"><label>PixelLab 키</label><input type="password" name="pixellabKey" placeholder="${s.hasPixellab ? '들어 있어요 (바꿀 때만 넣기)' : 'PixelLab API 키'}" autocomplete="off"></div>
         ${s.hasPixellab ? '<div class="field"><label class="check"><input type="checkbox" name="pixellabClear"> 키 지우기</label></div>' : ''}` },
+    { id: 'higgsfield', ico: '🎬', nm: '힉스필드', ds: '그림·영상을 만들어 주는 AI (유료 크레딧)', on: !!(s.higgsfield && s.higgsfield.installed && s.higgsfield.loggedIn !== false), lamp: s.higgsfield ? (s.higgsfield.installed ? (s.higgsfield.loggedIn === false ? '로그인 필요' : '쓸 수 있음') : '안 깔림') : '확인 안 함',
+      what: '힉스필드(higgsfield.ai)는 그림·영상을 만들어 주는 AI예요 (Kling·Veo·Seedance 같은 영상 모델, 업스케일, 배경 지우기). 연결하면 클로드 직원이 「보스 등장 영상 만들어」 같은 일을 직접 해요. <b>힉스필드 유료 구독이 필요하고, 만들 때마다 크레딧이 줄어요.</b> 직원은 크레딧이 많이 드는 영상은 먼저 사장님께 물어요.',
+      how: `① 「🎬 설치·로그인」을 누르면 검은 창이 떠요 → ② 인터넷 창이 뜨면 <b>힉스필드 계정으로 로그인</b> → ③ 「Global」을 물으면 고르기 → ④ 알들 컴퍼니를 껐다 켜고 「확인」. 키는 필요 없어요.${s.higgsfield ? `<br><br>마지막 확인: <b>${esc(s.higgsfield.msg)}</b> (${ago(s.higgsfield.at)})` : ''}`,
+      fields: '', act: 'higgsfield' },
     { id: 'mcp', ico: '🧩', nm: '클로드 연결 도구', ds: '구글 드라이브·노션 같은 바깥 서비스', on: !!(s.mcpList && s.mcpList.count), lamp: s.mcpList ? (s.mcpList.count ? `${s.mcpList.count}개 연결` : '없음') : '확인 안 함',
       what: '클로드가 구글 드라이브·노션·깃허브 같은 바깥 서비스를 직접 쓰게 해 주는 연결이에요 (영어로 「MCP 커넥터」). 여기 목록에 나오는 것만 PC 직원들이 쓸 수 있어요.',
       how: `아래 「목록 보기」로 지금 이어진 것을 확인해요. 더 잇고 싶으면 이 대화방의 클로드에게 「○○ 연결해 줘」라고 말하면 순서를 알려 드려요. 지금 없어도 일하는 데는 문제없어요 (그록과는 🤖 그록 봇으로 이어져 있어요).${s.mcpList ? `<br><br>마지막 확인 (${ago(s.mcpList.at)}):<code style="display:block;white-space:pre-wrap;margin-top:4px">${esc(s.mcpList.text)}</code>` : ''}`,
@@ -392,12 +396,15 @@ function connOne(id) {
       ${c.act === 'folder' && S.settings.grokDir ? '<button class="btn ghost" value="folder">지금 확인시키기</button>' : ''}
       ${c.act === 'github' ? '<button class="btn ghost" value="ghcheck">🐙 로그인·확인</button>' : ''}
       ${c.act === 'mcp' ? '<button class="btn" value="mcpcheck">🧩 목록 보기</button>' : ''}
+      ${c.act === 'higgsfield' ? '<button class="btn ghost" value="hfcheck">확인</button><button class="btn" value="hfsetup">🎬 설치·로그인</button>' : ''}
       ${c.fields ? '<button class="btn" value="ok">저장</button>' : '<button class="btn ghost" value="cancel">닫기</button>'}</div>`,
   async (fd, v) => {
     if (v === 'back') { setTimeout(connections, 30); return; }
     if (v === 'board') { copy('우리 팀 업무 공유판이야. 일하기 전에 꼭 읽고, 여기 적힌 결정과 규칙을 따라 줘: ' + BOARD, '복사했어요. 그록에 붙여 넣으세요'); return ''; }
     if (v === 'company') { window.open(S.settings.companyUrl, '_blank'); return ''; }
     if (v === 'folder') { const r = await api('/api/grokCheck'); if (!r.ok) return r.error; toast('AI협력팀이 그록 폴더를 확인해요'); return; }
+    if (v === 'hfsetup') { const r = await api('/api/conn/setup', { id: 'higgsfield' }); if (!r.ok) return r.error; toast('검은 창이 열려요. 안내대로 해 주세요'); return ''; }
+    if (v === 'hfcheck') { toast('힉스필드 확인 중…'); const r = await api('/api/conn/check', { id: 'higgsfield' }); if (!r.ok) return r.error; setTimeout(() => connOne(id), 200); return; }
     if (v === 'ghcheck' || v === 'mcpcheck') {
       toast(v === 'ghcheck' ? '깃허브 확인 중… 로그인 창이 뜨면 로그인해 주세요' : '연결 도구 목록을 보는 중… (최대 1분)');
       const r = await api('/api/conn/check', { id: v === 'ghcheck' ? 'github' : 'mcp' });

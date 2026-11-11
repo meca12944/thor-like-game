@@ -413,6 +413,13 @@ ${others}
 ## 허락
 - 위험할 수 있는 일은 회사 화면이 사장님께 대신 물어본다. 사장님이 한 번 「항상 허락」한 일은 다시 묻지 않는다.
 - 거절당하면 다른 방법을 찾고, 그래도 안 되면 보고에 이유를 적는다.
+${state.settings.higgsfield && state.settings.higgsfield.installed ? `
+## 🎬 힉스필드 (그림·영상 AI, 사장님 PC 에 연결됨)
+- 그림·영상(Kling·Veo·Seedance 등), 업스케일, 배경 지우기를 만든다. \`/higgsfield:generate\` 스킬이나 \`higgsfield\` 명령으로 쓴다.
+- **쓸 때마다 사장님 크레딧이 줄어든다.** 사장님이 시킨 일에만 쓰고, 만들기 전에 예상 크레딧을 확인한다. 영상처럼 크레딧이 많이 드는 것은 먼저 \`@사장님:\` 으로 「○○ 크레딧 들어요, 할까요?」 묻는다.
+- 결과는 higgsfield.ai 의 Assets 에도 남는다. 쓸 것은 내려받아 게임 폴더의 맞는 자리에 두고, 보고에 **파일 경로**와 **쓴 크레딧**을 적는다.
+- 빛·불·검기 같은 효과는 그림에 넣지 않는다 (게임 코드로 그림, CLAUDE.md).
+` : ''}
 ${partner}`;
 }
 function claudeArgs(emp, promptFile) {
@@ -1075,6 +1082,7 @@ function openShownFile(p) {
   else openPath(p);
 }
 
+const HF_BAT = "@echo off\nchcp 65001 >nul\ntitle 힉스필드 연결 (알들 컴퍼니)\necho.\necho  ===== 🎬 힉스필드 연결 =====\necho  [1/3] 힉스필드 프로그램 설치...\ncall npm i -g @higgsfield/cli || goto fail\necho.\necho  [2/3] 힉스필드 로그인 — 인터넷 창이 뜨면 힉스필드 계정으로 로그인해 주세요.\ncall higgsfield auth login || goto fail\necho.\necho  [3/3] 클로드 직원용 힉스필드 사용법(스킬) 설치\necho        물어보면 「Global」(전체)을 골라 주세요. 다른 건 Enter.\ncall npx -y skills add higgsfield-ai/skills\necho.\necho  다 됐어요! 이 창을 닫고, 알들 컴퍼니를 한 번 껐다 켠 뒤\necho  🔌 연결 → 🎬 힉스필드 → 「확인」을 눌러 주세요.\npause\nexit /b\n:fail\necho.\necho  문제가 생겼어요. 이 창을 사진으로 찍어 보내 주세요.\npause\n";
 const connStatus = createConnStatus({
   ROOT,
   getState: () => state,
@@ -1170,6 +1178,15 @@ const server = http.createServer(async (req, res) => {
       try { return json(res, await connStatus.check(b && b.id)); }
       catch (e) { return json(res, { ok: false, error: '다시 확인하지 못했어요.' }); }
     }
+    if (p === '/api/conn/setup') {
+      // 🎬 힉스필드 설치·로그인: 사장님이 볼 수 있는 검은 창을 열어 차례로 해요 (로그인·물음은 사장님이 직접)
+      if (b.id !== 'higgsfield') return json(res, { ok: false, error: '모르는 연결이에요.' });
+      if (!IS_WIN) return json(res, { ok: false, error: '윈도우 PC에서 눌러 주세요. (명령: npm i -g @higgsfield/cli → higgsfield auth login → npx skills add higgsfield-ai/skills)' });
+      const bat = path.join(DATA, 'higgsfield_setup.bat');
+      fs.writeFileSync(bat, HF_BAT.replace(/\n/g, '\r\n'), 'utf8');
+      spawn('cmd', ['/c', 'start', '', bat], { detached: true, windowsHide: false, cwd: DATA }).unref();
+      return json(res, { ok: true });
+    }
     if (p === '/api/conn/check') {
       const repo = state.settings.gameRepo;
       const run = (cmd, args, opt) => new Promise((ok) => execFile(cmd, args, { windowsHide: true, timeout: 120000, ...opt }, (err, out, errOut) => ok({ err, out: String(out || ''), errOut: String(errOut || '') })));
@@ -1183,6 +1200,17 @@ const server = http.createServer(async (req, res) => {
         const msg = okPush ? '올릴 수 있어요.' : /denied|403|Authentication|could not read|terminal prompts/i.test(r.errOut) ? '깃허브 로그인이 필요해요. 뜬 창에서 로그인한 뒤 다시 눌러 주세요.' : '확인 못 했어요: ' + r.errOut.trim().split('\n').slice(-2).join(' ');
         state.settings.ghPush = { ok: okPush, at: now(), msg, name, email };
         changed(); return json(res, { ok: true, result: state.settings.ghPush });
+      }
+      if (b.id === 'higgsfield') {
+        // 🎬 힉스필드: 프로그램(CLI)이 깔렸는지, 로그인됐는지 봐요. 키는 없어요 (힉스필드 계정 로그인).
+        const shell = IS_WIN;
+        const v = await run('higgsfield', ['--version'], { shell, timeout: 30000 });
+        const installed = !v.err;
+        let loggedIn = null;
+        if (installed) { const a = await run('higgsfield', ['auth', 'status'], { shell, timeout: 30000 }); loggedIn = a.err ? (/not|login|logged out|unauth/i.test(a.out + a.errOut) ? false : null) : !/not logged|logged out/i.test(a.out + a.errOut); }
+        const msg = !installed ? '아직 안 깔렸어요. 「설치·로그인」을 눌러 주세요.' : loggedIn === false ? '깔렸는데 로그인이 안 됐어요. 「설치·로그인」을 다시 눌러 주세요.' : '쓸 수 있어요.';
+        state.settings.higgsfield = { installed, version: v.out.trim().split('\n')[0].slice(0, 60), loggedIn, at: now(), msg };
+        changed(); return json(res, { ok: true, result: state.settings.higgsfield });
       }
       if (b.id === 'mcp') {
         if (!claude.ok) return json(res, { ok: false, error: '먼저 🧠 클로드 코드가 켜져 있어야 해요.' });
