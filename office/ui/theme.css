@@ -1,14 +1,55 @@
 /* 알들 컴퍼니 공용 테마 (클로드가 기준을 만들고 그록이 맞춰 씀 — office/공동개발_규칙.md)
-   - 색은 아래 --이름 만 쓰기 (밝은/어두운 화면 자동)
+   - 색·글꼴·단추·카드·창 모양은 아래 --이름 만 쓰기 (밝은/어두운 화면 자동). 이름 규칙 --무엇-어디, 이름은 바꾸지 말고 새로 더하기
    - 단추: .btn / .btn.ghost / .btn.green / .btn.red / .btn.small / .btn.big
    - 아이콘 타일: .tiles > .tile (.ico .nm .ds, 상태등 .lamp.on/.off)
    - 카드: .card (.card-head, time), 빈 자리 안내: .empty
    - 움직임·네온 없음. 상태등은 진짜 완료일 때만 🟢. 글은 중학생도 아는 쉬운 말. */
 :root {
-  --bg: #f3f4f6; --panel: #ffffff; --line: #e2e5ea; --text: #1d2129; --muted: #6b7280;
-  --accent: #c8643b; --accent-soft: #fbeee7; --blue: #2f6fde; --blue-soft: #e8effd;
-  --green: #1f9d55; --green-soft: #e3f5ea; --red: #d13b3b; --red-soft: #fdeaea;
-  --amber: #a86a12; --amber-soft: #fff3d6; --ink: #16181d;
+  /* ── 색 (밝은 화면) ── */
+  --bg: #f3f4f6;            /* 바탕 */
+  --panel: #ffffff;         /* 카드·창 바탕 */
+  --line: #e2e5ea;          /* 테두리 선 */
+  --text: #1d2129;          /* 글자 */
+  --muted: #6b7280;         /* 흐린 글자 */
+  --ink: #16181d;           /* 진한 칩·말풍선 테두리 */
+  --on-color: #fff;         /* 색 단추·동그라미 위 글자 */
+  --accent: #c8643b;        /* 대표색 (주황) */
+  --accent-soft: #fbeee7;
+  --blue: #2f6fde;          /* 링크·일하는 중 */
+  --blue-soft: #e8effd;
+  --green: #1f9d55;         /* 좋음·허락 */
+  --green-soft: #e3f5ea;
+  --red: #d13b3b;           /* 문제·거절 */
+  --red-soft: #fdeaea;
+  --amber: #a86a12;         /* 기다림·확인 필요 */
+  --amber-soft: #fff3d6;
+
+  /* ── 글꼴 ── */
+  --font: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --font-mono: Consolas, "D2Coding", monospace;
+  --font-size: 16px;        /* 기본 글자 */
+  --font-size-sm: 13px;     /* 작은 글자 */
+  --font-size-lg: 17px;     /* 제목 글자 */
+  --line-height: 1.6;
+
+  /* ── 단추 ── */
+  --btn-radius: 10px;
+  --btn-pad: 8px 16px;
+  --btn-weight: 700;
+
+  /* ── 카드·칸 ── */
+  --card-radius: 14px;
+  --card-pad: 14px 18px;
+  --input-radius: 8px;
+  --pill-radius: 99px;      /* 알약 모양 (칩·숫자) */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+
+  /* ── 창 (dialog) ── */
+  --dlg-radius: 16px;
+  --dlg-width: min(680px, 92vw);
+  --dlg-shadow: 0 10px 40px rgba(0,0,0,.25);
+  --backdrop: rgba(0,0,0,.35);   /* 창 뒤 어둡게 */
+  --overlay: rgba(0,0,0,.85);    /* 그림 크게 보기 뒤 */
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,9 +61,9 @@
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; display: flex; flex-direction: column; }
+body { margin: 0; background: var(--bg); color: var(--text); font: var(--font-size)/var(--line-height) var(--font); display: flex; flex-direction: column; }
 button, select, input, textarea { font: inherit; color: inherit; }
-.muted { color: var(--muted); } .small { font-size: 13px; font-weight: 400; }
+.muted { color: var(--muted); } .small { font-size: var(--font-size-sm); font-weight: 400; }
 
 /* 맨 위 */
 .top { display: flex; align-items: center; gap: 14px; padding: 12px 22px; background: var(--panel); border-bottom: 1px solid var(--line); }
@@ -30,7 +71,7 @@ button, select, input, textarea { font: inherit; color: inherit; }
 .brand img { width: 32px; height: 32px; border-radius: 8px; }
 .summary { flex: 1; color: var(--muted); }
 .summary b { color: var(--text); }
-.btn { border: 0; background: var(--accent); color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+.btn { border: 0; background: var(--accent); color: var(--on-color); padding: var(--btn-pad); border-radius: var(--btn-radius); cursor: pointer; font-weight: var(--btn-weight); }
 .btn:hover { filter: brightness(1.07); }
 .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
 .btn.green { background: var(--green); } .btn.red { background: transparent; color: var(--red); border: 1px solid var(--red); }
@@ -38,10 +79,10 @@ button, select, input, textarea { font: inherit; color: inherit; }
 .btn.small { padding: 4px 12px; font-size: 14px; }
 .link { background: none; border: 0; color: var(--blue); cursor: pointer; padding: 2px 4px; font-size: 14px; }
 
-.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; flex: none; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: var(--on-color); font-weight: 700; flex: none; }
 .badge { font-size: 11px; background: var(--ink); color: var(--panel); border-radius: 6px; padding: 0 5px; margin-left: 4px; vertical-align: 2px; }
 .empty { text-align: center; color: var(--muted); padding: 48px 0; }
-.card { background: var(--panel); border-radius: 14px; padding: 14px 18px; border: 1px solid var(--line); }
+.card { background: var(--panel); border-radius: var(--card-radius); padding: var(--card-pad); border: 1px solid var(--line); }
 .card.new { border-left: 5px solid var(--accent); }
 .card.boss { border: 2px solid var(--amber); }
 .card.err { border: 2px solid var(--red); }
@@ -52,7 +93,7 @@ button, select, input, textarea { font: inherit; color: inherit; }
 .card-task.open { white-space: pre-wrap; }
 .text { margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
 .text.clamp { max-height: 240px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
-.text code { word-break: break-all; background: var(--bg); padding: 0 4px; border-radius: 4px; font: 14px Consolas, "D2Coding", monospace; }
+.text code { word-break: break-all; background: var(--bg); padding: 0 4px; border-radius: 4px; font: 14px var(--font-mono); }
 .text h4 { margin: 6px 0 2px; font-size: 16px; }
 .card-foot { display: flex; gap: 6px; margin-top: 8px; align-items: center; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); }
 .card-foot .sp { flex: 1; }
@@ -61,22 +102,22 @@ button, select, input, textarea { font: inherit; color: inherit; }
 .media video, .media img { width: 100%; display: block; max-height: 360px; object-fit: contain; }
 .media img { cursor: zoom-in; }
 .media figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 8px; font-size: 12px; color: #fff; background: rgba(0,0,0,.5); pointer-events: none; }
-dialog { border: 0; border-radius: 16px; padding: 0; background: var(--panel); color: var(--text); width: min(680px, 92vw); box-shadow: 0 10px 40px rgba(0,0,0,.25); }
-dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog { border: 0; border-radius: var(--dlg-radius); padding: 0; background: var(--panel); color: var(--text); width: var(--dlg-width); box-shadow: var(--dlg-shadow); }
+dialog::backdrop { background: var(--backdrop); }
 #dlgForm { padding: 20px 22px; max-height: 86vh; overflow: auto; }
 #dlgForm h2 { margin: 0 0 14px; font-size: 19px; }
 #dlgForm h3 { margin: 18px 0 8px; font-size: 15px; color: var(--muted); }
 .field { margin-bottom: 12px; }
 .field label { display: block; font-weight: 700; margin-bottom: 4px; }
-.field .help { font-size: 13px; color: var(--muted); margin-top: 3px; }
-.field input[type=text], .field input[type=password], .field select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); }
+.field .help { font-size: var(--font-size-sm); color: var(--muted); margin-top: 3px; }
+.field input[type=text], .field input[type=password], .field select { width: 100%; padding: 8px 10px; border-radius: var(--input-radius); border: 1px solid var(--line); background: var(--bg); }
 .check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400 !important; }
 .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .dlg-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .err-text { color: var(--red); min-height: 1.4em; }
 details.more-set { margin-top: 10px; } details.more-set summary { cursor: pointer; color: var(--muted); }
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
-.tile { text-align: left; border: 2px solid var(--line); background: var(--bg); border-radius: 14px; padding: 12px 14px; cursor: pointer; position: relative; }
+.tile { text-align: left; border: 2px solid var(--line); background: var(--bg); border-radius: var(--card-radius); padding: 12px 14px; cursor: pointer; position: relative; }
 .tile:hover { border-color: var(--accent); }
 .tile .ico { font-size: 30px; line-height: 1; }
 .tile .nm { font-weight: 700; margin-top: 6px; }
@@ -87,9 +128,9 @@ details.more-set { margin-top: 10px; } details.more-set summary { cursor: pointe
 .conn-head .ico { font-size: 40px; }
 .qa { background: var(--bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
 .qa .qh { font-weight: 700; margin-bottom: 2px; }
-.zoom { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: grid; place-items: center; z-index: 9; cursor: zoom-out; }
+.zoom { position: fixed; inset: 0; background: var(--overlay); display: grid; place-items: center; z-index: 9; cursor: zoom-out; }
 .zoom img { max-width: 96vw; max-height: 96vh; }
-.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 10px 18px; border-radius: 10px; z-index: 10; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 10px 18px; border-radius: var(--btn-radius); z-index: 10; }
 .banner-red { margin: 12px 22px 0; padding: 12px 16px; border-radius: 12px; background: var(--red-soft); border: 2px solid var(--red); }
 .view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .view[hidden] { display: none; }

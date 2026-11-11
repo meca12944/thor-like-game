@@ -4,14 +4,14 @@
 #asks { padding: 0 22px; }
 .ask { display: flex; align-items: center; gap: 14px; margin-top: 12px; padding: 12px 16px; border-radius: 12px; background: var(--amber-soft); border: 2px solid var(--amber); }
 .ask .q { flex: 1; min-width: 0; }
-.ask .q b { font-size: 17px; }
-.ask code { display: block; margin-top: 4px; font: 13px/1.4 Consolas, "D2Coding", monospace; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ask .q b { font-size: var(--font-size-lg); }
+.ask code { display: block; margin-top: 4px; font: 13px/1.4 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ask .note { font-size: 13px; color: var(--muted); }
 
 /* 몸통 */
 .board { flex: 1; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; padding: 16px 22px 18px; min-height: 0; }
 .people, .main { min-height: 0; min-width: 0; display: flex; flex-direction: column; }
-.title { font-weight: 700; font-size: 17px; margin-bottom: 8px; display: flex; gap: 8px; align-items: baseline; }
+.title { font-weight: 700; font-size: var(--font-size-lg); margin-bottom: 8px; display: flex; gap: 8px; align-items: baseline; }
 
 /* 직원 */
 .emps { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
@@ -30,9 +30,9 @@
 
 /* 탭 · 기록 */
 .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 10px; cursor: pointer; font-size: 16px; color: var(--muted); font-weight: 600; }
-.tabs button.on { background: var(--panel); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.tabs i { font-style: normal; background: var(--accent); color: #fff; border-radius: 99px; padding: 0 7px; font-size: 12.5px; margin-left: 2px; }
+.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: var(--btn-radius); cursor: pointer; font-size: 16px; color: var(--muted); font-weight: 600; }
+.tabs button.on { background: var(--panel); color: var(--text); box-shadow: var(--shadow-sm); }
+.tabs i { font-style: normal; background: var(--accent); color: var(--on-color); border-radius: var(--pill-radius); padding: 0 7px; font-size: 12.5px; margin-left: 2px; }
 .tabs i:empty { display: none; }
 .feed { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
 
@@ -52,30 +52,30 @@
 
 .relay { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--amber-soft); border: 2px solid var(--amber); }
 .relay .step { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.relay .num { width: 24px; height: 24px; border-radius: 50%; background: var(--amber); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+.relay .num { width: 24px; height: 24px; border-radius: 50%; background: var(--amber); color: var(--on-color); display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
 .relay.slim { display: flex; align-items: center; gap: 10px; padding: 8px 14px; }
-.relay textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); resize: vertical; }
+.relay textarea { width: 100%; padding: 8px 10px; border-radius: var(--input-radius); border: 1px solid var(--line); background: var(--panel); resize: vertical; }
 .relay .files { font-size: 13px; color: var(--muted); }
 
 /* 말하기 */
-.say { margin-top: 10px; background: var(--panel); border-radius: 14px; padding: 12px 14px; border: 1px solid var(--line); }
+.say { margin-top: 10px; background: var(--panel); border-radius: var(--card-radius); padding: 12px 14px; border: 1px solid var(--line); }
 .say-to { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; color: var(--muted); font-size: 14.5px; }
-.say-to button { border: 1px solid var(--line); background: var(--bg); border-radius: 99px; padding: 3px 14px; cursor: pointer; font-size: 14.5px; }
+.say-to button { border: 1px solid var(--line); background: var(--bg); border-radius: var(--pill-radius); padding: 3px 14px; cursor: pointer; font-size: 14.5px; }
 .say-to button.on { background: var(--ink); color: var(--panel); border-color: var(--ink); }
 .say-to b { color: var(--text); }
 .say-row { display: flex; gap: 8px; align-items: stretch; }
-.say-row textarea { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); resize: vertical; }
+.say-row textarea { flex: 1; padding: 10px 12px; border-radius: var(--btn-radius); border: 1px solid var(--line); background: var(--bg); resize: vertical; }
 
 /* 창 */
 .log { font: 13px/1.5 Consolas, "D2Coding", "Malgun Gothic", monospace; background: var(--bg); border-radius: 8px; padding: 10px; height: 60vh; overflow: auto; white-space: pre-wrap; word-break: break-word; }
 .log .k-tool { color: var(--blue); } .log .k-order { color: var(--accent); font-weight: 700; } .log .k-done { color: var(--green); } .log .k-sys { color: var(--amber); }
 .rules { display: flex; flex-wrap: wrap; gap: 6px; }
-.rules span { background: var(--bg); border: 1px solid var(--line); border-radius: 99px; padding: 2px 4px 2px 10px; font: 13px Consolas, monospace; }
+.rules span { background: var(--bg); border: 1px solid var(--line); border-radius: var(--pill-radius); padding: 2px 4px 2px 10px; font: 13px Consolas, monospace; }
 .rules button { border: 0; background: none; cursor: pointer; color: var(--red); }
 .menu { display: flex; flex-direction: column; gap: 6px; }
 .menu button { text-align: left; }
 .guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 6px 0 12px; }
-.guide .g { background: var(--bg); border-radius: 14px; padding: 14px; text-align: center; }
+.guide .g { background: var(--bg); border-radius: var(--card-radius); padding: 14px; text-align: center; }
 .guide .g .big { font-size: 40px; }
 .guide .g > b { display: block; margin: 6px 0 4px; font-size: 16px; }
 .guide .g span { font-size: 14px; color: var(--muted); }
