@@ -8,6 +8,7 @@ const REPORT_DEPTS = [
   ['홍보', '📣 홍보'],
   ['경영지원', '💼 경영'],
   ['STCO', '🛍 STCO'],
+  ['영상 기획팀', '🎬 영상'],
   ['AI 협력·연결', '🔗 AI 협력'],
 ];
 let reportDept = '전체';

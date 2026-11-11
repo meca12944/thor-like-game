@@ -74,8 +74,8 @@
   .home-col-work .tile { background: var(--bg); }
 }
 
-/* 부서 아이콘 — 항상 3열 2줄 */
-.home-depts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+/* 부서 아이콘 — 3열. 7개가 되어도 칸 너비는 같고, 남는 칸은 다음 줄로 내려가요. */
+.home-depts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: start; }
 .home-depts .tile { text-align: center; padding: 10px 8px 8px; background: var(--panel); min-width: 0; }
 .home-depts .tile .ico { font-size: 26px; }
 .home-depts .tile .nm { font-size: 15px; margin-top: 4px; word-break: keep-all; }
@@ -182,6 +182,10 @@
 .dept-block + .dept-block { margin-top: 14px; }
 .dept-people { margin: 8px 0 0; padding-left: 18px; }
 .dept-people li { margin: 3px 0; }
+.who-ico { margin-right: 2px; }
+.dept-make { margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.dept-folder-label { display: block; width: 100%; font-size: 13px; color: var(--muted); }
+.dept-folder { display: block; width: 100%; margin-top: 4px; padding: 8px 10px; border-radius: var(--input-radius); border: 1px solid var(--line); background: var(--bg); color: var(--text); }
 .home-text {
   width: 100%;
   margin-top: 8px;

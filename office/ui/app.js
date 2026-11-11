@@ -63,7 +63,7 @@ function renderAsks() {
   document.querySelectorAll('.asks-box').forEach((x) => (x.innerHTML = h));
 }
 function renderEmps() {
-  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 부서 클로드 팀 한 번에 만들기</button><br><span class="small">게임 팀, 그리고 직원이 없는 다른 부서</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
+  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 부서 클로드 팀 한 번에 만들기</button><br><span class="small">눌러야 만들어요. 켤 때 저절로 만들지 않아요.</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
   $('#emps').innerHTML = S.employees.map((e) => `
     <div class="emp ${e.id === target ? 'sel' : ''}" data-act="pick" data-id="${e.id}">
       ${avatar(e.name)}
@@ -428,6 +428,7 @@ function guide() {
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
       <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
       <li>🏢 각 부서에는 <b>클로드 직원</b>과 <b>그록 봇</b>이 같이 있어요. 홈에서 일을 보내면 그록과 그 부서 클로드 팀장에게 가요.</li>
+      <li>부서 화면의 <b>＋ 만들기</b>를 눌러야 클로드 직원이 생겨요. 켤 때 저절로 만들지 않아요. 폴더를 직접 쓰려면 주소를 적고 만들기를 눌러요.</li>
     </ul>
     <div class="dlg-foot"><button class="btn" value="cancel">알겠어요</button></div>`);
 }
