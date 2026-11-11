@@ -1,4 +1,4 @@
-// 클로드 회사 — 권한 창구 (클로드 코드가 "이거 해도 돼요?" 물을 때 회사 화면으로 넘겨 줌)
+// 클로드 작업장 — 권한 창구 (클로드 코드가 "이거 해도 돼요?" 물을 때 회사 화면으로 넘겨 줌)
 'use strict';
 const http = require('http');
 const OFFICE = process.env.OFFICE_URL || 'http://127.0.0.1:7788';

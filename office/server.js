@@ -1,4 +1,4 @@
-// 클로드 회사 — 본체
+// 클로드 작업장 (옛 이름: 클로드 회사) — 본체
 // 사장님 PC에서 돌아가는 작은 서버. 직원(클로드 코드)들에게 일을 시키고, 보고·허락 요청을 한 화면에 모은다.
 // 따로 설치할 것 없음 (Node.js 기본 기능만 씀).
 'use strict';
@@ -20,7 +20,7 @@ const DEFAULT_RULES = ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'NotebookEdit', 
   'Bash(git status:*)', 'Bash(git log:*)', 'Bash(git diff:*)', 'Bash(git show:*)', 'Bash(git branch:*)',
   'Bash(grok:*)', 'Bash(ls:*)', 'Bash(dir:*)', 'Bash(cat:*)', 'Bash(head:*)', 'Bash(tail:*)', 'Bash(wc:*)', 'Bash(pwd:*)', 'Bash(echo:*)'];
 let state = {
-  settings: { port: Number(process.env.OFFICE_PORT) || 7788, claudeCmd: process.env.OFFICE_CLAUDE || 'claude', gameRepo: '', workspace: '', defaultMode: 'auto', maxHops: 6, grokDir: '', xaiKey: '', grokBudget: 5, grokMode: 'paste' },
+  settings: { port: Number(process.env.OFFICE_PORT) || 7788, claudeCmd: process.env.OFFICE_CLAUDE || 'claude', gameRepo: '', workspace: '', defaultMode: 'auto', maxHops: 6, grokDir: '', xaiKey: '', grokBudget: 5, grokMode: 'bot', botUrl: '', botKey: '', botTarget: 'AI 협력', ghToken: '', coopIssue: 207, companyUrl: 'https://cursor.com/canvas/store-6b845294-f0e8-4bad-ba45-aefe07f68d6a/0ced3cdd-d091-452c-94b1-bb0a223f0807' },
   rules: DEFAULT_RULES.slice(),
   employees: [],
   reports: [],
@@ -31,6 +31,8 @@ if (process.env.OFFICE_PORT) state.settings.port = Number(process.env.OFFICE_POR
 if (process.env.OFFICE_CLAUDE) state.settings.claudeCmd = process.env.OFFICE_CLAUDE;
 if (!state.rules.includes('Bash(grok:*)')) state.rules.push('Bash(grok:*)');
 state.grokLog = state.grokLog || [];
+// 11-11 그록 봇 연결이 생김: 예전 기본값(반자동)이던 판은 봇 연결로 (봇 설정이 없으면 저절로 반자동)
+if (!state.settings.grokV2) { if (state.settings.grokMode === 'paste') state.settings.grokMode = 'bot'; state.settings.grokV2 = true; }
 if (!state.settings.gameRepo) {
   const guess = path.join(process.env.USERPROFILE || process.env.HOME || '', 'thor-like-game');
   if (fs.existsSync(path.join(guess, '.git'))) state.settings.gameRepo = guess;
@@ -220,7 +222,7 @@ function officePrompt(emp) {
 - 그록과 파일을 주고받는 폴더(사장님 PC에 동기화된 구글 드라이브): ${state.settings.grokDir ? '`' + state.settings.grokDir + '`' : '(아직 설정 안 됨 — 사장님께 설정에서 「그록 폴더」를 정해 달라고 \`@사장님:\` 으로 말한다)'}
 - **부탁 보내기**: 다른 직원이 그록 부탁을 넘기면, 9장 규칙대로 부탁 문서를 써서 그록 폴더에 넣고, 사장님이 그록 채팅에 한 번에 붙여 넣을 글을 보고 맨 끝에 \`\`\` 블록 하나로 준다(화면에 「붙여넣기 글 복사」 단추가 생김).
 - **폴더 확인**: 「폴더 확인」 또는 「그록 폴더에 새 파일」 일을 받으면 묻지 말고 새 파일(전달 문서·영상·그림)을 열어 보고, 무엇이 왔는지·쓸 수 있는지 보고한다. 쓸 만하면 게임 폴더의 맞는 자리로 옮기고, 맞는 직원에게 \`@전달\` 로 넘긴다. 영상·그림은 경로를 적어 보고함에서 바로 보이게 한다.
-- **그록 터널**: 지금 방식 = ${grokPaste() ? '**반자동 붙여넣기** (돈 안 듦). \`grok\` 명령을 쓰면 회사 화면에 부탁이 뜨고, 사장님이 그록 앱에 옮겨 주고 답을 붙여 넣어 준다. 답이 오기까지 몇 분 걸릴 수 있다 → Bash 시간 제한을 600000 으로 두고, 끊기면 `grok wait 번호` 로 이어서 기다린다. 사장님 수고를 줄이게 **꼭 필요한 말만 한 번에 모아서** 묻는다' : '**그록 키** (자동, 돈 듦)'}.
+- **그록 터널**: 지금 방식 = ${grokWay() === 'bot' ? '**그록 봇 연결** (알들 컴퍼니, 돈 안 듦). `grok ask` 를 쓰면 그록 봇에게 바로 가고, 답은 깃허브 「AI협력 대화방」에서 저절로 돌아온다. 답이 오기까지 몇 분 걸릴 수 있다 → Bash 시간 제한을 600000 으로 두고, 끊기면 `grok wait 번호` 로 이어서 기다린다. 한 번에 꼭 필요한 말만 모아서 묻는다' : grokPaste() ? '**반자동 붙여넣기** (돈 안 듦). \`grok\` 명령을 쓰면 회사 화면에 부탁이 뜨고, 사장님이 그록 앱에 옮겨 주고 답을 붙여 넣어 준다. 답이 오기까지 몇 분 걸릴 수 있다 → Bash 시간 제한을 600000 으로 두고, 끊기면 `grok wait 번호` 로 이어서 기다린다. 사장님 수고를 줄이게 **꼭 필요한 말만 한 번에 모아서** 묻는다' : '**그록 키** (자동, 돈 듦)'}.
   - \`grok ask "질문" --img 참고.png --thread 주제이름\` : 그록에게 묻기 (같은 thread 면 앞 대화를 기억한다. 주제마다 thread 이름을 정한다)
   - \`grok image "그림 설명(영어가 더 정확)" --out 경로.png --n 2 --ref 기준그림.png\` : 그림 받기 (\`--ref\` = 그 그림을 고쳐 그리기)
   - \`grok video "움직임 설명" --img 첫장면.png --sec 6 --out 경로.mp4\` : 영상 받기 (1초에 약 $0.08 — 꼭 필요할 때만, 짧게)
@@ -230,8 +232,8 @@ function officePrompt(emp) {
 - **업무 공유판**: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md — 그록·다른 AI와 새 대화를 시작할 때 이 주소를 먼저 읽게 한다 (최신 결정·진행이 저절로 채워져 있음).
 - 그 밖의 AI(제미나이·챗GPT 등)와 일할 때도 같은 방식: 부탁 글은 \`\`\` 블록으로, 받은 결과는 검사해서 보고.
 ` : '';
-  return `# 클로드 회사 (사장님 PC의 업무 화면)
-너는 「클로드 회사」의 직원 **${emp.name}** 이고, 맡은 일은 **${emp.role}** 이다.
+  return `# 클로드 작업장 (알들 컴퍼니 「게임 필멸자」 부서, 사장님 PC의 업무 화면)
+너는 「클로드 작업장」의 직원 **${emp.name}** 이고, 맡은 일은 **${emp.role}** 이다.
 같은 회사 직원:
 ${others}
 
@@ -455,6 +457,93 @@ function spentToday(add) {
 const BOARD_URL = 'https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md';
 const relayWait = new Map(); // relay id → [res...]
 function grokPaste() { return state.settings.grokMode !== 'api' || !state.settings.xaiKey; }
+// ── 그록 봇 연결 (알들 컴퍼니, 사장님 11-11 「응」) ──
+// 클로드 → 그록: 알들 컴퍼니 명령창과 같은 웹훅 (주소·키는 사장님이 설정에 한 번 넣음, 이 PC 의 data 폴더에만 저장).
+// 그록 → 클로드: 깃허브 「AI협력 대화방」 글(coopIssue)의 댓글을 확인해서 기다리던 클로드에게 넘김.
+function botConfig() {
+  if (state.settings.botUrl && state.settings.botKey) return { url: state.settings.botUrl, key: state.settings.botKey, from: 'manual' };
+  return null;
+}
+function grokWay() {
+  if (state.settings.grokMode === 'api' && state.settings.xaiKey) return 'api';
+  if (state.settings.grokMode === 'bot' && botConfig()) return 'bot';
+  return 'paste';
+}
+const ISSUE_URL = () => `https://github.com/meca12944/thor-like-game/issues/${state.settings.coopIssue}`;
+async function sendToBot(item) {
+  const cfg = botConfig(); if (!cfg) return;
+  const command = `${item.relay.paste}\n\n— 답은 깃허브 「AI협력 대화방」 ${ISSUE_URL()} 에 댓글로 달아 주세요. 첫 줄에 [relay:${item.id}] 를 그대로 적어 주세요.`;
+  const body = JSON.stringify({ target: state.settings.botTarget || 'AI 협력', command, source: '클로드 회사', sentAt: new Date().toISOString(), relayId: item.id, replyTo: ISSUE_URL() });
+  try {
+    const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    item.relay.sent = true; item.relay.sendError = '';
+  } catch (e) { item.relay.sent = false; item.relay.sendError = '그록 봇에게 못 보냈어요 (' + e.message + '). 직접 붙여 넣어 주세요.'; }
+  changed(); pollSoon();
+}
+// 깃허브 대화방 확인
+let pollTimer = null, etag = '', rateLeft = 60, rateReset = 0;
+function pollSoon(ms) { clearTimeout(pollTimer); pollTimer = setTimeout(pollIssue, ms || 1500); }
+function nextPoll() {
+  const waiting = state.grokLog.some((g) => g.relay && g.relay.state === 'waiting');
+  let ms = state.settings.ghToken ? 20000 : waiting ? 20000 : 180000;
+  if (!state.settings.ghToken && rateLeft < 4 && rateReset) ms = Math.max(ms, rateReset * 1000 - Date.now() + 2000);
+  pollSoon(ms);
+}
+async function fetchFile(url) {
+  try {
+    const r = await fetch(url, { headers: { 'user-agent': 'claude-workshop' } });
+    if (!r.ok) return null;
+    const type = r.headers.get('content-type') || '';
+    const ext = /png/.test(type) ? '.png' : /jpe?g/.test(type) ? '.jpg' : /gif/.test(type) ? '.gif' : /webp/.test(type) ? '.webp' : /mp4/.test(type) ? '.mp4' : /webm/.test(type) ? '.webm' : '';
+    if (!ext) return null;
+    const dir = path.join(DATA, 'grok', 'files'); fs.mkdirSync(dir, { recursive: true });
+    const fp = path.join(dir, `bot_${Date.now()}_${Math.random().toString(36).slice(2, 6)}${ext}`);
+    fs.writeFileSync(fp, Buffer.from(await r.arrayBuffer()));
+    return fp;
+  } catch (e) { return null; }
+}
+async function pollIssue() {
+  if (grokWay() !== 'bot') return pollSoon(60000);
+  try {
+    const headers = { 'user-agent': 'claude-workshop', accept: 'application/vnd.github+json' };
+    if (state.settings.ghToken) headers.authorization = 'Bearer ' + state.settings.ghToken;
+    if (etag) headers['if-none-match'] = etag;
+    const r = await fetch(`${process.env.OFFICE_GH_API || 'https://api.github.com'}/repos/meca12944/thor-like-game/issues/${state.settings.coopIssue}/comments?per_page=100&sort=created&direction=desc`, { headers });
+    rateLeft = Number(r.headers.get('x-ratelimit-remaining') || rateLeft); rateReset = Number(r.headers.get('x-ratelimit-reset') || 0);
+    if (r.status === 200) {
+      etag = r.headers.get('etag') || '';
+      const list = (await r.json()).sort((a, b) => a.id - b.id);
+      if (state.coopLastId === undefined) { state.coopLastId = list.length ? list[list.length - 1].id : 0; save(); }
+      for (const c of list) {
+        if (c.id <= state.coopLastId) continue;
+        state.coopLastId = c.id; save();
+        await onBotComment(String(c.body || ''));
+      }
+    }
+  } catch (e) { /* 다음에 다시 */ }
+  nextPoll();
+}
+async function onBotComment(body) {
+  if (/<!-- claude-workshop -->/.test(body)) return;
+  const m = body.match(/\[relay:([0-9a-f]{6,})\]/i);
+  let text = body.replace(/^\s*\[그록\]\s*/, '').replace(/\[relay:[0-9a-f]+\]\s*/i, '').trim();
+  const files = [];
+  for (const mm of text.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)|<img[^>]+src="(https?:[^"]+)"|(https:\/\/github\.com\/user-attachments\/assets\/[\w-]+)/g)) {
+    const fp = await fetchFile(mm[1] || mm[2] || mm[3]); if (fp) files.push(fp);
+  }
+  const relay = m ? state.grokLog.find((g) => g.id === m[1] && g.relay) : null;
+  if (relay && relay.relay.state === 'waiting') return relayAnswer(relay.id, text, files);
+  if (!relays().length) {
+    // 그록이 먼저 말을 검 → 대화방에 올리고 AI협력팀에게
+    roomPost({ emp: 'grok', empName: '그록', kind: 'answer', text, files });
+    const team = state.employees.find((e) => e.partner);
+    if (team) order(team.id, `[그록 봇이 먼저 보낸 말 (깃허브 대화방)]\n${text}\n\n(필요하면 \`grok ask "답"\` 으로 그록에게 답해라.)`, '그록', 0, 'ask', null, { room: true });
+    return;
+  }
+  relayAnswer(null, text, files); // 번호가 없으면 가장 오래 기다린 부탁의 답으로
+}
+function relays() { return state.grokLog.filter((g) => g.relay && g.relay.state === 'waiting'); }
 function relayCreate({ emp, empName, kind, text, files }) {
   const speaker = emp === 'boss' ? '[사장님]' : `[클로드 ${empName}]`;
   let paste = kind === 'image' ? `${speaker} 그림 그려 줘: ${text}` : kind === 'video' ? `${speaker} 영상 만들어 줘: ${text}` : `${speaker} ${text}`;
@@ -462,7 +551,9 @@ function relayCreate({ emp, empName, kind, text, files }) {
   const e = findEmp(emp);
   if (e) { e.status = 'waiting'; e.now = '그록 답 기다리는 중 (사장님이 옮겨 주는 중)'; }
   push('relay', {});
-  return roomPost({ emp, empName, kind: emp === 'boss' ? 'boss' : 'ask', text: (kind === 'image' ? '🎨 ' : kind === 'video' ? '🎬 ' : '') + text, files: files || [], relay: { state: 'waiting', kind, paste } });
+  const item = roomPost({ emp, empName, kind: emp === 'boss' ? 'boss' : 'ask', text: (kind === 'image' ? '🎨 ' : kind === 'video' ? '🎬 ' : '') + text, files: files || [], relay: { state: 'waiting', kind, paste, way: grokWay() } });
+  if (item.relay.way === 'bot') sendToBot(item);
+  return item;
 }
 function relayAnswer(id, text, files) {
   const item = id ? state.grokLog.find((g) => g.id === id && g.relay) : state.grokLog.find((g) => g.relay && g.relay.state === 'waiting');
@@ -565,13 +656,15 @@ function grokCheck(force) {
   return fresh;
 }
 setInterval(() => grokCheck(false), 30000);
+pollSoon(5000);
 
 function publicState() {
   let grokSpent = 0;
   try { grokSpent = JSON.parse(fs.readFileSync(path.join(DATA, 'grok', 'spend.json'), 'utf8'))[new Date().toISOString().slice(0, 10)] || 0; } catch (e) { /* */ }
-  const { xaiKey, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
+  const { xaiKey, botKey, ghToken, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
+  const bc = botConfig();
   return {
-    settings: { ...safeSettings, hasXaiKey: !!xaiKey, grokSpent, grokPaste: grokPaste() },
+    settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, botFrom: bc ? bc.from : '', grokWay: grokWay(), grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     rules: state.rules,
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
@@ -644,7 +737,7 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/room/send') {
       const text = String(b.text || '').trim(); if (!text) return json(res, { ok: false, error: '할 말을 적어 주세요.' });
       const team = state.employees.find((e) => e.partner);
-      if ((b.mode === 'chat' || b.mode === 'image' || b.mode === 'video') && grokPaste()) { const it = relayCreate({ emp: 'boss', empName: '사장님', kind: b.mode, text }); return json(res, { ok: true, paste: it.relay.paste, id: it.id }); }
+      if ((b.mode === 'chat' || b.mode === 'image' || b.mode === 'video') && grokPaste()) { const it = relayCreate({ emp: 'boss', empName: '사장님', kind: b.mode, text }); return json(res, { ok: true, paste: it.relay.way === 'bot' ? '' : it.relay.paste, id: it.id }); }
       if (b.mode === 'chat') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomChat(text); return json(res, { ok: true }); }
       if (b.mode === 'image' || b.mode === 'video') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomMedia(b.mode, text, Number(b.sec) || 6); return json(res, { ok: true }); }
       if (!team) return json(res, { ok: false, error: 'AI협력팀 직원이 없어요.' });
@@ -735,7 +828,13 @@ const server = http.createServer(async (req, res) => {
       if (b.xaiKeyClear) state.settings.xaiKey = '';
       if (b.grokBudget !== undefined && b.grokBudget !== '') state.settings.grokBudget = Math.max(0, Number(b.grokBudget) || 0);
       if (typeof b.grokDir === 'string') grokKnown = null;
-      if (b.grokMode === 'paste' || b.grokMode === 'api') state.settings.grokMode = b.grokMode;
+      if (['paste', 'api', 'bot'].includes(b.grokMode)) state.settings.grokMode = b.grokMode;
+      for (const k of ['botUrl', 'botTarget', 'companyUrl']) if (typeof b[k] === 'string') state.settings[k] = b[k].trim();
+      if (typeof b.botKey === 'string' && b.botKey.trim()) state.settings.botKey = b.botKey.trim();
+      if (typeof b.ghToken === 'string' && b.ghToken.trim()) state.settings.ghToken = b.ghToken.trim();
+      if (b.botKeyClear) { state.settings.botKey = ''; state.settings.botUrl = ''; }
+      if (b.ghTokenClear) state.settings.ghToken = '';
+      pollSoon();
       if (b.maxHops) state.settings.maxHops = Math.max(1, Math.min(30, Number(b.maxHops) || 6));
       if (typeof b.claudeCmd === 'string') await detectClaude();
       changed(); return json(res, { ok: true });
@@ -750,11 +849,11 @@ const server = http.createServer(async (req, res) => {
 
 detectClaude().then(() => {
   server.on('error', (e) => {
-    if (e.code === 'EADDRINUSE') { console.log('클로드 회사가 이미 켜져 있어요. 창만 엽니다.'); process.exit(0); }
+    if (e.code === 'EADDRINUSE') { console.log('클로드 작업장이 이미 켜져 있어요. 창만 엽니다.'); process.exit(0); }
     throw e;
   });
   server.listen(state.settings.port, '127.0.0.1', () => {
-    console.log(`클로드 회사 문 열림: http://127.0.0.1:${state.settings.port}`);
+    console.log(`클로드 작업장 문 열림: http://127.0.0.1:${state.settings.port}`);
     console.log(claude.ok ? `클로드 코드 찾음 (${claude.version})` : '클로드 코드를 못 찾았어요. 설치 안내를 보세요.');
     // 꺼지기 전에 남아 있던 일 이어서
     for (const e of state.employees) next(e);
