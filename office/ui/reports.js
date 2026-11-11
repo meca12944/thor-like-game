@@ -89,8 +89,9 @@ function reportHtml(pack, opt) {
   const buttons = lockDept ? '' : ['전체'].concat(depts.map((d) => d.name)).map((name) => {
     const d = depts.find((x) => x.name === name);
     const label = name === '전체' ? '전체' : ((d && d.icon) ? d.icon + ' ' : '') + name;
+    const tip = name === '전체' ? '모든 부서 보고를 봐요' : (name + ' 보고만 봐요');
     const on = reportDept === name ? ' on' : '';
-    return `<button type="button" class="${on.trim()}" data-reportdept="${reportEsc(name)}">${reportEsc(label)}</button>`;
+    return `<button type="button" class="${on.trim()}" data-reportdept="${reportEsc(name)}" title="${reportEsc(tip)}">${reportEsc(label)}</button>`;
   }).join('');
   const cards = shown.map((r) => {
     const who = r.lead ? ` · ${(r.status === '완료' || r.status === '문제 있음') ? '검수' : '담당'}: ${reportEsc(r.lead)}` : '';

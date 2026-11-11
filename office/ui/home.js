@@ -268,7 +268,7 @@ function homePaint(el, A) {
         <div id="homeReports"></div>
       </section>
       <section class="home-col home-col-work">
-        <div class="title">🏢 부서 <span class="muted small">아이콘을 누르면 그 부서 화면</span></div>
+        <div class="title">🏢 부서 <span class="muted small">아이콘을 누르면 그 부서 화면</span><button type="button" class="btn ghost small" data-links="open" title="이어진 것과, 단추마다 하는 일을 봐요">🔌 연결·기능</button></div>
         <div class="home-depts">${tiles}</div>
         <div class="home-shortcuts">
           <button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>
