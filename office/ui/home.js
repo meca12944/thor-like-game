@@ -29,6 +29,7 @@ let boardPending = null;
 let boardLoadFlight = null;
 let boardForce = false;
 let boardDeptPick = '자동';
+let boardKeepOpen = false;
 const boardOpen = new Set();
 
 const HOME_DEPTS = [
@@ -293,7 +294,7 @@ function boardMs(r) {
 function boardInfo(r) {
   const stage = String((r && r.stage) || '');
   const visual = typeof reportVisual === 'function' ? reportVisual(r) : ((r && r.status) || '');
-  if (r && (r.needBoss || stage === '사장님 확인 필요' || visual === '사장님 확인 필요')) return { key: 'ask', label: '사장님 확인 필요', ask: true };
+  if (r && (r.needBoss || stage === '사장님 확인 필요' || visual === '사장님 확인 필요')) return { key: 'ask', label: '확인 필요', ask: true };
   if (r && (r.silent || visual === '응답 없음' || r.status === '문제 있음' || stage === '문제 있음')) return { key: 'stuck', label: '막힘', stuck: true };
   if (r && (r.status === '완료' || stage === '완료' || visual === '완료')) return { key: 'done', label: '끝' };
   if (/부서에 맡김|부서 작업/.test(stage)) return { key: 'work', label: '작업' };
@@ -360,12 +361,18 @@ function homeGearDot(A) {
   const btn = document.querySelector('#view-home [data-act="settings"]');
   if (btn) btn.classList.toggle('has-warn', homeHasWarn(A));
 }
+function homePaintDate() {
+  const el = document.getElementById('homeDate');
+  if (!el) return;
+  try {
+    el.textContent = new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+  } catch (e) { el.textContent = ''; }
+}
 function boardMore(r, esc) {
   const full = boardClean(r && r.command);
   const short = boardTitle(full);
   const hist = r && Array.isArray(r.history) ? r.history : [];
   const parts = [];
-  if (full && full !== short) parts.push('<div class="board-full"><b>시킨 일</b> ' + esc(full) + '</div>');
   if (hist.length) {
     let prev = '';
     const rows = [];
@@ -395,26 +402,65 @@ function boardItemHtml(x, esc) {
   const r = x.r || {};
   const id = String(r.id || '');
   const open = id && boardOpen.has(id);
-  const cls = x.info.ask ? ' need' : (x.info.stuck ? ' stuck' : '');
+  const cls = (x.info.ask ? ' need' : (x.info.stuck ? ' stuck' : '')) + (open ? ' open' : '');
   const dept = r.dept || r.target || '부서';
+  const title = boardClean(r.command) || '제목 없음';
   const more = open ? `<div class="board-more">${boardMore(r, esc)}</div>` : '';
-  return `<div class="board-item${cls}"><button type="button" class="board-row" data-home="row" data-id="${esc(id)}"><span class="bd">[${esc(dept)}]</span><span class="ttl">${esc(boardTitle(r.command))}</span><span class="stg">${esc(x.info.label)}</span><span class="age">${esc(boardAge(r))}</span></button>${more}</div>`;
+  return `<div class="board-item${cls}"><button type="button" class="board-row" data-home="row" data-id="${esc(id)}"><span class="bd">${esc(dept)}</span><span class="ttl">${esc(title)}</span><span class="stg">${esc(x.info.label)}</span><span class="age">${esc(boardAge(r))}</span></button>${more}</div>`;
+}
+function boardGearLine(dept, title, stage, age, attrs) {
+  return `<div class="board-item"><button type="button" class="board-row" ${attrs || ''}><span class="bd">${dept}</span><span class="ttl">${title}</span><span class="stg">${stage}</span><span class="age">${age}</span></button></div>`;
 }
 function boardGearHtml(pack, A, esc) {
-  const depts = (pack.depts || []).map((d) => `<button type="button" class="btn ghost" data-home="dept" data-id="${esc(d.id)}">${d.icon || '🏢'} ${esc(d.name)}</button>`).join('');
   const warn = homeWarnHtml(A, esc);
+  const depts = pack.depts || [];
+  const deptOpts = depts.map((d) => `<option value="${esc(d.id)}"${d.id === homeDeptId ? ' selected' : ''}>${esc(d.name)}</option>`).join('');
+  const make = `<div class="board-make"><button type="button" class="btn" data-home="makedept">＋ 만들기</button><select id="gearMakeDept" title="어느 부서에 직원을 만들지">${deptOpts}</select><label class="board-folder">폴더 주소 <input id="homeDeptFolder" type="text" autocomplete="off" placeholder="예: D:\\일\\홍보" value="${esc(homeDeptFolder)}"></label></div><div class="muted small">누르기 전에는 직원을 만들지 않아요.</div>`;
+  const deptLines = depts.map((d) => boardGearLine(esc(d.name), '이 부서 일 보기', '들어가기', '', `data-home="dept" data-id="${esc(d.id)}"`)).join('');
+  const people = [];
+  for (const d of depts) {
+    for (const e of homeClaudeList(A, d.id)) {
+      people.push(boardGearLine(esc(d.name), esc(e.name), esc(e.role || '직원'), esc(homeStatusWord(e)), `data-home="edit" data-id="${esc(e.id)}" data-dept="${esc(d.id)}"`));
+    }
+    for (const b of (pack.bots || []).filter((b) => b.dept === d.id)) {
+      people.push(boardGearLine(esc(d.name), esc(homeBotNick(A, b.name)), esc(b.role || '봇'), '별명', `data-home="nick" data-name="${esc(b.name)}" data-dept="${esc(d.id)}"`));
+    }
+  }
+  const peopleHtml = people.length ? people.join('') : '<div class="muted board-empty">아직 직원이 없어요. 위 만들기를 눌러요.</div>';
+  const edit = homeEdit && homeEdit.kind === 'emp'
+    ? `<div class="board-more"><input id="zEditName" value="${esc(homeEdit.name || '')}" placeholder="이름"><input id="zEditRole" value="${esc(homeEdit.role || '')}" placeholder="맡은 일"><button type="button" class="btn small" data-home="edit-save">저장</button><button type="button" class="btn ghost small" data-home="edit-cancel">취소</button></div>`
+    : (homeEdit && homeEdit.kind === 'bot'
+      ? `<div class="board-more"><input id="zEditNick" value="${esc(homeEdit.nick || '')}" placeholder="화면에 보일 이름"><button type="button" class="btn small" data-home="nick-save" data-name="${esc(homeEdit.origin || '')}">저장</button><button type="button" class="btn ghost small" data-home="edit-cancel">취소</button></div>`
+      : '');
+  const arts = [];
+  for (const r of (reportPack && reportPack.items) || []) {
+    for (const a of r.artifacts || []) {
+      if (!a) continue;
+      const name = a.name || a.text || '결과물';
+      arts.push(boardGearLine(esc(r.dept || r.target || '부서'), esc(String(name).slice(0, 40)), '결과물', '', ''));
+    }
+  }
+  const artHtml = arts.length ? arts.join('') : '<div class="muted board-empty">결과물이 아직 없어요.</div>';
+  const links = [
+    boardGearLine('연결', '그록에게 말 보내기', '받는 주소', '', 'data-home="conn-app"'),
+    boardGearLine('연결', '깃허브에 올리기', '합치기 부탁', '', 'data-home="conn-app"'),
+    boardGearLine('연결', '이어진 것 보기', '상태', '', 'data-links="open"'),
+    boardGearLine('연결', '사용법', '처음 쓰는 법', '', 'data-act="help"'),
+    boardGearLine('연결', '그 밖의 설정', '허락', '', 'data-home="oldset"'),
+    boardGearLine('연결', '클로드 작업장', '직원 화면', '', 'data-home="workshop"'),
+  ].join('');
   return `<section class="board-gear">
-    ${warn || '<div class="muted small">경고는 없어요.</div>'}
-    <div class="board-gear-head"><b>설정</b><button type="button" class="btn ghost small" data-home="gear-close">닫기</button></div>
-    <div class="board-gear-block"><b>부서</b><div class="muted small">누르면 직원 만들기, 폴더 주소, 별명, 결과물, 일 시키기, 이 부서 대화가 나와요.</div><div class="board-deptgrid">${depts}</div></div>
-    <div class="board-gear-links">
-      <button type="button" class="btn ghost" data-home="conn-app">연결</button>
-      <button type="button" class="btn ghost" data-links="open">이어진 것</button>
-      <button type="button" class="btn ghost" data-home="workshop">클로드 작업장</button>
-      <button type="button" class="btn ghost" data-home="team">부서마다 직원 만들기</button>
-      <button type="button" class="btn ghost" data-act="help">사용법</button>
-      <button type="button" class="btn ghost" data-home="oldset">그 밖의 설정</button>
-    </div>
+    ${warn || ''}
+    ${make}
+    ${edit}
+    <div class="board-sec">부서</div>
+    <div class="board-list">${deptLines}</div>
+    <div class="board-sec">직원</div>
+    ${peopleHtml}
+    <div class="board-sec">결과물</div>
+    ${artHtml}
+    <div class="board-sec">연결</div>
+    ${links}
   </section>`;
 }
 function boardSendDept(picked) {
@@ -431,21 +477,43 @@ function boardFormHtml(pack, esc) {
     <button class="btn" type="submit"${homeTopBusy ? ' disabled' : ''}>보내기</button>
   </form>`;
 }
+function boardInDept(x, A) {
+  if (homeMode !== 'dept') return true;
+  const name = homeCurrentDept(A).name;
+  return (x.r.dept || x.r.target || '') === name;
+}
+function boardAskText(n, loading) {
+  if (loading) return '불러오는 중';
+  if (!n) return '할 일 없음';
+  return `정하실 일 ${n}개 <span class="sub">(그록 채팅에서 답해요)</span>`;
+}
 function boardHomeHtml(pack, A, esc) {
   const loading = typeof reportPack === 'undefined' || !reportPack;
-  const rows = loading ? [] : boardRows(reportPack.items);
+  const rows = (loading ? [] : boardRows(reportPack.items)).filter((x) => boardInDept(x, A));
   const today = boardDay(Date.now());
   const askN = rows.filter((x) => x.info.ask).length;
   const doing = rows.filter((x) => x.info.key !== 'done').sort(boardSort);
+  const urgent = doing.filter((x) => x.info.ask || x.info.stuck);
+  const rest = doing.filter((x) => !(x.info.ask || x.info.stuck));
   const done = rows.filter((x) => x.info.key === 'done' && boardDay(x.ms) === today).sort((a, b) => (b.ms || 0) - (a.ms || 0));
-  const head = loading ? '불러오는 중' : (askN ? `정하실 일 ${askN}개 <span class="sub">(그록 채팅에서 답해요)</span>` : '할 일 없음');
+  const kept = rows.filter((x) => x.info.key === 'done' && boardDay(x.ms) !== today).sort((a, b) => (b.ms || 0) - (a.ms || 0));
+  const askText = boardAskText(askN, loading);
+  const head = homeMode === 'dept'
+    ? `<h1 class="board-head">${esc(homeCurrentDept(A).name)}</h1><div class="board-sub">${askText}</div>`
+    : `<h1 class="board-head">${askText}</h1>`;
+  const restHtml = loading
+    ? '<div class="muted board-empty">불러오는 중…</div>'
+    : (rest.length ? rest.map((x) => boardItemHtml(x, esc)).join('') : (urgent.length ? '' : '<div class="muted board-empty">지금 하는 일이 없어요.</div>'));
   const mid = homeGearOpen
     ? boardGearHtml(pack, A, esc)
-    : `<section class="board-now"><div class="board-sec">지금 하는 일</div><div class="board-list">${loading ? '<div class="muted board-empty">불러오는 중…</div>' : (doing.length ? doing.map((x) => boardItemHtml(x, esc)).join('') : '<div class="muted board-empty">지금 하는 일이 없어요.</div>')}</div></section>`;
-  const doneHtml = loading ? '' : (done.length
+    : `<section class="board-now"><div class="board-sec">지금 하는 일</div><div class="board-pin">${urgent.map((x) => boardItemHtml(x, esc)).join('')}</div><div class="board-list">${restHtml}</div></section>`;
+  const doneHtml = (loading || homeGearOpen) ? '' : (done.length
     ? `<details class="board-done" id="boardDone"${boardDoneOpen ? ' open' : ''}><summary>오늘 끝난 일 ${done.length}개</summary><div class="board-list">${done.map((x) => boardItemHtml(x, esc)).join('')}</div></details>`
     : '<div class="board-done muted">오늘 끝난 일 없음</div>');
-  return `<div class="home-page home-fit board-page"><h1 class="board-head">${head}</h1>${mid}${doneHtml}${boardFormHtml(pack, esc)}</div>`;
+  const keepHtml = (loading || homeGearOpen) ? '' : (kept.length
+    ? `<details class="board-keep" id="boardKeep"${boardKeepOpen ? ' open' : ''}><summary>보관 ${kept.length}개</summary><div class="board-list">${kept.map((x) => boardItemHtml(x, esc)).join('')}</div></details>`
+    : '<div class="board-keep muted">보관 없음</div>');
+  return `<div class="home-page home-fit board-page">${head}${mid}${doneHtml}${keepHtml}${boardFormHtml(pack, esc)}</div>`;
 }
 function boardKickLoad() {
   if (reportPack || boardLoadFlight || typeof loadReportPack !== 'function') return;
@@ -458,7 +526,7 @@ function boardKickLoad() {
   }).finally(() => {
     boardLoadFlight = null;
     const home = document.getElementById('home');
-    if (homeMode === 'home' && home && homeAPI && !homeFieldBusy(home)) homePaint(home, homeAPI);
+    if ((homeMode === 'home' || homeMode === 'dept') && home && homeAPI && !homeFieldBusy(home)) homePaint(home, homeAPI);
   });
 }
 function homePaint(el, A) {
@@ -477,9 +545,9 @@ function homePaint(el, A) {
   const snap = homeSnap(el);
   const pack = homeDepts(A);
   const esc = A.esc;
-  if (homeMode === 'dept') return homePaintDept(el, A, pack, esc);
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
   homeGearDot(A);
+  homePaintDate();
   const html = boardHomeHtml(pack, A, esc);
   const swapped = homeSwap(el, html);
   if (swapped === 'wait') return;
@@ -780,13 +848,26 @@ function homeBind(el, A) {
       const home = document.getElementById('home');
       if (home && homeAPI) homePaint(home, homeAPI);
     }, true);
+    document.addEventListener('click', (ev) => {
+      const brand = ev.target.closest && ev.target.closest('#view-home .brand');
+      if (!brand) return;
+      const view = document.getElementById('view-home');
+      if (!view || view.hidden) return;
+      ev.preventDefault();
+      homeMode = 'home';
+      homeGearOpen = false;
+      homeConn = -1;
+      const home = document.getElementById('home');
+      if (home && homeAPI) homePaint(home, homeAPI);
+    }, true);
   }
   if (el.dataset.doneBound !== '1') {
     el.dataset.doneBound = '1';
     el.addEventListener('toggle', (ev) => {
       const d = ev.target;
-      if (!d || d.id !== 'boardDone') return;
-      boardDoneOpen = !!d.open;
+      if (!d || (d.id !== 'boardDone' && d.id !== 'boardKeep')) return;
+      if (d.id === 'boardDone') boardDoneOpen = !!d.open;
+      if (d.id === 'boardKeep') boardKeepOpen = !!d.open;
     }, true);
   }
   if (el.dataset.homeBound === '1') return;
@@ -813,6 +894,8 @@ function homeBind(el, A) {
   });
   el.addEventListener('change', (ev) => {
     const t = ev.target;
+    if (!t) return;
+    if (t.id === 'gearMakeDept') { homeDeptId = t.value || homeDeptId; return; }
     if (!t || t.id !== 'homeTopDept' || !el.contains(t)) return;
     boardDeptPick = t.value || '자동';
     if (t.value && t.value !== '자동') homeTopSave(t.value);
@@ -864,17 +947,23 @@ function homeBind(el, A) {
     else if (act === 'gallery') { homeGallery = !homeGallery; }
     else if (act === 'edit') {
       const id = b.getAttribute('data-id') || '';
+      const deptId = b.getAttribute('data-dept') || homeDeptId;
+      if (deptId) homeDeptId = deptId;
       const emp = homeClaudeList(A, homeDeptId).find((e) => e.id === id);
       if (emp) homeEdit = { kind: 'emp', id: emp.id, name: emp.name, role: emp.role || '' };
     } else if (act === 'edit-cancel' || act === 'add-cancel') { homeEdit = null; homeAddOpen = false; }
     else if (act === 'edit-save') { homeSaveEmp(el, A); return; }
     else if (act === 'nick') {
       const name = b.getAttribute('data-name') || '';
+      const deptId = b.getAttribute('data-dept') || '';
+      if (deptId) homeDeptId = deptId;
       homeEdit = { kind: 'bot', origin: name, nick: homeBotNick(A, name) === name ? '' : homeBotNick(A, name) };
     } else if (act === 'nick-save') { homeSaveNick(el, A, b.getAttribute('data-name') || ''); return; }
     else if (act === 'add') { homeAddOpen = true; }
     else if (act === 'add-save') { homeAddEmp(el, A); return; }
     else if (act === 'makedept') {
+      const sel = el.querySelector('#gearMakeDept');
+      if (sel && sel.value) homeDeptId = sel.value;
       const inp = el.querySelector('#homeDeptFolder');
       if (inp) homeDeptFolder = inp.value;
       homeMakeDept(A);
@@ -898,7 +987,7 @@ async function homeSaveEmp(el, A) {
     homeDeptNote = { id: d.id, ok: true, text: '이름을 ' + r.name + '으로 고쳤어요.' };
     if (A.toast) A.toast('이름을 고쳤어요');
   }
-  if (homeMode === 'dept') homePaint(el, A);
+  if (homeMode === 'dept' || homeGearOpen) homePaint(el, A);
 }
 async function homeSaveNick(el, A, origin) {
   const d = homeCurrentDept(A);
@@ -912,7 +1001,7 @@ async function homeSaveNick(el, A, origin) {
     homeEdit = null;
     homeDeptNote = { id: d.id, ok: true, text: nick ? '화면 이름을 ' + nick + '으로 바꿨어요. 보낼 때는 원래 이름을 써요.' : '원래 이름으로 돌려놨어요.' };
   }
-  if (homeMode === 'dept') homePaint(el, A);
+  if (homeMode === 'dept' || homeGearOpen) homePaint(el, A);
 }
 async function homeAddEmp(el, A) {
   const d = homeCurrentDept(A);
@@ -934,7 +1023,7 @@ async function homeAddEmp(el, A) {
     homeDeptNote = { id: d.id, ok: true, text: name + ' 직원을 이 부서에 넣었어요.' };
     if (A.toast) A.toast(name + ' 직원을 넣었어요');
   }
-  if (homeMode === 'dept') homePaint(el, A);
+  if (homeMode === 'dept' || homeGearOpen) homePaint(el, A);
 }
 setInterval(async () => {
   const chat = document.getElementById('homeChat');

@@ -14,11 +14,9 @@
 <!-- 화면 1: 회사 홈 (그록이 ui/home.js 로 채워요. 없으면 app.js 의 기본 홈) -->
 <div id="view-home" class="view">
   <header class="top">
-    <div class="brand"><img src="/ui/icon.png" alt=""><b>알들 컴퍼니</b></div>
+    <div class="brand" data-home="back" title="회사 처음으로"><b>알들 컴퍼니</b><span id="homeDate" class="home-date"></span></div>
     <div class="summary" id="homeSummary"></div>
-    <button class="btn ghost" data-act="help" title="처음 쓰는 법">❓ 사용법</button>
-    <button class="btn ghost" data-act="conn" title="다른 프로그램·AI 와 연결">🔌 연결 <i class="connDot"></i></button>
-    <button class="btn ghost" data-act="settings" title="그 밖의 설정">⚙</button>
+    <button class="btn ghost" data-act="settings" title="설정">⚙</button>
   </header>
   <div class="asks-box"></div>
   <main id="home" class="home-main"></main>
