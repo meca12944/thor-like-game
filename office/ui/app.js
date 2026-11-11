@@ -1,7 +1,7 @@
 // 클로드 작업장 — 화면 (단순판, 사장님 11-11 「ui를 단순하고 쉽게」)
 'use strict';
 let S = { employees: [], reports: [], pending: [], rules: [], settings: {}, claude: {}, grokLog: [] };
-let tab = 'report', target = '', roomMode = 'grok', allEmp = '';
+let tab = 'report', target = '', roomMode = 'grok', allEmp = '', botTarget = '전체';
 const openTasks = new Set();
 const uploads = []; // 그록 답에 붙일 그림·영상
 const BOARD = 'https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md';
@@ -12,7 +12,7 @@ const COLORS = ['#c8643b', '#2f6fde', '#1f9d55', '#8b5cf6', '#d13b7a', '#0e8f8f'
 const colorOf = (s) => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; };
 const avatar = (name) => `<span class="avatar" style="background:${colorOf(name)}">${esc(String(name).slice(0, 1))}</span>`;
 const STATUS = { idle: '쉬는 중', working: '일하는 중', waiting: '기다리는 중', error: '문제 있음' };
-const MODES = { '': '회사 기본값', auto: '알아서 (애매한 것만 물어봄) — 추천', acceptEdits: '파일 고치기만 자동', all: '전부 허락 (아무것도 안 물어봄)' };
+const MODES = { '': '작업장 기본값', auto: '알아서 하고, 애매한 것만 물어봐요 (추천)', acceptEdits: '파일 고치기만 알아서, 나머지는 물어봐요', all: '아무것도 안 물어봐요 (조심)' };
 const partner = () => S.employees.find((e) => e.partner);
 const isBoss = (r) => r.toBoss !== false || r.needBoss || r.isError;
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => (el.hidden = true), 2200); }
@@ -39,6 +39,7 @@ function render() {
   const E = S.employees, working = E.filter((e) => e.status === 'working').length;
   $('#summary').innerHTML = E.length ? `직원 ${E.length}명 · <b>${working ? working + '명 일하는 중' : '모두 쉬는 중'}</b>` : '';
   renderAsks(); renderEmps(); renderFeed(); renderRelay(); renderSay();
+  $('#connDot').textContent = !S.claude.ok || !S.settings.gameRepo ? '⚠' : S.settings.botFrom ? '🟢' : '⚪';
   $('#cReport').textContent = S.reports.filter((r) => isBoss(r) && !r.read).length || '';
   const seen = Number(localStorage.getItem('grokSeen') || 0);
   $('#cGrok').textContent = tab === 'grok' ? '' : (S.grokLog.filter((g) => new Date(g.time) > seen).length || '');
@@ -53,7 +54,7 @@ function renderAsks() {
   $('#asks').innerHTML = h;
 }
 function renderEmps() {
-  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">기본 팀 만들기 (7명)</button><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
+  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 기본 팀 한 번에 뽑기 (7명)</button><br><span class="small">팀장·UI·스토리·몬스터·효과·모션·AI협력팀</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
   $('#emps').innerHTML = S.employees.map((e) => `
     <div class="emp ${e.id === target ? 'sel' : ''}" data-act="pick" data-id="${e.id}">
       ${avatar(e.name)}
@@ -85,6 +86,7 @@ function renderFeed() {
   if ([...box.querySelectorAll('video')].some((v) => !v.paused)) { box.dataset.dirty = '1'; return; }
   box.dataset.dirty = '';
   if (tab === 'grok') return renderChat(box);
+  if (tab === 'company') return renderCompany(box);
   let list = S.reports;
   let head = '';
   if (tab === 'report') list = list.filter(isBoss);
@@ -92,16 +94,23 @@ function renderFeed() {
     if (allEmp) list = list.filter((r) => r.emp === allEmp);
     head = `<div><select id="allEmp" class="btn ghost small"><option value="">모든 직원</option>${S.employees.map((e) => `<option value="${e.id}" ${e.id === allEmp ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</select> <span class="muted small">직원끼리 주고받은 것까지 모두</span></div>`;
   }
-  box.innerHTML = head + (list.length ? list.map(cardHtml).join('') : `<div class="empty">${tab === 'report' ? '아직 보고가 없어요.<br>아래에 할 일을 적어 보내 보세요.' : '기록이 없어요.'}</div>`);
+  box.innerHTML = head + (list.length ? list.map(cardHtml).join('') : `<div class="empty">${tab === 'report' ? '<div style="font-size:40px">📋</div>아직 받은 보고가 없어요.<br>👈 왼쪽에서 직원을 누르고, 👇 아래에 할 일을 적어 Enter!' : '기록이 없어요.'}</div>`);
   if (tab === 'report' && document.hasFocus()) {
     clearTimeout(renderFeed._r);
     renderFeed._r = setTimeout(() => { if (tab === 'report' && list.some((r) => !r.read)) api('/api/report/read', { all: true }); }, 4000);
   }
 }
+function renderCompany(box) {
+  const hist = S.botHistory || [];
+  box.innerHTML = `<div class="card"><div class="conn-head"><span class="ico">🏢</span><div><b>알들 컴퍼니 그록 봇에게 일 시키기</b><div class="muted small">그록이 만든 「알들 컴퍼니 명령창」과 똑같아요. 👇 아래에서 부서(대상)를 고르고 할 일을 적어 Enter. 결과는 알들 컴퍼니 보고 창에 올라가요.</div></div></div>
+    <div class="row-btns"><button class="btn ghost small" data-act="opencompany">🏢 알들 컴퍼니 보고 창 열기</button>${S.settings.botFrom ? '' : '<button class="btn small" data-act="openconn">🔌 먼저 그록 봇 잇기</button>'}</div></div>
+    ${hist.length ? hist.map((h) => `<div class="card"><div class="card-head"><b>📣 ${esc(h.target)}</b><span class="small" style="color:${h.ok ? 'var(--green)' : 'var(--red)'}">${h.ok ? '✅ 보냄' : '❌ ' + esc(h.result)}</span><time>${ago(h.time)}</time></div><div class="text">${esc(h.command)}</div></div>`).join('') : '<div class="empty">아직 보낸 일이 없어요.</div>'}`;
+}
 function renderChat(box) {
   try { localStorage.setItem('grokSeen', String(Date.now())); } catch (e) { /* */ }
-  const how = { bot: '그록 봇(알들 컴퍼니)과 자동으로 연결돼 있어요. 보내면 그록 봇에게 바로 가고, 답은 저절로 와요.', paste: '반자동: 그록에게 가는 말은 아래 노란 칸에서 복사해 그록 앱에 붙여 넣고, 그록 답을 붙여 넣어 주세요.', api: '그록 키로 바로 연결돼 있어요.' }[S.settings.grokWay] || '';
-  if (!S.grokLog.length) { box.innerHTML = `<div class="empty">그록 대화방이에요. 사장님 · 그록 · 클로드가 함께 이야기해요.<br>${how}</div>`; return; }
+  const how0 = { bot: '그록 봇(알들 컴퍼니)과 자동으로 연결돼 있어요. 보내면 그록 봇에게 바로 가고, 답은 저절로 와요.', paste: '반자동: 그록에게 가는 말은 아래 노란 칸에서 복사해 그록 앱에 붙여 넣고, 그록 답을 붙여 넣어 주세요.', api: '그록 키로 바로 연결돼 있어요.' }[S.settings.grokWay] || '';
+  const how = how0 + (S.settings.grokWay === 'paste' ? '<br>🔌 「연결 → 그록 봇」을 이어 두면 옮겨 주지 않아도 돼요.' : '');
+  if (!S.grokLog.length) { box.innerHTML = `<div class="empty"><div style="font-size:40px">💬</div>사장님 · 그록 · 클로드가 함께 이야기하는 곳이에요.<br>👇 아래에서 고르고 적어 보세요.<br><br><span class="small">${how}</span></div>`; return; }
   const stick = box.scrollTop + box.clientHeight > box.scrollHeight - 60;
   box.innerHTML = `<div class="chat">${S.grokLog.map((g) => {
     const cls = g.kind === 'boss' ? 'boss' : g.kind === 'sys' ? 'sys' : (g.kind === 'claude' || g.kind === 'ask') ? 'claude' : 'grok';
@@ -132,15 +141,21 @@ function renderRelay() {
 }
 function renderSay() {
   const to = $('#sayTo'), ta = $('#sayText');
+  if (tab === 'company') {
+    if (document.activeElement && document.activeElement.id === 'botTarget') return; // 적는 중이면 그대로
+    to.innerHTML = `📣 대상: <input id="botTarget" list="botTargets" value="${esc(botTarget)}" style="padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--bg);min-width:220px"><datalist id="botTargets">${(S.botTargets || []).map((t) => `<option value="${esc(t)}">`).join('')}</datalist> <span class="muted small">(부서나 봇 이름 — 눌러서 고르거나 적기)</span>`;
+    ta.placeholder = '그록 봇에게 시킬 일 (예: 블로그 이번 주 글 3개 써 줘)  · Enter 보내기';
+    return;
+  }
   if (tab === 'grok') {
     const p = partner();
-    const chips = [['grok', '그록에게'], ['claude', (p ? p.name : 'AI협력팀') + '에게'], ['meeting', '둘이 회의'], ['image', '🎨 그림 부탁']];
+    const chips = [['grok', '🤖 그록에게 말하기'], ['claude', '🧠 클로드(' + (p ? p.name : 'AI협력팀') + ')에게'], ['meeting', '🗣 둘이 회의시키기'], ['image', '🎨 그록에게 그림 부탁']];
     to.innerHTML = chips.map(([k, v]) => `<button type="button" data-room="${k}" class="${roomMode === k ? 'on' : ''}">${v}</button>`).join('') + '<span style="flex:1"></span><button type="button" class="link" data-act="roomreset">새 대화</button>';
-    ta.placeholder = { grok: '그록에게 할 말', claude: '클로드에게 할 말 — 필요하면 클로드가 그록에게도 물어봐요', meeting: '회의 주제 — 클로드와 그록이 주고받고 결론을 보고해요', image: '그록에게 부탁할 그림' }[roomMode] + ' (Enter 보내기)';
+    ta.placeholder = { grok: '그록에게 할 말 (예: 주인공 망토 색 추천해 줘)', claude: '클로드에게 할 말 — 필요하면 클로드가 그록에게도 물어봐요', meeting: '회의 주제 (예: 1장 보스 공격 패턴 정하기) — 둘이 이야기하고 결론을 보고해요', image: '그릴 것 (예: 붉은 망토 기사, 옆모습, 투명 배경)' }[roomMode] + '  · Enter 보내기';
   } else {
     const e = S.employees.find((x) => x.id === target);
-    to.innerHTML = e ? `받는 사람: <b>${esc(e.name)}</b> <span class="muted small">(왼쪽에서 바꾸기)</span><span style="flex:1"></span>${S.employees.length > 1 ? `<button type="button" data-act="toall" class="${target === 'all' ? 'on' : ''}">모두에게</button>` : ''}` : '먼저 직원을 뽑아 주세요.';
-    ta.placeholder = '할 일을 적어 주세요 (Enter 보내기, Shift+Enter 줄바꿈)';
+    to.innerHTML = e ? `✍️ <b>${esc(e.name)}</b>에게 일 시키기 <span class="muted small">(다른 직원은 왼쪽에서 누르기)</span><span style="flex:1"></span>${S.employees.length > 1 ? `<button type="button" data-act="toall" class="${target === 'all' ? 'on' : ''}">모두에게</button>` : ''}` : '먼저 직원을 뽑아 주세요.';
+    ta.placeholder = '할 일을 적어 주세요 (예: 몹 점검 표 다시 뽑아서 보고해)  · Enter 보내기, Shift+Enter 줄바꿈';
   }
 }
 
@@ -203,46 +218,112 @@ function empMenu(id) {
 }
 function settings() {
   const s = S.settings;
-  dialog(`<h2>설정</h2>
-    <div class="field"><label>게임 폴더</label><input type="text" name="gameRepo" value="${esc(s.gameRepo)}" placeholder="예) C:\\Users\\이름\\thor-like-game"><div class="help">새 직원의 일하는 자리를 여기서 만들어요.</div></div>
-    <div class="field"><label>그록 연결</label>
-      <label class="check"><input type="radio" name="grokMode" value="bot" ${s.grokMode === 'bot' ? 'checked' : ''}> 그록 봇 (알들 컴퍼니) — 자동, 공짜 (추천)</label>
-      <div style="margin:4px 0 8px 26px">
-        <input type="text" name="botUrl" value="${esc(s.botUrl)}" placeholder="웹훅 주소 (명령창 설정에 넣은 것과 같은 것)">
-        <input type="password" name="botKey" placeholder="${s.hasBotKey ? '웹훅 키 들어 있음 (바꿀 때만 넣기)' : '웹훅 키 (명령창과 같은 것)'}" autocomplete="off" style="margin-top:6px">
-        <div class="help">${s.botFrom ? '✅ 연결돼 있어요.' : '⚠ 아직 안 넣었어요. 넣기 전에는 반자동 붙여넣기로 돼요.'} 그록 봇의 답은 깃허브 <a href="${esc(s.issueUrl)}" target="_blank">AI협력 대화방</a>에서 저절로 와요.</div>
-      </div>
-      <label class="check"><input type="radio" name="grokMode" value="paste" ${s.grokMode === 'paste' ? 'checked' : ''}> 반자동 붙여넣기 — 공짜</label>
-      <label class="check"><input type="radio" name="grokMode" value="api" ${s.grokMode === 'api' ? 'checked' : ''}> 그록 키 — 자동, 쓴 만큼 돈 (말 한 번 약 30원)</label>
-      <input type="password" name="xaiKey" placeholder="${s.hasXaiKey ? '그록 키 들어 있음 (바꿀 때만 넣기)' : '그록 키 (xai-…) — 키 방식일 때만'}" autocomplete="off" style="margin-top:6px"></div>
-    <h3>바로 하기</h3>
+  dialog(`<h2>⚙ 그 밖의 설정</h2>
+    <p class="muted small">다른 프로그램·AI 와 잇는 것은 위의 「🔌 연결」에 있어요.</p>
     <div class="row-btns">
-      <button class="btn ghost" value="board">📋 업무판 주소 복사 (그록에 붙이기)</button>
-      <button class="btn ghost" value="folder">📁 그록 폴더 확인</button>
-      <button class="btn ghost" value="rules">✅ 허락 목록</button>
-      <button class="btn red" value="stopall">✋ 모두 멈춤</button>
+      <button class="btn ghost" value="rules">✅ 허락해 둔 일 목록</button>
+      <button class="btn red" value="stopall">✋ 모든 직원 멈추기</button>
     </div>
-    <details class="more-set"><summary>더 보기</summary>
-      <div class="field"><label>그록 폴더 (PC 의 구글 드라이브 폴더)</label><input type="text" name="grokDir" value="${esc(s.grokDir)}"><div class="help">새 파일이 오면 AI협력팀이 저절로 확인해요.</div></div>
-      <div class="field"><label>그록 봇에게 보낼 대상 이름</label><input type="text" name="botTarget" value="${esc(s.botTarget)}"><div class="help">알들 컴퍼니 명령창의 「대상」과 같은 이름 (기본: AI 협력)</div></div>
-      <div class="field"><label>알들 컴퍼니 주소</label><input type="text" name="companyUrl" value="${esc(s.companyUrl)}"></div>
-      <div class="field"><label>깃허브 열쇠 (있으면 20초마다, 없으면 기다릴 때만 확인)</label><input type="password" name="ghToken" placeholder="${s.hasGhToken ? '들어 있음' : '없어도 돼요'}" autocomplete="off"></div>
-      <div class="field"><label>기본 허락 방식</label><select name="defaultMode">${Object.entries(MODES).filter(([k]) => k).map(([k, v]) => `<option value="${k}" ${k === s.defaultMode ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
-      <div class="field"><label>그록 키 하루 한도 (달러)</label><input type="text" name="grokBudget" value="${esc(s.grokBudget)}"><div class="help">오늘 쓴 돈 $${(s.grokSpent || 0).toFixed(2)}</div></div>
-      <div class="field"><label>직원 작업 공간 위치</label><input type="text" name="workspace" value="${esc(s.workspace)}"></div>
-      <div class="field"><label>직원끼리 말이 오가는 최대 횟수</label><input type="text" name="maxHops" value="${esc(s.maxHops)}"></div>
-      <div class="field"><label>클로드 코드 명령</label><input type="text" name="claudeCmd" value="${esc(s.claudeCmd)}"><div class="help">${S.claude.ok ? '찾음 ' + esc(S.claude.version) : '못 찾음'}</div></div>
+    <details class="more-set"><summary>더 보기 (잘 안 바꾸는 것)</summary>
+      <div class="field"><label>직원이 물어보는 정도</label><select name="defaultMode">${Object.entries(MODES).filter(([k]) => k).map(([k, v]) => `<option value="${k}" ${k === s.defaultMode ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div class="field"><label>직원끼리 말이 오가는 최대 횟수</label><input type="text" name="maxHops" value="${esc(s.maxHops)}"><div class="help">직원끼리 끝없이 말을 주고받지 않게 막아요.</div></div>
+      <div class="field"><label>직원 작업 공간 위치</label><input type="text" name="workspace" value="${esc(s.workspace)}"><div class="help">비워 두면 게임 폴더 옆 「…_직원」 폴더</div></div>
     </details>
     <div class="err-text"></div>
     <div class="dlg-foot"><button class="btn ghost" value="quit" style="margin-right:auto">작업장 끄기</button><button class="btn ghost" value="cancel">닫기</button><button class="btn" value="ok">저장</button></div>`,
   async (fd, v) => {
-    if (v === 'board') { copy('우리 팀 업무 공유판이야. 일하기 전에 꼭 읽고, 여기 적힌 결정과 규칙을 따라 줘: ' + BOARD, '복사했어요. 그록에 붙여 넣으세요'); return ''; }
-    if (v === 'folder') { const r = await api('/api/grokCheck'); if (!r.ok) return r.error; toast('AI협력팀이 그록 폴더를 확인해요'); return; }
     if (v === 'rules') { setTimeout(rules, 30); return; }
     if (v === 'stopall') { if (confirm('모든 직원의 일을 멈출까요?')) await api('/api/stopAll'); return; }
     if (v === 'quit') { if (confirm('클로드 작업장을 끌까요? 일하던 직원도 멈춰요.')) { await api('/api/quit'); document.body.innerHTML = '<div class="empty">작업장 문을 닫았어요. 이 창을 닫아도 돼요.</div>'; } return; }
     const r = await api('/api/settings', fd); return r.ok ? null : r.error;
   });
+}
+// ───────── 🔌 연결 (커넥터) ─────────
+function conns() {
+  const s = S.settings;
+  return [
+    { id: 'claude', ico: '🧠', nm: '클로드 코드', ds: '직원(클로드)이 일하는 프로그램', on: S.claude.ok, lamp: S.claude.ok ? '켜짐' : '없음',
+      what: '직원들이 실제로 일하는 프로그램이에요. 지금 쓰는 클로드 구독으로 돌아가서 돈이 더 들지 않아요.',
+      how: S.claude.ok ? `잘 연결돼 있어요 (${esc(S.claude.version)}).` : '폴더 안 「처음_설치.bat」 을 두 번 누르면 깔려요. 깔고 나서 로그인하고 작업장을 다시 켜 주세요.',
+      fields: `<div class="field"><label>프로그램 이름 (보통 그대로)</label><input type="text" name="claudeCmd" value="${esc(s.claudeCmd)}"></div>` },
+    { id: 'game', ico: '🎮', nm: '게임 폴더', ds: '직원들이 고칠 게임 파일이 있는 곳', on: !!s.gameRepo, lamp: s.gameRepo ? '정해짐' : '안 정함',
+      what: '「필멸자」 게임 파일이 들어 있는 폴더예요. 새 직원을 뽑으면 여기서 그 직원만 쓰는 자리를 만들어 줘요.',
+      how: '보통 「C:\\Users\\(이름)\\thor-like-game」 이에요. 처음_설치.bat 이 받아 둔 곳이에요.',
+      fields: `<div class="field"><label>게임 폴더</label><input type="text" name="gameRepo" value="${esc(s.gameRepo)}" placeholder="예) C:\\Users\\이름\\thor-like-game"></div>` },
+    { id: 'bot', ico: '🤖', nm: '그록 봇', ds: '클로드가 그록에게 바로 말을 보내요', on: !!s.botFrom, lamp: s.botFrom ? '연결됨' : '안 됨',
+      what: '알들 컴퍼니의 그록 봇이에요. 연결하면 클로드가 그록에게 할 말이 생길 때 사장님이 옮겨 주지 않아도 바로 가요. 공짜예요.',
+      how: '알들 컴퍼니 명령창 「설정」에 넣은 <b>웹훅 주소</b>와 <b>웹훅 키</b>를 똑같이 아래에 붙여 넣으세요. 한 번만 하면 돼요.',
+      fields: `<div class="field"><label>웹훅 주소</label><input type="text" name="botUrl" value="${esc(s.botUrl)}" placeholder="https://… (명령창과 같은 것)"></div>
+        <div class="field"><label>웹훅 키</label><input type="password" name="botKey" placeholder="${s.hasBotKey ? '들어 있어요 (바꿀 때만 넣기)' : '명령창과 같은 키'}" autocomplete="off"></div>
+        <input type="hidden" name="grokMode" value="bot">` },
+    { id: 'mail', ico: '📮', nm: '그록 답 우편함', ds: '그록의 답을 받아 오는 곳 (깃허브)', on: s.coop && s.coop.ok, lamp: s.coop && s.coop.ok ? '받는 중' : '대기',
+      what: `그록 봇이 답을 깃허브 <a href="${esc(s.issueUrl)}" target="_blank">AI협력 대화방</a>에 남기면, 작업장이 가져와서 기다리던 클로드에게 넘겨 줘요. 공짜예요.`,
+      how: '따로 할 일은 없어요. 그록 봇을 연결하면 저절로 켜져요. 기다리는 답이 있으면 20초마다, 없으면 3분마다 확인해요.<br>더 빨리(늘 20초) 받고 싶으면 깃허브 열쇠를 넣으세요 (없어도 돼요).',
+      fields: `<div class="field"><label>깃허브 열쇠 (없어도 돼요)</label><input type="password" name="ghToken" placeholder="${s.hasGhToken ? '들어 있어요' : '비워 둬도 돼요'}" autocomplete="off"></div>` },
+    { id: 'company', ico: '🏢', nm: '알들 컴퍼니', ds: '회사 전체 화면 (모든 부서)', on: !!s.companyUrl, lamp: '열기',
+      what: '회사 전체 부서와 그록 봇 팀원이 있는 화면이에요. 이 작업장은 그 안의 「게임 필멸자」 부서예요.',
+      how: '위의 「🏢 알들 컴퍼니」 단추를 누르면 열려요.',
+      fields: `<div class="field"><label>알들 컴퍼니 주소</label><input type="text" name="companyUrl" value="${esc(s.companyUrl)}"></div>`, act: 'company' },
+    { id: 'board', ico: '📋', nm: '업무판', ds: '그록·다른 AI 에게 우리 일을 알려 줘요', on: true, lamp: '켜짐',
+      what: '지금 게임 상태·최근 결정·할 일이 저절로 모이는 공개 게시판이에요. 그록에게 주소를 한 번 주면 우리 일을 알고 일해요.',
+      how: '아래 「주소 복사」를 누르고 그록에게 붙여 넣으세요.', fields: '', act: 'board' },
+    { id: 'folder', ico: '📁', nm: '그록 폴더', ds: '그록 그림이 오면 저절로 확인해요', on: !!s.grokDir, lamp: s.grokDir ? '지켜보는 중' : '안 정함',
+      what: '구글 드라이브의 그록 공유 폴더를 PC 폴더로 보이게 해 두면, 새 그림·영상이 올 때 AI협력팀이 저절로 확인하고 보고해요.',
+      how: 'PC에 「Google Drive 데스크톱」을 깔고, 그 폴더 주소를 아래에 넣으세요 (예: G:\\내 드라이브\\…).',
+      fields: `<div class="field"><label>그록 폴더 (PC 주소)</label><input type="text" name="grokDir" value="${esc(s.grokDir)}"></div>`, act: 'folder' },
+    { id: 'xai', ico: '🔑', nm: '그록 키 (유료)', ds: '돈을 내고 그록과 완전 자동으로', on: s.grokWay === 'api', lamp: s.grokWay === 'api' ? '쓰는 중' : '안 씀',
+      what: '그록 회사(xAI)의 유료 키예요. 그록 봇 없이도 완전 자동이지만, 쓴 만큼 돈이 나가요 (말 한 번 약 30원, 그림 1장 약 60원).',
+      how: '보통은 필요 없어요. 쓰려면 console.x.ai 에서 키를 만들어 아래에 넣고 「이걸로 쓰기」에 체크하세요.',
+      fields: `<div class="field"><label>그록 키</label><input type="password" name="xaiKey" placeholder="${s.hasXaiKey ? '들어 있어요' : 'xai- 로 시작'}" autocomplete="off"></div>
+        <div class="field"><label class="check"><input type="checkbox" name="useApi" ${s.grokMode === 'api' ? 'checked' : ''}> 이걸로 쓰기 (끄면 그록 봇 → 붙여넣기 순서로 써요)</label></div>
+        <div class="field"><label>하루 한도 (달러)</label><input type="text" name="grokBudget" value="${esc(s.grokBudget)}"><div class="help">오늘 쓴 돈 $${(s.grokSpent || 0).toFixed(2)}</div></div>` },
+  ];
+}
+function connections() {
+  dialog(`<h2>🔌 연결</h2><p class="muted">작업장과 이어지는 것들이에요. 눌러 보면 무엇인지, 어떻게 잇는지 나와요.</p>
+    <div class="tiles">${conns().map((c) => `<button class="tile" value="c:${c.id}"><span class="lamp ${c.on ? 'on' : 'off'}">${c.on ? '🟢' : '⚪'} ${c.lamp}</span><div class="ico">${c.ico}</div><div class="nm">${c.nm}</div><div class="ds">${c.ds}</div></button>`).join('')}</div>
+    <div class="dlg-foot"><button class="btn ghost" value="cancel">닫기</button></div>`,
+  async (fd, v) => { if (v.startsWith('c:')) setTimeout(() => connOne(v.slice(2)), 30); });
+}
+function connOne(id) {
+  const c = conns().find((x) => x.id === id); if (!c) return;
+  dialog(`<div class="conn-head"><span class="ico">${c.ico}</span><div><h2 style="margin:0">${c.nm}</h2><span class="lamp ${c.on ? 'on' : 'off'}">${c.on ? '🟢' : '⚪'} ${c.lamp}</span></div></div>
+    <div class="qa"><b>이게 뭐예요?</b>${c.what}</div>
+    <div class="qa"><b>어떻게 해요?</b>${c.how}</div>
+    ${c.fields}
+    <div class="err-text"></div>
+    <div class="dlg-foot"><button class="btn ghost" value="back" style="margin-right:auto">← 연결 목록</button>
+      ${c.act === 'board' ? '<button class="btn" value="board">📋 주소 복사</button>' : ''}
+      ${c.act === 'company' ? '<button class="btn ghost" value="company">열기</button>' : ''}
+      ${c.act === 'folder' && S.settings.grokDir ? '<button class="btn ghost" value="folder">지금 확인시키기</button>' : ''}
+      ${c.fields ? '<button class="btn" value="ok">저장</button>' : '<button class="btn ghost" value="cancel">닫기</button>'}</div>`,
+  async (fd, v) => {
+    if (v === 'back') { setTimeout(connections, 30); return; }
+    if (v === 'board') { copy('우리 팀 업무 공유판이야. 일하기 전에 꼭 읽고, 여기 적힌 결정과 규칙을 따라 줘: ' + BOARD, '복사했어요. 그록에 붙여 넣으세요'); return ''; }
+    if (v === 'company') { window.open(S.settings.companyUrl, '_blank'); return ''; }
+    if (v === 'folder') { const r = await api('/api/grokCheck'); if (!r.ok) return r.error; toast('AI협력팀이 그록 폴더를 확인해요'); return; }
+    if (id === 'xai') fd.grokMode = fd.useApi ? 'api' : 'bot';
+    const r = await api('/api/settings', fd);
+    if (!r.ok) return r.error;
+    toast('저장했어요'); setTimeout(connections, 300);
+  });
+}
+// ───────── ❓ 사용법 ─────────
+function guide() {
+  dialog(`<h2>❓ 클로드 작업장 쓰는 법</h2>
+    <div class="guide">
+      <div class="g"><div class="big">👆</div><b>1. 직원 고르기</b><span>왼쪽에서 일 시킬 직원 이름을 눌러요.<br>모르겠으면 <b>팀장</b>에게!</span></div>
+      <div class="g"><div class="big">✍️</div><b>2. 할 일 적기</b><span>맨 아래 칸에 할 일을 적고<br><b>Enter</b> 를 눌러요.</span></div>
+      <div class="g"><div class="big">📋</div><b>3. 보고 보기</b><span>일이 끝나면 「받은 보고」에<br>글·사진·영상이 와요.</span></div>
+    </div>
+    <ul class="tips">
+      <li>🙋 위에 <b>노란 칸 「해도 될까요?」</b>가 뜨면 <b>허락</b>을 눌러요. 한 번 허락하면 다시 안 물어요.</li>
+      <li>💬 <b>그록과 이야기</b> 칸에서 그록에게 말하거나, 클로드와 그록에게 회의를 시킬 수 있어요.</li>
+      <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더 같은 것을 이어요. 아이콘을 누르면 쉬운 설명이 나와요.</li>
+      <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
+      <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
+    </ul>
+    <div class="dlg-foot"><button class="btn" value="cancel">알겠어요</button></div>`);
 }
 function rules() {
   const draw = () => `<h2>허락 목록</h2><p class="muted small">여기 있는 일은 모든 직원이 묻지 않고 해요. ✕ 를 누르면 다시 물어봐요.</p>
@@ -281,6 +362,8 @@ document.addEventListener('click', async (ev) => {
   if (a === 'team') { if (!S.settings.gameRepo) { toast('설정에서 「게임 폴더」를 먼저 정해 주세요'); return settings(); } $('#emps').innerHTML = '<div class="empty">직원 자리를 만드는 중… (1~2분)</div>'; const r = await api('/api/team'); if (!r.ok) alert(r.error); }
   if (a === 'hire') hire();
   if (a === 'gogrok') setTab('grok');
+  if (a === 'opencompany') { if (S.settings.companyUrl) window.open(S.settings.companyUrl, '_blank'); }
+  if (a === 'openconn') connOne('bot');
   if (a === 'toall') { target = 'all'; renderSay(); }
   if (a === 'task') { openTasks.has(id) ? openTasks.delete(id) : openTasks.add(id); t.classList.toggle('open'); }
   if (a === 'moretext') { t.previousElementSibling.classList.remove('clamp'); t.remove(); }
@@ -304,12 +387,17 @@ document.addEventListener('click', async (ev) => {
 });
 function setTab(t) { tab = t; $('#relayBox').dataset.id = ''; $('#tabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.t === t)); $('#feed')._once = false; $('#feed')._count = -1; render(); if (t !== 'grok') $('#feed').scrollTop = 0; }
 $('#tabs').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (b) setTab(b.dataset.t); });
+document.addEventListener('input', (ev) => { if (ev.target.id === 'botTarget') botTarget = ev.target.value; });
 document.addEventListener('change', (ev) => { if (ev.target.id === 'allEmp') { allEmp = ev.target.value; renderFeed(); } });
 $('#say').addEventListener('submit', async (ev) => {
   ev.preventDefault();
   const text = $('#sayText').value.trim(); if (!text) return;
   let r;
-  if (tab === 'grok') {
+  if (tab === 'company') {
+    botTarget = ($('#botTarget') && $('#botTarget').value.trim()) || botTarget;
+    r = await api('/api/bot/command', { target: botTarget, command: text });
+    if (r.ok) toast(`📣 ${botTarget}에게 보냈어요`);
+  } else if (tab === 'grok') {
     const mode = { grok: 'chat', claude: 'claude', meeting: 'meeting', image: 'image' }[roomMode];
     r = await api('/api/room/send', { mode, text });
     if (r.ok && r.paste) copy(r.paste, '그록에 붙일 글을 복사했어요. 그록 앱에 붙여 넣으세요');
@@ -338,6 +426,8 @@ document.addEventListener('pause', () => { if ($('#feed').dataset.dirty) renderF
 $('#btnHire').onclick = () => hire();
 $('#btnCompany').onclick = () => { if (S.settings.companyUrl) window.open(S.settings.companyUrl, '_blank'); };
 $('#btnSettings').onclick = settings;
+$('#btnConn').onclick = connections;
+$('#btnHelp').onclick = guide;
 setInterval(() => { if (S.employees.some((e) => e.status === 'working')) renderEmps(); }, 30000);
 
 // ───────── 실시간 연결 ─────────
@@ -368,3 +458,4 @@ function connect() {
   es.onerror = () => { $('#summary').innerHTML = '<span style="color:var(--red)">회사 본체와 연결이 끊겼어요. 다시 잇는 중…</span>'; };
 }
 connect();
+try { if (!localStorage.getItem('guideSeen')) { localStorage.setItem('guideSeen', '1'); setTimeout(guide, 800); } } catch (e) { /* */ }

@@ -25,12 +25,16 @@ let state = {
   employees: [],
   reports: [],
   grokLog: [],
+  botHistory: [],
 };
+// 알들 컴퍼니 명령창(그록 command.ps1)과 같은 대상 목록 — 그록과 같이 고침 (공동 개발)
+const BOT_TARGETS = ["전체", "제로폰", "블로그", "마케팅 홍보", "경영지원", "STCO 온라인 쇼핑몰", "STCO 오프라인", "게임 필멸자", "영상 제작", "AI 협력", "제로폰 홈페이지", "제로폰 홈페이지2", "제로폰 홈페이지3", "제로폰 홈페이지4", "제로폰 개통 안내", "제로폰 홍보 · 제로폰 관리", "네이버 판매자센터", "간판디자인", "폰클매니저 미래 오케이", "알들폰 해피콜 시스템", "알들폰 고객 안내사항 제작", "원오프 셋업 생산", "음봉일지", "철강주 동국제강 이익추정", "STCO 인동점 SEO·홍보", "STCO 인동점 포스&홈페이지", "STCO 인동점 포스&홈페이지 2", "게임만들기", "게임 스토리 작가", "게임 일러스트 작가", "히로인 모션 - 유나"];
 try { const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); state = { ...state, ...s, settings: { ...state.settings, ...(s.settings || {}) } }; } catch (e) { /* 처음 */ }
 if (process.env.OFFICE_PORT) state.settings.port = Number(process.env.OFFICE_PORT);
 if (process.env.OFFICE_CLAUDE) state.settings.claudeCmd = process.env.OFFICE_CLAUDE;
 if (!state.rules.includes('Bash(grok:*)')) state.rules.push('Bash(grok:*)');
 state.grokLog = state.grokLog || [];
+state.botHistory = state.botHistory || [];
 // 11-11 그록 봇 연결이 생김: 예전 기본값(반자동)이던 판은 봇 연결로 (봇 설정이 없으면 저절로 반자동)
 if (!state.settings.grokV2) { if (state.settings.grokMode === 'paste') state.settings.grokMode = 'bot'; state.settings.grokV2 = true; }
 if (!state.settings.gameRepo) {
@@ -482,7 +486,7 @@ async function sendToBot(item) {
   changed(); pollSoon();
 }
 // 깃허브 대화방 확인
-let pollTimer = null, etag = '', rateLeft = 60, rateReset = 0;
+let pollTimer = null, etag = '', rateLeft = 60, rateReset = 0, coopStatus = { ok: false, at: '' };
 function pollSoon(ms) { clearTimeout(pollTimer); pollTimer = setTimeout(pollIssue, ms || 1500); }
 function nextPoll() {
   const waiting = state.grokLog.some((g) => g.relay && g.relay.state === 'waiting');
@@ -510,6 +514,7 @@ async function pollIssue() {
     if (state.settings.ghToken) headers.authorization = 'Bearer ' + state.settings.ghToken;
     if (etag) headers['if-none-match'] = etag;
     const r = await fetch(`${process.env.OFFICE_GH_API || 'https://api.github.com'}/repos/meca12944/thor-like-game/issues/${state.settings.coopIssue}/comments?per_page=100&sort=created&direction=desc`, { headers });
+    coopStatus = { ok: r.status === 200 || r.status === 304, at: now() };
     rateLeft = Number(r.headers.get('x-ratelimit-remaining') || rateLeft); rateReset = Number(r.headers.get('x-ratelimit-reset') || 0);
     if (r.status === 200) {
       etag = r.headers.get('etag') || '';
@@ -664,7 +669,9 @@ function publicState() {
   const { xaiKey, botKey, ghToken, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
   const bc = botConfig();
   return {
-    settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, botFrom: bc ? bc.from : '', grokWay: grokWay(), grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
+    settings: { ...safeSettings, hasXaiKey: !!xaiKey, hasBotKey: !!botKey, hasGhToken: !!ghToken, botFrom: bc ? bc.from : '', grokWay: grokWay(), coop: coopStatus, grokSpent, grokPaste: grokWay() !== 'api', issueUrl: ISSUE_URL() },
+    botTargets: BOT_TARGETS,
+    botHistory: state.botHistory.slice(0, 50),
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     rules: state.rules,
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
@@ -745,6 +752,21 @@ const server = http.createServer(async (req, res) => {
       if (b.mode === 'meeting') order(team.id, `[대화방 회의] 주제: ${text}\n그록과 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 최대 ${Math.max(2, Math.min(12, Number(b.turns) || 6))}번 주고받으며 회의해. 매번 그록의 답을 읽고, 맞는 건 받아들이고 틀린 건 근거를 들어 반박해. 사장님도 이 대화를 실시간으로 본다. 끝나면 결론·할 일을 쉬운 말로 짧게 보고해.`, '사장님', 0, 'ask', null, { room: true });
       else order(team.id, `[대화방] 사장님: ${text}\n(사장님·그록·너가 함께 있는 대화방이다. 그록 의견이 필요하면 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 물어라. 답은 짧게.)`, '사장님', 0, 'ask', null, { room: true });
       return json(res, { ok: true });
+    }
+    if (p === '/api/bot/command') {
+      // 「🏢 회사 일 시키기」: 알들 컴퍼니 명령창과 똑같이 그록 봇에게 보냄 (사장님이 보낸 명령)
+      const cfg = botConfig();
+      const target = String(b.target || '').trim(), command = String(b.command || '').trim();
+      if (!cfg) return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' });
+      if (!target || !command) return json(res, { ok: false, error: '대상과 할 일을 적어 주세요.' });
+      const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
+      try {
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString() }) });
+        h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
+      } catch (e) { h.result = '실패: ' + e.message; }
+      state.botHistory.unshift(h); if (state.botHistory.length > 100) state.botHistory.length = 100;
+      changed();
+      return json(res, { ok: h.ok, error: h.ok ? '' : '못 보냈어요 (' + h.result + ')' });
     }
     if (p === '/api/room/relay') {
       const e = findEmp(b.emp);

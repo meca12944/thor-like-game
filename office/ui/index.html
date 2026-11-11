@@ -11,24 +11,27 @@
 <header class="top">
   <div class="brand"><img src="/ui/icon.png" alt=""><b>클로드 작업장</b><span class="muted small">게임 필멸자</span></div>
   <div class="summary" id="summary"></div>
-  <button class="btn ghost" id="btnCompany" title="회사 전체 화면 (부서·그록 봇)">🏢 알들 컴퍼니</button>
-  <button class="btn" id="btnHire">＋ 직원</button>
-  <button class="btn ghost" id="btnSettings">⚙ 설정</button>
+  <button class="btn ghost" id="btnHelp" title="처음 쓰는 법">❓ 사용법</button>
+  <button class="btn ghost" id="btnConn" title="다른 프로그램·AI 와 연결">🔌 연결 <i id="connDot"></i></button>
+  <button class="btn ghost" id="btnCompany" title="회사 전체 화면 열기">🏢 알들 컴퍼니</button>
+  <button class="btn" id="btnHire">＋ 직원 뽑기</button>
+  <button class="btn ghost" id="btnSettings" title="그 밖의 설정">⚙</button>
 </header>
 
 <div id="asks"></div>
 
 <main class="board">
   <aside class="people">
-    <div class="title">직원 <span class="muted small">눌러서 일 시킬 사람 고르기</span></div>
+    <div class="title">직원 <span class="muted small">👆 눌러서 일 시킬 사람 고르기</span></div>
     <div id="emps" class="emps"></div>
   </aside>
 
   <section class="main">
     <nav class="tabs" id="tabs">
-      <button data-t="report" class="on">📋 보고 <i id="cReport"></i></button>
-      <button data-t="grok">💬 그록 대화방 <i id="cGrok"></i></button>
-      <button data-t="all">📚 전체 기록</button>
+      <button data-t="report" class="on" title="직원들이 사장님께 올린 보고">📋 받은 보고 <i id="cReport"></i></button>
+      <button data-t="grok" title="사장님·그록·클로드가 함께 이야기하는 곳">💬 그록과 이야기 <i id="cGrok"></i></button>
+      <button data-t="company" title="알들 컴퍼니의 그록 봇 부서에 일 시키기 (명령창과 같아요)">🏢 회사 일 시키기</button>
+      <button data-t="all" title="직원끼리 주고받은 것까지 전부">📚 모든 기록</button>
     </nav>
     <div id="feed" class="feed"></div>
 
