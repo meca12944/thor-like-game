@@ -50,7 +50,11 @@ function homeTopPick(pack) {
 function homeTopPaintNote(root) {
   const note = root.querySelector('#homeTopNote');
   if (!note) return;
-  if (!homeTopNote) { note.textContent = ''; note.className = 'home-order-note'; return; }
+  if (!homeTopNote) {
+    note.className = 'home-order-note hint';
+    note.textContent = '부서를 고르고 할 일을 적은 뒤, 보내기나 엔터를 눌러요.';
+    return;
+  }
   note.className = 'home-order-note ' + (homeTopNote.ok ? 'ok' : 'bad');
   note.textContent = homeTopNote.text;
 }
@@ -81,15 +85,15 @@ function homeOrderHtml(pack, esc) {
     return `<option value="${esc(d.name)}"${on}>${esc(d.icon || '🏢')} ${esc(d.name)}</option>`;
   }).join('');
   return `<form class="home-order" id="homeTopSend">
-    <div class="home-order-head"><b>✍️ 일 시키기</b><span class="muted small">보낼 부서를 고르고 할 일을 적어요. 엔터를 눌러도 바로 보내요.</span></div>
     <div class="home-order-row">
+      <b class="home-order-title">✍️ 일 시키기</b>
       <label class="home-order-pick">보낼 곳
         <select id="homeTopDept">${opts}</select>
       </label>
       <input id="homeTopCmd" type="text" autocomplete="off" placeholder="할 일을 적고 엔터 (예: 오늘 할 일 정리해서 보고해)" value="${esc(homeTopDraft)}">
       <button class="btn" type="submit">보내기</button>
     </div>
-    <div id="homeTopNote" class="home-order-note"></div>
+    <div id="homeTopNote" class="home-order-note hint">부서를 고르고 할 일을 적은 뒤, 보내기나 엔터를 눌러요.</div>
   </form>`;
 }
 async function homeTopSend(el, A) {
@@ -135,19 +139,23 @@ function homePaint(el, A) {
   if (homeMode === 'dept') return homePaintDept(el, A, pack, esc);
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
   const tiles = pack.depts.map((d) => `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div></button>`).join('');
-  el.innerHTML = `<div class="home-page">
+  el.innerHTML = `<div class="home-page home-fit">
     ${homeOrderHtml(pack, esc)}
-    <div class="home-wrap">
-      <section>
+    <div class="home-grid">
+      <section class="home-col home-col-reports">
         <div id="homeReports"></div>
       </section>
-      <section>
-        <div class="title">🏢 부서 <span class="muted small">이름을 누르면 부서 화면이 나와요</span></div>
-        <div class="tiles">${tiles}</div>
-        <div class="title" style="margin-top:8px">🔌 연결 <span class="muted small">이게 무엇인지 먼저 봐요</span></div>
-        <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명 보기</button>
-        <div class="title" style="margin-top:8px">💬 클로드 ↔ 그록 대화 <span class="muted small">둘이 나눈 말</span></div>
-        <div id="homeChat"></div>
+      <section class="home-col home-col-work">
+        <div class="title">🏢 부서 <span class="muted small">아이콘을 누르면 그 부서 화면</span></div>
+        <div class="home-depts">${tiles}</div>
+        <div class="home-shortcuts">
+          <button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>
+          <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명</button>
+        </div>
+      </section>
+      <section class="home-col home-col-chat">
+        <div class="title">💬 클로드 ↔ 그록 <span class="muted small">최근 말</span><button type="button" class="link" data-act="coopall">모두 보기</button></div>
+        <div id="homeChat" class="home-chat"></div>
       </section>
     </div>
   </div>`;
@@ -155,29 +163,35 @@ function homePaint(el, A) {
   homeRestoreFocus(el, snap);
   if (typeof renderReports === 'function') renderReports(el.querySelector('#homeReports'));
   const chat = el.querySelector('#homeChat');
-  if (chat && typeof A.coopChat === 'function') A.coopChat(chat);
-  else if (chat && typeof A.chatWidget === 'function') A.chatWidget(chat, 4);
+  if (chat && typeof A.chatWidget === 'function') A.chatWidget(chat, 4);
+  else if (chat && typeof A.coopChat === 'function') A.coopChat(chat);
 }
 function homePaintDept(el, A, pack, esc) {
   const d = pack.depts.find((x) => x.id === homeDeptId) || { id: homeDeptId, name: '부서', icon: '🏢', sub: '' };
   const bots = (pack.bots || []).filter((b) => b.dept === d.id);
-  const people = bots.length ? bots.map((b) => `• <b>${esc(b.name)}</b>${b.lead ? ' (팀장)' : ''} — ${esc(b.role || '')}`).join('<br>') : '아직 팀원 목록이 없어요.';
+  const people = bots.length
+    ? `<ul class="dept-people">${bots.map((b) => `<li><b>${esc(b.name)}</b>${b.lead ? ' <span class="muted small">(팀장)</span>' : ''} — ${esc(b.role || '')}</li>`).join('')}</ul>`
+    : '<p class="muted">아직 팀원 목록이 없어요.</p>';
   const game = d.id === 'game';
-  el.innerHTML = `<div>
-    <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
-    <div class="card" style="margin-top:12px">
-      <div class="card-head"><span class="ico" style="font-size:28px">${d.icon || '🏢'}</span><b>${esc(d.name)}</b></div>
-      <div class="muted small">${esc(d.sub || '')}${d.lead ? ` · 팀장 ${esc(d.lead)}` : ''}</div>
-      ${game ? `<p>여기는 게임 부서 화면이에요. 작업장은 아래 단추를 눌러야 열려요.</p><button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>` : '<p>이 부서에 일을 적으면 팀장이 나눠 맡기고, 끝난 뒤 보고 창에 올려요.</p>'}
+  const blurb = game
+    ? '게임 일을 직접 보려면 오른쪽 위 「클로드 작업장」을 눌러요.'
+    : '오른쪽에 할 일을 적으면 팀장이 나눠 맡기고, 끝나면 보고 창에 올려요.';
+  el.innerHTML = `<div class="dept-page home-fit">
+    <div class="dept-bar">
+      <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
+      <div class="dept-name"><span class="ico">${d.icon || '🏢'}</span><div><b>${esc(d.name)}</b><div class="muted small">${esc(d.sub || '')}${d.lead ? ` · 팀장 ${esc(d.lead)}` : ''}</div></div></div>
+      ${game ? '<button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>' : ''}
     </div>
-    <div class="card" style="margin-top:12px"><b>👥 팀원</b><div style="margin-top:6px">${people}</div></div>
-    <form class="card" id="homeSend" style="margin-top:12px">
-      <b>✍️ 이 부서에 일 시키기</b>
-      <div class="muted small">예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
-      <textarea id="homeCmd" rows="3" style="width:100%;margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text)" placeholder="할 일을 한 줄로 적어요"></textarea>
-      <div id="homeSendErr" style="color:var(--red);min-height:1.2em"></div>
-      <button class="btn" type="submit">보내기</button>
-    </form>
+    <div class="dept-grid">
+      <section class="card dept-card"><b>👥 팀원</b><div class="muted small">${blurb}</div>${people}</section>
+      <form class="card dept-card dept-send" id="homeSend">
+        <b>✍️ 이 부서에 일 시키기</b>
+        <div class="muted small">예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
+        <textarea id="homeCmd" class="home-text" rows="4" placeholder="할 일을 적어 주세요"></textarea>
+        <div id="homeSendErr" class="home-err"></div>
+        <button class="btn" type="submit">보내기</button>
+      </form>
+    </div>
   </div>`;
   const form = el.querySelector('#homeSend');
   if (form) form.addEventListener('submit', async (ev) => {
@@ -197,20 +211,25 @@ function homePaintConn(el, A, esc) {
   const list = window.AldeulGrokConnectors || [];
   const tiles = list.map((c, i) => {
     const on = homeConnOn(c, A);
-    return `<button type="button" class="tile" data-home="connone" data-i="${i}"><span class="lamp ${on ? 'on' : 'off'}">${on ? '🟢' : '⚪'}</span><div class="ico">${esc(c.ico || '🔗')}</div><div class="nm">${esc(c.nm || '')}</div><div class="ds">${esc(c.ds || '')}</div></button>`;
+    const sel = i === homeConn ? ' sel' : '';
+    return `<button type="button" class="tile${sel}" data-home="connone" data-i="${i}"><span class="lamp ${on ? 'on' : 'off'}">${on ? '🟢' : '⚪'}</span><div class="ico">${esc(c.ico || '🔗')}</div><div class="nm">${esc(c.nm || '')}</div><div class="ds">${esc(c.ds || '')}</div></button>`;
   }).join('');
   const c = list[homeConn];
-  const detail = c ? `<div class="card" id="connDetail" style="margin-top:12px">
-      <b>${esc(c.ico || '')} ${esc(c.nm || '')}</b>
-      <div style="margin-top:8px"><b>이게 뭐예요?</b><div>${esc(c.what || '')}</div></div>
-      <div style="margin-top:8px"><b>무슨 기능?</b><div>${esc(c.func || '')}</div></div>
-      <div style="margin-top:8px"><b>어떻게 켜요?</b><div>${esc(c.how || '')}</div></div>
-    </div>` : '';
-  el.innerHTML = `<div>
-    <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
-    <div class="title" style="margin-top:12px">🔌 연결 설명 <span class="muted small">초록 불은 정말 이어졌을 때만 켜져요</span></div>
-    <div class="tiles">${tiles}</div>
-    ${detail}
+  const detail = c ? `<div class="card conn-detail" id="connDetail">
+      <div class="conn-head"><span class="ico">${esc(c.ico || '🔗')}</span><div><b>${esc(c.nm || '')}</b><div class="muted small">${esc(c.ds || '')}</div></div></div>
+      <div class="qa"><div class="qh">이게 뭐예요?</div>${esc(c.what || '')}</div>
+      <div class="qa"><div class="qh">무슨 기능?</div>${esc(c.func || '')}</div>
+      <div class="qa"><div class="qh">어떻게 켜요?</div>${esc(c.how || '')}</div>
+    </div>` : `<div class="card conn-detail"><b>아이콘을 눌러 주세요</b><p class="muted">왼쪽 아이콘을 누르면, 무엇인지와 켜는 법이 여기에 나와요. 초록 불은 정말 이어졌을 때만 켜져요.</p></div>`;
+  el.innerHTML = `<div class="conn-page home-fit">
+    <div class="dept-bar">
+      <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
+      <div class="title" style="margin:0">🔌 연결 설명 <span class="muted small">초록 불은 정말 이어졌을 때만 켜져요</span></div>
+    </div>
+    <div class="conn-grid">
+      <div class="tiles home-conn-tiles">${tiles}</div>
+      ${detail}
+    </div>
   </div>`;
 }
 function homeBind(el, A) {

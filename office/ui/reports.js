@@ -19,10 +19,8 @@ function reportEsc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function reportStatusColor(status) {
-  if (status === '완료') return 'var(--green,#1f9d55)';
-  if (status === '문제 있음') return 'var(--red,#d13b3b)';
-  if (status === '접수') return 'var(--blue,#2f6fde)';
-  return 'var(--muted,#6b7280)';
+  if (status === '완료' || status === '문제 있음' || status === '접수' || status === '진행 중') return status;
+  return '';
 }
 function reportInDept(r, name) {
   if (!name || name === '전체') return true;
@@ -55,44 +53,45 @@ function reportLink(url) {
   return `<a href="${reportEsc(s)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue,#2f6fde)">결과 보기</a>`;
 }
 function reportHtml(pack) {
-  const boxStyle = 'background:var(--panel,#ffffff);color:var(--text,#1d2129);border:1px solid var(--line,#e2e5ea)';
-  const muted = 'color:var(--muted,#6b7280);font-size:13px';
   if (!pack) {
-    return `<div class="card" style="${boxStyle}"><b>📋 보고 창</b><div style="${muted}">보고를 불러오는 중…</div></div>`;
+    return `<div class="card home-report-panel"><div class="home-report-head"><b>📋 보고 창</b><div class="muted small">보고를 불러오는 중…</div></div></div>`;
   }
   const list = Array.isArray(pack.items) ? pack.items : [];
   const shown = reportShown(list);
   const n = (st) => shown.filter((r) => r.status === st).length;
   const buttons = REPORT_DEPTS.map(([name, label]) => {
-    const on = reportDept === name;
-    const st = `border:1px solid var(--line,#e2e5ea);background:${on ? 'var(--bg,#f3f4f6)' : 'var(--panel,#ffffff)'};color:var(--text,#1d2129);border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:${on ? '700' : '500'}`;
-    return `<button type="button" data-reportdept="${reportEsc(name)}" style="${st}">${reportEsc(label)}</button>`;
+    const on = reportDept === name ? ' on' : '';
+    return `<button type="button" class="${on.trim()}" data-reportdept="${reportEsc(name)}">${reportEsc(label)}</button>`;
   }).join('');
   const cards = shown.map((r) => {
     const who = r.lead ? ` · ${(r.status === '완료' || r.status === '문제 있음') ? '검수' : '담당'}: ${reportEsc(r.lead)}` : '';
     const lines = (Array.isArray(r.summary) ? r.summary : []).map((s) => reportEsc(s)).join('<br>');
     const lamp = r.status === '완료' ? '<span class="lamp on">🟢</span>' : '';
-    return `<article class="card" style="${boxStyle};border-left:4px solid ${reportStatusColor(r.status)};margin-top:8px">
+    const status = reportStatusColor(r.status);
+    return `<article class="card home-report-card" data-status="${reportEsc(status)}">
       <div class="card-head">
         <b>${reportEsc(r.target || '대상 없음')}</b>
-        <span style="color:${reportStatusColor(r.status)};font-weight:700">${reportEsc(r.status || '')}</span>
-        ${r.needBoss ? '<span style="color:var(--blue,#2f6fde);font-weight:700">사장님 확인 필요</span>' : ''}
+        <span class="rst">${reportEsc(r.status || '')}</span>
+        ${r.needBoss ? '<span class="boss">사장님 확인 필요</span>' : ''}
         ${lamp}
         <time>${reportEsc(r.time || '')}</time>
       </div>
       <div>${reportEsc(r.command || '')}</div>
-      <div style="${muted}">올린 쪽: ${reportEsc(r.source || '그록')}${who}</div>
-      <div>${lines}</div>
+      <div class="who">올린 쪽: ${reportEsc(r.source || '그록')}${who}</div>
+      <div class="sum">${lines}</div>
       ${reportLink(r.result || r.where)}
     </article>`;
   }).join('');
-  const empty = shown.length ? '' : `<div class="empty">${reportDept === '전체' ? '아직 올라온 보고가 없어요.' : '이 부서에는 아직 보고가 없어요.'}${pack.error ? `<br><span class="small">${reportEsc(pack.error)}</span>` : ''}</div>`;
-  return `<div class="card" style="${boxStyle}">
-      <b>📋 보고 창</b>
-      <div style="${muted}">팀장 보고와 클로드 직원 보고를 시간 순으로 모았어요. 시간은 한국 시간이에요. 초록 불은 정말 끝났을 때만 켜져요.</div>
-      <div style="margin:6px 0;font-weight:700;color:var(--text,#1d2129)">접수 ${n('접수')} · 진행 중 ${n('진행 중')} · 완료 ${n('완료')} · 문제 ${n('문제 있음')}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${buttons}</div>
-    </div>${cards}${empty}`;
+  const emptyText = reportDept === '전체' ? '아직 올라온 보고가 없어요.' : '이 부서에는 아직 보고가 없어요.';
+  const empty = shown.length ? '' : `<div class="home-report-empty">${emptyText}${pack.error ? `<span class="small">${reportEsc(pack.error)}</span>` : '<span class="small">일을 보내면 여기에 접수로 떠요.</span>'}</div>`;
+  return `<div class="card home-report-panel">
+      <div class="home-report-head">
+        <div class="home-report-title"><b>📋 보고 창</b><span class="muted small">시간 순이에요. 초록 불은 정말 끝났을 때만 켜져요.</span></div>
+        <div class="home-report-counts">접수 ${n('접수')} · 진행 중 ${n('진행 중')} · 완료 ${n('완료')} · 문제 ${n('문제 있음')}</div>
+        <div class="home-report-filters">${buttons}</div>
+      </div>
+      <div class="home-report-list">${cards}${empty}</div>
+    </div>`;
 }
 async function renderReports(el) {
   if (!el) return;
