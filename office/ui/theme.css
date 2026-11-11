@@ -12,6 +12,17 @@
   --text: #1d2129;          /* 글자 */
   --muted: #6b7280;         /* 흐린 글자 */
   --ink: #16181d;           /* 진한 칩·말풍선 테두리 */
+  --navy: #1b2a4a;          /* 현황판 글자 (진남) */
+  --board-bg: #f4f5f7;      /* 현황판 바탕 */
+  --board-paper: #ffffff;   /* 현황판 줄 바탕 */
+  --board-line: #e2e5ea;
+  --board-muted: #5c6b7a;
+  --board-amber: #a86a12;
+  --board-amber-soft: #fff3d6;
+  --board-red: #d13b3b;
+  --board-red-soft: #fdeaea;
+  --board-green: #1f9d55;
+  --board-accent: #c8643b;
   --on-color: #fff;         /* 색 단추·동그라미 위 글자 */
   --accent: #c8643b;        /* 대표색 (주황) */
   --accent-soft: #fbeee7;

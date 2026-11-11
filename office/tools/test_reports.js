@@ -191,6 +191,13 @@ async function main() {
     const failed = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items.find((r) => r.id === seen[1].reportId);
     assert.ok(failed && failed.status === '문제 있음');
     assert.ok(!failed.summary.join(' ').includes('127.0.0.1'));
+    const pc = await post(appPort, '/api/bot/command', { target: 'AI 협력·연결', command: '현황판에서 보낸 일', source: 'PC' });
+    assert.strictEqual(pc.ok, false);
+    const pcHook = seen.find((row) => row && row.command === '현황판에서 보낸 일');
+    assert.ok(pcHook, 'PC에서 보낸 일이 봇에게 가야 해요');
+    assert.strictEqual(pcHook.source, 'PC');
+    assert.strictEqual(pcHook.via, 'PC에서 보냄');
+    assert.ok(!('via' in seen[0]), '예전 보내기에는 PC 표시가 없어요');
     const old = list.find((r) => r.id === 'rpt-old');
     assert.ok(old && old.dept === 'AI 협력·연결' && Array.isArray(old.artifacts) && old.artifacts.length === 0);
     const st = JSON.parse((await getRaw(appPort, '/api/state')).body);

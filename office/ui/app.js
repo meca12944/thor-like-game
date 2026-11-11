@@ -322,9 +322,9 @@ function conns() {
       fields: `<div class="field"><label>게임 폴더</label><input type="text" name="gameRepo" value="${esc(s.gameRepo)}" placeholder="예) C:\\Users\\이름\\thor-like-game"></div>` },
     { id: 'bot', ico: '🤖', nm: '그록 봇', ds: '클로드가 그록에게 바로 말을 보내요', on: !!s.botFrom, lamp: s.botFrom ? '연결됨' : '안 됨',
       what: '알들 컴퍼니의 그록 봇이에요. 연결하면 클로드가 그록에게 할 말이 생길 때 사장님이 옮겨 주지 않아도 바로 가요. 공짜예요.',
-      how: '알들 컴퍼니 명령창 「설정」에 넣은 <b>웹훅 주소</b>와 <b>웹훅 키</b>를 똑같이 아래에 붙여 넣으세요. 한 번만 하면 돼요.',
-      fields: `<div class="field"><label>웹훅 주소</label><input type="text" name="botUrl" value="${esc(s.botUrl)}" placeholder="https://… (명령창과 같은 것)"></div>
-        <div class="field"><label>웹훅 키</label><input type="password" name="botKey" placeholder="${s.hasBotKey ? '들어 있어요 (바꿀 때만 넣기)' : '명령창과 같은 키'}" autocomplete="off"></div>
+      how: '명령창 설정에 넣은 <b>받는 주소</b>와 <b>받는 열쇠</b>를 똑같이 아래에 붙여 넣으세요. 한 번만 하면 돼요.',
+      fields: `<div class="field"><label>받는 주소</label><input type="text" name="botUrl" value="${esc(s.botUrl)}" placeholder="https://… (명령창과 같은 것)"></div>
+        <div class="field"><label>받는 열쇠</label><input type="password" name="botKey" placeholder="${s.hasBotKey ? '들어 있어요 (바꿀 때만 넣기)' : '명령창과 같은 열쇠'}" autocomplete="off"></div>
         <input type="hidden" name="grokMode" value="bot">` },
     { id: 'mail', ico: '📮', nm: '그록 답 우편함', ds: '그록의 답을 받아 오는 곳 (깃허브)', on: s.coop && s.coop.ok, lamp: s.coop && s.coop.ok ? '받는 중' : '대기',
       what: `그록 봇이 답을 깃허브 <a href="${esc(s.issueUrl)}" target="_blank">AI협력 대화방</a>에 남기면, 작업장이 가져와서 기다리던 클로드에게 넘겨 줘요. 공짜예요.`,
@@ -341,18 +341,18 @@ function conns() {
       what: '구글 드라이브의 그록 공유 폴더를 PC 폴더로 보이게 해 두면, 새 그림·영상이 올 때 AI협력팀이 저절로 확인하고 보고해요.',
       how: 'PC에 「Google Drive 데스크톱」을 깔고, 그 폴더 주소를 아래에 넣으세요 (예: G:\\내 드라이브\\…).',
       fields: `<div class="field"><label>그록 폴더 (PC 주소)</label><input type="text" name="grokDir" value="${esc(s.grokDir)}"></div>`, act: 'folder' },
-    { id: 'github', ico: '🐙', nm: '깃허브 올리기', ds: '직원이 고친 것을 깃허브에 올려요 (PR)', on: !!(s.ghPush && s.ghPush.ok), lamp: s.ghPush ? (s.ghPush.ok ? '올릴 수 있음' : '로그인 필요') : '확인 안 함',
-      what: '직원(클로드)이 게임을 고치면, 깃허브에 올리고 「합치기 부탁(PR)」을 만들어요. 그러려면 이 PC 가 사장님 깃허브 계정으로 한 번 로그인돼 있어야 해요.',
-      how: `아래 「로그인·확인」을 누르세요. 로그인이 안 돼 있으면 <b>깃허브 로그인 창</b>이 떠요 → 사장님 깃허브 계정으로 로그인 → 다시 「로그인·확인」. 실제로 올리지는 않고 확인만 해요.${s.ghPush ? `<br><br>마지막 확인: <b>${esc(s.ghPush.msg)}</b> (${ago(s.ghPush.at)})${s.ghPush.name ? `<br>커밋 이름: ${esc(s.ghPush.name)} / ${esc(s.ghPush.email || '이메일 없음')}` : '<br>⚠ 커밋 이름이 없어요. 아래에 적어 주세요.'}` : ''}`,
-      fields: `<div class="field"><label>커밋에 남길 이름 (비워 두면 그대로)</label><input type="text" name="gitName" placeholder="${esc((s.ghPush && s.ghPush.name) || '예: meca12944')}"></div>
-        <div class="field"><label>커밋에 남길 이메일 (비워 두면 그대로)</label><input type="text" name="gitEmail" placeholder="${esc((s.ghPush && s.ghPush.email) || '깃허브 계정 이메일')}"></div>`, act: 'github' },
+    { id: 'github', ico: '🐙', nm: '깃허브 올리기', ds: '직원이 고친 것을 깃허브에 올려요', on: !!(s.ghPush && s.ghPush.ok), lamp: s.ghPush ? (s.ghPush.ok ? '올릴 수 있음' : '로그인 필요') : '확인 안 함',
+      what: '직원(클로드)이 게임을 고치면, 깃허브에 올리고 합치기 부탁을 만들어요. 그러려면 이 PC 가 사장님 깃허브 계정으로 한 번 로그인돼 있어야 해요.',
+      how: `아래 「로그인·확인」을 누르세요. 로그인이 안 돼 있으면 <b>깃허브 로그인 창</b>이 떠요 → 사장님 깃허브 계정으로 로그인 → 다시 「로그인·확인」. 실제로 올리지는 않고 확인만 해요.${s.ghPush ? `<br><br>마지막 확인: <b>${esc(s.ghPush.msg)}</b> (${ago(s.ghPush.at)})${s.ghPush.name ? `<br>올릴 때 적힐 이름: ${esc(s.ghPush.name)} / ${esc(s.ghPush.email || '이메일 없음')}` : '<br>⚠ 올릴 때 적힐 이름이 없어요. 아래에 적어 주세요.'}` : ''}`,
+      fields: `<div class="field"><label>올릴 때 적힐 이름 (비워 두면 그대로)</label><input type="text" name="gitName" placeholder="${esc((s.ghPush && s.ghPush.name) || '예: meca12944')}"></div>
+        <div class="field"><label>올릴 때 적힐 이메일 (비워 두면 그대로)</label><input type="text" name="gitEmail" placeholder="${esc((s.ghPush && s.ghPush.email) || '깃허브 계정 이메일')}"></div>`, act: 'github' },
     { id: 'pixellab', ico: '🎨', nm: 'PixelLab', ds: '직원이 도트 그림을 만들 때 써요', on: !!s.hasPixellab, lamp: s.hasPixellab ? '넣어 둠' : '안 넣음',
       what: '도트(픽셀) 그림을 만들어 주는 서비스예요. 직원이 몹·주인공 그림을 만들 때 이 키를 써요. <b>쓸 때마다 크레딧(돈)이 줄어요.</b> 직원은 일이 끝나면 쓴 크레딧을 보고해요.',
-      how: 'pixellab.ai 에 로그인 → 계정 설정에서 API 키를 복사 → 아래에 붙여 넣기. 키는 이 PC 의 data 폴더에만 있고 화면·기록에 안 나와요.',
-      fields: `<div class="field"><label>PixelLab 키</label><input type="password" name="pixellabKey" placeholder="${s.hasPixellab ? '들어 있어요 (바꿀 때만 넣기)' : 'PixelLab API 키'}" autocomplete="off"></div>
+      how: 'pixellab.ai 에 로그인 → 계정 설정에서 열쇠를 복사 → 아래에 붙여 넣기. 열쇠는 이 PC 에만 있고 화면·기록에 안 나와요.',
+      fields: `<div class="field"><label>그림 열쇠</label><input type="password" name="pixellabKey" placeholder="${s.hasPixellab ? '들어 있어요 (바꿀 때만 넣기)' : '그림 만드는 열쇠'}" autocomplete="off"></div>
         ${s.hasPixellab ? '<div class="field"><label class="check"><input type="checkbox" name="pixellabClear"> 키 지우기</label></div>' : ''}` },
     { id: 'mcp', ico: '🧩', nm: '클로드 연결 도구', ds: '구글 드라이브·노션 같은 바깥 서비스', on: !!(s.mcpList && s.mcpList.count), lamp: s.mcpList ? (s.mcpList.count ? `${s.mcpList.count}개 연결` : '없음') : '확인 안 함',
-      what: '클로드가 구글 드라이브·노션·깃허브 같은 바깥 서비스를 직접 쓰게 해 주는 연결이에요 (영어로 「MCP 커넥터」). 여기 목록에 나오는 것만 PC 직원들이 쓸 수 있어요.',
+      what: '클로드가 구글 드라이브·노션·깃허브 같은 바깥 서비스를 직접 쓰게 해 주는 연결이에요. 여기 목록에 나오는 것만 PC 직원들이 쓸 수 있어요.',
       how: `아래 「목록 보기」로 지금 이어진 것을 확인해요. 더 잇고 싶으면 이 대화방의 클로드에게 「○○ 연결해 줘」라고 말하면 순서를 알려 드려요. 지금 없어도 일하는 데는 문제없어요 (그록과는 🤖 그록 봇으로 이어져 있어요).${s.mcpList ? `<br><br>마지막 확인 (${ago(s.mcpList.at)}):<code style="display:block;white-space:pre-wrap;margin-top:4px">${esc(s.mcpList.text)}</code>` : ''}`,
       fields: '', act: 'mcp' },
     { id: 'reports', ico: '☁', nm: '회사 보고 폴더', ds: '그록 팀장들의 보고를 보고 창에 띄워요', on: !!s.reportsFile, lamp: s.reportsFile ? '정해짐' : '안 정함',
@@ -360,9 +360,9 @@ function conns() {
       how: 'PC에 「Google Drive 데스크톱」을 깔면 드라이브가 PC 폴더(예: G:\\내 드라이브)로 보여요. 그 안의 <b>알들 컴퍼니 보고\\reports.json</b> 파일 주소를 아래에 넣으세요. (파일에서 오른쪽 클릭 → 「경로로 복사」)',
       fields: `<div class="field"><label>보고 파일 주소</label><input type="text" name="reportsFile" value="${esc(s.reportsFile || '')}" placeholder="예: G:\내 드라이브\알들 컴퍼니 보고\reports.json"></div>` },
     { id: 'xai', ico: '🔑', nm: '그록 키 (유료)', ds: '돈을 내고 그록과 완전 자동으로', on: s.grokWay === 'api', lamp: s.grokWay === 'api' ? '쓰는 중' : '안 씀',
-      what: '그록 회사(xAI)의 유료 키예요. 그록 봇 없이도 완전 자동이지만, 쓴 만큼 돈이 나가요 (말 한 번 약 30원, 그림 1장 약 60원).',
+      what: '그록 회사의 유료 열쇠예요. 그록 봇 없이도 완전 자동이지만, 쓴 만큼 돈이 나가요 (말 한 번 약 30원, 그림 1장 약 60원).',
       how: '보통은 필요 없어요. 쓰려면 console.x.ai 에서 키를 만들어 아래에 넣고 「이걸로 쓰기」에 체크하세요.',
-      fields: `<div class="field"><label>그록 키</label><input type="password" name="xaiKey" placeholder="${s.hasXaiKey ? '들어 있어요' : 'xai- 로 시작'}" autocomplete="off"></div>
+      fields: `<div class="field"><label>그록 열쇠</label><input type="password" name="xaiKey" placeholder="${s.hasXaiKey ? '들어 있어요' : '그록 회사에서 받은 열쇠'}" autocomplete="off"></div>
         <div class="field"><label class="check"><input type="checkbox" name="useApi" ${s.grokMode === 'api' ? 'checked' : ''}> 이걸로 쓰기 (끄면 그록 봇 → 붙여넣기 순서로 써요)</label></div>
         <div class="field"><label>하루 한도 (달러)</label><input type="text" name="grokBudget" value="${esc(s.grokBudget)}"><div class="help">오늘 쓴 돈 $${(s.grokSpent || 0).toFixed(2)}</div></div>` },
   ];
@@ -413,7 +413,7 @@ function connOne(id) {
 // ───────── ❓ 사용법 ─────────
 function guide() {
   dialog(`<h2>❓ 클로드 작업장 쓰는 법</h2>
-    <p>처음 화면은 <b>🏢 알들 컴퍼니 홈</b>이에요: 📋 보고 창 + 부서 아이콘. 부서를 누르면 일을 시킬 수 있고, <b>🎮 게임 필멸자 → 🧠 클로드 작업장 열기</b>로 클로드 직원들에게 가요.</p>
+    <p>처음 화면은 <b>한 장 현황판</b>이에요. 맨 위에 정하실 일, 가운데 지금 하는 일, 맨 아래에 할 일 한 줄. 정하실 일은 그록 채팅에서 답해요. 부서·직원·연결은 오른쪽 위 <b>⚙</b> 안에 있어요.</p>
     <p class="muted small">클로드 작업장에서는 이렇게 해요:</p>
     <div class="guide">
       <div class="g"><div class="big">👆</div><b>1. 직원 고르기</b><span>왼쪽에서 일 시킬 직원 이름을 눌러요.<br>모르겠으면 <b>팀장</b>에게!</span></div>
@@ -422,7 +422,7 @@ function guide() {
     </div>
     <ul class="tips">
       <li>⚠ 지우기·덮어쓰기 같은 <b>위험한 일</b>은 허락해도 기억하지 않고 매번 물어요.</li>
-      <li>🙋 위에 <b>노란 칸 「해도 될까요?」</b>가 뜨면 <b>허락</b>을 눌러요. 한 번 허락하면 다시 안 물어요.</li>
+      <li>🙋 <b>해도 될까요?</b> 와 빨간 경고는 오른쪽 위 <b>⚙</b> 안에 있어요. 톱니에 빨간 점이 있으면 열어 보세요. 한 번 허락하면 다시 안 물어요.</li>
       <li>💬 <b>그록과 이야기</b> 칸에서 그록에게 말하거나, 클로드와 그록에게 회의를 시킬 수 있어요.</li>
       <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더·깃허브·PixelLab 같은 것을 이어요 (아이콘 11개). 아이콘을 누르면 「이게 뭐예요? / 어떻게 해요?」가 나와요. 🟢 = 이어짐, ⚪ = 아직.</li>
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
