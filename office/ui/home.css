@@ -79,6 +79,7 @@
 .home-depts .tile { text-align: center; padding: 10px 8px 8px; background: var(--panel); min-width: 0; }
 .home-depts .tile .ico { font-size: 26px; }
 .home-depts .tile .nm { font-size: 15px; margin-top: 4px; word-break: keep-all; }
+.home-depts .tile .home-cnt { margin-top: 3px; font-size: 12px; font-weight: 700; color: var(--text); }
 .home-depts .tile .ds {
   font-size: 12px;
   line-height: 1.35;
@@ -90,6 +91,7 @@
 }
 .home-shortcuts { display: flex; gap: 8px; margin-top: 8px; }
 .home-shortcuts .btn { flex: 1; }
+.home-team-btn { width: 100%; margin-top: 8px; }
 
 /* 대화는 칸 안에서만 내려가요 */
 .home-col-chat .title .link { margin-left: auto; }
@@ -177,6 +179,7 @@
 }
 .dept-card { min-height: 0; overflow: auto; }
 .dept-send { display: flex; flex-direction: column; gap: 0; }
+.dept-block + .dept-block { margin-top: 14px; }
 .dept-people { margin: 8px 0 0; padding-left: 18px; }
 .dept-people li { margin: 3px 0; }
 .home-text {
@@ -191,6 +194,7 @@
 }
 .dept-send .home-text { flex: 1 1 auto; min-height: 96px; }
 .home-err { color: var(--red); min-height: 1.3em; font-weight: 700; }
+.home-err.ok { color: var(--green); }
 .dept-send .btn { align-self: stretch; }
 
 /* 연결 설명: 왼쪽 아이콘, 오른쪽 설명 */

@@ -63,7 +63,7 @@ function renderAsks() {
   document.querySelectorAll('.asks-box').forEach((x) => (x.innerHTML = h));
 }
 function renderEmps() {
-  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 기본 팀 한 번에 뽑기 (7명)</button><br><span class="small">팀장·UI·스토리·몬스터·효과·모션·AI협력팀</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
+  if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 부서 클로드 팀 한 번에 만들기</button><br><span class="small">게임 팀, 그리고 직원이 없는 다른 부서</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
   $('#emps').innerHTML = S.employees.map((e) => `
     <div class="emp ${e.id === target ? 'sel' : ''}" data-act="pick" data-id="${e.id}">
       ${avatar(e.name)}
@@ -427,6 +427,7 @@ function guide() {
       <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더·깃허브·PixelLab 같은 것을 이어요 (아이콘 11개). 아이콘을 누르면 「이게 뭐예요? / 어떻게 해요?」가 나와요. 🟢 = 이어짐, ⚪ = 아직.</li>
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
       <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
+      <li>🏢 각 부서에는 <b>클로드 직원</b>과 <b>그록 봇</b>이 같이 있어요. 홈에서 일을 보내면 그록과 그 부서 클로드 팀장에게 가요.</li>
     </ul>
     <div class="dlg-foot"><button class="btn" value="cancel">알겠어요</button></div>`);
 }

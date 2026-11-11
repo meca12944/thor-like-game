@@ -9,6 +9,8 @@ let homeTopDraft = '';
 let homeTopDeptMem = '';
 let homeTopNote = null;
 let homeTopBusy = false;
+let homeTeamBusy = false;
+let homeDeptNote = null;
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -78,6 +80,45 @@ function homeRestoreFocus(el, snap) {
     node.setSelectionRange(n, n);
   }
 }
+function homeClaudeList(A, deptId) {
+  const all = (A && A.state && A.state.employees) || [];
+  return all.filter((e) => (e.dept || 'game') === deptId);
+}
+function homeJobLine(e, esc) {
+  const raw = String(e.task || e.wait || '').replace(/\s+/g, ' ').trim();
+  if (!raw) return '';
+  let nice = '';
+  const boxed = raw.match(/부서 일\]\s*(.+?)(?:\s+너는 이 부서|$)/);
+  if (boxed) nice = boxed[1];
+  else {
+    const lines = String(e.task || e.wait || '').split('\n').map((s) => s.trim()).filter(Boolean);
+    nice = lines.find((s) => s.charAt(0) !== '[' && s.indexOf('너는 이 부서') !== 0) || '';
+  }
+  nice = nice.trim();
+  if (!nice) return '';
+  return `<div class="muted small">${e.task ? '지금' : '맡은 일'}: ${esc(nice.slice(0, 90))}</div>`;
+}
+function homePeopleHtml(list, esc, claude) {
+  if (!list.length) return '';
+  const sorted = list.slice().sort((a, b) => (b.lead === true) - (a.lead === true) || String(a.name).localeCompare(String(b.name), 'ko'));
+  return `<ul class="dept-people">${sorted.map((p) => {
+    const lead = p.lead ? ' <span class="muted small">(팀장)</span>' : '';
+    const job = claude ? homeJobLine(p, esc) : '';
+    return `<li><b>${esc(p.name)}</b>${lead} — ${esc(p.role || '')}${job}</li>`;
+  }).join('')}</ul>`;
+}
+async function homeMakeTeams(A) {
+  if (homeTeamBusy) return;
+  homeTeamBusy = true;
+  if (A.toast) A.toast('클로드 팀 자리를 만드는 중이에요');
+  let r = null;
+  try { r = await A.api('/api/team'); }
+  catch (e) { r = { ok: false, error: '회사 프로그램이 켜져 있는지 봐 주세요.' }; }
+  homeTeamBusy = false;
+  if (!r || !r.ok) { if (A.toast) A.toast((r && r.error) || '못 만들었어요'); return; }
+  const n = (r.made || []).length;
+  if (A.toast) A.toast(n ? '클로드 직원 ' + n + '명을 만들었어요' : '이미 모든 부서에 클로드 직원이 있어요');
+}
 function homeOrderHtml(pack, esc) {
   const picked = homeTopPick(pack);
   const opts = (pack.depts || []).map((d) => {
@@ -119,14 +160,17 @@ async function homeTopSend(el, A) {
   const btnNow = el.querySelector('#homeTopSend button[type="submit"]');
   if (btnNow) btnNow.disabled = false;
   if (!r || !r.ok) {
-    homeTopNote = { ok: false, text: (r && r.error) || '못 보냈어요' };
+    let text = (r && r.error) || '못 보냈어요';
+    if (r && r.claudeLead && text.indexOf(r.claudeLead) < 0) text += ' 클로드 팀장 ' + r.claudeLead + '에게는 넣어 두었어요.';
+    homeTopNote = { ok: false, text };
     homeTopPaintNote(el);
     return;
   }
   homeTopDraft = '';
   const inpNow = el.querySelector('#homeTopCmd');
   if (inpNow) inpNow.value = '';
-  homeTopNote = { ok: true, text: name + '에 보냈어요. 그록이 받았어요 → 보고 창에 접수로 떠요' };
+  const leadBit = r.claudeLead ? ' 클로드 ' + r.claudeLead + '에게도 넣었어요.' : '';
+  homeTopNote = { ok: true, text: name + '에 보냈어요. 그록이 받았어요.' + leadBit + ' → 보고 창에 접수로 떠요' };
   homeTopPaintNote(el);
   reportAt = 0;
   const slot = el.querySelector('#homeReports');
@@ -138,7 +182,10 @@ function homePaint(el, A) {
   const esc = A.esc;
   if (homeMode === 'dept') return homePaintDept(el, A, pack, esc);
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
-  const tiles = pack.depts.map((d) => `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div></button>`).join('');
+  const tiles = pack.depts.map((d) => {
+    const n = homeClaudeList(A, d.id).length;
+    return `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div><div class="home-cnt">클로드 ${n}명</div></button>`;
+  }).join('');
   el.innerHTML = `<div class="home-page home-fit">
     ${homeOrderHtml(pack, esc)}
     <div class="home-grid">
@@ -152,6 +199,8 @@ function homePaint(el, A) {
           <button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>
           <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명</button>
         </div>
+        <button type="button" class="btn ghost home-team-btn" data-home="team">👥 부서마다 클로드 팀 만들기</button>
+        <div class="muted small">없는 클로드 직원을 한 번에 만들어요. 게임 폴더가 있어야 해요.</div>
       </section>
       <section class="home-col home-col-chat">
         <div class="title">💬 클로드 ↔ 그록 <span class="muted small">최근 말</span><button type="button" class="link" data-act="coopall">모두 보기</button></div>
@@ -169,26 +218,38 @@ function homePaint(el, A) {
 function homePaintDept(el, A, pack, esc) {
   const d = pack.depts.find((x) => x.id === homeDeptId) || { id: homeDeptId, name: '부서', icon: '🏢', sub: '' };
   const bots = (pack.bots || []).filter((b) => b.dept === d.id);
-  const people = bots.length
-    ? `<ul class="dept-people">${bots.map((b) => `<li><b>${esc(b.name)}</b>${b.lead ? ' <span class="muted small">(팀장)</span>' : ''} — ${esc(b.role || '')}</li>`).join('')}</ul>`
-    : '<p class="muted">아직 팀원 목록이 없어요.</p>';
+  const claude = homeClaudeList(A, d.id);
+  const lead = claude.find((e) => e.lead) || claude.find((e) => /팀장$/.test(e.name));
+  const claudeHtml = claude.length
+    ? homePeopleHtml(claude, esc, true)
+    : `<p class="muted">아직 클로드 직원이 없어요.</p><button type="button" class="btn" data-home="team">👥 클로드 팀 만들기</button>`;
+  const botHtml = bots.length ? homePeopleHtml(bots, esc, false) : '<p class="muted">아직 그록 봇 목록이 없어요.</p>';
   const game = d.id === 'game';
-  const blurb = game
-    ? '게임 일을 직접 보려면 오른쪽 위 「클로드 작업장」을 눌러요.'
-    : '오른쪽에 할 일을 적으면 팀장이 나눠 맡기고, 끝나면 보고 창에 올려요.';
+  const note = homeDeptNote && homeDeptNote.id === d.id ? homeDeptNote : null;
+  const hint = lead
+    ? `보내면 그록 팀장에게 가고, 클로드 팀장(${esc(lead.name)})에게도 같은 일이 들어가요.`
+    : '보내면 그록 팀장에게 가요. 클로드 팀장이 있으면 그 사람에게도 넣어요.';
   el.innerHTML = `<div class="dept-page home-fit">
     <div class="dept-bar">
       <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
-      <div class="dept-name"><span class="ico">${d.icon || '🏢'}</span><div><b>${esc(d.name)}</b><div class="muted small">${esc(d.sub || '')}${d.lead ? ` · 팀장 ${esc(d.lead)}` : ''}</div></div></div>
+      <div class="dept-name"><span class="ico">${d.icon || '🏢'}</span><div><b>${esc(d.name)}</b><div class="muted small">${esc(d.sub || '')} · 클로드 ${claude.length}명 · 그록 ${bots.length}명</div></div></div>
       ${game ? '<button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>' : ''}
     </div>
     <div class="dept-grid">
-      <section class="card dept-card"><b>👥 팀원</b><div class="muted small">${blurb}</div>${people}</section>
+      <section class="card dept-card">
+        <div class="dept-block"><b>🧠 클로드 직원</b> <span class="muted small">${claude.length}명</span>
+          <div class="muted small">${game ? '게임 일을 직접 보려면 오른쪽 위 「클로드 작업장」을 눌러요.' : '이 부서의 클로드 팀이에요. 일을 보내면 팀장이 받아요.'}</div>
+          ${claudeHtml}
+        </div>
+        <div class="dept-block"><b>🤖 그록 봇</b> <span class="muted small">${bots.length}명</span>
+          ${botHtml}
+        </div>
+      </section>
       <form class="card dept-card dept-send" id="homeSend">
         <b>✍️ 이 부서에 일 시키기</b>
-        <div class="muted small">예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
+        <div class="muted small">${hint}<br>예: ${game ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}</div>
         <textarea id="homeCmd" class="home-text" rows="4" placeholder="할 일을 적어 주세요"></textarea>
-        <div id="homeSendErr" class="home-err"></div>
+        <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
         <button class="btn" type="submit">보내기</button>
       </form>
     </div>
@@ -198,13 +259,20 @@ function homePaintDept(el, A, pack, esc) {
     ev.preventDefault();
     const command = (el.querySelector('#homeCmd').value || '').trim();
     const err = el.querySelector('#homeSendErr');
-    if (!command) { err.textContent = '할 일을 적어 주세요.'; return; }
+    if (!command) { if (err) err.textContent = '할 일을 적어 주세요.'; return; }
     const r = await A.api('/api/bot/command', { target: d.name, command });
-    if (!r.ok) { err.textContent = r.error || '못 보냈어요'; return; }
-    err.textContent = '';
-    el.querySelector('#homeCmd').value = '';
-    A.toast(d.name + '에 보냈어요');
-    reportAt = 0;
+    let text = '';
+    let ok = !!(r && r.ok);
+    if (!ok) {
+      text = (r && r.error) || '못 보냈어요';
+      if (r && r.claudeLead && text.indexOf(r.claudeLead) < 0) text += ' 클로드 팀장 ' + r.claudeLead + '에게는 넣어 두었어요.';
+    } else {
+      text = d.name + '에 보냈어요.' + (r.claudeLead ? ' 클로드 ' + r.claudeLead + '에게도 넣었어요.' : '');
+      A.toast(text);
+      reportAt = 0;
+    }
+    homeDeptNote = { id: d.id, ok, text };
+    if (homeMode === 'dept' && homeDeptId === d.id) homePaint(el, A);
   });
 }
 function homePaintConn(el, A, esc) {
@@ -261,6 +329,7 @@ function homeBind(el, A) {
     else if (act === 'workshop') { if (A.openWorkshop) A.openWorkshop(); return; }
     else if (act === 'conn') { homeMode = 'conn'; homeConn = -1; }
     else if (act === 'connone') { homeMode = 'conn'; homeConn = Number(b.getAttribute('data-i')); }
+    else if (act === 'team') { homeMakeTeams(A); return; }
     else return;
     homePaint(el, A);
   });
