@@ -11,6 +11,7 @@ let homeTopNote = null;
 let homeTopBusy = false;
 let homeTeamBusy = false;
 let homeDeptNote = null;
+let homeDeptFolder = '';
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -119,6 +120,20 @@ async function homeMakeTeams(A) {
   const n = (r.made || []).length;
   if (A.toast) A.toast(n ? '클로드 직원 ' + n + '명을 만들었어요' : '이미 모든 부서에 클로드 직원이 있어요');
 }
+async function homeMakeDept(A) {
+  if (homeTeamBusy) return;
+  const dept = homeDeptId;
+  const folder = String(homeDeptFolder || '').trim();
+  homeTeamBusy = true;
+  if (A.toast) A.toast('이 부서 직원을 만드는 중이에요');
+  let r = null;
+  try { r = await A.api('/api/team', { dept, folder }); }
+  catch (e) { r = { ok: false, error: '회사 프로그램이 켜져 있는지 봐 주세요.' }; }
+  homeTeamBusy = false;
+  if (!r || !r.ok) { if (A.toast) A.toast((r && r.error) || '못 만들었어요'); return; }
+  const n = (r.made || []).length;
+  if (A.toast) A.toast(n ? '클로드 직원 ' + n + '명을 만들었어요' : '이 부서에는 이미 클로드 직원이 다 있어요');
+}
 function homeOrderHtml(pack, esc) {
   const picked = homeTopPick(pack);
   const opts = (pack.depts || []).map((d) => {
@@ -200,7 +215,7 @@ function homePaint(el, A) {
           <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명</button>
         </div>
         <button type="button" class="btn ghost home-team-btn" data-home="team">👥 부서마다 클로드 팀 만들기</button>
-        <div class="muted small">없는 클로드 직원을 한 번에 만들어요. 게임 폴더가 있어야 해요.</div>
+        <div class="muted small">누르기 전에는 만들지 않아요. 한 부서만 만들려면 그 부서 화면의 「만들기」를 눌러요.</div>
       </section>
       <section class="home-col home-col-chat">
         <div class="title">💬 클로드 ↔ 그록 <span class="muted small">최근 말</span><button type="button" class="link" data-act="coopall">모두 보기</button></div>
@@ -222,7 +237,15 @@ function homePaintDept(el, A, pack, esc) {
   const lead = claude.find((e) => e.lead) || claude.find((e) => /팀장$/.test(e.name));
   const claudeHtml = claude.length
     ? homePeopleHtml(claude, esc, true)
-    : `<p class="muted">아직 클로드 직원이 없어요.</p><button type="button" class="btn" data-home="team">👥 클로드 팀 만들기</button>`;
+    : '<p class="muted">아직 클로드 직원이 없어요. 아래 「만들기」를 눌러요.</p>';
+  const makeHtml = `<div class="dept-make">
+      <button type="button" class="btn" data-home="makedept">＋ 만들기</button>
+      <div class="muted small">이 부서에 없는 클로드 직원을 만들어요. 폴더를 비우면 게임 폴더 옆에 자리를 만들어요.</div>
+      <label class="dept-folder-label">폴더 주소 (직접 고를 때)
+        <input id="homeDeptFolder" class="dept-folder" type="text" autocomplete="off" placeholder="예: D:\\일\\홍보" value="${esc(homeDeptFolder)}">
+      </label>
+      <div class="muted small">주소를 적으면 그 폴더 안에 직원마다 자리를 만들어요. 게임 폴더는 필요 없어요.</div>
+    </div>`;
   const botHtml = bots.length ? homePeopleHtml(bots, esc, false) : '<p class="muted">아직 그록 봇 목록이 없어요.</p>';
   const game = d.id === 'game';
   const note = homeDeptNote && homeDeptNote.id === d.id ? homeDeptNote : null;
@@ -240,6 +263,7 @@ function homePaintDept(el, A, pack, esc) {
         <div class="dept-block"><b>🧠 클로드 직원</b> <span class="muted small">${claude.length}명</span>
           <div class="muted small">${game ? '게임 일을 직접 보려면 오른쪽 위 「클로드 작업장」을 눌러요.' : '이 부서의 클로드 팀이에요. 일을 보내면 팀장이 받아요.'}</div>
           ${claudeHtml}
+          ${makeHtml}
         </div>
         <div class="dept-block"><b>🤖 그록 봇</b> <span class="muted small">${bots.length}명</span>
           ${botHtml}
@@ -316,7 +340,9 @@ function homeBind(el, A) {
   });
   el.addEventListener('input', (ev) => {
     const t = ev.target;
-    if (!t || t.id !== 'homeTopCmd' || !el.contains(t)) return;
+    if (!t || !el.contains(t)) return;
+    if (t.id === 'homeDeptFolder') { homeDeptFolder = t.value; return; }
+    if (t.id !== 'homeTopCmd') return;
     homeTopDraft = t.value;
     if (homeTopNote) { homeTopNote = null; homeTopPaintNote(el); }
   });
@@ -330,6 +356,12 @@ function homeBind(el, A) {
     else if (act === 'conn') { homeMode = 'conn'; homeConn = -1; }
     else if (act === 'connone') { homeMode = 'conn'; homeConn = Number(b.getAttribute('data-i')); }
     else if (act === 'team') { homeMakeTeams(A); return; }
+    else if (act === 'makedept') {
+      const inp = el.querySelector('#homeDeptFolder');
+      if (inp) homeDeptFolder = inp.value;
+      homeMakeDept(A);
+      return;
+    }
     else return;
     homePaint(el, A);
   });

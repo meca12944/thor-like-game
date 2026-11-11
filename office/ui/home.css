@@ -182,6 +182,9 @@
 .dept-block + .dept-block { margin-top: 14px; }
 .dept-people { margin: 8px 0 0; padding-left: 18px; }
 .dept-people li { margin: 3px 0; }
+.dept-make { margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.dept-folder-label { display: block; width: 100%; font-size: 13px; color: var(--muted); }
+.dept-folder { display: block; width: 100%; margin-top: 4px; padding: 8px 10px; border-radius: var(--input-radius); border: 1px solid var(--line); background: var(--bg); color: var(--text); }
 .home-text {
   width: 100%;
   margin-top: 8px;
