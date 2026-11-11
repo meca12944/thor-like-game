@@ -56,7 +56,7 @@ function renderAsks() {
   let h = '';
   if (!S.claude.ok) h += `<div class="banner-red"><b>클로드 코드를 못 찾았어요.</b> 폴더 안 「처음_설치.bat」 을 두 번 누르고, 로그인한 뒤 다시 켜 주세요.</div>`;
   for (const p of S.pending) h += p.danger
-    ? `<div class="ask danger"><div class="q"><b>⚠ ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">지우기·덮어쓰기·main 에 바로 올리기 같은 <b>위험한 일</b>이라 매번 물어요 (기억하지 않아요).</div></div>
+    ? `<div class="ask danger"><div class="q"><b>⚠ ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">${typeof p.danger === 'string' ? `<b>${esc(p.danger)}</b> 같은 ` : ''}<b>위험한 일</b>(지우기·배포·결제·push)이라 매번 물어요 (기억하지 않아요).</div></div>
     <button class="btn green" data-ans="once" data-id="${p.id}">이번만 허락</button><button class="btn red" data-ans="no" data-id="${p.id}">거절</button></div>`
     : `<div class="ask"><div class="q"><b>🙋 ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">한 번 허락하면 다음부터 다시 안 물어요.</div></div>
     <button class="btn green" data-ans="always" data-id="${p.id}">허락</button><button class="btn red" data-ans="no" data-id="${p.id}">거절</button></div>`;
@@ -205,7 +205,7 @@ function renderSay() {
   if (tab === 'grok') {
     const p = partner();
     const chips = [['grok', '🤖 그록에게 말하기'], ['claude', '🧠 클로드(' + (p ? p.name : 'AI협력팀') + ')에게'], ['meeting', '🗣 둘이 회의시키기'], ['image', '🎨 그록에게 그림 부탁']];
-    to.innerHTML = chips.map(([k, v]) => `<button type="button" data-room="${k}" class="${roomMode === k ? 'on' : ''}">${v}</button>`).join('') + '<span style="flex:1"></span><button type="button" class="link" data-act="roomreset">새 대화</button>';
+    to.innerHTML = chips.map(([k, v]) => `<button type="button" data-room="${k}" class="${roomMode === k ? 'on' : ''}">${v}</button>`).join('') + '<span style="flex:1"></span><button type="button" class="link" data-act="coopall" title="깃허브 AI협력 대화방 글 보기 (읽기만)">📮 깃허브 대화방</button><button type="button" class="link" data-act="roomreset">새 대화</button>';
     ta.placeholder = { grok: '그록에게 할 말 (예: 주인공 망토 색 추천해 줘)', claude: '클로드에게 할 말 — 필요하면 클로드가 그록에게도 물어봐요', meeting: '회의 주제 (예: 1장 보스 공격 패턴 정하기) — 둘이 이야기하고 결론을 보고해요', image: '그릴 것 (예: 붉은 망토 기사, 옆모습, 투명 배경)' }[roomMode] + '  · Enter 보내기';
   } else {
     const e = S.employees.find((x) => x.id === target);
@@ -271,12 +271,21 @@ function empMenu(id) {
     if (v === 'open') await api('/api/open', { id });
   });
 }
+// ⚙ 설정 안의 허락 목록 (하나씩 ✕ 로 지우기). ⚠ = 지우기·배포·결제·push → 목록에 있어도 매번 다시 물음
+function rulesHtml() {
+  const ask = new Set(S.rulesAsk || []);
+  if (!S.rules.length) return '<div class="muted small">허락해 둔 일이 없어요. 직원이 할 때마다 물어봐요.</div>';
+  return `<div class="rules set-rules">${S.rules.map((r) => `<span class="${ask.has(r) ? 'ask-every' : ''}" title="${ask.has(r) ? '지우기·배포·결제·push 라서 매번 다시 물어요' : '묻지 않고 해요'}">${ask.has(r) ? '⚠ ' : ''}${esc(r)} <button value="rdel:${encodeURIComponent(r)}" title="지우기">✕</button></span>`).join('')}</div>
+    <div class="help muted small" style="margin-top:6px">⚠ = 지우기·배포·결제·push. 목록에 있어도 <b>매번 다시 물어요</b>.</div>`;
+}
 function settings() {
   const s = S.settings;
   dialog(`<h2>⚙ 그 밖의 설정</h2>
     <p class="muted small">다른 프로그램·AI 와 잇는 것은 위의 「🔌 연결」에 있어요.</p>
-    <div class="row-btns">
-      <button class="btn ghost" value="rules">✅ 허락해 둔 일 목록</button>
+    <h3>✅ 허락해 둔 일 <span class="small">✕ 를 누르면 지워지고, 다음에 다시 물어봐요</span></h3>
+    <div id="setRules">${rulesHtml()}</div>
+    <div class="row-btns" style="margin-top:12px">
+      <button class="btn ghost small" value="rules">＋ 직접 더하기</button>
       <button class="btn red" value="stopall">✋ 모든 직원 멈추기</button>
     </div>
     <details class="more-set"><summary>더 보기 (잘 안 바꾸는 것)</summary>
@@ -287,6 +296,12 @@ function settings() {
     <div class="err-text"></div>
     <div class="dlg-foot"><button class="btn ghost" value="quit" style="margin-right:auto">작업장 끄기</button><button class="btn ghost" value="cancel">닫기</button><button class="btn" value="ok">저장</button></div>`,
   async (fd, v) => {
+    if (v.startsWith('rdel:')) { // 허락 하나 지우기 (창은 그대로)
+      const rule = decodeURIComponent(v.slice(5));
+      const list = S.rules.filter((r) => r !== rule);
+      await api('/api/rules', { rules: list }); S.rules = list;
+      $('#setRules').innerHTML = rulesHtml(); toast('지웠어요. 다음에 다시 물어봐요'); return '';
+    }
     if (v === 'rules') { setTimeout(rules, 30); return; }
     if (v === 'stopall') { if (confirm('모든 직원의 일을 멈출까요?')) await api('/api/stopAll'); return; }
     if (v === 'quit') { if (confirm('클로드 작업장을 끌까요? 일하던 직원도 멈춰요.')) { await api('/api/quit'); document.body.innerHTML = '<div class="empty">작업장 문을 닫았어요. 이 창을 닫아도 돼요.</div>'; } return; }
@@ -633,6 +648,8 @@ async function chatWidget(el, n) {
     <div class="row-btns" style="margin-top:8px">${n ? '<button class="btn ghost small" data-act="coopall">💬 대화 모두 보기</button>' : ''}<a class="btn ghost small" href="${esc(d.issueUrl)}" target="_blank" style="text-decoration:none">깃허브에서 보기</a></div>`
     : '<div class="empty small">아직 대화가 없어요. (몇 분마다 새로 읽어요)</div>';
 }
+// coopChat(el): el 안에 협력 대화방(깃허브 #207) 글을 모두 그린다. 모양은 theme.css 변수만 쓰는 .chat/.bubble (그록 홈 화면에서도 Aldeul.coopChat(el) 로 씀)
+function coopChat(el) { return chatWidget(el, 0); }
 function coopDialog() {
   dialog(`<h2>💬 클로드 ↔ 그록 대화</h2><p class="muted small">둘이 깃허브 「AI협력 대화방」에서 나눈 말이에요. 읽기만 해요.</p><div id="coopAll" style="max-height:62vh;overflow:auto"></div><div class="dlg-foot"><button class="btn ghost" value="cancel">닫기</button></div>`);
   fetch('/api/coop/chat?refresh=1').then(() => setTimeout(() => chatWidget($('#coopAll'), 0), 1500));
@@ -640,7 +657,7 @@ function coopDialog() {
 }
 // 그록 home.js 가 쓰는 창구
 window.Aldeul = {
-  get state() { return S; }, api, showView, toast, copy, esc, md, ago, chatWidget, avatar,
+  get state() { return S; }, api, showView, toast, copy, esc, md, ago, chatWidget, coopChat, avatar,
   reports: loadReports,
   onState(fn) { stateHooks.push(fn); },
   openConnections: () => connections(), openWorkshop: () => showView('workshop'), openDept, openSettings: () => settings(), openHelp: () => guide(),
