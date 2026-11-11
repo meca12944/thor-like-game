@@ -4,6 +4,11 @@
 let homeMode = 'home';
 let homeDeptId = '';
 let homeConn = -1;
+const HOME_DEPT_KEY = 'aldeulHomeDept';
+let homeTopDraft = '';
+let homeTopDeptMem = '';
+let homeTopNote = null;
+let homeTopBusy = false;
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -27,25 +32,127 @@ function homeConnOn(c, A) {
   if (c.id === 'claude') return !!(claude && claude.ok);
   return false;
 }
+function homeTopRead() {
+  try { return localStorage.getItem(HOME_DEPT_KEY) || ''; } catch (e) { return ''; }
+}
+function homeTopSave(name) {
+  if (!name) return;
+  homeTopDeptMem = name;
+  try { localStorage.setItem(HOME_DEPT_KEY, name); } catch (e) { /* 기억 못 해도 이번 화면은 유지 */ }
+}
+function homeTopPick(pack) {
+  const names = (pack.depts || []).map((d) => d.name).filter(Boolean);
+  const saved = [homeTopDeptMem, homeTopRead()].find((n) => names.includes(n));
+  if (saved) return saved;
+  if (names.includes('AI 협력·연결')) return 'AI 협력·연결';
+  return names[0] || '';
+}
+function homeTopPaintNote(root) {
+  const note = root.querySelector('#homeTopNote');
+  if (!note) return;
+  if (!homeTopNote) { note.textContent = ''; note.className = 'home-order-note'; return; }
+  note.className = 'home-order-note ' + (homeTopNote.ok ? 'ok' : 'bad');
+  note.textContent = homeTopNote.text;
+}
+function homeSnap(el) {
+  const cmd = el.querySelector('#homeTopCmd');
+  const dept = el.querySelector('#homeTopDept');
+  if (cmd) homeTopDraft = cmd.value;
+  if (dept && dept.value) homeTopSave(dept.value);
+  const ae = document.activeElement;
+  const focusId = ae && el.contains(ae) ? ae.id : '';
+  const caret = focusId === 'homeTopCmd' && cmd ? cmd.selectionStart : null;
+  return { focusId, caret };
+}
+function homeRestoreFocus(el, snap) {
+  if (!snap || (snap.focusId !== 'homeTopCmd' && snap.focusId !== 'homeTopDept')) return;
+  const node = el.querySelector('#' + snap.focusId);
+  if (!node || typeof node.focus !== 'function') return;
+  node.focus();
+  if (snap.focusId === 'homeTopCmd' && snap.caret != null && node.setSelectionRange) {
+    const n = Math.min(snap.caret, node.value.length);
+    node.setSelectionRange(n, n);
+  }
+}
+function homeOrderHtml(pack, esc) {
+  const picked = homeTopPick(pack);
+  const opts = (pack.depts || []).map((d) => {
+    const on = d.name === picked ? ' selected' : '';
+    return `<option value="${esc(d.name)}"${on}>${esc(d.icon || '🏢')} ${esc(d.name)}</option>`;
+  }).join('');
+  return `<form class="home-order" id="homeTopSend">
+    <div class="home-order-head"><b>✍️ 일 시키기</b><span class="muted small">보낼 부서를 고르고 할 일을 적어요. 엔터를 눌러도 바로 보내요.</span></div>
+    <div class="home-order-row">
+      <label class="home-order-pick">보낼 곳
+        <select id="homeTopDept">${opts}</select>
+      </label>
+      <input id="homeTopCmd" type="text" autocomplete="off" placeholder="할 일을 적고 엔터 (예: 오늘 할 일 정리해서 보고해)" value="${esc(homeTopDraft)}">
+      <button class="btn" type="submit">보내기</button>
+    </div>
+    <div id="homeTopNote" class="home-order-note"></div>
+  </form>`;
+}
+async function homeTopSend(el, A) {
+  if (homeTopBusy) return;
+  const sel = el.querySelector('#homeTopDept');
+  const inp = el.querySelector('#homeTopCmd');
+  const name = sel ? String(sel.value || '').trim() : '';
+  const command = inp ? String(inp.value || '').trim() : '';
+  if (inp) homeTopDraft = inp.value;
+  if (name) homeTopSave(name);
+  if (!name) { homeTopNote = { ok: false, text: '보낼 곳을 골라 주세요.' }; homeTopPaintNote(el); return; }
+  if (!command) { homeTopNote = { ok: false, text: '할 일을 적어 주세요.' }; homeTopPaintNote(el); return; }
+  homeTopBusy = true;
+  const btn = el.querySelector('#homeTopSend button[type="submit"]');
+  if (btn) btn.disabled = true;
+  let r = null;
+  try {
+    r = await A.api('/api/bot/command', { target: name, command });
+  } catch (e) {
+    r = { ok: false, error: '못 보냈어요. 회사 프로그램이 켜져 있는지 봐 주세요.' };
+  }
+  homeTopBusy = false;
+  const btnNow = el.querySelector('#homeTopSend button[type="submit"]');
+  if (btnNow) btnNow.disabled = false;
+  if (!r || !r.ok) {
+    homeTopNote = { ok: false, text: (r && r.error) || '못 보냈어요' };
+    homeTopPaintNote(el);
+    return;
+  }
+  homeTopDraft = '';
+  const inpNow = el.querySelector('#homeTopCmd');
+  if (inpNow) inpNow.value = '';
+  homeTopNote = { ok: true, text: name + '에 보냈어요. 그록이 받았어요 → 보고 창에 접수로 떠요' };
+  homeTopPaintNote(el);
+  reportAt = 0;
+  const slot = el.querySelector('#homeReports');
+  if (typeof renderReports === 'function' && slot) renderReports(slot);
+}
 function homePaint(el, A) {
+  const snap = homeSnap(el);
   const pack = homeDepts(A);
   const esc = A.esc;
   if (homeMode === 'dept') return homePaintDept(el, A, pack, esc);
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
   const tiles = pack.depts.map((d) => `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div></button>`).join('');
-  el.innerHTML = `<div class="home-wrap">
-    <section>
-      <div id="homeReports"></div>
-    </section>
-    <section>
-      <div class="title">🏢 부서 <span class="muted small">이름을 누르면 부서 화면이 나와요</span></div>
-      <div class="tiles">${tiles}</div>
-      <div class="title" style="margin-top:8px">🔌 연결 <span class="muted small">이게 무엇인지 먼저 봐요</span></div>
-      <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명 보기</button>
-      <div class="title" style="margin-top:8px">💬 클로드 ↔ 그록 대화 <span class="muted small">둘이 나눈 말</span></div>
-      <div id="homeChat"></div>
-    </section>
+  el.innerHTML = `<div class="home-page">
+    ${homeOrderHtml(pack, esc)}
+    <div class="home-wrap">
+      <section>
+        <div id="homeReports"></div>
+      </section>
+      <section>
+        <div class="title">🏢 부서 <span class="muted small">이름을 누르면 부서 화면이 나와요</span></div>
+        <div class="tiles">${tiles}</div>
+        <div class="title" style="margin-top:8px">🔌 연결 <span class="muted small">이게 무엇인지 먼저 봐요</span></div>
+        <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명 보기</button>
+        <div class="title" style="margin-top:8px">💬 클로드 ↔ 그록 대화 <span class="muted small">둘이 나눈 말</span></div>
+        <div id="homeChat"></div>
+      </section>
+    </div>
   </div>`;
+  homeTopPaintNote(el);
+  homeRestoreFocus(el, snap);
   if (typeof renderReports === 'function') renderReports(el.querySelector('#homeReports'));
   const chat = el.querySelector('#homeChat');
   if (chat && typeof A.coopChat === 'function') A.coopChat(chat);
@@ -109,6 +216,23 @@ function homePaintConn(el, A, esc) {
 function homeBind(el, A) {
   if (el.dataset.homeBound === '1') return;
   el.dataset.homeBound = '1';
+  el.addEventListener('submit', (ev) => {
+    const form = ev.target;
+    if (!form || form.id !== 'homeTopSend' || !el.contains(form)) return;
+    ev.preventDefault();
+    homeTopSend(el, A);
+  });
+  el.addEventListener('change', (ev) => {
+    const t = ev.target;
+    if (!t || t.id !== 'homeTopDept' || !el.contains(t)) return;
+    homeTopSave(t.value);
+  });
+  el.addEventListener('input', (ev) => {
+    const t = ev.target;
+    if (!t || t.id !== 'homeTopCmd' || !el.contains(t)) return;
+    homeTopDraft = t.value;
+    if (homeTopNote) { homeTopNote = null; homeTopPaintNote(el); }
+  });
   el.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-home]');
     if (!b || !el.contains(b)) return;
