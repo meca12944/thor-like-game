@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>클로드 회사</title>
+<link rel="icon" href="/ui/icon.png">
+<link rel="stylesheet" href="/ui/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="/ui/icon.png" alt=""><b>클로드 회사</b></div>
+  <div class="summary" id="summary"></div>
+  <button class="btn" id="btnHire">＋ 직원</button>
+  <button class="btn ghost" id="btnSettings">⚙ 설정</button>
+</header>
+
+<div id="asks"></div>
+
+<main class="board">
+  <aside class="people">
+    <div class="title">직원 <span class="muted small">눌러서 일 시킬 사람 고르기</span></div>
+    <div id="emps" class="emps"></div>
+  </aside>
+
+  <section class="main">
+    <nav class="tabs" id="tabs">
+      <button data-t="report" class="on">📋 보고 <i id="cReport"></i></button>
+      <button data-t="grok">💬 그록 대화방 <i id="cGrok"></i></button>
+      <button data-t="all">📚 전체 기록</button>
+    </nav>
+    <div id="feed" class="feed"></div>
+
+    <div id="relayBox" class="relay" hidden></div>
+
+    <form id="say" class="say">
+      <div class="say-to" id="sayTo"></div>
+      <div class="say-row">
+        <textarea id="sayText" rows="2"></textarea>
+        <button class="btn big" type="submit" id="sayBtn">보내기</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+<div id="toast" class="toast" hidden></div>
+<script src="/ui/app.js"></script>
+</body>
+</html>
