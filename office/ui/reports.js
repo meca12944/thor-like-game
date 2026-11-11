@@ -60,9 +60,19 @@ function reportHtml(pack) {
   const list = Array.isArray(pack.items) ? pack.items : [];
   const shown = reportShown(list);
   const n = (st) => shown.filter((r) => r.status === st).length;
+  const reportTips = {
+    '전체': '모든 부서 보고를 봐요',
+    '게임 필멸자': '게임 부서 보고만 봐요',
+    '제로폰': '제로폰 보고만 봐요',
+    '홍보': '홍보 부서 보고만 봐요',
+    '경영지원': '경영지원 보고만 봐요',
+    'STCO': 'STCO 보고만 봐요',
+    '영상 기획팀': '영상 기획팀 보고만 봐요',
+    'AI 협력·연결': 'AI 협력 보고만 봐요',
+  };
   const buttons = REPORT_DEPTS.map(([name, label]) => {
     const on = reportDept === name ? ' on' : '';
-    return `<button type="button" class="${on.trim()}" data-reportdept="${reportEsc(name)}">${reportEsc(label)}</button>`;
+    return `<button type="button" class="${on.trim()}" data-reportdept="${reportEsc(name)}" title="${reportEsc(reportTips[name] || name)}">${reportEsc(label)}</button>`;
   }).join('');
   const cards = shown.map((r) => {
     const who = r.lead ? ` · ${(r.status === '완료' || r.status === '문제 있음') ? '검수' : '담당'}: ${reportEsc(r.lead)}` : '';
