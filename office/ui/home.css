@@ -346,7 +346,7 @@ button.art-file, .art-file {
 .board-list { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
 .board-empty { padding: 12px 2px; }
 .board-item { background: var(--panel); border: 1px solid var(--line); border-radius: var(--input-radius); }
-.board-item.ask { background: var(--amber-soft); border-color: var(--amber); }
+.board-item.need { background: var(--amber-soft); border-color: var(--amber); }
 .board-item.stuck { background: var(--red-soft); border-color: var(--red); }
 .board-row {
   display: flex;
@@ -365,7 +365,11 @@ button.art-file, .art-file {
 .board-row .stg { font-weight: 700; }
 .board-row .age { color: var(--muted); }
 .board-row .stg::before, .board-row .age::before { content: "·"; margin-right: 8px; color: var(--muted); font-weight: 400; }
-.board-item.ask .stg { color: var(--amber); }
+.board-item.need .stg { color: var(--amber); }
+.board-item.need, .board-item.stuck { margin: 0; padding: 0; border-width: 1px; }
+.board-warnline { margin: 0 0 8px; font-weight: 700; }
+.report-more { margin-top: 4px; }
+.report-more summary { cursor: pointer; color: var(--muted); font-size: 13px; }
 .board-item.stuck .stg { color: var(--red); }
 .board-more { padding: 0 12px 10px; }
 .board-log ol { margin: 4px 0 0; padding-left: 18px; }

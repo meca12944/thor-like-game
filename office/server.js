@@ -77,7 +77,7 @@ const BOT_TARGETS = {
     { name: '영상 기획 2', dept: 'video', role: '영상 기획 보조' },
     { id: '그록봇 최적화 예전 이벨린', name: '알들컴퍼니', dept: 'ai', role: '회사 전체 연결·명령 중계·보고 창 관리', lead: true },
     { name: '알들 컴퍼니 보고 담당', dept: 'ai', role: '보고 정리·클로드에게 답 전달' },
-    { name: '알들 컴퍼니 개발 담당', dept: 'ai', role: '프로그램 개선 PR' },
+    { name: '알들 컴퍼니 개발 담당', dept: 'ai', role: '프로그램 개선' },
     { name: '클로드 (API · tunnel.py)', dept: 'ai', role: '게임 외 부서의 클로드 도움' },
   ],
 };

@@ -28,6 +28,7 @@ let boardDoneOpen = false;
 let boardPending = null;
 let boardLoadFlight = null;
 let boardForce = false;
+let boardDeptPick = '자동';
 const boardOpen = new Set();
 
 const HOME_DEPTS = [
@@ -100,7 +101,10 @@ function homeSnap(el) {
   const task = el.querySelector('#homeCmd');
   const folder = el.querySelector('#homeDeptFolder');
   if (cmd) homeTopDraft = cmd.value;
-  if (dept && dept.value) homeTopSave(dept.value);
+  if (dept && dept.value) {
+    boardDeptPick = dept.value;
+    if (dept.value !== '자동') homeTopSave(dept.value);
+  }
   if (task) homeDeptDraft = task.value;
   if (folder) homeDeptFolder = folder.value;
   const who = el.querySelector('#homeWho');
@@ -192,9 +196,10 @@ async function homeTopSend(el, A) {
   if (homeTopBusy) return;
   const sel = el.querySelector('#homeTopDept');
   const inp = el.querySelector('#homeTopCmd');
-  const name = sel ? String(sel.value || '').trim() : '';
+  const picked = sel ? String(sel.value || '자동').trim() : '자동';
+  const name = boardSendDept(picked);
   const command = inp ? String(inp.value || '').trim() : '';
-  if (name) homeTopSave(name);
+  boardDeptPick = picked || '자동';
   if (!name) { if (A.toast) A.toast('보낼 곳을 골라 주세요.'); return; }
   if (!command) { if (A.toast) A.toast('할 일을 적어 주세요.'); return; }
   homeTopBusy = true;
@@ -296,16 +301,13 @@ function boardInfo(r) {
   if (r && r.status === '진행 중') return { key: 'work', label: '작업' };
   return { key: 'wait', label: '대기' };
 }
-function boardAge(r, info) {
+function boardAge(r) {
   const ms = boardMs(r);
   const min = ms ? Math.max(0, Math.floor((Date.now() - ms) / 60000)) : 0;
-  const base = min < 1 ? '방금' : (min < 60 ? min + '분째' : (min < 1440 ? Math.floor(min / 60) + '시간째' : Math.floor(min / 1440) + '일째'));
-  if (info && info.key === 'wait' && min >= 10) {
-    if (min < 60) return min + '분째 대기';
-    if (min < 1440) return Math.floor(min / 60) + '시간째 대기';
-    return Math.floor(min / 1440) + '일째 대기';
-  }
-  return base;
+  if (min < 1) return '방금';
+  if (min < 60) return min + '분째';
+  if (min < 1440) return Math.floor(min / 60) + '시간째';
+  return Math.floor(min / 1440) + '일째';
 }
 function boardDay(ms) {
   if (!ms) return '';
@@ -337,10 +339,17 @@ function homeHasWarn(A) {
   const pending = (A && A.state && A.state.pending) || [];
   return !(claude && claude.ok) || pending.length > 0;
 }
+function homeWarnLine(A) {
+  const claude = A && A.state && A.state.claude;
+  const pending = (A && A.state && A.state.pending) || [];
+  if (!claude || !claude.ok) return '클로드 프로그램을 못 찾았어요.';
+  if (pending.length) return '직원이 허락을 기다려요.';
+  return '';
+}
 function homeWarnHtml(A, esc) {
   const bits = [];
-  const claude = A && A.state && A.state.claude;
-  if (!claude || !claude.ok) bits.push('<div class="board-warn"><b>클로드 코드를 못 찾았어요.</b> 폴더 안 「처음_설치.bat」을 두 번 누르고, 로그인한 뒤 다시 켜 주세요.</div>');
+  const line = homeWarnLine(A);
+  if (line) bits.push('<p class="board-warnline">' + esc(line) + '</p>');
   for (const p of ((A && A.state && A.state.pending) || [])) {
     if (p.danger) bits.push(`<div class="ask danger"><div class="q"><b>⚠ ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><div class="note">위험한 일이라 매번 물어요.</div></div><button type="button" class="btn green" data-ans="once" data-id="${esc(p.id)}">이번만 허락</button><button type="button" class="btn red" data-ans="no" data-id="${esc(p.id)}">거절</button></div>`);
     else bits.push(`<div class="ask"><div class="q"><b>🙋 ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><div class="note">한 번 허락하면 다음부터 다시 안 물어요.</div></div><button type="button" class="btn green" data-ans="always" data-id="${esc(p.id)}">허락</button><button type="button" class="btn red" data-ans="no" data-id="${esc(p.id)}">거절</button></div>`);
@@ -386,17 +395,17 @@ function boardItemHtml(x, esc) {
   const r = x.r || {};
   const id = String(r.id || '');
   const open = id && boardOpen.has(id);
-  const cls = x.info.ask ? ' ask' : (x.info.stuck ? ' stuck' : '');
+  const cls = x.info.ask ? ' need' : (x.info.stuck ? ' stuck' : '');
   const dept = r.dept || r.target || '부서';
   const more = open ? `<div class="board-more">${boardMore(r, esc)}</div>` : '';
-  return `<div class="board-item${cls}"><button type="button" class="board-row" data-home="row" data-id="${esc(id)}"><span class="bd">[${esc(dept)}]</span><span class="ttl">${esc(boardTitle(r.command))}</span><span class="stg">${esc(x.info.label)}</span><span class="age">${esc(boardAge(r, x.info))}</span></button>${more}</div>`;
+  return `<div class="board-item${cls}"><button type="button" class="board-row" data-home="row" data-id="${esc(id)}"><span class="bd">[${esc(dept)}]</span><span class="ttl">${esc(boardTitle(r.command))}</span><span class="stg">${esc(x.info.label)}</span><span class="age">${esc(boardAge(r))}</span></button>${more}</div>`;
 }
 function boardGearHtml(pack, A, esc) {
   const depts = (pack.depts || []).map((d) => `<button type="button" class="btn ghost" data-home="dept" data-id="${esc(d.id)}">${d.icon || '🏢'} ${esc(d.name)}</button>`).join('');
   const warn = homeWarnHtml(A, esc);
   return `<section class="board-gear">
-    <div class="board-gear-head"><b>설정</b><button type="button" class="btn ghost small" data-home="gear-close">닫기</button></div>
     ${warn || '<div class="muted small">경고는 없어요.</div>'}
+    <div class="board-gear-head"><b>설정</b><button type="button" class="btn ghost small" data-home="gear-close">닫기</button></div>
     <div class="board-gear-block"><b>부서</b><div class="muted small">누르면 직원 만들기, 폴더 주소, 별명, 결과물, 일 시키기, 이 부서 대화가 나와요.</div><div class="board-deptgrid">${depts}</div></div>
     <div class="board-gear-links">
       <button type="button" class="btn ghost" data-home="conn-app">연결</button>
@@ -408,9 +417,14 @@ function boardGearHtml(pack, A, esc) {
     </div>
   </section>`;
 }
+function boardSendDept(picked) {
+  const name = String(picked || '').trim();
+  if (!name || name === '자동') return 'AI 협력·연결';
+  return name;
+}
 function boardFormHtml(pack, esc) {
-  const picked = homeTopPick(pack);
-  const opts = (pack.depts || []).map((d) => `<option value="${esc(d.name)}"${d.name === picked ? ' selected' : ''}>${esc(d.name)}</option>`).join('');
+  const picked = boardDeptPick || '자동';
+  const opts = `<option value="자동"${picked === '자동' ? ' selected' : ''}>자동</option>` + (pack.depts || []).map((d) => `<option value="${esc(d.name)}"${d.name === picked ? ' selected' : ''}>${esc(d.name)}</option>`).join('');
   return `<form class="board-say" id="homeTopSend">
     <select id="homeTopDept" title="부서" aria-label="부서">${opts}</select>
     <input id="homeTopCmd" type="text" autocomplete="off" placeholder="예: 오늘 할 일 정리해서 보고해" value="${esc(homeTopDraft)}">
@@ -609,7 +623,7 @@ async function homeLoadTalk(el, A, d) {
         return '<li><b>' + esc(h.stage || '') + '</b> ' + notes + '</li>';
       }).join('');
       const mark = c.needBoss ? ' <b class="boss-need">사장님 확인 필요</b>' : '';
-      lines.push('<details class="cmd-fold" data-cmd="' + esc(id) + '"><summary>' + esc(c.command || ('명령 ' + id)) + mark + ' · ' + esc(c.stage || '') + '</summary><div class="cmd-log"><b>진행 기록</b><ol>' + (rows || '<li>아직 기록이 없어요.</li>') + '</ol></div></details>');
+      lines.push('<details class="cmd-fold" data-cmd="' + esc(id) + '"><summary>' + esc(c.command || '시킨 일') + mark + ' · ' + esc(c.stage || '') + '</summary><div class="cmd-log"><b>진행 기록</b><ol>' + (rows || '<li>아직 기록이 없어요.</li>') + '</ol></div></details>');
       continue;
     }
     const who = c.who === 'grok' ? '그록' : c.who === 'claude' ? '클로드' : '사장님';
@@ -800,7 +814,8 @@ function homeBind(el, A) {
   el.addEventListener('change', (ev) => {
     const t = ev.target;
     if (!t || t.id !== 'homeTopDept' || !el.contains(t)) return;
-    homeTopSave(t.value);
+    boardDeptPick = t.value || '자동';
+    if (t.value && t.value !== '자동') homeTopSave(t.value);
   });
   el.addEventListener('input', (ev) => {
     const t = ev.target;

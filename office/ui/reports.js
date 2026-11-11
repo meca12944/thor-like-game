@@ -150,7 +150,7 @@ function reportHtml(pack, opt) {
     const open = reportOpen.has(r.id || '');
     const id = r.id || '';
     const when = r.updated ? ('바뀜 ' + r.updated) : (r.time || '');
-    const num = r.cmdId ? ' · 번호 ' + reportEsc(r.cmdId) : '';
+    const moreId = r.cmdId ? `<details class="report-more"><summary>자세히</summary><div class="muted small">이 일 표시 ${reportEsc(r.cmdId)}</div></details>` : '';
     return `<article class="card home-report-card" data-status="${reportEsc(reportVisual(r))}" data-report-toggle="1" data-report-id="${reportEsc(id)}">
       <div class="card-head">
         <span class="st-lamp${r.status === '완료' && !r.silent ? ' on' : ''}"></span>
@@ -160,7 +160,8 @@ function reportHtml(pack, opt) {
         <time>${reportEsc(when)}</time>
       </div>
       ${reportLogHtml(r)}
-      <div class="who">올린 쪽: ${reportEsc(r.source || '그록')}${who}${num}${arts ? ' · 결과물 ' + arts + '개' : ''}${open ? '' : ' · 카드는 결과물, 명령은 진행 기록'}</div>
+      <div class="who">올린 쪽: ${reportEsc(r.source || '그록')}${who}${arts ? ' · 결과물 ' + arts + '개' : ''}${open ? '' : ' · 누르면 결과물'}</div>
+      ${moreId}
       <div class="sum">${lines}</div>
       ${reportArtHtml(r)}
     </article>`;
@@ -226,6 +227,7 @@ async function renderReports(el, opt) {
     if (el.dataset.bound !== '1') {
       el.dataset.bound = '1';
       el.addEventListener('click', (ev) => {
+        if (ev.target.closest('.report-more')) return;
         const fold = ev.target.closest('.cmd-fold');
         if (fold) {
           const cid = fold.getAttribute('data-cmd') || '';
