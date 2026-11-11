@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:45 한국 시각, main `793f3d48 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:48 한국 시각, main `bd2b0845 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,10 +42,10 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `claude/textbook-office-coop` — 팀 회의 교본 9-6: 전 부서 클로드+그록 짝 규칙 더함 (#220)
 - 11-11 · `grok/office-claude-all-depts` — main을 가져와 겹치는 부서 직원 코드를 맞춤
 - 11-11 · `grok/office-ui-layout` — 회사 홈을 한 화면에 맞게 다시 배치
 - 11-11 · `grok/office-home-command` — 회사 홈 맨 위에 일 시키기 칸을 넣음
-- 11-11 · `claude/textbook-office-coop` — 팀 회의 교본: 9-6 그록과 프로그램 같이 고치기 (#212·#215·#216 결론)
 - 11-11 · `grok/office-reports-v2` — 회사 홈과 보고 창을 최신 main에 맞춤
 - 11-11 · `claude/office-coop-chat` — 클로드 작업장: 위험한 일 매번 묻기 넓힘 · 설정에서 허락 하나씩 지우기 · coopChat(el) · 보고 요약/상태
 - 11-11 · `grok/office-reports` — 보고 창은 사장님께 가는 카드만 보여 주기
