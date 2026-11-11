@@ -1,1 +1,2 @@
-/* 알들 컴퍼니 회사 홈 화면 모양 — 그록이 맡는 파일. 색·단추는 theme.css 이름만 쓰기 */
+/* 회사 홈에서 조금만 더하는 자리. 색은 theme.css 이름을 그대로 써요. */
+.home-wrap section { min-width: 0; }
