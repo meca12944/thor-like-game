@@ -21,6 +21,8 @@ let homeAddName = '';
 let homeAddRole = '';
 let homeAPI = null;
 let homeDeptFolder = '';
+let homeComposing = false;
+let homePaintWait = false;
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -70,6 +72,21 @@ function homeTopPaintNote(root) {
   }
   note.className = 'home-order-note ' + (homeTopNote.ok ? 'ok' : 'bad');
   note.textContent = homeTopNote.text;
+}
+function homeTexting(node) {
+  if (!node || !node.tagName) return false;
+  const tag = node.tagName;
+  if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+  if (tag === 'INPUT') {
+    const t = String(node.type || 'text').toLowerCase();
+    return t === 'text' || t === 'search' || t === 'password' || t === '';
+  }
+  return false;
+}
+function homeFieldBusy(el) {
+  if (homeComposing) return true;
+  const ae = document.activeElement;
+  return !!(el && ae && el.contains(ae) && homeTexting(ae));
 }
 function homeSnap(el) {
   const cmd = el.querySelector('#homeTopCmd');
@@ -223,6 +240,18 @@ async function homeTopSend(el, A) {
   if (typeof renderReports === 'function' && slot) renderReports(slot);
 }
 function homePaint(el, A) {
+  // 글 쓰는 중에는 입력칸을 다시 만들지 않아요. 보고 목록만 조용히 새로고침합니다.
+  if (homeFieldBusy(el)) {
+    homeSnap(el);
+    homePaintWait = true;
+    const slot = el.querySelector('#zDeptReports') || el.querySelector('#homeReports');
+    if (slot && typeof renderReports === 'function') {
+      const opt = slot.id === 'zDeptReports' ? { dept: homeCurrentDept(A).name, title: '📋 이 부서 보고' } : undefined;
+      renderReports(slot, opt);
+    }
+    return;
+  }
+  homePaintWait = false;
   const snap = homeSnap(el);
   const pack = homeDepts(A);
   const esc = A.esc;
@@ -418,14 +447,20 @@ async function homeDeptAssign(el, A, d, who, command) {
     r = { ok: false, error: '못 보냈어요. 회사 프로그램이 켜져 있는지 봐 주세요.' };
   }
   const ok = !!(r && r.ok);
-  if (!ok && err) { /* 다시 그리며 안내 */ }
-  const text = ok ? '넣었어요. 보고 칸에 접수로 떠요.' : ((r && r.error) || '못 보냈어요');
+  const text = ok ? '넣었어요. 바로 아래 보고에 접수로 떠요.' : ((r && r.error) || '못 보냈어요');
   if (ok) {
     homeDeptDraft = '';
     homeTalkDraft = '';
+    const cmd = el.querySelector('#homeCmd');
+    const talk = el.querySelector('#homeTalk');
+    if (cmd) cmd.value = '';
+    if (talk) talk.value = '';
     reportAt = 0;
     if (A.toast) A.toast(d.name + '에 넣었어요');
   }
+  homeComposing = false;
+  const typing = document.activeElement;
+  if (typing && el.contains(typing) && homeTexting(typing)) typing.blur();
   show(ok, text);
 }
 function homePaintDept(el, A, pack, esc) {
@@ -461,16 +496,6 @@ function homePaintDept(el, A, pack, esc) {
           <div class="muted small">별명은 이 화면에서만 바뀝니다. 일을 보낼 때는 원래 이름을 써요.</div>
           ${homeBotRows(A, bots, esc)}
         </div>
-      </section>
-      <section class="dept-col dept-mid">
-        <form class="card dept-send" id="homeSend">
-          <b>✍️ 일 시키기</b>
-          <div class="muted small">팀장이나 직원을 고르고 할 일을 적어요. 보내면 바로 접수로 보고에 떠요.</div>
-          <label class="home-order-pick">받을 사람 <select id="homeWho">${homeWhoHtml(A, claude, bots, esc)}</select></label>
-          <textarea id="homeCmd" class="home-text" rows="3" placeholder="예: ${esc(example)}">${esc(homeDeptDraft)}</textarea>
-          <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
-          <button class="btn" type="submit">보내기</button>
-        </form>
         <div class="card dept-talk">
           <b>💬 이 부서 대화·답</b>
           <div class="muted small">이 부서 이야기와 직원 답을 여기 모아요.</div>
@@ -481,10 +506,20 @@ function homePaintDept(el, A, pack, esc) {
           </form>
         </div>
       </section>
-      <section class="dept-col" id="zDeptReports"></section>
+      <section class="dept-col dept-work">
+        <form class="card dept-send" id="homeSend">
+          <b>✍️ 일 시키기</b>
+          <div class="muted small">팀장이나 직원을 고르고 할 일을 적어요. 보내면 바로 접수로 보고에 떠요.</div>
+          <label class="home-order-pick">받을 사람 <select id="homeWho">${homeWhoHtml(A, claude, bots, esc)}</select></label>
+          <textarea id="homeCmd" class="home-text" rows="4" placeholder="예: ${esc(example)}">${esc(homeDeptDraft)}</textarea>
+          <div id="homeSendErr" class="home-err${note && note.ok ? ' ok' : ''}">${note ? esc(note.text) : ''}</div>
+          <button class="btn" type="submit">보내기</button>
+        </form>
+        <section class="dept-reports" id="zDeptReports"></section>
+      </section>
     </div>
   </div>`;
-  if (typeof renderReports === 'function') renderReports(el.querySelector('#zDeptReports'), { dept: d.name, title: '📋 보고·결과물' });
+  if (typeof renderReports === 'function') renderReports(el.querySelector('#zDeptReports'), { dept: d.name, title: '📋 이 부서 보고' });
   homeLoadTalk(el, A, d);
 }
 function homePaintConn(el, A, esc) {
@@ -547,6 +582,15 @@ function homeBind(el, A) {
     if (t.id !== 'homeTopCmd') return;
     homeTopDraft = t.value;
     if (homeTopNote) { homeTopNote = null; homeTopPaintNote(el); }
+  });
+  el.addEventListener('compositionstart', () => { homeComposing = true; });
+  el.addEventListener('compositionend', () => { homeComposing = false; homeSnap(el); });
+  el.addEventListener('focusout', () => {
+    if (!homePaintWait) return;
+    setTimeout(() => {
+      if (!homePaintWait || homeFieldBusy(el)) return;
+      homePaint(el, A);
+    }, 0);
   });
   el.addEventListener('click', (ev) => {
     const art = ev.target.closest('[data-art-open]');
