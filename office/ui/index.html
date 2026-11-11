@@ -11,70 +11,40 @@
 <header class="top">
   <div class="brand"><img src="/ui/icon.png" alt=""><b>클로드 회사</b></div>
   <div class="summary" id="summary"></div>
-  <div class="actions">
-    <button class="btn ghost" id="btnBoard" title="그록·다른 AI에게 붙여 넣을 업무 공유판 주소를 복사해요">업무판 주소 복사</button>
-    <button class="btn ghost" id="btnFolder" title="AI협력팀이 그록 폴더를 확인해서 보고해요">폴더 확인</button>
-    <button class="btn" id="btnHire">＋ 직원 뽑기</button>
-    <button class="btn ghost" id="btnRules">허락 목록</button>
-    <button class="btn ghost" id="btnSettings">설정</button>
-    <button class="btn danger" id="btnStopAll">모두 멈춤</button>
-  </div>
+  <button class="btn" id="btnHire">＋ 직원</button>
+  <button class="btn ghost" id="btnSettings">⚙ 설정</button>
 </header>
 
-<div id="banners"></div>
+<div id="asks"></div>
 
 <main class="board">
-  <section class="left">
-    <div class="sec-title">직원 <span id="empCount" class="muted"></span></div>
+  <aside class="people">
+    <div class="title">직원 <span class="muted small">눌러서 일 시킬 사람 고르기</span></div>
     <div id="emps" class="emps"></div>
-    <form id="orderBox" class="order">
-      <div class="order-row">
-        <label>받는 사람</label>
-        <select id="orderTo"></select>
-      </div>
-      <textarea id="orderText" rows="4" placeholder="할 일을 적어 주세요. (Ctrl+Enter 로 보내기)&#10;예) 몹 점검 표 다시 뽑아서 보고해"></textarea>
-      <div class="order-row end">
-        <span class="muted small">직원끼리는 알아서 말을 주고받아요.</span>
-        <button class="btn" type="submit">일 시키기</button>
-      </div>
-    </form>
-  </section>
+  </aside>
 
-  <section class="right">
-    <div class="sec-title">
-      보고함
-      <div class="tabs" id="tabs">
-        <button data-f="boss" class="on">사장님께 <i id="cBoss"></i></button>
-        <button data-f="team">직원끼리</button>
-        <button data-f="grok">그록 터널 <i id="cGrok"></i></button>
-        <button data-f="unread">안 읽음 <i id="cUnread"></i></button>
-        <button data-f="media">영상·그림</button>
-        <button data-f="error">문제</button>
-        <button data-f="all">전체</button>
-      </div>
-      <select id="filterEmp" class="small-select"><option value="">모든 직원</option></select>
-      <button class="link" id="btnReadAll">모두 읽음</button>
-    </div>
-    <div id="reports" class="reports"></div>
-    <form id="roomBar" class="room-bar" hidden>
-      <div class="room-modes" id="roomModes">
-        <button type="button" data-m="chat" class="on">그록에게 말하기</button>
-        <button type="button" data-m="claude">AI협력팀에게</button>
-        <button type="button" data-m="meeting">둘이 회의 시키기</button>
-        <button type="button" data-m="image">그림 부탁</button>
-        <button type="button" data-m="video">영상 부탁</button>
-        <span class="sp"></span>
-        <button type="button" class="link" id="roomReset" title="그록이 앞 이야기를 잊고 새로 시작해요">새 대화</button>
-      </div>
-      <div class="room-row">
-        <textarea id="roomText" rows="2" placeholder="그록에게 할 말 (Enter 보내기, Shift+Enter 줄바꿈)"></textarea>
-        <button class="btn" type="submit">보내기</button>
+  <section class="main">
+    <nav class="tabs" id="tabs">
+      <button data-t="report" class="on">📋 보고 <i id="cReport"></i></button>
+      <button data-t="grok">💬 그록 대화방 <i id="cGrok"></i></button>
+      <button data-t="all">📚 전체 기록</button>
+    </nav>
+    <div id="feed" class="feed"></div>
+
+    <div id="relayBox" class="relay" hidden></div>
+
+    <form id="say" class="say">
+      <div class="say-to" id="sayTo"></div>
+      <div class="say-row">
+        <textarea id="sayText" rows="2"></textarea>
+        <button class="btn big" type="submit" id="sayBtn">보내기</button>
       </div>
     </form>
   </section>
 </main>
 
 <dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+<div id="toast" class="toast" hidden></div>
 <script src="/ui/app.js"></script>
 </body>
 </html>

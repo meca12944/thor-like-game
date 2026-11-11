@@ -50,6 +50,37 @@ function tellOffice(kind, text, files) {
     req.on('error', ok); req.end(body);
   });
 }
+// ── 반자동: 키가 없으면 회사 화면에 부탁을 띄우고, 사장님이 붙여 넣은 그록 답을 기다림 ──
+function office(p, body) {
+  return new Promise((ok, no) => {
+    const data = JSON.stringify(body);
+    const req = http.request(new URL(p, process.env.OFFICE_URL), { method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) } }, (r) => {
+      let d = ''; r.setEncoding('utf8'); r.on('data', (c) => (d += c)); r.on('end', () => { try { ok(JSON.parse(d)); } catch (e) { no(new Error('회사 답을 못 읽음')); } });
+    });
+    req.on('error', () => no(new Error('회사 화면이 꺼져 있어요')));
+    req.end(data);
+  });
+}
+const PASTE = !KEY && !!process.env.OFFICE_URL;
+async function waitRelay(id) {
+  let r = { pending: true };
+  while (r.pending) r = await office('/api/room/wait', { id, wait: 540000 });
+  if (r.error) die(r.error);
+  return r;
+}
+async function relay(kind, text, files) {
+  const { id } = await office('/api/room/relay', { emp: process.env.OFFICE_EMP || '', kind, text, files: (files || []).map((f) => path.resolve(f)) });
+  console.error(`그록 답 기다리는 중 (번호 ${id}) — 사장님이 그록 앱에 옮겨 주는 중이에요. 끊기면: grok wait ${id}`);
+  return waitRelay(id);
+}
+async function relayFiles(r, out) {
+  const files = (r.files || []).filter((f) => fs.existsSync(f));
+  if (!files.length) { console.log(r.text || '(그록이 파일 없이 답했어요)'); return; }
+  const saved = files.map((f, i) => { const o = numbered(out, i, files.length); fs.mkdirSync(path.dirname(path.resolve(o)), { recursive: true }); fs.copyFileSync(f, o); return path.resolve(o); });
+  if (r.text) console.log(r.text);
+  console.log(saved.join('\n'));
+}
+
 async function call(method, p, body) {
   if (!KEY) die('그록 키가 없어요. 사장님께 「설정 → 그록 키」를 넣어 달라고 보고하세요.');
   const r = await fetch(BASE + p, { method, headers: { authorization: 'Bearer ' + KEY, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
@@ -79,6 +110,7 @@ async function ask(o) {
   if (o.new) prev = null;
   const imgs = [].concat(o.img || []).filter((x) => x !== true);
   for (const f of imgs) if (!fs.existsSync(f)) die('그림이 없어요: ' + f);
+  if (PASTE) { const r = await relay('chat', text, imgs); return console.log(r.text || '(그록이 그림만 보냈어요: ' + (r.files || []).join(', ') + ')'); }
   let content = imgs.length ? [{ type: 'input_text', text }, ...imgs.map((f) => ({ type: 'input_image', image_url: dataUri(f) }))] : text;
   guard(PRICE.chat);
   await tellOffice('ask', text, imgs);
@@ -97,6 +129,7 @@ async function image(o) {
   const prompt = o._.join(' ').trim(); if (!prompt) die('그릴 것을 적어 주세요.');
   const out = typeof o.out === 'string' ? o.out : `grok_image_${Date.now()}.png`;
   const n = Math.max(1, Math.min(4, Number(o.n) || 1));
+  if (PASTE) return relayFiles(await relay('image', prompt + (n > 1 ? ` (${n}장)` : ''), [].concat(o.ref || []).filter((x) => x !== true)), out);
   guard(PRICE.image * n);
   const refs = [].concat(o.ref || []).filter((x) => x !== true);
   await tellOffice('ask', '🎨 그림 부탁: ' + prompt, refs);
@@ -113,6 +146,7 @@ async function video(o) {
   const prompt = o._.join(' ').trim(); if (!prompt) die('영상 설명을 적어 주세요.');
   const out = typeof o.out === 'string' ? o.out : `grok_video_${Date.now()}.mp4`;
   const sec = Math.max(1, Math.min(15, Number(o.sec) || 6));
+  if (PASTE) return relayFiles(await relay('video', `${prompt} (${sec}초)`, typeof o.img === 'string' ? [o.img] : []), out);
   guard(PRICE.videoSec * sec);
   const img = typeof o.img === 'string' ? o.img : null;
   await tellOffice('ask', `🎬 영상 부탁 (${sec}초): ${prompt}`, img ? [img] : []);
@@ -136,6 +170,7 @@ async function video(o) {
 (async () => {
   const [cmd, ...rest] = process.argv.slice(2);
   const o = args(rest);
+  if (cmd === 'wait') { const r = await waitRelay(o._[0]); if (r.text) console.log(r.text); if ((r.files || []).length) console.log(r.files.join('\n')); return; }
   if (cmd === 'ask') return ask(o);
   if (cmd === 'image') return image(o);
   if (cmd === 'video') return video(o);

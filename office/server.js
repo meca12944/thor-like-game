@@ -20,7 +20,7 @@ const DEFAULT_RULES = ['Read', 'Glob', 'Grep', 'Edit', 'Write', 'NotebookEdit', 
   'Bash(git status:*)', 'Bash(git log:*)', 'Bash(git diff:*)', 'Bash(git show:*)', 'Bash(git branch:*)',
   'Bash(grok:*)', 'Bash(ls:*)', 'Bash(dir:*)', 'Bash(cat:*)', 'Bash(head:*)', 'Bash(tail:*)', 'Bash(wc:*)', 'Bash(pwd:*)', 'Bash(echo:*)'];
 let state = {
-  settings: { port: Number(process.env.OFFICE_PORT) || 7788, claudeCmd: process.env.OFFICE_CLAUDE || 'claude', gameRepo: '', workspace: '', defaultMode: 'auto', maxHops: 6, grokDir: '', xaiKey: '', grokBudget: 5 },
+  settings: { port: Number(process.env.OFFICE_PORT) || 7788, claudeCmd: process.env.OFFICE_CLAUDE || 'claude', gameRepo: '', workspace: '', defaultMode: 'auto', maxHops: 6, grokDir: '', xaiKey: '', grokBudget: 5, grokMode: 'paste' },
   rules: DEFAULT_RULES.slice(),
   employees: [],
   reports: [],
@@ -178,7 +178,7 @@ function askPermission(empId, tool, input, res) {
   const p = { id: uid(), emp: empId, empName: emp ? emp.name : empId, tool, input, label: describeTool(tool, input), detail: tool === 'Bash' || tool === 'PowerShell' ? input.command : JSON.stringify(input).slice(0, 400), rules: makeRules(tool, input), time: now(), res };
   pending.set(p.id, p);
   if (emp) { emp.status = 'waiting'; emp.now = '허락 기다리는 중: ' + p.label; }
-  res.on('close', () => { if (pending.has(p.id) && !res.writableEnded) { pending.delete(p.id); changed(); } });
+  res.on('close', () => { if (pending.has(p.id) && !res.writableEnded) { pending.delete(p.id); const e = findEmp(empId); if (e && e.status === 'waiting' && ![...pending.values()].some((q) => q.emp === empId)) { e.status = procs.has(e.id) ? 'working' : 'idle'; e.now = ''; } changed(); } });
   changed();
   push('ask', { id: p.id });
 }
@@ -220,7 +220,7 @@ function officePrompt(emp) {
 - 그록과 파일을 주고받는 폴더(사장님 PC에 동기화된 구글 드라이브): ${state.settings.grokDir ? '`' + state.settings.grokDir + '`' : '(아직 설정 안 됨 — 사장님께 설정에서 「그록 폴더」를 정해 달라고 \`@사장님:\` 으로 말한다)'}
 - **부탁 보내기**: 다른 직원이 그록 부탁을 넘기면, 9장 규칙대로 부탁 문서를 써서 그록 폴더에 넣고, 사장님이 그록 채팅에 한 번에 붙여 넣을 글을 보고 맨 끝에 \`\`\` 블록 하나로 준다(화면에 「붙여넣기 글 복사」 단추가 생김).
 - **폴더 확인**: 「폴더 확인」 또는 「그록 폴더에 새 파일」 일을 받으면 묻지 말고 새 파일(전달 문서·영상·그림)을 열어 보고, 무엇이 왔는지·쓸 수 있는지 보고한다. 쓸 만하면 게임 폴더의 맞는 자리로 옮기고, 맞는 직원에게 \`@전달\` 로 넘긴다. 영상·그림은 경로를 적어 보고함에서 바로 보이게 한다.
-- **그록 터널 (실시간)**: ${state.settings.xaiKey ? '켜져 있다' : '아직 키가 없다 (사장님이 설정에서 「그록 키」를 넣으면 켜짐)'}. 셸에서 바로 그록과 일한다. 사장님이 옮겨 줄 필요 없다.
+- **그록 터널**: 지금 방식 = ${grokPaste() ? '**반자동 붙여넣기** (돈 안 듦). \`grok\` 명령을 쓰면 회사 화면에 부탁이 뜨고, 사장님이 그록 앱에 옮겨 주고 답을 붙여 넣어 준다. 답이 오기까지 몇 분 걸릴 수 있다 → Bash 시간 제한을 600000 으로 두고, 끊기면 `grok wait 번호` 로 이어서 기다린다. 사장님 수고를 줄이게 **꼭 필요한 말만 한 번에 모아서** 묻는다' : '**그록 키** (자동, 돈 듦)'}.
   - \`grok ask "질문" --img 참고.png --thread 주제이름\` : 그록에게 묻기 (같은 thread 면 앞 대화를 기억한다. 주제마다 thread 이름을 정한다)
   - \`grok image "그림 설명(영어가 더 정확)" --out 경로.png --n 2 --ref 기준그림.png\` : 그림 받기 (\`--ref\` = 그 그림을 고쳐 그리기)
   - \`grok video "움직임 설명" --img 첫장면.png --sec 6 --out 경로.mp4\` : 영상 받기 (1초에 약 $0.08 — 꼭 필요할 때만, 짧게)
@@ -294,7 +294,8 @@ function startRun(emp, task, isRetry) {
   const pk = Object.keys(env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
   env[pk] = path.join(ROOT, 'tools', 'bin') + path.delimiter + (env[pk] || '');
   delete env.XAI_API_KEY;
-  if (emp.partner && state.settings.xaiKey) env.XAI_API_KEY = state.settings.xaiKey; // 그록 키는 AI협력팀에게만
+  if (emp.partner && !grokPaste()) env.XAI_API_KEY = state.settings.xaiKey; // 그록 키는 AI협력팀에게만 (키 방식일 때)
+  if (emp.partner) { env.BASH_DEFAULT_TIMEOUT_MS = env.BASH_DEFAULT_TIMEOUT_MS || '600000'; env.BASH_MAX_TIMEOUT_MS = env.BASH_MAX_TIMEOUT_MS || '1800000'; }
   const child = spawn(quoteIf(claude.path), args.map(quoteIf), { cwd: emp.folder, shell: claude.useShell, windowsHide: true, env });
   procs.set(emp.id, child);
   emp.status = 'working'; emp.now = '일 시작'; emp.task = task; emp.startedAt = now();
@@ -437,7 +438,7 @@ function makeFolder(name, cb) {
 const XAI = (process.env.XAI_BASE_URL || 'https://api.x.ai').replace(/\/$/, '');
 const GROK_SYSTEM = '너는 「필멸자」(PC용 2D 액션 게임)를 만드는 팀과 함께 일하는 그록이다. 이 대화방에는 사장님과 클로드 직원(AI협력팀 등)이 함께 있다. 말머리 [사장님] / [클로드 이름] 으로 누가 말하는지 구분해서 그 사람에게 답한다. 쉬운 한국어로 짧고 분명하게 말한다. 그림·효과 규칙: 빛·불·검기 같은 효과는 그림에 넣지 않는다(게임 코드로 그림).';
 function roomPost(it) {
-  const item = { id: uid(), time: now(), emp: it.emp || '', empName: it.empName || '', kind: it.kind || '', text: String(it.text || '').slice(0, 20000), files: it.files || [], streaming: !!it.streaming };
+  const item = { id: uid(), time: now(), emp: it.emp || '', empName: it.empName || '', kind: it.kind || '', text: String(it.text || '').slice(0, 20000), files: it.files || [], streaming: !!it.streaming, relay: it.relay || null };
   state.grokLog.push(item); if (state.grokLog.length > 400) state.grokLog.splice(0, state.grokLog.length - 400);
   changed(); push('grok', { id: item.id });
   return item;
@@ -450,6 +451,40 @@ function spentToday(add) {
   if (add) { s[d] = Math.round(((s[d] || 0) + add) * 1000) / 1000; fs.writeFileSync(spendFile(), JSON.stringify(s)); }
   return s[d] || 0;
 }
+// ── 반자동 붙여넣기: 그록 키 없이, 사장님이 그록 앱에 옮겨 주고 답을 붙여 넣음 (사장님 11-11 「반자동 붙여넣기」) ──
+const BOARD_URL = 'https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md';
+const relayWait = new Map(); // relay id → [res...]
+function grokPaste() { return state.settings.grokMode !== 'api' || !state.settings.xaiKey; }
+function relayCreate({ emp, empName, kind, text, files }) {
+  const speaker = emp === 'boss' ? '[사장님]' : `[클로드 ${empName}]`;
+  let paste = kind === 'image' ? `${speaker} 그림 그려 줘: ${text}` : kind === 'video' ? `${speaker} 영상 만들어 줘: ${text}` : `${speaker} ${text}`;
+  if (!state.relayStarted) { paste = `(우리 팀 업무 공유판이야. 처음이면 먼저 읽고 여기 결정·규칙을 따라 줘: ${BOARD_URL})\n\n` + paste; state.relayStarted = true; }
+  const e = findEmp(emp);
+  if (e) { e.status = 'waiting'; e.now = '그록 답 기다리는 중 (사장님이 옮겨 주는 중)'; }
+  push('relay', {});
+  return roomPost({ emp, empName, kind: emp === 'boss' ? 'boss' : 'ask', text: (kind === 'image' ? '🎨 ' : kind === 'video' ? '🎬 ' : '') + text, files: files || [], relay: { state: 'waiting', kind, paste } });
+}
+function relayAnswer(id, text, files) {
+  const item = id ? state.grokLog.find((g) => g.id === id && g.relay) : state.grokLog.find((g) => g.relay && g.relay.state === 'waiting');
+  const ans = roomPost({ emp: 'grok', empName: '그록', kind: 'answer', text: text || (files.length ? '' : '(빈 답)'), files });
+  if (!item) return ans;
+  item.relay.state = 'done'; item.relay.answer = ans.id;
+  for (const r of relayWait.get(item.id) || []) { try { r.end(JSON.stringify({ id: item.id, text, files })); } catch (e) { /* */ } }
+  relayWait.delete(item.id);
+  const e = findEmp(item.emp);
+  if (e && e.status === 'waiting' && procs.has(e.id)) { e.status = 'working'; e.now = '그록 답 받음'; }
+  changed();
+  return ans;
+}
+function relayHold(id, res, wait) {
+  const item = state.grokLog.find((g) => g.id === id && g.relay);
+  if (!item) return json(res, { id, error: '그런 부탁 번호가 없어요' }, 404);
+  if (item.relay.state === 'done') { const a = state.grokLog.find((g) => g.id === item.relay.answer); return json(res, { id, text: a ? a.text : '', files: a ? a.files : [] }); }
+  const list = relayWait.get(id) || []; list.push(res); relayWait.set(id, list);
+  const t = setTimeout(() => { const l = relayWait.get(id) || []; const i = l.indexOf(res); if (i >= 0) { l.splice(i, 1); json(res, { id, pending: true }); } }, Math.min(Number(wait) || 540000, 540000));
+  res.on('close', () => clearTimeout(t));
+}
+
 function roomCheck() {
   if (!state.settings.xaiKey) return '그록 키가 없어요. 설정 → 「그록 키」를 넣어 주세요 (console.x.ai 에서 만들어요).';
   if (spentToday(0) >= (state.settings.grokBudget || 5)) return `오늘 그록 한도 $${state.settings.grokBudget} 를 다 썼어요. 설정에서 한도를 올릴 수 있어요.`;
@@ -536,7 +571,7 @@ function publicState() {
   try { grokSpent = JSON.parse(fs.readFileSync(path.join(DATA, 'grok', 'spend.json'), 'utf8'))[new Date().toISOString().slice(0, 10)] || 0; } catch (e) { /* */ }
   const { xaiKey, ...safeSettings } = state.settings; // 키는 화면에도 안 보냄
   return {
-    settings: { ...safeSettings, hasXaiKey: !!xaiKey, grokSpent },
+    settings: { ...safeSettings, hasXaiKey: !!xaiKey, grokSpent, grokPaste: grokPaste() },
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     rules: state.rules,
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
@@ -609,6 +644,7 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/room/send') {
       const text = String(b.text || '').trim(); if (!text) return json(res, { ok: false, error: '할 말을 적어 주세요.' });
       const team = state.employees.find((e) => e.partner);
+      if ((b.mode === 'chat' || b.mode === 'image' || b.mode === 'video') && grokPaste()) { const it = relayCreate({ emp: 'boss', empName: '사장님', kind: b.mode, text }); return json(res, { ok: true, paste: it.relay.paste, id: it.id }); }
       if (b.mode === 'chat') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomChat(text); return json(res, { ok: true }); }
       if (b.mode === 'image' || b.mode === 'video') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomMedia(b.mode, text, Number(b.sec) || 6); return json(res, { ok: true }); }
       if (!team) return json(res, { ok: false, error: 'AI협력팀 직원이 없어요.' });
@@ -617,7 +653,28 @@ const server = http.createServer(async (req, res) => {
       else order(team.id, `[대화방] 사장님: ${text}\n(사장님·그록·너가 함께 있는 대화방이다. 그록 의견이 필요하면 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 물어라. 답은 짧게.)`, '사장님', 0, 'ask', null, { room: true });
       return json(res, { ok: true });
     }
-    if (p === '/api/room/reset') { try { fs.unlinkSync(path.join(DATA, 'grok', 'thread_room.json')); } catch (e) { /* */ } roomPost({ emp: 'boss', empName: '회사', kind: 'sys', text: '— 새 대화 시작 (그록이 앞 이야기를 잊어요) —', files: [] }); return json(res, { ok: true }); }
+    if (p === '/api/room/relay') {
+      const e = findEmp(b.emp);
+      const files = (Array.isArray(b.files) ? b.files : []).filter((f) => { try { return fs.statSync(f).isFile(); } catch (x) { return false; } }).slice(0, 6);
+      const it = relayCreate({ emp: e ? e.id : 'boss', empName: e ? e.name : '직원', kind: b.kind || 'chat', text: String(b.text || ''), files });
+      return json(res, { id: it.id });
+    }
+    if (p === '/api/room/wait') return relayHold(String(b.id || ''), res, b.wait);
+    if (p === '/api/room/answer') {
+      const dir = path.join(DATA, 'grok', 'files'); fs.mkdirSync(dir, { recursive: true });
+      const files = [];
+      for (const [i, f] of (Array.isArray(b.uploads) ? b.uploads : []).slice(0, 8).entries()) {
+        const m = String(f.data || '').match(/^data:([^;]+);base64,(.*)$/); if (!m) continue;
+        const ext = (path.extname(String(f.name || '')) || '.' + (m[1].split('/')[1] || 'bin').replace('jpeg', 'jpg').replace('quicktime', 'mov')).toLowerCase();
+        const fp = path.join(dir, `grok_${Date.now()}_${i}${ext}`);
+        fs.writeFileSync(fp, Buffer.from(m[2], 'base64')); files.push(fp);
+      }
+      const text = String(b.text || '').trim();
+      if (!text && !files.length) return json(res, { ok: false, error: '그록 답을 붙여 넣어 주세요.' });
+      relayAnswer(b.id || null, text, files);
+      return json(res, { ok: true });
+    }
+    if (p === '/api/room/reset') { state.relayStarted = false; try { fs.unlinkSync(path.join(DATA, 'grok', 'thread_room.json')); } catch (e) { /* */ } roomPost({ emp: 'boss', empName: '회사', kind: 'sys', text: '— 새 대화 시작 (그록이 앞 이야기를 잊어요) —', files: [] }); return json(res, { ok: true }); }
     if (p === '/api/grok/log') {
       const emp = findEmp(b.emp);
       const files = (Array.isArray(b.files) ? b.files : []).filter((f) => { try { return fs.statSync(f).isFile(); } catch (e) { return false; } }).slice(0, 8);
@@ -678,6 +735,7 @@ const server = http.createServer(async (req, res) => {
       if (b.xaiKeyClear) state.settings.xaiKey = '';
       if (b.grokBudget !== undefined && b.grokBudget !== '') state.settings.grokBudget = Math.max(0, Number(b.grokBudget) || 0);
       if (typeof b.grokDir === 'string') grokKnown = null;
+      if (b.grokMode === 'paste' || b.grokMode === 'api') state.settings.grokMode = b.grokMode;
       if (b.maxHops) state.settings.maxHops = Math.max(1, Math.min(30, Number(b.maxHops) || 6));
       if (typeof b.claudeCmd === 'string') await detectClaude();
       changed(); return json(res, { ok: true });
