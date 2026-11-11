@@ -110,9 +110,16 @@ async function main() {
     denials: [],
     keep: '그대로',
   };
+  const claudeMore = [
+    { id: 'claude-skip', empName: '몬스터', time: '2026-11-11T06:00:00.000Z', task: '직원끼리', text: '이건 사장님 카드가 아니에요.', toBoss: false, needBoss: false, isError: false, stopped: false },
+    { id: 'claude-ask', empName: '팀장', time: '2026-11-11T04:00:00.000Z', task: '표 확인', text: '일을 끝냈어요.\n@전달 몬스터: 표 다시 봐 줘\n```js\nconsole.log("숨김")\n```\n빨간 칸은 없어요.', toBoss: true, needBoss: true, isError: false, stopped: false },
+    { id: 'claude-stop', empName: '팀장', time: '2026-11-11T03:00:00.000Z', task: '멈춘 일', text: '중간에 멈췄어요.', toBoss: true, needBoss: false, isError: false, stopped: true },
+    { id: 'claude-pref', empName: '팀장', time: '2026-11-11T02:00:00.000Z', task: '요약 있는 일', text: '@전달 효과: 빼 주세요\n본문은 쓰지 마요.', summary: ['요약 칸을 먼저 썼어요.'], status: '진행 중', toBoss: true, needBoss: false, isError: false },
+    { id: 'claude-err', empName: '팀장', time: '2026-11-11T01:00:00.000Z', task: '깨진 일', text: '문제가 났어요.', toBoss: true, needBoss: false, isError: true, stopped: false },
+  ];
   fs.writeFileSync(path.join(dataDir, 'state.json'), JSON.stringify({
     settings: { botUrl: `http://127.0.0.1:${hookPort}/hook`, botKey: secret },
-    reports: [claudeReport],
+    reports: [claudeReport, ...claudeMore],
   }));
   fs.writeFileSync(path.join(dataDir, 'company-reports.json'), JSON.stringify([
     { id: 'rpt-local-zero', time: '2026-11-11 16:30', target: '제로폰', command: '오늘 정책 확인해서 보고해', lead: '', status: '접수', summary: ['명령을 받았어요.'], source: '그록' },
@@ -179,6 +186,18 @@ async function main() {
     assert.ok(!JSON.stringify(list).includes(secret));
     assert.ok(!JSON.stringify(list).includes('그대로'));
     assert.strictEqual(claude.where, 'https://github.com/meca12944/thor-like-game/issues/207');
+    assert.ok(!ids.includes('claude-skip'), '사장님께 가는 보고만 카드로 보여요');
+    const ask = list.find((r) => r.id === 'claude-ask');
+    assert.ok(ask && ask.status === '완료' && ask.needBoss === true, '확인이 필요하면 완료에 배지예요');
+    assert.ok(ask.summary.join('\n').includes('일을 끝냈어요'));
+    assert.ok(!ask.summary.join('\n').includes('@전달') && !ask.summary.join('\n').includes('숨김'));
+    const stopped = list.find((r) => r.id === 'claude-stop');
+    assert.ok(stopped && stopped.status === '문제 있음');
+    const pref = list.find((r) => r.id === 'claude-pref');
+    assert.ok(pref && pref.status === '진행 중' && pref.summary.join('') === '요약 칸을 먼저 썼어요.');
+    assert.ok(!pref.summary.join('').includes('본문은'));
+    const err = list.find((r) => r.id === 'claude-err');
+    assert.ok(err && err.status === '문제 있음');
     for (let i = 1; i < list.length; i++) {
       const prev = Date.parse(list[i - 1].time.replace(' ', 'T') + ':00+09:00');
       const cur = Date.parse(list[i].time.replace(' ', 'T') + ':00+09:00');

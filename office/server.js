@@ -1057,7 +1057,7 @@ function grokNormalize(r, sourceDefault) {
   const deptGiven = String(r.dept || '').trim();
   const known = BOT_TARGETS.depts.some((d) => d.name === deptGiven);
   const dept = known ? deptGiven : ((grokDeptOf(target) || {}).name || '');
-  return {
+  const card = {
     id: String(r.id).slice(0, 80),
     time: grokTimeText(r.time),
     target,
@@ -1069,6 +1069,8 @@ function grokNormalize(r, sourceDefault) {
     source,
     dept,
   };
+  if (r.needBoss === true) card.needBoss = true;
+  return card;
 }
 function grokPreferPublic(localItem, pubItem) {
   // 같은 번호가 공개 보고에 있으면 그 상태·요약·결과가 이김.
@@ -1083,27 +1085,37 @@ function grokPreferPublic(localItem, pubItem) {
     where: pubItem.where || localItem.where,
     source: pubItem.source || localItem.source || '그록',
     dept: pubItem.dept || localItem.dept,
+    needBoss: pubItem.needBoss === true || localItem.needBoss === true,
   };
 }
+function grokBossPlain(text) {
+  // 코드 묶음과 「@전달」 줄은 사장님 카드에 넣지 않아요.
+  return String(text || '').replace(/```[\s\S]*?```/g, '\n').split(/\n/).filter((line) => !/@전달/.test(line) && !/```/.test(line)).join('\n');
+}
+function grokClaudeStatus(r) {
+  if (GROK_REPORT_STATUSES.has(r.status)) return r.status;
+  if (r.stopped || r.isError) return '문제 있음';
+  return '완료';
+}
 function grokClaudeCard(r) {
-  // 화면용 새 객체만 만들어요. state.reports 항목은 그대로 둡니다.
-  const text = String(r.text || '');
-  const lines = text.split(/\n+/).map(grokSafeLine).filter(Boolean).slice(0, 3);
-  let status = '완료';
-  if (r.isError) status = '문제 있음';
-  else if (r.needBoss) status = '진행 중';
-  const found = text.match(/https?:\/\/[^\s"'<>)]+/);
+  // 사장님께 가는 보고만 카드로. state.reports 항목은 읽기만 하고 그대로 둡니다.
+  if (!r || r.toBoss !== true) return null;
+  const plain = grokBossPlain(r.text);
+  const given = Array.isArray(r.summary) ? r.summary.map(grokSafeLine).filter(Boolean).slice(0, 3) : [];
+  const lines = given.length ? given : plain.split(/\n+/).map(grokSafeLine).filter(Boolean).slice(0, 3);
+  const found = plain.match(/https?:\/\/[^\s"'<>)]+/);
   return grokNormalize({
     id: r.id,
     time: r.time,
     target: '게임 필멸자',
-    command: String(r.task || '').split('\n')[0],
-    lead: r.empName || '클로드',
-    status,
+    command: String(r.task || r.command || '').split('\n')[0],
+    lead: r.lead || r.empName || '클로드',
+    status: grokClaudeStatus(r),
     summary: lines.length ? lines : ['보고가 도착했어요.'],
-    where: found ? found[0] : '',
+    where: r.where || (found ? found[0] : ''),
     source: '클로드',
     dept: '게임 필멸자',
+    needBoss: r.needBoss === true,
   }, '클로드');
 }
 async function grokPublicReports() {

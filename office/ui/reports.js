@@ -84,6 +84,7 @@ function reportHtml(list) {
       <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">
         <b>${reportEsc(r.target || '대상 없음')}</b>
         <span style="color:${reportStatusColor(r.status)};font-weight:700">${reportEsc(r.status || '')}</span>
+        ${r.needBoss ? '<span style="color:var(--blue,#2f6fde);font-weight:700">사장님 확인 필요</span>' : ''}
         <span style="margin-left:auto;${muted}">${reportEsc(r.time || '')}</span>
       </div>
       <div>${reportEsc(r.command || '')}</div>
