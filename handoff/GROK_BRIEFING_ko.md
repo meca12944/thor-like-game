@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 18:05 한국 시각, main `2cabe9f2 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:03 한국 시각, main `3ea0063a 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,6 +42,7 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `grok/office-claude-all-depts` — 부서마다 클로드 직원을 두고, 일을 팀장에게도 넣음
 - 11-11 · `grok/office-ui-layout` — 회사 홈을 한 화면에 맞게 다시 배치
 - 11-11 · `grok/office-home-command` — 회사 홈 맨 위에 일 시키기 칸을 넣음
 - 11-11 · `claude/textbook-office-coop` — 팀 회의 교본: 9-6 그록과 프로그램 같이 고치기 (#212·#215·#216 결론)
