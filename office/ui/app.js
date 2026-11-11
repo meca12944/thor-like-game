@@ -428,6 +428,7 @@ function guide() {
       <li>⋯ 직원 이름 옆 <b>⋯</b> 를 누르면: 지금 하는 일 보기, 멈추기, 고치기.</li>
       <li>직원끼리는 알아서 말을 주고받아요. 사장님이 말을 옮길 필요 없어요.</li>
       <li>🏢 각 부서에는 <b>클로드 직원</b>과 <b>그록 봇</b>이 같이 있어요. 홈에서 일을 보내면 그록과 그 부서 클로드 팀장에게 가요.</li>
+      <li>📋 보고 카드의 <b>명령</b>을 누르면 그 일의 진행 기록이 시간순으로 나와요. 대화 창에서도 명령마다 한 덩어리로 보여요.</li>
       <li>부서 화면의 <b>＋ 만들기</b>를 눌러야 클로드 직원이 생겨요. 켤 때 저절로 만들지 않아요. 폴더를 직접 쓰려면 주소를 적고 만들기를 눌러요.</li>
     </ul>
     <div class="dlg-foot"><button class="btn" value="cancel">알겠어요</button></div>`);
@@ -643,11 +644,42 @@ function openDept(id) {
 // 💬 클로드↔그록 대화 창 (그록 설계안 6번: 깃허브 #207 댓글, 읽기 전용)
 const WHO = { grok: '🤖 그록', claude: '🧠 클로드', boss: '👤 사장님' };
 const chatDrawn = new WeakMap();
+const chatOpen = new Set();
+function cmdBubble(c) {
+  const id = c.cmdId || '';
+  const open = chatOpen.has(id) ? ' open' : '';
+  const hist = (c.history || []).map((h) => {
+    const notes = (h.notes || []).map((line) => `<div>${esc(line)}</div>`).join('');
+    const link = h.url ? ` · <a href="${esc(h.url)}" target="_blank">원문</a>` : '';
+    return `<li><span class="muted">${esc(ago(h.time))}</span> <b>${esc(h.stage || '')}</b>${link}${notes}</li>`;
+  }).join('');
+  const title = c.command ? esc(c.command) : ('명령 ' + esc(id));
+  const mark = c.needBoss ? ' <b class="boss-need">사장님 확인 필요</b>' : '';
+  return `<details class="bubble grok cmd-bundle" data-cmd="${esc(id)}"${open}><summary><b>${title}</b>${mark}<div class="who">진행 ${esc(c.stage || '')} · ${ago(c.time)} · 누르면 진행 기록</div></summary><div class="cmd-log"><b>진행 기록</b><ol>${hist || '<li>아직 기록이 없어요.</li>'}</ol></div></details>`;
+}
+function talkBubble(c, n) {
+  const text = c.text || '';
+  return `<div class="bubble ${c.who === 'grok' ? 'grok' : c.who === 'claude' ? 'claude' : 'boss'}"><div class="who">${WHO[c.who] || WHO.boss} · ${ago(c.time)} · <a href="${esc(c.url)}" target="_blank">원문</a></div>${md(text.length > 700 && n ? text.slice(0, 700) + '…' : text)}</div>`;
+}
 async function chatWidget(el, n) {
   if (!el) return;
+  if (el.dataset.cmdBound !== '1') {
+    el.dataset.cmdBound = '1';
+    el.addEventListener('toggle', (ev) => {
+      const d = ev.target;
+      if (!d || d.tagName !== 'DETAILS' || !d.dataset.cmd) return;
+      if (d.open) chatOpen.add(d.dataset.cmd); else chatOpen.delete(d.dataset.cmd);
+    }, true);
+  }
   let d; try { d = await fetch('/api/coop/chat').then((r) => r.json()); } catch (e) { el.innerHTML = '<div class="empty small">대화를 못 불러왔어요.</div>'; return; }
-  const items = (d.items || []).slice(-(n || 50));
-  const html = items.length ? `<div class="chat">${items.map((c) => `<div class="bubble ${c.who === 'grok' ? 'grok' : c.who === 'claude' ? 'claude' : 'boss'}"><div class="who">${WHO[c.who]} · ${ago(c.time)} · <a href="${esc(c.url)}" target="_blank">원문</a></div>${md(c.text.length > 700 && n ? c.text.slice(0, 700) + '…' : c.text)}</div>`).join('')}</div>
+  let items = d.items || [];
+  if (n) {
+    const cmds = items.filter((c) => c.kind === 'cmd').slice(-2);
+    const talks = items.filter((c) => c.kind !== 'cmd').slice(-n);
+    const want = new Set(cmds.concat(talks));
+    items = items.filter((c) => want.has(c));
+  } else items = items.slice(-50);
+  const html = items.length ? `<div class="chat">${items.map((c) => c.kind === 'cmd' ? cmdBubble(c) : talkBubble(c, n)).join('')}</div>
     <div class="row-btns" style="margin-top:8px">${n ? '<button class="btn ghost small" data-act="coopall">💬 대화 모두 보기</button>' : ''}<a class="btn ghost small" href="${esc(d.issueUrl)}" target="_blank" style="text-decoration:none">깃허브에서 보기</a></div>`
     : '<div class="empty small">아직 대화가 없어요. (몇 분마다 새로 읽어요)</div>';
   if (chatDrawn.get(el) === html) return;

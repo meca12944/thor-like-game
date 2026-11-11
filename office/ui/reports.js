@@ -7,6 +7,7 @@ let reportPack = null;
 let reportAt = 0;
 let reportFlight = null;
 const reportOpen = new Set();
+const reportLogOpen = new Set();
 
 function reportEsc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -27,6 +28,55 @@ function reportDepts(pack) {
     if (n && names.indexOf(n) < 0) names.push(n);
   }
   return names.map((name) => ({ id: name, name, icon: '🏢' }));
+}
+function reportMs(time) {
+  const s = String(time || '').trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
+    const ms = Date.parse(s.slice(0, 16).replace(' ', 'T') + ':00+09:00');
+    if (!Number.isNaN(ms)) return ms;
+  }
+  const ms = Date.parse(s);
+  return Number.isNaN(ms) ? 0 : ms;
+}
+function reportRank(r) {
+  if (!r) return 5;
+  if (r.needBoss || r.stage === '사장님 확인 필요') return 2;
+  if (r.status === '진행 중') return 0;
+  if (r.status === '문제 있음') return 1;
+  if (r.silent || r.status === '접수') return 3;
+  if (r.status === '완료') return 4;
+  return 5;
+}
+function reportSort(a, b) {
+  const d = reportRank(a) - reportRank(b);
+  if (d) return d;
+  return reportMs(b.updated || b.time) - reportMs(a.updated || a.time);
+}
+function reportVisual(r) {
+  if (r && r.silent) return '응답 없음';
+  if (r && (r.stage === '사장님 확인 필요' || (r.needBoss && r.status !== '완료'))) return '사장님 확인 필요';
+  if (r && (r.status === '완료' || r.status === '문제 있음' || r.status === '접수' || r.status === '진행 중')) return r.status;
+  return (r && r.status) || '';
+}
+function reportLabel(r) {
+  if (r && r.silent) return '응답 없음 — 그록이 아직 안 받음';
+  if (r && r.stage) return r.stage;
+  return (r && r.status) || '';
+}
+function reportIsLive() {
+  const items = (reportPack && reportPack.items) || [];
+  return items.some((r) => r && (r.status === '진행 중' || r.needBoss || (r.status === '접수' && !r.silent)));
+}
+function reportLogHtml(r) {
+  const id = (r && (r.cmdId || r.id)) || '';
+  const open = reportLogOpen.has(id) ? ' open' : '';
+  const hist = r && Array.isArray(r.history) ? r.history : [];
+  const rows = hist.map((h) => {
+    const notes = (Array.isArray(h.notes) ? h.notes : []).map((n) => '<div>' + reportEsc(n) + '</div>').join('');
+    return '<li><time>' + reportEsc(h.time || '') + '</time> <b>' + reportEsc(h.stage || '') + '</b>' + notes + '</li>';
+  }).join('');
+  const body = rows || '<li class="muted">아직 진행 기록이 없어요.</li>';
+  return '<details class="cmd-fold" data-cmd="' + reportEsc(id) + '"' + open + '><summary>' + reportEsc((r && r.command) || '명령') + '</summary><div class="cmd-log"><b>진행 기록</b><ol>' + body + '</ol></div></details>';
 }
 function reportShown(items, lockDept) {
   const all = Array.isArray(items) ? items : [];
@@ -82,7 +132,7 @@ function reportHtml(pack, opt) {
     return `<div class="card home-report-panel"><div class="home-report-head"><b>${reportEsc(title)}</b><div class="muted small">보고를 불러오는 중…</div></div></div>`;
   }
   const list = Array.isArray(pack.items) ? pack.items : [];
-  const shown = reportShown(list, lockDept);
+  const shown = reportShown(list, lockDept).slice().sort(reportSort);
   const n = (st) => shown.filter((r) => r.status === st).length;
   const depts = reportDepts(pack);
   if (!lockDept && reportDept !== '전체' && !depts.some((d) => d.name === reportDept)) reportDept = '전체';
@@ -99,23 +149,25 @@ function reportHtml(pack, opt) {
     const arts = Array.isArray(r.artifacts) ? r.artifacts.length : 0;
     const open = reportOpen.has(r.id || '');
     const id = r.id || '';
-    return `<article class="card home-report-card" data-status="${reportEsc(r.status || '')}" data-report-toggle="1" data-report-id="${reportEsc(id)}">
+    const when = r.updated ? ('바뀜 ' + r.updated) : (r.time || '');
+    const num = r.cmdId ? ' · 번호 ' + reportEsc(r.cmdId) : '';
+    return `<article class="card home-report-card" data-status="${reportEsc(reportVisual(r))}" data-report-toggle="1" data-report-id="${reportEsc(id)}">
       <div class="card-head">
-        <span class="st-lamp${r.status === '완료' ? ' on' : ''}"></span>
+        <span class="st-lamp${r.status === '완료' && !r.silent ? ' on' : ''}"></span>
         <b>${reportEsc(r.dept || r.target || '부서 없음')}</b>
-        <span class="rst">${reportEsc(r.status || '')}</span>
-        ${r.needBoss ? '<span class="boss">사장님 확인 필요</span>' : ''}
-        <time>${reportEsc(r.time || '')}</time>
+        <span class="rst">${reportEsc(reportLabel(r))}</span>
+        ${r.needBoss && r.stage !== '사장님 확인 필요' ? '<span class="boss">사장님 확인 필요</span>' : ''}
+        <time>${reportEsc(when)}</time>
       </div>
-      <div>${reportEsc(r.command || '')}</div>
-      <div class="who">올린 쪽: ${reportEsc(r.source || '그록')}${who}${arts ? ' · 결과물 ' + arts + '개' : ''}${open ? '' : ' · 누르면 결과물'}</div>
+      ${reportLogHtml(r)}
+      <div class="who">올린 쪽: ${reportEsc(r.source || '그록')}${who}${num}${arts ? ' · 결과물 ' + arts + '개' : ''}${open ? '' : ' · 카드는 결과물, 명령은 진행 기록'}</div>
       <div class="sum">${lines}</div>
       ${reportArtHtml(r)}
     </article>`;
   }).join('');
   const emptyText = (lockDept || reportDept !== '전체') ? '이 부서에는 아직 보고가 없어요.' : '아직 올라온 보고가 없어요.';
   const empty = shown.length ? '' : `<div class="home-report-empty">${emptyText}${pack.error ? `<span class="small">${reportEsc(pack.error)}</span>` : '<span class="small">일을 보내면 여기에 접수로 떠요.</span>'}</div>`;
-  const hint = lockDept ? '이 부서 보고만, 최신순이에요. 초록 불은 끝났을 때만 켜져요.' : '모든 부서 보고를 시간 순으로 모았어요. 초록 불은 끝났을 때만 켜져요.';
+  const hint = lockDept ? '이 부서만. 진행 중인 일부터 보여요. 명령을 누르면 진행 기록. 초록 불은 끝났을 때만.' : '진행 중인 일부터 보여요. 명령을 누르면 진행 기록. 초록 불은 끝났을 때만.';
   return `<div class="card home-report-panel">
       <div class="home-report-head">
         <div class="home-report-title"><b>${reportEsc(title)}</b><span class="muted small">${hint}</span></div>
@@ -174,6 +226,14 @@ async function renderReports(el, opt) {
     if (el.dataset.bound !== '1') {
       el.dataset.bound = '1';
       el.addEventListener('click', (ev) => {
+        const fold = ev.target.closest('.cmd-fold');
+        if (fold) {
+          const cid = fold.getAttribute('data-cmd') || '';
+          setTimeout(() => {
+            if (fold.open) reportLogOpen.add(cid); else reportLogOpen.delete(cid);
+          }, 0);
+          return;
+        }
         const art = ev.target.closest('[data-art-open]');
         if (art) {
           ev.preventDefault();
@@ -200,7 +260,8 @@ async function renderReports(el, opt) {
       });
     }
     reportPaint(el);
-    if (reportPack && Date.now() - reportAt < 15000) {
+    const wait = reportIsLive() ? 0 : 15000;
+    if (reportPack && Date.now() - reportAt < wait) {
       if (typeof homeAfterReports === 'function') homeAfterReports();
       return;
     }
@@ -215,3 +276,10 @@ async function renderReports(el, opt) {
     el.innerHTML = '<div class="card home-report-panel"><b>보고 창</b><div class="muted small">보고 창을 그리지 못했어요.</div></div>';
   }
 }
+setInterval(() => {
+  if (typeof document === 'undefined' || !reportIsLive()) return;
+  const nodes = document.querySelectorAll('#homeReports, #zDeptReports');
+  if (!nodes.length) return;
+  reportAt = 0;
+  nodes.forEach((el) => renderReports(el));
+}, 8000);

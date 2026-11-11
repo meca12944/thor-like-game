@@ -67,7 +67,14 @@ async function main() {
   const appPort = await freePort();
   const seen = [];
   let posts = 0;
+  const ghComments = [];
   const hook = http.createServer((q, s) => {
+    if (q.method === 'GET' && String(q.url || '').startsWith('/repos/meca12944/thor-like-game/issues/207/comments')) {
+      s.setHeader('content-type', 'application/json');
+      s.setHeader('x-ratelimit-remaining', '40');
+      s.end(JSON.stringify(ghComments));
+      return;
+    }
     if (q.method !== 'POST' || q.url !== '/hook') { s.statusCode = 500; s.end('no'); return; }
     let d = '';
     q.on('data', (c) => (d += c));
@@ -100,10 +107,18 @@ async function main() {
       { id: 'claude-pref', empName: '팀장', time: '2026-11-11T02:00:00.000Z', task: '요약 있는 일', text: '@전달 효과: 빼 주세요\n본문은 쓰지 마요.', summary: ['요약 칸을 먼저 썼어요.'], status: '진행 중', toBoss: true, needBoss: false, isError: false },
     ],
   }));
+  const kstStamp = (ms) => {
+    const t = new Date(ms + 9 * 60 * 60 * 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    return t.getUTCFullYear() + '-' + p(t.getUTCMonth() + 1) + '-' + p(t.getUTCDate()) + ' ' + p(t.getUTCHours()) + ':' + p(t.getUTCMinutes());
+  };
   fs.writeFileSync(path.join(dataDir, 'company-reports.json'), JSON.stringify([
     { id: 'rpt-local-zero', time: '2026-11-11 16:30', target: '제로폰', command: '오늘 정책 확인해서 보고해', status: '접수', summary: ['명령을 받았어요.'], source: '그록' },
     { id: 'rpt-same', time: '2026-11-11 16:00', target: 'AI 협력', command: '옛 접수', status: '접수', summary: ['아직 접수'], source: '그록' },
     { id: 'rpt-old', time: '2026-11-11 10:00', target: '없는부서', command: '예전 일', status: '완료', summary: ['예전 파일에는 부서가 없어요.'] },
+    { id: 'rpt-live', time: kstStamp(Date.now() - 60 * 1000), target: 'AI 협력·연결', dept: 'AI 협력·연결', command: '진행 기록 시험', status: '접수', summary: ['명령을 받았어요.'], source: '그록', cmdId: 'abcd1234' },
+    { id: 'rpt-boss', time: kstStamp(Date.now() - 60 * 1000), target: '홍보', dept: '홍보', command: '확인 부탁', status: '접수', summary: ['명령을 받았어요.'], source: '그록', cmdId: 'boss5678' },
+    { id: 'rpt-quiet', time: kstStamp(Date.now() - 20 * 60 * 1000), target: '제로폰', dept: '제로폰', command: '오래된 접수', status: '접수', summary: ['명령을 받았어요.'], source: '그록', cmdId: 'quiet001' },
   ]));
 
   const child = spawn(process.execPath, ['server.js'], {
@@ -164,10 +179,13 @@ async function main() {
     assert.strictEqual(ok.ok, true);
     assert.ok(seen[0].reportId);
     assert.strictEqual(seen[0].source, '알들 컴퍼니 명령창');
+    assert.match(seen[0].cmdId, /^[0-9a-f]{8}$/);
     assert.ok(!JSON.stringify(seen[0]).includes(secret));
     const list2 = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items;
     const made = list2.find((r) => r.id === seen[0].reportId);
-    assert.ok(made && made.status === '접수');
+    assert.ok(made && made.status === '접수' && made.cmdId === seen[0].cmdId);
+    const quiet = list2.find((r) => r.id === 'rpt-quiet');
+    assert.ok(quiet && quiet.silent === true && quiet.status === '접수');
     const bad = await post(appPort, '/api/bot/command', { target: '홍보', command: '블로그 초안 써 줘' });
     assert.strictEqual(bad.ok, false);
     const failed = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items.find((r) => r.id === seen[1].reportId);
@@ -230,6 +248,39 @@ async function main() {
     const pub = JSON.parse((await getRaw(appPort, '/api/state')).body);
     assert.strictEqual(pub.botNicks['제로폰 홈페이지'], '폰팀');
     assert.ok(pub.botTargets.bots.some((b) => b.name === '제로폰 홈페이지'));
+    const iso = (ms) => new Date(ms).toISOString();
+    const cmt = (id, ms, body) => ({ id, created_at: iso(ms), body, html_url: 'https://github.com/meca12944/thor-like-game/issues/207#issuecomment-' + id });
+    const nowMs = Date.now();
+    ghComments.push(
+      cmt(1, nowMs - 5 * 60 * 1000, '[그록] 안녕'),
+      cmt(2, nowMs - 4 * 60 * 1000, '[그록 상태] [cmd:abcd1234] 접수함'),
+      cmt(3, nowMs - 3 * 60 * 1000, '[그록 상태] [cmd:abcd1234] 그록 답안 작성 중\n그록 안: 표부터 볼게요'),
+      cmt(4, nowMs - 2 * 60 * 1000, '[그록 상태] [cmd:abcd1234] 문제 있음\napi_key=supersecret'),
+      cmt(5, nowMs - 60 * 1000, '[그록 상태] [cmd:abcd1234] 클로드와 토의 중 (2/3)\n그록 안: 짧게\n클로드 의견: 좋아요\n합의: 이렇게 가요'),
+      cmt(6, nowMs - 30 * 1000, '[그록 상태] [cmd:boss5678] 사장님 확인 필요\n합의: 사장님이 봐 주세요'),
+      cmt(7, nowMs - 20 * 1000, '[그록 상태] [cmd:nope9999] 완료\n없는 번호'),
+      cmt(8, nowMs - 10 * 1000, '[그록 상태] [cmd:abcd1234] 알 수 없는 단계'),
+    );
+    await getRaw(appPort, '/api/coop/chat?refresh=1');
+    await sleep(1000);
+    const moved = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items;
+    const live = moved.find((r) => r.id === 'rpt-live');
+    assert.ok(live && live.status === '진행 중' && live.stage === '클로드와 토의 중 (2/3)');
+    assert.ok(live.history && live.history.length === 4);
+    assert.strictEqual(live.history[0].stage, '접수함');
+    assert.strictEqual(live.history[3].stage, '클로드와 토의 중 (2/3)');
+    assert.ok(live.summary.join(' ').includes('합의: 이렇게 가요'));
+    assert.ok(live.history.some((h) => h.stage === '문제 있음' && !(h.notes || []).join(' ').includes('supersecret')));
+    assert.ok(!JSON.stringify(live).includes('supersecret'));
+    assert.ok(!JSON.stringify(live).includes('알 수 없는 단계'));
+    const boss = moved.find((r) => r.id === 'rpt-boss');
+    assert.ok(boss && boss.needBoss === true && boss.status === '진행 중' && boss.stage === '사장님 확인 필요');
+    assert.ok(!moved.some((r) => r.cmdId === 'nope9999'));
+    const chat = JSON.parse((await getRaw(appPort, '/api/coop/chat')).body);
+    assert.ok((chat.items || []).some((c) => c.kind === 'talk' && String(c.text || '').includes('안녕')));
+    assert.ok(!(chat.items || []).some((c) => c.kind !== 'cmd' && String(c.text || '').includes('[그록 상태]')));
+    const bundle = (chat.items || []).find((c) => c.kind === 'cmd' && c.cmdId === 'abcd1234');
+    assert.ok(bundle && bundle.command === '진행 기록 시험' && bundle.history.length === 4 && bundle.dept === 'AI 협력·연결');
     const ordered = await post(appPort, '/api/order', { to: hired.id, text: '부서 일 시험', dept: '제로폰' });
     assert.strictEqual(ordered.ok, true);
     const queued = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items.find((r) => r.command === '부서 일 시험');

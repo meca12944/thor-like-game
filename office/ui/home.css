@@ -161,7 +161,19 @@
 .home-report-card[data-status="문제 있음"] .rst { color: var(--red); }
 .home-report-card[data-status="접수"] .rst { color: var(--blue); }
 .home-report-card[data-status="진행 중"] .rst { color: var(--amber); }
+.home-report-card[data-status="응답 없음"] { border-left: 4px solid var(--muted); }
+.home-report-card[data-status="응답 없음"] .rst { color: var(--muted); }
+.home-report-card[data-status="사장님 확인 필요"] { border-left: 4px solid var(--amber); background: var(--amber-soft); }
+.home-report-card[data-status="사장님 확인 필요"] .rst { color: var(--amber); }
 .home-report-card .boss { color: var(--blue); font-weight: 700; white-space: nowrap; }
+.cmd-fold { margin-top: 4px; }
+.cmd-fold summary { cursor: pointer; font-weight: 700; }
+.cmd-log { margin-top: 4px; font-size: 13px; }
+.cmd-log ol { margin: 4px 0 0; padding-left: 18px; }
+.cmd-log li { margin: 2px 0; }
+.bubble.cmd-bundle { align-self: stretch; max-width: 100%; }
+.bubble.cmd-bundle summary { cursor: pointer; }
+.bubble.cmd-bundle .boss-need { color: var(--amber); }
 .home-report-card .who { color: var(--muted); font-size: 13px; }
 .home-report-card .sum { margin-top: 2px; }
 

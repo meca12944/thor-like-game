@@ -462,15 +462,27 @@ async function homeLoadTalk(el, A, d) {
   try {
     const data = await fetch('/api/coop/chat', { cache: 'no-store' }).then((r) => r.json());
     coop = ((data && data.items) || []).filter((c) => {
+      if (c && c.kind === 'cmd') return c.dept === d.name;
       const t = String(c && c.text || '');
+      if (t.indexOf('[그록 상태]') === 0) return false;
       if (t.indexOf('[부서:' + d.name + ']') >= 0 || t.indexOf(d.name) >= 0) return true;
       return names.some((n) => n && t.indexOf(n) >= 0);
-    }).slice(-6);
+    }).slice(-8);
   } catch (e) { coop = []; }
   const local = ((A.state && A.state.reports) || []).filter((r) => names.indexOf(r.empName) >= 0).slice(0, 6);
   const esc = A.esc;
   const lines = [];
   for (const c of coop) {
+    if (c.kind === 'cmd') {
+      const id = c.cmdId || '';
+      const rows = (c.history || []).map((h) => {
+        const notes = (h.notes || []).map((n) => '<div>' + esc(n) + '</div>').join('');
+        return '<li><b>' + esc(h.stage || '') + '</b> ' + notes + '</li>';
+      }).join('');
+      const mark = c.needBoss ? ' <b class="boss-need">사장님 확인 필요</b>' : '';
+      lines.push('<details class="cmd-fold" data-cmd="' + esc(id) + '"><summary>' + esc(c.command || ('명령 ' + id)) + mark + ' · ' + esc(c.stage || '') + '</summary><div class="cmd-log"><b>진행 기록</b><ol>' + (rows || '<li>아직 기록이 없어요.</li>') + '</ol></div></details>');
+      continue;
+    }
     const who = c.who === 'grok' ? '그록' : c.who === 'claude' ? '클로드' : '사장님';
     lines.push(`<div class="dept-line"><b>${esc(who)}</b> <span class="muted small">${esc(String(c.text || '').replace(/\s+/g, ' ').slice(0, 160))}</span></div>`);
   }
@@ -753,6 +765,12 @@ async function homeAddEmp(el, A) {
   }
   if (homeMode === 'dept') homePaint(el, A);
 }
+setInterval(() => {
+  const chat = document.getElementById('homeChat');
+  if (!chat || !window.Aldeul || typeof window.Aldeul.chatWidget !== 'function') return;
+  if (typeof reportIsLive === 'function' && !reportIsLive()) return;
+  window.Aldeul.chatWidget(chat, 4);
+}, 8000);
 window.AldeulHome = {
   render(el, A) {
     if (!el || !A) return;
