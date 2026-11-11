@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-title 클로드 작업장 - 처음 설치
+title 알들 컴퍼니 - 처음 설치
 cd /d "%~dp0"
 echo.
-echo  ===== 클로드 작업장 처음 설치 =====
+echo  ===== 알들 컴퍼니 처음 설치 =====
 echo  필요한 프로그램을 차례로 깔아요. 중간에 "예"를 눌러 주세요.
 echo.
 where winget >nul 2>nul || (echo  winget 이 없어요. Microsoft Store 에서 "앱 설치 관리자"를 업데이트한 뒤 다시 해 주세요. & pause & exit /b)
@@ -36,6 +36,6 @@ echo  로그인이 끝나면 그 창은 닫아도 돼요.
 pause
 start "" powershell -NoExit -NoProfile -Command "$env:Path=[Environment]::GetEnvironmentVariable('Path','Machine')+';'+[Environment]::GetEnvironmentVariable('Path','User')+';'+$env:USERPROFILE+'\.local\bin'; claude"
 echo.
-echo  다 됐어요! 바탕화면의 「클로드 작업장」 아이콘을 두 번 누르면 회사가 열려요.
+echo  다 됐어요! 바탕화면의 「알들 컴퍼니」 아이콘을 두 번 누르면 회사가 열려요.
 echo  (아이콘이 안 열리면 PC를 한 번 다시 켜 주세요.)
 pause

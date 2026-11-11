@@ -3,52 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>클로드 작업장 · 게임 필멸자</title>
+<title>알들 컴퍼니</title>
 <link rel="icon" href="/ui/icon.png">
+<link rel="stylesheet" href="/ui/theme.css">
 <link rel="stylesheet" href="/ui/style.css">
+<link rel="stylesheet" href="/ui/home.css">
 </head>
 <body>
-<header class="top">
-  <div class="brand"><img src="/ui/icon.png" alt=""><b>클로드 작업장</b><span class="muted small">게임 필멸자</span></div>
-  <div class="summary" id="summary"></div>
-  <button class="btn ghost" id="btnHelp" title="처음 쓰는 법">❓ 사용법</button>
-  <button class="btn ghost" id="btnConn" title="다른 프로그램·AI 와 연결">🔌 연결 <i id="connDot"></i></button>
-  <button class="btn ghost" id="btnCompany" title="회사 전체 화면 열기">🏢 알들 컴퍼니</button>
-  <button class="btn" id="btnHire">＋ 직원 뽑기</button>
-  <button class="btn ghost" id="btnSettings" title="그 밖의 설정">⚙</button>
-</header>
+<!-- 화면 1: 회사 홈 (그록이 ui/home.js 로 채워요. 없으면 app.js 의 기본 홈) -->
+<div id="view-home" class="view">
+  <header class="top">
+    <div class="brand"><img src="/ui/icon.png" alt=""><b>알들 컴퍼니</b></div>
+    <div class="summary" id="homeSummary"></div>
+    <button class="btn ghost" data-act="help" title="처음 쓰는 법">❓ 사용법</button>
+    <button class="btn ghost" data-act="conn" title="다른 프로그램·AI 와 연결">🔌 연결 <i class="connDot"></i></button>
+    <button class="btn ghost" data-act="settings" title="그 밖의 설정">⚙</button>
+  </header>
+  <div class="asks-box"></div>
+  <main id="home" class="home-main"></main>
+</div>
 
-<div id="asks"></div>
+<!-- 화면 2: 게임 필멸자 — 클로드 작업장 -->
+<div id="view-workshop" class="view" hidden>
+  <header class="top">
+    <button class="btn ghost" data-act="home" title="회사 홈으로">← 알들 컴퍼니</button>
+    <div class="brand"><b>🧠 클로드 작업장</b><span class="muted small">게임 필멸자</span></div>
+    <div class="summary" id="summary"></div>
+    <button class="btn ghost" data-act="help" title="처음 쓰는 법">❓ 사용법</button>
+    <button class="btn ghost" data-act="conn" title="다른 프로그램·AI 와 연결">🔌 연결 <i class="connDot"></i></button>
+    <button class="btn" id="btnHire">＋ 직원 뽑기</button>
+    <button class="btn ghost" data-act="settings" title="그 밖의 설정">⚙</button>
+  </header>
 
-<main class="board">
-  <aside class="people">
-    <div class="title">직원 <span class="muted small">👆 눌러서 일 시킬 사람 고르기</span></div>
-    <div id="emps" class="emps"></div>
-  </aside>
+  <div class="asks-box"></div>
 
-  <section class="main">
-    <nav class="tabs" id="tabs">
-      <button data-t="report" class="on" title="직원들이 사장님께 올린 보고">📋 받은 보고 <i id="cReport"></i></button>
-      <button data-t="grok" title="사장님·그록·클로드가 함께 이야기하는 곳">💬 그록과 이야기 <i id="cGrok"></i></button>
-      <button data-t="company" title="알들 컴퍼니의 그록 봇 부서에 일 시키기 (명령창과 같아요)">🏢 회사 일 시키기</button>
-      <button data-t="all" title="직원끼리 주고받은 것까지 전부">📚 모든 기록</button>
-    </nav>
-    <div id="feed" class="feed"></div>
+  <main class="board">
+    <aside class="people">
+      <div class="title">직원 <span class="muted small">👆 눌러서 일 시킬 사람 고르기</span></div>
+      <div id="emps" class="emps"></div>
+    </aside>
 
-    <div id="relayBox" class="relay" hidden></div>
+    <section class="main">
+      <nav class="tabs" id="tabs">
+        <button data-t="report" class="on" title="직원들이 사장님께 올린 보고">📋 받은 보고 <i id="cReport"></i></button>
+        <button data-t="grok" title="사장님·그록·클로드가 함께 이야기하는 곳">💬 그록과 이야기 <i id="cGrok"></i></button>
+        <button data-t="company" title="알들 컴퍼니의 그록 봇 부서에 일 시키기 (명령창과 같아요)">🏢 회사 일 시키기</button>
+        <button data-t="all" title="직원끼리 주고받은 것까지 전부">📚 모든 기록</button>
+      </nav>
+      <div id="feed" class="feed"></div>
 
-    <form id="say" class="say">
-      <div class="say-to" id="sayTo"></div>
-      <div class="say-row">
-        <textarea id="sayText" rows="2"></textarea>
-        <button class="btn big" type="submit" id="sayBtn">보내기</button>
-      </div>
-    </form>
-  </section>
-</main>
+      <div id="relayBox" class="relay" hidden></div>
+
+      <form id="say" class="say">
+        <div class="say-to" id="sayTo"></div>
+        <div class="say-row">
+          <textarea id="sayText" rows="2"></textarea>
+          <button class="btn big" type="submit" id="sayBtn">보내기</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
 
 <dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
 <div id="toast" class="toast" hidden></div>
 <script src="/ui/app.js"></script>
+<!-- 그록이 맡는 파일 (없어도 돼요): 회사 홈·부서 화면, 그록 쪽 연결 목록 -->
+<script src="/ui/connectors_grok.js"></script>
+<script src="/ui/home.js"></script>
 </body>
 </html>
