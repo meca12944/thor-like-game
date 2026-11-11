@@ -35,23 +35,32 @@ const mediaHtml = (files, url) => files.length ? `<div class="media">${files.map
 
 // ───────── 그리기 ─────────
 function render() {
+  renderAsks();
+  document.querySelectorAll('.connDot').forEach((x) => (x.textContent = !S.claude.ok || !S.settings.gameRepo ? '⚠' : S.settings.botFrom ? '🟢' : '⚪'));
+  for (const fn of stateHooks) { try { fn(S); } catch (e) { console.error(e); } }
+  if (view === 'home') { renderHome(); return setTitle(); }
   if (!target || !S.employees.some((e) => e.id === target)) target = (S.employees.find((e) => e.name === '팀장') || S.employees[0] || {}).id || '';
   const E = S.employees, working = E.filter((e) => e.status === 'working').length;
   $('#summary').innerHTML = E.length ? `직원 ${E.length}명 · <b>${working ? working + '명 일하는 중' : '모두 쉬는 중'}</b>` : '';
-  renderAsks(); renderEmps(); renderFeed(); renderRelay(); renderSay();
-  $('#connDot').textContent = !S.claude.ok || !S.settings.gameRepo ? '⚠' : S.settings.botFrom ? '🟢' : '⚪';
+  renderEmps(); renderFeed(); renderRelay(); renderSay();
   $('#cReport').textContent = S.reports.filter((r) => isBoss(r) && !r.read).length || '';
   const seen = Number(localStorage.getItem('grokSeen') || 0);
   $('#cGrok').textContent = tab === 'grok' ? '' : (S.grokLog.filter((g) => new Date(g.time) > seen).length || '');
+  setTitle();
+}
+function setTitle() {
   const n = S.pending.length + relays().length + S.reports.filter((r) => isBoss(r) && !r.read).length;
-  document.title = (n ? `(${n}) ` : '') + '클로드 작업장';
+  document.title = (n ? `(${n}) ` : '') + '알들 컴퍼니';
 }
 function renderAsks() {
   let h = '';
   if (!S.claude.ok) h += `<div class="banner-red"><b>클로드 코드를 못 찾았어요.</b> 폴더 안 「처음_설치.bat」 을 두 번 누르고, 로그인한 뒤 다시 켜 주세요.</div>`;
-  for (const p of S.pending) h += `<div class="ask"><div class="q"><b>🙋 ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">한 번 허락하면 다음부터 다시 안 물어요.</div></div>
+  for (const p of S.pending) h += p.danger
+    ? `<div class="ask danger"><div class="q"><b>⚠ ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">지우기·덮어쓰기·main 에 바로 올리기 같은 <b>위험한 일</b>이라 매번 물어요 (기억하지 않아요).</div></div>
+    <button class="btn green" data-ans="once" data-id="${p.id}">이번만 허락</button><button class="btn red" data-ans="no" data-id="${p.id}">거절</button></div>`
+    : `<div class="ask"><div class="q"><b>🙋 ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><code>${esc(p.detail)}</code><div class="note">한 번 허락하면 다음부터 다시 안 물어요.</div></div>
     <button class="btn green" data-ans="always" data-id="${p.id}">허락</button><button class="btn red" data-ans="no" data-id="${p.id}">거절</button></div>`;
-  $('#asks').innerHTML = h;
+  document.querySelectorAll('.asks-box').forEach((x) => (x.innerHTML = h));
 }
 function renderEmps() {
   if (!S.employees.length) { $('#emps').innerHTML = `<div class="empty">아직 직원이 없어요.<br><br><button class="btn" data-act="team">👥 기본 팀 한 번에 뽑기 (7명)</button><br><span class="small">팀장·UI·스토리·몬스터·효과·모션·AI협력팀</span><br><br><button class="link" data-act="hire">한 명씩 뽑기</button></div>`; return; }
@@ -331,6 +340,10 @@ function conns() {
       what: '클로드가 구글 드라이브·노션·깃허브 같은 바깥 서비스를 직접 쓰게 해 주는 연결이에요 (영어로 「MCP 커넥터」). 여기 목록에 나오는 것만 PC 직원들이 쓸 수 있어요.',
       how: `아래 「목록 보기」로 지금 이어진 것을 확인해요. 더 잇고 싶으면 이 대화방의 클로드에게 「○○ 연결해 줘」라고 말하면 순서를 알려 드려요. 지금 없어도 일하는 데는 문제없어요 (그록과는 🤖 그록 봇으로 이어져 있어요).${s.mcpList ? `<br><br>마지막 확인 (${ago(s.mcpList.at)}):<code style="display:block;white-space:pre-wrap;margin-top:4px">${esc(s.mcpList.text)}</code>` : ''}`,
       fields: '', act: 'mcp' },
+    { id: 'reports', ico: '☁', nm: '회사 보고 폴더', ds: '그록 팀장들의 보고를 보고 창에 띄워요', on: !!s.reportsFile, lamp: s.reportsFile ? '정해짐' : '안 정함',
+      what: '그록 팀장들이 검수한 보고를 사장님 구글 드라이브(사장님만 보는 곳)의 「알들 컴퍼니 보고」 폴더에 <b>reports.json</b> 으로 남겨요. 홈의 📋 보고 창이 이 파일을 읽어서 보여 줘요.',
+      how: 'PC에 「Google Drive 데스크톱」을 깔면 드라이브가 PC 폴더(예: G:\\내 드라이브)로 보여요. 그 안의 <b>알들 컴퍼니 보고\\reports.json</b> 파일 주소를 아래에 넣으세요. (파일에서 오른쪽 클릭 → 「경로로 복사」)',
+      fields: `<div class="field"><label>보고 파일 주소</label><input type="text" name="reportsFile" value="${esc(s.reportsFile || '')}" placeholder="예: G:\내 드라이브\알들 컴퍼니 보고\reports.json"></div>` },
     { id: 'xai', ico: '🔑', nm: '그록 키 (유료)', ds: '돈을 내고 그록과 완전 자동으로', on: s.grokWay === 'api', lamp: s.grokWay === 'api' ? '쓰는 중' : '안 씀',
       what: '그록 회사(xAI)의 유료 키예요. 그록 봇 없이도 완전 자동이지만, 쓴 만큼 돈이 나가요 (말 한 번 약 30원, 그림 1장 약 60원).',
       how: '보통은 필요 없어요. 쓰려면 console.x.ai 에서 키를 만들어 아래에 넣고 「이걸로 쓰기」에 체크하세요.',
@@ -342,8 +355,14 @@ function conns() {
 function connections() {
   dialog(`<h2>🔌 연결</h2><p class="muted">작업장과 이어지는 것들이에요. 눌러 보면 무엇인지, 어떻게 잇는지 나와요.</p>
     <div class="tiles">${conns().map((c) => `<button class="tile" value="c:${c.id}"><span class="lamp ${c.on ? 'on' : 'off'}">${c.on ? '🟢' : '⚪'} ${c.lamp}</span><div class="ico">${c.ico}</div><div class="nm">${c.nm}</div><div class="ds">${c.ds}</div></button>`).join('')}</div>
+    ${(window.AldeulGrokConnectors || []).length ? `<h3>🤖 그록 쪽 연결 (보기용)</h3><div class="tiles">${window.AldeulGrokConnectors.map((c, i) => `<button class="tile" value="g:${i}">${c.on != null ? `<span class="lamp ${c.on ? 'on' : 'off'}">${c.on ? '🟢' : '⚪'}</span>` : ''}<div class="ico">${esc(c.ico || '🔗')}</div><div class="nm">${esc(c.nm || '')}</div><div class="ds">${esc(c.ds || '')}</div></button>`).join('')}</div>` : ''}
     <div class="dlg-foot"><button class="btn ghost" value="cancel">닫기</button></div>`,
-  async (fd, v) => { if (v.startsWith('c:')) setTimeout(() => connOne(v.slice(2)), 30); });
+  async (fd, v) => {
+    if (v.startsWith('c:')) setTimeout(() => connOne(v.slice(2)), 30);
+    if (v.startsWith('g:')) { const c = (window.AldeulGrokConnectors || [])[Number(v.slice(2))]; if (c) setTimeout(() => dialog(`<div class="conn-head"><span class="ico">${esc(c.ico || '🔗')}</span><div><h2 style="margin:0">${esc(c.nm || '')}</h2><span class="muted small">그록 쪽 연결 — 보기용</span></div></div>
+      <div class="qa"><div class="qh">이게 뭐예요?</div>${esc(c.what || c.ds || '')}</div>${c.func ? `<div class="qa"><div class="qh">무슨 기능?</div>${esc(c.func)}</div>` : ''}${c.how ? `<div class="qa"><div class="qh">어떻게 켜요?</div>${esc(c.how)}</div>` : ''}
+      <div class="dlg-foot"><button class="btn ghost" value="back" style="margin-right:auto">← 연결 목록</button><button class="btn ghost" value="cancel">닫기</button></div>`, async (f2, v2) => { if (v2 === 'back') setTimeout(connections, 30); }), 30); }
+  });
 }
 function connOne(id) {
   const c = conns().find((x) => x.id === id); if (!c) return;
@@ -379,12 +398,15 @@ function connOne(id) {
 // ───────── ❓ 사용법 ─────────
 function guide() {
   dialog(`<h2>❓ 클로드 작업장 쓰는 법</h2>
+    <p>처음 화면은 <b>🏢 알들 컴퍼니 홈</b>이에요: 📋 보고 창 + 부서 아이콘. 부서를 누르면 일을 시킬 수 있고, <b>🎮 게임 필멸자 → 🧠 클로드 작업장 열기</b>로 클로드 직원들에게 가요.</p>
+    <p class="muted small">클로드 작업장에서는 이렇게 해요:</p>
     <div class="guide">
       <div class="g"><div class="big">👆</div><b>1. 직원 고르기</b><span>왼쪽에서 일 시킬 직원 이름을 눌러요.<br>모르겠으면 <b>팀장</b>에게!</span></div>
       <div class="g"><div class="big">✍️</div><b>2. 할 일 적기</b><span>맨 아래 칸에 할 일을 적고<br><b>Enter</b> 를 눌러요.</span></div>
       <div class="g"><div class="big">📋</div><b>3. 보고 보기</b><span>일이 끝나면 「받은 보고」에<br>글·사진·영상이 와요.</span></div>
     </div>
     <ul class="tips">
+      <li>⚠ 지우기·덮어쓰기 같은 <b>위험한 일</b>은 허락해도 기억하지 않고 매번 물어요.</li>
       <li>🙋 위에 <b>노란 칸 「해도 될까요?」</b>가 뜨면 <b>허락</b>을 눌러요. 한 번 허락하면 다시 안 물어요.</li>
       <li>💬 <b>그록과 이야기</b> 칸에서 그록에게 말하거나, 클로드와 그록에게 회의를 시킬 수 있어요.</li>
       <li>🔌 <b>연결</b>에서 그록 봇·게임 폴더·깃허브·PixelLab 같은 것을 이어요 (아이콘 11개). 아이콘을 누르면 「이게 뭐예요? / 어떻게 해요?」가 나와요. 🟢 = 이어짐, ⚪ = 아직.</li>
@@ -500,10 +522,17 @@ $('#relayBox').addEventListener('dragover', (ev) => ev.preventDefault());
 $('#relayBox').addEventListener('drop', (ev) => { ev.preventDefault(); addFiles(ev.dataTransfer.files); });
 document.addEventListener('pause', () => { if ($('#feed').dataset.dirty) renderFeed(); }, true);
 $('#btnHire').onclick = () => hire();
-$('#btnCompany').onclick = () => { if (S.settings.companyUrl) window.open(S.settings.companyUrl, '_blank'); };
-$('#btnSettings').onclick = settings;
-$('#btnConn').onclick = connections;
-$('#btnHelp').onclick = guide;
+// 위 단추들 (두 화면 공통)
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act;
+  if (a === 'help') guide();
+  if (a === 'conn') connections();
+  if (a === 'settings') settings();
+  if (a === 'home') showView('home');
+  if (a === 'dept') openDept(t.dataset.id);
+  if (a === 'coopall') coopDialog();
+});
 setInterval(() => { if (S.employees.some((e) => e.status === 'working')) renderEmps(); }, 30000);
 
 // ───────── 실시간 연결 ─────────
@@ -533,5 +562,90 @@ function connect() {
   });
   es.onerror = () => { $('#summary').innerHTML = '<span style="color:var(--red)">회사 본체와 연결이 끊겼어요. 다시 잇는 중…</span>'; };
 }
+
+// ───────── 화면 바꾸기 · 회사 홈 (그록 설계안 1번, 사장님 「좋아」) ─────────
+let view = 'home';
+const stateHooks = [];
+function showView(v) {
+  view = v === 'workshop' ? 'workshop' : 'home';
+  $('#view-home').hidden = view !== 'home';
+  $('#view-workshop').hidden = view !== 'workshop';
+  render();
+}
+function renderHome() {
+  const el = $('#home'); if (!el || view !== 'home') return;
+  const E = S.employees, working = E.filter((e) => e.status === 'working').length;
+  $('#homeSummary').innerHTML = `🧠 클로드 직원 ${E.length}명${working ? ` · <b>${working}명 일하는 중</b>` : ''}`;
+  if (window.AldeulHome && typeof window.AldeulHome.render === 'function') { try { window.AldeulHome.render(el, window.Aldeul); return; } catch (e) { console.error(e); } }
+  renderHomeDefault(el);
+}
+let companyReports = { items: [], error: '', at: 0 };
+async function loadReports() {
+  try { const r = await fetch('/api/company/reports').then((x) => x.json()); companyReports = { items: r.items || [], error: r.ok ? '' : (r.error || ''), at: Date.now() }; } catch (e) { companyReports.error = '못 읽었어요'; }
+  return companyReports;
+}
+function deptPack() { const t = S.botTargets; return t && Array.isArray(t.depts) ? t : { depts: [], bots: [] }; }
+// 기본 홈 (그록의 home.js 가 들어오기 전까지 쓰는 단순한 판)
+function renderHomeDefault(el) {
+  if (Date.now() - companyReports.at > 60000) loadReports().then(() => view === 'home' && renderHome());
+  const pack = deptPack();
+  const mine = S.reports.filter(isBoss).slice(0, 4).map((r) => ({ time: r.time, who: '🧠 ' + r.empName, text: r.text.split('\n').filter(Boolean).slice(0, 3).join('\n') }));
+  const theirs = companyReports.items.slice(0, 6).map((r) => ({ time: r.time, who: '🏢 ' + (r.target || r.lead || '그록 팀'), text: (r.status ? `[${r.status}] ` : '') + (r.summary.join('\n') || r.command) }));
+  const feed = mine.concat(theirs).sort((a, b) => String(b.time).localeCompare(String(a.time))).slice(0, 8);
+  el.innerHTML = `<div class="home-wrap">
+    <section><div class="title">📋 보고 창 <span class="muted small">일이 끝나면 여기 올라와요</span></div>
+      ${feed.length ? feed.map((f) => `<div class="card"><div class="card-head"><b>${esc(f.who)}</b><time>${ago(f.time)}</time></div><div class="text">${md(f.text)}</div></div>`).join('') : `<div class="empty">아직 보고가 없어요.${companyReports.error ? `<br><span class="small">회사 보고: ${esc(companyReports.error)} — 🔌 연결 → ☁ 회사 보고 폴더</span>` : ''}</div>`}
+    </section>
+    <section><div class="title">🏢 부서 <span class="muted small">눌러서 일 시키기</span></div>
+      <div class="tiles">${(pack.depts.length ? pack.depts : [{ id: 'game', name: '게임 필멸자', icon: '🎮', sub: '게임 코드·그림·영상·음악' }]).map((d) => `<button class="tile" data-act="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div></button>`).join('')}</div>
+      <div class="title" style="margin-top:16px">💬 클로드 ↔ 그록 대화 <span class="muted small">둘이 깃허브에서 나눈 말</span></div>
+      <div id="homeChat"></div>
+    </section></div>`;
+  chatWidget($('#homeChat'), 4);
+}
+function openDept(id) {
+  const pack = deptPack();
+  const d = pack.depts.find((x) => x.id === id) || { id: 'game', name: '게임 필멸자', icon: '🎮' };
+  const bots = pack.bots.filter((b) => b.dept === d.id);
+  const game = d.id === 'game';
+  dialog(`<div class="conn-head"><span class="ico">${d.icon || '🏢'}</span><div><h2 style="margin:0">${esc(d.name)}</h2><span class="muted small">${esc(d.sub || '')}</span></div></div>
+    ${game ? `<div class="qa"><div class="qh">🧠 클로드 작업장</div>클로드 직원 ${S.employees.length}명이 게임 코드·문서를 맡아요. 허락·보고도 여기서 해요.<div class="row-btns" style="margin-top:8px"><button class="btn" value="workshop">🧠 클로드 작업장 열기</button></div></div>` : ''}
+    <div class="qa"><div class="qh">👥 팀원</div>${bots.length ? bots.map((b) => `• <b>${esc(b.name)}</b>${b.lead ? ' (팀장)' : ''} — ${esc(b.role || '')}`).join('<br>') : '아직 목록이 없어요.'}</div>
+    <div class="field"><label>✍️ 이 부서에 일 시키기</label><textarea name="cmd" rows="3" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg)" placeholder="예: ${game ? '보스 그림 시트 정리해서 보고해' : '오늘 할 일 정리해서 보고해'}"></textarea>
+      <div class="help">보내면 그 부서 팀장이 나눠 맡기고, 검수해서 보고 창에 올려요.</div></div>
+    <div class="err-text"></div>
+    <div class="dlg-foot"><button class="btn ghost" value="cancel">닫기</button><button class="btn" value="send">보내기</button></div>`,
+  async (fd, v) => {
+    if (v === 'workshop') { showView('workshop'); return; }
+    const command = String(fd.cmd || '').trim(); if (!command) return '할 일을 적어 주세요.';
+    const r = await api('/api/bot/command', { target: d.name, command });
+    if (!r.ok) return r.error || '못 보냈어요';
+    toast(`📣 ${d.name}에 보냈어요`);
+  });
+}
+// 💬 클로드↔그록 대화 창 (그록 설계안 6번: 깃허브 #207 댓글, 읽기 전용)
+const WHO = { grok: '🤖 그록', claude: '🧠 클로드', boss: '👤 사장님' };
+async function chatWidget(el, n) {
+  if (!el) return;
+  let d; try { d = await fetch('/api/coop/chat').then((r) => r.json()); } catch (e) { el.innerHTML = '<div class="empty small">대화를 못 불러왔어요.</div>'; return; }
+  const items = (d.items || []).slice(-(n || 50));
+  el.innerHTML = items.length ? `<div class="chat">${items.map((c) => `<div class="bubble ${c.who === 'grok' ? 'grok' : c.who === 'claude' ? 'claude' : 'boss'}"><div class="who">${WHO[c.who]} · ${ago(c.time)} · <a href="${esc(c.url)}" target="_blank">원문</a></div>${md(c.text.length > 700 && n ? c.text.slice(0, 700) + '…' : c.text)}</div>`).join('')}</div>
+    <div class="row-btns" style="margin-top:8px">${n ? '<button class="btn ghost small" data-act="coopall">💬 대화 모두 보기</button>' : ''}<a class="btn ghost small" href="${esc(d.issueUrl)}" target="_blank" style="text-decoration:none">깃허브에서 보기</a></div>`
+    : '<div class="empty small">아직 대화가 없어요. (몇 분마다 새로 읽어요)</div>';
+}
+function coopDialog() {
+  dialog(`<h2>💬 클로드 ↔ 그록 대화</h2><p class="muted small">둘이 깃허브 「AI협력 대화방」에서 나눈 말이에요. 읽기만 해요.</p><div id="coopAll" style="max-height:62vh;overflow:auto"></div><div class="dlg-foot"><button class="btn ghost" value="cancel">닫기</button></div>`);
+  fetch('/api/coop/chat?refresh=1').then(() => setTimeout(() => chatWidget($('#coopAll'), 0), 1500));
+  chatWidget($('#coopAll'), 0);
+}
+// 그록 home.js 가 쓰는 창구
+window.Aldeul = {
+  get state() { return S; }, api, showView, toast, copy, esc, md, ago, chatWidget, avatar,
+  reports: loadReports,
+  onState(fn) { stateHooks.push(fn); },
+  openConnections: () => connections(), openWorkshop: () => showView('workshop'), openDept, openSettings: () => settings(), openHelp: () => guide(),
+  get view() { return view; },
+};
+
 connect();
 try { if (!localStorage.getItem('guideSeen')) { localStorage.setItem('guideSeen', '1'); setTimeout(guide, 800); } } catch (e) { /* */ }
