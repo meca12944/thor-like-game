@@ -200,26 +200,46 @@ function ruleMatches(rule, tool, input) {
   if (tool === 'WebFetch' && m[2].startsWith('domain:')) { try { return new URL(input.url).hostname === m[2].slice(7); } catch (e) { return false; } }
   return false;
 }
-// 위험한 일: 지우기·억지 덮어쓰기·main 에 바로 올리기·배포·결제 → 「허락」을 눌러도 기억하지 않고 매번 물어요
+// 위험한 일: 지우기·배포·결제·push → 「허락」을 눌러도 기억하지 않고 매번 물어요 (사장님 11-11)
+// 명령 한 토막(&&·|·; 로 나눈 것)마다 맨 앞 낱말로 본다. 읽기만 하는 명령(grep·git log 등)은 글 속에 낱말이 있어도 괜찮음.
 const DANGER = [
-  /\brm\s+-[a-z]*r[a-z]*f|\brm\s+-[a-z]*f[a-z]*r/i,
-  /\b(rmdir|rd)\s+\/s\b|\bdel\s+\/[sqf]|Remove-Item\b[^\n]*-Recurse/i,
-  /\bgit\s+push\b[^\n]*(\s--force(-with-lease)?\b|\s-f\b|\s\+\S)/i,
-  /\bgit\s+push\b[^\n]*\s(HEAD:)?(refs\/heads\/)?(main|master)\b/i,
-  /\bgit\s+(reset\s+--hard|clean\s+-[a-z]*f|branch\s+-D)\b|\bgit\s+push\b[^\n]*--delete\b/i,
-  /\b(npm|yarn|pnpm)\s+publish\b|\b(vercel|netlify|firebase)\b[^\n]*\bdeploy\b|\bgh\s+(release\s+create|pr\s+merge)\b/i,
-  /\b(stripe|paypal|payment)\b|결제/i,
+  ['지우기', /^(rm|rmdir|del|erase|rd|unlink|shred|format|Remove-Item|ri|Clear-Content)(\s|$)|^git\s+(rm|clean)\b|^git\s+branch\s.*(-d|-D|--delete)\b|^git\s+reset\s.*--hard\b|^git\s+(stash\s+(drop|clear)|worktree\s+remove)\b|^(gh|npm|docker|kubectl)\s.*\b(delete|rm|rmi|prune|unpublish)\b/i],
+  ['배포', /^(\S+\s+){0,2}(deploy|publish)\b|^(vercel|netlify|firebase|wrangler|fly|flyctl|heroku|gh-pages|surge)(\s|$)|^gh\s+(release\s+(create|upload)|workflow\s+run)\b|^(terraform|kubectl|helm)\s+(apply|install|upgrade)\b/i],
+  ['결제', /\b(pay|payment|purchase|billing|charge|subscribe|stripe|paypal)\b|결제|구매/i],
+  ['push', /^git\s+(-\S+\s+\S+\s+)*push\b|^(docker|podman|helm)\s+push\b|^gh\s+pr\s+merge\b|^gh\s+repo\s+sync\b/i],
 ];
-function isDanger(tool, input) {
-  if (tool !== 'Bash' && tool !== 'PowerShell') return false;
-  const c = String((input && input.command) || '');
-  return DANGER.some((r) => r.test(c));
+const READ_ONLY = /^(grep|rg|findstr|echo|cat|type|head|tail|less|more|ls|dir|wc|Select-String|sls|Get-Content|gc|git\s+(log|show|diff|status|grep|blame))(\s|$)/i;
+function dangerOfText(one) {
+  const s = String(one || '').trim().replace(/^(sudo|&)\s+/, '').replace(/^cmd(\.exe)?\s+\/c\s+/i, '');
+  if (READ_ONLY.test(s)) return '';
+  for (const [kind, re] of DANGER) if (re.test(s)) return kind;
+  return '';
 }
-// 이 낱말로 시작하는 허락은 클로드 코드에 미리 넘기지 않고 회사 창구에서 한 번 더 살펴봄 (위험한 변형을 막으려고)
-const RISKY_PREFIX = ['rm', 'del', 'rmdir', 'rd', 'Remove-Item', 'git push', 'git reset', 'git clean', 'git branch', 'npm publish', 'vercel', 'netlify', 'firebase', 'gh release', 'gh pr'];
+// 위험하면 종류(지우기·배포·결제·push)를, 아니면 '' 를 돌려줌. 셸 명령 말고 연결 도구(MCP)도 이름으로 봄
+function isDanger(tool, input) {
+  if (tool === 'Bash' || tool === 'PowerShell') { for (const one of splitShell(input && input.command)) { const k = dangerOfText(one); if (k) return k; } return ''; }
+  const name = String(tool || '');
+  if (/(delete|trash|remove|destroy|purge)/i.test(name)) return '지우기';
+  if (/(deploy|publish|release)/i.test(name)) return '배포';
+  if (/(pay|billing|purchase|checkout|charge|stripe|subscription)/i.test(name)) return '결제';
+  if (/(^|_|-)push(_|-|$)|merge_pull/i.test(name)) return 'push';
+  return '';
+}
+// 규칙 자체가 위험한 일인지 (⚙ 설정 허락 목록에 「⚠ 매번 물어요」 표시)
+function ruleIsDanger(rule) {
+  const m = String(rule).match(/^(Bash|PowerShell)\((.*)\)$/);
+  return m ? !!dangerOfText(m[2].replace(/:\*$/, '')) : !!isDanger(String(rule).replace(/\(.*$/, ''), {});
+}
+// 클로드 코드에 미리 넘겨도 되는 허락인지. 위험한 일까지 통째로 푸는 규칙(셸 전체·git:*·rm:* 등)은 빼서 회사 창구에서 한 번 더 봄
 function safeForCli(rule) {
-  const m = rule.match(/^(Bash|PowerShell)\((.+?)(:\*)?\)$/);
-  return !m || !RISKY_PREFIX.some((p) => m[2] === p || m[2].startsWith(p + ' '));
+  const m = String(rule).match(/^([^(]+)(?:\((.*)\))?$/);
+  if (!m) return true;
+  if (m[1] === 'Bash' || m[1] === 'PowerShell') {
+    if (!m[2]) return false;
+    const pre = m[2].replace(/:\*$/, '').trim();
+    return !dangerOfText(pre) && !BASH_TWO.includes(pre) && !/^(sh|bash|cmd|cmd\.exe|sudo|env|xargs|eval)$/i.test(pre);
+  }
+  return !isDanger(m[1], {});
 }
 function isAllowed(tool, input) {
   if (isDanger(tool, input)) return false;
@@ -463,7 +483,9 @@ function finishRun(emp, task, run) {
   }
   // 사장님께 가는 보고 = 사장님이 시킨 직원이 남에게 더 넘기지 않고 낸 답 (또는 사장님 확인·문제)
   const toBoss = (task.root || emp.id) === emp.id && forwards.filter((f) => f.to !== '사장님').length === 0;
-  const rep = { id: uid(), emp: emp.id, empName: emp.name, time: now(), from: task.from, kind: task.kind || 'ask', toBoss, task: task.text, text, files: findMedia(emp, text), cost: run.cost, denials: run.denials, isError: run.isError, stopped: !!run.stopped, needBoss: asks.length > 0, asks, read: false, forwards: [] };
+  const rep = { id: uid(), emp: emp.id, empName: emp.name, time: now(), from: task.from, kind: task.kind || 'ask', toBoss, task: task.text, text, files: findMedia(emp, text), cost: run.cost, denials: run.denials, isError: run.isError, stopped: !!run.stopped, needBoss: asks.length > 0, asks, read: false, forwards: [],
+    summary: text.split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 3), // 보고 글 앞쪽 3줄
+    status: run.isError || run.stopped ? '문제 있음' : '완료' };
   state.reports.unshift(rep);
   if (state.reports.length > 300) state.reports.length = 300;
   emp.status = run.isError ? 'error' : 'idle'; emp.now = run.isError ? '문제가 생겼어요' : ''; emp.task = null;
@@ -758,10 +780,11 @@ function publicState() {
     botHistory: state.botHistory.slice(0, 50),
     grokLog: state.grokLog.slice(-150).map((g) => ({ ...g, files: g.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
     rules: state.rules,
+    rulesAsk: state.rules.filter(ruleIsDanger), // 목록에 있어도 매번 다시 묻는 규칙 (⚙ 설정에 ⚠ 표시)
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
     employees: state.employees.map((e) => ({ id: e.id, name: e.name, role: e.role, partner: !!e.partner, folder: e.folder, mode: e.mode, model: e.model, status: e.status, now: e.now, queue: e.queue.length, task: e.task ? e.task.text : '', taskFrom: e.task ? e.task.from : '', startedAt: e.startedAt, hasSession: !!e.started })),
     reports: state.reports.slice(0, 120).map((r) => ({ ...r, files: r.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
-    pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, danger: !!p.danger, label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
+    pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, danger: p.danger || '', label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
   };
 }
 

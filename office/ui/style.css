@@ -88,3 +88,7 @@
 .home-main { flex: 1; overflow: auto; padding: 16px 22px 22px; }
 .home-wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; }
 .home-wrap section { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ⚙ 설정 안 허락 목록: ⚠ = 지우기·배포·결제·push → 매번 다시 물음 */
+.set-rules { max-height: 200px; overflow: auto; }
+.rules span.ask-every { border-color: var(--amber); background: var(--amber-soft); }
