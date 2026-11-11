@@ -26,9 +26,12 @@ jobs:
       - name: 모든 브랜치 기록 받기
         run: git fetch --filter=blob:none origin '+refs/heads/*:refs/remotes/origin/*'
       - name: 업무판 채우기
-        run: python3 tools/team_board.py --main origin/main
+        run: |
+          if [ ! -f tools/team_board.py ]; then echo "main 에 아직 업무판 도구가 없음 (합치기 전) — 건너뜀"; exit 0; fi
+          python3 tools/team_board.py --main origin/main
       - name: 바뀌었으면 올리기
         run: |
+          if [ ! -f tools/team_board.py ]; then exit 0; fi
           if git diff --quiet -- handoff/GROK_BRIEFING_ko.md; then echo "바뀐 것 없음"; exit 0; fi
           git config user.name "team-board-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
