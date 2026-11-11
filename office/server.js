@@ -96,6 +96,8 @@ function detectClaude() {
     };
     const run = (args, cb) => {
       const p = spawn(quoteIf(claude.path), args.map(quoteIf), { shell: claude.useShell, windowsHide: true });
+      const t = setTimeout(() => { try { p.kill(); } catch (e) { /* */ } }, 15000);
+      p.on('close', () => clearTimeout(t));
       let out = '';
       p.stdout.on('data', (d) => (out += d));
       p.on('error', (e) => cb(e));
@@ -869,15 +871,18 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { json(res, { ok: false, error: e.message }, 500); }
 });
 
-detectClaude().then(() => {
-  server.on('error', (e) => {
-    if (e.code === 'EADDRINUSE') { console.log('클로드 작업장이 이미 켜져 있어요. 창만 엽니다.'); process.exit(0); }
-    throw e;
-  });
-  server.listen(state.settings.port, '127.0.0.1', () => {
-    console.log(`클로드 작업장 문 열림: http://127.0.0.1:${state.settings.port}`);
+// 문을 먼저 열고(창이 바로 뜨게), 클로드 코드 찾기는 뒤에서 (11-11 PC 첫 실행 「연결을 거부했습니다」 고침)
+process.on('uncaughtException', (e) => { console.error('[멈추지 않고 계속] ' + (e && e.stack || e)); });
+process.on('unhandledRejection', (e) => { console.error('[멈추지 않고 계속] ' + (e && e.stack || e)); });
+server.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') { console.log('클로드 작업장이 이미 켜져 있어요. 창만 엽니다.'); process.exit(0); }
+  console.error('문을 못 열었어요: ' + e.message); process.exit(1);
+});
+server.listen(state.settings.port, '127.0.0.1', () => {
+  console.log(`클로드 작업장 문 열림: http://127.0.0.1:${state.settings.port}`);
+  detectClaude().then(() => {
     console.log(claude.ok ? `클로드 코드 찾음 (${claude.version})` : '클로드 코드를 못 찾았어요. 설치 안내를 보세요.');
-    // 꺼지기 전에 남아 있던 일 이어서
-    for (const e of state.employees) next(e);
+    changed();
+    for (const e of state.employees) next(e); // 꺼지기 전에 남아 있던 일 이어서
   });
 });
