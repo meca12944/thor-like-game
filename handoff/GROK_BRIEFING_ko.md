@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:58 한국 시각, main `47c6e5f2 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 20:03 한국 시각, main `af8ac7a1 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,7 +42,7 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
-- 11-11 · `grok/office-dept-reports` — main의 입력 고침을 부서 보고 화면에 맞춤
+- 11-11 · `grok/office-dept-reports` — main의 연결 화면과 새 팀원 둘을 부서 보고에 맞춤
 - 11-11 · `cursor/ai-office-bots-a7f8` — AI 협력·연결에 그록 팀원 둘을 더함
 - 11-11 · `grok/office-connections` — 연결·기능 화면을 넣어 이어진 것과 단추 설명을 보여요
 - 11-11 · `grok/office-input-fix` — 글 쓰는 동안 입력칸이 지워지지 않게 함
