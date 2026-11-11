@@ -642,13 +642,20 @@ function openDept(id) {
 }
 // 💬 클로드↔그록 대화 창 (그록 설계안 6번: 깃허브 #207 댓글, 읽기 전용)
 const WHO = { grok: '🤖 그록', claude: '🧠 클로드', boss: '👤 사장님' };
+const chatDrawn = new WeakMap();
 async function chatWidget(el, n) {
   if (!el) return;
   let d; try { d = await fetch('/api/coop/chat').then((r) => r.json()); } catch (e) { el.innerHTML = '<div class="empty small">대화를 못 불러왔어요.</div>'; return; }
   const items = (d.items || []).slice(-(n || 50));
-  el.innerHTML = items.length ? `<div class="chat">${items.map((c) => `<div class="bubble ${c.who === 'grok' ? 'grok' : c.who === 'claude' ? 'claude' : 'boss'}"><div class="who">${WHO[c.who]} · ${ago(c.time)} · <a href="${esc(c.url)}" target="_blank">원문</a></div>${md(c.text.length > 700 && n ? c.text.slice(0, 700) + '…' : c.text)}</div>`).join('')}</div>
+  const html = items.length ? `<div class="chat">${items.map((c) => `<div class="bubble ${c.who === 'grok' ? 'grok' : c.who === 'claude' ? 'claude' : 'boss'}"><div class="who">${WHO[c.who]} · ${ago(c.time)} · <a href="${esc(c.url)}" target="_blank">원문</a></div>${md(c.text.length > 700 && n ? c.text.slice(0, 700) + '…' : c.text)}</div>`).join('')}</div>
     <div class="row-btns" style="margin-top:8px">${n ? '<button class="btn ghost small" data-act="coopall">💬 대화 모두 보기</button>' : ''}<a class="btn ghost small" href="${esc(d.issueUrl)}" target="_blank" style="text-decoration:none">깃허브에서 보기</a></div>`
     : '<div class="empty small">아직 대화가 없어요. (몇 분마다 새로 읽어요)</div>';
+  if (chatDrawn.get(el) === html) return;
+  const top = el.scrollTop;
+  const atTop = top < 8;
+  chatDrawn.set(el, html);
+  el.innerHTML = html;
+  el.scrollTop = atTop ? 0 : top;
 }
 // coopChat(el): el 안에 협력 대화방(깃허브 #207) 글을 모두 그린다. 모양은 theme.css 변수만 쓰는 .chat/.bubble (그록 홈 화면에서도 Aldeul.coopChat(el) 로 씀)
 function coopChat(el) { return chatWidget(el, 0); }
