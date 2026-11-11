@@ -1,0 +1,37 @@
+# 업무 공유판 자동 갱신 (사장님 11-11 「공짜 업무 공유판 만들어」)
+# main 에 무엇이 들어오거나 다른 브랜치에 작업이 올라오면, handoff/GROK_BRIEFING_ko.md 의 자동 칸을 새로 채워 main 에 올린다.
+# 그록·다른 클로드는 https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md 하나만 읽으면 된다.
+name: team-board
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['handoff/GROK_BRIEFING_ko.md']
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: team-board
+  cancel-in-progress: false
+jobs:
+  board:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          filter: blob:none
+      - name: 모든 브랜치 기록 받기
+        run: git fetch --filter=blob:none origin '+refs/heads/*:refs/remotes/origin/*'
+      - name: 업무판 채우기
+        run: python3 tools/team_board.py --main origin/main
+      - name: 바뀌었으면 올리기
+        run: |
+          if git diff --quiet -- handoff/GROK_BRIEFING_ko.md; then echo "바뀐 것 없음"; exit 0; fi
+          git config user.name "team-board-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add handoff/GROK_BRIEFING_ko.md
+          git commit -m "업무 공유판 자동 갱신 [skip ci]"
+          git pull --rebase origin main && git push origin HEAD:main

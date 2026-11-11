@@ -227,6 +227,7 @@ function officePrompt(emp) {
   - \`grok spent\` : 오늘 쓴 돈. 하루 한도 $${state.settings.grokBudget || 5} 를 넘으면 도구가 멈춘다.
   - 그록과 주고받은 말·그림은 회사 화면 「그록 터널」에 저절로 보인다. 받은 그림은 9장 규칙(빛·효과 빼기, 투명 PNG, 기준 그림과 나란히 검수)으로 검사하고, 보고에 경로와 **쓴 돈**을 적는다.
   - 터널이 안 될 때(키 없음·한도)는 예전처럼 드라이브 폴더 + 붙여넣기 글로 한다.
+- **업무 공유판**: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md — 그록·다른 AI와 새 대화를 시작할 때 이 주소를 먼저 읽게 한다 (최신 결정·진행이 저절로 채워져 있음).
 - 그 밖의 AI(제미나이·챗GPT 등)와 일할 때도 같은 방식: 부탁 글은 \`\`\` 블록으로, 받은 결과는 검사해서 보고.
 ` : '';
   return `# 클로드 회사 (사장님 PC의 업무 화면)

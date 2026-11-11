@@ -303,6 +303,11 @@ $('#roomBar').addEventListener('submit', async (ev) => {
   $('#roomText').value = '';
 });
 $('#roomText').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); $('#roomBar').requestSubmit(); } });
+$('#btnBoard').onclick = async (ev) => {
+  const t = ev.currentTarget;
+  await navigator.clipboard.writeText('우리 팀 업무 공유판이야. 일하기 전에 꼭 읽고, 여기 적힌 결정과 규칙을 따라 줘: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md');
+  t.textContent = '복사됨 ✓ 그록에 붙여 넣기'; setTimeout(() => (t.textContent = '업무판 주소 복사'), 2500);
+};
 $('#btnHire').onclick = () => hire();
 $('#btnFolder').onclick = async () => { const r = await api('/api/grokCheck'); if (!r.ok) alert(r.error); };
 $('#btnSettings').onclick = settings;
