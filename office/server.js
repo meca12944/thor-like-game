@@ -1371,6 +1371,7 @@ const server = http.createServer(async (req, res) => {
       changed(); return json(res, { ok: true });
     }
     if (p === '/api/rules') { if (Array.isArray(b.rules)) state.rules = b.rules.map(String).filter(Boolean); changed(); return json(res, { ok: true }); }
+    if (p === '/api/report/bossdone') { const r = state.reports.find((x) => x.id === b.id); if (r) { r.bossDone = true; r.read = true; } changed(); return json(res, { ok: !!r }); } // ✅ 사장님 결재 끝
     if (p === '/api/report/read') { for (const r of state.reports) if (b.all || r.id === b.id) r.read = true; changed(); return json(res, { ok: true }); }
     if (p === '/api/report/delete') { state.reports = state.reports.filter((r) => r.id !== b.id); changed(); return json(res, { ok: true }); }
     if (p === '/api/quit') { json(res, { ok: true }); state.employees.forEach((e) => stopEmp(e, false)); setTimeout(() => process.exit(0), 500); return; }

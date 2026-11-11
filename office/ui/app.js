@@ -44,6 +44,7 @@ function render() {
   $('#summary').innerHTML = E.length ? `직원 ${E.length}명 · <b>${working ? working + '명 일하는 중' : '모두 쉬는 중'}</b>` : '';
   renderEmps(); renderFeed(); renderRelay(); renderSay();
   $('#cReport').textContent = S.reports.filter((r) => isBoss(r) && !r.read).length || '';
+  $('#cBoss').textContent = (S.pending.length + bossWaiting().length) || '';
   const seen = Number(localStorage.getItem('grokSeen') || 0);
   $('#cGrok').textContent = tab === 'grok' ? '' : (S.grokLog.filter((g) => new Date(g.time) > seen).length || '');
   setTitle();
@@ -96,6 +97,7 @@ function renderFeed() {
   box.dataset.dirty = '';
   if (tab === 'grok') return renderChat(box);
   if (tab === 'company') return renderCompany(box);
+  if (tab === 'boss') return renderBoss(box);
   let list = S.reports;
   let head = '';
   if (tab === 'report') list = list.filter(isBoss);
@@ -108,6 +110,34 @@ function renderFeed() {
     clearTimeout(renderFeed._r);
     renderFeed._r = setTimeout(() => { if (tab === 'report' && list.some((r) => !r.read)) api('/api/report/read', { all: true }); }, 4000);
   }
+}
+// ✅ 사장님 결재 (사장님 11-11 「결재건 탭 따로 만들어서 모든 결재 및 보고 간단히 올려」)
+// 위: 허락 기다리는 일 + 직원이 「@사장님:」 으로 물은 것(「결재 끝」 누르기 전까지). 아래: 클로드·그록 보고를 한 줄씩.
+function bossWaiting() { return S.reports.filter((r) => r.needBoss && r.asks && r.asks.length && !r.bossDone); }
+function bossLine(r) {
+  const src = Array.isArray(r.summary) && r.summary.length ? r.summary : String(r.text || '').split('\n');
+  const lines = src.map((l) => String(l).replace(/^[#>*\-\s]+/, '').replace(/\*\*/g, '').trim())
+    .filter((l) => l && !/^@전달|^@사장님|^```/.test(l));
+  return lines[0] || '보고가 왔어요.';
+}
+function renderBoss(box) {
+  if (Date.now() - companyReports.at > 60000) loadReports().then(() => tab === 'boss' && renderFeed());
+  const wait = bossWaiting();
+  const perm = S.pending.map((p) => `<div class="card boss"><div class="card-head">${avatar(p.empName)}<b>${esc(p.empName)}</b><span class="muted small">${p.danger ? '⚠ 위험한 일 · 매번 물어요' : '허락'}</span></div>
+      <div class="text">「${esc(p.label)}」 해도 될까요?</div>
+      <div class="card-foot"><span class="sp"></span><button class="btn green" data-ans="${p.danger ? 'once' : 'always'}" data-id="${p.id}">${p.danger ? '이번만 허락' : '허락'}</button><button class="btn red" data-ans="no" data-id="${p.id}">거절</button></div></div>`).join('');
+  const asks = wait.map((r) => `<div class="card boss"><div class="card-head">${avatar(r.empName)}<b>${esc(r.empName)}</b><time>${ago(r.time)}</time></div>
+      <div class="text">${r.asks.map((a) => '🙋 ' + esc(a)).join('<br>')}</div>
+      <div class="card-foot"><span class="muted small">📋 ${esc(String(r.task || '').split('\n')[0].slice(0, 80))}</span><span class="sp"></span>
+        <button class="link" data-act="reply" data-id="${r.id}">답하기</button><button class="btn small" data-act="bossdone" data-id="${r.id}">결재 끝</button></div></div>`).join('');
+  const mine = S.reports.filter(isBoss).slice(0, 30).map((r) => ({ time: r.time, who: r.empName, ico: r.isError || r.stopped ? '🔴' : r.needBoss && !r.bossDone ? '🙋' : '🟢', text: bossLine(r) }));
+  // 회사 보고(/api/company/reports)에는 클로드 보고도 섞여 있어요 → 그록 쪽(source 그록)만 더해서 두 번 안 보이게
+  const theirs = (companyReports.items || []).filter((r) => r.source !== '클로드').slice(0, 15).map((r) => ({ time: r.time, who: '🤖 ' + (r.lead || r.target || '그록 팀'), ico: r.status === '문제 있음' ? '🔴' : r.status === '완료' ? '🟢' : '🔵', text: (r.status ? '[' + r.status + '] ' : '') + ((r.summary && r.summary[0]) || r.command || '') }));
+  const rows = mine.concat(theirs).sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 40);
+  box.innerHTML = `<div style="margin:4px 0 8px"><b>🙋 결재 기다림</b> <span class="muted small">${S.pending.length + wait.length}건</span></div>
+    ${perm + asks || '<div class="empty small">기다리는 결재가 없어요. 👍</div>'}
+    <div style="margin:16px 0 8px"><b>📋 보고 한눈에</b> <span class="muted small">최근 ${rows.length}개 · 🟢 완료 · 🙋 결재 필요 · 🔴 문제 · 🔵 진행</span></div>
+    ${rows.length ? '<div class="card">' + rows.map((x) => `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--line)"><span>${x.ico}</span><b style="white-space:nowrap">${esc(x.who)}</b><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.text)}</span><time class="muted small" style="white-space:nowrap">${ago(x.time)}</time></div>`).join('') + '</div>' : '<div class="empty small">아직 보고가 없어요.</div>'}`;
 }
 function companyPack() {
   const t = S.botTargets;
@@ -481,6 +511,7 @@ document.addEventListener('click', async (ev) => {
     const m = r.text.match(/```[\w-]*\n?([\s\S]*?)```/);
     copy(a === 'copycode' && m ? m[1].trim() : r.text);
   }
+  if (a === 'bossdone') { api('/api/report/bossdone', { id }); return; }
   if (a === 'reply') { const r = S.reports.find((x) => x.id === id); if (!r) return; target = r.emp; setTab('report'); $('#sayText').focus(); }
   if (a === 'roomreset') { if (confirm('새 대화를 시작할까요? (그록 앱에서도 새 대화를 열어 주세요)')) api('/api/room/reset'); }
   if (a === 'relaycopy') { const g = S.grokLog.find((x) => x.id === id); if (g) copy(g.relay.paste, '복사했어요. 그록 앱에 붙여 넣으세요'); }
