@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:48 한국 시각, main `bd2b0845 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 19:52 한국 시각, main `45dee177 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,6 +42,7 @@
 - 10-30 · #199 주인공 키 218 → 144 (사장님 「주인공이 왜 이리 거대해, 작아져야지」)
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `grok/office-input-fix` — 글 쓰는 동안 입력칸이 지워지지 않게 함
 - 11-11 · `claude/textbook-office-coop` — 팀 회의 교본 9-6: 전 부서 클로드+그록 짝 규칙 더함 (#220)
 - 11-11 · `grok/office-claude-all-depts` — main을 가져와 겹치는 부서 직원 코드를 맞춤
 - 11-11 · `grok/office-ui-layout` — 회사 홈을 한 화면에 맞게 다시 배치
@@ -51,7 +52,6 @@
 - 11-11 · `grok/office-reports` — 보고 창은 사장님께 가는 카드만 보여 주기
 - 11-11 · `claude/office-theme` — main(#213) 합침: theme.css 는 main 판 위에 글꼴·단추·카드·창 변수를 더하는 것으로 정리
 - 11-11 · `grok/office-company-depts` — 회사 일 시키기 부서·팀원 이름을 알들 컴퍼니와 같게
-- 11-06 · `claude/linette-8dir` — 모션 교과서: 정면 3타 게임 반영(PR #205)
 
 ## 최근 결정 (팀 회의 교본 10장, 새것부터)
 - **11-11 그록 설계안 (#207)** — 알들 컴퍼니 이름·회사 홈·부서 화면, home.js/connectors_grok.js 는 그록, 틀·테마·대화 창·위험 허락은 클로드, 회사 보고 = 사장님 드라이브(공개 저장소 X)
