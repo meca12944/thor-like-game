@@ -165,8 +165,8 @@
 .home-report-card .who { color: var(--muted); font-size: 13px; }
 .home-report-card .sum { margin-top: 2px; }
 
-/* 부서 화면: 왼쪽 팀원, 오른쪽 일 시키기 */
-.dept-bar { display: flex; align-items: center; gap: 12px; flex: none; }
+/* 부서 화면: 팀원 | 일 시키기 | 보고. 1280 가로에 세 칸. */
+.dept-bar { display: flex; align-items: center; gap: 10px; flex: none; }
 .dept-name { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
 .dept-name .ico { font-size: 28px; line-height: 1; }
 .dept-name b { font-size: 18px; }
@@ -174,14 +174,91 @@
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: 10px;
 }
+.dept-col { min-width: 0; min-height: 0; overflow: auto; }
+#zDeptReports { display: flex; flex-direction: column; overflow: hidden; }
+#zDeptReports .home-report-panel { flex: 1 1 auto; min-height: 0; }
+.dept-mid { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.dept-mid > .card { min-height: 0; }
 .dept-card { min-height: 0; overflow: auto; }
-.dept-send { display: flex; flex-direction: column; gap: 0; }
-.dept-block + .dept-block { margin-top: 14px; }
-.dept-people { margin: 8px 0 0; padding-left: 18px; }
-.dept-people li { margin: 3px 0; }
+.dept-send { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.dept-send .home-order-pick { margin-top: 6px; }
+.dept-send select { max-width: 100%; }
+.dept-block + .dept-block { margin-top: 12px; }
+.dept-people { margin: 6px 0 8px; padding-left: 0; list-style: none; }
+.dept-people li { margin: 4px 0; }
+.dept-row { display: flex; gap: 6px; align-items: flex-start; justify-content: space-between; }
+.dept-row .btn { flex: none; }
+.dept-edit input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: var(--input-radius);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+.dept-edit-row { display: flex; gap: 6px; margin-top: 6px; }
+.dept-talk { flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; }
+.dept-talk-list { flex: 1 1 auto; min-height: 64px; overflow: auto; margin-top: 6px; }
+.dept-line { margin: 4px 0; word-break: break-word; }
+.dept-talk-send { display: flex; gap: 6px; margin-top: 6px; }
+.dept-talk-send input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--input-radius);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+.art-gallery {
+  flex: none;
+  max-height: 200px;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  padding: 10px 12px;
+}
+.art-photos { display: grid; grid-template-columns: repeat(auto-fill, 96px); gap: 8px; }
+.art-photo { margin: 0; }
+.art-photo img {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: block;
+}
+.art-photo figcaption, .art-text, .art-link, .art-file { font-size: 13px; }
+.art-box { margin-top: 6px; }
+.art-text { margin-top: 4px; }
+.art-link { display: inline-block; margin-top: 4px; color: var(--blue); }
+button.art-file, .art-file {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: var(--input-radius);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.st-lamp {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  display: inline-block;
+  flex: none;
+}
+.st-lamp.on { background: var(--green); }
 .home-text {
   width: 100%;
   margin-top: 8px;
@@ -215,8 +292,13 @@
 .conn-detail { min-height: 0; overflow: auto; }
 .conn-detail .qa:last-child { margin-bottom: 0; }
 
+@media (max-width: 1100px) {
+  .dept-grid { grid-template-columns: 1fr 1fr; }
+  .dept-grid .dept-col:last-child { grid-column: 1 / -1; min-height: 220px; }
+}
 @media (max-width: 860px) {
   .dept-grid, .conn-grid { grid-template-columns: 1fr; }
+  .dept-grid .dept-col:last-child { grid-column: auto; }
   .home-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(160px, 1fr); }
   .home-col-reports, .home-col-work, .home-col-chat { grid-column: 1; grid-row: auto; }
 }

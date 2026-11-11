@@ -24,11 +24,16 @@ function freePort() {
 }
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
-function post(port, pathname, body) {
+function post(port, pathname, body, headers) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body || {});
-    const req = http.request({ host: '127.0.0.1', port, path: pathname, method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) } }, (res) => {
-      let d = ''; res.on('data', (c) => (d += c)); res.on('end', () => { try { resolve(JSON.parse(d || '{}')); } catch (e) { reject(e); } });
+    const req = http.request({ host: '127.0.0.1', port, path: pathname, method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data), ...(headers || {}) } }, (res) => {
+      let d = ''; res.on('data', (c) => (d += c)); res.on('end', () => {
+        let json = {};
+        try { json = JSON.parse(d || '{}'); } catch (e) { return reject(e); }
+        json._status = res.statusCode;
+        resolve(json);
+      });
     });
     req.on('error', reject);
     req.end(data);
@@ -98,6 +103,7 @@ async function main() {
   fs.writeFileSync(path.join(dataDir, 'company-reports.json'), JSON.stringify([
     { id: 'rpt-local-zero', time: '2026-11-11 16:30', target: '제로폰', command: '오늘 정책 확인해서 보고해', status: '접수', summary: ['명령을 받았어요.'], source: '그록' },
     { id: 'rpt-same', time: '2026-11-11 16:00', target: 'AI 협력', command: '옛 접수', status: '접수', summary: ['아직 접수'], source: '그록' },
+    { id: 'rpt-old', time: '2026-11-11 10:00', target: '없는부서', command: '예전 일', status: '완료', summary: ['예전 파일에는 부서가 없어요.'] },
   ]));
 
   const child = spawn(process.execPath, ['server.js'], {
@@ -109,7 +115,7 @@ async function main() {
   child.stdout.on('data', (c) => (log += c));
   child.stderr.on('data', (c) => (log += c));
   const stop = () => { try { child.kill('SIGTERM'); } catch (e) { /* */ } };
-  const timer = setTimeout(() => { stop(); console.error(log); process.exit(1); }, 25000);
+  const timer = setTimeout(() => { stop(); console.error(log); process.exit(1); }, 40000);
   try {
     for (let i = 0; i < 50 && !log.includes('문 열림'); i++) {
       if (child.exitCode !== null) throw new Error('서버가 바로 끝났어요\n' + log);
@@ -167,6 +173,67 @@ async function main() {
     const failed = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items.find((r) => r.id === seen[1].reportId);
     assert.ok(failed && failed.status === '문제 있음');
     assert.ok(!failed.summary.join(' ').includes('127.0.0.1'));
+    const old = list.find((r) => r.id === 'rpt-old');
+    assert.ok(old && old.dept === 'AI 협력·연결' && Array.isArray(old.artifacts) && old.artifacts.length === 0);
+    const st = JSON.parse((await getRaw(appPort, '/api/state')).body);
+    assert.deepStrictEqual(body.depts.map((d) => d.name), st.botTargets.depts.map((d) => d.name));
+    const png = path.join(dataDir, 'shot.png');
+    fs.writeFileSync(png, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64'));
+    const denied = await post(appPort, '/api/company/reports', { command: '몰래', dept: '홍보' }, { authorization: 'Bearer nope' });
+    assert.strictEqual(denied._status, 401);
+    assert.ok(!readJson(path.join(dataDir, 'company-reports.json')).some((r) => r.command === '몰래'));
+    const posted = await post(appPort, '/api/company/reports', {
+      dept: '홍보', target: '홍보', command: '결과물 시험', status: '완료',
+      summary: ['요약을 적었어요.'],
+      artifacts: [
+        { kind: 'text', text: '포스터 문구를 다듬었어요.' },
+        { kind: 'text', text: 'api_key=supersecret 숨김' },
+        { kind: 'link', name: '합치기 부탁', url: 'https://github.com/meca12944/thor-like-game/pull/1' },
+        { kind: 'photo', name: 'shot.png', path: png },
+        { kind: 'file', name: 'memo.txt', path: path.join(dataDir, 'memo.txt') },
+      ],
+    }, { authorization: 'Bearer ' + secret });
+    assert.strictEqual(posted.ok, true);
+    fs.writeFileSync(path.join(dataDir, 'memo.txt'), 'memo');
+    const rich = JSON.parse((await getRaw(appPort, '/api/company/reports')).body);
+    const madeArt = rich.items.find((r) => r.command === '결과물 시험');
+    assert.ok(madeArt && madeArt.dept === '홍보' && madeArt.status === '완료');
+    const kinds = madeArt.artifacts.map((a) => a.kind).sort();
+    assert.ok(kinds.indexOf('text') >= 0 && kinds.indexOf('link') >= 0 && kinds.indexOf('photo') >= 0 && kinds.indexOf('file') >= 0);
+    assert.ok(!JSON.stringify(madeArt).includes('supersecret'));
+    const photo = madeArt.artifacts.find((a) => a.kind === 'photo');
+    assert.ok(photo && photo.src && photo.src.indexOf('/file?c=') === 0);
+    const img = await getRaw(appPort, photo.src);
+    assert.strictEqual(img.status, 200);
+    assert.ok(img.type.indexOf('image/png') === 0);
+    const hired = await post(appPort, '/api/employee', { name: '시험직원', role: '시험 역할', dept: 'zero', folder: dataDir });
+    assert.strictEqual(hired.ok, true);
+    await sleep(400);
+    const beforeEmp = readJson(path.join(dataDir, 'state.json')).employees.find((e) => e.id === hired.id);
+    const blank = await post(appPort, '/api/employee', { id: hired.id, rename: true, name: '  ', role: '다른 일' });
+    assert.strictEqual(blank.ok, false);
+    const renamed = await post(appPort, '/api/employee', { id: hired.id, rename: true, name: '안내담당', role: '고객 안내' });
+    assert.strictEqual(renamed.ok, true);
+    await sleep(400);
+    const afterEmp = readJson(path.join(dataDir, 'state.json')).employees.find((e) => e.id === hired.id);
+    assert.strictEqual(afterEmp.name, '안내담당');
+    assert.strictEqual(afterEmp.role, '고객 안내');
+    assert.strictEqual(afterEmp.folder, beforeEmp.folder);
+    assert.strictEqual(afterEmp.sessionId, beforeEmp.sessionId);
+    const other = await post(appPort, '/api/employee', { name: '다른직원', role: '다른 일', dept: 'promo', folder: dataDir });
+    assert.strictEqual(other.ok, true);
+    const dup = await post(appPort, '/api/employee', { id: hired.id, rename: true, name: '다른직원', role: '고객 안내' });
+    assert.strictEqual(dup.ok, false);
+    assert.strictEqual(readJson(path.join(dataDir, 'state.json')).employees.find((e) => e.id === hired.id).name, '안내담당');
+    const nick = await post(appPort, '/api/bot/nick', { name: '제로폰 홈페이지', nick: '폰팀' });
+    assert.strictEqual(nick.ok, true);
+    const pub = JSON.parse((await getRaw(appPort, '/api/state')).body);
+    assert.strictEqual(pub.botNicks['제로폰 홈페이지'], '폰팀');
+    assert.ok(pub.botTargets.bots.some((b) => b.name === '제로폰 홈페이지'));
+    const ordered = await post(appPort, '/api/order', { to: hired.id, text: '부서 일 시험', dept: '제로폰' });
+    assert.strictEqual(ordered.ok, true);
+    const queued = JSON.parse((await getRaw(appPort, '/api/company/reports')).body).items.find((r) => r.command === '부서 일 시험');
+    assert.ok(queued && queued.status === '접수' && queued.dept === '제로폰');
     await sleep(500);
     const after = readJson(path.join(dataDir, 'state.json')).reports.find((r) => r.id === 'claude-keep-1');
     assert.deepStrictEqual(after, before);
