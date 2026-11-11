@@ -19,7 +19,7 @@ const HOME_DEPTS = [
   { id: 'promo', name: '홍보', sub: '블로그·마케팅·영상', icon: '📣', lead: '제로폰 홍보 · 제로폰 관리' },
   { id: 'admin', name: '경영지원', sub: '해피콜·안내·생산·투자', icon: '💼', lead: '폰클매니저 미래 오케이' },
   { id: 'stco', name: 'STCO', sub: '온라인·오프라인', icon: '🛍', lead: 'STCO 인동점 SEO·홍보' },
-  { id: 'video', name: '영상 기획팀', sub: '콘티·대본·자막', icon: '🎬', lead: '영상 기획 팀장' },
+  { id: 'video', name: '영상 기획팀', sub: '영상 기획·대본', icon: '🎬', lead: '영상 기획 팀장', grokLead: '영상 기획 팀장' },
   { id: 'ai', name: 'AI 협력·연결', sub: '명령 중계·보고 창·클로드 연결', icon: '🔗', lead: '그록봇 최적화 예전 이벨린' },
 ];
 function homeDepts(A) {
@@ -106,7 +106,8 @@ function homePeopleHtml(list, esc, claude) {
   return `<ul class="dept-people">${sorted.map((p) => {
     const lead = p.lead ? ' <span class="muted small">(팀장)</span>' : '';
     const job = claude ? homeJobLine(p, esc) : '';
-    return `<li><b>${esc(p.name)}</b>${lead} — ${esc(p.role || '')}${job}</li>`;
+    const mark = claude ? '🧠' : '🤖';
+    return `<li><span class="who-ico">${mark}</span> <b>${esc(p.name)}</b>${lead} — ${esc(p.role || '')}${job}</li>`;
   }).join('')}</ul>`;
 }
 async function homeMakeTeams(A) {

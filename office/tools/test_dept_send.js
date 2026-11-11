@@ -55,7 +55,11 @@ function checkSource() {
   assert.ok(server.includes('게시·광고 수정은 안 함'));
   assert.ok(server.includes("id: 'video'") && server.includes("name: '영상 기획팀'"));
   assert.ok(server.includes("name: '영상 기획 직원'") && server.includes("name: '영상 기획 2'"));
+  assert.ok(server.includes("sub: '영상 기획·대본'") && server.includes("grokLead: '영상 기획 팀장'"));
   assert.ok(home.includes("id: 'video'") && home.includes("name: '영상 기획팀'"));
+  assert.ok(home.includes('class="who-ico"'));
+  const reports = fs.readFileSync(path.join(root, 'ui', 'reports.js'), 'utf8');
+  assert.ok(reports.includes("['영상 기획팀', '🎬 영상']"));
   const sendAt = server.indexOf('async function sendToBot');
   const sendFn = server.slice(sendAt, server.indexOf('function pollSoon'));
   assert.ok(sendFn.includes("const target = dept || 'AI 협력'"));
@@ -149,14 +153,18 @@ async function main() {
     assert.ok(!fs.existsSync(path.join(vLead.folder, '.git')));
     assert.ok(!st2.employees.some((e) => e.name === '영상기획'));
     const vDept = st2.botTargets.depts.find((d) => d.id === 'video');
-    assert.ok(vDept && vDept.name === '영상 기획팀');
+    assert.ok(vDept && vDept.name === '영상 기획팀' && vDept.sub === '영상 기획·대본');
+    assert.strictEqual(vDept.lead, '영상 기획 팀장');
+    assert.strictEqual(vDept.grokLead, '영상 기획 팀장');
+    assert.strictEqual(vDept.icon, '🎬');
     const vBots = st2.botTargets.bots.filter((b) => b.dept === 'video').map((b) => b.name).sort();
     assert.deepStrictEqual(vBots, ['영상 기획 2', '영상 기획 팀장']);
 
     await post(appPort, '/api/room/relay', { emp: 'emp-promo', kind: 'chat', text: '쇼츠 문구 부탁' });
     await post(appPort, '/api/room/relay', { kind: 'chat', text: '사장님 말' });
-    for (let i = 0; i < 30 && seen.length < 2; i++) await sleep(100);
-    assert.strictEqual(seen.length, 2, '그록에게 두 통이 가야 해요');
+    await post(appPort, '/api/room/relay', { emp: vLead.id, kind: 'chat', text: '대본 부탁' });
+    for (let i = 0; i < 30 && seen.length < 3; i++) await sleep(100);
+    assert.strictEqual(seen.length, 3, '그록에게 세 통이 가야 해요');
     assert.ok(seen.every((x) => x.authOk));
     const empMsg = seen.find((x) => String(x.body.command || '').includes('쇼츠 문구'));
     const bossMsg = seen.find((x) => String(x.body.command || '').includes('사장님 말'));
@@ -169,8 +177,19 @@ async function main() {
     assert.strictEqual(bossMsg.body.target, 'AI 협력');
     assert.strictEqual(bossMsg.body.dept, '');
     assert.ok(!String(bossMsg.body.command).includes('[부서:'));
-    const room = (await getJson(appPort, '/api/state')).grokLog.find((g) => String(g.text || '').includes('쇼츠 문구'));
+    const vidMsg = seen.find((x) => String(x.body.command || '').includes('대본 부탁'));
+    assert.ok(vidMsg);
+    assert.strictEqual(vidMsg.body.target, '영상 기획팀');
+    assert.strictEqual(vidMsg.body.dept, '영상 기획팀');
+    assert.ok(String(vidMsg.body.command).includes('[부서:영상 기획팀]'));
+    assert.ok(!String(vidMsg.body.command).includes('[부서:video]'));
+    assert.ok(!String(vidMsg.body.dept).includes('video'));
+    const after = await getJson(appPort, '/api/state');
+    assert.strictEqual(after.employees.find((e) => e.id === vLead.id).dept, 'video');
+    const room = after.grokLog.find((g) => String(g.text || '').includes('쇼츠 문구'));
     assert.ok(room && room.text.startsWith('[부서:홍보] '));
+    const vroom = after.grokLog.find((g) => String(g.text || '').includes('대본 부탁'));
+    assert.ok(vroom && vroom.text.startsWith('[부서:영상 기획팀] '));
     console.log('부서 보내기 시험 통과');
   } finally {
     clearTimeout(timer);
