@@ -1,4 +1,4 @@
-// 알들 컴퍼니 회사 홈·부서 화면. 보고 창은 여기서만 불러요.
+// 알들 컴퍼니 회사 홈·부서 화면. 첫 화면은 한 장 현황판. 보고 카드는 부서 화면에서 불러요.
 // A = window.Aldeul. 색은 theme.css 이름만 써요. 움직임·네온 없음.
 'use strict';
 let homeMode = 'home';
@@ -23,6 +23,12 @@ let homeAPI = null;
 let homeDeptFolder = '';
 let homeComposing = false;
 let homePaintWait = false;
+let homeGearOpen = false;
+let boardDoneOpen = false;
+let boardPending = null;
+let boardLoadFlight = null;
+let boardForce = false;
+const boardOpen = new Set();
 
 const HOME_DEPTS = [
   { id: 'game', name: '게임 필멸자', sub: '게임 코드·그림·영상·음악', icon: '🎮', lead: '클로드' },
@@ -182,62 +188,43 @@ async function homeMakeDept(A) {
   const n = (r.made || []).length;
   if (A.toast) A.toast(n ? '클로드 직원 ' + n + '명을 만들었어요' : '이 부서에는 이미 클로드 직원이 다 있어요');
 }
-function homeOrderHtml(pack, esc) {
-  const picked = homeTopPick(pack);
-  const opts = (pack.depts || []).map((d) => {
-    const on = d.name === picked ? ' selected' : '';
-    return `<option value="${esc(d.name)}"${on}>${esc(d.icon || '🏢')} ${esc(d.name)}</option>`;
-  }).join('');
-  return `<form class="home-order" id="homeTopSend">
-    <div class="home-order-row">
-      <b class="home-order-title">✍️ 일 시키기</b>
-      <label class="home-order-pick">보낼 곳
-        <select id="homeTopDept">${opts}</select>
-      </label>
-      <input id="homeTopCmd" type="text" autocomplete="off" placeholder="할 일을 적고 엔터 (예: 오늘 할 일 정리해서 보고해)" value="${esc(homeTopDraft)}">
-      <button class="btn" type="submit">보내기</button>
-    </div>
-    <div id="homeTopNote" class="home-order-note hint">부서를 고르고 할 일을 적은 뒤, 보내기나 엔터를 눌러요.</div>
-  </form>`;
-}
 async function homeTopSend(el, A) {
   if (homeTopBusy) return;
   const sel = el.querySelector('#homeTopDept');
   const inp = el.querySelector('#homeTopCmd');
   const name = sel ? String(sel.value || '').trim() : '';
   const command = inp ? String(inp.value || '').trim() : '';
-  if (inp) homeTopDraft = inp.value;
   if (name) homeTopSave(name);
-  if (!name) { homeTopNote = { ok: false, text: '보낼 곳을 골라 주세요.' }; homeTopPaintNote(el); return; }
-  if (!command) { homeTopNote = { ok: false, text: '할 일을 적어 주세요.' }; homeTopPaintNote(el); return; }
+  if (!name) { if (A.toast) A.toast('보낼 곳을 골라 주세요.'); return; }
+  if (!command) { if (A.toast) A.toast('할 일을 적어 주세요.'); return; }
   homeTopBusy = true;
-  const btn = el.querySelector('#homeTopSend button[type="submit"]');
-  if (btn) btn.disabled = true;
+  homeTopDraft = '';
+  if (inp) inp.value = '';
+  boardPending = { id: 'pending-' + Date.now(), dept: name, command, at: Date.now() };
+  homeComposing = false;
+  if (inp && typeof inp.blur === 'function') inp.blur();
+  boardForce = true;
+  homePaint(el, A);
+  boardForce = false;
   let r = null;
   try {
-    r = await A.api('/api/bot/command', { target: name, command });
+    r = await A.api('/api/bot/command', { target: name, command, source: 'PC' });
   } catch (e) {
     r = { ok: false, error: '못 보냈어요. 회사 프로그램이 켜져 있는지 봐 주세요.' };
   }
   homeTopBusy = false;
-  const btnNow = el.querySelector('#homeTopSend button[type="submit"]');
-  if (btnNow) btnNow.disabled = false;
-  if (!r || !r.ok) {
-    let text = (r && r.error) || '못 보냈어요';
-    if (r && r.claudeLead && text.indexOf(r.claudeLead) < 0) text += ' 클로드 팀장 ' + r.claudeLead + '에게는 넣어 두었어요.';
-    homeTopNote = { ok: false, text };
-    homeTopPaintNote(el);
-    return;
-  }
-  homeTopDraft = '';
-  const inpNow = el.querySelector('#homeTopCmd');
-  if (inpNow) inpNow.value = '';
-  const leadBit = r.claudeLead ? ' 클로드 ' + r.claudeLead + '에게도 넣었어요.' : '';
-  homeTopNote = { ok: true, text: name + '에 보냈어요. 그록이 받았어요.' + leadBit + ' → 보고 창에 접수로 떠요' };
-  homeTopPaintNote(el);
   reportAt = 0;
-  const slot = el.querySelector('#homeReports');
-  if (typeof renderReports === 'function' && slot) renderReports(slot);
+  if (typeof loadReportPack === 'function') {
+    try {
+      const data = await loadReportPack();
+      if (data && Array.isArray(data.items)) reportPack = { items: data.items, depts: data.depts || [], error: data.ok ? '' : (data.error || '') };
+    } catch (e) { /* 방금 줄은 그대로 둬요 */ }
+  }
+  const items = (reportPack && reportPack.items) || [];
+  if (items.some((it) => it && String(it.command || '').trim() === command && (it.dept === name || it.target === name))) boardPending = null;
+  if (!r || !r.ok) { if (A.toast) A.toast((r && r.error) || '못 보냈어요'); }
+  else if (A.toast) A.toast('보냈어요. 그록 채팅에 적혀요.');
+  if (homeMode === 'home') homePaint(el, A);
 }
 let homeScrollUntil = 0;
 let homeScrollTimer = null;
@@ -245,7 +232,7 @@ let homeScrollWait = false;
 let homeShell = '';
 window.homeReportScroll = { top: 0, height: 0, atTop: true };
 function homeUserScrolling() { return Date.now() < homeScrollUntil; }
-const HOME_SCROLL = ['.home-main', '.dept-col', '.home-chat', '.dept-talk-list', '.home-col-work', '.art-gallery', '.home-report-list'];
+const HOME_SCROLL = ['.home-main', '.dept-col', '.home-chat', '.dept-talk-list', '.home-col-work', '.art-gallery', '.home-report-list', '.board-list', '.board-gear'];
 function homeCollectScroll() {
   const list = document.querySelector('.home-report-list');
   if (list) window.homeReportScroll = { top: list.scrollTop, height: list.scrollHeight, atTop: list.scrollTop < 8 };
@@ -290,9 +277,179 @@ function homeNoteScroll() {
     if (homeScrollWait && home && window.Aldeul) homePaint(home, window.Aldeul);
   }, 320);
 }
+function boardClean(s) {
+  return String(s || '').replace(/\s*\([1-9]\/3\)/g, '').replace(/\[?cmd:[A-Za-z0-9]+\]?/gi, '').replace(/\s+/g, ' ').trim();
+}
+function boardMs(r) {
+  if (typeof reportMs === 'function') return reportMs(r && (r.updated || r.time));
+  const ms = Date.parse(r && (r.updated || r.time));
+  return Number.isNaN(ms) ? 0 : ms;
+}
+function boardInfo(r) {
+  const stage = String((r && r.stage) || '');
+  const visual = typeof reportVisual === 'function' ? reportVisual(r) : ((r && r.status) || '');
+  if (r && (r.needBoss || stage === '사장님 확인 필요' || visual === '사장님 확인 필요')) return { key: 'ask', label: '사장님 확인 필요', ask: true };
+  if (r && (r.silent || visual === '응답 없음' || r.status === '문제 있음' || stage === '문제 있음')) return { key: 'stuck', label: '막힘', stuck: true };
+  if (r && (r.status === '완료' || stage === '완료' || visual === '완료')) return { key: 'done', label: '끝' };
+  if (/부서에 맡김|부서 작업/.test(stage)) return { key: 'work', label: '작업' };
+  if (/답안|토의/.test(stage)) return { key: 'talk', label: '토의' };
+  if (r && r.status === '진행 중') return { key: 'work', label: '작업' };
+  return { key: 'wait', label: '대기' };
+}
+function boardAge(r, info) {
+  const ms = boardMs(r);
+  const min = ms ? Math.max(0, Math.floor((Date.now() - ms) / 60000)) : 0;
+  const base = min < 1 ? '방금' : (min < 60 ? min + '분째' : (min < 1440 ? Math.floor(min / 60) + '시간째' : Math.floor(min / 1440) + '일째'));
+  if (info && info.key === 'wait' && min >= 10) {
+    if (min < 60) return min + '분째 대기';
+    if (min < 1440) return Math.floor(min / 60) + '시간째 대기';
+    return Math.floor(min / 1440) + '일째 대기';
+  }
+  return base;
+}
+function boardDay(ms) {
+  if (!ms) return '';
+  try { return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }); }
+  catch (e) { return ''; }
+}
+function boardTitle(command) {
+  const s = boardClean(String(command || ''));
+  if (!s) return '제목 없음';
+  return s.length > 36 ? s.slice(0, 36) + '…' : s;
+}
+function boardRows(items) {
+  const list = (Array.isArray(items) ? items : []).slice();
+  if (boardPending) {
+    const p = boardPending;
+    const hit = list.some((it) => it && String(it.command || '').trim() === p.command && (it.dept === p.dept || it.target === p.dept));
+    if (!hit) list.unshift({ id: p.id, dept: p.dept, target: p.dept, command: p.command, status: '접수', time: new Date(p.at).toISOString(), summary: [], history: [] });
+  }
+  return list.map((r) => ({ r, info: boardInfo(r), ms: boardMs(r) }));
+}
+function boardSort(a, b) {
+  const pa = (a.info.ask || a.info.stuck) ? 0 : 1;
+  const pb = (b.info.ask || b.info.stuck) ? 0 : 1;
+  if (pa !== pb) return pa - pb;
+  return (b.ms || 0) - (a.ms || 0);
+}
+function homeHasWarn(A) {
+  const claude = A && A.state && A.state.claude;
+  const pending = (A && A.state && A.state.pending) || [];
+  return !(claude && claude.ok) || pending.length > 0;
+}
+function homeWarnHtml(A, esc) {
+  const bits = [];
+  const claude = A && A.state && A.state.claude;
+  if (!claude || !claude.ok) bits.push('<div class="board-warn"><b>클로드 코드를 못 찾았어요.</b> 폴더 안 「처음_설치.bat」을 두 번 누르고, 로그인한 뒤 다시 켜 주세요.</div>');
+  for (const p of ((A && A.state && A.state.pending) || [])) {
+    if (p.danger) bits.push(`<div class="ask danger"><div class="q"><b>⚠ ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><div class="note">위험한 일이라 매번 물어요.</div></div><button type="button" class="btn green" data-ans="once" data-id="${esc(p.id)}">이번만 허락</button><button type="button" class="btn red" data-ans="no" data-id="${esc(p.id)}">거절</button></div>`);
+    else bits.push(`<div class="ask"><div class="q"><b>🙋 ${esc(p.empName)}: 「${esc(p.label)}」 해도 될까요?</b><div class="note">한 번 허락하면 다음부터 다시 안 물어요.</div></div><button type="button" class="btn green" data-ans="always" data-id="${esc(p.id)}">허락</button><button type="button" class="btn red" data-ans="no" data-id="${esc(p.id)}">거절</button></div>`);
+  }
+  return bits.join('');
+}
+function homeGearDot(A) {
+  const btn = document.querySelector('#view-home [data-act="settings"]');
+  if (btn) btn.classList.toggle('has-warn', homeHasWarn(A));
+}
+function boardMore(r, esc) {
+  const full = boardClean(r && r.command);
+  const short = boardTitle(full);
+  const hist = r && Array.isArray(r.history) ? r.history : [];
+  const parts = [];
+  if (full && full !== short) parts.push('<div class="board-full"><b>시킨 일</b> ' + esc(full) + '</div>');
+  if (hist.length) {
+    let prev = '';
+    const rows = [];
+    for (const h of hist) {
+      const st = boardClean(h && h.stage);
+      const seen = new Set();
+      const notes = (Array.isArray(h && h.notes) ? h.notes : []).map((n) => boardClean(n)).filter((n) => {
+        if (!n || n === full || n === short || seen.has(n)) return false;
+        seen.add(n);
+        return true;
+      });
+      const key = st + '|' + notes.join('|');
+      if (!st && !notes.length) continue;
+      if (key === prev) continue;
+      prev = key;
+      rows.push('<li><span class="muted">' + esc(String((h && h.time) || '')) + '</span> ' + esc(st) + notes.map((n) => '<div>' + esc(n) + '</div>').join('') + '</li>');
+    }
+    parts.push('<div class="board-log"><b>진행 기록</b><ol>' + (rows.join('') || '<li class="muted">아직 진행 기록이 없어요.</li>') + '</ol></div>');
+  } else {
+    const lines = (r && Array.isArray(r.summary) ? r.summary : []).map((s) => boardClean(s)).filter((s) => s && s !== full && s !== short);
+    if (lines.length) parts.push('<div class="board-log">' + lines.map((s) => esc(s)).join('<br>') + '</div>');
+    else parts.push('<div class="muted small">아직 진행 기록이 없어요.</div>');
+  }
+  return parts.join('');
+}
+function boardItemHtml(x, esc) {
+  const r = x.r || {};
+  const id = String(r.id || '');
+  const open = id && boardOpen.has(id);
+  const cls = x.info.ask ? ' ask' : (x.info.stuck ? ' stuck' : '');
+  const dept = r.dept || r.target || '부서';
+  const more = open ? `<div class="board-more">${boardMore(r, esc)}</div>` : '';
+  return `<div class="board-item${cls}"><button type="button" class="board-row" data-home="row" data-id="${esc(id)}"><span class="bd">[${esc(dept)}]</span><span class="ttl">${esc(boardTitle(r.command))}</span><span class="stg">${esc(x.info.label)}</span><span class="age">${esc(boardAge(r, x.info))}</span></button>${more}</div>`;
+}
+function boardGearHtml(pack, A, esc) {
+  const depts = (pack.depts || []).map((d) => `<button type="button" class="btn ghost" data-home="dept" data-id="${esc(d.id)}">${d.icon || '🏢'} ${esc(d.name)}</button>`).join('');
+  const warn = homeWarnHtml(A, esc);
+  return `<section class="board-gear">
+    <div class="board-gear-head"><b>설정</b><button type="button" class="btn ghost small" data-home="gear-close">닫기</button></div>
+    ${warn || '<div class="muted small">경고는 없어요.</div>'}
+    <div class="board-gear-block"><b>부서</b><div class="muted small">누르면 직원 만들기, 폴더 주소, 별명, 결과물, 일 시키기, 이 부서 대화가 나와요.</div><div class="board-deptgrid">${depts}</div></div>
+    <div class="board-gear-links">
+      <button type="button" class="btn ghost" data-home="conn-app">연결</button>
+      <button type="button" class="btn ghost" data-links="open">이어진 것</button>
+      <button type="button" class="btn ghost" data-home="workshop">클로드 작업장</button>
+      <button type="button" class="btn ghost" data-home="team">부서마다 직원 만들기</button>
+      <button type="button" class="btn ghost" data-act="help">사용법</button>
+      <button type="button" class="btn ghost" data-home="oldset">그 밖의 설정</button>
+    </div>
+  </section>`;
+}
+function boardFormHtml(pack, esc) {
+  const picked = homeTopPick(pack);
+  const opts = (pack.depts || []).map((d) => `<option value="${esc(d.name)}"${d.name === picked ? ' selected' : ''}>${esc(d.name)}</option>`).join('');
+  return `<form class="board-say" id="homeTopSend">
+    <select id="homeTopDept" title="부서" aria-label="부서">${opts}</select>
+    <input id="homeTopCmd" type="text" autocomplete="off" placeholder="예: 오늘 할 일 정리해서 보고해" value="${esc(homeTopDraft)}">
+    <button class="btn" type="submit"${homeTopBusy ? ' disabled' : ''}>보내기</button>
+  </form>`;
+}
+function boardHomeHtml(pack, A, esc) {
+  const loading = typeof reportPack === 'undefined' || !reportPack;
+  const rows = loading ? [] : boardRows(reportPack.items);
+  const today = boardDay(Date.now());
+  const askN = rows.filter((x) => x.info.ask).length;
+  const doing = rows.filter((x) => x.info.key !== 'done').sort(boardSort);
+  const done = rows.filter((x) => x.info.key === 'done' && boardDay(x.ms) === today).sort((a, b) => (b.ms || 0) - (a.ms || 0));
+  const head = loading ? '불러오는 중' : (askN ? `정하실 일 ${askN}개 <span class="sub">(그록 채팅에서 답해요)</span>` : '할 일 없음');
+  const mid = homeGearOpen
+    ? boardGearHtml(pack, A, esc)
+    : `<section class="board-now"><div class="board-sec">지금 하는 일</div><div class="board-list">${loading ? '<div class="muted board-empty">불러오는 중…</div>' : (doing.length ? doing.map((x) => boardItemHtml(x, esc)).join('') : '<div class="muted board-empty">지금 하는 일이 없어요.</div>')}</div></section>`;
+  const doneHtml = loading ? '' : (done.length
+    ? `<details class="board-done" id="boardDone"${boardDoneOpen ? ' open' : ''}><summary>오늘 끝난 일 ${done.length}개</summary><div class="board-list">${done.map((x) => boardItemHtml(x, esc)).join('')}</div></details>`
+    : '<div class="board-done muted">오늘 끝난 일 없음</div>');
+  return `<div class="home-page home-fit board-page"><h1 class="board-head">${head}</h1>${mid}${doneHtml}${boardFormHtml(pack, esc)}</div>`;
+}
+function boardKickLoad() {
+  if (reportPack || boardLoadFlight || typeof loadReportPack !== 'function') return;
+  boardLoadFlight = loadReportPack().then((data) => {
+    if (data && Array.isArray(data.items)) reportPack = { items: data.items, depts: data.depts || [], error: data.ok ? '' : (data.error || '') };
+    else if (!reportPack) reportPack = { items: [], depts: [], error: '보고를 불러오지 못했어요.' };
+    reportAt = Date.now();
+  }).catch(() => {
+    if (!reportPack) reportPack = { items: [], depts: [], error: '보고를 불러오지 못했어요.' };
+  }).finally(() => {
+    boardLoadFlight = null;
+    const home = document.getElementById('home');
+    if (homeMode === 'home' && home && homeAPI && !homeFieldBusy(home)) homePaint(home, homeAPI);
+  });
+}
 function homePaint(el, A) {
   // 글 쓰는 중에는 입력칸을 다시 만들지 않아요. 보고 목록만 조용히 새로고침합니다.
-  if (homeFieldBusy(el)) {
+  if (homeFieldBusy(el) && !boardForce) {
     homeSnap(el);
     homePaintWait = true;
     const slot = el.querySelector('#zDeptReports') || el.querySelector('#homeReports');
@@ -308,40 +465,12 @@ function homePaint(el, A) {
   const esc = A.esc;
   if (homeMode === 'dept') return homePaintDept(el, A, pack, esc);
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
-  const tiles = pack.depts.map((d) => {
-    const n = homeClaudeList(A, d.id).length;
-    return `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div><div class="home-cnt">클로드 ${n}명</div></button>`;
-  }).join('');
-  const html = `<div class="home-page home-fit">
-    ${homeOrderHtml(pack, esc)}
-    <div class="home-grid">
-      <section class="home-col home-col-reports">
-        <div id="homeReports"></div>
-      </section>
-      <section class="home-col home-col-work">
-        <div class="title">🏢 부서 <span class="muted small">아이콘을 누르면 그 부서 화면</span><button type="button" class="btn ghost small" data-links="open" title="이어진 것과, 단추마다 하는 일을 봐요">🔌 연결·기능</button></div>
-        <div class="home-depts">${tiles}</div>
-        <div class="home-shortcuts">
-          <button type="button" class="btn" data-home="workshop">🧠 클로드 작업장</button>
-          <button type="button" class="btn ghost" data-home="conn">🔌 연결 설명</button>
-        </div>
-        <button type="button" class="btn ghost home-team-btn" data-home="team">👥 부서마다 클로드 팀 만들기</button>
-        <div class="muted small">누르기 전에는 만들지 않아요. 한 부서만 만들려면 그 부서 화면의 「만들기」를 눌러요.</div>
-      </section>
-      <section class="home-col home-col-chat">
-        <div class="title">💬 클로드 ↔ 그록 <span class="muted small">최근 말</span><button type="button" class="link" data-act="coopall">모두 보기</button></div>
-        <div id="homeChat" class="home-chat"></div>
-      </section>
-    </div>
-  </div>`;
+  homeGearDot(A);
+  const html = boardHomeHtml(pack, A, esc);
   const swapped = homeSwap(el, html);
   if (swapped === 'wait') return;
   if (swapped) homeRestoreFocus(el, snap);
-  homeTopPaintNote(el);
-  if (typeof renderReports === 'function') renderReports(el.querySelector('#homeReports'));
-  const chat = el.querySelector('#homeChat');
-  if (chat && typeof A.chatWidget === 'function') A.chatWidget(chat, 4);
-  else if (chat && typeof A.coopChat === 'function') A.coopChat(chat);
+  if (!reportPack) boardKickLoad();
 }
 function homeCurrentDept(A, pack) {
   const list = (pack || homeDepts(A)).depts || [];
@@ -625,6 +754,26 @@ function homeBind(el, A) {
       const t = ev.target;
       if (t && t.closest && t.closest('#home, .home-main')) homeNoteScroll();
     }, true);
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest && ev.target.closest('#view-home [data-act="settings"]');
+      if (!btn) return;
+      const view = document.getElementById('view-home');
+      if (!view || view.hidden) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (homeMode !== 'home') { homeMode = 'home'; homeGearOpen = true; }
+      else homeGearOpen = !homeGearOpen;
+      const home = document.getElementById('home');
+      if (home && homeAPI) homePaint(home, homeAPI);
+    }, true);
+  }
+  if (el.dataset.doneBound !== '1') {
+    el.dataset.doneBound = '1';
+    el.addEventListener('toggle', (ev) => {
+      const d = ev.target;
+      if (!d || d.id !== 'boardDone') return;
+      boardDoneOpen = !!d.open;
+    }, true);
   }
   if (el.dataset.homeBound === '1') return;
   el.dataset.homeBound = '1';
@@ -684,9 +833,16 @@ function homeBind(el, A) {
     const b = ev.target.closest('[data-home]');
     if (!b || !el.contains(b)) return;
     const act = b.getAttribute('data-home');
-    if (act === 'back') { homeMode = 'home'; homeConn = -1; homeEdit = null; }
-    else if (act === 'dept') { homeMode = 'dept'; homeDeptId = b.getAttribute('data-id') || ''; homeEdit = null; homeGallery = false; }
-    else if (act === 'workshop') { if (A.openWorkshop) A.openWorkshop(); return; }
+    if (act === 'back') { homeMode = 'home'; homeConn = -1; homeEdit = null; homeGearOpen = false; }
+    else if (act === 'dept') { homeMode = 'dept'; homeDeptId = b.getAttribute('data-id') || ''; homeEdit = null; homeGallery = false; homeGearOpen = false; }
+    else if (act === 'workshop') { homeGearOpen = false; if (A.openWorkshop) A.openWorkshop(); return; }
+    else if (act === 'row') {
+      const id = b.getAttribute('data-id') || '';
+      if (!id) return;
+      if (boardOpen.has(id)) boardOpen.delete(id); else boardOpen.add(id);
+    } else if (act === 'gear-close') homeGearOpen = false;
+    else if (act === 'conn-app') { if (A.openConnections) A.openConnections(); return; }
+    else if (act === 'oldset') { if (A.openSettings) A.openSettings(); return; }
     else if (act === 'conn') { homeMode = 'conn'; homeConn = -1; }
     else if (act === 'connone') { homeMode = 'conn'; homeConn = Number(b.getAttribute('data-i')); }
     else if (act === 'team') { homeMakeTeams(A); return; }
@@ -765,11 +921,22 @@ async function homeAddEmp(el, A) {
   }
   if (homeMode === 'dept') homePaint(el, A);
 }
-setInterval(() => {
+setInterval(async () => {
   const chat = document.getElementById('homeChat');
-  if (!chat || !window.Aldeul || typeof window.Aldeul.chatWidget !== 'function') return;
-  if (typeof reportIsLive === 'function' && !reportIsLive()) return;
-  window.Aldeul.chatWidget(chat, 4);
+  if (chat && window.Aldeul && typeof window.Aldeul.chatWidget === 'function') {
+    if (typeof reportIsLive !== 'function' || reportIsLive()) window.Aldeul.chatWidget(chat, 4);
+  }
+  if (homeMode !== 'home' || !homeAPI || typeof loadReportPack !== 'function') return;
+  const home = document.getElementById('home');
+  if (!home || homeFieldBusy(home)) return;
+  try {
+    const data = await loadReportPack();
+    if (data && Array.isArray(data.items)) {
+      reportPack = { items: data.items, depts: data.depts || [], error: data.ok ? '' : (data.error || '') };
+      reportAt = Date.now();
+    }
+  } catch (e) { return; }
+  if (homeMode === 'home' && homeAPI && !homeFieldBusy(home)) homePaint(home, homeAPI);
 }, 8000);
 window.AldeulHome = {
   render(el, A) {

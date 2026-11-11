@@ -1234,7 +1234,11 @@ const server = http.createServer(async (req, res) => {
       }
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
       try {
-        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target: botDeliverTarget(target), command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId, cmdId }) });
+        // 현황판 아래 칸은 source 를 PC 로 보내요. 그록이 채팅에 「(PC에서 보냄)」으로 적어요.
+        const fromPc = b.source === 'PC';
+        const hookBody = { target: botDeliverTarget(target), command, source: fromPc ? 'PC' : '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId, cmdId };
+        if (fromPc) hookBody.via = 'PC에서 보냄';
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify(hookBody) });
         h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
       } catch (e) { h.result = '실패: ' + e.message; }
       grokReportSent(reportId, h.ok);
