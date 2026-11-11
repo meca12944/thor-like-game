@@ -829,19 +829,20 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/company/reports') {
       // 그록이 사장님 구글 드라이브에 쓰는 회사 보고 (사장님 11-11 「좋아」: 공개 저장소 대신 드라이브)
       const f = state.settings.reportsFile;
-      if (!f) return json(res, { ok: false, error: '아직 「☁ 회사 보고 폴더」를 정하지 않았어요.', items: [] });
+      if (!f) return json(res, grokFillCompanyReports({ ok: false, error: '아직 「☁ 회사 보고 폴더」를 정하지 않았어요.', items: [] }));
       try {
         const st = fs.statSync(f);
         let raw = JSON.parse(fs.readFileSync(f, 'utf8').replace(/^\uFEFF/, ''));
         if (!Array.isArray(raw)) raw = raw.reports || raw.items || [];
         const str = (v, n) => String(v == null ? '' : v).slice(0, n);
         const items = raw.slice(-200).map((r) => ({
+          id: str(r.id, 80),
           time: str(r.time || r.sentAt || r.at, 40), target: str(r.target || r.dept, 80), command: str(r.command, 500), lead: str(r.lead || r.leader, 80),
           status: str(r.status, 40), summary: (Array.isArray(r.summary) ? r.summary : String(r.summary || '').split('\n')).map((x) => str(x, 300)).filter(Boolean).slice(0, 5),
           result: str(r.result || r.output || r.where, 300),
         })).sort((a, b) => String(b.time).localeCompare(String(a.time)));
-        return json(res, { ok: true, items, at: st.mtime });
-      } catch (e) { return json(res, { ok: false, error: '보고 파일을 못 읽었어요: ' + e.message, items: [] }); }
+        return json(res, grokFillCompanyReports({ ok: true, items, at: st.mtime }));
+      } catch (e) { return json(res, grokFillCompanyReports({ ok: false, error: '보고 파일을 못 읽었어요: ' + e.message, items: [] })); }
     }
     if (p === '/api/events') {
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' });
@@ -903,7 +904,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (p === '/api/bot/command') {
       // 「🏢 회사 일 시키기」: 바탕화면 명령창과 같은 곳으로 보냄.
-      // 몸: {target, command, source: "알들 컴퍼니 명령창", sentAt}. 접속 정보는 🔌 연결 → 🤖 그록 봇에 저장된 것을 쓴다.
+      // 몸: {target, command, source: "알들 컴퍼니 명령창", sentAt, reportId}. 접속 정보는 🔌 연결 → 🤖 그록 봇에 저장된 것을 쓴다.
       const target = String(b.target || '').trim(), command = String(b.command || '').trim();
       if (!command) return json(res, { ok: false, error: '할 일을 적어 주세요. 예: 제로폰 오늘 정책 확인해서 보고해' });
       if (!target) return json(res, { ok: false, error: '보낼 곳을 골라 주세요.' });
@@ -911,10 +912,12 @@ const server = http.createServer(async (req, res) => {
       const cfg = botConfig();
       if (!cfg) return json(res, { ok: false, error: '먼저 🔌 연결 → 🤖 그록 봇을 이어 주세요.' });
       const h = { id: uid(), time: now(), target, command, ok: false, result: '' };
+      const reportId = grokReportIntake(target, command);
       try {
-        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString() }) });
+        const r = await fetch(cfg.url, { method: 'POST', headers: { authorization: 'Bearer ' + cfg.key, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify({ target, command, source: '알들 컴퍼니 명령창', sentAt: new Date().toISOString(), reportId }) });
         h.ok = r.ok; h.result = r.ok ? '보냄' : '실패 ' + r.status;
       } catch (e) { h.result = '실패: ' + e.message; }
+      grokReportSent(reportId, h.ok);
       state.botHistory.unshift(h); if (state.botHistory.length > 100) state.botHistory.length = 100;
       changed();
       return json(res, { ok: h.ok, error: h.ok ? '' : '못 보냈어요 (' + h.result + ')' });
@@ -1043,3 +1046,208 @@ server.listen(state.settings.port, '127.0.0.1', () => {
     for (const e of state.employees) next(e); // 꺼지기 전에 남아 있던 일 이어서
   });
 });
+
+// ── 그록: 보고 창 더하기 ──
+// 새 주소는 만들지 않아요. 위의 /api/company/reports 가 준 items 뒤에
+// 접수 기록과 사장님께 가는 클로드 보고만 더합니다. state.reports 는 읽기만 해요.
+const GROK_REPORT_STATUSES = new Set(['접수', '진행 중', '완료', '문제 있음']);
+function grokReportFile() { return path.join(DATA, 'company-reports.json'); }
+function grokReadArray(file) {
+  try {
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return Array.isArray(data) ? data : [];
+  } catch (e) { return []; }
+}
+function grokWriteLocal(list) {
+  fs.mkdirSync(DATA, { recursive: true });
+  const file = grokReportFile();
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(list, null, 1));
+  fs.renameSync(tmp, file);
+}
+function grokKst(d) {
+  const base = d instanceof Date ? d : new Date(d);
+  const ms = base.getTime();
+  if (Number.isNaN(ms)) return '';
+  const t = new Date(ms + 9 * 60 * 60 * 1000);
+  const p = (n) => String(n).padStart(2, '0');
+  return t.getUTCFullYear() + '-' + p(t.getUTCMonth() + 1) + '-' + p(t.getUTCDate()) + ' ' + p(t.getUTCHours()) + ':' + p(t.getUTCMinutes());
+}
+function grokTimeText(time) {
+  const s = String(time || '').trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) return s.slice(0, 16);
+  return grokKst(s) || grokKst(new Date());
+}
+function grokReportMs(time) {
+  const s = String(time || '').trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
+    const ms = Date.parse(s.slice(0, 16).replace(' ', 'T') + ':00+09:00');
+    if (!Number.isNaN(ms)) return ms;
+  }
+  const ms = Date.parse(s);
+  return Number.isNaN(ms) ? 0 : ms;
+}
+function grokSafeUrl(u) {
+  const s = String(u || '').trim();
+  if (!/^https?:\/\//i.test(s)) return '';
+  if (/[\s"'<>]/.test(s)) return '';
+  return s;
+}
+function grokSafeLine(s) {
+  const t = String(s || '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  if (/[A-Za-z]:\\/.test(t) || /\/Users\/|\/home\//.test(t)) return '';
+  if (/bearer\s|api[_-]?key|webhook|비밀번호|암호|시크릿|secret|token/i.test(t)) return '';
+  return t.slice(0, 180);
+}
+function grokDeptOf(target) {
+  const t = String(target || '').trim();
+  if (!t || t === '전체') return null;
+  let d = BOT_TARGETS.depts.find((x) => x.name === t);
+  if (!d) d = BOT_TARGETS.depts.find((x) => x.name.startsWith(t));
+  if (!d) {
+    const bot = BOT_TARGETS.bots.find((b) => b.name === t);
+    if (bot) d = BOT_TARGETS.depts.find((x) => x.id === bot.dept);
+  }
+  return d || null;
+}
+function grokDeptName(name) {
+  const t = String(name || '').trim();
+  if (BOT_TARGETS.depts.some((d) => d.name === t)) return t;
+  const d = grokDeptOf(t);
+  return d ? d.name : '';
+}
+function grokCleanLines(lines) {
+  const out = [];
+  let inCode = false;
+  for (const raw of lines) {
+    const line = String(raw || '').trim();
+    if (!line) continue;
+    if (/^```/.test(line)) { inCode = !inCode; continue; }
+    if (inCode || /```/.test(line) || /@전달/.test(line)) continue;
+    const safe = grokSafeLine(line);
+    if (safe) out.push(safe);
+    if (out.length >= 3) break;
+  }
+  return out;
+}
+function grokClaudeStatus(r) {
+  if (GROK_REPORT_STATUSES.has(r.status)) return r.status;
+  if (r.stopped || r.isError) return '문제 있음';
+  return '완료';
+}
+function grokClaudeCard(r) {
+  if (!r || r.toBoss !== true) return null;
+  const given = grokCleanLines(Array.isArray(r.summary) ? r.summary : []);
+  const plain = String(r.text || '').replace(/```[\s\S]*?```/g, '\n');
+  const lines = given.length ? given : grokCleanLines(plain.split('\n'));
+  const found = plain.split('\n').filter((line) => !/@전달/.test(line)).join('\n').match(/https?:\/\/[^\s"'<>)]+/);
+  const card = {
+    id: String(r.id || '').slice(0, 80),
+    time: grokTimeText(r.time),
+    target: '게임 필멸자',
+    command: String(r.task || r.command || '').split('\n')[0].replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: String(r.lead || r.empName || '클로드').slice(0, 80),
+    status: grokClaudeStatus(r),
+    summary: lines.length ? lines : ['보고가 도착했어요.'],
+    result: grokSafeUrl(r.result || r.where || (found ? found[0] : '')),
+    source: '클로드',
+    dept: '게임 필멸자',
+  };
+  if (r.needBoss === true) card.needBoss = true;
+  return card.id ? card : null;
+}
+function grokLocalCard(r) {
+  if (!r || !r.id) return null;
+  const target = String(r.target || '').trim().slice(0, 80);
+  const dept = grokDeptOf(target);
+  return {
+    id: String(r.id).slice(0, 80),
+    time: grokTimeText(r.time),
+    target,
+    command: String(r.command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: String(r.lead || (dept && dept.lead) || '').slice(0, 80),
+    status: GROK_REPORT_STATUSES.has(r.status) ? r.status : '접수',
+    summary: grokCleanLines(Array.isArray(r.summary) ? r.summary : []).slice(0, 3),
+    result: grokSafeUrl(r.result || r.where),
+    source: '그록',
+    dept: dept ? dept.name : '',
+  };
+}
+function grokPublicItem(r) {
+  if (!r || typeof r !== 'object') return null;
+  const target = String(r.target || '').trim().slice(0, 80);
+  const id = String(r.id || '').trim().slice(0, 80);
+  const known = GROK_REPORT_STATUSES.has(r.status) ? r.status : String(r.status || '').trim().slice(0, 40);
+  const item = {
+    time: grokTimeText(r.time),
+    target,
+    command: String(r.command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: String(r.lead || '').trim().slice(0, 80),
+    status: known || '완료',
+    summary: grokCleanLines(Array.isArray(r.summary) ? r.summary : String(r.summary || '').split('\n')),
+    result: grokSafeUrl(r.result),
+    source: r.source === '클로드' ? '클로드' : '그록',
+    dept: grokDeptName(target),
+  };
+  if (id) item.id = id;
+  if (r.needBoss === true) item.needBoss = true;
+  return item;
+}
+function grokFillCompanyReports(payload) {
+  try {
+    const base = payload && typeof payload === 'object' ? { ...payload } : { ok: false, items: [] };
+    const items = (Array.isArray(base.items) ? base.items : []).map(grokPublicItem).filter(Boolean);
+    const ids = new Set(items.map((it) => it.id).filter(Boolean));
+    for (const raw of grokReadArray(grokReportFile())) {
+      const card = grokLocalCard(raw);
+      if (!card || ids.has(card.id)) continue;
+      ids.add(card.id);
+      items.push(card);
+    }
+    for (const r of state.reports.slice(0, 120)) {
+      const card = grokClaudeCard(r);
+      if (!card || ids.has(card.id)) continue;
+      ids.add(card.id);
+      items.push(card);
+    }
+    items.sort((a, b) => grokReportMs(b.time) - grokReportMs(a.time));
+    base.items = items;
+    return base;
+  } catch (e) {
+    return payload || { ok: false, items: [] };
+  }
+}
+function grokReportIntake(target, command) {
+  const id = 'rpt-' + uid();
+  const dept = grokDeptOf(target);
+  const item = {
+    id,
+    time: grokKst(new Date()),
+    target,
+    command: String(command || '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    lead: dept && dept.lead ? dept.lead : '',
+    status: '접수',
+    summary: ['명령을 받았어요. 팀장이 확인하면 진행으로 바뀌어요.'],
+    result: '',
+    source: '그록',
+    dept: dept ? dept.name : '',
+  };
+  try {
+    const list = grokReadArray(grokReportFile());
+    list.unshift(item);
+    if (list.length > 200) list.length = 200;
+    grokWriteLocal(list);
+  } catch (e) { console.error('[보고 창] 접수 기록을 저장하지 못했어요'); }
+  return id;
+}
+function grokReportSent(id, ok) {
+  if (!id || ok) return;
+  try {
+    const list = grokReadArray(grokReportFile());
+    const i = list.findIndex((r) => r && r.id === id);
+    if (i < 0) return;
+    list[i] = { ...list[i], status: '문제 있음', summary: ['그록 봇에게 일을 넘기지 못했어요. 연결을 확인한 뒤 다시 보내 주세요.'] };
+    grokWriteLocal(list);
+  } catch (e) { console.error('[보고 창] 문제 상태를 저장하지 못했어요'); }
+}
