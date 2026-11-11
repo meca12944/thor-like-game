@@ -14,6 +14,8 @@
 <!-- 화면 1: 회사 홈 (그록이 ui/home.js 로 채워요. 없으면 app.js 의 기본 홈) -->
 <div id="view-home" class="view">
   <header class="top">
+    <button type="button" class="home-back" data-home="back" hidden>← 첫 화면</button>
+    <b id="homeScreen" class="home-screen" hidden></b>
     <div class="brand" data-home="back" title="회사 처음으로"><b>알들 컴퍼니</b><span id="homeDate" class="home-date"></span></div>
     <div class="summary" id="homeSummary"></div>
     <button class="btn ghost" data-act="settings" title="설정">⚙</button>

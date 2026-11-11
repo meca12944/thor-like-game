@@ -368,6 +368,24 @@ function homePaintDate() {
     el.textContent = new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
   } catch (e) { el.textContent = ''; }
 }
+function homePaintBar(A) {
+  homePaintDate();
+  const back = document.querySelector('#view-home .home-back');
+  const screen = document.getElementById('homeScreen');
+  const sub = homeGearOpen || homeMode === 'dept';
+  if (back) back.hidden = !sub;
+  if (!screen) return;
+  if (homeGearOpen) {
+    screen.hidden = false;
+    screen.textContent = '설정';
+  } else if (homeMode === 'dept') {
+    screen.hidden = false;
+    screen.textContent = '부서: ' + homeCurrentDept(A).name;
+  } else {
+    screen.hidden = true;
+    screen.textContent = '';
+  }
+}
 function boardMore(r, esc) {
   const full = boardClean(r && r.command);
   const short = boardTitle(full);
@@ -498,9 +516,7 @@ function boardHomeHtml(pack, A, esc) {
   const done = rows.filter((x) => x.info.key === 'done' && boardDay(x.ms) === today).sort((a, b) => (b.ms || 0) - (a.ms || 0));
   const kept = rows.filter((x) => x.info.key === 'done' && boardDay(x.ms) !== today).sort((a, b) => (b.ms || 0) - (a.ms || 0));
   const askText = boardAskText(askN, loading);
-  const head = homeMode === 'dept'
-    ? `<h1 class="board-head">${esc(homeCurrentDept(A).name)}</h1><div class="board-sub">${askText}</div>`
-    : `<h1 class="board-head">${askText}</h1>`;
+  const head = homeGearOpen ? '' : `<h1 class="board-head">${askText}</h1>`;
   const restHtml = loading
     ? '<div class="muted board-empty">불러오는 중…</div>'
     : (rest.length ? rest.map((x) => boardItemHtml(x, esc)).join('') : (urgent.length ? '' : '<div class="muted board-empty">지금 하는 일이 없어요.</div>'));
@@ -547,7 +563,7 @@ function homePaint(el, A) {
   const esc = A.esc;
   if (homeMode === 'conn') return homePaintConn(el, A, esc);
   homeGearDot(A);
-  homePaintDate();
+  homePaintBar(A);
   const html = boardHomeHtml(pack, A, esc);
   const swapped = homeSwap(el, html);
   if (swapped === 'wait') return;
@@ -849,7 +865,7 @@ function homeBind(el, A) {
       if (home && homeAPI) homePaint(home, homeAPI);
     }, true);
     document.addEventListener('click', (ev) => {
-      const brand = ev.target.closest && ev.target.closest('#view-home .brand');
+      const brand = ev.target.closest && ev.target.closest('#view-home .brand, #view-home .home-back');
       if (!brand) return;
       const view = document.getElementById('view-home');
       if (!view || view.hidden) return;
