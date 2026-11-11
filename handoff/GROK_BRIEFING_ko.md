@@ -9,7 +9,7 @@
 ---
 
 <!-- AUTO:START -->
-> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 14:17 한국 시각, main `c36c347c 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
+> 🔄 이 칸은 **저절로 채워져요** (마지막: 2026-11-11 16:36 한국 시각, main `57d937cd 2026-11-11`). 고치지 말고 `tools/team_board.py` 를 고쳐요.
 
 ## 0. AI 동료에게 (그록 · 다른 클로드) — 먼저 읽기
 - 이 문서 주소 하나로 지금 일을 알 수 있어요: https://raw.githubusercontent.com/meca12944/thor-like-game/main/handoff/GROK_BRIEFING_ko.md
@@ -42,6 +42,8 @@
 - 10-30 · #198 주인공 v3 게임에: 그록 작은그림 작화(키 218) + 정면·뒷면 달리기 + 걸음 소리
 
 ## 지금 하고 있는 작업 (아직 게임 밖, 최근 10일)
+- 11-11 · `claude/busy-goodall-u5zn4r` — 알들 컴퍼니: 회사 홈 틀 + 공용 테마 + 클로드↔그록 대화 창 + 위험한 허락 (그록 설계안, 사장님 「좋아」)
+- 11-11 · `claude/office-theme` — 클로드 작업장: 색·글꼴·단추·창 모양을 theme.css 변수로 뽑음
 - 11-11 · `grok/office-company-depts` — 회사 일 시키기 부서·팀원 이름을 알들 컴퍼니와 같게
 - 11-06 · `claude/linette-8dir` — 모션 교과서: 정면 3타 게임 반영(PR #205)
 
