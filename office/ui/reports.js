@@ -130,6 +130,36 @@ function reportOpt(el) {
   const title = el && el.dataset ? (el.dataset.reportTitle || '') : '';
   return { dept, title };
 }
+const reportDrawn = new WeakMap();
+function reportPaint(el) {
+  if (!el) return;
+  if (typeof homeUserScrolling === 'function' && homeUserScrolling()) {
+    el.dataset.reportDirty = '1';
+    return;
+  }
+  delete el.dataset.reportDirty;
+  const html = reportHtml(reportPack, reportOpt(el));
+  if (reportDrawn.get(el) === html) return;
+  const list = el.querySelector('.home-report-list');
+  let top = 0;
+  let height = 0;
+  let atTop = true;
+  if (list) {
+    top = list.scrollTop;
+    height = list.scrollHeight;
+    atTop = top < 8;
+  } else if (window.homeReportScroll) {
+    top = window.homeReportScroll.top;
+    height = window.homeReportScroll.height;
+    atTop = window.homeReportScroll.atTop;
+  }
+  reportDrawn.set(el, html);
+  el.innerHTML = html;
+  const next = el.querySelector('.home-report-list');
+  if (!next) return;
+  if (atTop) next.scrollTop = 0;
+  else next.scrollTop = top + Math.max(0, next.scrollHeight - height);
+}
 async function reportOpenFile(id, index) {
   try {
     await fetch('/api/openFile', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ c: id, a: Number(index) }) });
@@ -155,7 +185,8 @@ async function renderReports(el, opt) {
         const deptBtn = ev.target.closest('[data-reportdept]');
         if (deptBtn) {
           reportDept = deptBtn.getAttribute('data-reportdept') || '전체';
-          el.innerHTML = reportHtml(reportPack, reportOpt(el));
+          reportDrawn.delete(el);
+          reportPaint(el);
           return;
         }
         const card = ev.target.closest('[data-report-toggle]');
@@ -164,10 +195,11 @@ async function renderReports(el, opt) {
         if (!id) return;
         if (reportOpen.has(id)) reportOpen.delete(id);
         else reportOpen.add(id);
-        el.innerHTML = reportHtml(reportPack, reportOpt(el));
+        reportDrawn.delete(el);
+        reportPaint(el);
       });
     }
-    el.innerHTML = reportHtml(reportPack, reportOpt(el));
+    reportPaint(el);
     if (reportPack && Date.now() - reportAt < 15000) {
       if (typeof homeAfterReports === 'function') homeAfterReports();
       return;
@@ -177,7 +209,7 @@ async function renderReports(el, opt) {
     else if (!reportPack) reportPack = { items: [], depts: [], error: '보고를 불러오지 못했어요.' };
     reportAt = Date.now();
     const slot = el.isConnected ? el : document.getElementById('homeReports');
-    if (slot) slot.innerHTML = reportHtml(reportPack, reportOpt(slot));
+    if (slot) reportPaint(slot);
     if (typeof homeAfterReports === 'function') homeAfterReports();
   } catch (e) {
     el.innerHTML = '<div class="card home-report-panel"><b>보고 창</b><div class="muted small">보고 창을 그리지 못했어요.</div></div>';

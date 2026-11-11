@@ -239,6 +239,57 @@ async function homeTopSend(el, A) {
   const slot = el.querySelector('#homeReports');
   if (typeof renderReports === 'function' && slot) renderReports(slot);
 }
+let homeScrollUntil = 0;
+let homeScrollTimer = null;
+let homeScrollWait = false;
+let homeShell = '';
+window.homeReportScroll = { top: 0, height: 0, atTop: true };
+function homeUserScrolling() { return Date.now() < homeScrollUntil; }
+const HOME_SCROLL = ['.home-main', '.dept-col', '.home-chat', '.dept-talk-list', '.home-col-work', '.art-gallery', '.home-report-list'];
+function homeCollectScroll() {
+  const list = document.querySelector('.home-report-list');
+  if (list) window.homeReportScroll = { top: list.scrollTop, height: list.scrollHeight, atTop: list.scrollTop < 8 };
+  const saved = [];
+  HOME_SCROLL.forEach((sel) => {
+    document.querySelectorAll(sel).forEach((n, i) => {
+      if (!n.scrollTop && !n.scrollLeft) return;
+      saved.push({ sel: sel, i: i, top: n.scrollTop, left: n.scrollLeft, h: n.scrollHeight, atTop: n.scrollTop < 8 });
+    });
+  });
+  return saved;
+}
+function homeApplyScroll(saved) {
+  (saved || []).forEach((s) => {
+    const n = document.querySelectorAll(s.sel)[s.i];
+    if (!n) return;
+    if (s.atTop) { n.scrollTop = 0; return; }
+    const grow = s.sel === '.home-report-list' ? Math.max(0, n.scrollHeight - s.h) : 0;
+    n.scrollTop = s.top + grow;
+    n.scrollLeft = s.left || 0;
+  });
+}
+function homeSwap(el, html) {
+  if (homeUserScrolling()) { homeScrollWait = true; return 'wait'; }
+  homeScrollWait = false;
+  if (homeShell === html && el.firstElementChild) return false;
+  const saved = homeCollectScroll();
+  homeShell = html;
+  el.innerHTML = html;
+  homeApplyScroll(saved);
+  return true;
+}
+function homeNoteScroll() {
+  homeScrollUntil = Date.now() + 280;
+  clearTimeout(homeScrollTimer);
+  homeScrollTimer = setTimeout(() => {
+    if (homeUserScrolling()) return;
+    const home = document.getElementById('home');
+    document.querySelectorAll('#homeReports, #zDeptReports').forEach((node) => {
+      if (node.dataset.reportDirty === '1' && typeof renderReports === 'function') renderReports(node, typeof reportOpt === 'function' ? reportOpt(node) : undefined);
+    });
+    if (homeScrollWait && home && window.Aldeul) homePaint(home, window.Aldeul);
+  }, 320);
+}
 function homePaint(el, A) {
   // 글 쓰는 중에는 입력칸을 다시 만들지 않아요. 보고 목록만 조용히 새로고침합니다.
   if (homeFieldBusy(el)) {
@@ -261,7 +312,7 @@ function homePaint(el, A) {
     const n = homeClaudeList(A, d.id).length;
     return `<button type="button" class="tile" data-home="dept" data-id="${esc(d.id)}"><div class="ico">${d.icon || '🏢'}</div><div class="nm">${esc(d.name)}</div><div class="ds">${esc(d.sub || '')}</div><div class="home-cnt">클로드 ${n}명</div></button>`;
   }).join('');
-  el.innerHTML = `<div class="home-page home-fit">
+  const html = `<div class="home-page home-fit">
     ${homeOrderHtml(pack, esc)}
     <div class="home-grid">
       <section class="home-col home-col-reports">
@@ -283,8 +334,10 @@ function homePaint(el, A) {
       </section>
     </div>
   </div>`;
+  const swapped = homeSwap(el, html);
+  if (swapped === 'wait') return;
+  if (swapped) homeRestoreFocus(el, snap);
   homeTopPaintNote(el);
-  homeRestoreFocus(el, snap);
   if (typeof renderReports === 'function') renderReports(el.querySelector('#homeReports'));
   const chat = el.querySelector('#homeChat');
   if (chat && typeof A.chatWidget === 'function') A.chatWidget(chat, 4);
@@ -428,7 +481,12 @@ async function homeLoadTalk(el, A, d) {
   const html = lines.length ? lines.join('') : '<div class="muted small">아직 이 부서 대화가 없어요. 아래에 적으면 고른 사람에게 가요.</div>';
   const box = el.querySelector('#zTalkList');
   if (!box || homeMode !== 'dept' || homeDeptId !== d.id) return;
+  if (box.dataset.talk === html) return;
+  const top = box.scrollTop;
+  const atTop = top < 8;
+  box.dataset.talk = html;
   box.innerHTML = html;
+  box.scrollTop = atTop ? 0 : top;
 }
 async function homeDeptAssign(el, A, d, who, command) {
   const show = (ok, text) => {
@@ -477,7 +535,7 @@ function homePaintDept(el, A, pack, esc) {
   const note = homeDeptNote && homeDeptNote.id === d.id ? homeDeptNote : null;
   const example = d.id === 'game' ? '보스 그림 정리해서 보고해' : '오늘 할 일 정리해서 보고해';
   const galleryBtn = homeGallery ? '결과물 접기' : '결과물 모아 보기';
-  el.innerHTML = `<div class="dept-page home-fit">
+  const html = `<div class="dept-page home-fit">
     <div class="dept-bar">
       <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
       <div class="dept-name"><span class="ico">${d.icon || '🏢'}</span><div><b>${esc(d.name)}</b><div class="muted small">${esc(d.sub || '')} · 클로드 ${claude.length}명 · 그록 ${bots.length}명</div></div></div>
@@ -518,6 +576,7 @@ function homePaintDept(el, A, pack, esc) {
       </section>
     </div>
   </div>`;
+  if (homeSwap(el, html) === 'wait') return;
   if (typeof renderReports === 'function') renderReports(el.querySelector('#zDeptReports'), { dept: d.name, title: '📋 이 부서 보고' });
   homeLoadTalk(el, A, d);
 }
@@ -535,7 +594,7 @@ function homePaintConn(el, A, esc) {
       <div class="qa"><div class="qh">무슨 기능?</div>${esc(c.func || '')}</div>
       <div class="qa"><div class="qh">어떻게 켜요?</div>${esc(c.how || '')}</div>
     </div>` : `<div class="card conn-detail"><b>아이콘을 눌러 주세요</b><p class="muted">왼쪽 아이콘을 누르면, 무엇인지와 켜는 법이 여기에 나와요. 초록 불은 정말 이어졌을 때만 켜져요.</p></div>`;
-  el.innerHTML = `<div class="conn-page home-fit">
+  const html = `<div class="conn-page home-fit">
     <div class="dept-bar">
       <button type="button" class="btn ghost" data-home="back">← 회사 홈</button>
       <div class="title" style="margin:0">🔌 연결 설명 <span class="muted small">초록 불은 정말 이어졌을 때만 켜져요</span></div>
@@ -545,8 +604,16 @@ function homePaintConn(el, A, esc) {
       ${detail}
     </div>
   </div>`;
+  homeSwap(el, html);
 }
 function homeBind(el, A) {
+  if (!window.homeScrollBound) {
+    window.homeScrollBound = true;
+    document.addEventListener('scroll', (ev) => {
+      const t = ev.target;
+      if (t && t.closest && t.closest('#home, .home-main')) homeNoteScroll();
+    }, true);
+  }
   if (el.dataset.homeBound === '1') return;
   el.dataset.homeBound = '1';
   el.addEventListener('submit', (ev) => {
