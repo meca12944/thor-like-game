@@ -200,7 +200,29 @@ function ruleMatches(rule, tool, input) {
   if (tool === 'WebFetch' && m[2].startsWith('domain:')) { try { return new URL(input.url).hostname === m[2].slice(7); } catch (e) { return false; } }
   return false;
 }
+// 위험한 일: 지우기·억지 덮어쓰기·main 에 바로 올리기·배포·결제 → 「허락」을 눌러도 기억하지 않고 매번 물어요
+const DANGER = [
+  /\brm\s+-[a-z]*r[a-z]*f|\brm\s+-[a-z]*f[a-z]*r/i,
+  /\b(rmdir|rd)\s+\/s\b|\bdel\s+\/[sqf]|Remove-Item\b[^\n]*-Recurse/i,
+  /\bgit\s+push\b[^\n]*(\s--force(-with-lease)?\b|\s-f\b|\s\+\S)/i,
+  /\bgit\s+push\b[^\n]*\s(HEAD:)?(refs\/heads\/)?(main|master)\b/i,
+  /\bgit\s+(reset\s+--hard|clean\s+-[a-z]*f|branch\s+-D)\b|\bgit\s+push\b[^\n]*--delete\b/i,
+  /\b(npm|yarn|pnpm)\s+publish\b|\b(vercel|netlify|firebase)\b[^\n]*\bdeploy\b|\bgh\s+(release\s+create|pr\s+merge)\b/i,
+  /\b(stripe|paypal|payment)\b|결제/i,
+];
+function isDanger(tool, input) {
+  if (tool !== 'Bash' && tool !== 'PowerShell') return false;
+  const c = String((input && input.command) || '');
+  return DANGER.some((r) => r.test(c));
+}
+// 이 낱말로 시작하는 허락은 클로드 코드에 미리 넘기지 않고 회사 창구에서 한 번 더 살펴봄 (위험한 변형을 막으려고)
+const RISKY_PREFIX = ['rm', 'del', 'rmdir', 'rd', 'Remove-Item', 'git push', 'git reset', 'git clean', 'git branch', 'npm publish', 'vercel', 'netlify', 'firebase', 'gh release', 'gh pr'];
+function safeForCli(rule) {
+  const m = rule.match(/^(Bash|PowerShell)\((.+?)(:\*)?\)$/);
+  return !m || !RISKY_PREFIX.some((p) => m[2] === p || m[2].startsWith(p + ' '));
+}
 function isAllowed(tool, input) {
+  if (isDanger(tool, input)) return false;
   if (tool === 'Bash' || tool === 'PowerShell') {
     const parts = splitShell(input.command);
     if (!parts.length) return false;
@@ -233,7 +255,7 @@ const pending = new Map(); // id → {id, emp, tool, input, label, rules, res, t
 function askPermission(empId, tool, input, res) {
   if (isAllowed(tool, input)) return res.end(JSON.stringify({ allow: true }));
   const emp = findEmp(empId);
-  const p = { id: uid(), emp: empId, empName: emp ? emp.name : empId, tool, input, label: describeTool(tool, input), detail: tool === 'Bash' || tool === 'PowerShell' ? input.command : JSON.stringify(input).slice(0, 400), rules: makeRules(tool, input), time: now(), res };
+  const p = { id: uid(), emp: empId, empName: emp ? emp.name : empId, tool, input, danger: isDanger(tool, input), label: describeTool(tool, input), detail: tool === 'Bash' || tool === 'PowerShell' ? input.command : JSON.stringify(input).slice(0, 400), rules: makeRules(tool, input), time: now(), res };
   pending.set(p.id, p);
   if (emp) { emp.status = 'waiting'; emp.now = '허락 기다리는 중: ' + p.label; }
   res.on('close', () => { if (pending.has(p.id) && !res.writableEnded) { pending.delete(p.id); const e = findEmp(empId); if (e && e.status === 'waiting' && ![...pending.values()].some((q) => q.emp === empId)) { e.status = procs.has(e.id) ? 'working' : 'idle'; e.now = ''; } changed(); } });
@@ -244,6 +266,7 @@ function answerPermission(id, answer) {
   const p = pending.get(id);
   if (!p) return false;
   pending.delete(id);
+  if (answer === 'always' && p.danger) answer = 'once'; // 위험한 일은 기억하지 않음
   if (answer === 'always') { for (const r of p.rules) if (!state.rules.includes(r)) state.rules.push(r); }
   // 같은 규칙으로 풀리는 다른 요청도 같이 풂
   if (answer === 'always') for (const q of [...pending.values()]) if (isAllowed(q.tool, q.input)) { pending.delete(q.id); q.res.end(JSON.stringify({ allow: true })); restoreWorking(q.emp); }
@@ -319,7 +342,8 @@ function claudeArgs(emp, promptFile) {
     fs.writeFileSync(mcpFile, JSON.stringify({ mcpServers: { office: { command: process.execPath, args: [path.join(ROOT, 'perm-mcp.js')], env: { OFFICE_URL: `http://127.0.0.1:${state.settings.port}`, OFFICE_EMP: emp.id } } } }));
     a.push('--mcp-config', mcpFile);
     a.push('--permission-prompt-tool', 'mcp__office__approve');
-    if (state.rules.length) a.push('--allowedTools', ...state.rules);
+    const cliRules = state.rules.filter(safeForCli);
+    if (cliRules.length) a.push('--allowedTools', ...cliRules);
   }
   if (claude.flags['--append-system-prompt-file']) a.push('--append-system-prompt-file', promptFile);
   else a.push('--append-system-prompt', fs.readFileSync(promptFile, 'utf8'));
@@ -539,11 +563,12 @@ async function sendToBot(item) {
   changed(); pollSoon();
 }
 // 깃허브 대화방 확인
+let coopChat = [];
 let pollTimer = null, etag = '', rateLeft = 60, rateReset = 0, coopStatus = { ok: false, at: '' };
 function pollSoon(ms) { clearTimeout(pollTimer); pollTimer = setTimeout(pollIssue, ms || 1500); }
 function nextPoll() {
   const waiting = state.grokLog.some((g) => g.relay && g.relay.state === 'waiting');
-  let ms = state.settings.ghToken ? 20000 : waiting ? 20000 : 180000;
+  let ms = state.settings.ghToken ? 20000 : waiting ? 20000 : grokWay() === 'bot' ? 180000 : 300000;
   if (!state.settings.ghToken && rateLeft < 4 && rateReset) ms = Math.max(ms, rateReset * 1000 - Date.now() + 2000);
   pollSoon(ms);
 }
@@ -561,7 +586,7 @@ async function fetchFile(url) {
   } catch (e) { return null; }
 }
 async function pollIssue() {
-  if (grokWay() !== 'bot') return pollSoon(60000);
+  // 그록 봇이 안 이어졌어도 「클로드↔그록 대화」 창을 위해 #207 은 천천히 읽어요
   try {
     const headers = { 'user-agent': 'claude-workshop', accept: 'application/vnd.github+json' };
     if (state.settings.ghToken) headers.authorization = 'Bearer ' + state.settings.ghToken;
@@ -572,6 +597,12 @@ async function pollIssue() {
     if (r.status === 200) {
       etag = r.headers.get('etag') || '';
       const list = (await r.json()).sort((a, b) => a.id - b.id);
+      coopChat = list.map((c) => {
+        const body = String(c.body || '');
+        const who = /^\s*\[그록\]/.test(body) ? 'grok' : /claude-workshop|^\s*\[클로드\]/.test(body) ? 'claude' : 'boss';
+        const text = body.replace(/<!--[\s\S]*?-->/g, '').replace(/\n---\n_Generated by[\s\S]*$/, '').replace(/^\s*\[(그록|클로드)\]\s*/, '').trim();
+        return { id: c.id, who, time: c.created_at, text: text.slice(0, 6000), url: c.html_url };
+      });
       if (state.coopLastId === undefined) { state.coopLastId = list.length ? list[list.length - 1].id : 0; save(); }
       for (const c of list) {
         if (c.id <= state.coopLastId) continue;
@@ -730,7 +761,7 @@ function publicState() {
     claude: { ok: claude.ok, version: claude.version, error: claude.error, modes: claude.modes },
     employees: state.employees.map((e) => ({ id: e.id, name: e.name, role: e.role, partner: !!e.partner, folder: e.folder, mode: e.mode, model: e.model, status: e.status, now: e.now, queue: e.queue.length, task: e.task ? e.task.text : '', taskFrom: e.task ? e.task.from : '', startedAt: e.startedAt, hasSession: !!e.started })),
     reports: state.reports.slice(0, 120).map((r) => ({ ...r, files: r.files.map((f, i) => ({ i, name: path.basename(f), kind: /\.(mp4|webm|mov)$/i.test(f) ? 'video' : 'image' })) })),
-    pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
+    pending: [...pending.values()].map((p) => ({ id: p.id, emp: p.emp, empName: p.empName, tool: p.tool, danger: !!p.danger, label: p.label, detail: p.detail, rules: p.rules, time: p.time })),
   };
 }
 
@@ -771,6 +802,24 @@ const server = http.createServer(async (req, res) => {
       return sendFile(req, res, full);
     }
     if (p === '/api/state') return json(res, publicState());
+    if (p === '/api/coop/chat') { if (u.searchParams.get('refresh')) pollSoon(200); return json(res, { items: coopChat, issueUrl: ISSUE_URL(), at: coopStatus.at }); }
+    if (p === '/api/company/reports') {
+      // 그록이 사장님 구글 드라이브에 쓰는 회사 보고 (사장님 11-11 「좋아」: 공개 저장소 대신 드라이브)
+      const f = state.settings.reportsFile;
+      if (!f) return json(res, { ok: false, error: '아직 「☁ 회사 보고 폴더」를 정하지 않았어요.', items: [] });
+      try {
+        const st = fs.statSync(f);
+        let raw = JSON.parse(fs.readFileSync(f, 'utf8').replace(/^\uFEFF/, ''));
+        if (!Array.isArray(raw)) raw = raw.reports || raw.items || [];
+        const str = (v, n) => String(v == null ? '' : v).slice(0, n);
+        const items = raw.slice(-200).map((r) => ({
+          time: str(r.time || r.sentAt || r.at, 40), target: str(r.target || r.dept, 80), command: str(r.command, 500), lead: str(r.lead || r.leader, 80),
+          status: str(r.status, 40), summary: (Array.isArray(r.summary) ? r.summary : String(r.summary || '').split('\n')).map((x) => str(x, 300)).filter(Boolean).slice(0, 5),
+          result: str(r.result || r.output || r.where, 300),
+        })).sort((a, b) => String(b.time).localeCompare(String(a.time)));
+        return json(res, { ok: true, items, at: st.mtime });
+      } catch (e) { return json(res, { ok: false, error: '보고 파일을 못 읽었어요: ' + e.message, items: [] }); }
+    }
     if (p === '/api/events') {
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' });
       res.write(`event: state\ndata: ${JSON.stringify(publicState())}\n\n`);
@@ -930,7 +979,7 @@ const server = http.createServer(async (req, res) => {
       if (b.grokBudget !== undefined && b.grokBudget !== '') state.settings.grokBudget = Math.max(0, Number(b.grokBudget) || 0);
       if (typeof b.grokDir === 'string') grokKnown = null;
       if (['paste', 'api', 'bot'].includes(b.grokMode)) state.settings.grokMode = b.grokMode;
-      for (const k of ['botUrl', 'botTarget', 'companyUrl']) if (typeof b[k] === 'string') state.settings[k] = b[k].trim();
+      for (const k of ['botUrl', 'botTarget', 'companyUrl', 'reportsFile']) if (typeof b[k] === 'string') state.settings[k] = b[k].trim().replace(/^"|"$/g, '');
       if (typeof b.botKey === 'string' && b.botKey.trim()) state.settings.botKey = b.botKey.trim();
       if (typeof b.ghToken === 'string' && b.ghToken.trim()) state.settings.ghToken = b.ghToken.trim();
       if (b.botKeyClear) { state.settings.botKey = ''; state.settings.botUrl = ''; }

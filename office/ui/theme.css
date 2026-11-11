@@ -1,6 +1,9 @@
-/* 클로드 작업장 — 겉모습 변수 (theme.css)
-   색·글꼴·버튼·창 모양을 여기 한 곳에서 정한다. style.css 와 다른 화면(그록의 홈 화면 등)은 이 이름만 쓴다.
-   이름 규칙: --무엇-어디 (예: --btn-radius = 버튼 모서리). 이름을 바꾸면 다른 화면이 깨지니 바꾸지 말고 새로 더한다. */
+/* 알들 컴퍼니 공용 테마 (클로드가 기준을 만들고 그록이 맞춰 씀 — office/공동개발_규칙.md)
+   - 색·글꼴·단추·카드·창 모양은 아래 --이름 만 쓰기 (밝은/어두운 화면 자동). 이름 규칙 --무엇-어디, 이름은 바꾸지 말고 새로 더하기
+   - 단추: .btn / .btn.ghost / .btn.green / .btn.red / .btn.small / .btn.big
+   - 아이콘 타일: .tiles > .tile (.ico .nm .ds, 상태등 .lamp.on/.off)
+   - 카드: .card (.card-head, time), 빈 자리 안내: .empty
+   - 움직임·네온 없음. 상태등은 진짜 완료일 때만 🟢. 글은 중학생도 아는 쉬운 말. */
 :root {
   /* ── 색 (밝은 화면) ── */
   --bg: #f3f4f6;            /* 바탕 */
@@ -9,7 +12,7 @@
   --text: #1d2129;          /* 글자 */
   --muted: #6b7280;         /* 흐린 글자 */
   --ink: #16181d;           /* 진한 칩·말풍선 테두리 */
-  --on-color: #fff;         /* 색 단추 위 글자 */
+  --on-color: #fff;         /* 색 단추·동그라미 위 글자 */
   --accent: #c8643b;        /* 대표색 (주황) */
   --accent-soft: #fbeee7;
   --blue: #2f6fde;          /* 링크·일하는 중 */
@@ -24,7 +27,7 @@
   /* ── 글꼴 ── */
   --font: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
   --font-mono: Consolas, "D2Coding", monospace;
-  --font-size: 16px;        /* 기본 글자 크기 */
+  --font-size: 16px;        /* 기본 글자 */
   --font-size-sm: 13px;     /* 작은 글자 */
   --font-size-lg: 17px;     /* 제목 글자 */
   --line-height: 1.6;
@@ -50,12 +53,84 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    /* ── 색 (어두운 화면) ── */
-    --bg: #15171b; --panel: #1f2227; --line: #31353c; --text: #e8eaee; --muted: #9aa1ab; --ink: #e8eaee;
-    --accent: #e0855e; --accent-soft: #3a2a22;
-    --blue: #6c9cf0; --blue-soft: #1f2a3d;
-    --green: #4cc27f; --green-soft: #1b3326;
-    --red: #ef6b6b; --red-soft: #3b2020;
-    --amber: #e3b456; --amber-soft: #3a3020;
+    --bg: #15171b; --panel: #1f2227; --line: #31353c; --text: #e8eaee; --muted: #9aa1ab;
+    --accent: #e0855e; --accent-soft: #3a2a22; --blue: #6c9cf0; --blue-soft: #1f2a3d;
+    --green: #4cc27f; --green-soft: #1b3326; --red: #ef6b6b; --red-soft: #3b2020;
+    --amber: #e3b456; --amber-soft: #3a3020; --ink: #e8eaee;
   }
 }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: var(--font-size)/var(--line-height) var(--font); display: flex; flex-direction: column; }
+button, select, input, textarea { font: inherit; color: inherit; }
+.muted { color: var(--muted); } .small { font-size: var(--font-size-sm); font-weight: 400; }
+
+/* 맨 위 */
+.top { display: flex; align-items: center; gap: 14px; padding: 12px 22px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 20px; }
+.brand img { width: 32px; height: 32px; border-radius: 8px; }
+.summary { flex: 1; color: var(--muted); }
+.summary b { color: var(--text); }
+.btn { border: 0; background: var(--accent); color: var(--on-color); padding: var(--btn-pad); border-radius: var(--btn-radius); cursor: pointer; font-weight: var(--btn-weight); }
+.btn:hover { filter: brightness(1.07); }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
+.btn.green { background: var(--green); } .btn.red { background: transparent; color: var(--red); border: 1px solid var(--red); }
+.btn.big { padding: 0 26px; font-size: 17px; }
+.btn.small { padding: 4px 12px; font-size: 14px; }
+.link { background: none; border: 0; color: var(--blue); cursor: pointer; padding: 2px 4px; font-size: 14px; }
+
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: var(--on-color); font-weight: 700; flex: none; }
+.badge { font-size: 11px; background: var(--ink); color: var(--panel); border-radius: 6px; padding: 0 5px; margin-left: 4px; vertical-align: 2px; }
+.empty { text-align: center; color: var(--muted); padding: 48px 0; }
+.card { background: var(--panel); border-radius: var(--card-radius); padding: var(--card-pad); border: 1px solid var(--line); }
+.card.new { border-left: 5px solid var(--accent); }
+.card.boss { border: 2px solid var(--amber); }
+.card.err { border: 2px solid var(--red); }
+.card-head { display: flex; align-items: center; gap: 10px; }
+.card-head .avatar { width: 30px; height: 30px; font-size: 14px; }
+.card-head time { margin-left: auto; font-size: 13px; color: var(--muted); }
+.card-task { font-size: 13.5px; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.card-task.open { white-space: pre-wrap; }
+.text { margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
+.text.clamp { max-height: 240px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.text code { word-break: break-all; background: var(--bg); padding: 0 4px; border-radius: 4px; font: 14px var(--font-mono); }
+.text h4 { margin: 6px 0 2px; font-size: 16px; }
+.card-foot { display: flex; gap: 6px; margin-top: 8px; align-items: center; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); }
+.card-foot .sp { flex: 1; }
+.media { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; margin-top: 10px; }
+.media figure { margin: 0; background: #000; border-radius: 10px; overflow: hidden; position: relative; }
+.media video, .media img { width: 100%; display: block; max-height: 360px; object-fit: contain; }
+.media img { cursor: zoom-in; }
+.media figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 8px; font-size: 12px; color: #fff; background: rgba(0,0,0,.5); pointer-events: none; }
+dialog { border: 0; border-radius: var(--dlg-radius); padding: 0; background: var(--panel); color: var(--text); width: var(--dlg-width); box-shadow: var(--dlg-shadow); }
+dialog::backdrop { background: var(--backdrop); }
+#dlgForm { padding: 20px 22px; max-height: 86vh; overflow: auto; }
+#dlgForm h2 { margin: 0 0 14px; font-size: 19px; }
+#dlgForm h3 { margin: 18px 0 8px; font-size: 15px; color: var(--muted); }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-weight: 700; margin-bottom: 4px; }
+.field .help { font-size: var(--font-size-sm); color: var(--muted); margin-top: 3px; }
+.field input[type=text], .field input[type=password], .field select { width: 100%; padding: 8px 10px; border-radius: var(--input-radius); border: 1px solid var(--line); background: var(--bg); }
+.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400 !important; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.err-text { color: var(--red); min-height: 1.4em; }
+details.more-set { margin-top: 10px; } details.more-set summary { cursor: pointer; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.tile { text-align: left; border: 2px solid var(--line); background: var(--bg); border-radius: var(--card-radius); padding: 12px 14px; cursor: pointer; position: relative; }
+.tile:hover { border-color: var(--accent); }
+.tile .ico { font-size: 30px; line-height: 1; }
+.tile .nm { font-weight: 700; margin-top: 6px; }
+.tile .ds { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.45; }
+.tile .lamp { position: absolute; top: 10px; right: 12px; font-size: 12.5px; font-weight: 700; }
+.lamp.on { color: var(--green); } .lamp.off { color: var(--muted); } .lamp.warn { color: var(--amber); }
+.conn-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.conn-head .ico { font-size: 40px; }
+.qa { background: var(--bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
+.qa .qh { font-weight: 700; margin-bottom: 2px; }
+.zoom { position: fixed; inset: 0; background: var(--overlay); display: grid; place-items: center; z-index: 9; cursor: zoom-out; }
+.zoom img { max-width: 96vw; max-height: 96vh; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 10px 18px; border-radius: var(--btn-radius); z-index: 10; }
+.banner-red { margin: 12px 22px 0; padding: 12px 16px; border-radius: 12px; background: var(--red-soft); border: 2px solid var(--red); }
+.view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.view[hidden] { display: none; }
