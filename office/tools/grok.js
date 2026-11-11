@@ -79,9 +79,10 @@ async function ask(o) {
   if (o.new) prev = null;
   const imgs = [].concat(o.img || []).filter((x) => x !== true);
   for (const f of imgs) if (!fs.existsSync(f)) die('그림이 없어요: ' + f);
-  const content = imgs.length ? [{ type: 'input_text', text }, ...imgs.map((f) => ({ type: 'input_image', image_url: dataUri(f) }))] : text;
+  let content = imgs.length ? [{ type: 'input_text', text }, ...imgs.map((f) => ({ type: 'input_image', image_url: dataUri(f) }))] : text;
   guard(PRICE.chat);
   await tellOffice('ask', text, imgs);
+  if (thread === 'room' && typeof content === 'string' && !/^\[클로드/.test(content)) content = '[클로드 직원] ' + content;
   const body = { model: o.model || M_CHAT, input: [{ role: 'user', content }] };
   if (prev) body.previous_response_id = prev;
   const j = await call('POST', '/v1/responses', body);

@@ -269,10 +269,10 @@ function claudeArgs(emp, promptFile) {
   if (emp.started) a.push('--resume', emp.sessionId); else a.push('--session-id', emp.sessionId);
   return a;
 }
-function order(empId, text, from = '사장님', hop = 0, kind = 'ask', root = null) {
+function order(empId, text, from = '사장님', hop = 0, kind = 'ask', root = null, extra = {}) {
   const emp = findEmp(empId);
   if (!emp) return false;
-  emp.queue.push({ id: uid(), text, from, hop, kind, root: root || emp.id, time: now() });
+  emp.queue.push({ id: uid(), text, from, hop, kind, root: root || emp.id, time: now(), ...extra });
   changed();
   next(emp);
   return true;
@@ -383,6 +383,7 @@ function finishRun(emp, task, run) {
   if (state.reports.length > 300) state.reports.length = 300;
   emp.status = run.isError ? 'error' : 'idle'; emp.now = run.isError ? '문제가 생겼어요' : ''; emp.task = null;
   if (emp.partner && grokKnown) grokKnown = listGrok();
+  if (task.room) roomPost({ emp: emp.id, empName: emp.name, kind: 'claude', text, files: rep.files });
   addLog(emp.id, 'done', text);
   // 다른 직원에게 전달
   if (!run.stopped) {
@@ -429,6 +430,77 @@ function makeFolder(name, cb) {
       cb(null, dir);
     });
   });
+}
+
+// ───────── 대화방 (사장님 · 그록 · AI협력팀 실시간) ─────────
+const XAI = (process.env.XAI_BASE_URL || 'https://api.x.ai').replace(/\/$/, '');
+const GROK_SYSTEM = '너는 「필멸자」(PC용 2D 액션 게임)를 만드는 팀과 함께 일하는 그록이다. 이 대화방에는 사장님과 클로드 직원(AI협력팀 등)이 함께 있다. 말머리 [사장님] / [클로드 이름] 으로 누가 말하는지 구분해서 그 사람에게 답한다. 쉬운 한국어로 짧고 분명하게 말한다. 그림·효과 규칙: 빛·불·검기 같은 효과는 그림에 넣지 않는다(게임 코드로 그림).';
+function roomPost(it) {
+  const item = { id: uid(), time: now(), emp: it.emp || '', empName: it.empName || '', kind: it.kind || '', text: String(it.text || '').slice(0, 20000), files: it.files || [], streaming: !!it.streaming };
+  state.grokLog.push(item); if (state.grokLog.length > 400) state.grokLog.splice(0, state.grokLog.length - 400);
+  changed(); push('grok', { id: item.id });
+  return item;
+}
+function spendFile() { return path.join(DATA, 'grok', 'spend.json'); }
+function spentToday(add) {
+  fs.mkdirSync(path.join(DATA, 'grok'), { recursive: true });
+  let s = {}; try { s = JSON.parse(fs.readFileSync(spendFile(), 'utf8')); } catch (e) { /* */ }
+  const d = new Date().toISOString().slice(0, 10);
+  if (add) { s[d] = Math.round(((s[d] || 0) + add) * 1000) / 1000; fs.writeFileSync(spendFile(), JSON.stringify(s)); }
+  return s[d] || 0;
+}
+function roomCheck() {
+  if (!state.settings.xaiKey) return '그록 키가 없어요. 설정 → 「그록 키」를 넣어 주세요 (console.x.ai 에서 만들어요).';
+  if (spentToday(0) >= (state.settings.grokBudget || 5)) return `오늘 그록 한도 $${state.settings.grokBudget} 를 다 썼어요. 설정에서 한도를 올릴 수 있어요.`;
+  return '';
+}
+async function roomChat(text) {
+  const tf = path.join(DATA, 'grok', 'thread_room.json');
+  let prev = null; try { prev = JSON.parse(fs.readFileSync(tf, 'utf8')).id; } catch (e) { /* 새 대화 */ }
+  roomPost({ emp: 'boss', empName: '사장님', kind: 'boss', text, files: [] });
+  const ans = roomPost({ emp: 'grok', empName: '그록', kind: 'answer', text: '', streaming: true });
+  const input = [];
+  if (!prev) input.push({ role: 'system', content: GROK_SYSTEM });
+  input.push({ role: 'user', content: '[사장님] ' + text });
+  const body = { model: process.env.GROK_CHAT_MODEL || 'grok-4.7', input, stream: true };
+  if (prev) body.previous_response_id = prev;
+  let last = 0;
+  const flush = (force) => { const t = Date.now(); if (force || t - last > 120) { last = t; push('grokdelta', { id: ans.id, text: ans.text }); } };
+  try {
+    const r = await fetch(XAI + '/v1/responses', { method: 'POST', headers: { authorization: 'Bearer ' + state.settings.xaiKey, 'content-type': 'application/json', accept: 'text/event-stream' }, body: JSON.stringify(body) });
+    if (!r.ok) { const t = await r.text(); throw new Error(`그록이 거절했어요 (${r.status}) ${t.slice(0, 300)}`); }
+    let respId = null, buf = '';
+    const dec = new TextDecoder();
+    const onData = (line) => {
+      if (!line.startsWith('data:')) return;
+      const d = line.slice(5).trim(); if (!d || d === '[DONE]') return;
+      let j; try { j = JSON.parse(d); } catch (e) { return; }
+      if (j.type === 'response.output_text.delta' && j.delta) { ans.text += j.delta; flush(false); }
+      else if (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) { ans.text += j.choices[0].delta.content; flush(false); }
+      const resp = j.response || (j.type === 'response.completed' ? j : null);
+      if (resp && resp.id) respId = resp.id;
+      if (j.type === 'response.completed' && !ans.text && resp && Array.isArray(resp.output)) for (const it of resp.output) for (const c of it.content || []) if (c.type === 'output_text') ans.text += c.text;
+    };
+    for await (const chunk of r.body) {
+      buf += dec.decode(chunk, { stream: true }); let i;
+      while ((i = buf.indexOf('\n')) >= 0) { onData(buf.slice(0, i).trim()); buf = buf.slice(i + 1); }
+    }
+    if (buf.trim()) onData(buf.trim());
+    if (respId) fs.writeFileSync(tf, JSON.stringify({ id: respId, time: now() }));
+    spentToday(0.02);
+  } catch (e) { ans.text += (ans.text ? '\n' : '') + '⚠ ' + e.message; }
+  ans.streaming = false; if (!ans.text) ans.text = '(빈 답)';
+  flush(true); changed();
+}
+function roomMedia(kind, text, sec) {
+  const dir = path.join(DATA, 'grok', 'files'); fs.mkdirSync(dir, { recursive: true });
+  const out = path.join(dir, `boss_${Date.now()}.${kind === 'video' ? 'mp4' : 'png'}`);
+  const args = [path.join(ROOT, 'tools', 'grok.js'), kind, text, '--out', out];
+  if (kind === 'video') args.push('--sec', String(Math.max(1, Math.min(15, sec))));
+  const env = { ...process.env, XAI_API_KEY: state.settings.xaiKey, OFFICE_URL: `http://127.0.0.1:${state.settings.port}`, OFFICE_EMP: 'boss', OFFICE_DATA: DATA, GROK_DAILY_BUDGET: String(state.settings.grokBudget || 5) };
+  const c = spawn(process.execPath, args, { env, windowsHide: true });
+  let err = ''; c.stderr.on('data', (d) => (err += d));
+  c.on('close', (code) => { if (code !== 0) roomPost({ emp: 'grok', empName: '그록', kind: 'answer', text: '⚠ ' + (err.trim() || '실패'), files: [] }); });
 }
 
 let grokKnown = null;
@@ -533,13 +605,24 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method !== 'POST') { res.writeHead(404); return res.end('없음'); }
     const b = await readBody(req);
+    if (p === '/api/room/send') {
+      const text = String(b.text || '').trim(); if (!text) return json(res, { ok: false, error: '할 말을 적어 주세요.' });
+      const team = state.employees.find((e) => e.partner);
+      if (b.mode === 'chat') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomChat(text); return json(res, { ok: true }); }
+      if (b.mode === 'image' || b.mode === 'video') { const err = roomCheck(); if (err) return json(res, { ok: false, error: err }); roomMedia(b.mode, text, Number(b.sec) || 6); return json(res, { ok: true }); }
+      if (!team) return json(res, { ok: false, error: 'AI협력팀 직원이 없어요.' });
+      roomPost({ emp: 'boss', empName: '사장님', kind: 'boss', text: (b.mode === 'meeting' ? '🗣 회의 주제: ' : '→ ' + team.name + ': ') + text, files: [] });
+      if (b.mode === 'meeting') order(team.id, `[대화방 회의] 주제: ${text}\n그록과 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 최대 ${Math.max(2, Math.min(12, Number(b.turns) || 6))}번 주고받으며 회의해. 매번 그록의 답을 읽고, 맞는 건 받아들이고 틀린 건 근거를 들어 반박해. 사장님도 이 대화를 실시간으로 본다. 끝나면 결론·할 일을 쉬운 말로 짧게 보고해.`, '사장님', 0, 'ask', null, { room: true });
+      else order(team.id, `[대화방] 사장님: ${text}\n(사장님·그록·너가 함께 있는 대화방이다. 그록 의견이 필요하면 \`grok ask --thread room "[클로드 ${team.name}] 할 말"\` 로 물어라. 답은 짧게.)`, '사장님', 0, 'ask', null, { room: true });
+      return json(res, { ok: true });
+    }
+    if (p === '/api/room/reset') { try { fs.unlinkSync(path.join(DATA, 'grok', 'thread_room.json')); } catch (e) { /* */ } roomPost({ emp: 'boss', empName: '회사', kind: 'sys', text: '— 새 대화 시작 (그록이 앞 이야기를 잊어요) —', files: [] }); return json(res, { ok: true }); }
     if (p === '/api/grok/log') {
       const emp = findEmp(b.emp);
       const files = (Array.isArray(b.files) ? b.files : []).filter((f) => { try { return fs.statSync(f).isFile(); } catch (e) { return false; } }).slice(0, 8);
-      const item = { id: uid(), time: now(), emp: emp ? emp.id : '', empName: emp ? emp.name : '직원', kind: String(b.kind || ''), text: String(b.text || '').slice(0, 20000), files };
-      state.grokLog.push(item); if (state.grokLog.length > 400) state.grokLog.splice(0, state.grokLog.length - 400);
-      if (emp) { emp.now = item.kind === 'ask' ? '그록과 이야기하는 중' : '그록 답 받음'; }
-      changed(); push('grok', { id: item.id });
+      const isBoss = b.emp === 'boss';
+      roomPost({ emp: isBoss ? 'boss' : emp ? emp.id : '', empName: isBoss ? '사장님' : emp ? emp.name : '직원', kind: String(b.kind || ''), text: String(b.text || ''), files });
+      if (emp) { emp.now = b.kind === 'ask' ? '그록과 이야기하는 중' : '그록 답 받음'; changed(); }
       return json(res, { ok: true });
     }
     if (p === '/api/perm/ask') return askPermission(b.emp, b.tool_name, b.input || {}, res);

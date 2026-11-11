@@ -81,6 +81,7 @@ function renderReports() {
   $('#cBoss').textContent = S.reports.filter((r) => isBoss(r) && !r.read).length || '';
   const seenGrok = Number(localStorage.getItem('grokSeen') || 0);
   $('#cGrok').textContent = S.grokLog.filter((g) => new Date(g.time) > seenGrok).length || '';
+  $('#roomBar').hidden = filter !== 'grok';
   if (filter === 'grok') return renderGrok();
   let list = S.reports;
   if (filter === 'unread') list = list.filter((r) => !r.read);
@@ -130,7 +131,9 @@ function renderGrok() {
   const stick = box.scrollTop + box.clientHeight > box.scrollHeight - 40;
   box.innerHTML = `<div class="grok">${S.grokLog.map((g) => {
     const me = g.kind === 'ask';
-    return `<div class="bubble ${me ? 'me' : ''}"><div class="who">${me ? esc(g.empName) + ' → 그록' : '그록 → ' + esc(g.empName)} · ${ago(g.time)}</div>${md(g.text)}${g.files.length ? `<div class="media">${g.files.map((f) => f.kind === 'video' ? `<figure><video src="/grokfile?g=${g.id}&i=${f.i}" controls preload="metadata"></video><figcaption>${esc(f.name)}</figcaption></figure>` : `<figure><img src="/grokfile?g=${g.id}&i=${f.i}" loading="lazy" data-act="zoom"><figcaption>${esc(f.name)}</figcaption></figure>`).join('')}</div>` : ''}</div>`;
+    const cls = g.kind === 'boss' ? 'boss' : g.kind === 'sys' ? 'sys' : g.kind === 'claude' ? 'me' : me ? 'me' : 'grokb';
+    const who = g.kind === 'boss' ? '사장님' : g.kind === 'sys' ? '' : g.kind === 'claude' ? esc(g.empName) + ' (클로드)' : me ? esc(g.empName) + ' → 그록' : g.emp === 'grok' ? '그록' : '그록 → ' + esc(g.empName);
+    return `<div class="bubble ${cls}" data-gid="${g.id}">${who ? `<div class="who">${who} · ${ago(g.time)}</div>` : ''}<span class="gtext ${g.streaming ? 'typing' : ''}">${md(g.text)}</span>${g.files.length ? `<div class="media">${g.files.map((f) => f.kind === 'video' ? `<figure><video src="/grokfile?g=${g.id}&i=${f.i}" controls preload="metadata"></video><figcaption>${esc(f.name)}</figcaption></figure>` : `<figure><img src="/grokfile?g=${g.id}&i=${f.i}" loading="lazy" data-act="zoom"><figcaption>${esc(f.name)}</figcaption></figure>`).join('')}</div>` : ''}</div>`;
   }).join('')}</div>`;
   if (stick) box.scrollTop = box.scrollHeight;
 }
@@ -287,6 +290,19 @@ $('#orderText').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && 
 $('#tabs').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; filter = b.dataset.f; $('#tabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); renderReports(); });
 $('#filterEmp').addEventListener('change', (ev) => { filterEmp = ev.target.value; renderReports(); });
 $('#btnReadAll').onclick = () => api('/api/report/read', { all: true });
+let roomMode = 'chat';
+const ROOM_PH = { chat: '그록에게 할 말 (Enter 보내기, Shift+Enter 줄바꿈)', claude: 'AI협력팀(클로드)에게 할 말 — 필요하면 그록에게도 물어봐요', meeting: '회의 주제 — AI협력팀과 그록이 서로 주고받으며 회의하고 결론을 보고해요', image: '그릴 것 (영어로 쓰면 더 정확해요) — 1장 약 $0.04', video: '영상 설명 — 6초, 약 $0.48' };
+$('#roomModes').addEventListener('click', (ev) => { const b = ev.target.closest('[data-m]'); if (!b) return; roomMode = b.dataset.m; $('#roomModes').querySelectorAll('[data-m]').forEach((x) => x.classList.toggle('on', x === b)); $('#roomText').placeholder = ROOM_PH[roomMode]; $('#roomText').focus(); });
+$('#roomReset').onclick = () => { if (confirm('그록이 앞 이야기를 잊고 새 대화를 시작할까요?')) api('/api/room/reset'); };
+$('#roomBar').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const text = $('#roomText').value.trim(); if (!text) return;
+  if (roomMode === 'video' && !confirm('영상은 6초에 약 $0.48 들어요. 부탁할까요?')) return;
+  const r = await api('/api/room/send', { mode: roomMode, text });
+  if (!r.ok) return alert(r.error);
+  $('#roomText').value = '';
+});
+$('#roomText').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); $('#roomBar').requestSubmit(); } });
 $('#btnHire').onclick = () => hire();
 $('#btnFolder').onclick = async () => { const r = await api('/api/grokCheck'); if (!r.ok) alert(r.error); };
 $('#btnSettings').onclick = settings;
@@ -316,6 +332,12 @@ function connect() {
     box.insertAdjacentHTML('beforeend', box._fmt(d.line)); if (stick) box.scrollTop = box.scrollHeight;
   });
   es.addEventListener('grok', () => { if (filter === 'grok') renderGrok(); });
+  es.addEventListener('grokdelta', (ev) => {
+    const d = JSON.parse(ev.data); const g = S.grokLog.find((x) => x.id === d.id); if (g) g.text = d.text;
+    const el = document.querySelector(`[data-gid="${d.id}"] .gtext`); if (!el) return;
+    const box = $('#reports'); const stick = box.scrollTop + box.clientHeight > box.scrollHeight - 60;
+    el.innerHTML = md(d.text); if (stick) box.scrollTop = box.scrollHeight;
+  });
   es.onerror = () => { $('#summary').innerHTML = '<span class="chip err">회사 본체와 연결이 끊겼어요. 다시 잇는 중…</span>'; };
 }
 connect();

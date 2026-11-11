@@ -55,6 +55,21 @@
       <button class="link" id="btnReadAll">모두 읽음</button>
     </div>
     <div id="reports" class="reports"></div>
+    <form id="roomBar" class="room-bar" hidden>
+      <div class="room-modes" id="roomModes">
+        <button type="button" data-m="chat" class="on">그록에게 말하기</button>
+        <button type="button" data-m="claude">AI협력팀에게</button>
+        <button type="button" data-m="meeting">둘이 회의 시키기</button>
+        <button type="button" data-m="image">그림 부탁</button>
+        <button type="button" data-m="video">영상 부탁</button>
+        <span class="sp"></span>
+        <button type="button" class="link" id="roomReset" title="그록이 앞 이야기를 잊고 새로 시작해요">새 대화</button>
+      </div>
+      <div class="room-row">
+        <textarea id="roomText" rows="2" placeholder="그록에게 할 말 (Enter 보내기, Shift+Enter 줄바꿈)"></textarea>
+        <button class="btn" type="submit">보내기</button>
+      </div>
+    </form>
   </section>
 </main>
 
