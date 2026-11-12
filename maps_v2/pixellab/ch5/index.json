@@ -1,0 +1,2250 @@
+{
+ "chapter": 5,
+ "zones": [
+  {
+   "id": "cemetery",
+   "name": "잿빛 묘지 (대성당 외곽)",
+   "kind": "field"
+  },
+  {
+   "id": "nave",
+   "name": "대성당 1층 본당",
+   "kind": "interior"
+  },
+  {
+   "id": "choir",
+   "name": "대성당 2층 성가대석",
+   "kind": "interior"
+  },
+  {
+   "id": "tower",
+   "name": "종탑 나선 계단",
+   "kind": "dungeon"
+  },
+  {
+   "id": "hub",
+   "name": "대성당 지하 허브",
+   "kind": "interior"
+  },
+  {
+   "id": "gate",
+   "name": "지하 수장고 진입로",
+   "kind": "dungeon"
+  },
+  {
+   "id": "husks",
+   "name": "수장고 · 껍데기 산",
+   "kind": "dungeon"
+  },
+  {
+   "id": "depths",
+   "name": "수장고 최심부",
+   "kind": "dungeon"
+  },
+  {
+   "id": "boss",
+   "name": "껍데기들의 군주 (보스방)",
+   "kind": "boss"
+  },
+  {
+   "id": "coffin",
+   "name": "수장고 밑바닥 · 1회차 석관",
+   "kind": "hidden"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c5_decal_grave",
+   "type": "decal",
+   "zone": "cemetery",
+   "slot": "c5_decal_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "잿빛 묘지 바닥 장식 16장",
+   "prompt": "1). broken tombstone piece in ash 2). withered flowers 3). melted candle stubs on stone 4). small stone cross fallen 5). ash drift 6). dead leaves 7). cracked grave slab 8). wooden grave marker",
+   "file": "ch5/decals/c5_decal_grave",
+   "tiles": 16
+  },
+  {
+   "id": "c5_decal_nave",
+   "type": "decal",
+   "zone": "nave",
+   "slot": "c5_decal_nave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대성당 바닥 장식 16장",
+   "prompt": "1). stained glass shards amber and teal 2). candle wax drips 3). cracked marble 4). fallen prayer book 5). broken stone carving fragment 6). dust and ash 7). torn hymn pages 8). iron candle holder fal",
+   "file": "ch5/decals/c5_decal_nave",
+   "tiles": 16
+  },
+  {
+   "id": "c5_decal_vault",
+   "type": "decal",
+   "zone": "husks",
+   "slot": "c5_decal_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 바닥 장식 16장",
+   "prompt": "1). pale bone dust 2). rusty broken sword blade 3). small skull 4). scattered rib bones 5). torn grey cloak scrap 6). rusty helmet 7). cracked stone 8). melted wax",
+   "file": "ch5/decals/c5_decal_vault",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch5",
+   "type": "decal",
+   "zone": "cemetery",
+   "slot": "fx_decal_ch5",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대성당 지하 바닥 장식 16장 (보충)",
+   "prompt": "1). creamy white wax puddle 2). small cream skull 3). rib bones 4). broken rosary beads 5). torn grey shroud 6). cracked flagstone 7). candle stubs 8). bone dust",
+   "file": "ch5/decals/fx_decal_ch5",
+   "tiles": 16
+  },
+  {
+   "id": "c5_kit_cathedral",
+   "type": "kit",
+   "zone": "nave",
+   "slot": "c5_kit_cathedral",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대성당 건물 키트",
+   "prompt": "gothic cathedral: grey stone walls with pointed arches and marble floor",
+   "file": "ch5/kits/c5_kit_cathedral",
+   "tiles": 80
+  },
+  {
+   "id": "c5_kit_crypt",
+   "type": "kit",
+   "zone": "gate",
+   "slot": "c5_kit_crypt",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 수장고 건물 키트",
+   "prompt": "underground crypt vault: old stone brick walls with burial niches and flagstone floor",
+   "file": "ch5/kits/c5_kit_crypt",
+   "tiles": 80
+  },
+  {
+   "id": "c5_kit_mausoleum",
+   "type": "kit",
+   "zone": "cemetery",
+   "slot": "c5_kit_mausoleum",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "묘지 납골당 건물 키트",
+   "prompt": "graveyard mausoleum: weathered stone walls and stone floor",
+   "file": "ch5/kits/c5_kit_mausoleum",
+   "tiles": 80
+  },
+  {
+   "id": "c5_altar_r2_s43",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대성당 제단 (다시)",
+   "prompt": "wide low pale stone cathedral altar table seen from above, gold cloth on top, two gold candlesticks, carved front panel, wide horizontal shape, filling the frame, seen from slightly above, dark fantas",
+   "file": "ch5/props/c5_altar_r2_s43.png",
+   "size": [
+    256,
+    128
+   ],
+   "bbox": [
+    70,
+    31,
+    186,
+    113
+   ]
+  },
+  {
+   "id": "c5_confessional_s19",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_confessional",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "고해성사실",
+   "prompt": "old carved wooden confessional booth with two small doors and a lattice window, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/c5_confessional_s19.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    27,
+    11,
+    116,
+    155
+   ]
+  },
+  {
+   "id": "c5_confessional_s31",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_confessional",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "고해성사실",
+   "prompt": "old carved wooden confessional booth with two small doors and a lattice window, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/c5_confessional_s31.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    34,
+    17,
+    110,
+    154
+   ]
+  },
+  {
+   "id": "c5_confessional_s7",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_confessional",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "고해성사실",
+   "prompt": "old carved wooden confessional booth with two small doors and a lattice window, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/c5_confessional_s7.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    27,
+    6,
+    117,
+    157
+   ]
+  },
+  {
+   "id": "c5_f_angel_s19",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_angel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "천사 석상",
+   "prompt": "weathered stone angel statue with folded wings and praying hands on a pedestal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch5/props/c5_f_angel_s19.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    28,
+    25,
+    84,
+    169
+   ]
+  },
+  {
+   "id": "c5_f_angel_s7",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_angel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "천사 석상",
+   "prompt": "weathered stone angel statue with folded wings and praying hands on a pedestal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch5/props/c5_f_angel_s7.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    22,
+    20,
+    88,
+    147
+   ]
+  },
+  {
+   "id": "c5_f_candles_s7",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_candles",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛불 무리 (불 없음)",
+   "prompt": "cluster of melted white candles of different heights, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch5/props/c5_f_candles_s7.png",
+   "size": [
+    96,
+    80
+   ],
+   "bbox": [
+    4,
+    14,
+    87,
+    69
+   ]
+  },
+  {
+   "id": "c5_f_coffin_s19",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_f_coffin",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "닫힌 관",
+   "prompt": "closed plain wooden coffin with iron handles, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch5/props/c5_f_coffin_s19.png",
+   "size": [
+    160,
+    96
+   ],
+   "bbox": [
+    27,
+    25,
+    137,
+    90
+   ]
+  },
+  {
+   "id": "c5_f_coffin_s7",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_f_coffin",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "닫힌 관",
+   "prompt": "closed plain wooden coffin with iron handles, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch5/props/c5_f_coffin_s7.png",
+   "size": [
+    160,
+    96
+   ],
+   "bbox": [
+    30,
+    34,
+    126,
+    84
+   ]
+  },
+  {
+   "id": "c5_f_cross_grave_s19",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_cross_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "돌 십자가 무덤",
+   "prompt": "tall weathered stone cross grave marker on a small mound, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch5/props/c5_f_cross_grave_s19.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    19,
+    26,
+    76,
+    130
+   ]
+  },
+  {
+   "id": "c5_f_cross_grave_s7",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_cross_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "돌 십자가 무덤",
+   "prompt": "tall weathered stone cross grave marker on a small mound, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch5/props/c5_f_cross_grave_s7.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    3,
+    17,
+    93,
+    137
+   ]
+  },
+  {
+   "id": "c5_f_dead_tree_s19",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_dead_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "묘지 마른 나무",
+   "prompt": "gnarled leafless graveyard tree with grey bark, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch5/props/c5_f_dead_tree_s19.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    0,
+    8,
+    133,
+    152
+   ]
+  },
+  {
+   "id": "c5_f_dead_tree_s7",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_dead_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "묘지 마른 나무",
+   "prompt": "gnarled leafless graveyard tree with grey bark, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch5/props/c5_f_dead_tree_s7.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    0,
+    0,
+    138,
+    151
+   ]
+  },
+  {
+   "id": "c5_f_lectern_s19",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_lectern",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성경 독서대",
+   "prompt": "carved stone lectern with a big open bible, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch5/props/c5_f_lectern_s19.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    27,
+    65,
+    69,
+    127
+   ]
+  },
+  {
+   "id": "c5_f_ossuary_s7",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_f_ossuary",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "해골 선반",
+   "prompt": "stone wall shelf niches filled with rows of old skulls, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch5/props/c5_f_ossuary_s7.png",
+   "size": [
+    144,
+    160
+   ],
+   "bbox": [
+    24,
+    31,
+    122,
+    131
+   ]
+  },
+  {
+   "id": "c5_f_pew_s19",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_pew",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "교회 긴 의자",
+   "prompt": "long wooden church pew bench, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch5/props/c5_f_pew_s19.png",
+   "size": [
+    192,
+    96
+   ],
+   "bbox": [
+    39,
+    39,
+    156,
+    82
+   ]
+  },
+  {
+   "id": "c5_f_tombstones_s19",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_tombstones",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "묘비 무리",
+   "prompt": "cluster of three old crooked tombstones with moss, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and as",
+   "file": "ch5/props/c5_f_tombstones_s19.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    34,
+    19,
+    117,
+    97
+   ]
+  },
+  {
+   "id": "c5_f_urns_r2_s41",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_f_urns",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유골 항아리 (다시)",
+   "prompt": "three old burial urns side by side: tan clay, green bronze and pale stone, with lids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch5/props/c5_f_urns_r2_s41.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    13,
+    29,
+    115,
+    82
+   ]
+  },
+  {
+   "id": "c5_f_urns_r2_s43",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_f_urns",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유골 항아리 (다시)",
+   "prompt": "three old burial urns side by side: tan clay, green bronze and pale stone, with lids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch5/props/c5_f_urns_r2_s43.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    15,
+    28,
+    113,
+    83
+   ]
+  },
+  {
+   "id": "c5_f_window_frame_s19",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_window_frame",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 스테인드글라스 창틀",
+   "prompt": "fallen pointed arch window frame with a few remaining colored stained glass panes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch5/props/c5_f_window_frame_s19.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    31,
+    16,
+    81,
+    159
+   ]
+  },
+  {
+   "id": "c5_f_window_frame_s7",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_window_frame",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 스테인드글라스 창틀",
+   "prompt": "fallen pointed arch window frame with a few remaining colored stained glass panes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch5/props/c5_f_window_frame_s7.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    29,
+    15,
+    83,
+    145
+   ]
+  },
+  {
+   "id": "c5_grave_altar_r2_s41",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_grave_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "묘지 제단 (다시)",
+   "prompt": "big weathered pale grey stone graveyard altar block with rusty orange wire wrapped around it and white melted candles on top, large and close up, filling the frame, seen from slightly above, dark fant",
+   "file": "ch5/props/c5_grave_altar_r2_s41.png",
+   "size": [
+    176,
+    144
+   ],
+   "bbox": [
+    45,
+    6,
+    134,
+    134
+   ]
+  },
+  {
+   "id": "c5_husk_mountain_s19",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통 잡음 많음",
+   "source": "orig",
+   "item": "껍데기 산",
+   "prompt": "huge heap of empty rusty armor suits, torn grey cloaks and broken longswords piled high, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/c5_husk_mountain_s19.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    11,
+    22,
+    224,
+    139
+   ]
+  },
+  {
+   "id": "c5_husk_mountain_s31",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통 잡음 많음",
+   "source": "orig",
+   "item": "껍데기 산",
+   "prompt": "huge heap of empty rusty armor suits, torn grey cloaks and broken longswords piled high, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/c5_husk_mountain_s31.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    16,
+    20,
+    224,
+    136
+   ]
+  },
+  {
+   "id": "c5_husk_mountain_s7",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통 잡음 많음",
+   "source": "orig",
+   "item": "껍데기 산",
+   "prompt": "huge heap of empty rusty armor suits, torn grey cloaks and broken longswords piled high, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/c5_husk_mountain_s7.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    15,
+    21,
+    226,
+    144
+   ]
+  },
+  {
+   "id": "c5_mortuary_slab_r2_s41",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_mortuary_slab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "안치대 (다시)",
+   "prompt": "large pale grey stone mortuary table with a plain light grey cloth draped over it, white candles at the four corners, large and close up, filling the frame, seen from slightly above, dark fantasy ruin",
+   "file": "ch5/props/c5_mortuary_slab_r2_s41.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    21,
+    20,
+    171,
+    103
+   ]
+  },
+  {
+   "id": "c5_mortuary_slab_r2_s43",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_mortuary_slab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "안치대 (다시)",
+   "prompt": "large pale grey stone mortuary table with a plain light grey cloth draped over it, white candles at the four corners, large and close up, filling the frame, seen from slightly above, dark fantasy ruin",
+   "file": "ch5/props/c5_mortuary_slab_r2_s43.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    24,
+    32,
+    168,
+    102
+   ]
+  },
+  {
+   "id": "c5_organ_s19",
+   "type": "prop",
+   "zone": "choir",
+   "slot": "c5_organ",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "파이프 오르간",
+   "prompt": "large broken pipe organ with tall brass pipes, some bent, wooden console covered in ash, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch5/props/c5_organ_s19.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    40,
+    29,
+    136,
+    212
+   ]
+  },
+  {
+   "id": "c5_organ_s31",
+   "type": "prop",
+   "zone": "choir",
+   "slot": "c5_organ",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "파이프 오르간",
+   "prompt": "large broken pipe organ with tall brass pipes, some bent, wooden console covered in ash, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch5/props/c5_organ_s31.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    35,
+    17,
+    141,
+    218
+   ]
+  },
+  {
+   "id": "c5_organ_s7",
+   "type": "prop",
+   "zone": "choir",
+   "slot": "c5_organ",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "파이프 오르간",
+   "prompt": "large broken pipe organ with tall brass pipes, some bent, wooden console covered in ash, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch5/props/c5_organ_s7.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    27,
+    5,
+    148,
+    217
+   ]
+  },
+  {
+   "id": "c5_sarcophagus_r2_s41",
+   "type": "prop",
+   "zone": "coffin",
+   "slot": "c5_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "1회차 검은 석관 (다시)",
+   "prompt": "big long charcoal grey polished stone sarcophagus with a carved lid, pale silver trim and three small round grooves on the lid, large and close up, filling the frame, seen from slightly above, dark fa",
+   "file": "ch5/props/c5_sarcophagus_r2_s41.png",
+   "size": [
+    208,
+    128
+   ],
+   "bbox": [
+    20,
+    20,
+    190,
+    111
+   ]
+  },
+  {
+   "id": "c5_sarcophagus_r2_s43",
+   "type": "prop",
+   "zone": "coffin",
+   "slot": "c5_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "1회차 검은 석관 (다시)",
+   "prompt": "big long charcoal grey polished stone sarcophagus with a carved lid, pale silver trim and three small round grooves on the lid, large and close up, filling the frame, seen from slightly above, dark fa",
+   "file": "ch5/props/c5_sarcophagus_r2_s43.png",
+   "size": [
+    208,
+    128
+   ],
+   "bbox": [
+    11,
+    25,
+    197,
+    113
+   ]
+  },
+  {
+   "id": "c5_sarcophagus_s19",
+   "type": "prop",
+   "zone": "coffin",
+   "slot": "c5_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "1회차 검은 석관",
+   "prompt": "long jet black stone sarcophagus with a carved lid and three small round grooves on top, ominous, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch5/props/c5_sarcophagus_s19.png",
+   "size": [
+    200,
+    112
+   ],
+   "bbox": [
+    30,
+    31,
+    170,
+    83
+   ]
+  },
+  {
+   "id": "c5_skull_pit_s19",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_skull_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "해골 구덩이",
+   "prompt": "round stone-rimmed pit filled with old pale skulls and bones, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch5/props/c5_skull_pit_s19.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    35,
+    26,
+    190,
+    133
+   ]
+  },
+  {
+   "id": "c5_skull_pit_s31",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_skull_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "해골 구덩이",
+   "prompt": "round stone-rimmed pit filled with old pale skulls and bones, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch5/props/c5_skull_pit_s31.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    41,
+    26,
+    183,
+    141
+   ]
+  },
+  {
+   "id": "c5_skull_pit_s7",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_skull_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "해골 구덩이",
+   "prompt": "round stone-rimmed pit filled with old pale skulls and bones, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch5/props/c5_skull_pit_s7.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    1,
+    21,
+    223,
+    155
+   ]
+  },
+  {
+   "id": "fl_c5_altar_r2_s101",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대성당 제단 (다시) (보충)",
+   "prompt": "wide low pale stone cathedral altar table seen from above, gold cloth on top, two gold candlesticks, carved front panel, wide horizontal shape, filling the frame, seen from slightly above, dark fantas",
+   "file": "ch5/props/fl_c5_altar_r2_s101.png",
+   "size": [
+    256,
+    128
+   ],
+   "bbox": [
+    60,
+    10,
+    198,
+    113
+   ]
+  },
+  {
+   "id": "fl_c5_bell_s97",
+   "type": "prop",
+   "zone": "tower",
+   "slot": "c5_bell",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "종탑 큰 종 (보충)",
+   "prompt": "big old bronze church bell, green patina and rust, hanging from a thick wooden beam, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "file": "ch5/props/fl_c5_bell_s97.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    22,
+    9,
+    122,
+    132
+   ]
+  },
+  {
+   "id": "fl_c5_confessional_s101",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_confessional",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "고해성사실 (보충)",
+   "prompt": "old carved wooden confessional booth with two small doors and a lattice window, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/fl_c5_confessional_s101.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    28,
+    20,
+    116,
+    156
+   ]
+  },
+  {
+   "id": "fl_c5_confessional_s97",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_confessional",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "고해성사실 (보충)",
+   "prompt": "old carved wooden confessional booth with two small doors and a lattice window, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/fl_c5_confessional_s97.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    29,
+    4,
+    115,
+    164
+   ]
+  },
+  {
+   "id": "fl_c5_f_angel_s101",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_angel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "천사 석상 (보충)",
+   "prompt": "weathered stone angel statue with folded wings and praying hands on a pedestal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch5/props/fl_c5_f_angel_s101.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    26,
+    13,
+    92,
+    170
+   ]
+  },
+  {
+   "id": "fl_c5_f_angel_s97",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_angel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "천사 석상 (보충)",
+   "prompt": "weathered stone angel statue with folded wings and praying hands on a pedestal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch5/props/fl_c5_f_angel_s97.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    26,
+    18,
+    90,
+    170
+   ]
+  },
+  {
+   "id": "fl_c5_f_candles_s97",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_candles",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛불 무리 (불 없음) (보충)",
+   "prompt": "cluster of melted white candles of different heights, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch5/props/fl_c5_f_candles_s97.png",
+   "size": [
+    96,
+    80
+   ],
+   "bbox": [
+    11,
+    20,
+    85,
+    71
+   ]
+  },
+  {
+   "id": "fl_c5_f_coffin_s97",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_f_coffin",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "닫힌 관 (보충)",
+   "prompt": "closed plain wooden coffin with iron handles, dusty, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch5/props/fl_c5_f_coffin_s97.png",
+   "size": [
+    160,
+    96
+   ],
+   "bbox": [
+    30,
+    35,
+    128,
+    85
+   ]
+  },
+  {
+   "id": "fl_c5_f_cross_grave_s101",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_cross_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "돌 십자가 무덤 (보충)",
+   "prompt": "tall weathered stone cross grave marker on a small mound, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch5/props/fl_c5_f_cross_grave_s101.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    0,
+    7,
+    96,
+    144
+   ]
+  },
+  {
+   "id": "fl_c5_f_cross_grave_s97",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_cross_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "돌 십자가 무덤 (보충)",
+   "prompt": "tall weathered stone cross grave marker on a small mound, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch5/props/fl_c5_f_cross_grave_s97.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    5,
+    8,
+    90,
+    137
+   ]
+  },
+  {
+   "id": "fl_c5_f_dead_tree_s101",
+   "type": "prop",
+   "zone": "cemetery",
+   "slot": "c5_f_dead_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "묘지 마른 나무 (보충)",
+   "prompt": "gnarled leafless graveyard tree with grey bark, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch5/props/fl_c5_f_dead_tree_s101.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    6,
+    10,
+    138,
+    146
+   ]
+  },
+  {
+   "id": "fl_c5_f_ossuary_s101",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_f_ossuary",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "해골 선반 (보충)",
+   "prompt": "stone wall shelf niches filled with rows of old skulls, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch5/props/fl_c5_f_ossuary_s101.png",
+   "size": [
+    144,
+    160
+   ],
+   "bbox": [
+    22,
+    53,
+    122,
+    112
+   ]
+  },
+  {
+   "id": "fl_c5_f_ossuary_s97",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_f_ossuary",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "해골 선반 (보충)",
+   "prompt": "stone wall shelf niches filled with rows of old skulls, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch5/props/fl_c5_f_ossuary_s97.png",
+   "size": [
+    144,
+    160
+   ],
+   "bbox": [
+    27,
+    35,
+    117,
+    125
+   ]
+  },
+  {
+   "id": "fl_c5_f_pew_s97",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_pew",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "교회 긴 의자 (보충)",
+   "prompt": "long wooden church pew bench, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch5/props/fl_c5_f_pew_s97.png",
+   "size": [
+    192,
+    96
+   ],
+   "bbox": [
+    36,
+    27,
+    153,
+    88
+   ]
+  },
+  {
+   "id": "fl_c5_f_urns_r2_s97",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_f_urns",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유골 항아리 (다시) (보충)",
+   "prompt": "three old burial urns side by side: tan clay, green bronze and pale stone, with lids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch5/props/fl_c5_f_urns_r2_s97.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    13,
+    39,
+    115,
+    83
+   ]
+  },
+  {
+   "id": "fl_c5_f_window_frame_s97",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_window_frame",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 스테인드글라스 창틀 (보충)",
+   "prompt": "fallen pointed arch window frame with a few remaining colored stained glass panes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch5/props/fl_c5_f_window_frame_s97.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    26,
+    7,
+    88,
+    145
+   ]
+  },
+  {
+   "id": "fl_c5_gothic_pillar_s97",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_gothic_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "고딕 기둥 (보충)",
+   "prompt": "tall grey gothic cathedral column with carved capital, cracked, broken at the top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch5/props/fl_c5_gothic_pillar_s97.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    13,
+    7,
+    68,
+    219
+   ]
+  },
+  {
+   "id": "fl_c5_mortuary_slab_r2_s97",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c5_mortuary_slab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "안치대 (다시) (보충)",
+   "prompt": "large pale grey stone mortuary table with a plain light grey cloth draped over it, white candles at the four corners, large and close up, filling the frame, seen from slightly above, dark fantasy ruin",
+   "file": "ch5/props/fl_c5_mortuary_slab_r2_s97.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    25,
+    18,
+    167,
+    108
+   ]
+  },
+  {
+   "id": "fl_c5_organ_s97",
+   "type": "prop",
+   "zone": "choir",
+   "slot": "c5_organ",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "파이프 오르간 (보충)",
+   "prompt": "large broken pipe organ with tall brass pipes, some bent, wooden console covered in ash, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch5/props/fl_c5_organ_s97.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    32,
+    4,
+    145,
+    215
+   ]
+  },
+  {
+   "id": "fl_c5_sarcophagus_r2_s97",
+   "type": "prop",
+   "zone": "coffin",
+   "slot": "c5_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "1회차 검은 석관 (다시) (보충)",
+   "prompt": "big long charcoal grey polished stone sarcophagus with a carved lid, pale silver trim and three small round grooves on the lid, large and close up, filling the frame, seen from slightly above, dark fa",
+   "file": "ch5/props/fl_c5_sarcophagus_r2_s97.png",
+   "size": [
+    208,
+    128
+   ],
+   "bbox": [
+    32,
+    48,
+    176,
+    103
+   ]
+  },
+  {
+   "id": "fl_c5_sarcophagus_s97",
+   "type": "prop",
+   "zone": "coffin",
+   "slot": "c5_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "1회차 검은 석관 (보충)",
+   "prompt": "long jet black stone sarcophagus with a carved lid and three small round grooves on top, ominous, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch5/props/fl_c5_sarcophagus_s97.png",
+   "size": [
+    200,
+    112
+   ],
+   "bbox": [
+    30,
+    36,
+    169,
+    88
+   ]
+  },
+  {
+   "id": "fl_c5_skull_pit_s97",
+   "type": "prop",
+   "zone": "depths",
+   "slot": "c5_skull_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "해골 구덩이 (보충)",
+   "prompt": "round stone-rimmed pit filled with old pale skulls and bones, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch5/props/fl_c5_skull_pit_s97.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    45,
+    18,
+    179,
+    144
+   ]
+  },
+  {
+   "id": "fl_c5_spiral_stair_s97",
+   "type": "prop",
+   "zone": "tower",
+   "slot": "c5_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "종탑 돌 나선 계단 (보충)",
+   "prompt": "round grey stone spiral staircase going up around a central stone column, seen from above, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall,",
+   "file": "ch5/props/fl_c5_spiral_stair_s97.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    45,
+    18,
+    133,
+    191
+   ]
+  },
+  {
+   "id": "rd_c5_bell_s61_s61",
+   "type": "prop",
+   "zone": "tower",
+   "slot": "c5_bell",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "큰 종 (다시) ← c5_bell",
+   "prompt": "big old bronze brown church bell with a little green patina hanging from a wooden beam, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch5/props/rd_c5_bell_s61_s61.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    44,
+    9,
+    99,
+    117
+   ]
+  },
+  {
+   "id": "rd_c5_f_candles_s61_s61",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_candles",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "촛불 무리 (다시) ← c5_f_candles",
+   "prompt": "cluster of seven separate white candles of different heights with wax drips, unlit, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch5/props/rd_c5_f_candles_s61_s61.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    25,
+    8,
+    88,
+    84
+   ]
+  },
+  {
+   "id": "rd_c5_f_ossuary_s67_s67",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_f_ossuary",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "해골 선반 (다시) ← c5_f_ossuary",
+   "prompt": "pale stone wall shelf niches filled with rows of old cream skulls, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch5/props/rd_c5_f_ossuary_s67_s67.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    14,
+    31,
+    133,
+    144
+   ]
+  },
+  {
+   "id": "rd_c5_f_pew_s61_s61",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_pew",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "교회 의자 (다시) ← c5_f_pew",
+   "prompt": "long honey brown wooden church pew bench with a high back, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch5/props/rd_c5_f_pew_s61_s61.png",
+   "size": [
+    192,
+    112
+   ],
+   "bbox": [
+    26,
+    30,
+    167,
+    94
+   ]
+  },
+  {
+   "id": "rd_c5_f_pew_s67_s67",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_f_pew",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "교회 의자 (다시) ← c5_f_pew",
+   "prompt": "long honey brown wooden church pew bench with a high back, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch5/props/rd_c5_f_pew_s67_s67.png",
+   "size": [
+    192,
+    112
+   ],
+   "bbox": [
+    29,
+    37,
+    165,
+    100
+   ]
+  },
+  {
+   "id": "rd_c5_gothic_pillar_s61_s61",
+   "type": "prop",
+   "zone": "nave",
+   "slot": "c5_gothic_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "고딕 기둥 (다시) ← c5_gothic_pillar",
+   "prompt": "tall pale grey gothic stone column with carved capital, cracked, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "file": "ch5/props/rd_c5_gothic_pillar_s61_s61.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    14,
+    8,
+    67,
+    211
+   ]
+  },
+  {
+   "id": "rd_c5_husk_mountain_s61_s61",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통",
+   "source": "redo",
+   "item": "껍데기 산 (다시) ← c5_husk_mountain",
+   "prompt": "big heap of empty steel armor suits and grey cloaks with clearly drawn helmets and breastplates, fewer bigger pieces, wide horizontal shape, large and close up, filling the frame, seen from slightly a",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/rd_c5_husk_mountain_s61_s61.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    39,
+    26,
+    203,
+    129
+   ]
+  },
+  {
+   "id": "rd_c5_husk_mountain_s67_s67",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통 병사 줄",
+   "source": "redo",
+   "item": "껍데기 산 (다시) ← c5_husk_mountain",
+   "prompt": "big heap of empty steel armor suits and grey cloaks with clearly drawn helmets and breastplates, fewer bigger pieces, wide horizontal shape, large and close up, filling the frame, seen from slightly a",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/rd_c5_husk_mountain_s67_s67.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    49,
+    49,
+    191,
+    139
+   ]
+  },
+  {
+   "id": "rd_c5_husk_mountain_s71_s71",
+   "type": "prop",
+   "zone": "husks",
+   "slot": "c5_husk_mountain",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "redo",
+   "item": "껍데기 산 (다시) ← c5_husk_mountain",
+   "prompt": "big heap of empty steel armor suits and grey cloaks with clearly drawn helmets and breastplates, fewer bigger pieces, wide horizontal shape, large and close up, filling the frame, seen from slightly a",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch5/props/rd_c5_husk_mountain_s71_s71.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    30,
+    45,
+    214,
+    124
+   ]
+  },
+  {
+   "id": "rd_c5_spiral_stair_s61_s61",
+   "type": "prop",
+   "zone": "tower",
+   "slot": "c5_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "나선 계단 (다시) ← c5_spiral_stair",
+   "prompt": "round grey stone spiral staircase winding around a central column, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch5/props/rd_c5_spiral_stair_s61_s61.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    41,
+    37,
+    134,
+    173
+   ]
+  },
+  {
+   "id": "c5_room_choir",
+   "type": "room",
+   "zone": "choir",
+   "slot": "c5_room_choir",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대성당 2층 성가대석",
+   "prompt": "The choir loft of a ruined gothic cathedral: a broken pipe organ, wooden choir stalls, music stands, ash and dust, pointed arch windows, muted sepia and grey",
+   "file": "ch5/rooms/c5_room_choir",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c5_room_hub",
+   "type": "room",
+   "zone": "hub",
+   "slot": "c5_room_hub",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대성당 지하 허브",
+   "prompt": "An underground crypt hub under a cathedral: grey stone vaulted walls, a stone mortuary table with a grey cloth, a cold ash fire pit, candles, stone benches, muted sepia and grey",
+   "file": "ch5/rooms/c5_room_hub",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c5_room_sarcophagus",
+   "type": "room",
+   "zone": "coffin",
+   "slot": "c5_room_sarcophagus",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 밑바닥 1회차 석관 방 (허브와 같은 건물, style_room 연결)",
+   "prompt": "its hidden lowest crypt: one long jet black stone sarcophagus in the middle, nothing else, dust, a few melted candles",
+   "file": "ch5/rooms/c5_room_sarcophagus",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c5_room_vault",
+   "type": "room",
+   "zone": "husks",
+   "slot": "c5_room_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 수장고 방 (허브와 같은 건물, style_room 연결)",
+   "prompt": "its burial vault chamber: stone burial niches in the walls, piles of empty rusty armor and broken swords, bone dust on the floor",
+   "file": "ch5/rooms/c5_room_vault",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c5_choir_wood_r2_s531",
+   "type": "tileset",
+   "zone": "choir",
+   "slot": "c5_choir_wood",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성가대석 나무 마루 ↔ 대리석 (다시, 갈색)",
+   "prompt": [
+    "cracked pale grey marble floor, muted ash grey",
+    "worn dull greyish brown wooden floorboards, muted desaturated sepia"
+   ],
+   "file": "ch5/tiles/c5_choir_wood_r2_s531",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_choir_wood_r2_s532",
+   "type": "tileset",
+   "zone": "choir",
+   "slot": "c5_choir_wood",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성가대석 나무 마루 ↔ 대리석 (다시, 갈색)",
+   "prompt": [
+    "cracked pale grey marble floor, muted ash grey",
+    "worn dull greyish brown wooden floorboards, muted desaturated sepia"
+   ],
+   "file": "ch5/tiles/c5_choir_wood_r2_s532",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_edge_vault_s523",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c5_edge_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 해골 구덩이 가장자리 (절벽형)",
+   "prompt": [
+    "deep pit floor with pale bone dust far below, muted desaturated sepia and ash grey tones",
+    "old grey stone vault floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_edge_vault_s523",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c5_edge_vault_s524",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c5_edge_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 해골 구덩이 가장자리 (절벽형)",
+   "prompt": [
+    "deep pit floor with pale bone dust far below, muted desaturated sepia and ash grey tones",
+    "old grey stone vault floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_edge_vault_s524",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c5_grave_grass_s501",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_grass",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "잿빛 묘지 재 덮인 흙 ↔ 마른 잔디",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "dry pale yellow dead grass tufts, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_grave_grass_s501",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_grave_grass_s502",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_grass",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "잿빛 묘지 재 덮인 흙 ↔ 마른 잔디",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "dry pale yellow dead grass tufts, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_grave_grass_s502",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_grave_path_s503",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_path",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "묘지 흙 ↔ 돌 포장 오솔길",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "old grey cobblestone cemetery path with moss, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_grave_path_s503",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_grave_path_s504",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_path",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "묘지 흙 ↔ 돌 포장 오솔길",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "old grey cobblestone cemetery path with moss, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_grave_path_s504",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_hub_wax_s513",
+   "type": "tileset",
+   "zone": "hub",
+   "slot": "c5_hub_wax",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 허브 돌판 ↔ 촛농",
+   "prompt": [
+    "old grey flagstone crypt floor, muted desaturated sepia and ash grey tones",
+    "thick puddles of hardened creamy white candle wax with candle stubs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_hub_wax_s513",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_hub_wax_s514",
+   "type": "tileset",
+   "zone": "hub",
+   "slot": "c5_hub_wax",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 허브 돌판 ↔ 촛농",
+   "prompt": [
+    "old grey flagstone crypt floor, muted desaturated sepia and ash grey tones",
+    "thick puddles of hardened creamy white candle wax with candle stubs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_hub_wax_s514",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_nave_aisle_s507",
+   "type": "tileset",
+   "zone": "nave",
+   "slot": "c5_nave_aisle",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "본당 대리석 ↔ 바랜 통로 융단",
+   "prompt": [
+    "cracked pale grey marble cathedral floor, muted desaturated sepia and ash grey tones",
+    "faded dusty wine red aisle carpet with worn gold edge, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_nave_aisle_s507",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_nave_aisle_s508",
+   "type": "tileset",
+   "zone": "nave",
+   "slot": "c5_nave_aisle",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "본당 대리석 ↔ 바랜 통로 융단",
+   "prompt": [
+    "cracked pale grey marble cathedral floor, muted desaturated sepia and ash grey tones",
+    "faded dusty wine red aisle carpet with worn gold edge, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_nave_aisle_s508",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_pro_vault",
+   "type": "tileset",
+   "zone": "husks",
+   "slot": "c5_pro_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 돌바닥 ↔ 뼛가루 (pro)",
+   "prompt": [
+    "pale bone dust with rusty brown blade fragments",
+    "old grey stone block vault floor"
+   ],
+   "file": "ch5/tiles/c5_pro_vault",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_vault_bones_s511",
+   "type": "tileset",
+   "zone": "husks",
+   "slot": "c5_vault_bones",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 돌바닥 ↔ 뼛가루와 녹슨 칼날 조각",
+   "prompt": [
+    "old grey stone block vault floor, muted desaturated sepia and ash grey tones",
+    "pale bone dust and rusty brown broken blade fragments on stone, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_vault_bones_s511",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c5_vault_bones_s512",
+   "type": "tileset",
+   "zone": "husks",
+   "slot": "c5_vault_bones",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수장고 돌바닥 ↔ 뼛가루와 녹슨 칼날 조각",
+   "prompt": [
+    "old grey stone block vault floor, muted desaturated sepia and ash grey tones",
+    "pale bone dust and rusty brown broken blade fragments on stone, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/c5_vault_bones_s512",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_choir_wood_r2_s5225",
+   "type": "tileset",
+   "zone": "choir",
+   "slot": "c5_choir_wood",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성가대석 나무 마루 ↔ 대리석 (다시, 갈색) (보충)",
+   "prompt": [
+    "cracked pale grey marble floor, muted ash grey",
+    "worn dull greyish brown wooden floorboards, muted desaturated sepia"
+   ],
+   "file": "ch5/tiles/fl_c5_choir_wood_r2_s5225",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_edge_belltower_s6257",
+   "type": "tileset",
+   "zone": "tower",
+   "slot": "c5_edge_belltower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "종탑 가운데 구멍 가장자리 (절벽형) (보충)",
+   "prompt": [
+    "deep empty shaft far below, deep grey blue shadow, muted desaturated sepia and ash grey tones",
+    "grey stone spiral stair landing, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_edge_belltower_s6257",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c5_edge_vault_s6014",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c5_edge_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "수장고 해골 구덩이 가장자리 (절벽형) (보충)",
+   "prompt": [
+    "deep pit floor with pale bone dust far below, muted desaturated sepia and ash grey tones",
+    "old grey stone vault floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_edge_vault_s6014",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c5_grave_grass_s7852",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_grass",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "잿빛 묘지 재 덮인 흙 ↔ 마른 잔디 (보충)",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "dry pale yellow dead grass tufts, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_grave_grass_s7852",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_grave_path_s3986",
+   "type": "tileset",
+   "zone": "cemetery",
+   "slot": "c5_grave_path",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "묘지 흙 ↔ 돌 포장 오솔길 (보충)",
+   "prompt": [
+    "grey brown soil covered with light grey ash, muted desaturated sepia and ash grey tones",
+    "old grey cobblestone cemetery path with moss, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_grave_path_s3986",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_hub_wax_s4438",
+   "type": "tileset",
+   "zone": "hub",
+   "slot": "c5_hub_wax",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하 허브 돌판 ↔ 촛농 (보충)",
+   "prompt": [
+    "old grey flagstone crypt floor, muted desaturated sepia and ash grey tones",
+    "thick puddles of hardened creamy white candle wax with candle stubs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_hub_wax_s4438",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_nave_aisle_s7710",
+   "type": "tileset",
+   "zone": "nave",
+   "slot": "c5_nave_aisle",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "본당 대리석 ↔ 바랜 통로 융단 (보충)",
+   "prompt": [
+    "cracked pale grey marble cathedral floor, muted desaturated sepia and ash grey tones",
+    "faded dusty wine red aisle carpet with worn gold edge, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_nave_aisle_s7710",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c5_vault_bones_s7664",
+   "type": "tileset",
+   "zone": "husks",
+   "slot": "c5_vault_bones",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "수장고 돌바닥 ↔ 뼛가루와 녹슨 칼날 조각 (보충)",
+   "prompt": [
+    "old grey stone block vault floor, muted desaturated sepia and ash grey tones",
+    "pale bone dust and rusty brown broken blade fragments on stone, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/fl_c5_vault_bones_s7664",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c5_edge_belltower_s3157",
+   "type": "tileset",
+   "zone": "tower",
+   "slot": "c5_edge_belltower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "종탑 구멍 가장자리 (다시) ← c5_edge_belltower",
+   "prompt": [
+    "grey stone stair landing far below, warm grey, muted desaturated sepia and ash grey tones",
+    "grey stone spiral stair landing, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/rd_c5_edge_belltower_s3157",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "rd_c5_edge_belltower_s3158",
+   "type": "tileset",
+   "zone": "tower",
+   "slot": "c5_edge_belltower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "종탑 구멍 가장자리 (다시) ← c5_edge_belltower",
+   "prompt": [
+    "grey stone stair landing far below, warm grey, muted desaturated sepia and ash grey tones",
+    "grey stone spiral stair landing, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/rd_c5_edge_belltower_s3158",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "rd_c5_nave_glass_s2627",
+   "type": "tileset",
+   "zone": "nave",
+   "slot": "c5_nave_glass",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대리석 ↔ 스테인드글라스 조각 (다시) ← c5_nave_glass",
+   "prompt": [
+    "cracked pale grey marble cathedral floor, muted desaturated sepia and ash grey tones",
+    "many big angular broken stained glass pieces in amber yellow, teal and wine red lying on marble, each piece clearly visible with lead edges, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch5/tiles/rd_c5_nave_glass_s2627",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c5_pro_nave",
+   "type": "tileset",
+   "zone": "nave",
+   "slot": "c5_pro_nave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대성당 대리석 ↔ 스테인드글라스 (pro, 다시) ← c5_pro_nave",
+   "prompt": [
+    "large angular stained glass shards in amber yellow, teal and wine red, clearly visible",
+    "cracked pale grey marble cathedral floor"
+   ],
+   "file": "ch5/tiles/rd_c5_pro_nave",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

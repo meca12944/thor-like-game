@@ -1,0 +1,922 @@
+{
+ "hub": "px_hub",
+ "zones": [
+  {
+   "id": "px_ch1_cliff_n",
+   "ch": 1,
+   "zone": "cliff_n",
+   "w": 90,
+   "h": 50,
+   "props": 23,
+   "props_total": 23,
+   "floors": [
+    "cl_ts_crack_std32",
+    "cl_ts_scree_std32"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch1_ws_b1",
+   "ch": 1,
+   "zone": "ws_b1",
+   "w": 86,
+   "h": 40,
+   "props": 21,
+   "props_total": 21,
+   "floors": [
+    "b1_ts_floor_grate_std32",
+    "fl_b1_ts_floor_thread_r2_s7752"
+   ],
+   "rooms": [
+    "b1_room_torture"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch1_ws_b2",
+   "ch": 1,
+   "zone": "ws_b2",
+   "w": 66,
+   "h": 40,
+   "props": 12,
+   "props_total": 12,
+   "floors": [
+    "b2_ts_floor_pit_std32",
+    "b2_ts_floor_web_std32"
+   ],
+   "rooms": [
+    "b2_room_cocoon"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_road_s",
+   "ch": 2,
+   "zone": "road_s",
+   "w": 92,
+   "h": 50,
+   "props": 24,
+   "props_total": 24,
+   "floors": [
+    "c2_pro_road",
+    "c2_road_cobble_s101",
+    "t05_tileset_std_ch2road"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch2_road_n",
+   "ch": 2,
+   "zone": "road_n",
+   "w": 64,
+   "h": 50,
+   "props": 11,
+   "props_total": 11,
+   "floors": [
+    "c2_road_scrap_r2"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch2_gate",
+   "ch": 2,
+   "zone": "gate",
+   "w": 56,
+   "h": 50,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "c2_rampart_flag_s105"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch2_armory",
+   "ch": 2,
+   "zone": "armory",
+   "w": 56,
+   "h": 40,
+   "props": 1,
+   "props_total": 1,
+   "floors": [
+    "c2_pro_road"
+   ],
+   "rooms": [
+    "c2_room_armory"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_forge",
+   "ch": 2,
+   "zone": "forge",
+   "w": 66,
+   "h": 50,
+   "props": 12,
+   "props_total": 12,
+   "floors": [
+    "c2_forge_coal_r2"
+   ],
+   "rooms": [
+    "c2_room_forge",
+    "c2_room_forge_lift",
+    "t09_room_ch2forge"
+   ],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch2_sw_entry",
+   "ch": 2,
+   "zone": "sw_entry",
+   "w": 78,
+   "h": 40,
+   "props": 10,
+   "props_total": 10,
+   "floors": [
+    "c2_sewer_sludge_s111",
+    "c2_pro_sewer",
+    "t06_tileset_pro_ch2sewer"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_sw_slum",
+   "ch": 2,
+   "zone": "sw_slum",
+   "w": 64,
+   "h": 40,
+   "props": 11,
+   "props_total": 11,
+   "floors": [
+    "c2_slum_plank_s117"
+   ],
+   "rooms": [
+    "c2_room_grey_shop"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_sw_mid",
+   "ch": 2,
+   "zone": "sw_mid",
+   "w": 56,
+   "h": 40,
+   "props": 4,
+   "props_total": 4,
+   "floors": [
+    "c2_sewer_mercury_s113"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_sw_dead",
+   "ch": 2,
+   "zone": "sw_dead",
+   "w": 56,
+   "h": 40,
+   "props": 1,
+   "props_total": 1,
+   "floors": [
+    "c2_pro_road"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch2_sw_deep",
+   "ch": 2,
+   "zone": "sw_deep",
+   "w": 56,
+   "h": 40,
+   "props": 0,
+   "props_total": 0,
+   "floors": [
+    "c2_sewer_toxic_r2_s301"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_lobby",
+   "ch": 3,
+   "zone": "lobby",
+   "w": 75,
+   "h": 40,
+   "props": 16,
+   "props_total": 16,
+   "floors": [
+    "c3_parquet_marble_s205",
+    "c3_carpet_r2"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_f2",
+   "ch": 3,
+   "zone": "f2",
+   "w": 79,
+   "h": 40,
+   "props": 18,
+   "props_total": 18,
+   "floors": [
+    "c3_pro_marble_ink",
+    "c3_marble_ink_s201"
+   ],
+   "rooms": [
+    "c3_room_reading"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_f3",
+   "ch": 3,
+   "zone": "f3",
+   "w": 79,
+   "h": 40,
+   "props": 18,
+   "props_total": 18,
+   "floors": [
+    "rd_c3_carpet_marble_s1410",
+    "c3_marble_pages_s204",
+    "c3_pages_r2"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_boss",
+   "ch": 3,
+   "zone": "boss",
+   "w": 56,
+   "h": 40,
+   "props": 5,
+   "props_total": 5,
+   "floors": [
+    "c3_b1_stone_drain_s211"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_b1",
+   "ch": 3,
+   "zone": "b1",
+   "w": 104,
+   "h": 40,
+   "props": 9,
+   "props_total": 9,
+   "floors": [
+    "c3_b1_stone_drain_s211",
+    "c3_wax_r2",
+    "rd_c3_b1_stone_wax_s1533",
+    "c3_pro_b1"
+   ],
+   "rooms": [
+    "c3_room_forbidden"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch3_secret",
+   "ch": 3,
+   "zone": "secret",
+   "w": 56,
+   "h": 40,
+   "props": 1,
+   "props_total": 1,
+   "floors": [
+    "c3_b1_stone_drain_s211"
+   ],
+   "rooms": [
+    "c3_room_secret"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch4_front",
+   "ch": 4,
+   "zone": "front",
+   "w": 78,
+   "h": 50,
+   "props": 14,
+   "props_total": 14,
+   "floors": [
+    "c4_pro_street",
+    "c4_street_ash_s401",
+    "rd_c4_street_cracks_s1459"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch4_alley",
+   "ch": 4,
+   "zone": "alley",
+   "w": 56,
+   "h": 50,
+   "props": 3,
+   "props_total": 3,
+   "floors": [
+    "c4_garden_gravel_s405"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch4_avenue",
+   "ch": 4,
+   "zone": "avenue",
+   "w": 70,
+   "h": 50,
+   "props": 14,
+   "props_total": 14,
+   "floors": [
+    "c4_garden_gravel_s405"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch4_roof",
+   "ch": 4,
+   "zone": "roof",
+   "w": 56,
+   "h": 50,
+   "props": 6,
+   "props_total": 6,
+   "floors": [
+    "c4_roof_slate_s407"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch4_hall1",
+   "ch": 4,
+   "zone": "hall1",
+   "w": 79,
+   "h": 40,
+   "props": 18,
+   "props_total": 18,
+   "floors": [
+    "c4_hall_carpet_s409",
+    "c4_pro_hall"
+   ],
+   "rooms": [
+    "c4_room_banquet1"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch4_hall2",
+   "ch": 4,
+   "zone": "hall2",
+   "w": 66,
+   "h": 40,
+   "props": 12,
+   "props_total": 12,
+   "floors": [
+    "c4_garden_gravel_s405"
+   ],
+   "rooms": [
+    "c4_room_attic",
+    "c4_room_banquet2"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch4_cellar",
+   "ch": 4,
+   "zone": "cellar",
+   "w": 59,
+   "h": 40,
+   "props": 9,
+   "props_total": 9,
+   "floors": [
+    "rd_c4_cellar_wine_s1761"
+   ],
+   "rooms": [
+    "c4_room_cellar"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch4_boss",
+   "ch": 4,
+   "zone": "boss",
+   "w": 56,
+   "h": 40,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "c4_garden_gravel_s405"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch4_grave",
+   "ch": 4,
+   "zone": "grave",
+   "w": 57,
+   "h": 50,
+   "props": 8,
+   "props_total": 8,
+   "floors": [
+    "rd_c4_ash_grave_s1422"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch5_cemetery",
+   "ch": 5,
+   "zone": "cemetery",
+   "w": 68,
+   "h": 50,
+   "props": 13,
+   "props_total": 13,
+   "floors": [
+    "c5_grave_grass_s501",
+    "c5_grave_path_s503"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch5_nave",
+   "ch": 5,
+   "zone": "nave",
+   "w": 84,
+   "h": 40,
+   "props": 20,
+   "props_total": 20,
+   "floors": [
+    "c5_nave_aisle_s507",
+    "rd_c5_nave_glass_s2627",
+    "rd_c5_pro_nave"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_choir",
+   "ch": 5,
+   "zone": "choir",
+   "w": 56,
+   "h": 40,
+   "props": 4,
+   "props_total": 4,
+   "floors": [
+    "c5_choir_wood_r2_s531"
+   ],
+   "rooms": [
+    "c5_room_choir"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_tower",
+   "ch": 5,
+   "zone": "tower",
+   "w": 56,
+   "h": 40,
+   "props": 4,
+   "props_total": 4,
+   "floors": [
+    "c5_choir_wood_r2_s531"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_hub",
+   "ch": 5,
+   "zone": "hub",
+   "w": 56,
+   "h": 40,
+   "props": 0,
+   "props_total": 0,
+   "floors": [
+    "c5_hub_wax_s513"
+   ],
+   "rooms": [
+    "c5_room_hub"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_gate",
+   "ch": 5,
+   "zone": "gate",
+   "w": 56,
+   "h": 40,
+   "props": 6,
+   "props_total": 6,
+   "floors": [
+    "c5_choir_wood_r2_s531"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_husks",
+   "ch": 5,
+   "zone": "husks",
+   "w": 62,
+   "h": 40,
+   "props": 10,
+   "props_total": 10,
+   "floors": [
+    "c5_pro_vault",
+    "c5_vault_bones_s511"
+   ],
+   "rooms": [
+    "c5_room_vault"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_depths",
+   "ch": 5,
+   "zone": "depths",
+   "w": 56,
+   "h": 40,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "c5_choir_wood_r2_s531"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch5_coffin",
+   "ch": 5,
+   "zone": "coffin",
+   "w": 56,
+   "h": 40,
+   "props": 5,
+   "props_total": 5,
+   "floors": [
+    "c5_choir_wood_r2_s531"
+   ],
+   "rooms": [
+    "c5_room_sarcophagus"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_pipe",
+   "ch": 6,
+   "zone": "pipe",
+   "w": 56,
+   "h": 40,
+   "props": 6,
+   "props_total": 6,
+   "floors": [
+    "c6_lab_marble_s609"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_junk",
+   "ch": 6,
+   "zone": "junk",
+   "w": 78,
+   "h": 50,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "rd_c6_junk_mercury_s3575",
+    "c6_junk_oil_s601",
+    "c6_pro_junk"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch6_steam",
+   "ch": 6,
+   "zone": "steam",
+   "w": 56,
+   "h": 40,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "c6_steam_plate_s605"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_refinery",
+   "ch": 6,
+   "zone": "refinery",
+   "w": 59,
+   "h": 40,
+   "props": 9,
+   "props_total": 9,
+   "floors": [
+    "rd_c6_refinery_tile_s2562"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_lab",
+   "ch": 6,
+   "zone": "lab",
+   "w": 64,
+   "h": 40,
+   "props": 11,
+   "props_total": 11,
+   "floors": [
+    "c6_lab_marble_s609"
+   ],
+   "rooms": [
+    "c6_room_lab"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_tower1",
+   "ch": 6,
+   "zone": "tower1",
+   "w": 56,
+   "h": 40,
+   "props": 3,
+   "props_total": 3,
+   "floors": [
+    "c6_tower_brass_s613"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_tower2",
+   "ch": 6,
+   "zone": "tower2",
+   "w": 57,
+   "h": 40,
+   "props": 8,
+   "props_total": 8,
+   "floors": [
+    "c6_pro_tower",
+    "c6_tower_gears_r2_s631"
+   ],
+   "rooms": [
+    "c6_room_pendulum",
+    "c6_room_time_vault"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_tower3",
+   "ch": 6,
+   "zone": "tower3",
+   "w": 56,
+   "h": 40,
+   "props": 7,
+   "props_total": 7,
+   "floors": [
+    "c6_lab_marble_s609"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch6_core",
+   "ch": 6,
+   "zone": "core",
+   "w": 56,
+   "h": 40,
+   "props": 2,
+   "props_total": 2,
+   "floors": [
+    "c6_lab_marble_s609"
+   ],
+   "rooms": [
+    "c6_room_core"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_rampart",
+   "ch": 7,
+   "zone": "rampart",
+   "w": 57,
+   "h": 50,
+   "props": 8,
+   "props_total": 8,
+   "floors": [
+    "c7_pro_rampart",
+    "c7_rampart_sand_s701"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch7_forecourt",
+   "ch": 7,
+   "zone": "forecourt",
+   "w": 64,
+   "h": 40,
+   "props": 11,
+   "props_total": 11,
+   "floors": [
+    "fl_c7_forecourt_s6853"
+   ],
+   "rooms": [
+    "c7_room_forecourt"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_sandfall",
+   "ch": 7,
+   "zone": "sandfall",
+   "w": 56,
+   "h": 40,
+   "props": 6,
+   "props_total": 6,
+   "floors": [
+    "fl_c7_stair_sand_s7071"
+   ],
+   "rooms": [],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_gallery",
+   "ch": 7,
+   "zone": "gallery",
+   "w": 79,
+   "h": 40,
+   "props": 18,
+   "props_total": 18,
+   "floors": [
+    "c7_pro_gallery",
+    "rd_c7_gallery_carpet_s1389"
+   ],
+   "rooms": [
+    "c7_room_gallery"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_throne",
+   "ch": 7,
+   "zone": "throne",
+   "w": 86,
+   "h": 40,
+   "props": 21,
+   "props_total": 21,
+   "floors": [
+    "c7_throne_floor_s711"
+   ],
+   "rooms": [
+    "c7_room_throne"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_altar",
+   "ch": 7,
+   "zone": "altar",
+   "w": 56,
+   "h": 40,
+   "props": 4,
+   "props_total": 4,
+   "floors": [
+    "c7_garden_s707"
+   ],
+   "rooms": [
+    "c7_room_altar"
+   ],
+   "outdoor": false
+  },
+  {
+   "id": "px_ch7_sidegarden",
+   "ch": 7,
+   "zone": "sidegarden",
+   "w": 75,
+   "h": 50,
+   "props": 16,
+   "props_total": 16,
+   "floors": [
+    "c7_garden_s707"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch8_rift_gate",
+   "ch": 8,
+   "zone": "rift_gate",
+   "w": 56,
+   "h": 50,
+   "props": 6,
+   "props_total": 6,
+   "floors": [
+    "c8_debris_marble_s807"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch8_skybridge",
+   "ch": 8,
+   "zone": "skybridge",
+   "w": 88,
+   "h": 50,
+   "props": 22,
+   "props_total": 22,
+   "floors": [
+    "c8_debris_marble_s807"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch8_arena1",
+   "ch": 8,
+   "zone": "arena1",
+   "w": 78,
+   "h": 50,
+   "props": 5,
+   "props_total": 5,
+   "floors": [
+    "fl_c8_arena_ash_s5400",
+    "fl_c8_arena_crack_r2_s7696",
+    "c8_pro_arena"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch8_arena2",
+   "ch": 8,
+   "zone": "arena2",
+   "w": 56,
+   "h": 50,
+   "props": 5,
+   "props_total": 5,
+   "floors": [
+    "fl_c8_storm_threads_r2_s3650",
+    "c8_pro_storm"
+   ],
+   "rooms": [],
+   "outdoor": true
+  },
+  {
+   "id": "px_ch8_ending",
+   "ch": 8,
+   "zone": "ending",
+   "w": 62,
+   "h": 50,
+   "props": 10,
+   "props_total": 10,
+   "floors": [
+    "c8_debris_marble_s807"
+   ],
+   "rooms": [],
+   "outdoor": true
+  }
+ ],
+ "rooms": [
+  "px_ch1_int_b1_room_torture",
+  "px_ch1_int_b2_room_cocoon",
+  "px_ch2_int_c2_room_armory",
+  "px_ch2_int_c2_room_forge",
+  "px_ch2_int_c2_room_forge_lift",
+  "px_ch2_int_t09_room_ch2forge",
+  "px_ch2_int_c2_room_grey_shop",
+  "px_ch3_int_c3_room_reading",
+  "px_ch3_int_c3_room_forbidden",
+  "px_ch3_int_c3_room_secret",
+  "px_ch4_int_c4_room_banquet1",
+  "px_ch4_int_c4_room_attic",
+  "px_ch4_int_c4_room_banquet2",
+  "px_ch4_int_c4_room_cellar",
+  "px_ch5_int_c5_room_choir",
+  "px_ch5_int_c5_room_hub",
+  "px_ch5_int_c5_room_vault",
+  "px_ch5_int_c5_room_sarcophagus",
+  "px_ch6_int_c6_room_lab",
+  "px_ch6_int_c6_room_pendulum",
+  "px_ch6_int_c6_room_time_vault",
+  "px_ch6_int_c6_room_core",
+  "px_ch7_int_c7_room_forecourt",
+  "px_ch7_int_c7_room_gallery",
+  "px_ch7_int_c7_room_throne",
+  "px_ch7_int_c7_room_altar"
+ ]
+}

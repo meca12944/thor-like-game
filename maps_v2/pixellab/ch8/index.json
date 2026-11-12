@@ -1,0 +1,1485 @@
+{
+ "chapter": 8,
+ "zones": [
+  {
+   "id": "rift_gate",
+   "name": "핏빛 하늘 입구",
+   "kind": "sky"
+  },
+  {
+   "id": "skybridge",
+   "name": "잔해 다리",
+   "kind": "sky"
+  },
+  {
+   "id": "arena1",
+   "name": "공허의 틈새 결전장 (1페이즈)",
+   "kind": "boss"
+  },
+  {
+   "id": "arena2",
+   "name": "재앙의 폭풍 (2페이즈 · 같은 자리)",
+   "kind": "boss"
+  },
+  {
+   "id": "ending",
+   "name": "결말: 코어 / 제단",
+   "kind": "sky"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c8_decal_arena",
+   "type": "decal",
+   "zone": "arena1",
+   "slot": "c8_decal_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "결전장 바닥 장식 16장",
+   "prompt": "1). crimson red crack 2). pale ash dust 3). red thread strands 4). broken stone slab 5). small floating pebbles 6). scorched stone 7). cracked rune circle 8). dust ring",
+   "file": "ch8/decals/c8_decal_arena",
+   "tiles": 16
+  },
+  {
+   "id": "c8_decal_debris",
+   "type": "decal",
+   "zone": "skybridge",
+   "slot": "c8_decal_debris",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "잔해 발판 바닥 장식 16장",
+   "prompt": "1). broken marble piece 2). gold leaf flakes 3). crumbled bricks 4). torn crimson cloth 5). ash 6). broken roof tiles 7). cracked stone 8). splintered wood",
+   "file": "ch8/decals/c8_decal_debris",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch8",
+   "type": "decal",
+   "zone": "rift_gate",
+   "slot": "fx_decal_ch8",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 바닥 장식 16장 (보충)",
+   "prompt": "1). thin crimson red thread strands 2). pale ash dust ring 3). crimson crack 4). floating pebbles 5). broken stone slab 6). gold fragments 7). marble chip 8). dust swirl",
+   "file": "ch8/decals/fx_decal_ch8",
+   "tiles": 16
+  },
+  {
+   "id": "c8_kit_platform",
+   "type": "kit",
+   "zone": "skybridge",
+   "slot": "c8_kit_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 잔해 발판 키트",
+   "prompt": "floating ruined castle debris: broken grey stone walls on floating platforms",
+   "file": "ch8/kits/c8_kit_platform",
+   "tiles": 80
+  },
+  {
+   "id": "c8_arena_s19",
+   "type": "prop",
+   "zone": "arena1",
+   "slot": "c8_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "공허의 틈새 결전장 (작은 판)",
+   "prompt": "round grey stone arena platform with a crimson red crack in the middle and broken edges, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal cap",
+   "file": "ch8/props/c8_arena_s19.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    8,
+    17,
+    192,
+    183
+   ]
+  },
+  {
+   "id": "c8_arena_s31",
+   "type": "prop",
+   "zone": "arena1",
+   "slot": "c8_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "공허의 틈새 결전장 (작은 판)",
+   "prompt": "round grey stone arena platform with a crimson red crack in the middle and broken edges, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal cap",
+   "file": "ch8/props/c8_arena_s31.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    13,
+    16,
+    187,
+    187
+   ]
+  },
+  {
+   "id": "c8_arena_s7",
+   "type": "prop",
+   "zone": "arena1",
+   "slot": "c8_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "공허의 틈새 결전장 (작은 판)",
+   "prompt": "round grey stone arena platform with a crimson red crack in the middle and broken edges, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal cap",
+   "file": "ch8/props/c8_arena_s7.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    25,
+    25,
+    175,
+    175
+   ]
+  },
+  {
+   "id": "c8_float_chapel_s19",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_chapel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 성당 조각",
+   "prompt": "floating chunk of a grey gothic chapel wall with a pointed window on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch8/props/c8_float_chapel_s19.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    45,
+    12,
+    148,
+    196
+   ]
+  },
+  {
+   "id": "c8_float_chapel_s31",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_chapel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 성당 조각",
+   "prompt": "floating chunk of a grey gothic chapel wall with a pointed window on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch8/props/c8_float_chapel_s31.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    49,
+    13,
+    143,
+    195
+   ]
+  },
+  {
+   "id": "c8_float_chapel_s7",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_chapel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 성당 조각",
+   "prompt": "floating chunk of a grey gothic chapel wall with a pointed window on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch8/props/c8_float_chapel_s7.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    46,
+    17,
+    142,
+    186
+   ]
+  },
+  {
+   "id": "c8_float_platform_s19",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 둥근 발판",
+   "prompt": "round floating grey stone platform with a jagged rock underside, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_platform_s19.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    23,
+    25,
+    177,
+    144
+   ]
+  },
+  {
+   "id": "c8_float_platform_s31",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 둥근 발판",
+   "prompt": "round floating grey stone platform with a jagged rock underside, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_platform_s31.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    9,
+    34,
+    191,
+    136
+   ]
+  },
+  {
+   "id": "c8_float_platform_s7",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 둥근 발판",
+   "prompt": "round floating grey stone platform with a jagged rock underside, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_platform_s7.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    34,
+    27,
+    166,
+    137
+   ]
+  },
+  {
+   "id": "c8_float_throne_s19",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 옥좌 조각",
+   "prompt": "floating jagged rock platform with a cracked cream marble floor and a broken golden throne on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ins",
+   "file": "ch8/props/c8_float_throne_s19.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    7,
+    18,
+    185,
+    173
+   ]
+  },
+  {
+   "id": "c8_float_throne_s31",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 옥좌 조각",
+   "prompt": "floating jagged rock platform with a cracked cream marble floor and a broken golden throne on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ins",
+   "file": "ch8/props/c8_float_throne_s31.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    9,
+    10,
+    192,
+    172
+   ]
+  },
+  {
+   "id": "c8_float_throne_s7",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 옥좌 조각",
+   "prompt": "floating jagged rock platform with a cracked cream marble floor and a broken golden throne on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ins",
+   "file": "ch8/props/c8_float_throne_s7.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    14,
+    29,
+    178,
+    181
+   ]
+  },
+  {
+   "id": "c8_float_tower_s19",
+   "type": "prop",
+   "zone": "arena2",
+   "slot": "c8_float_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 탑 조각",
+   "prompt": "floating broken top of a grey stone tower with a slate cone roof on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_tower_s19.png",
+   "size": [
+    160,
+    224
+   ],
+   "bbox": [
+    33,
+    6,
+    123,
+    214
+   ]
+  },
+  {
+   "id": "c8_float_tower_s31",
+   "type": "prop",
+   "zone": "arena2",
+   "slot": "c8_float_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 탑 조각",
+   "prompt": "floating broken top of a grey stone tower with a slate cone roof on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_tower_s31.png",
+   "size": [
+    160,
+    224
+   ],
+   "bbox": [
+    46,
+    10,
+    114,
+    214
+   ]
+  },
+  {
+   "id": "c8_float_tower_s7",
+   "type": "prop",
+   "zone": "arena2",
+   "slot": "c8_float_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 탑 조각",
+   "prompt": "floating broken top of a grey stone tower with a slate cone roof on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/c8_float_tower_s7.png",
+   "size": [
+    160,
+    224
+   ],
+   "bbox": [
+    31,
+    14,
+    127,
+    209
+   ]
+  },
+  {
+   "id": "fl_c8_arena_s101",
+   "type": "prop",
+   "zone": "arena1",
+   "slot": "c8_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "공허의 틈새 결전장 (작은 판) (보충)",
+   "prompt": "round grey stone arena platform with a crimson red crack in the middle and broken edges, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal cap",
+   "file": "ch8/props/fl_c8_arena_s101.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    3,
+    28,
+    197,
+    179
+   ]
+  },
+  {
+   "id": "fl_c8_arena_s97",
+   "type": "prop",
+   "zone": "arena1",
+   "slot": "c8_arena",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "공허의 틈새 결전장 (작은 판) (보충)",
+   "prompt": "round grey stone arena platform with a crimson red crack in the middle and broken edges, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal cap",
+   "file": "ch8/props/fl_c8_arena_s97.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    19,
+    42,
+    181,
+    164
+   ]
+  },
+  {
+   "id": "fl_c8_float_bridge_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 다리 조각 (보충)",
+   "prompt": "floating broken grey stone bridge segment with arches, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch8/props/fl_c8_float_bridge_s101.png",
+   "size": [
+    256,
+    112
+   ],
+   "bbox": [
+    25,
+    7,
+    226,
+    98
+   ]
+  },
+  {
+   "id": "fl_c8_float_bridge_s97",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 다리 조각 (보충)",
+   "prompt": "floating broken grey stone bridge segment with arches, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch8/props/fl_c8_float_bridge_s97.png",
+   "size": [
+    256,
+    112
+   ],
+   "bbox": [
+    43,
+    37,
+    210,
+    83
+   ]
+  },
+  {
+   "id": "fl_c8_float_chapel_s101",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_chapel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 성당 조각 (보충)",
+   "prompt": "floating chunk of a grey gothic chapel wall with a pointed window on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch8/props/fl_c8_float_chapel_s101.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    61,
+    12,
+    132,
+    196
+   ]
+  },
+  {
+   "id": "fl_c8_float_chapel_s97",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_chapel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 성당 조각 (보충)",
+   "prompt": "floating chunk of a grey gothic chapel wall with a pointed window on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch8/props/fl_c8_float_chapel_s97.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    48,
+    14,
+    145,
+    192
+   ]
+  },
+  {
+   "id": "fl_c8_float_gate_s101",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_float_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 황금 문 조각 (보충)",
+   "prompt": "floating jagged rock with half of a broken golden door standing on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall,",
+   "file": "ch8/props/fl_c8_float_gate_s101.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    45,
+    11,
+    151,
+    177
+   ]
+  },
+  {
+   "id": "fl_c8_float_house_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_house",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 집 조각 (보충)",
+   "prompt": "floating chunk of ground with a broken timber house on it, jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle",
+   "file": "ch8/props/fl_c8_float_house_s101.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    17,
+    11,
+    191,
+    164
+   ]
+  },
+  {
+   "id": "fl_c8_float_house_s97",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_house",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 집 조각 (보충)",
+   "prompt": "floating chunk of ground with a broken timber house on it, jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle",
+   "file": "ch8/props/fl_c8_float_house_s97.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    24,
+    10,
+    184,
+    166
+   ]
+  },
+  {
+   "id": "fl_c8_float_platform_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 둥근 발판 (보충)",
+   "prompt": "round floating grey stone platform with a jagged rock underside, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/fl_c8_float_platform_s101.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    29,
+    46,
+    171,
+    131
+   ]
+  },
+  {
+   "id": "fl_c8_float_platform_s97",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 둥근 발판 (보충)",
+   "prompt": "round floating grey stone platform with a jagged rock underside, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/fl_c8_float_platform_s97.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    30,
+    36,
+    170,
+    132
+   ]
+  },
+  {
+   "id": "fl_c8_float_rampart_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 성벽 조각 (보충)",
+   "prompt": "floating chunk of grey stone castle wall with battlements on a jagged rock base, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capit",
+   "file": "ch8/props/fl_c8_float_rampart_s101.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    38,
+    7,
+    205,
+    154
+   ]
+  },
+  {
+   "id": "fl_c8_float_rampart_s97",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 성벽 조각 (보충)",
+   "prompt": "floating chunk of grey stone castle wall with battlements on a jagged rock base, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capit",
+   "file": "ch8/props/fl_c8_float_rampart_s97.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    25,
+    17,
+    215,
+    145
+   ]
+  },
+  {
+   "id": "fl_c8_float_rubble_r2_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 작은 잔해 (다시) (보충)",
+   "prompt": "five small floating pale grey rock chunks with jagged undersides and a few cream bricks on top, grouped together, large and close up, filling the frame, seen from slightly above, dark fantasy ruined r",
+   "file": "ch8/props/fl_c8_float_rubble_r2_s101.png",
+   "size": [
+    176,
+    144
+   ],
+   "bbox": [
+    36,
+    32,
+    138,
+    120
+   ]
+  },
+  {
+   "id": "fl_c8_float_stair_r2_s101",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 계단 조각 (다시) (보충)",
+   "prompt": "floating jagged rock chunk carrying a short flight of wide pale grey stone stairs going up, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch8/props/fl_c8_float_stair_r2_s101.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    58,
+    57,
+    182,
+    151
+   ]
+  },
+  {
+   "id": "fl_c8_float_stair_r2_s97",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 계단 조각 (다시) (보충)",
+   "prompt": "floating jagged rock chunk carrying a short flight of wide pale grey stone stairs going up, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch8/props/fl_c8_float_stair_r2_s97.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    39,
+    33,
+    171,
+    141
+   ]
+  },
+  {
+   "id": "fl_c8_float_throne_s101",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 옥좌 조각 (보충)",
+   "prompt": "floating jagged rock platform with a cracked cream marble floor and a broken golden throne on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ins",
+   "file": "ch8/props/fl_c8_float_throne_s101.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    23,
+    25,
+    169,
+    180
+   ]
+  },
+  {
+   "id": "fl_c8_float_throne_s97",
+   "type": "prop",
+   "zone": "ending",
+   "slot": "c8_float_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 옥좌 조각 (보충)",
+   "prompt": "floating jagged rock platform with a cracked cream marble floor and a broken golden throne on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ins",
+   "file": "ch8/props/fl_c8_float_throne_s97.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    29,
+    41,
+    163,
+    179
+   ]
+  },
+  {
+   "id": "fl_c8_float_tower_s101",
+   "type": "prop",
+   "zone": "arena2",
+   "slot": "c8_float_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 탑 조각 (보충)",
+   "prompt": "floating broken top of a grey stone tower with a slate cone roof on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/fl_c8_float_tower_s101.png",
+   "size": [
+    160,
+    224
+   ],
+   "bbox": [
+    26,
+    9,
+    135,
+    213
+   ]
+  },
+  {
+   "id": "fl_c8_float_tower_s97",
+   "type": "prop",
+   "zone": "arena2",
+   "slot": "c8_float_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 탑 조각 (보충)",
+   "prompt": "floating broken top of a grey stone tower with a slate cone roof on a jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch8/props/fl_c8_float_tower_s97.png",
+   "size": [
+    160,
+    224
+   ],
+   "bbox": [
+    42,
+    9,
+    118,
+    215
+   ]
+  },
+  {
+   "id": "fl_c8_rift_r2_s101",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_rift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 가운데 붉은 틈 (다시) (보충)",
+   "prompt": "round patch of pale grey stone floor slabs split by one long jagged crimson red crack, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal",
+   "file": "ch8/props/fl_c8_rift_r2_s101.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    45,
+    29,
+    181,
+    130
+   ]
+  },
+  {
+   "id": "fl_c8_rift_r2_s97",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_rift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 가운데 붉은 틈 (다시) (보충)",
+   "prompt": "round patch of pale grey stone floor slabs split by one long jagged crimson red crack, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal",
+   "file": "ch8/props/fl_c8_rift_r2_s97.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    39,
+    18,
+    188,
+    144
+   ]
+  },
+  {
+   "id": "rd_c8_float_bridge_s61_s61",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 다리 조각 (다시) ← c8_float_bridge",
+   "prompt": "floating broken pale grey stone bridge segment with arches, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch8/props/rd_c8_float_bridge_s61_s61.png",
+   "size": [
+    256,
+    112
+   ],
+   "bbox": [
+    22,
+    38,
+    235,
+    88
+   ]
+  },
+  {
+   "id": "rd_c8_float_bridge_s67_s67",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 다리 조각 (다시) ← c8_float_bridge",
+   "prompt": "floating broken pale grey stone bridge segment with arches, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch8/props/rd_c8_float_bridge_s67_s67.png",
+   "size": [
+    256,
+    112
+   ],
+   "bbox": [
+    26,
+    18,
+    226,
+    86
+   ]
+  },
+  {
+   "id": "rd_c8_float_gate_s61_s61",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_float_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 황금 문 조각 (다시) ← c8_float_gate",
+   "prompt": "floating jagged pale rock with half of a broken golden door standing on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch8/props/rd_c8_float_gate_s61_s61.png",
+   "size": [
+    192,
+    192
+   ],
+   "bbox": [
+    31,
+    13,
+    161,
+    178
+   ]
+  },
+  {
+   "id": "rd_c8_float_house_s61_s61",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_house",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 집 조각 (다시) ← c8_float_house",
+   "prompt": "floating chunk of ground with a big broken timber house on it, jagged rock base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ca",
+   "file": "ch8/props/rd_c8_float_house_s61_s61.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    31,
+    6,
+    177,
+    171
+   ]
+  },
+  {
+   "id": "rd_c8_float_rampart_s61_s61",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 성벽 조각 (다시) ← c8_float_rampart",
+   "prompt": "floating chunk of pale grey stone castle wall with battlements on a jagged rock base, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch8/props/rd_c8_float_rampart_s61_s61.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    15,
+    10,
+    228,
+    156
+   ]
+  },
+  {
+   "id": "rd_c8_float_rubble_s61_s61",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 작은 잔해 (다시) ← c8_float_rubble",
+   "prompt": "five small floating pale grey rock chunks with jagged undersides and cream bricks on top, grouped, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital in",
+   "file": "ch8/props/rd_c8_float_rubble_s61_s61.png",
+   "size": [
+    176,
+    144
+   ],
+   "bbox": [
+    10,
+    20,
+    165,
+    132
+   ]
+  },
+  {
+   "id": "rd_c8_float_rubble_s71_s71",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 작은 잔해 (다시) ← c8_float_rubble",
+   "prompt": "five small floating pale grey rock chunks with jagged undersides and cream bricks on top, grouped, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital in",
+   "file": "ch8/props/rd_c8_float_rubble_s71_s71.png",
+   "size": [
+    176,
+    144
+   ],
+   "bbox": [
+    20,
+    23,
+    154,
+    129
+   ]
+  },
+  {
+   "id": "rd_c8_float_stair_s61_s61",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 계단 조각 (다시) ← c8_float_stair",
+   "prompt": "floating jagged rock chunk carrying a short flight of wide pale grey stone stairs going up, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch8/props/rd_c8_float_stair_s61_s61.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    30,
+    16,
+    161,
+    135
+   ]
+  },
+  {
+   "id": "rd_c8_float_stair_s67_s67",
+   "type": "prop",
+   "zone": "skybridge",
+   "slot": "c8_float_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "떠 있는 계단 조각 (다시) ← c8_float_stair",
+   "prompt": "floating jagged rock chunk carrying a short flight of wide pale grey stone stairs going up, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch8/props/rd_c8_float_stair_s67_s67.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    27,
+    18,
+    181,
+    158
+   ]
+  },
+  {
+   "id": "rd_c8_rift_s61_s61",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_rift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "결전장 붉은 틈 (다시) ← c8_rift",
+   "prompt": "round patch of pale grey stone floor slabs split by one long jagged crimson red crack, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal",
+   "file": "ch8/props/rd_c8_rift_s61_s61.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    38,
+    5,
+    186,
+    155
+   ]
+  },
+  {
+   "id": "rd_c8_rift_s67_s67",
+   "type": "prop",
+   "zone": "rift_gate",
+   "slot": "c8_rift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "결전장 붉은 틈 (다시) ← c8_rift",
+   "prompt": "round patch of pale grey stone floor slabs split by one long jagged crimson red crack, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal",
+   "file": "ch8/props/rd_c8_rift_s67_s67.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    20,
+    15,
+    202,
+    160
+   ]
+  },
+  {
+   "id": "c8_debris_marble_s807",
+   "type": "tileset",
+   "zone": "ending",
+   "slot": "c8_debris_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 옥좌 조각 바닥 ↔ 깨진 대리석",
+   "prompt": [
+    "cracked pale cream marble floor with gold inlay, muted desaturated sepia and ash grey tones",
+    "broken marble rubble and ash, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/c8_debris_marble_s807",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c8_debris_marble_s808",
+   "type": "tileset",
+   "zone": "ending",
+   "slot": "c8_debris_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 옥좌 조각 바닥 ↔ 깨진 대리석",
+   "prompt": [
+    "cracked pale cream marble floor with gold inlay, muted desaturated sepia and ash grey tones",
+    "broken marble rubble and ash, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/c8_debris_marble_s808",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c8_edge_platform_s821",
+   "type": "tileset",
+   "zone": "skybridge",
+   "slot": "c8_edge_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 발판 가장자리 (절벽형, 핏빛 하늘)",
+   "prompt": [
+    "open crimson red sky far below, muted desaturated sepia and ash grey tones",
+    "old grey stone floor slabs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/c8_edge_platform_s821",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c8_edge_platform_s822",
+   "type": "tileset",
+   "zone": "skybridge",
+   "slot": "c8_edge_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떠 있는 발판 가장자리 (절벽형, 핏빛 하늘)",
+   "prompt": [
+    "open crimson red sky far below, muted desaturated sepia and ash grey tones",
+    "old grey stone floor slabs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/c8_edge_platform_s822",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c8_pro_arena",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_pro_arena",
+   "verdict": "soso",
+   "review": "보통 틈 안 보임",
+   "source": "orig",
+   "item": "결전장 돌바닥 ↔ 붉은 틈 (pro)",
+   "prompt": [
+    "jagged crimson red fissure cracks",
+    "old pale grey round stone arena floor slabs"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch8/tiles/c8_pro_arena",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c8_pro_storm",
+   "type": "tileset",
+   "zone": "arena2",
+   "slot": "c8_pro_storm",
+   "verdict": "soso",
+   "review": "보통 실 안 보임",
+   "source": "orig",
+   "item": "결전장 돌바닥 ↔ 붉은 실타래 (pro)",
+   "prompt": [
+    "tangled crimson red threads",
+    "old pale grey stone arena floor slabs"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch8/tiles/c8_pro_storm",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c8_arena_ash_s5400",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_arena_ash",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 돌바닥 ↔ 잿가루 (보충)",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey ash dust drifts, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_arena_ash_s5400",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c8_arena_crack_r2_s7696",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_arena_crack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 돌바닥 ↔ 붉은 틈 (다시) (보충)",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs crossed by many thin jagged crimson red crack lines, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_arena_crack_r2_s7696",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c8_debris_marble_s7383",
+   "type": "tileset",
+   "zone": "ending",
+   "slot": "c8_debris_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 옥좌 조각 바닥 ↔ 깨진 대리석 (보충)",
+   "prompt": [
+    "cracked pale cream marble floor with gold inlay, muted desaturated sepia and ash grey tones",
+    "broken marble rubble and ash, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_debris_marble_s7383",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c8_edge_marble_s5226",
+   "type": "tileset",
+   "zone": "ending",
+   "slot": "c8_edge_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 대리석 발판 가장자리 (절벽형) (보충)",
+   "prompt": [
+    "open crimson red sky far below, muted desaturated sepia and ash grey tones",
+    "cracked pale cream marble floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_edge_marble_s5226",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c8_edge_platform_s5621",
+   "type": "tileset",
+   "zone": "skybridge",
+   "slot": "c8_edge_platform",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떠 있는 발판 가장자리 (절벽형, 핏빛 하늘) (보충)",
+   "prompt": [
+    "open crimson red sky far below, muted desaturated sepia and ash grey tones",
+    "old grey stone floor slabs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_edge_platform_s5621",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c8_storm_threads_r2_s3650",
+   "type": "tileset",
+   "zone": "arena2",
+   "slot": "c8_storm_threads",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "결전장 돌바닥 ↔ 붉은 실타래 (다시) (보충)",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs covered by thin tangled crimson red thread lines like a net, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/fl_c8_storm_threads_r2_s3650",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c8_arena_ash_s3300",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_arena_ash",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌바닥 ↔ 잿가루 (다시) ← c8_arena_ash",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "soft drifts of pale grey ash dust, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_arena_ash_s3300",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c8_arena_crack_s1835",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_arena_crack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌바닥 ↔ 붉은 틈 (다시) ← c8_arena_crack",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs crossed by many thin jagged crimson red crack lines, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_arena_crack_s1835",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c8_arena_crack_s1836",
+   "type": "tileset",
+   "zone": "arena1",
+   "slot": "c8_arena_crack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌바닥 ↔ 붉은 틈 (다시) ← c8_arena_crack",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs crossed by many thin jagged crimson red crack lines, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_arena_crack_s1836",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c8_edge_marble_s3127",
+   "type": "tileset",
+   "zone": "ending",
+   "slot": "c8_edge_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대리석 발판 가장자리 (다시) ← c8_edge_marble",
+   "prompt": [
+    "open dull crimson red sky far below, muted desaturated sepia and ash grey tones",
+    "cracked pale cream marble floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_edge_marble_s3127",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "rd_c8_storm_threads_s3002",
+   "type": "tileset",
+   "zone": "arena2",
+   "slot": "c8_storm_threads",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌바닥 ↔ 붉은 실타래 (다시) ← c8_storm_threads",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs covered by thin tangled crimson red thread lines like a net, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_storm_threads_s3002",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c8_storm_threads_s3003",
+   "type": "tileset",
+   "zone": "arena2",
+   "slot": "c8_storm_threads",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌바닥 ↔ 붉은 실타래 (다시) ← c8_storm_threads",
+   "prompt": [
+    "old pale grey stone arena floor slabs, muted desaturated sepia and ash grey tones",
+    "pale grey stone slabs covered by thin tangled crimson red thread lines like a net, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch8/tiles/rd_c8_storm_threads_s3003",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

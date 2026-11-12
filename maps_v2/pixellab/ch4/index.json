@@ -1,0 +1,2696 @@
+{
+ "chapter": 4,
+ "zones": [
+  {
+   "id": "front",
+   "name": "불타는 정면 거리",
+   "kind": "field"
+  },
+  {
+   "id": "alley",
+   "name": "귀족가 뒷골목",
+   "kind": "field"
+  },
+  {
+   "id": "avenue",
+   "name": "귀족가 대로",
+   "kind": "field"
+  },
+  {
+   "id": "roof",
+   "name": "지붕 암살자 루트",
+   "kind": "field"
+  },
+  {
+   "id": "hall1",
+   "name": "연회장 본관 1층",
+   "kind": "interior"
+  },
+  {
+   "id": "hall2",
+   "name": "연회장 2층",
+   "kind": "interior"
+  },
+  {
+   "id": "cellar",
+   "name": "지하 와인 저장고",
+   "kind": "dungeon"
+  },
+  {
+   "id": "boss",
+   "name": "엘레노어의 대연회장",
+   "kind": "boss"
+  },
+  {
+   "id": "grave",
+   "name": "어린아이들의 재 무덤",
+   "kind": "hidden"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "t12_feltinit_mansion",
+   "type": "building",
+   "zone": "avenue",
+   "slot": "t12_feltinit_mansion",
+   "verdict": "soso",
+   "review": "보통: 펠트 여관을 그대로 복사(저택 느낌 없음)",
+   "source": "test",
+   "item": "ch4 불탄 귀족 저택 (펠트 h_inn 을 init 으로, 화풍 맞추기)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: burned noble mansion of pale stone with melted gold trim, broken tiled roof, soot-blackened tall windows, ink outlines and soft painted s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/buildings/t12_feltinit_mansion.png",
+   "size": [
+    384,
+    284
+   ],
+   "bbox": [
+    0,
+    0,
+    384,
+    284
+   ]
+  },
+  {
+   "id": "t12_feltinit_mansion_str150",
+   "type": "building",
+   "zone": "avenue",
+   "slot": "t12_feltinit_mansion_str150",
+   "verdict": "soso",
+   "review": "보통: 같음",
+   "source": "test",
+   "item": "ch4 불탄 귀족 저택 (펠트 h_inn 을 init 으로, 화풍 맞추기) — init 세기 150",
+   "prompt": "building, front wall and door facing the viewer, roof visible: burned noble mansion of pale stone with melted gold trim, broken tiled roof, soot-blackened tall windows, ink outlines and soft painted s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/buildings/t12_feltinit_mansion_str150.png",
+   "size": [
+    384,
+    284
+   ],
+   "bbox": [
+    0,
+    0,
+    384,
+    284
+   ]
+  },
+  {
+   "id": "c4_decal_banquet",
+   "type": "decal",
+   "zone": "hall1",
+   "slot": "c4_decal_banquet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 바닥 장식 16장",
+   "prompt": "1). spilled burgundy wine on marble 2). broken crystal wine glass 3). fallen silver fork and knife 4). chandelier crystal drops 5). ash on carpet 6). dropped napkin 7). scattered bread crumbs 8). brok",
+   "file": "ch4/decals/c4_decal_banquet",
+   "tiles": 16
+  },
+  {
+   "id": "c4_decal_cellar",
+   "type": "decal",
+   "zone": "cellar",
+   "slot": "c4_decal_cellar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "와인 저장고 바닥 장식 16장",
+   "prompt": "1). burgundy wine stain on stone 2). rusty barrel hoop 3). broken barrel staves 4). wine corks 5). green glass bottle shards 6). straw on stone 7). cracked flagstone 8). small puddle",
+   "file": "ch4/decals/c4_decal_cellar",
+   "tiles": 16
+  },
+  {
+   "id": "c4_decal_street",
+   "type": "decal",
+   "zone": "front",
+   "slot": "c4_decal_street",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "귀족가 바닥 장식 16장",
+   "prompt": "1). light grey ash drift on marble 2). broken slate roof tile on paving 3). melted gold leaf drip on stone 4). charred wooden beam piece 5). scorched black soot mark 6). broken glass shards 7). torn s",
+   "file": "ch4/decals/c4_decal_street",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch4",
+   "type": "decal",
+   "zone": "front",
+   "slot": "fx_decal_ch4",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 정원 바닥 장식 16장 (보충)",
+   "prompt": "1). dead rose petals 2). pale ash drift 3). broken porcelain cup 4). gold button 5). fallen leaves 6). broken slate tile 7). cracked paving 8). silver spoon",
+   "file": "ch4/decals/fx_decal_ch4",
+   "tiles": 16
+  },
+  {
+   "id": "c4_kit_banquet",
+   "type": "kit",
+   "zone": "hall1",
+   "slot": "c4_kit_banquet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 건물 키트",
+   "prompt": "grand banquet hall: crimson and gold panelled walls with marble floor",
+   "file": "ch4/kits/c4_kit_banquet",
+   "tiles": 80
+  },
+  {
+   "id": "c4_kit_cellar",
+   "type": "kit",
+   "zone": "cellar",
+   "slot": "c4_kit_cellar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "와인 저장고 건물 키트",
+   "prompt": "wine cellar: brick vault walls with stone floor",
+   "file": "ch4/kits/c4_kit_cellar",
+   "tiles": 80
+  },
+  {
+   "id": "c4_kit_mansion",
+   "type": "kit",
+   "zone": "alley",
+   "slot": "c4_kit_mansion",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "귀족 저택 건물 키트",
+   "prompt": "burned noble mansion: pale stone walls with melted gold trim and parquet floor",
+   "file": "ch4/kits/c4_kit_mansion",
+   "tiles": 80
+  },
+  {
+   "id": "c4_ash_graves_r2_s43",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_ash_graves",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "어린아이들의 재 무덤 (다시)",
+   "prompt": "three large round mounds of pale grey ash side by side, each with a small wooden toy and white flowers on top, big and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch4/props/c4_ash_graves_r2_s43.png",
+   "size": [
+    192,
+    144
+   ],
+   "bbox": [
+    5,
+    41,
+    188,
+    104
+   ]
+  },
+  {
+   "id": "c4_ash_graves_r2_s47",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_ash_graves",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "어린아이들의 재 무덤 (다시)",
+   "prompt": "three large round mounds of pale grey ash side by side, each with a small wooden toy and white flowers on top, big and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch4/props/c4_ash_graves_r2_s47.png",
+   "size": [
+    192,
+    144
+   ],
+   "bbox": [
+    4,
+    47,
+    188,
+    112
+   ]
+  },
+  {
+   "id": "c4_brazier_s19",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 파란 돌",
+   "source": "orig",
+   "item": "쇠 화로",
+   "prompt": "ornate wrought iron brazier on three legs filled with grey charcoal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/c4_brazier_s19.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    23,
+    53,
+    90,
+    114
+   ]
+  },
+  {
+   "id": "c4_brazier_s31",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 파란 돌",
+   "source": "orig",
+   "item": "쇠 화로",
+   "prompt": "ornate wrought iron brazier on three legs filled with grey charcoal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/c4_brazier_s31.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    19,
+    42,
+    91,
+    116
+   ]
+  },
+  {
+   "id": "c4_brazier_s7",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 파란 돌",
+   "source": "orig",
+   "item": "쇠 화로",
+   "prompt": "ornate wrought iron brazier on three legs filled with grey charcoal, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted s",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/c4_brazier_s7.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    27,
+    56,
+    85,
+    113
+   ]
+  },
+  {
+   "id": "c4_carriage_s19",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_carriage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "부서진 귀족 마차",
+   "prompt": "wrecked burned noble carriage, scorched gilded panels, one broken wheel, torn curtains, ash on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch4/props/c4_carriage_s19.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    22,
+    18,
+    195,
+    136
+   ]
+  },
+  {
+   "id": "c4_carriage_s7",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_carriage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "부서진 귀족 마차",
+   "prompt": "wrecked burned noble carriage, scorched gilded panels, one broken wheel, torn curtains, ash on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch4/props/c4_carriage_s7.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    29,
+    21,
+    205,
+    144
+   ]
+  },
+  {
+   "id": "c4_chandelier_r2_s41",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_chandelier",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떨어진 샹들리에 (다시)",
+   "prompt": "one big round gold chandelier with many curved arms and clear crystal drops, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch4/props/c4_chandelier_r2_s41.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    20,
+    0,
+    172,
+    167
+   ]
+  },
+  {
+   "id": "c4_chandelier_r2_s43",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_chandelier",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떨어진 샹들리에 (다시)",
+   "prompt": "one big round gold chandelier with many curved arms and clear crystal drops, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch4/props/c4_chandelier_r2_s43.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    22,
+    0,
+    170,
+    168
+   ]
+  },
+  {
+   "id": "c4_chandelier_r2_s47",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_chandelier",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "떨어진 샹들리에 (다시)",
+   "prompt": "one big round gold chandelier with many curved arms and clear crystal drops, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch4/props/c4_chandelier_r2_s47.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    37,
+    0,
+    157,
+    162
+   ]
+  },
+  {
+   "id": "c4_f_ball_s19",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_ball",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "붉은 가죽 공",
+   "prompt": "small red leather ball with stitched seams, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch4/props/c4_f_ball_s19.png",
+   "size": [
+    48,
+    48
+   ],
+   "bbox": [
+    6,
+    5,
+    42,
+    41
+   ]
+  },
+  {
+   "id": "c4_f_ball_s7",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_ball",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "붉은 가죽 공",
+   "prompt": "small red leather ball with stitched seams, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch4/props/c4_f_ball_s7.png",
+   "size": [
+    48,
+    48
+   ],
+   "bbox": [
+    10,
+    12,
+    37,
+    38
+   ]
+  },
+  {
+   "id": "c4_f_bottle_crate_s19",
+   "type": "prop",
+   "zone": "alley",
+   "slot": "c4_f_bottle_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "와인병 상자",
+   "prompt": "wooden crate full of dusty green wine bottles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/c4_f_bottle_crate_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    13,
+    13,
+    95,
+    87
+   ]
+  },
+  {
+   "id": "c4_f_bottle_crate_s7",
+   "type": "prop",
+   "zone": "alley",
+   "slot": "c4_f_bottle_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "와인병 상자",
+   "prompt": "wooden crate full of dusty green wine bottles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/c4_f_bottle_crate_s7.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    25,
+    28,
+    96,
+    86
+   ]
+  },
+  {
+   "id": "c4_f_candelabra_s19",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "금촛대",
+   "prompt": "tall gold candelabra with melted unlit white candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch4/props/c4_f_candelabra_s19.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    17,
+    10,
+    47,
+    139
+   ]
+  },
+  {
+   "id": "c4_f_candelabra_s7",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "금촛대",
+   "prompt": "tall gold candelabra with melted unlit white candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch4/props/c4_f_candelabra_s7.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    11,
+    3,
+    52,
+    141
+   ]
+  },
+  {
+   "id": "c4_f_casks_s19",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_f_casks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "작은 술통 더미",
+   "prompt": "stack of three small oak casks on their sides in a pyramid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch4/props/c4_f_casks_s19.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    22,
+    8,
+    106,
+    97
+   ]
+  },
+  {
+   "id": "c4_f_casks_s7",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_f_casks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "작은 술통 더미",
+   "prompt": "stack of three small oak casks on their sides in a pyramid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch4/props/c4_f_casks_s7.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    27,
+    42,
+    101,
+    101
+   ]
+  },
+  {
+   "id": "c4_f_chairs_s19",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_chairs",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 연회 의자",
+   "prompt": "two broken gilded banquet chairs with red velvet seats, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch4/props/c4_f_chairs_s19.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    16,
+    42,
+    96,
+    100
+   ]
+  },
+  {
+   "id": "c4_f_chairs_s7",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_chairs",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 연회 의자",
+   "prompt": "two broken gilded banquet chairs with red velvet seats, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch4/props/c4_f_chairs_s7.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    10,
+    51,
+    103,
+    103
+   ]
+  },
+  {
+   "id": "c4_f_curtain_s19",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_curtain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "찢어진 커튼",
+   "prompt": "tall torn crimson velvet curtain with gold tassels, burned at the bottom, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mu",
+   "file": "ch4/props/c4_f_curtain_s19.png",
+   "size": [
+    112,
+    160
+   ],
+   "bbox": [
+    8,
+    0,
+    99,
+    147
+   ]
+  },
+  {
+   "id": "c4_f_lamp_s19",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 가로등",
+   "prompt": "elegant black iron street lamp post with a glass lantern, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch4/props/c4_f_lamp_s19.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    18,
+    3,
+    46,
+    168
+   ]
+  },
+  {
+   "id": "c4_f_lamp_s7",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 가로등",
+   "prompt": "elegant black iron street lamp post with a glass lantern, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch4/props/c4_f_lamp_s7.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    16,
+    9,
+    49,
+    170
+   ]
+  },
+  {
+   "id": "c4_f_plant_s19",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_f_plant",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시든 화분",
+   "prompt": "tall ornate stone flower pot with a withered brown dead plant, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia b",
+   "file": "ch4/props/c4_f_plant_s19.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    23,
+    8,
+    57,
+    105
+   ]
+  },
+  {
+   "id": "c4_f_plant_s7",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_f_plant",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시든 화분",
+   "prompt": "tall ornate stone flower pot with a withered brown dead plant, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia b",
+   "file": "ch4/props/c4_f_plant_s7.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    14,
+    16,
+    59,
+    104
+   ]
+  },
+  {
+   "id": "c4_f_platter_r2_s43",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_f_platter",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "은쟁반 잿더미 (다시)",
+   "prompt": "shiny silver serving platter holding a small heap of pale grey ash, a polished silver dome lid next to it, bright silver, filling the frame, seen from slightly above, dark fantasy ruined royal capital",
+   "file": "ch4/props/c4_f_platter_r2_s43.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    19,
+    37,
+    92,
+    75
+   ]
+  },
+  {
+   "id": "c4_f_portrait_s19",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_portrait",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "불탄 초상화",
+   "prompt": "large gilded portrait frame with a half burned painting of a noble lady, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch4/props/c4_f_portrait_s19.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    19,
+    26,
+    93,
+    118
+   ]
+  },
+  {
+   "id": "c4_f_portrait_s7",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_portrait",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "불탄 초상화",
+   "prompt": "large gilded portrait frame with a half burned painting of a noble lady, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch4/props/c4_f_portrait_s7.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    9,
+    9,
+    105,
+    134
+   ]
+  },
+  {
+   "id": "c4_f_roof_tiles_s7",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_f_roof_tiles",
+   "verdict": "soso",
+   "review": "보통",
+   "source": "filler",
+   "item": "깨진 기와 더미",
+   "prompt": "pile of broken grey blue slate roof tiles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys,",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/c4_f_roof_tiles_s7.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    1,
+    24,
+    100,
+    67
+   ]
+  },
+  {
+   "id": "c4_f_tea_table_s19",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_tea_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "끝없는 다과회 탁자",
+   "prompt": "small round table with a lace cloth, a porcelain tea set, cups and a cake stand of cakes, a little ash on them, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch4/props/c4_f_tea_table_s19.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    40,
+    39,
+    101,
+    106
+   ]
+  },
+  {
+   "id": "c4_f_tea_table_s7",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_tea_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "끝없는 다과회 탁자",
+   "prompt": "small round table with a lace cloth, a porcelain tea set, cups and a cake stand of cakes, a little ash on them, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch4/props/c4_f_tea_table_s7.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    37,
+    54,
+    104,
+    113
+   ]
+  },
+  {
+   "id": "c4_f_toy_horse_s19",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_f_toy_horse",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 장난감 말",
+   "prompt": "small wooden toy rocking horse, painted, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/c4_f_toy_horse_s19.png",
+   "size": [
+    80,
+    80
+   ],
+   "bbox": [
+    6,
+    9,
+    75,
+    75
+   ]
+  },
+  {
+   "id": "c4_f_toy_horse_s7",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_f_toy_horse",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 장난감 말",
+   "prompt": "small wooden toy rocking horse, painted, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/c4_f_toy_horse_s7.png",
+   "size": [
+    80,
+    80
+   ],
+   "bbox": [
+    6,
+    10,
+    78,
+    72
+   ]
+  },
+  {
+   "id": "c4_fireplace_s19",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_fireplace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 벽난로",
+   "prompt": "huge ornate carved marble fireplace with gold trim and a tall mantel, empty grey stone hearth, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch4/props/c4_fireplace_s19.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    17,
+    9,
+    191,
+    165
+   ]
+  },
+  {
+   "id": "c4_fireplace_s31",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_fireplace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 벽난로",
+   "prompt": "huge ornate carved marble fireplace with gold trim and a tall mantel, empty grey stone hearth, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch4/props/c4_fireplace_s31.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    44,
+    61,
+    164,
+    147
+   ]
+  },
+  {
+   "id": "c4_fountain_s19",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_fountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "정원 마른 분수",
+   "prompt": "ornate round marble garden fountain, dry basin filled with grey ash, a small cherub figure on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cast",
+   "file": "ch4/props/c4_fountain_s19.png",
+   "size": [
+    176,
+    160
+   ],
+   "bbox": [
+    34,
+    18,
+    141,
+    149
+   ]
+  },
+  {
+   "id": "c4_fountain_s31",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_fountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "정원 마른 분수",
+   "prompt": "ornate round marble garden fountain, dry basin filled with grey ash, a small cherub figure on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cast",
+   "file": "ch4/props/c4_fountain_s31.png",
+   "size": [
+    176,
+    160
+   ],
+   "bbox": [
+    34,
+    25,
+    142,
+    133
+   ]
+  },
+  {
+   "id": "c4_fountain_s7",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_fountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "정원 마른 분수",
+   "prompt": "ornate round marble garden fountain, dry basin filled with grey ash, a small cherub figure on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cast",
+   "file": "ch4/props/c4_fountain_s7.png",
+   "size": [
+    176,
+    160
+   ],
+   "bbox": [
+    43,
+    34,
+    133,
+    135
+   ]
+  },
+  {
+   "id": "c4_wine_rack_s19",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "와인 선반 벽",
+   "prompt": "tall wooden wine rack wall full of dusty green bottles lying in rows, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch4/props/c4_wine_rack_s19.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    31,
+    12,
+    161,
+    148
+   ]
+  },
+  {
+   "id": "c4_wine_rack_s31",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "와인 선반 벽",
+   "prompt": "tall wooden wine rack wall full of dusty green bottles lying in rows, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch4/props/c4_wine_rack_s31.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    46,
+    9,
+    145,
+    148
+   ]
+  },
+  {
+   "id": "c4_wine_rack_s7",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "와인 선반 벽",
+   "prompt": "tall wooden wine rack wall full of dusty green bottles lying in rows, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch4/props/c4_wine_rack_s7.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    41,
+    17,
+    151,
+    147
+   ]
+  },
+  {
+   "id": "fl_c4_ash_graves_r2_s101",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_ash_graves",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "어린아이들의 재 무덤 (다시) (보충)",
+   "prompt": "three large round mounds of pale grey ash side by side, each with a small wooden toy and white flowers on top, big and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch4/props/fl_c4_ash_graves_r2_s101.png",
+   "size": [
+    192,
+    144
+   ],
+   "bbox": [
+    7,
+    56,
+    187,
+    118
+   ]
+  },
+  {
+   "id": "fl_c4_ash_graves_r2_s97",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_ash_graves",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "어린아이들의 재 무덤 (다시) (보충)",
+   "prompt": "three large round mounds of pale grey ash side by side, each with a small wooden toy and white flowers on top, big and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch4/props/fl_c4_ash_graves_r2_s97.png",
+   "size": [
+    192,
+    144
+   ],
+   "bbox": [
+    2,
+    47,
+    190,
+    109
+   ]
+  },
+  {
+   "id": "fl_c4_carriage_s101",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_carriage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 귀족 마차 (보충)",
+   "prompt": "wrecked burned noble carriage, scorched gilded panels, one broken wheel, torn curtains, ash on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch4/props/fl_c4_carriage_s101.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    43,
+    7,
+    179,
+    148
+   ]
+  },
+  {
+   "id": "fl_c4_carriage_s97",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_carriage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 귀족 마차 (보충)",
+   "prompt": "wrecked burned noble carriage, scorched gilded panels, one broken wheel, torn curtains, ash on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch4/props/fl_c4_carriage_s97.png",
+   "size": [
+    224,
+    160
+   ],
+   "bbox": [
+    33,
+    22,
+    186,
+    143
+   ]
+  },
+  {
+   "id": "fl_c4_chandelier_r2_s101",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_chandelier",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떨어진 샹들리에 (다시) (보충)",
+   "prompt": "one big round gold chandelier with many curved arms and clear crystal drops, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch4/props/fl_c4_chandelier_r2_s101.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    33,
+    1,
+    161,
+    161
+   ]
+  },
+  {
+   "id": "fl_c4_chandelier_r2_s97",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_chandelier",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "떨어진 샹들리에 (다시) (보충)",
+   "prompt": "one big round gold chandelier with many curved arms and clear crystal drops, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch4/props/fl_c4_chandelier_r2_s97.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    36,
+    4,
+    156,
+    134
+   ]
+  },
+  {
+   "id": "fl_c4_chimneys_s101",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_chimneys",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지붕 굴뚝 무리 (보충)",
+   "prompt": "cluster of tall brick chimney stacks on a slate roof ridge, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch4/props/fl_c4_chimneys_s101.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    0,
+    16,
+    144,
+    176
+   ]
+  },
+  {
+   "id": "fl_c4_chimneys_s97",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_chimneys",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지붕 굴뚝 무리 (보충)",
+   "prompt": "cluster of tall brick chimney stacks on a slate roof ridge, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch4/props/fl_c4_chimneys_s97.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    7,
+    4,
+    138,
+    162
+   ]
+  },
+  {
+   "id": "fl_c4_f_ball_s101",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_ball",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "붉은 가죽 공 (보충)",
+   "prompt": "small red leather ball with stitched seams, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch4/props/fl_c4_f_ball_s101.png",
+   "size": [
+    48,
+    48
+   ],
+   "bbox": [
+    8,
+    10,
+    40,
+    42
+   ]
+  },
+  {
+   "id": "fl_c4_f_bottle_crate_s101",
+   "type": "prop",
+   "zone": "alley",
+   "slot": "c4_f_bottle_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "와인병 상자 (보충)",
+   "prompt": "wooden crate full of dusty green wine bottles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/fl_c4_f_bottle_crate_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    25,
+    40,
+    86,
+    84
+   ]
+  },
+  {
+   "id": "fl_c4_f_candelabra_s101",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "금촛대 (보충)",
+   "prompt": "tall gold candelabra with melted unlit white candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch4/props/fl_c4_f_candelabra_s101.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    10,
+    4,
+    53,
+    138
+   ]
+  },
+  {
+   "id": "fl_c4_f_candelabra_s97",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "금촛대 (보충)",
+   "prompt": "tall gold candelabra with melted unlit white candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch4/props/fl_c4_f_candelabra_s97.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    10,
+    9,
+    54,
+    136
+   ]
+  },
+  {
+   "id": "fl_c4_f_casks_s101",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_f_casks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "작은 술통 더미 (보충)",
+   "prompt": "stack of three small oak casks on their sides in a pyramid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch4/props/fl_c4_f_casks_s101.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    45,
+    34,
+    83,
+    100
+   ]
+  },
+  {
+   "id": "fl_c4_f_chairs_s101",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_chairs",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 연회 의자 (보충)",
+   "prompt": "two broken gilded banquet chairs with red velvet seats, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch4/props/fl_c4_f_chairs_s101.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    13,
+    40,
+    99,
+    105
+   ]
+  },
+  {
+   "id": "fl_c4_f_chairs_s97",
+   "type": "prop",
+   "zone": "hall2",
+   "slot": "c4_f_chairs",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 연회 의자 (보충)",
+   "prompt": "two broken gilded banquet chairs with red velvet seats, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch4/props/fl_c4_f_chairs_s97.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    15,
+    47,
+    97,
+    105
+   ]
+  },
+  {
+   "id": "fl_c4_f_lamp_s101",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 가로등 (보충)",
+   "prompt": "elegant black iron street lamp post with a glass lantern, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch4/props/fl_c4_f_lamp_s101.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    13,
+    11,
+    53,
+    165
+   ]
+  },
+  {
+   "id": "fl_c4_f_lamp_s97",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 가로등 (보충)",
+   "prompt": "elegant black iron street lamp post with a glass lantern, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch4/props/fl_c4_f_lamp_s97.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    15,
+    5,
+    47,
+    171
+   ]
+  },
+  {
+   "id": "fl_c4_f_plant_s101",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_f_plant",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시든 화분 (보충)",
+   "prompt": "tall ornate stone flower pot with a withered brown dead plant, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia b",
+   "file": "ch4/props/fl_c4_f_plant_s101.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    27,
+    3,
+    69,
+    104
+   ]
+  },
+  {
+   "id": "fl_c4_f_plant_s97",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_f_plant",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시든 화분 (보충)",
+   "prompt": "tall ornate stone flower pot with a withered brown dead plant, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia b",
+   "file": "ch4/props/fl_c4_f_plant_s97.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    12,
+    9,
+    63,
+    107
+   ]
+  },
+  {
+   "id": "fl_c4_f_platter_r2_s101",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_f_platter",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "은쟁반 잿더미 (다시) (보충)",
+   "prompt": "shiny silver serving platter holding a small heap of pale grey ash, a polished silver dome lid next to it, bright silver, filling the frame, seen from slightly above, dark fantasy ruined royal capital",
+   "file": "ch4/props/fl_c4_f_platter_r2_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    24,
+    30,
+    89,
+    81
+   ]
+  },
+  {
+   "id": "fl_c4_f_platter_r2_s97",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_f_platter",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "은쟁반 잿더미 (다시) (보충)",
+   "prompt": "shiny silver serving platter holding a small heap of pale grey ash, a polished silver dome lid next to it, bright silver, filling the frame, seen from slightly above, dark fantasy ruined royal capital",
+   "file": "ch4/props/fl_c4_f_platter_r2_s97.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    14,
+    45,
+    106,
+    85
+   ]
+  },
+  {
+   "id": "fl_c4_f_portrait_s101",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_portrait",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "불탄 초상화 (보충)",
+   "prompt": "large gilded portrait frame with a half burned painting of a noble lady, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch4/props/fl_c4_f_portrait_s101.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    18,
+    23,
+    98,
+    122
+   ]
+  },
+  {
+   "id": "fl_c4_f_portrait_s97",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_portrait",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "불탄 초상화 (보충)",
+   "prompt": "large gilded portrait frame with a half burned painting of a noble lady, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch4/props/fl_c4_f_portrait_s97.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    25,
+    29,
+    88,
+    116
+   ]
+  },
+  {
+   "id": "fl_c4_f_tea_table_s101",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_tea_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "끝없는 다과회 탁자 (보충)",
+   "prompt": "small round table with a lace cloth, a porcelain tea set, cups and a cake stand of cakes, a little ash on them, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch4/props/fl_c4_f_tea_table_s101.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    44,
+    36,
+    103,
+    90
+   ]
+  },
+  {
+   "id": "fl_c4_f_tea_table_s97",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_tea_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "끝없는 다과회 탁자 (보충)",
+   "prompt": "small round table with a lace cloth, a porcelain tea set, cups and a cake stand of cakes, a little ash on them, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch4/props/fl_c4_f_tea_table_s97.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    29,
+    39,
+    115,
+    120
+   ]
+  },
+  {
+   "id": "fl_c4_f_toy_horse_s101",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_f_toy_horse",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 장난감 말 (보충)",
+   "prompt": "small wooden toy rocking horse, painted, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/fl_c4_f_toy_horse_s101.png",
+   "size": [
+    80,
+    80
+   ],
+   "bbox": [
+    2,
+    9,
+    77,
+    73
+   ]
+  },
+  {
+   "id": "fl_c4_f_toy_horse_s97",
+   "type": "prop",
+   "zone": "grave",
+   "slot": "c4_f_toy_horse",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 장난감 말 (보충)",
+   "prompt": "small wooden toy rocking horse, painted, worn, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch4/props/fl_c4_f_toy_horse_s97.png",
+   "size": [
+    80,
+    80
+   ],
+   "bbox": [
+    12,
+    10,
+    74,
+    70
+   ]
+  },
+  {
+   "id": "fl_c4_fireplace_s101",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_fireplace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거대 벽난로 (보충)",
+   "prompt": "huge ornate carved marble fireplace with gold trim and a tall mantel, empty grey stone hearth, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch4/props/fl_c4_fireplace_s101.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    37,
+    53,
+    171,
+    153
+   ]
+  },
+  {
+   "id": "fl_c4_fireplace_s97",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_fireplace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거대 벽난로 (보충)",
+   "prompt": "huge ornate carved marble fireplace with gold trim and a tall mantel, empty grey stone hearth, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch4/props/fl_c4_fireplace_s97.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    31,
+    25,
+    177,
+    167
+   ]
+  },
+  {
+   "id": "fl_c4_fountain_s101",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_fountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 마른 분수 (보충)",
+   "prompt": "ornate round marble garden fountain, dry basin filled with grey ash, a small cherub figure on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cast",
+   "file": "ch4/props/fl_c4_fountain_s101.png",
+   "size": [
+    176,
+    160
+   ],
+   "bbox": [
+    38,
+    26,
+    138,
+    143
+   ]
+  },
+  {
+   "id": "fl_c4_fountain_s97",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_fountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 마른 분수 (보충)",
+   "prompt": "ornate round marble garden fountain, dry basin filled with grey ash, a small cherub figure on top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cast",
+   "file": "ch4/props/fl_c4_fountain_s97.png",
+   "size": [
+    176,
+    160
+   ],
+   "bbox": [
+    42,
+    33,
+    134,
+    139
+   ]
+  },
+  {
+   "id": "fl_c4_long_table_s97",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_long_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "중앙 긴 식탁 (보충)",
+   "prompt": "very long banquet table with a burned white tablecloth, silver candelabras, plates of ashen food and a thin rapier stuck into a roast turkey made of ash, filling the frame, seen from slightly above, d",
+   "file": "ch4/props/fl_c4_long_table_s97.png",
+   "size": [
+    256,
+    112
+   ],
+   "bbox": [
+    12,
+    16,
+    244,
+    91
+   ]
+  },
+  {
+   "id": "fl_c4_mansion_gate_s101",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_mansion_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "저택 철문 (보충)",
+   "prompt": "tall wrought iron mansion gate between two pale stone pillars with urns, gate half open, gilded tips, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch4/props/fl_c4_mansion_gate_s101.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    31,
+    10,
+    177,
+    153
+   ]
+  },
+  {
+   "id": "fl_c4_mansion_gate_s97",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_mansion_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "저택 철문 (보충)",
+   "prompt": "tall wrought iron mansion gate between two pale stone pillars with urns, gate half open, gilded tips, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch4/props/fl_c4_mansion_gate_s97.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    34,
+    2,
+    174,
+    167
+   ]
+  },
+  {
+   "id": "fl_c4_wine_barrel_r2_s101",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 오크통 (다시) (보충)",
+   "prompt": "big honey brown oak wine barrel with rusty iron hoops on a wooden stand, a small burgundy wine stain, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch4/props/fl_c4_wine_barrel_r2_s101.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    23,
+    11,
+    105,
+    119
+   ]
+  },
+  {
+   "id": "fl_c4_wine_barrel_r2_s97",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 오크통 (다시) (보충)",
+   "prompt": "big honey brown oak wine barrel with rusty iron hoops on a wooden stand, a small burgundy wine stain, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal c",
+   "file": "ch4/props/fl_c4_wine_barrel_r2_s97.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    25,
+    19,
+    114,
+    121
+   ]
+  },
+  {
+   "id": "rd_c4_brazier_s61_s61",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 푸른 돌",
+   "source": "redo",
+   "item": "쇠 화로 (다시) ← c4_brazier",
+   "prompt": "ornate wrought iron brazier on three legs filled with cold grey ash and pale grey charcoal, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/rd_c4_brazier_s61_s61.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    22,
+    28,
+    89,
+    115
+   ]
+  },
+  {
+   "id": "rd_c4_brazier_s67_s67",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 푸른 돌",
+   "source": "redo",
+   "item": "쇠 화로 (다시) ← c4_brazier",
+   "prompt": "ornate wrought iron brazier on three legs filled with cold grey ash and pale grey charcoal, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/rd_c4_brazier_s67_s67.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    18,
+    24,
+    99,
+    116
+   ]
+  },
+  {
+   "id": "rd_c4_brazier_s71_s71",
+   "type": "prop",
+   "zone": "front",
+   "slot": "c4_brazier",
+   "verdict": "soso",
+   "review": "보통 푸른 연기",
+   "source": "redo",
+   "item": "쇠 화로 (다시) ← c4_brazier",
+   "prompt": "ornate wrought iron brazier on three legs filled with cold grey ash and pale grey charcoal, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/rd_c4_brazier_s71_s71.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    19,
+    14,
+    91,
+    119
+   ]
+  },
+  {
+   "id": "rd_c4_chimneys_s61_s61",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_chimneys",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "굴뚝 (다시) ← c4_chimneys",
+   "prompt": "cluster of three tall red brown brick chimney stacks on a slate roof ridge, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch4/props/rd_c4_chimneys_s61_s61.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    19,
+    12,
+    144,
+    176
+   ]
+  },
+  {
+   "id": "rd_c4_f_curtain_s61_s61",
+   "type": "prop",
+   "zone": "hall1",
+   "slot": "c4_f_curtain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "찢어진 커튼 (다시) ← c4_f_curtain",
+   "prompt": "torn faded crimson velvet curtain hanging from a gold rod, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-staine",
+   "file": "ch4/props/rd_c4_f_curtain_s61_s61.png",
+   "size": [
+    112,
+    160
+   ],
+   "bbox": [
+    2,
+    10,
+    110,
+    150
+   ]
+  },
+  {
+   "id": "rd_c4_f_roof_tiles_s61_s61",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_f_roof_tiles",
+   "verdict": "soso",
+   "review": "보통 청색",
+   "source": "redo",
+   "item": "지붕 기와 더미 (다시) ← c4_f_roof_tiles",
+   "prompt": "neat stack of grey blue slate roof tiles with a few broken ones, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/rd_c4_f_roof_tiles_s61_s61.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    18,
+    15,
+    111,
+    81
+   ]
+  },
+  {
+   "id": "rd_c4_f_roof_tiles_s67_s67",
+   "type": "prop",
+   "zone": "roof",
+   "slot": "c4_f_roof_tiles",
+   "verdict": "soso",
+   "review": "보통 청색",
+   "source": "redo",
+   "item": "지붕 기와 더미 (다시) ← c4_f_roof_tiles",
+   "prompt": "neat stack of grey blue slate roof tiles with a few broken ones, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch4/props/rd_c4_f_roof_tiles_s67_s67.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    31,
+    26,
+    96,
+    70
+   ]
+  },
+  {
+   "id": "rd_c4_long_table_s61_s61",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_long_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "중앙 긴 식탁 (다시) ← c4_long_table",
+   "prompt": "very long banquet table with a white tablecloth, silver candelabras and plates of grey ash food, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch4/props/rd_c4_long_table_s61_s61.png",
+   "size": [
+    256,
+    128
+   ],
+   "bbox": [
+    11,
+    44,
+    245,
+    112
+   ]
+  },
+  {
+   "id": "rd_c4_long_table_s67_s67",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_long_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "중앙 긴 식탁 (다시) ← c4_long_table",
+   "prompt": "very long banquet table with a white tablecloth, silver candelabras and plates of grey ash food, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch4/props/rd_c4_long_table_s67_s67.png",
+   "size": [
+    256,
+    128
+   ],
+   "bbox": [
+    7,
+    38,
+    250,
+    94
+   ]
+  },
+  {
+   "id": "rd_c4_long_table_s71_s71",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c4_long_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "중앙 긴 식탁 (다시) ← c4_long_table",
+   "prompt": "very long banquet table with a white tablecloth, silver candelabras and plates of grey ash food, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch4/props/rd_c4_long_table_s71_s71.png",
+   "size": [
+    256,
+    128
+   ],
+   "bbox": [
+    3,
+    32,
+    253,
+    104
+   ]
+  },
+  {
+   "id": "rd_c4_mansion_gate_s61_s61",
+   "type": "prop",
+   "zone": "avenue",
+   "slot": "c4_mansion_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "저택 철문 (다시) ← c4_mansion_gate",
+   "prompt": "tall wrought iron mansion gate between two pale stone pillars with urns, gilded tips, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch4/props/rd_c4_mansion_gate_s61_s61.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    35,
+    5,
+    173,
+    154
+   ]
+  },
+  {
+   "id": "rd_c4_wine_barrel_s61_s61",
+   "type": "prop",
+   "zone": "cellar",
+   "slot": "c4_wine_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "오크통 (다시) ← c4_wine_barrel",
+   "prompt": "big honey brown oak wine barrel with rusty iron hoops on a wooden stand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch4/props/rd_c4_wine_barrel_s61_s61.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    33,
+    23,
+    96,
+    111
+   ]
+  },
+  {
+   "id": "c4_room_attic",
+   "type": "room",
+   "zone": "hall2",
+   "slot": "c4_room_attic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지붕 루트 끝 다락방",
+   "prompt": "A cramped attic room under a slate roof of a noble mansion: slanted timber beams, dusty trunks, old furniture under sheets, a small round window, muted sepia",
+   "file": "ch4/rooms/c4_room_attic",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c4_room_banquet1",
+   "type": "room",
+   "zone": "hall1",
+   "slot": "c4_room_banquet1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 본관 1층",
+   "prompt": "The ground floor of a burned noble banquet hall: crimson walls with gold trim, a very long banquet table with a white cloth, a huge marble fireplace, a fallen chandelier, ash everywhere, muted sepia",
+   "file": "ch4/rooms/c4_room_banquet1",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c4_room_banquet2",
+   "type": "room",
+   "zone": "hall2",
+   "slot": "c4_room_banquet2",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 2층 귀빈석 (1층과 같은 건물, style_room 연결)",
+   "prompt": "its upper floor guest gallery: velvet guest seats, small tables with tea sets, a balcony rail edge, portraits on the walls, ash",
+   "file": "ch4/rooms/c4_room_banquet2",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c4_room_cellar",
+   "type": "room",
+   "zone": "cellar",
+   "slot": "c4_room_cellar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 와인 저장고",
+   "prompt": "An underground wine cellar under a noble mansion: red brown brick arched walls, rows of oak barrels, broken barrels and burgundy wine puddles, wine racks, muted sepia",
+   "file": "ch4/rooms/c4_room_cellar",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c4_edge_roof_s423",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_edge_roof",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지붕 가장자리 ↔ 아래 거리 (절벽형)",
+   "prompt": [
+    "grey cobbled street far below, muted desaturated sepia and ash grey tones",
+    "grey blue slate roof tiles, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_edge_roof_s423",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c4_edge_roof_s424",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_edge_roof",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지붕 가장자리 ↔ 아래 거리 (절벽형)",
+   "prompt": [
+    "grey cobbled street far below, muted desaturated sepia and ash grey tones",
+    "grey blue slate roof tiles, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_edge_roof_s424",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c4_edge_wall_s421",
+   "type": "tileset",
+   "zone": "alley",
+   "slot": "c4_edge_wall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대로 ↔ 높은 저택 담 (절벽형)",
+   "prompt": [
+    "soot-stained pale grey marble street paving, muted desaturated sepia and ash grey tones",
+    "top of a tall mansion garden wall, flat stone coping, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_edge_wall_s421",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c4_edge_wall_s422",
+   "type": "tileset",
+   "zone": "alley",
+   "slot": "c4_edge_wall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대로 ↔ 높은 저택 담 (절벽형)",
+   "prompt": [
+    "soot-stained pale grey marble street paving, muted desaturated sepia and ash grey tones",
+    "top of a tall mansion garden wall, flat stone coping, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_edge_wall_s422",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c4_garden_gravel_s405",
+   "type": "tileset",
+   "zone": "avenue",
+   "slot": "c4_garden_gravel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "저택 정원 마른 잔디 ↔ 자갈길",
+   "prompt": [
+    "withered pale brown dead lawn grass dusted with ash, muted desaturated sepia and ash grey tones",
+    "light grey gravel garden path, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_garden_gravel_s405",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_garden_gravel_s406",
+   "type": "tileset",
+   "zone": "avenue",
+   "slot": "c4_garden_gravel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "저택 정원 마른 잔디 ↔ 자갈길",
+   "prompt": [
+    "withered pale brown dead lawn grass dusted with ash, muted desaturated sepia and ash grey tones",
+    "light grey gravel garden path, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_garden_gravel_s406",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_hall_carpet_s409",
+   "type": "tileset",
+   "zone": "hall1",
+   "slot": "c4_hall_carpet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 체크 대리석 ↔ 바랜 붉은 융단",
+   "prompt": [
+    "checkered cream and grey marble floor, muted desaturated sepia and ash grey tones",
+    "faded dusty crimson carpet with gold trim, ash spots, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_hall_carpet_s409",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_hall_carpet_s410",
+   "type": "tileset",
+   "zone": "hall1",
+   "slot": "c4_hall_carpet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 체크 대리석 ↔ 바랜 붉은 융단",
+   "prompt": [
+    "checkered cream and grey marble floor, muted desaturated sepia and ash grey tones",
+    "faded dusty crimson carpet with gold trim, ash spots, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_hall_carpet_s410",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_pro_hall",
+   "type": "tileset",
+   "zone": "hall1",
+   "slot": "c4_pro_hall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연회장 대리석 ↔ 붉은 융단 (pro)",
+   "prompt": [
+    "checkered cream and grey marble floor",
+    "faded crimson banquet carpet with gold trim"
+   ],
+   "file": "ch4/tiles/c4_pro_hall",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_pro_street",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_pro_street",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "귀족가 그을린 대리석 포석 ↔ 재 (pro)",
+   "prompt": [
+    "thick drifts of light grey ash",
+    "soot-stained pale marble paving stones of a noble avenue"
+   ],
+   "file": "ch4/tiles/c4_pro_street",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_roof_slate_s407",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_roof_slate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지붕 루트 슬레이트 기와 ↔ 무너진 기와",
+   "prompt": [
+    "grey blue slate roof tiles in neat rows, muted desaturated sepia and ash grey tones",
+    "collapsed roof with broken slate tiles and charred brown beams, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_roof_slate_s407",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_roof_slate_s408",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_roof_slate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지붕 루트 슬레이트 기와 ↔ 무너진 기와",
+   "prompt": [
+    "grey blue slate roof tiles in neat rows, muted desaturated sepia and ash grey tones",
+    "collapsed roof with broken slate tiles and charred brown beams, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_roof_slate_s408",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_street_ash_s401",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_street_ash",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "귀족가 그을린 대리석 포석 ↔ 쌓인 재",
+   "prompt": [
+    "soot-stained pale grey marble paving stones, muted desaturated sepia and ash grey tones",
+    "thick drifts of light grey ash like snow, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_street_ash_s401",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c4_street_ash_s402",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_street_ash",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "귀족가 그을린 대리석 포석 ↔ 쌓인 재",
+   "prompt": [
+    "soot-stained pale grey marble paving stones, muted desaturated sepia and ash grey tones",
+    "thick drifts of light grey ash like snow, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/c4_street_ash_s402",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c4_edge_roof_s4993",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_edge_roof",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지붕 가장자리 ↔ 아래 거리 (절벽형) (보충)",
+   "prompt": [
+    "grey cobbled street far below, muted desaturated sepia and ash grey tones",
+    "grey blue slate roof tiles, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/fl_c4_edge_roof_s4993",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c4_edge_wall_s7188",
+   "type": "tileset",
+   "zone": "alley",
+   "slot": "c4_edge_wall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대로 ↔ 높은 저택 담 (절벽형) (보충)",
+   "prompt": [
+    "soot-stained pale grey marble street paving, muted desaturated sepia and ash grey tones",
+    "top of a tall mansion garden wall, flat stone coping, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/fl_c4_edge_wall_s7188",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c4_garden_gravel_s3036",
+   "type": "tileset",
+   "zone": "avenue",
+   "slot": "c4_garden_gravel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "저택 정원 마른 잔디 ↔ 자갈길 (보충)",
+   "prompt": [
+    "withered pale brown dead lawn grass dusted with ash, muted desaturated sepia and ash grey tones",
+    "light grey gravel garden path, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/fl_c4_garden_gravel_s3036",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c4_roof_slate_s4191",
+   "type": "tileset",
+   "zone": "roof",
+   "slot": "c4_roof_slate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지붕 루트 슬레이트 기와 ↔ 무너진 기와 (보충)",
+   "prompt": [
+    "grey blue slate roof tiles in neat rows, muted desaturated sepia and ash grey tones",
+    "collapsed roof with broken slate tiles and charred brown beams, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/fl_c4_roof_slate_s4191",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c4_street_ash_s5612",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_street_ash",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "귀족가 그을린 대리석 포석 ↔ 쌓인 재 (보충)",
+   "prompt": [
+    "soot-stained pale grey marble paving stones, muted desaturated sepia and ash grey tones",
+    "thick drifts of light grey ash like snow, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/fl_c4_street_ash_s5612",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_ash_grave_s1422",
+   "type": "tileset",
+   "zone": "grave",
+   "slot": "c4_ash_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "재 무덤 흙 ↔ 잿가루 (다시) ← c4_ash_grave",
+   "prompt": [
+    "soft grey brown soil with small pebbles, muted desaturated sepia and ash grey tones",
+    "smooth pale grey ash ground, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_ash_grave_s1422",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_ash_grave_s1423",
+   "type": "tileset",
+   "zone": "grave",
+   "slot": "c4_ash_grave",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "재 무덤 흙 ↔ 잿가루 (다시) ← c4_ash_grave",
+   "prompt": [
+    "soft grey brown soil with small pebbles, muted desaturated sepia and ash grey tones",
+    "smooth pale grey ash ground, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_ash_grave_s1423",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_cellar_wine_s1761",
+   "type": "tileset",
+   "zone": "cellar",
+   "slot": "c4_cellar_wine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "와인 저장고 돌바닥 ↔ 와인 얼룩 (다시) ← c4_cellar_wine",
+   "prompt": [
+    "old grey brown flagstone cellar floor, muted desaturated sepia and ash grey tones",
+    "old flagstones soaked with dried dull brownish burgundy wine stains and oak barrel staves, not pink, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_cellar_wine_s1761",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_cellar_wine_s1762",
+   "type": "tileset",
+   "zone": "cellar",
+   "slot": "c4_cellar_wine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "와인 저장고 돌바닥 ↔ 와인 얼룩 (다시) ← c4_cellar_wine",
+   "prompt": [
+    "old grey brown flagstone cellar floor, muted desaturated sepia and ash grey tones",
+    "old flagstones soaked with dried dull brownish burgundy wine stains and oak barrel staves, not pink, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_cellar_wine_s1762",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_street_cracks_s1459",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_street_cracks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "그을린 포석 ↔ 갈라진 틈 (다시) ← c4_street_cracks",
+   "prompt": [
+    "pale grey cobblestone street with ash, muted desaturated sepia and ash grey tones",
+    "cobblestones split by wide cracks showing brown earth and grey rubble inside, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_street_cracks_s1459",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c4_street_cracks_s1460",
+   "type": "tileset",
+   "zone": "front",
+   "slot": "c4_street_cracks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "그을린 포석 ↔ 갈라진 틈 (다시) ← c4_street_cracks",
+   "prompt": [
+    "pale grey cobblestone street with ash, muted desaturated sepia and ash grey tones",
+    "cobblestones split by wide cracks showing brown earth and grey rubble inside, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch4/tiles/rd_c4_street_cracks_s1460",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

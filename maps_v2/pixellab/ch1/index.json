@@ -1,0 +1,1680 @@
+{
+ "chapter": 1,
+ "zones": [
+  {
+   "id": "cliff_n",
+   "name": "북쪽 절벽",
+   "kind": "field"
+  },
+  {
+   "id": "field_c",
+   "name": "잿빛 들판 중앙",
+   "kind": "field"
+  },
+  {
+   "id": "field_e",
+   "name": "동쪽 들판 · 가도 들머리",
+   "kind": "field"
+  },
+  {
+   "id": "field_s",
+   "name": "남쪽 들판 · 무명 무덤가",
+   "kind": "field"
+  },
+  {
+   "id": "felt",
+   "name": "펠트 마을",
+   "kind": "town"
+  },
+  {
+   "id": "ws_1f",
+   "name": "폐공방 1층 작업실",
+   "kind": "dungeon"
+  },
+  {
+   "id": "ws_b1",
+   "name": "폐공방 지하 1층 고문실",
+   "kind": "dungeon"
+  },
+  {
+   "id": "ws_b2",
+   "name": "폐공방 지하 2층 고치 저장고",
+   "kind": "dungeon"
+  },
+  {
+   "id": "ws_boss",
+   "name": "실타래의 베틀방",
+   "kind": "boss"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "fx_decal_ch1",
+   "type": "decal",
+   "zone": "cliff_n",
+   "slot": "fx_decal_ch1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하 고문실 바닥 장식 16장 (보충)",
+   "prompt": "1). tangled crimson red thread 2). rusty iron nails 3). torn cloth scrap 4). broken wooden stool leg 5). spool of thread 6). cracked stone 7). dust 8). small bone",
+   "file": "ch1/decals/fx_decal_ch1",
+   "tiles": 16
+  },
+  {
+   "id": "b1_altar_doll_r2",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_altar_doll",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "숨겨진 제단 + 꿰매진 인형 (다시)",
+   "prompt": "large old stone altar block with a carved front, an old stitched rag doll sewn with red thread lying on top, melted unlit candle stubs at the corners, filling the frame, seen from slightly above, dark",
+   "file": "ch1/props/b1_altar_doll_r2.png",
+   "size": [
+    160,
+    128
+   ],
+   "bbox": [
+    19,
+    41,
+    141,
+    111
+   ]
+  },
+  {
+   "id": "b1_cage_s7",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_cage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "빈 쇠창살 우리",
+   "prompt": "empty old rusty iron cage with bars and an open door, standing on the floor, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch1/props/b1_cage_s7.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    31,
+    21,
+    113,
+    153
+   ]
+  },
+  {
+   "id": "b1_chair_s19",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실이 감긴 구속 의자",
+   "prompt": "old heavy wooden chair with leather straps on the arms, tangled with red threads, empty, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/b1_chair_s19.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    22,
+    16,
+    87,
+    129
+   ]
+  },
+  {
+   "id": "b1_chair_s7",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실이 감긴 구속 의자",
+   "prompt": "old heavy wooden chair with leather straps on the arms, tangled with red threads, empty, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/b1_chair_s7.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    14,
+    18,
+    100,
+    136
+   ]
+  },
+  {
+   "id": "b1_rack_s19",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "나무 고문대 (빈 것)",
+   "prompt": "empty old wooden stretching rack table with ropes and a wheel crank, dusty, red threads, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/b1_rack_s19.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    25,
+    18,
+    156,
+    110
+   ]
+  },
+  {
+   "id": "b1_sewer_hole_s19",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewer_hole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수 구멍 (지름길 ②)",
+   "prompt": "round rusty iron sewer grate over a dark drain hole in a stone floor, a few loose stones around it, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/b1_sewer_hole_s19.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    27,
+    44,
+    100,
+    97
+   ]
+  },
+  {
+   "id": "b1_sewer_hole_s7",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewer_hole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수 구멍 (지름길 ②)",
+   "prompt": "round rusty iron sewer grate over a dark drain hole in a stone floor, a few loose stones around it, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/b1_sewer_hole_s7.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    34,
+    33,
+    97,
+    90
+   ]
+  },
+  {
+   "id": "b1_sewing_machine_s19",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewing_machine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대형 재봉틀",
+   "prompt": "huge antique iron sewing machine on a heavy wooden table, giant needle, red thread spool, cogs and a foot treadle, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch1/props/b1_sewing_machine_s19.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    7,
+    4,
+    184,
+    170
+   ]
+  },
+  {
+   "id": "b1_sewing_machine_s7",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewing_machine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대형 재봉틀",
+   "prompt": "huge antique iron sewing machine on a heavy wooden table, giant needle, red thread spool, cogs and a foot treadle, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch1/props/b1_sewing_machine_s7.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    28,
+    45,
+    168,
+    166
+   ]
+  },
+  {
+   "id": "b1_thread_heap_r2",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_thread_heap",
+   "verdict": "soso",
+   "review": "보통: 털실 뭉치",
+   "source": "orig",
+   "item": "붉은 실 더미 (다시)",
+   "prompt": "big tangled ball heap of dark red yarn threads with three wooden thread spools, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/b1_thread_heap_r2.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    25,
+    15,
+    109,
+    94
+   ]
+  },
+  {
+   "id": "b1_wardrobe_over_r2",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_wardrobe_over",
+   "verdict": "soso",
+   "review": "보통: 쓰러진 상자 느낌",
+   "source": "orig",
+   "item": "뒤집힌 옷장 (다시)",
+   "prompt": "large tall wooden wardrobe fallen over and lying flat on its back on the floor, its two doors broken open, torn old royal gowns spilling out, filling the frame, seen from slightly above, dark fantasy ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/b1_wardrobe_over_r2.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    22,
+    15,
+    157,
+    116
+   ]
+  },
+  {
+   "id": "b2_cocoon_hang_s19",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_cocoon_hang",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "천장에 매달린 고치 무리",
+   "prompt": "cluster of three white silk cocoons hanging from thick threads, eerie, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch1/props/b2_cocoon_hang_s19.png",
+   "size": [
+    160,
+    192
+   ],
+   "bbox": [
+    40,
+    9,
+    122,
+    184
+   ]
+  },
+  {
+   "id": "b2_cocoon_hang_s7",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_cocoon_hang",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "천장에 매달린 고치 무리",
+   "prompt": "cluster of three white silk cocoons hanging from thick threads, eerie, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch1/props/b2_cocoon_hang_s7.png",
+   "size": [
+    160,
+    192
+   ],
+   "bbox": [
+    57,
+    0,
+    105,
+    159
+   ]
+  },
+  {
+   "id": "b2_silk_crates_s19",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_silk_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실에 감긴 상자",
+   "prompt": "stack of old wooden crates completely wrapped in white spider silk, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch1/props/b2_silk_crates_s19.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    29,
+    18,
+    96,
+    105
+   ]
+  },
+  {
+   "id": "b2_web_patch_r2",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_web_patch",
+   "verdict": "ok",
+   "review": "OK: 둥근 거미줄",
+   "source": "orig",
+   "item": "바닥 거미줄 판 (다시)",
+   "prompt": "large round white spider web net spread flat, radial strands and spiral threads, torn in places, transparent gaps, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside",
+   "file": "ch1/props/b2_web_patch_r2.png",
+   "size": [
+    160,
+    128
+   ],
+   "bbox": [
+    31,
+    16,
+    128,
+    112
+   ]
+  },
+  {
+   "id": "b2_web_pillar_s19",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_web_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거미줄에 싸인 기둥",
+   "prompt": "square stone pillar thickly wrapped in white spider webs from floor to top, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns ",
+   "file": "ch1/props/b2_web_pillar_s19.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    22,
+    12,
+    73,
+    172
+   ]
+  },
+  {
+   "id": "b2_web_pillar_s7",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_web_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거미줄에 싸인 기둥",
+   "prompt": "square stone pillar thickly wrapped in white spider webs from floor to top, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns ",
+   "file": "ch1/props/b2_web_pillar_s7.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    14,
+    12,
+    82,
+    183
+   ]
+  },
+  {
+   "id": "cl_edge_rail_r2",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_edge_rail",
+   "verdict": "soso",
+   "review": "보통: 가늘게 나옴",
+   "source": "orig",
+   "item": "절벽 끝 부서진 돌 난간 (다시)",
+   "prompt": "long straight broken stone balustrade railing with short pillars, cracked, one part fallen, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/cl_edge_rail_r2.png",
+   "size": [
+    192,
+    96
+   ],
+   "bbox": [
+    6,
+    41,
+    186,
+    55
+   ]
+  },
+  {
+   "id": "cl_edge_rail_s7",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_edge_rail",
+   "verdict": "soso",
+   "review": "보통: 작음",
+   "source": "orig",
+   "item": "절벽 끝 부서진 돌 난간",
+   "prompt": "straight section of a broken low stone balustrade railing at a cliff edge, cracked and partly fallen, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/cl_edge_rail_s7.png",
+   "size": [
+    192,
+    96
+   ],
+   "bbox": [
+    35,
+    29,
+    140,
+    74
+   ]
+  },
+  {
+   "id": "cl_petri_tree_r2",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_petri_tree",
+   "verdict": "ok",
+   "review": "OK: 회색 죽은 나무(돌 느낌은 약함)",
+   "source": "orig",
+   "item": "석화된 거대 나무 (다시, 투명)",
+   "prompt": "enormous ancient tree turned entirely to cold grey stone, petrified grey rock trunk and bare grey stone branches, no leaves, no brown wood, dark hollow between huge grey stone roots, filling the frame",
+   "file": "ch1/props/cl_petri_tree_r2.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    9,
+    5,
+    176,
+    215
+   ]
+  },
+  {
+   "id": "cl_rock_spire_s19",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rock_spire",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "뾰족한 바위 기둥",
+   "prompt": "tall jagged grey rock spire with cracks and ash dust, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch1/props/cl_rock_spire_s19.png",
+   "size": [
+    112,
+    192
+   ],
+   "bbox": [
+    5,
+    5,
+    109,
+    185
+   ]
+  },
+  {
+   "id": "cl_rock_spire_s7",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rock_spire",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "뾰족한 바위 기둥",
+   "prompt": "tall jagged grey rock spire with cracks and ash dust, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch1/props/cl_rock_spire_s7.png",
+   "size": [
+    112,
+    192
+   ],
+   "bbox": [
+    18,
+    5,
+    85,
+    154
+   ]
+  },
+  {
+   "id": "cl_rockfall_s19",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rockfall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "낙석 바위 더미",
+   "prompt": "heap of fallen jagged grey rocks and boulders from a rockfall, ash dust on top, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch1/props/cl_rockfall_s19.png",
+   "size": [
+    176,
+    128
+   ],
+   "bbox": [
+    8,
+    13,
+    157,
+    109
+   ]
+  },
+  {
+   "id": "cl_rockfall_s7",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rockfall",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "낙석 바위 더미",
+   "prompt": "heap of fallen jagged grey rocks and boulders from a rockfall, ash dust on top, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch1/props/cl_rockfall_s7.png",
+   "size": [
+    176,
+    128
+   ],
+   "bbox": [
+    17,
+    26,
+    163,
+    104
+   ]
+  },
+  {
+   "id": "cl_rope_bridge_s19",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rope_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "밧줄 다리 (지름길 ③)",
+   "prompt": "long horizontal rope bridge of old wooden planks and frayed ropes spanning a dark chasm, wooden posts at both ends, seen from above, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch1/props/cl_rope_bridge_s19.png",
+   "size": [
+    384,
+    128
+   ],
+   "bbox": [
+    0,
+    0,
+    384,
+    128
+   ]
+  },
+  {
+   "id": "cl_rope_bridge_s7",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rope_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "밧줄 다리 (지름길 ③)",
+   "prompt": "long horizontal rope bridge of old wooden planks and frayed ropes spanning a dark chasm, wooden posts at both ends, seen from above, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch1/props/cl_rope_bridge_s7.png",
+   "size": [
+    384,
+    128
+   ],
+   "bbox": [
+    0,
+    0,
+    384,
+    128
+   ]
+  },
+  {
+   "id": "cl_wind_tree_s19",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_wind_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "바람에 꺾인 마른 나무",
+   "prompt": "dead leafless tree bent sideways by strong wind, bare twisted branches, grey ash on the bark, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch1/props/cl_wind_tree_s19.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    6,
+    11,
+    129,
+    152
+   ]
+  },
+  {
+   "id": "cl_wind_tree_s7",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_wind_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "바람에 꺾인 마른 나무",
+   "prompt": "dead leafless tree bent sideways by strong wind, bare twisted branches, grey ash on the bark, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch1/props/cl_wind_tree_s7.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    2,
+    15,
+    135,
+    154
+   ]
+  },
+  {
+   "id": "fd_deserter_1",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "탈영병 유해 1",
+   "prompt": "skeletal remains of a fallen soldier lying in ash, worn leather bracers and gauntlets, tattered grey cloak, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch1/props/fd_deserter_1.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    5,
+    29,
+    93,
+    57
+   ]
+  },
+  {
+   "id": "fd_deserter_2",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_2",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "탈영병 유해 2",
+   "prompt": "skeletal remains of a fallen soldier slumped face down, rusty gauntlets, a broken spear beside him, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/fd_deserter_2.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    5,
+    29,
+    90,
+    56
+   ]
+  },
+  {
+   "id": "fd_deserter_3",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_3",
+   "verdict": "ok",
+   "review": "OK: 검붉은 방울 있음",
+   "source": "orig",
+   "item": "탈영병 유해 3",
+   "prompt": "skeletal remains of a fallen soldier lying on his back with leather bracers, a few small dark red drops on the ground beside him, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch1/props/fd_deserter_3.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    10,
+    30,
+    85,
+    58
+   ]
+  },
+  {
+   "id": "fd_wagon_over_r2",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_wagon_over",
+   "verdict": "soso",
+   "review": "보통: 서 있는 마차(뒤집기 안 됨)",
+   "source": "orig",
+   "item": "들판 뒤집힌 마차 (다시)",
+   "prompt": "large old wooden covered wagon tipped over onto its side, two broken wheels sticking up, torn canvas cover, spilled crates, grey ash dust, filling the frame, seen from slightly above, dark fantasy rui",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/fd_wagon_over_r2.png",
+   "size": [
+    208,
+    176
+   ],
+   "bbox": [
+    14,
+    21,
+    176,
+    154
+   ]
+  },
+  {
+   "id": "fd_wagon_over_s7",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_wagon_over",
+   "verdict": "soso",
+   "review": "보통: 서 있는 마차 + 땅판",
+   "source": "orig",
+   "item": "들판 뒤집힌 마차 (8x5 tiles)",
+   "prompt": "large old wooden wagon overturned on its side in grey ash, broken wheels, torn canvas cover, scattered crates, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/props/fd_wagon_over_s7.png",
+   "size": [
+    320,
+    208
+   ],
+   "bbox": [
+    0,
+    0,
+    320,
+    208
+   ]
+  },
+  {
+   "id": "fl_b1_cage_s101",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_cage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "빈 쇠창살 우리 (보충)",
+   "prompt": "empty old rusty iron cage with bars and an open door, standing on the floor, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch1/props/fl_b1_cage_s101.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    28,
+    18,
+    116,
+    148
+   ]
+  },
+  {
+   "id": "fl_b1_cage_s97",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_cage",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "빈 쇠창살 우리 (보충)",
+   "prompt": "empty old rusty iron cage with bars and an open door, standing on the floor, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns",
+   "file": "ch1/props/fl_b1_cage_s97.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    30,
+    27,
+    115,
+    157
+   ]
+  },
+  {
+   "id": "fl_b1_chair_s101",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "실이 감긴 구속 의자 (보충)",
+   "prompt": "old heavy wooden chair with leather straps on the arms, tangled with red threads, empty, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/fl_b1_chair_s101.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    12,
+    16,
+    97,
+    130
+   ]
+  },
+  {
+   "id": "fl_b1_chair_s97",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "실이 감긴 구속 의자 (보충)",
+   "prompt": "old heavy wooden chair with leather straps on the arms, tangled with red threads, empty, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/fl_b1_chair_s97.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    21,
+    17,
+    93,
+    126
+   ]
+  },
+  {
+   "id": "fl_b1_rack_s101",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 고문대 (빈 것) (보충)",
+   "prompt": "empty old wooden stretching rack table with ropes and a wheel crank, dusty, red threads, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/fl_b1_rack_s101.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    46,
+    17,
+    149,
+    113
+   ]
+  },
+  {
+   "id": "fl_b1_rack_s97",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나무 고문대 (빈 것) (보충)",
+   "prompt": "empty old wooden stretching rack table with ropes and a wheel crank, dusty, red threads, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch1/props/fl_b1_rack_s97.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    50,
+    7,
+    159,
+    118
+   ]
+  },
+  {
+   "id": "fl_b1_sewer_hole_s101",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewer_hole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 구멍 (지름길 ②) (보충)",
+   "prompt": "round rusty iron sewer grate over a dark drain hole in a stone floor, a few loose stones around it, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/fl_b1_sewer_hole_s101.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    28,
+    33,
+    100,
+    100
+   ]
+  },
+  {
+   "id": "fl_b1_sewer_hole_s97",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewer_hole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 구멍 (지름길 ②) (보충)",
+   "prompt": "round rusty iron sewer grate over a dark drain hole in a stone floor, a few loose stones around it, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/fl_b1_sewer_hole_s97.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    37,
+    43,
+    87,
+    87
+   ]
+  },
+  {
+   "id": "fl_b1_sewing_machine_s101",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewing_machine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대형 재봉틀 (보충)",
+   "prompt": "huge antique iron sewing machine on a heavy wooden table, giant needle, red thread spool, cogs and a foot treadle, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch1/props/fl_b1_sewing_machine_s101.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    16,
+    22,
+    176,
+    161
+   ]
+  },
+  {
+   "id": "fl_b1_sewing_machine_s97",
+   "type": "prop",
+   "zone": "ws_b1",
+   "slot": "b1_sewing_machine",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대형 재봉틀 (보충)",
+   "prompt": "huge antique iron sewing machine on a heavy wooden table, giant needle, red thread spool, cogs and a foot treadle, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle ",
+   "file": "ch1/props/fl_b1_sewing_machine_s97.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    13,
+    12,
+    172,
+    166
+   ]
+  },
+  {
+   "id": "fl_b2_silk_crates_s101",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_silk_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "실에 감긴 상자 (보충)",
+   "prompt": "stack of old wooden crates completely wrapped in white spider silk, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch1/props/fl_b2_silk_crates_s101.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    36,
+    12,
+    95,
+    103
+   ]
+  },
+  {
+   "id": "fl_b2_silk_crates_s97",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_silk_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "실에 감긴 상자 (보충)",
+   "prompt": "stack of old wooden crates completely wrapped in white spider silk, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch1/props/fl_b2_silk_crates_s97.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    28,
+    10,
+    97,
+    106
+   ]
+  },
+  {
+   "id": "fl_b2_web_patch_r2_s97",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_web_patch",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "바닥 거미줄 판 (다시) (보충)",
+   "prompt": "large round white spider web net spread flat, radial strands and spiral threads, torn in places, transparent gaps, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside",
+   "file": "ch1/props/fl_b2_web_patch_r2_s97.png",
+   "size": [
+    160,
+    128
+   ],
+   "bbox": [
+    24,
+    12,
+    136,
+    122
+   ]
+  },
+  {
+   "id": "fl_b2_web_pillar_s101",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_web_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거미줄에 싸인 기둥 (보충)",
+   "prompt": "square stone pillar thickly wrapped in white spider webs from floor to top, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns ",
+   "file": "ch1/props/fl_b2_web_pillar_s101.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    12,
+    14,
+    92,
+    179
+   ]
+  },
+  {
+   "id": "fl_cl_petri_tree_r2_s97",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_petri_tree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "석화된 거대 나무 (다시, 투명) (보충)",
+   "prompt": "enormous ancient tree turned entirely to cold grey stone, petrified grey rock trunk and bare grey stone branches, no leaves, no brown wood, dark hollow between huge grey stone roots, filling the frame",
+   "file": "ch1/props/fl_cl_petri_tree_r2_s97.png",
+   "size": [
+    176,
+    224
+   ],
+   "bbox": [
+    7,
+    6,
+    176,
+    205
+   ]
+  },
+  {
+   "id": "fl_cl_rock_spire_s97",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rock_spire",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "뾰족한 바위 기둥 (보충)",
+   "prompt": "tall jagged grey rock spire with cracks and ash dust, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch1/props/fl_cl_rock_spire_s97.png",
+   "size": [
+    112,
+    192
+   ],
+   "bbox": [
+    2,
+    3,
+    110,
+    188
+   ]
+  },
+  {
+   "id": "fl_cl_rope_bridge_s97",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_rope_bridge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "밧줄 다리 (지름길 ③) (보충)",
+   "prompt": "long horizontal rope bridge of old wooden planks and frayed ropes spanning a dark chasm, wooden posts at both ends, seen from above, seen from slightly above, dark fantasy ruined royal capital inside ",
+   "file": "ch1/props/fl_cl_rope_bridge_s97.png",
+   "size": [
+    384,
+    128
+   ],
+   "bbox": [
+    0,
+    0,
+    384,
+    128
+   ]
+  },
+  {
+   "id": "fl_fd_deserter_1_s97",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "탈영병 유해 1 (보충)",
+   "prompt": "skeletal remains of a fallen soldier lying in ash, worn leather bracers and gauntlets, tattered grey cloak, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch1/props/fl_fd_deserter_1_s97.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    0,
+    13,
+    96,
+    64
+   ]
+  },
+  {
+   "id": "fl_fd_deserter_2_s97",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_2",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "탈영병 유해 2 (보충)",
+   "prompt": "skeletal remains of a fallen soldier slumped face down, rusty gauntlets, a broken spear beside him, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch1/props/fl_fd_deserter_2_s97.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    20,
+    14,
+    91,
+    62
+   ]
+  },
+  {
+   "id": "fl_fd_deserter_3_s97",
+   "type": "prop",
+   "zone": "field_c",
+   "slot": "fd_deserter_3",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "탈영병 유해 3 (보충)",
+   "prompt": "skeletal remains of a fallen soldier lying on his back with leather bracers, a few small dark red drops on the ground beside him, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch1/props/fl_fd_deserter_3_s97.png",
+   "size": [
+    96,
+    64
+   ],
+   "bbox": [
+    18,
+    12,
+    81,
+    58
+   ]
+  },
+  {
+   "id": "rd_b2_cocoon_heap_s67_s67",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_cocoon_heap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "고치 더미 (다시) ← b2_cocoon_heap",
+   "prompt": "pile of white silk cocoons wrapped in threads, long oval shapes, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch1/props/rd_b2_cocoon_heap_s67_s67.png",
+   "size": [
+    176,
+    128
+   ],
+   "bbox": [
+    12,
+    27,
+    166,
+    108
+   ]
+  },
+  {
+   "id": "rd_b2_silk_curtain_s61_s61",
+   "type": "prop",
+   "zone": "ws_b2",
+   "slot": "b2_silk_curtain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "비단 장막 (다시) ← b2_silk_curtain",
+   "prompt": "hanging sheet of white spider silk strands from a wooden beam, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch1/props/rd_b2_silk_curtain_s61_s61.png",
+   "size": [
+    128,
+    176
+   ],
+   "bbox": [
+    0,
+    12,
+    128,
+    176
+   ]
+  },
+  {
+   "id": "rd_cl_wall_chunk_s61_s61",
+   "type": "prop",
+   "zone": "cliff_n",
+   "slot": "cl_wall_chunk",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "무너진 벽 조각 (다시) ← cl_wall_chunk",
+   "prompt": "broken chunk of grey stone castle wall with rubble, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mute",
+   "file": "ch1/props/rd_cl_wall_chunk_s61_s61.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    6,
+    8,
+    186,
+    152
+   ]
+  },
+  {
+   "id": "b1_room_torture",
+   "type": "room",
+   "zone": "ws_b1",
+   "slot": "b1_room_torture",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 48px 키트 (붉은 실이 핏자국처럼 보이는 곳 있음)",
+   "source": "orig",
+   "item": "지하1 고문실 방 (create-room, 48px 키트)",
+   "prompt": "A dark torture cellar under a ruined royal tailor workshop: empty iron cages, chains on stone walls, an empty wooden rack, red threads tangled everywhere, no people, muted sepia",
+   "file": "ch1/rooms/b1_room_torture",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "b2_room_cocoon",
+   "type": "room",
+   "zone": "ws_b2",
+   "slot": "b2_room_cocoon",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 48px 키트 (고치가 알 더미처럼 보임)",
+   "source": "orig",
+   "item": "지하2 고치 저장고 방 (create-room, 48px 키트)",
+   "prompt": "A spider's cocoon storage cellar deep under a ruined tailor workshop: white silk cocoons piled on the floor and hanging, thick webs on stone walls, no people, muted grey and sepia",
+   "file": "ch1/rooms/b2_room_cocoon",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "b1_ts_floor_grate_std32",
+   "type": "tileset",
+   "zone": "ws_b1",
+   "slot": "b1_ts_floor_grate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하1 바닥 ↔ 녹슨 쇠 바닥판 (standard 32)",
+   "prompt": [
+    "dark stained stone flagstone dungeon floor",
+    "rusty riveted iron floor plates with drain slits"
+   ],
+   "file": "ch1/tiles/b1_ts_floor_grate_std32",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "b1_ts_wall_pro32",
+   "type": "tileset",
+   "zone": "ws_b1",
+   "slot": "b1_ts_wall",
+   "verdict": "soso",
+   "review": "보통: 벽 윗면이 밋밋한 베이지",
+   "source": "orig",
+   "item": "지하1 고문실 바닥+벽 (pro 32, 벽 transition 1.0)",
+   "prompt": [
+    "dark stained stone flagstone dungeon floor with a few red threads",
+    "thick dark stone brick dungeon wall with rusty chains and hanging red threads"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/tiles/b1_ts_wall_pro32",
+   "tile": 32,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "b2_ts_floor_pit_std32",
+   "type": "tileset",
+   "zone": "ws_b2",
+   "slot": "b2_ts_floor_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하2 바닥 ↔ 어두운 구덩이 (standard 32)",
+   "prompt": [
+    "black dark pit hole",
+    "old cracked dark stone cellar floor with white web strands"
+   ],
+   "file": "ch1/tiles/b2_ts_floor_pit_std32",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "b2_ts_floor_web_std32",
+   "type": "tileset",
+   "zone": "ws_b2",
+   "slot": "b2_ts_floor_web",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하2 고치 저장고 바닥 ↔ 거미줄 깔린 바닥 (standard 32)",
+   "prompt": [
+    "old cracked dark stone cellar floor with dust",
+    "floor thickly covered with white spider silk webbing"
+   ],
+   "file": "ch1/tiles/b2_ts_floor_web_std32",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "b2_ts_wall_pro32",
+   "type": "tileset",
+   "zone": "ws_b2",
+   "slot": "b2_ts_wall",
+   "verdict": "soso",
+   "review": "보통: 벽 윗면 밋밋",
+   "source": "orig",
+   "item": "지하2 고치 저장고 바닥+벽 (pro 32, 벽 transition 1.0)",
+   "prompt": [
+    "old cracked dark stone cellar floor with white web strands",
+    "dark stone cellar wall covered with thick white spider webs and silk cocoons"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch1/tiles/b2_ts_wall_pro32",
+   "tile": 32,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "cl_ts_cliff_std16_a",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_cliff",
+   "verdict": "ok",
+   "review": "OK: 절벽 벽 있음",
+   "source": "orig",
+   "item": "북쪽 절벽 타일 (standard 16px, 절벽형 transition 1.0)",
+   "prompt": [
+    "dark bottomless chasm far below, grey ash fog",
+    "grey ash-covered cliff-top ground with dry dead grass and pebbles"
+   ],
+   "file": "ch1/tiles/cl_ts_cliff_std16_a",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "cl_ts_cliff_std16_b",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_cliff",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "북쪽 절벽 타일 (standard 16px, 절벽형) 시드2",
+   "prompt": [
+    "dark empty abyss with thin grey ash fog",
+    "ashen grey ground with sparse withered grass"
+   ],
+   "file": "ch1/tiles/cl_ts_cliff_std16_b",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "cl_ts_crack_std32",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_crack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "잿빛 땅 ↔ 갈라진 꺼진 땅 (standard 32)",
+   "prompt": [
+    "grey ash-covered ground with dry dead grass",
+    "cracked collapsed dark earth with deep fissures"
+   ],
+   "file": "ch1/tiles/cl_ts_crack_std32",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "cl_ts_scree_std32",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_scree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "절벽 위 잿빛 땅 ↔ 자갈 돌무더기 (standard 32)",
+   "prompt": [
+    "grey ash-covered ground with dry dead grass",
+    "loose grey scree rubble and broken stones"
+   ],
+   "file": "ch1/tiles/cl_ts_scree_std32",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_b1_ts_floor_grate_std32_s4643",
+   "type": "tileset",
+   "zone": "ws_b1",
+   "slot": "b1_ts_floor_grate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하1 바닥 ↔ 녹슨 쇠 바닥판 (standard 32) (보충)",
+   "prompt": [
+    "dark stained stone flagstone dungeon floor",
+    "rusty riveted iron floor plates with drain slits"
+   ],
+   "file": "ch1/tiles/fl_b1_ts_floor_grate_std32_s4643",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_b1_ts_floor_thread_r2_s7752",
+   "type": "tileset",
+   "zone": "ws_b1",
+   "slot": "b1_ts_floor_thread",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하1 바닥 ↔ 붉은 실 가닥 (다시, 덜 피처럼) (보충)",
+   "prompt": [
+    "dark stained stone flagstone dungeon floor",
+    "stone flagstones with loose thin crimson thread strands tangled over them, stone clearly visible between strands"
+   ],
+   "file": "ch1/tiles/fl_b1_ts_floor_thread_r2_s7752",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_b2_ts_floor_pit_std32_s7545",
+   "type": "tileset",
+   "zone": "ws_b2",
+   "slot": "b2_ts_floor_pit",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하2 바닥 ↔ 어두운 구덩이 (standard 32) (보충)",
+   "prompt": [
+    "black dark pit hole",
+    "old cracked dark stone cellar floor with white web strands"
+   ],
+   "file": "ch1/tiles/fl_b2_ts_floor_pit_std32_s7545",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_b2_ts_floor_web_std32_s3539",
+   "type": "tileset",
+   "zone": "ws_b2",
+   "slot": "b2_ts_floor_web",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하2 고치 저장고 바닥 ↔ 거미줄 깔린 바닥 (standard 32) (보충)",
+   "prompt": [
+    "old cracked dark stone cellar floor with dust",
+    "floor thickly covered with white spider silk webbing"
+   ],
+   "file": "ch1/tiles/fl_b2_ts_floor_web_std32_s3539",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_cl_ts_cliff_std16_a_s4660",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_cliff",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "북쪽 절벽 타일 (standard 16px, 절벽형 transition 1.0) (보충)",
+   "prompt": [
+    "dark bottomless chasm far below, grey ash fog",
+    "grey ash-covered cliff-top ground with dry dead grass and pebbles"
+   ],
+   "file": "ch1/tiles/fl_cl_ts_cliff_std16_a_s4660",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_cl_ts_cliff_std16_b_s6158",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_cliff",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "북쪽 절벽 타일 (standard 16px, 절벽형) 시드2 (보충)",
+   "prompt": [
+    "dark empty abyss with thin grey ash fog",
+    "ashen grey ground with sparse withered grass"
+   ],
+   "file": "ch1/tiles/fl_cl_ts_cliff_std16_b_s6158",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_cl_ts_crack_std32_s4352",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_crack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "잿빛 땅 ↔ 갈라진 꺼진 땅 (standard 32) (보충)",
+   "prompt": [
+    "grey ash-covered ground with dry dead grass",
+    "cracked collapsed dark earth with deep fissures"
+   ],
+   "file": "ch1/tiles/fl_cl_ts_crack_std32_s4352",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_cl_ts_scree_std32_s6499",
+   "type": "tileset",
+   "zone": "cliff_n",
+   "slot": "cl_ts_scree",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "절벽 위 잿빛 땅 ↔ 자갈 돌무더기 (standard 32) (보충)",
+   "prompt": [
+    "grey ash-covered ground with dry dead grass",
+    "loose grey scree rubble and broken stones"
+   ],
+   "file": "ch1/tiles/fl_cl_ts_scree_std32_s6499",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_b1_ts_floor_thread_s3129",
+   "type": "tileset",
+   "zone": "ws_b1",
+   "slot": "b1_ts_floor_thread",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "고문실 바닥 ↔ 붉은 실 (다시) ← b1_ts_floor_thread",
+   "prompt": [
+    "old grey stone basement floor, muted desaturated sepia and ash grey tones",
+    "grey stone covered by thin tangled crimson red thread lines like a net, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch1/tiles/rd_b1_ts_floor_thread_s3129",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

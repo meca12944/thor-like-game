@@ -1,0 +1,1217 @@
+{
+  "id": "f01b3cb5-b7d1-4a2e-8477-abba8d723eda",
+  "name": "c5_room_hub building kit",
+  "lower_description": "grey flagstone slabs, one square per tile, with dull sepia grime in the joints",
+  "upper_description": "a cornice of grey stone running along the top",
+  "transition_description": "grey dressed stone blocks with sepia-stained mortar",
+  "tile_size": {
+    "width": 48,
+    "height": 48
+  },
+  "transition_size": 1.0,
+  "view": "high top-down",
+  "tileset_data": {
+    "tiles": [
+      {
+        "id": "0",
+        "name": "t1_0_r1_c0",
+        "corners": {
+          "NW": "lower",
+          "NE": "lower",
+          "SW": "lower",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 1,
+          "col": 0
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 96,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "1",
+        "name": "t1_1_r2_c1",
+        "corners": {
+          "NW": "lower",
+          "NE": "lower",
+          "SW": "lower",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 2,
+          "col": 1
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 96,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "2",
+        "name": "t1_2_r2_c2",
+        "corners": {
+          "NW": "lower",
+          "NE": "lower",
+          "SW": "upper",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 2,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 192,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "3",
+        "name": "t1_3_r2_c3",
+        "corners": {
+          "NW": "lower",
+          "NE": "lower",
+          "SW": "upper",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 2,
+          "col": 3
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 192,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "10",
+        "name": "t1_10_r3_c1",
+        "corners": {
+          "NW": "lower",
+          "NE": "upper",
+          "SW": "lower",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 3,
+          "col": 1
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 144,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "4",
+        "name": "t1_4_r4_c1",
+        "corners": {
+          "NW": "lower",
+          "NE": "upper",
+          "SW": "lower",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 4,
+          "col": 1
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 192,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "5",
+        "name": "t1_5_r5_c2",
+        "corners": {
+          "NW": "upper",
+          "NE": "upper",
+          "SW": "upper",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 5,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 288,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "6",
+        "name": "t1_6_r3_c6",
+        "corners": {
+          "NW": "upper",
+          "NE": "lower",
+          "SW": "upper",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 3,
+          "col": 6
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "14",
+        "name": "t1_14_r4_c6",
+        "corners": {
+          "NW": "upper",
+          "NE": "lower",
+          "SW": "upper",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 4,
+          "col": 6
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 48,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "8",
+        "name": "t1_8_r4_c3",
+        "corners": {
+          "NW": "upper",
+          "NE": "lower",
+          "SW": "upper",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 4,
+          "col": 3
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 192,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "9",
+        "name": "t1_9_r4_c4",
+        "corners": {
+          "NW": "lower",
+          "NE": "upper",
+          "SW": "upper",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 4,
+          "col": 4
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 288,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "16",
+        "name": "t1_16_r6_c4",
+        "corners": {
+          "NW": "upper",
+          "NE": "upper",
+          "SW": "upper",
+          "SE": "transition"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            2,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            0,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 6,
+          "col": 4
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 288,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "17",
+        "name": "t1_17_r6_c5",
+        "corners": {
+          "NW": "upper",
+          "NE": "upper",
+          "SW": "transition",
+          "SE": "transition"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            2,
+            2,
+            255
+          ],
+          "row_3": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 6,
+          "col": 5
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "18",
+        "name": "t1_18_r6_c6",
+        "corners": {
+          "NW": "upper",
+          "NE": "lower",
+          "SW": "transition",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            2,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 6,
+          "col": 6
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 96,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "19",
+        "name": "t1_19_r7_c4",
+        "corners": {
+          "NW": "upper",
+          "NE": "transition",
+          "SW": "upper",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            1,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            2,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 7,
+          "col": 4
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 336,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "20",
+        "name": "t1_20_r7_c5",
+        "corners": {
+          "NW": "transition",
+          "NE": "transition",
+          "SW": "lower",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_1": [
+            255,
+            2,
+            2,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 7,
+          "col": 5
+        },
+        "bounding_box": {
+          "x": 144,
+          "y": 48,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "21",
+        "name": "t1_21_r7_c6",
+        "corners": {
+          "NW": "transition",
+          "NE": "lower",
+          "SW": "lower",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            2,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 7,
+          "col": 6
+        },
+        "bounding_box": {
+          "x": 48,
+          "y": 144,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "22",
+        "name": "t1_22_r8_c1",
+        "corners": {
+          "NW": "lower",
+          "NE": "upper",
+          "SW": "lower",
+          "SE": "transition"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            2,
+            255
+          ],
+          "row_3": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 8,
+          "col": 1
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "23",
+        "name": "t1_23_r8_c2",
+        "corners": {
+          "NW": "upper",
+          "NE": "upper",
+          "SW": "transition",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            2,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            0,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 8,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "24",
+        "name": "t1_24_r8_c4",
+        "corners": {
+          "NW": "upper",
+          "NE": "lower",
+          "SW": "transition",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_2": [
+            255,
+            2,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            0,
+            1,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 8,
+          "col": 4
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 288,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "25",
+        "name": "t1_25_r9_c1",
+        "corners": {
+          "NW": "lower",
+          "NE": "transition",
+          "SW": "lower",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            2,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 9,
+          "col": 1
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 48,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "26",
+        "name": "t1_26_r9_c2",
+        "corners": {
+          "NW": "transition",
+          "NE": "upper",
+          "SW": "lower",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            1,
+            255
+          ],
+          "row_1": [
+            255,
+            2,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 9,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 48,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "27",
+        "name": "t1_27_r9_c4",
+        "corners": {
+          "NW": "transition",
+          "NE": "upper",
+          "SW": "lower",
+          "SE": "upper"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_1": [
+            255,
+            2,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 9,
+          "col": 4
+        },
+        "bounding_box": {
+          "x": 96,
+          "y": 336,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "28",
+        "name": "t1_28_r10_c2",
+        "corners": {
+          "NW": "lower",
+          "NE": "upper",
+          "SW": "upper",
+          "SE": "transition"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "row_1": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            2,
+            255
+          ],
+          "row_3": [
+            255,
+            1,
+            0,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 10,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 96,
+          "width": 48,
+          "height": 48
+        }
+      },
+      {
+        "id": "30",
+        "name": "t1_30_r11_c2",
+        "corners": {
+          "NW": "upper",
+          "NE": "transition",
+          "SW": "upper",
+          "SE": "lower"
+        },
+        "pattern_4x4": {
+          "row_0": [
+            255,
+            0,
+            1,
+            255
+          ],
+          "row_1": [
+            255,
+            1,
+            2,
+            255
+          ],
+          "row_2": [
+            255,
+            1,
+            0,
+            255
+          ],
+          "row_3": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        "original_position": {
+          "row": 11,
+          "col": 2
+        },
+        "bounding_box": {
+          "x": 0,
+          "y": 144,
+          "width": 48,
+          "height": 48
+        }
+      }
+    ],
+    "tile_size": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "format": "tileset15",
+  "layout": {
+    "type": "tileset15_t1",
+    "description": "4x8 grid of transition (cliff) tiles. Tiles are one cell high; a cliff face occupies the map cell BELOW the terrain boundary (wall tiles carry corners with 'transition'). Use pattern_4x4 (row_0 = terrain above, row_3 = terrain below) to pick tiles.",
+    "grid_size": {
+      "width": 4,
+      "height": 8
+    },
+    "tile_count": 25
+  },
+  "pattern_system": {
+    "type": "4x4_wildcard",
+    "description": "4\u00d74 patterns with wildcards for flexible tile matching",
+    "wildcard_value": 255,
+    "pattern_layout": {
+      "description": "4\u00d74 grid where center 2\u00d72 matches tile corners, outer ring uses wildcards",
+      "example": {
+        "row_0": "All wildcards (*)",
+        "row_1": "Wildcard + NW corner + NE corner + Wildcard",
+        "row_2": "Wildcard + SW corner + SE corner + Wildcard",
+        "row_3": "All wildcards (*)"
+      }
+    },
+    "terrain_encoding": {
+      "lower": 0,
+      "upper": 1,
+      "transition": 2,
+      "wildcard": 255
+    },
+    "usage": {
+      "description": "Sample 4\u00d74 terrain around tile position, encode as pattern key, lookup in cache",
+      "benefits": [
+        "O(1) lookup performance",
+        "Flexible edge matching",
+        "Unified pattern system"
+      ]
+    }
+  },
+  "tileset_image": {
+    "filename": "c5-room-hub-tileset15-48px.png",
+    "format": "PNG",
+    "dimensions": {
+      "width": 192,
+      "height": 384
+    }
+  }
+}

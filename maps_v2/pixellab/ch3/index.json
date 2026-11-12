@@ -1,0 +1,2081 @@
+{
+ "chapter": 3,
+ "zones": [
+  {
+   "id": "lobby",
+   "name": "대서고 1층 로비",
+   "kind": "dungeon"
+  },
+  {
+   "id": "f2",
+   "name": "대서고 2층 중앙 열람실",
+   "kind": "dungeon"
+  },
+  {
+   "id": "f3",
+   "name": "대서고 3층 서가 회랑",
+   "kind": "dungeon"
+  },
+  {
+   "id": "boss",
+   "name": "3층 보스방 · 셀레네의 서고",
+   "kind": "boss"
+  },
+  {
+   "id": "b1",
+   "name": "지하 금지된 서고",
+   "kind": "dungeon"
+  },
+  {
+   "id": "secret",
+   "name": "금지된 서고 비밀방",
+   "kind": "hidden"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c3_decal_b1",
+   "type": "decal",
+   "zone": "b1",
+   "slot": "c3_decal_b1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 금서고 바닥 장식 16장",
+   "prompt": "1). dark stone with candle wax pool 2). dark stone with scorched burn mark 3). dark stone with torn parchment 4). dark stone with a rusted lock 5). dark stone with ink rune scribbles 6). cracked dark ",
+   "file": "ch3/decals/c3_decal_b1",
+   "tiles": 16
+  },
+  {
+   "id": "c3_decal_library",
+   "type": "decal",
+   "zone": "lobby",
+   "slot": "c3_decal_library",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대서고 바닥 장식 16장",
+   "prompt": "1). marble with small hardened black ink spill 2). marble with scattered torn pages 3). marble with a fallen open book 4). cracked marble with dust 5). marble with colored stained glass shards 6). mar",
+   "file": "ch3/decals/c3_decal_library",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch3",
+   "type": "decal",
+   "zone": "lobby",
+   "slot": "fx_decal_ch3",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대서고 바닥 장식 16장 (보충)",
+   "prompt": "1). fallen open book 2). scattered paper pages 3). indigo ink splash 4). candle wax drip 5). broken quill 6). dust 7). torn map scrap 8). cracked marble",
+   "file": "ch3/decals/fx_decal_ch3",
+   "tiles": 16
+  },
+  {
+   "id": "c3_kit_forbidden",
+   "type": "kit",
+   "zone": "b1",
+   "slot": "c3_kit_forbidden",
+   "verdict": "ok",
+   "review": "OK: 건물 키트",
+   "source": "orig",
+   "item": "지하 금지된 서고 키트",
+   "prompt": "forbidden underground archive: dark stone walls and stone floor",
+   "file": "ch3/kits/c3_kit_forbidden",
+   "tiles": 80
+  },
+  {
+   "id": "c3_kit_library",
+   "type": "kit",
+   "zone": "lobby",
+   "slot": "c3_kit_library",
+   "verdict": "ok",
+   "review": "OK: 건물 키트 80조각",
+   "source": "orig",
+   "item": "대서고 건물 키트 (대리석+책장 벽)",
+   "prompt": "grand royal library: marble walls lined with bookshelves and marble floor",
+   "file": "ch3/kits/c3_kit_library",
+   "tiles": 80
+  },
+  {
+   "id": "c3_kit_reading",
+   "type": "kit",
+   "zone": "f2",
+   "slot": "c3_kit_reading",
+   "verdict": "ok",
+   "review": "OK: 건물 키트",
+   "source": "orig",
+   "item": "열람실 건물 키트 (나무 벽+마루)",
+   "prompt": "library reading hall: dark wood panelled walls with parquet floor",
+   "file": "ch3/kits/c3_kit_reading",
+   "tiles": 80
+  },
+  {
+   "id": "t08_tilespro_plain_ch3",
+   "type": "kit",
+   "zone": "b1",
+   "slot": "t08_tilespro_plain_ch3",
+   "verdict": "ok",
+   "review": "OK: 바닥 16장",
+   "source": "test",
+   "item": "ch3 library floor variations (create-tiles-pro plain 32px)",
+   "prompt": "1). dusty cracked white marble floor tile 2). marble floor with spilled dried black ink 3). marble floor with scattered torn book pages 4). dark worn marble floor with ash",
+   "file": "ch3/kits/t08_tilespro_plain_ch3",
+   "tiles": 16
+  },
+  {
+   "id": "c3_book_mountain_s31",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_book_mountain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "책 산",
+   "prompt": "huge heap of thousands of old books and torn parchment piled high, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sep",
+   "file": "ch3/props/c3_book_mountain_s31.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    19,
+    15,
+    174,
+    143
+   ]
+  },
+  {
+   "id": "c3_broken_railing_r2_s41",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_broken_railing",
+   "verdict": "soso",
+   "review": "보통: 계단 난간처럼",
+   "source": "orig",
+   "item": "부서진 난간 (다시)",
+   "prompt": "big section of a carved pale marble balustrade with thick round balusters and a top rail, the right part broken off with marble chunks on the floor, filling the frame, seen from slightly above, dark f",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/props/c3_broken_railing_r2_s41.png",
+   "size": [
+    200,
+    128
+   ],
+   "bbox": [
+    0,
+    1,
+    138,
+    128
+   ]
+  },
+  {
+   "id": "c3_chained_chest_s19",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_chained_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "사슬 금서 보관함",
+   "prompt": "heavy black iron chest bound with thick rusty chains and padlocks, carved runes, ink stains, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_chained_chest_s19.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    13,
+    25,
+    131,
+    115
+   ]
+  },
+  {
+   "id": "c3_chained_chest_s31",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_chained_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "사슬 금서 보관함",
+   "prompt": "heavy black iron chest bound with thick rusty chains and padlocks, carved runes, ink stains, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_chained_chest_s31.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    18,
+    34,
+    126,
+    110
+   ]
+  },
+  {
+   "id": "c3_chained_chest_s7",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_chained_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "사슬 금서 보관함",
+   "prompt": "heavy black iron chest bound with thick rusty chains and padlocks, carved runes, ink stains, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_chained_chest_s7.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    29,
+    28,
+    124,
+    113
+   ]
+  },
+  {
+   "id": "c3_f_book_stack_r2_s43",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_book_stack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "책 더미 (다시)",
+   "prompt": "three neat stacks of old brown and red leather books with gold lettering on the spines, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, so",
+   "file": "ch3/props/c3_f_book_stack_r2_s43.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    8,
+    19,
+    88,
+    78
+   ]
+  },
+  {
+   "id": "c3_f_bust_s19",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_bust",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 흉상",
+   "prompt": "broken marble bust of a scholar on a pedestal, nose chipped, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch3/props/c3_f_bust_s19.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    14,
+    12,
+    82,
+    128
+   ]
+  },
+  {
+   "id": "c3_f_bust_s7",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_bust",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 흉상",
+   "prompt": "broken marble bust of a scholar on a pedestal, nose chipped, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch3/props/c3_f_bust_s7.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    20,
+    18,
+    76,
+    116
+   ]
+  },
+  {
+   "id": "c3_f_candelabra_s19",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛대 (불 없음)",
+   "prompt": "tall iron candelabra with melted unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch3/props/c3_f_candelabra_s19.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    15,
+    7,
+    50,
+    140
+   ]
+  },
+  {
+   "id": "c3_f_candelabra_s7",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛대 (불 없음)",
+   "prompt": "tall iron candelabra with melted unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch3/props/c3_f_candelabra_s7.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    12,
+    4,
+    53,
+    137
+   ]
+  },
+  {
+   "id": "c3_f_cart_s19",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_cart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "책 수레",
+   "prompt": "wooden library book cart with wheels loaded with books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/c3_f_cart_s19.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    34,
+    16,
+    94,
+    100
+   ]
+  },
+  {
+   "id": "c3_f_chair_s19",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "열람 의자",
+   "prompt": "carved wooden library chair with a worn red cushion, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/c3_f_chair_s19.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    13,
+    7,
+    67,
+    104
+   ]
+  },
+  {
+   "id": "c3_f_chair_s7",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "열람 의자",
+   "prompt": "carved wooden library chair with a worn red cushion, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/c3_f_chair_s7.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    11,
+    24,
+    69,
+    99
+   ]
+  },
+  {
+   "id": "c3_f_glass_shards_s19",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c3_f_glass_shards",
+   "verdict": "soso",
+   "review": "보통",
+   "source": "filler",
+   "item": "스테인드글라스 조각 무더기",
+   "prompt": "scattered colorful stained glass shards and a broken lead window frame, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mute",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/props/c3_f_glass_shards_s19.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    30,
+    18,
+    98,
+    81
+   ]
+  },
+  {
+   "id": "c3_f_glass_shards_s7",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c3_f_glass_shards",
+   "verdict": "soso",
+   "review": "보통: 조각 대신 창문 하나",
+   "source": "filler",
+   "item": "스테인드글라스 조각 무더기",
+   "prompt": "scattered colorful stained glass shards and a broken lead window frame, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mute",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/props/c3_f_glass_shards_s7.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    44,
+    5,
+    84,
+    69
+   ]
+  },
+  {
+   "id": "c3_f_globe_s19",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_globe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "낡은 지구의",
+   "prompt": "old brass celestial globe on a wooden stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash grey",
+   "file": "ch3/props/c3_f_globe_s19.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    21,
+    26,
+    76,
+    123
+   ]
+  },
+  {
+   "id": "c3_f_globe_s7",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_globe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "낡은 지구의",
+   "prompt": "old brass celestial globe on a wooden stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash grey",
+   "file": "ch3/props/c3_f_globe_s7.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    13,
+    23,
+    84,
+    117
+   ]
+  },
+  {
+   "id": "c3_f_parchment_s19",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_parchment",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "양피지 더미",
+   "prompt": "messy heap of yellowed parchment sheets and torn pages, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/c3_f_parchment_s19.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    25,
+    30,
+    97,
+    65
+   ]
+  },
+  {
+   "id": "c3_f_parchment_s7",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_parchment",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "양피지 더미",
+   "prompt": "messy heap of yellowed parchment sheets and torn pages, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/c3_f_parchment_s7.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    14,
+    27,
+    97,
+    65
+   ]
+  },
+  {
+   "id": "c3_f_scrolls_s19",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_scrolls",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "두루마리 더미",
+   "prompt": "pile of rolled parchment scrolls with wax seals, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch3/props/c3_f_scrolls_s19.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    5,
+    7,
+    107,
+    78
+   ]
+  },
+  {
+   "id": "c3_f_scrolls_s7",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_scrolls",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "두루마리 더미",
+   "prompt": "pile of rolled parchment scrolls with wax seals, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch3/props/c3_f_scrolls_s7.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    0,
+    16,
+    112,
+    73
+   ]
+  },
+  {
+   "id": "c3_f_small_shelf_s19",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_small_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "작은 책장",
+   "prompt": "small wooden bookshelf half empty with fallen books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/c3_f_small_shelf_s19.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    20,
+    17,
+    92,
+    126
+   ]
+  },
+  {
+   "id": "c3_pillar_shelf_pile_s19",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_pillar_shelf_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "무너진 대리석 기둥 + 책장 더미",
+   "prompt": "collapsed broken marble column lying across a smashed wooden bookshelf and a heap of spilled old books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch3/props/c3_pillar_shelf_pile_s19.png",
+   "size": [
+    200,
+    176
+   ],
+   "bbox": [
+    1,
+    14,
+    198,
+    160
+   ]
+  },
+  {
+   "id": "c3_pillar_shelf_pile_s7",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_pillar_shelf_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "무너진 대리석 기둥 + 책장 더미",
+   "prompt": "collapsed broken marble column lying across a smashed wooden bookshelf and a heap of spilled old books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch3/props/c3_pillar_shelf_pile_s7.png",
+   "size": [
+    200,
+    176
+   ],
+   "bbox": [
+    18,
+    21,
+    173,
+    157
+   ]
+  },
+  {
+   "id": "c3_reading_table_s19",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_reading_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "큰 열람 탁자",
+   "prompt": "long heavy wooden reading table with scattered books, ink bottles, papers and unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_reading_table_s19.png",
+   "size": [
+    200,
+    144
+   ],
+   "bbox": [
+    13,
+    45,
+    187,
+    129
+   ]
+  },
+  {
+   "id": "c3_reading_table_s31",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_reading_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "큰 열람 탁자",
+   "prompt": "long heavy wooden reading table with scattered books, ink bottles, papers and unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_reading_table_s31.png",
+   "size": [
+    200,
+    144
+   ],
+   "bbox": [
+    26,
+    43,
+    175,
+    115
+   ]
+  },
+  {
+   "id": "c3_reading_table_s7",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_reading_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "큰 열람 탁자",
+   "prompt": "long heavy wooden reading table with scattered books, ink bottles, papers and unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/c3_reading_table_s7.png",
+   "size": [
+    200,
+    144
+   ],
+   "bbox": [
+    12,
+    71,
+    188,
+    134
+   ]
+  },
+  {
+   "id": "c3_scholar_remains_s19",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c3_scholar_remains",
+   "verdict": "ok",
+   "review": "OK: 앉아 책 든 유해",
+   "source": "orig",
+   "item": "난간 끝 학자 유해",
+   "prompt": "skeletal remains of an old scholar in a tattered robe slumped holding a book, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained",
+   "file": "ch3/props/c3_scholar_remains_s19.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    21,
+    16,
+    110,
+    90
+   ]
+  },
+  {
+   "id": "c3_tall_shelf_s19",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_tall_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "키 큰 책장",
+   "prompt": "very tall dark wooden library bookshelf packed with old leather books, a rolling ladder, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch3/props/c3_tall_shelf_s19.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    14,
+    37,
+    114,
+    188
+   ]
+  },
+  {
+   "id": "c3_tall_shelf_s31",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_tall_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "키 큰 책장",
+   "prompt": "very tall dark wooden library bookshelf packed with old leather books, a rolling ladder, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch3/props/c3_tall_shelf_s31.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    21,
+    17,
+    110,
+    215
+   ]
+  },
+  {
+   "id": "c3_tall_shelf_s7",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_tall_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "키 큰 책장",
+   "prompt": "very tall dark wooden library bookshelf packed with old leather books, a rolling ladder, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch3/props/c3_tall_shelf_s7.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    21,
+    15,
+    111,
+    208
+   ]
+  },
+  {
+   "id": "fl_c3_alchemy_furnace_s101",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_alchemy_furnace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "연금술 화로 (보충)",
+   "prompt": "large old stone and brass alchemy furnace with a domed iron door, pipes and glass vessels, cold, soot-stained, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch3/props/fl_c3_alchemy_furnace_s101.png",
+   "size": [
+    176,
+    192
+   ],
+   "bbox": [
+    48,
+    23,
+    128,
+    152
+   ]
+  },
+  {
+   "id": "fl_c3_alchemy_furnace_s97",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_alchemy_furnace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "연금술 화로 (보충)",
+   "prompt": "large old stone and brass alchemy furnace with a domed iron door, pipes and glass vessels, cold, soot-stained, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch3/props/fl_c3_alchemy_furnace_s97.png",
+   "size": [
+    176,
+    192
+   ],
+   "bbox": [
+    43,
+    0,
+    133,
+    173
+   ]
+  },
+  {
+   "id": "fl_c3_chained_chest_s101",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_chained_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "사슬 금서 보관함 (보충)",
+   "prompt": "heavy black iron chest bound with thick rusty chains and padlocks, carved runes, ink stains, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/fl_c3_chained_chest_s101.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    18,
+    23,
+    127,
+    117
+   ]
+  },
+  {
+   "id": "fl_c3_chained_chest_s97",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_chained_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "사슬 금서 보관함 (보충)",
+   "prompt": "heavy black iron chest bound with thick rusty chains and padlocks, carved runes, ink stains, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/fl_c3_chained_chest_s97.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    8,
+    18,
+    138,
+    116
+   ]
+  },
+  {
+   "id": "fl_c3_f_book_stack_r2_s101",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_book_stack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "책 더미 (다시) (보충)",
+   "prompt": "three neat stacks of old brown and red leather books with gold lettering on the spines, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, so",
+   "file": "ch3/props/fl_c3_f_book_stack_r2_s101.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    14,
+    11,
+    85,
+    87
+   ]
+  },
+  {
+   "id": "fl_c3_f_book_stack_r2_s97",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_book_stack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "책 더미 (다시) (보충)",
+   "prompt": "three neat stacks of old brown and red leather books with gold lettering on the spines, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, so",
+   "file": "ch3/props/fl_c3_f_book_stack_r2_s97.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    17,
+    41,
+    80,
+    84
+   ]
+  },
+  {
+   "id": "fl_c3_f_bust_s101",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_bust",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 흉상 (보충)",
+   "prompt": "broken marble bust of a scholar on a pedestal, nose chipped, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch3/props/fl_c3_f_bust_s101.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    18,
+    6,
+    87,
+    120
+   ]
+  },
+  {
+   "id": "fl_c3_f_bust_s97",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_bust",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 흉상 (보충)",
+   "prompt": "broken marble bust of a scholar on a pedestal, nose chipped, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia bro",
+   "file": "ch3/props/fl_c3_f_bust_s97.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    24,
+    12,
+    74,
+    118
+   ]
+  },
+  {
+   "id": "fl_c3_f_candelabra_s101",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛대 (불 없음) (보충)",
+   "prompt": "tall iron candelabra with melted unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch3/props/fl_c3_f_candelabra_s101.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    12,
+    3,
+    51,
+    138
+   ]
+  },
+  {
+   "id": "fl_c3_f_candelabra_s97",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "촛대 (불 없음) (보충)",
+   "prompt": "tall iron candelabra with melted unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash g",
+   "file": "ch3/props/fl_c3_f_candelabra_s97.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    10,
+    4,
+    53,
+    143
+   ]
+  },
+  {
+   "id": "fl_c3_f_cart_s97",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_cart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "책 수레 (보충)",
+   "prompt": "wooden library book cart with wheels loaded with books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/fl_c3_f_cart_s97.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    27,
+    44,
+    98,
+    101
+   ]
+  },
+  {
+   "id": "fl_c3_f_chair_s101",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "열람 의자 (보충)",
+   "prompt": "carved wooden library chair with a worn red cushion, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/fl_c3_f_chair_s101.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    10,
+    13,
+    67,
+    108
+   ]
+  },
+  {
+   "id": "fl_c3_f_chair_s97",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_chair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "열람 의자 (보충)",
+   "prompt": "carved wooden library chair with a worn red cushion, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/fl_c3_f_chair_s97.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    11,
+    12,
+    74,
+    107
+   ]
+  },
+  {
+   "id": "fl_c3_f_globe_s101",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_globe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "낡은 지구의 (보충)",
+   "prompt": "old brass celestial globe on a wooden stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash grey",
+   "file": "ch3/props/fl_c3_f_globe_s101.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    21,
+    15,
+    79,
+    120
+   ]
+  },
+  {
+   "id": "fl_c3_f_globe_s97",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_f_globe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "낡은 지구의 (보충)",
+   "prompt": "old brass celestial globe on a wooden stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash grey",
+   "file": "ch3/props/fl_c3_f_globe_s97.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    16,
+    9,
+    84,
+    119
+   ]
+  },
+  {
+   "id": "fl_c3_f_parchment_s101",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_parchment",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "양피지 더미 (보충)",
+   "prompt": "messy heap of yellowed parchment sheets and torn pages, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/fl_c3_f_parchment_s101.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    29,
+    24,
+    103,
+    65
+   ]
+  },
+  {
+   "id": "fl_c3_f_parchment_s97",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_parchment",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "양피지 더미 (보충)",
+   "prompt": "messy heap of yellowed parchment sheets and torn pages, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns a",
+   "file": "ch3/props/fl_c3_f_parchment_s97.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    8,
+    27,
+    85,
+    66
+   ]
+  },
+  {
+   "id": "fl_c3_f_scrolls_s101",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_scrolls",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "두루마리 더미 (보충)",
+   "prompt": "pile of rolled parchment scrolls with wax seals, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch3/props/fl_c3_f_scrolls_s101.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    5,
+    9,
+    108,
+    75
+   ]
+  },
+  {
+   "id": "fl_c3_f_scrolls_s97",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_scrolls",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "두루마리 더미 (보충)",
+   "prompt": "pile of rolled parchment scrolls with wax seals, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch3/props/fl_c3_f_scrolls_s97.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    8,
+    20,
+    106,
+    73
+   ]
+  },
+  {
+   "id": "fl_c3_f_small_shelf_s101",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_small_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "작은 책장 (보충)",
+   "prompt": "small wooden bookshelf half empty with fallen books, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ",
+   "file": "ch3/props/fl_c3_f_small_shelf_s101.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    31,
+    39,
+    82,
+    124
+   ]
+  },
+  {
+   "id": "fl_c3_reading_table_s101",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_reading_table",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "큰 열람 탁자 (보충)",
+   "prompt": "long heavy wooden reading table with scattered books, ink bottles, papers and unlit candles, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wal",
+   "file": "ch3/props/fl_c3_reading_table_s101.png",
+   "size": [
+    200,
+    144
+   ],
+   "bbox": [
+    13,
+    10,
+    188,
+    138
+   ]
+  },
+  {
+   "id": "fl_c3_scholar_remains_s101",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c3_scholar_remains",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "난간 끝 학자 유해 (보충)",
+   "prompt": "skeletal remains of an old scholar in a tattered robe slumped holding a book, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained",
+   "file": "ch3/props/fl_c3_scholar_remains_s101.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    43,
+    16,
+    95,
+    90
+   ]
+  },
+  {
+   "id": "fl_c3_scholar_remains_s97",
+   "type": "prop",
+   "zone": "boss",
+   "slot": "c3_scholar_remains",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "난간 끝 학자 유해 (보충)",
+   "prompt": "skeletal remains of an old scholar in a tattered robe slumped holding a book, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained",
+   "file": "ch3/props/fl_c3_scholar_remains_s97.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    14,
+    15,
+    89,
+    89
+   ]
+  },
+  {
+   "id": "fl_c3_spiral_stair_s101",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나선 계단 (보충)",
+   "prompt": "round spiral staircase of dark wood and iron rails going up, seen from above, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained",
+   "file": "ch3/props/fl_c3_spiral_stair_s101.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    17,
+    33,
+    159,
+    174
+   ]
+  },
+  {
+   "id": "fl_c3_spiral_stair_s97",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "나선 계단 (보충)",
+   "prompt": "round spiral staircase of dark wood and iron rails going up, seen from above, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained",
+   "file": "ch3/props/fl_c3_spiral_stair_s97.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    47,
+    25,
+    132,
+    186
+   ]
+  },
+  {
+   "id": "rd_c3_alchemy_furnace_s61_s61",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_alchemy_furnace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "연금술 화로 (다시) ← c3_alchemy_furnace",
+   "prompt": "big brick and copper alchemy furnace with a domed top, a small iron door and pipes, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch3/props/rd_c3_alchemy_furnace_s61_s61.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    2,
+    1,
+    158,
+    175
+   ]
+  },
+  {
+   "id": "rd_c3_alchemy_furnace_s67_s67",
+   "type": "prop",
+   "zone": "b1",
+   "slot": "c3_alchemy_furnace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "연금술 화로 (다시) ← c3_alchemy_furnace",
+   "prompt": "big brick and copper alchemy furnace with a domed top, a small iron door and pipes, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal",
+   "file": "ch3/props/rd_c3_alchemy_furnace_s67_s67.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    14,
+    10,
+    146,
+    162
+   ]
+  },
+  {
+   "id": "rd_c3_f_book_stack_s61_s61",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_book_stack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "책 더미 (다시) ← c3_f_book_stack",
+   "prompt": "stack of thick leather books in brown, red and green covers, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch3/props/rd_c3_f_book_stack_s61_s61.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    15,
+    14,
+    82,
+    102
+   ]
+  },
+  {
+   "id": "rd_c3_f_book_stack_s67_s67",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_book_stack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "책 더미 (다시) ← c3_f_book_stack",
+   "prompt": "stack of thick leather books in brown, red and green covers, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch3/props/rd_c3_f_book_stack_s67_s67.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    15,
+    14,
+    84,
+    107
+   ]
+  },
+  {
+   "id": "rd_c3_f_cart_s61_s61",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_cart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "책 수레 (다시) ← c3_f_cart",
+   "prompt": "honey brown wooden library book cart on wheels loaded with colorful books, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch3/props/rd_c3_f_cart_s61_s61.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    36,
+    12,
+    116,
+    105
+   ]
+  },
+  {
+   "id": "rd_c3_f_ink_bottles_s61_s61",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_f_ink_bottles",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "잉크병 (다시) ← c3_f_ink_bottles",
+   "prompt": "three glass ink bottles with indigo ink and feather quills, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch3/props/rd_c3_f_ink_bottles_s61_s61.png",
+   "size": [
+    96,
+    80
+   ],
+   "bbox": [
+    11,
+    10,
+    85,
+    66
+   ]
+  },
+  {
+   "id": "rd_c3_f_small_shelf_s61_s61",
+   "type": "prop",
+   "zone": "f3",
+   "slot": "c3_f_small_shelf",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "작은 책장 (다시) ← c3_f_small_shelf",
+   "prompt": "small honey brown wooden bookshelf full of colorful books, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-staine",
+   "file": "ch3/props/rd_c3_f_small_shelf_s61_s61.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    34,
+    20,
+    96,
+    126
+   ]
+  },
+  {
+   "id": "rd_c3_hidden_shelf_door_s61_s61",
+   "type": "prop",
+   "zone": "secret",
+   "slot": "c3_hidden_shelf_door",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "숨은 책장 문 (다시) ← c3_hidden_shelf_door",
+   "prompt": "tall honey brown bookshelf full of books swung open like a door, a stone passage behind it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch3/props/rd_c3_hidden_shelf_door_s61_s61.png",
+   "size": [
+    144,
+    176
+   ],
+   "bbox": [
+    30,
+    18,
+    117,
+    172
+   ]
+  },
+  {
+   "id": "rd_c3_lectern_s67_s67",
+   "type": "prop",
+   "zone": "f2",
+   "slot": "c3_lectern",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "독서대 (다시) ← c3_lectern",
+   "prompt": "carved honey brown wooden reading lectern with a big open book, freestanding, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch3/props/rd_c3_lectern_s67_s67.png",
+   "size": [
+    96,
+    144
+   ],
+   "bbox": [
+    14,
+    9,
+    77,
+    134
+   ]
+  },
+  {
+   "id": "rd_c3_spiral_stair_s61_s61",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "나선 계단 (다시) ← c3_spiral_stair",
+   "prompt": "wooden spiral staircase around a central post with brass railing posts, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch3/props/rd_c3_spiral_stair_s61_s61.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    36,
+    0,
+    143,
+    182
+   ]
+  },
+  {
+   "id": "rd_c3_spiral_stair_s67_s67",
+   "type": "prop",
+   "zone": "lobby",
+   "slot": "c3_spiral_stair",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "나선 계단 (다시) ← c3_spiral_stair",
+   "prompt": "wooden spiral staircase around a central post with brass railing posts, seen from above, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a col",
+   "file": "ch3/props/rd_c3_spiral_stair_s67_s67.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    31,
+    45,
+    140,
+    180
+   ]
+  },
+  {
+   "id": "c3_room_forbidden",
+   "type": "room",
+   "zone": "b1",
+   "slot": "c3_room_forbidden",
+   "verdict": "ok",
+   "review": "OK: 화로·사슬 책장",
+   "source": "orig",
+   "item": "지하 금지된 서고",
+   "prompt": "A forbidden underground archive: dark stone walls with iron-barred book niches, chained books, melted candles, a big cold alchemy furnace in the corner, muted sepia",
+   "file": "ch3/rooms/c3_room_forbidden",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c3_room_reading",
+   "type": "room",
+   "zone": "f2",
+   "slot": "c3_room_reading",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 48px 키트",
+   "source": "orig",
+   "item": "2층 중앙 열람실",
+   "prompt": "The central reading hall of a silent ruined royal library: tall bookshelves on the walls, long reading tables, a lectern under a broken stained glass window, dust and spilled ink, muted sepia",
+   "file": "ch3/rooms/c3_room_reading",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c3_room_secret",
+   "type": "room",
+   "zone": "secret",
+   "slot": "c3_room_secret",
+   "verdict": "ok",
+   "review": "OK: 금서고와 같은 벽(style_room 연결), 바닥 마법진",
+   "source": "orig",
+   "item": "금지된 서고 비밀방 (금서고와 같은 건물, style_room 연결)",
+   "prompt": "its hidden secret chamber: a small sealed study with a stone desk, a rune circle carved in the floor, shelves of sealed forbidden books",
+   "file": "ch3/rooms/c3_room_secret",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c3_b1_stone_drain_s211",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_b1_stone_drain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 돌바닥 ↔ 배수 통로 물",
+   "prompt": [
+    "dark murky drain water",
+    "dark old stone block floor of a forbidden archive"
+   ],
+   "file": "ch3/tiles/c3_b1_stone_drain_s211",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_carpet_r2",
+   "type": "tileset",
+   "zone": "lobby",
+   "slot": "c3_carpet",
+   "verdict": "soso",
+   "review": "보통: 자홍빛",
+   "source": "orig",
+   "item": "바랜 붉은 융단 ↔ 대리석 (다시)",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "faded dusty dark red woven carpet, plain soft fabric texture"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_carpet_r2",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_edge_b1_s223",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_edge_b1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 금서고 벽 (절벽형)",
+   "prompt": [
+    "dark old stone block archive floor",
+    "dark stone vault floor raised level"
+   ],
+   "file": "ch3/tiles/c3_edge_b1_s223",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c3_edge_b1_s224",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_edge_b1",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 금서고 벽 (절벽형)",
+   "prompt": [
+    "dark old stone block archive floor",
+    "dark stone vault floor raised level"
+   ],
+   "file": "ch3/tiles/c3_edge_b1_s224",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c3_marble_ink_s201",
+   "type": "tileset",
+   "zone": "f2",
+   "slot": "c3_marble_ink",
+   "verdict": "soso",
+   "review": "보통: 잉크가 밋밋한 검정",
+   "source": "orig",
+   "item": "대서고 먼지 낀 대리석 ↔ 굳은 검은 잉크",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "spilled hardened glossy black ink pooled over marble"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_marble_ink_s201",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_marble_ink_s202",
+   "type": "tileset",
+   "zone": "f2",
+   "slot": "c3_marble_ink",
+   "verdict": "soso",
+   "review": "보통: 같음",
+   "source": "orig",
+   "item": "대서고 먼지 낀 대리석 ↔ 굳은 검은 잉크",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "spilled hardened glossy black ink pooled over marble"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_marble_ink_s202",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_marble_pages_s204",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_marble_pages",
+   "verdict": "soso",
+   "review": "보통: 종이가 거의 안 보임",
+   "source": "orig",
+   "item": "대리석 ↔ 찢어진 책장·종이 더미",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "floor covered with torn book pages, loose parchment and fallen old books"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_marble_pages_s204",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_pages_r2",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_pages",
+   "verdict": "soso",
+   "review": "보통: 종이가 노란 판처럼",
+   "source": "orig",
+   "item": "대리석 ↔ 찢어진 책장·종이 (다시)",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "messy layer of scattered torn yellowed paper pages over marble"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_pages_r2",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_parquet_marble_s205",
+   "type": "tileset",
+   "zone": "lobby",
+   "slot": "c3_parquet_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "열람실 나무 마루 ↔ 대리석",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "old dark polished wooden parquet floor, scratched and dusty"
+   ],
+   "file": "ch3/tiles/c3_parquet_marble_s205",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_parquet_marble_s206",
+   "type": "tileset",
+   "zone": "lobby",
+   "slot": "c3_parquet_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "열람실 나무 마루 ↔ 대리석",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "old dark polished wooden parquet floor, scratched and dusty"
+   ],
+   "file": "ch3/tiles/c3_parquet_marble_s206",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_pro_b1",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_pro_b1",
+   "verdict": "soso",
+   "review": "보통: 촛농이 흙처럼",
+   "source": "orig",
+   "item": "지하 금서고 돌바닥 ↔ 촛농 (pro)",
+   "prompt": [
+    "dark old stone block floor of a forbidden archive",
+    "dark stone floor covered with hardened dripped candle wax"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/c3_pro_b1",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_pro_marble_ink",
+   "type": "tileset",
+   "zone": "f2",
+   "slot": "c3_pro_marble_ink",
+   "verdict": "ok",
+   "review": "OK: 결 있는 잉크",
+   "source": "orig",
+   "item": "로비 대리석 ↔ 굳은 잉크 (pro)",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "spilled hardened glossy black ink pooled over marble"
+   ],
+   "file": "ch3/tiles/c3_pro_marble_ink",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c3_wax_r2",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_wax",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "지하 돌바닥 ↔ 촛농 (다시)",
+   "prompt": [
+    "dark old stone block floor",
+    "stone floor covered with thick puddles of hardened creamy white candle wax"
+   ],
+   "file": "ch3/tiles/c3_wax_r2",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c3_b1_stone_drain_s4178",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_b1_stone_drain",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "지하 돌바닥 ↔ 배수 통로 물 (보충)",
+   "prompt": [
+    "dark murky drain water",
+    "dark old stone block floor of a forbidden archive"
+   ],
+   "file": "ch3/tiles/fl_c3_b1_stone_drain_s4178",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c3_parquet_marble_s5456",
+   "type": "tileset",
+   "zone": "lobby",
+   "slot": "c3_parquet_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "열람실 나무 마루 ↔ 대리석 (보충)",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles",
+    "old dark polished wooden parquet floor, scratched and dusty"
+   ],
+   "file": "ch3/tiles/fl_c3_parquet_marble_s5456",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c3_b1_stone_wax_s1533",
+   "type": "tileset",
+   "zone": "b1",
+   "slot": "c3_b1_stone_wax",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "지하 돌바닥 ↔ 촛농 (다시) ← c3_b1_stone_wax",
+   "prompt": [
+    "old grey flagstone floor, muted desaturated sepia and ash grey tones",
+    "thick puddles of hardened creamy white candle wax with candle stubs, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch3/tiles/rd_c3_b1_stone_wax_s1533",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c3_carpet_marble_s1410",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_carpet_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대리석 ↔ 바랜 융단 (다시) ← c3_carpet_marble",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles, muted desaturated sepia and ash grey tones",
+    "faded dull brick red woven carpet, plain soft fabric, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch3/tiles/rd_c3_carpet_marble_s1410",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c3_edge_balcony_s950",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_edge_balcony",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "발코니 가장자리 (다시) ← c3_edge_balcony",
+   "prompt": [
+    "marble floor far below, grey shadow, muted desaturated sepia and ash grey tones",
+    "pale grey marble balcony floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch3/tiles/rd_c3_edge_balcony_s950",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "rd_c3_edge_balcony_s951",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_edge_balcony",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "발코니 가장자리 (다시) ← c3_edge_balcony",
+   "prompt": [
+    "marble floor far below, grey shadow, muted desaturated sepia and ash grey tones",
+    "pale grey marble balcony floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch3/tiles/rd_c3_edge_balcony_s951",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "rd_c3_marble_ink_s3064",
+   "type": "tileset",
+   "zone": "f2",
+   "slot": "c3_marble_ink",
+   "verdict": "soso",
+   "review": "보통 남색 판",
+   "source": "redo",
+   "item": "대리석 ↔ 잉크 (다시) ← c3_marble_ink",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles, muted desaturated sepia and ash grey tones",
+    "splashes of deep indigo blue ink on marble, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/rd_c3_marble_ink_s3064",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c3_marble_ink_s3065",
+   "type": "tileset",
+   "zone": "f2",
+   "slot": "c3_marble_ink",
+   "verdict": "soso",
+   "review": "보통 남색 판",
+   "source": "redo",
+   "item": "대리석 ↔ 잉크 (다시) ← c3_marble_ink",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles, muted desaturated sepia and ash grey tones",
+    "splashes of deep indigo blue ink on marble, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/rd_c3_marble_ink_s3065",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c3_pages_s1368",
+   "type": "tileset",
+   "zone": "f3",
+   "slot": "c3_pages",
+   "verdict": "soso",
+   "review": "보통 줄만 보임",
+   "source": "redo",
+   "item": "대리석 ↔ 찢어진 종이 (다시) ← c3_pages",
+   "prompt": [
+    "dusty cracked pale grey marble floor tiles, muted desaturated sepia and ash grey tones",
+    "scattered pale cream paper sheets with grey text lines, each sheet clearly rectangular, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch3/tiles/rd_c3_pages_s1368",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

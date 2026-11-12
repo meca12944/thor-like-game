@@ -1,0 +1,2157 @@
+{
+ "chapter": 6,
+ "zones": [
+  {
+   "id": "pipe",
+   "name": "증기 관문 (4장 귀족가에서)",
+   "kind": "dungeon"
+  },
+  {
+   "id": "junk",
+   "name": "기계 쓰레기장",
+   "kind": "field"
+  },
+  {
+   "id": "steam",
+   "name": "증기 파이프 회랑",
+   "kind": "dungeon"
+  },
+  {
+   "id": "refinery",
+   "name": "중앙 수은 정제소",
+   "kind": "dungeon"
+  },
+  {
+   "id": "lab",
+   "name": "상층부 연금술 실험실",
+   "kind": "dungeon"
+  },
+  {
+   "id": "tower1",
+   "name": "시계탑 하층",
+   "kind": "dungeon"
+  },
+  {
+   "id": "tower2",
+   "name": "시계탑 중층",
+   "kind": "dungeon"
+  },
+  {
+   "id": "tower3",
+   "name": "시계탑 최상층 · 시계바늘 기어",
+   "kind": "dungeon"
+  },
+  {
+   "id": "core",
+   "name": "메인 태엽실 (보스)",
+   "kind": "boss"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c6_extractor_s31",
+   "type": "building",
+   "zone": "refinery",
+   "slot": "c6_extractor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "메인 추출기",
+   "prompt": "huge alchemical machine with a tall glass cylinder full of pale silver blue mercury, brass frame, pipes and a spiral keyhole, wide horizontal shape, large and close up, filling the frame, seen from sl",
+   "file": "ch6/buildings/c6_extractor_s31.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    53,
+    9,
+    188,
+    147
+   ]
+  },
+  {
+   "id": "c6_extractor_s7",
+   "type": "building",
+   "zone": "refinery",
+   "slot": "c6_extractor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "메인 추출기",
+   "prompt": "huge alchemical machine with a tall glass cylinder full of pale silver blue mercury, brass frame, pipes and a spiral keyhole, wide horizontal shape, large and close up, filling the frame, seen from sl",
+   "file": "ch6/buildings/c6_extractor_s7.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    15,
+    9,
+    225,
+    150
+   ]
+  },
+  {
+   "id": "fl_c6_extractor_s97",
+   "type": "building",
+   "zone": "refinery",
+   "slot": "c6_extractor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "메인 추출기 (보충)",
+   "prompt": "huge alchemical machine with a tall glass cylinder full of pale silver blue mercury, brass frame, pipes and a spiral keyhole, wide horizontal shape, large and close up, filling the frame, seen from sl",
+   "file": "ch6/buildings/fl_c6_extractor_s97.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    52,
+    6,
+    189,
+    153
+   ]
+  },
+  {
+   "id": "c6_decal_junk",
+   "type": "decal",
+   "zone": "junk",
+   "slot": "c6_decal_junk",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "쓰레기장 바닥 장식 16장",
+   "prompt": "1). rusty gear 2). scattered bolts and nuts 3). small mercury droplets silver blue 4). oil stain umber 5). broken pipe piece 6). rusty spring 7). bent iron plate 8). ash drift",
+   "file": "ch6/decals/c6_decal_junk",
+   "tiles": 16
+  },
+  {
+   "id": "c6_decal_lab",
+   "type": "decal",
+   "zone": "lab",
+   "slot": "c6_decal_lab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실험실 바닥 장식 16장",
+   "prompt": "1). broken glass flask shards 2). olive green poison splash 3). spilled white powder 4). torn alchemy notes 5). brass measuring tool 6). cork stoppers 7). lime stain 8). small crucible",
+   "file": "ch6/decals/c6_decal_lab",
+   "tiles": 16
+  },
+  {
+   "id": "c6_decal_refinery",
+   "type": "decal",
+   "zone": "refinery",
+   "slot": "c6_decal_refinery",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "정제소·증기 회랑 바닥 장식 16장",
+   "prompt": "1). mercury droplets silver blue 2). limescale crust white 3). broken glass tube 4). brass rivets 5). rust stain 6). floor drain grate 7). copper wire coil 8). cracked tile",
+   "file": "ch6/decals/c6_decal_refinery",
+   "tiles": 16
+  },
+  {
+   "id": "c6_decal_tower",
+   "type": "decal",
+   "zone": "tower1",
+   "slot": "c6_decal_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 바닥 장식 16장",
+   "prompt": "1). small brass gear 2). clock spring coil 3). loose screws 4). wood splinters 5). broken clock hand 6). dust 7). brass plate scrap 8). cracked floor board",
+   "file": "ch6/decals/c6_decal_tower",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch6",
+   "type": "decal",
+   "zone": "tower1",
+   "slot": "fx_decal_ch6",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증기 공장 바닥 장식 16장 (보충)",
+   "prompt": "1). brass gear 2). copper wire 3). shiny silver mercury droplets 4). rusty bolts 5). broken gauge glass 6). rivets 7). bent spring 8). iron plate scrap",
+   "file": "ch6/decals/fx_decal_ch6",
+   "tiles": 16
+  },
+  {
+   "id": "c6_kit_lab",
+   "type": "kit",
+   "zone": "lab",
+   "slot": "c6_kit_lab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "연금술 실험실 건물 키트",
+   "prompt": "alchemist laboratory: stone walls with shelves of flasks, marble floor",
+   "file": "ch6/kits/c6_kit_lab",
+   "tiles": 80
+  },
+  {
+   "id": "c6_kit_refinery",
+   "type": "kit",
+   "zone": "refinery",
+   "slot": "c6_kit_refinery",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수은 정제소 건물 키트",
+   "prompt": "alchemical mercury refinery: pale tiled walls with glass tubes, tiled floor",
+   "file": "ch6/kits/c6_kit_refinery",
+   "tiles": 80
+  },
+  {
+   "id": "c6_kit_steam",
+   "type": "kit",
+   "zone": "steam",
+   "slot": "c6_kit_steam",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "증기 파이프 회랑 건물 키트",
+   "prompt": "narrow steam corridor: walls covered with brass pipes and valves, riveted iron floor",
+   "file": "ch6/kits/c6_kit_steam",
+   "tiles": 80
+  },
+  {
+   "id": "c6_kit_tower",
+   "type": "kit",
+   "zone": "tower1",
+   "slot": "c6_kit_tower",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 건물 키트",
+   "prompt": "clock tower interior: brick walls with brass gears, wooden floor",
+   "file": "ch6/kits/c6_kit_tower",
+   "tiles": 80
+  },
+  {
+   "id": "c6_clock_hand_r2_s41",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_clock_hand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 시계바늘 (다시)",
+   "prompt": "one very long flat ornate brass clock pointer arrow with a pointed tip at one end and a round pivot hub at the other, a long straight bar, wide horizontal shape, large and close up, filling the frame,",
+   "file": "ch6/props/c6_clock_hand_r2_s41.png",
+   "size": [
+    256,
+    96
+   ],
+   "bbox": [
+    11,
+    27,
+    245,
+    69
+   ]
+  },
+  {
+   "id": "c6_clock_hand_r2_s43",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_clock_hand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 시계바늘 (다시)",
+   "prompt": "one very long flat ornate brass clock pointer arrow with a pointed tip at one end and a round pivot hub at the other, a long straight bar, wide horizontal shape, large and close up, filling the frame,",
+   "file": "ch6/props/c6_clock_hand_r2_s43.png",
+   "size": [
+    256,
+    96
+   ],
+   "bbox": [
+    4,
+    34,
+    252,
+    63
+   ]
+  },
+  {
+   "id": "c6_clock_hand_r2_s47",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_clock_hand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 시계바늘 (다시)",
+   "prompt": "one very long flat ornate brass clock pointer arrow with a pointed tip at one end and a round pivot hub at the other, a long straight bar, wide horizontal shape, large and close up, filling the frame,",
+   "file": "ch6/props/c6_clock_hand_r2_s47.png",
+   "size": [
+    256,
+    96
+   ],
+   "bbox": [
+    11,
+    16,
+    244,
+    78
+   ]
+  },
+  {
+   "id": "c6_f_alembic_s19",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_alembic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증류기",
+   "prompt": "copper alembic still with a curved glass tube, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch6/props/c6_f_alembic_s19.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    30,
+    2,
+    72,
+    118
+   ]
+  },
+  {
+   "id": "c6_f_alembic_s7",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_alembic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증류기",
+   "prompt": "copper alembic still with a curved glass tube, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch6/props/c6_f_alembic_s7.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    25,
+    23,
+    71,
+    112
+   ]
+  },
+  {
+   "id": "c6_f_bolt_crate_s7",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_f_bolt_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "볼트 상자",
+   "prompt": "wooden crate full of iron bolts and nuts, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, ",
+   "file": "ch6/props/c6_f_bolt_crate_s7.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    20,
+    44,
+    90,
+    86
+   ]
+  },
+  {
+   "id": "c6_f_clock_face_s19",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_f_clock_face",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시계 문자판",
+   "prompt": "large round cream clock face with roman numerals and brass rim, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia ",
+   "file": "ch6/props/c6_f_clock_face_s19.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    11,
+    10,
+    133,
+    131
+   ]
+  },
+  {
+   "id": "c6_f_clock_face_s7",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_f_clock_face",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시계 문자판",
+   "prompt": "large round cream clock face with roman numerals and brass rim, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia ",
+   "file": "ch6/props/c6_f_clock_face_s7.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    6,
+    5,
+    137,
+    136
+   ]
+  },
+  {
+   "id": "c6_f_coal_cart_r2_s41",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_f_coal_cart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "석탄 수레 (다시)",
+   "prompt": "small rusty iron mine cart on wheels full of grey stone lumps and ore, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted",
+   "file": "ch6/props/c6_f_coal_cart_r2_s41.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    34,
+    42,
+    103,
+    100
+   ]
+  },
+  {
+   "id": "c6_f_coal_cart_r2_s43",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_f_coal_cart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "석탄 수레 (다시)",
+   "prompt": "small rusty iron mine cart on wheels full of grey stone lumps and ore, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted",
+   "file": "ch6/props/c6_f_coal_cart_r2_s43.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    45,
+    48,
+    102,
+    89
+   ]
+  },
+  {
+   "id": "c6_f_flask_rack_s19",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_flask_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "플라스크 선반",
+   "prompt": "wooden rack with glass flasks of pale blue and amber liquids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch6/props/c6_f_flask_rack_s19.png",
+   "size": [
+    128,
+    144
+   ],
+   "bbox": [
+    21,
+    9,
+    107,
+    127
+   ]
+  },
+  {
+   "id": "c6_f_flask_rack_s7",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_flask_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "플라스크 선반",
+   "prompt": "wooden rack with glass flasks of pale blue and amber liquids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch6/props/c6_f_flask_rack_s7.png",
+   "size": [
+    128,
+    144
+   ],
+   "bbox": [
+    31,
+    9,
+    112,
+    141
+   ]
+  },
+  {
+   "id": "c6_f_gauge_s19",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_f_gauge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "계기판",
+   "prompt": "brass panel with round pressure gauges and small levers on a stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted se",
+   "file": "ch6/props/c6_f_gauge_s19.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    19,
+    12,
+    93,
+    116
+   ]
+  },
+  {
+   "id": "c6_f_gauge_s7",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_f_gauge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "계기판",
+   "prompt": "brass panel with round pressure gauges and small levers on a stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted se",
+   "file": "ch6/props/c6_f_gauge_s7.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    33,
+    38,
+    79,
+    89
+   ]
+  },
+  {
+   "id": "c6_f_gear_pile_s19",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_f_gear_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "톱니 더미",
+   "prompt": "pile of rusty and brass gears of different sizes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash",
+   "file": "ch6/props/c6_f_gear_pile_s19.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    12,
+    11,
+    125,
+    91
+   ]
+  },
+  {
+   "id": "c6_f_gear_pile_s7",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_f_gear_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "톱니 더미",
+   "prompt": "pile of rusty and brass gears of different sizes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash",
+   "file": "ch6/props/c6_f_gear_pile_s7.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    9,
+    13,
+    120,
+    80
+   ]
+  },
+  {
+   "id": "c6_f_glass_tubes_s19",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_glass_tubes",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유리관 묶음",
+   "prompt": "bundle of tall glass tubes in a brass frame with pale blue liquid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sep",
+   "file": "ch6/props/c6_f_glass_tubes_s19.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    19,
+    24,
+    93,
+    120
+   ]
+  },
+  {
+   "id": "c6_f_glass_tubes_s7",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_glass_tubes",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유리관 묶음",
+   "prompt": "bundle of tall glass tubes in a brass frame with pale blue liquid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sep",
+   "file": "ch6/props/c6_f_glass_tubes_s7.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    23,
+    14,
+    89,
+    135
+   ]
+  },
+  {
+   "id": "c6_f_mercury_barrel_r2_s41",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_f_mercury_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "수은 통 (다시)",
+   "prompt": "grey iron barrel with a brass lid and pale silver blue mercury drips on the side, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-sta",
+   "file": "ch6/props/c6_f_mercury_barrel_r2_s41.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    26,
+    17,
+    71,
+    93
+   ]
+  },
+  {
+   "id": "c6_f_mercury_barrel_s19",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_f_mercury_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "수은 통",
+   "prompt": "iron barrel with a brass lid and pale silver blue mercury drip marks, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted ",
+   "file": "ch6/props/c6_f_mercury_barrel_s19.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    32,
+    38,
+    72,
+    94
+   ]
+  },
+  {
+   "id": "c6_f_pipe_s19",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_f_pipe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "파이프 토막",
+   "prompt": "short thick copper pipe segment with flanges and rivets, wide horizontal shape, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/c6_f_pipe_s19.png",
+   "size": [
+    160,
+    80
+   ],
+   "bbox": [
+    14,
+    18,
+    146,
+    60
+   ]
+  },
+  {
+   "id": "c6_f_pipe_s7",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_f_pipe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "파이프 토막",
+   "prompt": "short thick copper pipe segment with flanges and rivets, wide horizontal shape, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/c6_f_pipe_s7.png",
+   "size": [
+    160,
+    80
+   ],
+   "bbox": [
+    12,
+    22,
+    147,
+    58
+   ]
+  },
+  {
+   "id": "c6_f_workbench_s19",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_workbench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "연금술 작업대",
+   "prompt": "wooden alchemy workbench with a brass alembic, flasks and scrolls, wide horizontal shape, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, ",
+   "file": "ch6/props/c6_f_workbench_s19.png",
+   "size": [
+    176,
+    112
+   ],
+   "bbox": [
+    25,
+    12,
+    150,
+    111
+   ]
+  },
+  {
+   "id": "c6_scrap_heap_s19",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_scrap_heap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "거대 고철 더미",
+   "prompt": "huge heap of rusty scrap metal, broken gears, bent pipes and iron plates, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital insi",
+   "file": "ch6/props/c6_scrap_heap_s19.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    8,
+    14,
+    232,
+    142
+   ]
+  },
+  {
+   "id": "c6_time_vault_s19",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_time_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시간 정지 금고",
+   "prompt": "heavy grey iron vault safe with a brass clock dial lock on the door, rivets, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle",
+   "file": "ch6/props/c6_time_vault_s19.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    18,
+    9,
+    138,
+    161
+   ]
+  },
+  {
+   "id": "c6_time_vault_s31",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_time_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시간 정지 금고",
+   "prompt": "heavy grey iron vault safe with a brass clock dial lock on the door, rivets, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle",
+   "file": "ch6/props/c6_time_vault_s31.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    24,
+    16,
+    136,
+    162
+   ]
+  },
+  {
+   "id": "c6_time_vault_s7",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_time_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시간 정지 금고",
+   "prompt": "heavy grey iron vault safe with a brass clock dial lock on the door, rivets, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle",
+   "file": "ch6/props/c6_time_vault_s7.png",
+   "size": [
+    160,
+    176
+   ],
+   "bbox": [
+    26,
+    21,
+    140,
+    155
+   ]
+  },
+  {
+   "id": "c6_trap_mercury_s19",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_trap_mercury",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수은 분출구",
+   "prompt": "round brass floor nozzle with pale silver blue mercury droplets around it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch6/props/c6_trap_mercury_s19.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    5,
+    13,
+    92,
+    88
+   ]
+  },
+  {
+   "id": "c6_trap_mercury_s7",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_trap_mercury",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "수은 분출구",
+   "prompt": "round brass floor nozzle with pale silver blue mercury droplets around it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle w",
+   "file": "ch6/props/c6_trap_mercury_s7.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    22,
+    35,
+    81,
+    80
+   ]
+  },
+  {
+   "id": "c6_valve_s19",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_valve",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "파이프 밸브",
+   "prompt": "thick brass pipe junction with a big round red valve wheel, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/c6_valve_s19.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    30,
+    12,
+    93,
+    86
+   ]
+  },
+  {
+   "id": "c6_valve_s31",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_valve",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "파이프 밸브",
+   "prompt": "thick brass pipe junction with a big round red valve wheel, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/c6_valve_s31.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    15,
+    0,
+    102,
+    86
+   ]
+  },
+  {
+   "id": "fl_c6_clock_hand_r2_s97",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_clock_hand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거대 시계바늘 (다시) (보충)",
+   "prompt": "one very long flat ornate brass clock pointer arrow with a pointed tip at one end and a round pivot hub at the other, a long straight bar, wide horizontal shape, large and close up, filling the frame,",
+   "file": "ch6/props/fl_c6_clock_hand_r2_s97.png",
+   "size": [
+    256,
+    96
+   ],
+   "bbox": [
+    9,
+    35,
+    246,
+    61
+   ]
+  },
+  {
+   "id": "fl_c6_f_alembic_s97",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_alembic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증류기 (보충)",
+   "prompt": "copper alembic still with a curved glass tube, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch6/props/fl_c6_f_alembic_s97.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    25,
+    9,
+    71,
+    119
+   ]
+  },
+  {
+   "id": "fl_c6_f_clock_face_s97",
+   "type": "prop",
+   "zone": "tower3",
+   "slot": "c6_f_clock_face",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시계 문자판 (보충)",
+   "prompt": "large round cream clock face with roman numerals and brass rim, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia ",
+   "file": "ch6/props/fl_c6_f_clock_face_s97.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    16,
+    16,
+    128,
+    126
+   ]
+  },
+  {
+   "id": "fl_c6_f_flask_rack_s97",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_flask_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "플라스크 선반 (보충)",
+   "prompt": "wooden rack with glass flasks of pale blue and amber liquids, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch6/props/fl_c6_f_flask_rack_s97.png",
+   "size": [
+    128,
+    144
+   ],
+   "bbox": [
+    27,
+    28,
+    106,
+    121
+   ]
+  },
+  {
+   "id": "fl_c6_f_gauge_s97",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_f_gauge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "계기판 (보충)",
+   "prompt": "brass panel with round pressure gauges and small levers on a stand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted se",
+   "file": "ch6/props/fl_c6_f_gauge_s97.png",
+   "size": [
+    112,
+    128
+   ],
+   "bbox": [
+    30,
+    9,
+    83,
+    122
+   ]
+  },
+  {
+   "id": "fl_c6_f_gear_pile_s97",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_f_gear_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "톱니 더미 (보충)",
+   "prompt": "pile of rusty and brass gears of different sizes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash",
+   "file": "ch6/props/fl_c6_f_gear_pile_s97.png",
+   "size": [
+    128,
+    96
+   ],
+   "bbox": [
+    7,
+    16,
+    124,
+    87
+   ]
+  },
+  {
+   "id": "fl_c6_f_glass_tubes_s97",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_glass_tubes",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "유리관 묶음 (보충)",
+   "prompt": "bundle of tall glass tubes in a brass frame with pale blue liquid, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sep",
+   "file": "ch6/props/fl_c6_f_glass_tubes_s97.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    24,
+    20,
+    91,
+    123
+   ]
+  },
+  {
+   "id": "fl_c6_f_mercury_barrel_r2_s97",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_f_mercury_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "수은 통 (다시) (보충)",
+   "prompt": "grey iron barrel with a brass lid and pale silver blue mercury drips on the side, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-sta",
+   "file": "ch6/props/fl_c6_f_mercury_barrel_r2_s97.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    36,
+    38,
+    75,
+    99
+   ]
+  },
+  {
+   "id": "fl_c6_f_pipe_s97",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_f_pipe",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "파이프 토막 (보충)",
+   "prompt": "short thick copper pipe segment with flanges and rivets, wide horizontal shape, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/fl_c6_f_pipe_s97.png",
+   "size": [
+    160,
+    80
+   ],
+   "bbox": [
+    0,
+    18,
+    160,
+    61
+   ]
+  },
+  {
+   "id": "fl_c6_f_workbench_s97",
+   "type": "prop",
+   "zone": "lab",
+   "slot": "c6_f_workbench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "연금술 작업대 (보충)",
+   "prompt": "wooden alchemy workbench with a brass alembic, flasks and scrolls, wide horizontal shape, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, ",
+   "file": "ch6/props/fl_c6_f_workbench_s97.png",
+   "size": [
+    176,
+    112
+   ],
+   "bbox": [
+    12,
+    11,
+    165,
+    105
+   ]
+  },
+  {
+   "id": "fl_c6_mainspring_r2_s97",
+   "type": "prop",
+   "zone": "core",
+   "slot": "c6_mainspring",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "메인 태엽 (다시) (보충)",
+   "prompt": "giant flat spiral coiled brass clock spring like a snail shell coil, lying on a riveted iron base, thick copper pipes attached to its sides, large and close up, filling the frame, seen from slightly a",
+   "file": "ch6/props/fl_c6_mainspring_r2_s97.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    35,
+    13,
+    180,
+    184
+   ]
+  },
+  {
+   "id": "fl_c6_pendulum_s97",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_pendulum",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거대 진자 (보충)",
+   "prompt": "giant brass clock pendulum with a long rod and a round engraved bob, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch6/props/fl_c6_pendulum_s97.png",
+   "size": [
+    112,
+    224
+   ],
+   "bbox": [
+    23,
+    0,
+    89,
+    224
+   ]
+  },
+  {
+   "id": "fl_c6_scrap_heap_s97",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_scrap_heap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "거대 고철 더미 (보충)",
+   "prompt": "huge heap of rusty scrap metal, broken gears, bent pipes and iron plates, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital insi",
+   "file": "ch6/props/fl_c6_scrap_heap_s97.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    8,
+    29,
+    230,
+    139
+   ]
+  },
+  {
+   "id": "fl_c6_trap_steam_s97",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_trap_steam",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증기 분사 함정 (보충)",
+   "prompt": "iron floor steam vent nozzle with brass rim and a rusty grate, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-st",
+   "file": "ch6/props/fl_c6_trap_steam_s97.png",
+   "size": [
+    96,
+    96
+   ],
+   "bbox": [
+    14,
+    15,
+    73,
+    85
+   ]
+  },
+  {
+   "id": "fl_c6_valve_s97",
+   "type": "prop",
+   "zone": "pipe",
+   "slot": "c6_valve",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "파이프 밸브 (보충)",
+   "prompt": "thick brass pipe junction with a big round red valve wheel, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stain",
+   "file": "ch6/props/fl_c6_valve_s97.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    5,
+    19,
+    92,
+    80
+   ]
+  },
+  {
+   "id": "rd_c6_boiler_s61_s61",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_boiler",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "보일러 (다시) ← c6_boiler",
+   "prompt": "big broken copper steam boiler with riveted plates, gauges and pipes, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, ",
+   "file": "ch6/props/rd_c6_boiler_s61_s61.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    40,
+    44,
+    165,
+    148
+   ]
+  },
+  {
+   "id": "rd_c6_f_mercury_barrel_s61_s61",
+   "type": "prop",
+   "zone": "refinery",
+   "slot": "c6_f_mercury_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "수은 통 (다시) ← c6_f_mercury_barrel",
+   "prompt": "pale grey iron barrel with a brass lid and shiny silver mercury drips on its side, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch6/props/rd_c6_f_mercury_barrel_s61_s61.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    19,
+    20,
+    77,
+    101
+   ]
+  },
+  {
+   "id": "rd_c6_f_oil_cans_s61_s61",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_f_oil_cans",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "기름통 (다시) ← c6_f_oil_cans",
+   "prompt": "three old pale tin grey oil cans with spouts and rusty orange spots, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch6/props/rd_c6_f_oil_cans_s61_s61.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    6,
+    28,
+    104,
+    82
+   ]
+  },
+  {
+   "id": "rd_c6_f_oil_cans_s67_s67",
+   "type": "prop",
+   "zone": "junk",
+   "slot": "c6_f_oil_cans",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "기름통 (다시) ← c6_f_oil_cans",
+   "prompt": "three old pale tin grey oil cans with spouts and rusty orange spots, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch6/props/rd_c6_f_oil_cans_s67_s67.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    9,
+    24,
+    106,
+    80
+   ]
+  },
+  {
+   "id": "rd_c6_lift_s61_s61",
+   "type": "prop",
+   "zone": "tower1",
+   "slot": "c6_lift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "화물 승강기 (다시) ← c6_lift",
+   "prompt": "square iron cargo lift platform with a rusty orange iron bar gate and brass corner posts, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a co",
+   "file": "ch6/props/rd_c6_lift_s61_s61.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    26,
+    38,
+    150,
+    142
+   ]
+  },
+  {
+   "id": "rd_c6_mainspring_s61_s61",
+   "type": "prop",
+   "zone": "core",
+   "slot": "c6_mainspring",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "메인 태엽 (다시) ← c6_mainspring",
+   "prompt": "flat spiral coiled brass band like a snail shell seen from above, sitting on a square riveted iron base with copper pipes, large and close up, filling the frame, seen from slightly above, dark fantasy",
+   "file": "ch6/props/rd_c6_mainspring_s61_s61.png",
+   "size": [
+    200,
+    200
+   ],
+   "bbox": [
+    27,
+    16,
+    171,
+    179
+   ]
+  },
+  {
+   "id": "rd_c6_pendulum_s61_s61",
+   "type": "prop",
+   "zone": "tower2",
+   "slot": "c6_pendulum",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "거대 진자 (다시) ← c6_pendulum",
+   "prompt": "giant brass clock pendulum with a long rod and a round engraved bob, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch6/props/rd_c6_pendulum_s61_s61.png",
+   "size": [
+    112,
+    224
+   ],
+   "bbox": [
+    30,
+    6,
+    82,
+    192
+   ]
+  },
+  {
+   "id": "rd_c6_trap_piston_s61_s61",
+   "type": "prop",
+   "zone": "tower1",
+   "slot": "c6_trap_piston",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "압착 피스톤 (다시) ← c6_trap_piston",
+   "prompt": "tall rusty orange iron piston press with a heavy square stamp block between two brass guide pillars, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ",
+   "file": "ch6/props/rd_c6_trap_piston_s61_s61.png",
+   "size": [
+    112,
+    160
+   ],
+   "bbox": [
+    23,
+    10,
+    91,
+    146
+   ]
+  },
+  {
+   "id": "rd_c6_trap_piston_s67_s67",
+   "type": "prop",
+   "zone": "tower1",
+   "slot": "c6_trap_piston",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "압착 피스톤 (다시) ← c6_trap_piston",
+   "prompt": "tall rusty orange iron piston press with a heavy square stamp block between two brass guide pillars, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital ",
+   "file": "ch6/props/rd_c6_trap_piston_s67_s67.png",
+   "size": [
+    112,
+    160
+   ],
+   "bbox": [
+    23,
+    4,
+    90,
+    149
+   ]
+  },
+  {
+   "id": "rd_c6_trap_steam_s61_s61",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_trap_steam",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "증기 분사구 (다시) ← c6_trap_steam",
+   "prompt": "round iron floor grate with a brass rim and small steam holes, set in a square iron plate, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch6/props/rd_c6_trap_steam_s61_s61.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    13,
+    13,
+    99,
+    97
+   ]
+  },
+  {
+   "id": "rd_c6_trap_steam_s67_s67",
+   "type": "prop",
+   "zone": "steam",
+   "slot": "c6_trap_steam",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "증기 분사구 (다시) ← c6_trap_steam",
+   "prompt": "round iron floor grate with a brass rim and small steam holes, set in a square iron plate, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch6/props/rd_c6_trap_steam_s67_s67.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    10,
+    11,
+    102,
+    101
+   ]
+  },
+  {
+   "id": "c6_room_core",
+   "type": "room",
+   "zone": "core",
+   "slot": "c6_room_core",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "메인 태엽실 보스방 (진자 홀과 같은 건물, style_room 연결)",
+   "prompt": "its boss chamber: a giant coiled brass mainspring in the middle connected by thick pipes, brass gear plates on the floor, open space for a fight",
+   "file": "ch6/rooms/c6_room_core",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c6_room_lab",
+   "type": "room",
+   "zone": "lab",
+   "slot": "c6_room_lab",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "상층부 연금술 실험실",
+   "prompt": "An alchemist laboratory high in a steam works: grey stone walls with shelves of glass flasks, cracked marble floor with lime stains, workbenches with alembics, olive green poison puddles, muted sepia ",
+   "file": "ch6/rooms/c6_room_lab",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c6_room_pendulum",
+   "type": "room",
+   "zone": "tower2",
+   "slot": "c6_room_pendulum",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 하층 진자 홀",
+   "prompt": "The lower hall of a giant clock tower: red brown brick walls, a huge brass pendulum, wooden floor with brass gear plates, beams, muted sepia and bronze",
+   "file": "ch6/rooms/c6_room_pendulum",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c6_room_time_vault",
+   "type": "room",
+   "zone": "tower2",
+   "slot": "c6_room_time_vault",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실험실 시간 정지 금고 방 (실험실과 같은 건물, style_room 연결)",
+   "prompt": "its sealed vault room: a heavy grey iron vault safe with a brass clock dial lock against the north wall, dust motes, shelves of flasks",
+   "file": "ch6/rooms/c6_room_time_vault",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c6_edge_junk_s623",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_edge_junk",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "쓰레기장 꺼진 지반 가장자리 (절벽형)",
+   "prompt": [
+    "grey ash fog far below, pale grey, muted desaturated sepia and ash grey tones",
+    "greasy umber brown soil with rusty gears, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_edge_junk_s623",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c6_edge_junk_s624",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_edge_junk",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "쓰레기장 꺼진 지반 가장자리 (절벽형)",
+   "prompt": [
+    "grey ash fog far below, pale grey, muted desaturated sepia and ash grey tones",
+    "greasy umber brown soil with rusty gears, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_edge_junk_s624",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c6_edge_tower_gap_s621",
+   "type": "tileset",
+   "zone": "tower1",
+   "slot": "c6_edge_tower_gap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 바닥 틈 가장자리 (절벽형, 아래층 보임)",
+   "prompt": [
+    "lower clock tower floor far below with brass gears, deep grey brown shadow, muted desaturated sepia and ash grey tones",
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_edge_tower_gap_s621",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c6_edge_tower_gap_s622",
+   "type": "tileset",
+   "zone": "tower1",
+   "slot": "c6_edge_tower_gap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 바닥 틈 가장자리 (절벽형, 아래층 보임)",
+   "prompt": [
+    "lower clock tower floor far below with brass gears, deep grey brown shadow, muted desaturated sepia and ash grey tones",
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_edge_tower_gap_s622",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c6_junk_oil_s601",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_oil",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "쓰레기장 기름땅 ↔ 녹슨 톱니·볼트",
+   "prompt": [
+    "greasy umber brown oil-stained soil with grey ash, muted desaturated sepia and ash grey tones",
+    "umber soil littered with rusty orange brown gears, bolts and nuts, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_junk_oil_s601",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_junk_oil_s602",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_oil",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "쓰레기장 기름땅 ↔ 녹슨 톱니·볼트",
+   "prompt": [
+    "greasy umber brown oil-stained soil with grey ash, muted desaturated sepia and ash grey tones",
+    "umber soil littered with rusty orange brown gears, bolts and nuts, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_junk_oil_s602",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_lab_marble_s609",
+   "type": "tileset",
+   "zone": "lab",
+   "slot": "c6_lab_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실험실 깨진 대리석 ↔ 독 웅덩이",
+   "prompt": [
+    "cracked pale grey marble floor with white lime stains, muted desaturated sepia and ash grey tones",
+    "dull olive green poison puddle with tiny glass shards, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_lab_marble_s609",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_lab_marble_s610",
+   "type": "tileset",
+   "zone": "lab",
+   "slot": "c6_lab_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "실험실 깨진 대리석 ↔ 독 웅덩이",
+   "prompt": [
+    "cracked pale grey marble floor with white lime stains, muted desaturated sepia and ash grey tones",
+    "dull olive green poison puddle with tiny glass shards, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_lab_marble_s610",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_pro_junk",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_pro_junk",
+   "verdict": "soso",
+   "review": "보통 수은 안 보임",
+   "source": "orig",
+   "item": "쓰레기장 기름땅 ↔ 수은 웅덩이 (pro)",
+   "prompt": [
+    "shiny pale silver blue liquid mercury pool",
+    "greasy umber brown soil littered with rusty gears and bolts"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_pro_junk",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_pro_tower",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_pro_tower",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "시계탑 나무 마루 ↔ 황동 톱니 바닥 (pro)",
+   "prompt": [
+    "interlocking brass gear wheels floor",
+    "worn greyish brown wooden plank floor"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_pro_tower",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_steam_plate_s605",
+   "type": "tileset",
+   "zone": "steam",
+   "slot": "c6_steam_plate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "증기 회랑 철판 바닥 ↔ 증기 배수 격자",
+   "prompt": [
+    "riveted grey iron plate floor with rust spots, muted desaturated sepia and ash grey tones",
+    "rusty iron floor grates with brass rims, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_steam_plate_s605",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_steam_plate_s606",
+   "type": "tileset",
+   "zone": "steam",
+   "slot": "c6_steam_plate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "증기 회랑 철판 바닥 ↔ 증기 배수 격자",
+   "prompt": [
+    "riveted grey iron plate floor with rust spots, muted desaturated sepia and ash grey tones",
+    "rusty iron floor grates with brass rims, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_steam_plate_s606",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_tower_brass_s613",
+   "type": "tileset",
+   "zone": "tower1",
+   "slot": "c6_tower_brass",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "시계탑 황동판 ↔ 돌바닥",
+   "prompt": [
+    "grey stone block floor, muted desaturated sepia and ash grey tones",
+    "riveted dull brass plate floor with engraved lines, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/c6_tower_brass_s613",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_tower_gears_r2_s631",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "시계탑 나무 마루 ↔ 황동 톱니 바닥 (다시)",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "large visible round bronze cog wheels with teeth set into the floor, muted gold, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_tower_gears_r2_s631",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_tower_gears_r2_s632",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "시계탑 나무 마루 ↔ 황동 톱니 바닥 (다시)",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "large visible round bronze cog wheels with teeth set into the floor, muted gold, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_tower_gears_r2_s632",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_tower_gears_s611",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "시계탑 나무 마루 ↔ 맞물린 황동 톱니 바닥",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "interlocking brass gear wheels floor, muted gold and bronze, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_tower_gears_s611",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c6_tower_gears_s612",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "orig",
+   "item": "시계탑 나무 마루 ↔ 맞물린 황동 톱니 바닥",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "interlocking brass gear wheels floor, muted gold and bronze, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/c6_tower_gears_s612",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c6_edge_junk_s6370",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_edge_junk",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "쓰레기장 꺼진 지반 가장자리 (절벽형) (보충)",
+   "prompt": [
+    "grey ash fog far below, pale grey, muted desaturated sepia and ash grey tones",
+    "greasy umber brown soil with rusty gears, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/fl_c6_edge_junk_s6370",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c6_edge_tower_gap_s6517",
+   "type": "tileset",
+   "zone": "tower1",
+   "slot": "c6_edge_tower_gap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "시계탑 바닥 틈 가장자리 (절벽형, 아래층 보임) (보충)",
+   "prompt": [
+    "lower clock tower floor far below with brass gears, deep grey brown shadow, muted desaturated sepia and ash grey tones",
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/fl_c6_edge_tower_gap_s6517",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c6_lab_marble_s7681",
+   "type": "tileset",
+   "zone": "lab",
+   "slot": "c6_lab_marble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "실험실 깨진 대리석 ↔ 독 웅덩이 (보충)",
+   "prompt": [
+    "cracked pale grey marble floor with white lime stains, muted desaturated sepia and ash grey tones",
+    "dull olive green poison puddle with tiny glass shards, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/fl_c6_lab_marble_s7681",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c6_steam_plate_s4893",
+   "type": "tileset",
+   "zone": "steam",
+   "slot": "c6_steam_plate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "증기 회랑 철판 바닥 ↔ 증기 배수 격자 (보충)",
+   "prompt": [
+    "riveted grey iron plate floor with rust spots, muted desaturated sepia and ash grey tones",
+    "rusty iron floor grates with brass rims, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/fl_c6_steam_plate_s4893",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_junk_mercury_s3575",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_mercury",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "기름땅 ↔ 수은 웅덩이 (다시) ← c6_junk_mercury",
+   "prompt": [
+    "greasy umber brown soil with grey ash, muted desaturated sepia and ash grey tones",
+    "pool of shiny liquid mercury like molten silver, bright white highlights and grey reflections, metallic chrome, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/rd_c6_junk_mercury_s3575",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_junk_mercury_s3576",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_mercury",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "기름땅 ↔ 수은 웅덩이 (다시) ← c6_junk_mercury",
+   "prompt": [
+    "greasy umber brown soil with grey ash, muted desaturated sepia and ash grey tones",
+    "pool of shiny liquid mercury like molten silver, bright white highlights and grey reflections, metallic chrome, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/rd_c6_junk_mercury_s3576",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_junk_oil_s1660",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_oil",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "기름땅 ↔ 녹슨 톱니 (다시) ← c6_junk_oil",
+   "prompt": [
+    "greasy umber brown soil with grey ash, muted desaturated sepia and ash grey tones",
+    "many big rusty orange gear wheels and hex nuts half buried in umber soil, each gear clearly visible with teeth, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_junk_oil_s1660",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_junk_oil_s1661",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_oil",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "기름땅 ↔ 녹슨 톱니 (다시) ← c6_junk_oil",
+   "prompt": [
+    "greasy umber brown soil with grey ash, muted desaturated sepia and ash grey tones",
+    "many big rusty orange gear wheels and hex nuts half buried in umber soil, each gear clearly visible with teeth, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_junk_oil_s1661",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_junk_oil_s1662",
+   "type": "tileset",
+   "zone": "junk",
+   "slot": "c6_junk_oil",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "기름땅 ↔ 녹슨 톱니 (다시) ← c6_junk_oil",
+   "prompt": [
+    "greasy umber brown soil with grey ash, muted desaturated sepia and ash grey tones",
+    "many big rusty orange gear wheels and hex nuts half buried in umber soil, each gear clearly visible with teeth, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_junk_oil_s1662",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_refinery_tile_s2562",
+   "type": "tileset",
+   "zone": "refinery",
+   "slot": "c6_refinery_tile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "석회 타일 ↔ 수은 저수조 (다시) ← c6_refinery_tile",
+   "prompt": [
+    "pale cream ceramic floor tiles with white limescale, muted desaturated sepia and ash grey tones",
+    "pool of shiny liquid mercury like molten silver, bright white highlights, metallic chrome, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/rd_c6_refinery_tile_s2562",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_refinery_tile_s2563",
+   "type": "tileset",
+   "zone": "refinery",
+   "slot": "c6_refinery_tile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "석회 타일 ↔ 수은 저수조 (다시) ← c6_refinery_tile",
+   "prompt": [
+    "pale cream ceramic floor tiles with white limescale, muted desaturated sepia and ash grey tones",
+    "pool of shiny liquid mercury like molten silver, bright white highlights, metallic chrome, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch6/tiles/rd_c6_refinery_tile_s2563",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_tower_gears_s1352",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "나무 마루 ↔ 황동 톱니 바닥 (다시) ← c6_tower_gears",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "floor made of big flat bronze gear wheels with clear square teeth and round holes, clockwork mechanism seen from above, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_tower_gears_s1352",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_tower_gears_s1353",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "나무 마루 ↔ 황동 톱니 바닥 (다시) ← c6_tower_gears",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "floor made of big flat bronze gear wheels with clear square teeth and round holes, clockwork mechanism seen from above, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_tower_gears_s1353",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c6_tower_gears_s1354",
+   "type": "tileset",
+   "zone": "tower2",
+   "slot": "c6_tower_gears",
+   "verdict": "soso",
+   "review": "보통 톱니 안 보임",
+   "source": "redo",
+   "item": "나무 마루 ↔ 황동 톱니 바닥 (다시) ← c6_tower_gears",
+   "prompt": [
+    "worn greyish brown wooden plank floor, muted desaturated sepia and ash grey tones",
+    "floor made of big flat bronze gear wheels with clear square teeth and round holes, clockwork mechanism seen from above, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch6/tiles/rd_c6_tower_gears_s1354",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}
