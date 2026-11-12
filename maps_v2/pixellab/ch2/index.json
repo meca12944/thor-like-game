@@ -1,0 +1,2632 @@
+{
+ "chapter": 2,
+ "zones": [
+  {
+   "id": "road_s",
+   "name": "철혈의 가도 · 외곽",
+   "kind": "field"
+  },
+  {
+   "id": "road_n",
+   "name": "철혈의 가도 · 바리케이드",
+   "kind": "field"
+  },
+  {
+   "id": "gate",
+   "name": "내성문 앞 광장",
+   "kind": "boss"
+  },
+  {
+   "id": "armory",
+   "name": "숨겨진 무기고",
+   "kind": "hidden"
+  },
+  {
+   "id": "forge",
+   "name": "무쇠 공방",
+   "kind": "town"
+  },
+  {
+   "id": "sw_entry",
+   "name": "하수도 · 첫 수문",
+   "kind": "dungeon"
+  },
+  {
+   "id": "sw_slum",
+   "name": "하수도 · 배수관 판자촌",
+   "kind": "town"
+  },
+  {
+   "id": "sw_mid",
+   "name": "하수도 · 중간 통로와 중앙 저수조",
+   "kind": "dungeon"
+  },
+  {
+   "id": "sw_dead",
+   "name": "하수도 · 막다른 배수로",
+   "kind": "dungeon"
+  },
+  {
+   "id": "sw_deep",
+   "name": "하수도 · 맹독 폐수 최심부",
+   "kind": "dungeon"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c2_forge_ext_a",
+   "type": "building",
+   "zone": "forge",
+   "slot": "c2_forge_ext",
+   "verdict": "ok",
+   "review": "OK: 펠트 대장간과 같은 화풍(모양도 거의 같음)",
+   "source": "orig",
+   "item": "무쇠 공방 외관 (펠트 대장간 변형)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: large soot-blackened stone and iron blacksmith workshop with a tall brick chimney, open forge front with anvils, iron plates on the roof,",
+   "file": "ch2/buildings/c2_forge_ext_a.png",
+   "size": [
+    352,
+    296
+   ],
+   "bbox": [
+    0,
+    0,
+    352,
+    296
+   ]
+  },
+  {
+   "id": "c2_forge_ext_b",
+   "type": "building",
+   "zone": "forge",
+   "slot": "c2_forge_ext",
+   "verdict": "ok",
+   "review": "OK: 같음",
+   "source": "orig",
+   "item": "무쇠 공방 외관 (펠트 대장간 변형) 2",
+   "prompt": "building, front wall and door facing the viewer, roof visible: large soot-blackened stone and iron blacksmith workshop with a tall brick chimney, open forge front with anvils, iron plates on the roof,",
+   "file": "ch2/buildings/c2_forge_ext_b.png",
+   "size": [
+    352,
+    296
+   ],
+   "bbox": [
+    0,
+    0,
+    352,
+    296
+   ]
+  },
+  {
+   "id": "c2_shanty_a",
+   "type": "building",
+   "zone": "sw_slum",
+   "slot": "c2_shanty",
+   "verdict": "soso",
+   "review": "보통: 펠트 집 그대로(판자촌 느낌 약함)",
+   "source": "orig",
+   "item": "배수관 판자집 (펠트 집 변형)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: poor shanty of rotten planks and rusty scrap iron sheets, patched roof, a rusty drain pipe running under it, ink outlines and soft painte",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/buildings/c2_shanty_a.png",
+   "size": [
+    320,
+    288
+   ],
+   "bbox": [
+    0,
+    0,
+    320,
+    288
+   ]
+  },
+  {
+   "id": "c2_shanty_b",
+   "type": "building",
+   "zone": "sw_slum",
+   "slot": "c2_shanty",
+   "verdict": "soso",
+   "review": "보통: 같음",
+   "source": "orig",
+   "item": "배수관 판자집 (펠트 집 변형) 2",
+   "prompt": "building, front wall and door facing the viewer, roof visible: tiny shack of patched planks and scrap iron sheets with a crooked stovepipe, ink outlines and soft painted shading, seen from slightly ab",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/buildings/c2_shanty_b.png",
+   "size": [
+    256,
+    244
+   ],
+   "bbox": [
+    0,
+    0,
+    256,
+    244
+   ]
+  },
+  {
+   "id": "fl_t02_building_ironforge_s97",
+   "type": "building",
+   "zone": "forge",
+   "slot": "t02_building_ironforge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "ch2 iron workshop building (big map-object test) (보충)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: large soot-blackened stone and iron blacksmith workshop with a tall brick chimney, open forge front with anvils, a wooden crane lift on t",
+   "file": "ch2/buildings/fl_t02_building_ironforge_s97.png",
+   "size": [
+    352,
+    320
+   ],
+   "bbox": [
+    0,
+    0,
+    352,
+    320
+   ]
+  },
+  {
+   "id": "t02_building_ironforge",
+   "type": "building",
+   "zone": "forge",
+   "slot": "t02_building_ironforge",
+   "verdict": "ok",
+   "review": "OK: 큰 크기라 단색 배경 → 키잉함",
+   "source": "test",
+   "item": "ch2 iron workshop building (big map-object test)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: large soot-blackened stone and iron blacksmith workshop with a tall brick chimney, open forge front with anvils, a wooden crane lift on t",
+   "file": "ch2/buildings/t02_building_ironforge.png",
+   "size": [
+    352,
+    320
+   ],
+   "bbox": [
+    0,
+    0,
+    352,
+    320
+   ]
+  },
+  {
+   "id": "t02b_building_ironforge_feltinit",
+   "type": "building",
+   "zone": "forge",
+   "slot": "t02b_building_ironforge_feltinit",
+   "verdict": "ok",
+   "review": "OK: 펠트5 대장간을 init → 펠트와 가장 비슷",
+   "source": "test",
+   "item": "ch2 iron workshop with felt5 forge as init_image (style-match test)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: soot-blackened stone blacksmith workshop with a dark slate roof, a tall brick chimney, open forge front with an anvil, rusty iron plates,",
+   "file": "ch2/buildings/t02b_building_ironforge_feltinit.png",
+   "size": [
+    352,
+    296
+   ],
+   "bbox": [
+    0,
+    0,
+    352,
+    296
+   ]
+  },
+  {
+   "id": "t11_feltinit_shanty",
+   "type": "building",
+   "zone": "sw_slum",
+   "slot": "t11_feltinit_shanty",
+   "verdict": "ok",
+   "review": "OK: 펠트 집을 거의 그대로 따라감",
+   "source": "test",
+   "item": "ch2 배수관 판자집 (펠트 h_tool 을 init 으로, 화풍 맞추기)",
+   "prompt": "building, front wall and door facing the viewer, roof visible: poor shanty house of rotten planks and scrap iron sheets built on top of a big rusty sewer drain pipe, patched roof, ink outlines and sof",
+   "file": "ch2/buildings/t11_feltinit_shanty.png",
+   "size": [
+    320,
+    288
+   ],
+   "bbox": [
+    0,
+    0,
+    320,
+    288
+   ]
+  },
+  {
+   "id": "t11_feltinit_shanty_str120",
+   "type": "building",
+   "zone": "sw_slum",
+   "slot": "t11_feltinit_shanty_str120",
+   "verdict": "ok",
+   "review": "OK: 세기 120도 모양은 펠트 집 그대로",
+   "source": "test",
+   "item": "ch2 배수관 판자집 (펠트 h_tool 을 init 으로, 화풍 맞추기) — init 세기 120",
+   "prompt": "building, front wall and door facing the viewer, roof visible: poor shanty house of rotten planks and scrap iron sheets built on top of a big rusty sewer drain pipe, patched roof, ink outlines and sof",
+   "file": "ch2/buildings/t11_feltinit_shanty_str120.png",
+   "size": [
+    320,
+    288
+   ],
+   "bbox": [
+    0,
+    0,
+    320,
+    288
+   ]
+  },
+  {
+   "id": "c2_decal_road",
+   "type": "decal",
+   "zone": "road_s",
+   "slot": "c2_decal_road",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "가도 바닥 장식 16장",
+   "prompt": "1). cracked cobblestone with grey ash 2). rusty broken armor plate on stone 3). dented helmet on stone 4). broken spear shaft on stone 5). scattered ash and pebbles 6). dried dark stain on stone 7). s",
+   "file": "ch2/decals/c2_decal_road",
+   "tiles": 16
+  },
+  {
+   "id": "c2_decal_sewer",
+   "type": "decal",
+   "zone": "sw_entry",
+   "slot": "c2_decal_sewer",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 바닥 장식 16장",
+   "prompt": "1). rusty round iron drain grate 2). white lime crust on stone 3). small brown sewage puddle 4). green slime patch 5). small blue mercury drops 6). cracked wet stone 7). rat-chewed rags 8). rusty pipe",
+   "file": "ch2/decals/c2_decal_sewer",
+   "tiles": 16
+  },
+  {
+   "id": "c2_decal_slum_forge",
+   "type": "decal",
+   "zone": "forge",
+   "slot": "c2_decal_slum_forge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "판자촌·공방 바닥 장식 16장",
+   "prompt": "1). broken wooden plank on stone 2). rusty nails and iron scraps 3). coal lumps on stone 4). iron filings and soot 5). small sludge puddle on planks 6). torn rag 7). rat-chewed bone 8). cracked soot-s",
+   "file": "ch2/decals/c2_decal_slum_forge",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch2",
+   "type": "decal",
+   "zone": "road_s",
+   "slot": "fx_decal_ch2",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수도·가도 바닥 장식 16장 (보충)",
+   "prompt": "1). murky olive puddle 2). rusty grate piece 3). broken arrow 4). dented helmet 5). wet moss 6). rat bones 7). cracked cobblestone 8). rope coil",
+   "file": "ch2/decals/fx_decal_ch2",
+   "tiles": 16
+  },
+  {
+   "id": "c2_kit_rampart",
+   "type": "kit",
+   "zone": "gate",
+   "slot": "c2_kit_rampart",
+   "verdict": "ok",
+   "review": "OK: 건물 키트 80조각",
+   "source": "orig",
+   "item": "성곽·초소 건물 키트",
+   "prompt": "royal castle rampart guard post: grey stone brick walls with flagstone floor",
+   "file": "ch2/kits/c2_kit_rampart",
+   "tiles": 80
+  },
+  {
+   "id": "c2_kit_sewer",
+   "type": "kit",
+   "zone": "sw_entry",
+   "slot": "c2_kit_sewer",
+   "verdict": "ok",
+   "review": "OK: 건물 키트 80조각",
+   "source": "orig",
+   "item": "하수도 터널 건물 키트",
+   "prompt": "old sewer tunnel: lime-crusted brick walls with wet stone floor",
+   "file": "ch2/kits/c2_kit_sewer",
+   "tiles": 80
+  },
+  {
+   "id": "c2_kit_slum",
+   "type": "kit",
+   "zone": "sw_slum",
+   "slot": "c2_kit_slum",
+   "verdict": "ok",
+   "review": "OK: 건물 키트 80조각",
+   "source": "orig",
+   "item": "배수관 판자촌 건물 키트",
+   "prompt": "shanty houses: patched plank walls with plank floor",
+   "file": "ch2/kits/c2_kit_slum",
+   "tiles": 80
+  },
+  {
+   "id": "t07_tilespro_building_ch2",
+   "type": "kit",
+   "zone": "gate",
+   "slot": "t07_tilespro_building_ch2",
+   "verdict": "ok",
+   "review": "OK: 건물 키트 80조각(벽·문·기둥·계단·지붕)",
+   "source": "test",
+   "item": "ch2 fortress building kit (create-tiles-pro building)",
+   "prompt": "soot-blackened fortress interior: stone brick walls with ash cobblestone floor",
+   "file": "ch2/kits/t07_tilespro_building_ch2",
+   "tiles": 80
+  },
+  {
+   "id": "c2_barricade_r2_s43",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_barricade",
+   "verdict": "soso",
+   "review": "보통: 말뚝 상자",
+   "source": "orig",
+   "item": "바리케이드 (다시)",
+   "prompt": "big street barricade blocking a road: broken wooden carts, sharpened wooden stakes, rusty spears and dented shields piled high in one heap, filling the frame, seen from slightly above, dark fantasy ru",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/props/c2_barricade_r2_s43.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    20,
+    29,
+    191,
+    148
+   ]
+  },
+  {
+   "id": "c2_barricade_s19",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_barricade",
+   "verdict": "soso",
+   "review": "보통: 말뚝 울타리처럼 보임",
+   "source": "orig",
+   "item": "바리케이드",
+   "prompt": "big street barricade blocking a road: broken wooden carts, sharpened wooden stakes, rusty spears and dented shields piled high, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/props/c2_barricade_s19.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    8,
+    35,
+    188,
+    140
+   ]
+  },
+  {
+   "id": "c2_barricade_s7",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_barricade",
+   "verdict": "soso",
+   "review": "보통: 땅판이 붙음",
+   "source": "orig",
+   "item": "바리케이드",
+   "prompt": "big street barricade blocking a road: broken wooden carts, sharpened wooden stakes, rusty spears and dented shields piled high, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/props/c2_barricade_s7.png",
+   "size": [
+    200,
+    160
+   ],
+   "bbox": [
+    24,
+    25,
+    177,
+    131
+   ]
+  },
+  {
+   "id": "c2_bone_pile_s19",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_bone_pile",
+   "verdict": "ok",
+   "review": "OK: 해골 더미(무거운 느낌)",
+   "source": "orig",
+   "item": "백골 더미",
+   "prompt": "heap of many old grey bones and skulls with rusty helmet pieces, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch2/props/c2_bone_pile_s19.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    18,
+    20,
+    137,
+    97
+   ]
+  },
+  {
+   "id": "c2_bone_pile_s31",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_bone_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "백골 더미",
+   "prompt": "heap of many old grey bones and skulls with rusty helmet pieces, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch2/props/c2_bone_pile_s31.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    15,
+    18,
+    129,
+    92
+   ]
+  },
+  {
+   "id": "c2_corpses_s19",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_corpses",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "전사자 시체",
+   "prompt": "skeletal remains of a fallen knight in rusty armor lying on his side on cobblestones, a tag chain at the neck, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch2/props/c2_corpses_s19.png",
+   "size": [
+    128,
+    80
+   ],
+   "bbox": [
+    20,
+    32,
+    123,
+    71
+   ]
+  },
+  {
+   "id": "c2_corpses_s7",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_corpses",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "전사자 시체",
+   "prompt": "skeletal remains of a fallen knight in rusty armor lying on his side on cobblestones, a tag chain at the neck, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch2/props/c2_corpses_s7.png",
+   "size": [
+    128,
+    80
+   ],
+   "bbox": [
+    12,
+    16,
+    108,
+    78
+   ]
+  },
+  {
+   "id": "c2_couple_remains_s7",
+   "type": "prop",
+   "zone": "sw_dead",
+   "slot": "c2_couple_remains",
+   "verdict": "soso",
+   "review": "보통: 서 있음",
+   "source": "orig",
+   "item": "부부 유골",
+   "prompt": "two skeletons lying side by side holding hands in a dead-end drain, tattered clothes, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/props/c2_couple_remains_s7.png",
+   "size": [
+    160,
+    96
+   ],
+   "bbox": [
+    33,
+    23,
+    121,
+    79
+   ]
+  },
+  {
+   "id": "c2_f_anvil_s19",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_f_anvil",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "모루",
+   "prompt": "heavy iron anvil on a thick wooden stump with hammers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns an",
+   "file": "ch2/props/c2_f_anvil_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    27,
+    42,
+    83,
+    90
+   ]
+  },
+  {
+   "id": "c2_f_armor_scraps_r2_s41",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_armor_scraps",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "녹슨 갑옷 조각 (다시)",
+   "prompt": "pile of metallic grey steel armor pieces: dented helmets, a breastplate and gauntlets with rust spots, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch2/props/c2_f_armor_scraps_r2_s41.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    0,
+    11,
+    111,
+    76
+   ]
+  },
+  {
+   "id": "c2_f_banner_s19",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "찢어진 깃대",
+   "prompt": "tall wooden banner pole with a torn faded red royal banner, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch2/props/c2_f_banner_s19.png",
+   "size": [
+    80,
+    176
+   ],
+   "bbox": [
+    7,
+    4,
+    71,
+    170
+   ]
+  },
+  {
+   "id": "c2_f_banner_s7",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "찢어진 깃대",
+   "prompt": "tall wooden banner pole with a torn faded red royal banner, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch2/props/c2_f_banner_s7.png",
+   "size": [
+    80,
+    176
+   ],
+   "bbox": [
+    11,
+    8,
+    69,
+    172
+   ]
+  },
+  {
+   "id": "c2_f_battlement_r2_s41",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_f_battlement",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "무너진 흉벽 조각 (다시)",
+   "prompt": "broken grey stone castle battlement wall segment with two square merlons, cracked, rubble at its base, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch2/props/c2_f_battlement_r2_s41.png",
+   "size": [
+    160,
+    112
+   ],
+   "bbox": [
+    3,
+    8,
+    157,
+    109
+   ]
+  },
+  {
+   "id": "c2_f_crates_s19",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_f_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "녹슨 상자 더미",
+   "prompt": "stack of old wooden crates with rusty iron bands, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash",
+   "file": "ch2/props/c2_f_crates_s19.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    20,
+    12,
+    100,
+    102
+   ]
+  },
+  {
+   "id": "c2_f_ladder_s19",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_ladder",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "판자촌 사다리",
+   "prompt": "tall crooked wooden ladder leaning upright, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch2/props/c2_f_ladder_s19.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    19,
+    17,
+    44,
+    159
+   ]
+  },
+  {
+   "id": "c2_f_ladder_s7",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_ladder",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "판자촌 사다리",
+   "prompt": "tall crooked wooden ladder leaning upright, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch2/props/c2_f_ladder_s7.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    23,
+    0,
+    39,
+    170
+   ]
+  },
+  {
+   "id": "c2_f_pipe_outlet_s19",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_f_pipe_outlet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 배수관 출구",
+   "prompt": "large rusty round sewer drain pipe sticking out of a brick wall with sludge dripping, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch2/props/c2_f_pipe_outlet_s19.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    21,
+    15,
+    123,
+    118
+   ]
+  },
+  {
+   "id": "c2_f_pipe_outlet_s7",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_f_pipe_outlet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 배수관 출구",
+   "prompt": "large rusty round sewer drain pipe sticking out of a brick wall with sludge dripping, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch2/props/c2_f_pipe_outlet_s7.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    25,
+    1,
+    136,
+    124
+   ]
+  },
+  {
+   "id": "c2_f_quench_tub_s19",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_f_quench_tub",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "담금질 통",
+   "prompt": "wooden quenching tub of dark water with iron tongs, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch2/props/c2_f_quench_tub_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    22,
+    14,
+    93,
+    82
+   ]
+  },
+  {
+   "id": "c2_f_quench_tub_s7",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_f_quench_tub",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "담금질 통",
+   "prompt": "wooden quenching tub of dark water with iron tongs, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch2/props/c2_f_quench_tub_s7.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    25,
+    35,
+    87,
+    88
+   ]
+  },
+  {
+   "id": "c2_f_sacks_s19",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_sacks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "자루 더미",
+   "prompt": "pile of dirty patched burlap sacks, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch2/props/c2_f_sacks_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    2,
+    23,
+    110,
+    91
+   ]
+  },
+  {
+   "id": "c2_f_sacks_s7",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_sacks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "자루 더미",
+   "prompt": "pile of dirty patched burlap sacks, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch2/props/c2_f_sacks_s7.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    12,
+    21,
+    100,
+    86
+   ]
+  },
+  {
+   "id": "c2_f_sewage_barrel_r2_s41",
+   "type": "prop",
+   "zone": "sw_mid",
+   "slot": "c2_f_sewage_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "오물 통 (다시)",
+   "prompt": "old light brown wooden barrel with iron hoops, brown muck spilling over the top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch2/props/c2_f_sewage_barrel_r2_s41.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    27,
+    32,
+    77,
+    88
+   ]
+  },
+  {
+   "id": "c2_f_spear_rack_s7",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_spear_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 창 걸이",
+   "prompt": "broken wooden weapon rack with rusty spears and a fallen shield, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch2/props/c2_f_spear_rack_s7.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    12,
+    4,
+    115,
+    117
+   ]
+  },
+  {
+   "id": "c2_headless_knight_s7",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_headless_knight",
+   "verdict": "ok",
+   "review": "OK: 머리 없음",
+   "source": "orig",
+   "item": "목 잘린 거대 기사상 (검 꽂힘)",
+   "prompt": "huge stone statue of an armored knight whose head is broken off, headless, jagged stone neck stump, a greatsword stuck down into its chest, standing on a pedestal, filling the frame, seen from slightl",
+   "file": "ch2/props/c2_headless_knight_s7.png",
+   "size": [
+    160,
+    240
+   ],
+   "bbox": [
+    37,
+    39,
+    119,
+    217
+   ]
+  },
+  {
+   "id": "c2_sluice_gate_r2_s41",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_sluice_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 첫 수문 (다시)",
+   "prompt": "arched brick sewer tunnel entrance closed by a big rusty iron grid sluice gate, a large valve wheel on the brick wall beside it, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch2/props/c2_sluice_gate_r2_s41.png",
+   "size": [
+    200,
+    192
+   ],
+   "bbox": [
+    27,
+    14,
+    173,
+    162
+   ]
+  },
+  {
+   "id": "c2_sluice_gate_r2_s43",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_sluice_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 첫 수문 (다시)",
+   "prompt": "arched brick sewer tunnel entrance closed by a big rusty iron grid sluice gate, a large valve wheel on the brick wall beside it, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch2/props/c2_sluice_gate_r2_s43.png",
+   "size": [
+    200,
+    192
+   ],
+   "bbox": [
+    6,
+    24,
+    168,
+    169
+   ]
+  },
+  {
+   "id": "fl_c2_bone_pile_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_bone_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "백골 더미 (보충)",
+   "prompt": "heap of many old grey bones and skulls with rusty helmet pieces, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch2/props/fl_c2_bone_pile_s97.png",
+   "size": [
+    144,
+    112
+   ],
+   "bbox": [
+    9,
+    28,
+    138,
+    96
+   ]
+  },
+  {
+   "id": "fl_c2_corpses_s101",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_corpses",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "전사자 시체 (보충)",
+   "prompt": "skeletal remains of a fallen knight in rusty armor lying on his side on cobblestones, a tag chain at the neck, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch2/props/fl_c2_corpses_s101.png",
+   "size": [
+    128,
+    80
+   ],
+   "bbox": [
+    5,
+    31,
+    118,
+    71
+   ]
+  },
+  {
+   "id": "fl_c2_corpses_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_corpses",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "전사자 시체 (보충)",
+   "prompt": "skeletal remains of a fallen knight in rusty armor lying on his side on cobblestones, a tag chain at the neck, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch2/props/fl_c2_corpses_s97.png",
+   "size": [
+    128,
+    80
+   ],
+   "bbox": [
+    24,
+    32,
+    123,
+    77
+   ]
+  },
+  {
+   "id": "fl_c2_f_anvil_s101",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_f_anvil",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "모루 (보충)",
+   "prompt": "heavy iron anvil on a thick wooden stump with hammers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns an",
+   "file": "ch2/props/fl_c2_f_anvil_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    21,
+    45,
+    90,
+    89
+   ]
+  },
+  {
+   "id": "fl_c2_f_armor_scraps_r2_s101",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_armor_scraps",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "녹슨 갑옷 조각 (다시) (보충)",
+   "prompt": "pile of metallic grey steel armor pieces: dented helmets, a breastplate and gauntlets with rust spots, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch2/props/fl_c2_f_armor_scraps_r2_s101.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    1,
+    13,
+    112,
+    77
+   ]
+  },
+  {
+   "id": "fl_c2_f_armor_scraps_r2_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_armor_scraps",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "녹슨 갑옷 조각 (다시) (보충)",
+   "prompt": "pile of metallic grey steel armor pieces: dented helmets, a breastplate and gauntlets with rust spots, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal ",
+   "file": "ch2/props/fl_c2_f_armor_scraps_r2_s97.png",
+   "size": [
+    112,
+    80
+   ],
+   "bbox": [
+    2,
+    5,
+    110,
+    74
+   ]
+  },
+  {
+   "id": "fl_c2_f_banner_s101",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "찢어진 깃대 (보충)",
+   "prompt": "tall wooden banner pole with a torn faded red royal banner, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch2/props/fl_c2_f_banner_s101.png",
+   "size": [
+    80,
+    176
+   ],
+   "bbox": [
+    7,
+    10,
+    75,
+    169
+   ]
+  },
+  {
+   "id": "fl_c2_f_banner_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "찢어진 깃대 (보충)",
+   "prompt": "tall wooden banner pole with a torn faded red royal banner, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia brow",
+   "file": "ch2/props/fl_c2_f_banner_s97.png",
+   "size": [
+    80,
+    176
+   ],
+   "bbox": [
+    10,
+    2,
+    74,
+    172
+   ]
+  },
+  {
+   "id": "fl_c2_f_crates_s101",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_f_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "녹슨 상자 더미 (보충)",
+   "prompt": "stack of old wooden crates with rusty iron bands, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash",
+   "file": "ch2/props/fl_c2_f_crates_s101.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    15,
+    11,
+    96,
+    107
+   ]
+  },
+  {
+   "id": "fl_c2_f_ladder_s101",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_ladder",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "판자촌 사다리 (보충)",
+   "prompt": "tall crooked wooden ladder leaning upright, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys",
+   "file": "ch2/props/fl_c2_f_ladder_s101.png",
+   "size": [
+    64,
+    176
+   ],
+   "bbox": [
+    17,
+    3,
+    51,
+    162
+   ]
+  },
+  {
+   "id": "fl_c2_f_pipe_outlet_s101",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_f_pipe_outlet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 배수관 출구 (보충)",
+   "prompt": "large rusty round sewer drain pipe sticking out of a brick wall with sludge dripping, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch2/props/fl_c2_f_pipe_outlet_s101.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    30,
+    10,
+    113,
+    124
+   ]
+  },
+  {
+   "id": "fl_c2_f_pipe_outlet_s97",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_f_pipe_outlet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수 배수관 출구 (보충)",
+   "prompt": "large rusty round sewer drain pipe sticking out of a brick wall with sludge dripping, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch2/props/fl_c2_f_pipe_outlet_s97.png",
+   "size": [
+    144,
+    128
+   ],
+   "bbox": [
+    16,
+    10,
+    124,
+    122
+   ]
+  },
+  {
+   "id": "fl_c2_f_quench_tub_s101",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_f_quench_tub",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "담금질 통 (보충)",
+   "prompt": "wooden quenching tub of dark water with iron tongs, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch2/props/fl_c2_f_quench_tub_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    28,
+    38,
+    84,
+    85
+   ]
+  },
+  {
+   "id": "fl_c2_f_sacks_s101",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_sacks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "자루 더미 (보충)",
+   "prompt": "pile of dirty patched burlap sacks, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch2/props/fl_c2_f_sacks_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    20,
+    30,
+    105,
+    85
+   ]
+  },
+  {
+   "id": "fl_c2_f_sacks_s97",
+   "type": "prop",
+   "zone": "sw_slum",
+   "slot": "c2_f_sacks",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "자루 더미 (보충)",
+   "prompt": "pile of dirty patched burlap sacks, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatu",
+   "file": "ch2/props/fl_c2_f_sacks_s97.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    11,
+    32,
+    106,
+    86
+   ]
+  },
+  {
+   "id": "fl_c2_f_sewage_barrel_r2_s101",
+   "type": "prop",
+   "zone": "sw_mid",
+   "slot": "c2_f_sewage_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "오물 통 (다시) (보충)",
+   "prompt": "old light brown wooden barrel with iron hoops, brown muck spilling over the top, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch2/props/fl_c2_f_sewage_barrel_r2_s101.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    29,
+    46,
+    67,
+    98
+   ]
+  },
+  {
+   "id": "fl_c2_f_spear_rack_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_spear_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "부서진 창 걸이 (보충)",
+   "prompt": "broken wooden weapon rack with rusty spears and a fallen shield, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia",
+   "file": "ch2/props/fl_c2_f_spear_rack_s97.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    39,
+    25,
+    98,
+    118
+   ]
+  },
+  {
+   "id": "fl_c2_gear_crank_s101",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_gear_crank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성문 기어 손잡이 (보충)",
+   "prompt": "massive rusty iron gear wheel mechanism with a long crank handle on a stone base, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-sta",
+   "file": "ch2/props/fl_c2_gear_crank_s101.png",
+   "size": [
+    128,
+    160
+   ],
+   "bbox": [
+    25,
+    16,
+    104,
+    143
+   ]
+  },
+  {
+   "id": "fl_c2_gear_crank_s97",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_gear_crank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성문 기어 손잡이 (보충)",
+   "prompt": "massive rusty iron gear wheel mechanism with a long crank handle on a stone base, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-sta",
+   "file": "ch2/props/fl_c2_gear_crank_s97.png",
+   "size": [
+    128,
+    160
+   ],
+   "bbox": [
+    6,
+    14,
+    113,
+    149
+   ]
+  },
+  {
+   "id": "fl_c2_headless_knight_s101",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_headless_knight",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "목 잘린 거대 기사상 (검 꽂힘) (보충)",
+   "prompt": "huge stone statue of an armored knight whose head is broken off, headless, jagged stone neck stump, a greatsword stuck down into its chest, standing on a pedestal, filling the frame, seen from slightl",
+   "file": "ch2/props/fl_c2_headless_knight_s101.png",
+   "size": [
+    160,
+    240
+   ],
+   "bbox": [
+    28,
+    26,
+    134,
+    240
+   ]
+  },
+  {
+   "id": "fl_c2_headless_knight_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_headless_knight",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "목 잘린 거대 기사상 (검 꽂힘) (보충)",
+   "prompt": "huge stone statue of an armored knight whose head is broken off, headless, jagged stone neck stump, a greatsword stuck down into its chest, standing on a pedestal, filling the frame, seen from slightl",
+   "file": "ch2/props/fl_c2_headless_knight_s97.png",
+   "size": [
+    160,
+    240
+   ],
+   "bbox": [
+    30,
+    10,
+    132,
+    240
+   ]
+  },
+  {
+   "id": "fl_c2_inner_gate_s101",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_inner_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "내성문 (거대 성문) (보충)",
+   "prompt": "colossal closed double gate of rusted riveted iron plates set in a tall stone gatehouse arch, a big round gear socket for a crank handle beside it, filling the frame, seen from slightly above, dark fa",
+   "file": "ch2/props/fl_c2_inner_gate_s101.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    30,
+    10,
+    162,
+    183
+   ]
+  },
+  {
+   "id": "fl_c2_inner_gate_s97",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_inner_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "내성문 (거대 성문) (보충)",
+   "prompt": "colossal closed double gate of rusted riveted iron plates set in a tall stone gatehouse arch, a big round gear socket for a crank handle beside it, filling the frame, seen from slightly above, dark fa",
+   "file": "ch2/props/fl_c2_inner_gate_s97.png",
+   "size": [
+    192,
+    208
+   ],
+   "bbox": [
+    28,
+    10,
+    166,
+    183
+   ]
+  },
+  {
+   "id": "fl_c2_lift_s101",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_lift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "공방 리프트 승강기 (보충)",
+   "prompt": "wooden and iron cargo lift platform in a tall timber frame with ropes, pulleys and a crank, soot-stained, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch2/props/fl_c2_lift_s101.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    13,
+    0,
+    159,
+    208
+   ]
+  },
+  {
+   "id": "fl_c2_manhole_s101",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_manhole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "맨홀 입구 (보충)",
+   "prompt": "round open manhole in a cobblestone street with a rusty iron cover lying beside it and a ladder going down, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colo",
+   "file": "ch2/props/fl_c2_manhole_s101.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    21,
+    23,
+    94,
+    90
+   ]
+  },
+  {
+   "id": "fl_c2_sluice_gate_r2_s101",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_sluice_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수도 첫 수문 (다시) (보충)",
+   "prompt": "arched brick sewer tunnel entrance closed by a big rusty iron grid sluice gate, a large valve wheel on the brick wall beside it, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch2/props/fl_c2_sluice_gate_r2_s101.png",
+   "size": [
+    200,
+    192
+   ],
+   "bbox": [
+    31,
+    15,
+    169,
+    169
+   ]
+  },
+  {
+   "id": "fl_c2_sluice_gate_r2_s97",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_sluice_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수도 첫 수문 (다시) (보충)",
+   "prompt": "arched brick sewer tunnel entrance closed by a big rusty iron grid sluice gate, a large valve wheel on the brick wall beside it, filling the frame, seen from slightly above, dark fantasy ruined royal ",
+   "file": "ch2/props/fl_c2_sluice_gate_r2_s97.png",
+   "size": [
+    200,
+    192
+   ],
+   "bbox": [
+    27,
+    16,
+    173,
+    167
+   ]
+  },
+  {
+   "id": "fl_c2_watchpost_s101",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_watchpost",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "무너진 초소 (보충)",
+   "prompt": "small ruined stone guard post by a road, collapsed roof beams, broken wooden door, torn red banner, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch2/props/fl_c2_watchpost_s101.png",
+   "size": [
+    200,
+    192
+   ],
+   "bbox": [
+    31,
+    28,
+    158,
+    167
+   ]
+  },
+  {
+   "id": "fl_t03b_prop_headless_knight_s97",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "t03b_prop_headless_knight",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "ch2 headless knight statue redo (보충)",
+   "prompt": "stone statue of an armored knight whose head is broken off, headless, only a jagged broken stone neck stump above the shoulders, a broken greatsword stuck into the chest plate, cracked pedestal, seen ",
+   "file": "ch2/props/fl_t03b_prop_headless_knight_s97.png",
+   "size": [
+    160,
+    240
+   ],
+   "bbox": [
+    40,
+    9,
+    120,
+    230
+   ]
+  },
+  {
+   "id": "rd_c2_f_crates_s61_s61",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_f_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "나무 상자 (다시) ← c2_f_crates",
+   "prompt": "stack of three light pine wooden crates with rope, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted",
+   "file": "ch2/props/rd_c2_f_crates_s61_s61.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    27,
+    22,
+    100,
+    99
+   ]
+  },
+  {
+   "id": "rd_c2_f_crates_s67_s67",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_f_crates",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "나무 상자 (다시) ← c2_f_crates",
+   "prompt": "stack of three light pine wooden crates with rope, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted",
+   "file": "ch2/props/rd_c2_f_crates_s67_s67.png",
+   "size": [
+    128,
+    112
+   ],
+   "bbox": [
+    36,
+    35,
+    92,
+    100
+   ]
+  },
+  {
+   "id": "rd_c2_f_sewage_barrel_s61_s61",
+   "type": "prop",
+   "zone": "sw_mid",
+   "slot": "c2_f_sewage_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "오물 통 (다시) ← c2_f_sewage_barrel",
+   "prompt": "honey brown oak barrel with rusty hoops and a murky olive green drip, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, ",
+   "file": "ch2/props/rd_c2_f_sewage_barrel_s61_s61.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    17,
+    17,
+    80,
+    97
+   ]
+  },
+  {
+   "id": "rd_c2_f_sewage_barrel_s67_s67",
+   "type": "prop",
+   "zone": "sw_mid",
+   "slot": "c2_f_sewage_barrel",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "오물 통 (다시) ← c2_f_sewage_barrel",
+   "prompt": "honey brown oak barrel with rusty hoops and a murky olive green drip, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, ",
+   "file": "ch2/props/rd_c2_f_sewage_barrel_s67_s67.png",
+   "size": [
+    96,
+    112
+   ],
+   "bbox": [
+    17,
+    15,
+    79,
+    100
+   ]
+  },
+  {
+   "id": "rd_c2_f_spear_rack_s61_s61",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_spear_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "창 거치대 (다시) ← c2_f_spear_rack",
+   "prompt": "light pine wooden rack holding rusty spears upright, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch2/props/rd_c2_f_spear_rack_s61_s61.png",
+   "size": [
+    128,
+    144
+   ],
+   "bbox": [
+    25,
+    6,
+    103,
+    138
+   ]
+  },
+  {
+   "id": "rd_c2_f_spear_rack_s67_s67",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "c2_f_spear_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "창 거치대 (다시) ← c2_f_spear_rack",
+   "prompt": "light pine wooden rack holding rusty spears upright, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mut",
+   "file": "ch2/props/rd_c2_f_spear_rack_s67_s67.png",
+   "size": [
+    128,
+    144
+   ],
+   "bbox": [
+    39,
+    13,
+    119,
+    141
+   ]
+  },
+  {
+   "id": "rd_c2_f_weapon_rack_s61_s61",
+   "type": "prop",
+   "zone": "armory",
+   "slot": "c2_f_weapon_rack",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "무기 거치대 (다시) ← c2_f_weapon_rack",
+   "prompt": "light pine wooden weapon rack with swords, axes and a shield, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-sta",
+   "file": "ch2/props/rd_c2_f_weapon_rack_s61_s61.png",
+   "size": [
+    160,
+    144
+   ],
+   "bbox": [
+    4,
+    12,
+    147,
+    127
+   ]
+  },
+  {
+   "id": "rd_c2_gear_crank_s61_s61",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_gear_crank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "톱니 크랭크 (다시) ← c2_gear_crank",
+   "prompt": "big iron gear wheel crank mechanism with a wooden handle on a stone base, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wa",
+   "file": "ch2/props/rd_c2_gear_crank_s61_s61.png",
+   "size": [
+    144,
+    144
+   ],
+   "bbox": [
+    16,
+    8,
+    130,
+    137
+   ]
+  },
+  {
+   "id": "rd_c2_inner_gate_s61_s61",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_inner_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "내성 문 (다시) ← c2_inner_gate",
+   "prompt": "big grey stone gatehouse arch with a raised iron portcullis and wooden doors, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch2/props/rd_c2_inner_gate_s61_s61.png",
+   "size": [
+    224,
+    176
+   ],
+   "bbox": [
+    49,
+    16,
+    177,
+    156
+   ]
+  },
+  {
+   "id": "rd_c2_inner_gate_s67_s67",
+   "type": "prop",
+   "zone": "gate",
+   "slot": "c2_inner_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "내성 문 (다시) ← c2_inner_gate",
+   "prompt": "big grey stone gatehouse arch with a raised iron portcullis and wooden doors, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castl",
+   "file": "ch2/props/rd_c2_inner_gate_s67_s67.png",
+   "size": [
+    224,
+    176
+   ],
+   "bbox": [
+    64,
+    20,
+    160,
+    146
+   ]
+  },
+  {
+   "id": "rd_c2_lift_s61_s61",
+   "type": "prop",
+   "zone": "forge",
+   "slot": "c2_lift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "승강기 (다시) ← c2_lift",
+   "prompt": "square wooden lift platform with rope pulleys and iron corner posts, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, s",
+   "file": "ch2/props/rd_c2_lift_s61_s61.png",
+   "size": [
+    160,
+    160
+   ],
+   "bbox": [
+    13,
+    0,
+    147,
+    146
+   ]
+  },
+  {
+   "id": "rd_c2_manhole_s61_s61",
+   "type": "prop",
+   "zone": "sw_entry",
+   "slot": "c2_manhole",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "맨홀 (다시) ← c2_manhole",
+   "prompt": "round iron manhole cover with a cross pattern set in grey cobblestones, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall",
+   "file": "ch2/props/rd_c2_manhole_s61_s61.png",
+   "size": [
+    112,
+    112
+   ],
+   "bbox": [
+    17,
+    16,
+    96,
+    94
+   ]
+  },
+  {
+   "id": "rd_c2_watchpost_s61_s61",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "c2_watchpost",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "감시초소 (다시) ← c2_watchpost",
+   "prompt": "tall wooden watch tower post with a small roof and a ladder, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stai",
+   "file": "ch2/props/rd_c2_watchpost_s61_s61.png",
+   "size": [
+    160,
+    192
+   ],
+   "bbox": [
+    39,
+    12,
+    117,
+    181
+   ]
+  },
+  {
+   "id": "t01c_prop_barricade",
+   "type": "prop",
+   "zone": "road_n",
+   "slot": "t01c_prop_barricade",
+   "verdict": "soso",
+   "review": "보통: 작게 그려짐",
+   "source": "test",
+   "item": "ch2 barricade (다시 2)",
+   "prompt": "big street barricade blocking a road: overturned wooden carts, sharpened wooden stakes, rusty spears and dented shields piled high, filling the frame, seen from slightly above, dark fantasy ruined roy",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/props/t01c_prop_barricade.png",
+   "size": [
+    192,
+    128
+   ],
+   "bbox": [
+    20,
+    25,
+    173,
+    105
+   ]
+  },
+  {
+   "id": "t03b_prop_headless_knight",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "t03b_prop_headless_knight",
+   "verdict": "ok",
+   "review": "OK: 머리 없음(칼은 빠짐)",
+   "source": "test",
+   "item": "ch2 headless knight statue redo",
+   "prompt": "stone statue of an armored knight whose head is broken off, headless, only a jagged broken stone neck stump above the shoulders, a broken greatsword stuck into the chest plate, cracked pedestal, seen ",
+   "file": "ch2/props/t03b_prop_headless_knight.png",
+   "size": [
+    160,
+    240
+   ],
+   "bbox": [
+    37,
+    31,
+    130,
+    224
+   ]
+  },
+  {
+   "id": "t04_prop_bone_pile",
+   "type": "prop",
+   "zone": "road_s",
+   "slot": "t04_prop_bone_pile",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "test",
+   "item": "ch2 fallen soldiers bone pile (prop test)",
+   "prompt": "small pile of old grey bones, a skull and a rusty dented helmet with broken armor pieces, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted",
+   "file": "ch2/props/t04_prop_bone_pile.png",
+   "size": [
+    128,
+    80
+   ],
+   "bbox": [
+    37,
+    22,
+    118,
+    75
+   ]
+  },
+  {
+   "id": "c2_room_armory",
+   "type": "room",
+   "zone": "armory",
+   "slot": "c2_room_armory",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 48px 키트",
+   "source": "orig",
+   "item": "숨겨진 무기고",
+   "prompt": "A hidden old royal armory vault inside the castle wall: stone walls, rows of weapon racks and armor stands, dusty chests, muted sepia and ash grey",
+   "file": "ch2/rooms/c2_room_armory",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c2_room_forge",
+   "type": "room",
+   "zone": "forge",
+   "slot": "c2_room_forge",
+   "verdict": "ok",
+   "review": "OK: 화덕 붉은 불빛이 그림에 들어감",
+   "source": "orig",
+   "item": "무쇠 공방 안 (카일라 대장간)",
+   "prompt": "A soot-blackened blacksmith forge workshop inside a ruined royal city: a big brick furnace, anvils, quench tubs, racks of rusty weapons, coal heaps, stone floor, muted sepia and ash grey",
+   "file": "ch2/rooms/c2_room_forge",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c2_room_forge_lift",
+   "type": "room",
+   "zone": "forge",
+   "slot": "c2_room_forge_lift",
+   "verdict": "ok",
+   "review": "OK: 공방과 같은 벽·바닥(style_room 연결)",
+   "source": "orig",
+   "item": "무쇠 공방 리프트 방 (공방과 같은 건물, style_room 연결)",
+   "prompt": "its back room: the cargo lift shaft room with a wooden lift platform, ropes and pulleys, crates of iron ore",
+   "file": "ch2/rooms/c2_room_forge_lift",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c2_room_grey_shop",
+   "type": "room",
+   "zone": "sw_slum",
+   "slot": "c2_room_grey_shop",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 48px 키트",
+   "source": "orig",
+   "item": "판자촌 그레이 가게",
+   "prompt": "A cramped scavenger shop in a shanty built over a sewer: plank walls patched with scrap iron, shelves of junk, rat furs, tools, a counter, muted brown and grey",
+   "file": "ch2/rooms/c2_room_grey_shop",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "t09_room_ch2forge",
+   "type": "room",
+   "zone": "forge",
+   "slot": "t09_room_ch2forge",
+   "verdict": "ok",
+   "review": "OK: 방 1칸 + 키트, 조금 휑함",
+   "source": "test",
+   "item": "ch2 iron workshop interior (create-room 32)",
+   "prompt": "A soot-blackened blacksmith forge inside a ruined dark fantasy royal city: cold furnace, anvils, racks of rusty weapons, stone floor, muted sepia and ash grey",
+   "file": "ch2/rooms/t09_room_ch2forge",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c2_edge_rampart_s132",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c2_edge_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽 길 가장자리 (높은 벽 · 절벽형)",
+   "prompt": [
+    "dark cobblestone street far below the wall",
+    "grey stone flagstone rampart walkway on top of a high castle wall"
+   ],
+   "file": "ch2/tiles/c2_edge_rampart_s132",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c2_edge_sewer_s134",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_edge_sewer",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 배수로 가장자리 (절벽형)",
+   "prompt": [
+    "brown murky sewage channel water",
+    "old sewer stone walkway crusted with white lime"
+   ],
+   "file": "ch2/tiles/c2_edge_sewer_s134",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c2_forge_coal_r2",
+   "type": "tileset",
+   "zone": "forge",
+   "slot": "c2_forge_coal",
+   "verdict": "soso",
+   "review": "보통: 여전히 검게 나옴",
+   "source": "orig",
+   "item": "공방 돌바닥 ↔ 석탄 가루 (다시)",
+   "prompt": [
+    "soot-stained grey stone workshop floor",
+    "dark grey heaps of coal lumps and iron filings, visible lumps"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_forge_coal_r2",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_forge_coal_s121",
+   "type": "tileset",
+   "zone": "forge",
+   "slot": "c2_forge_coal",
+   "verdict": "soso",
+   "review": "보통: 석탄이 검은 구멍처럼 보임",
+   "source": "orig",
+   "item": "공방 그을린 돌바닥 ↔ 석탄 가루",
+   "prompt": [
+    "soot-blackened stone workshop floor",
+    "heaps of black coal dust and iron filings on the floor"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_forge_coal_s121",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_forge_coal_s122",
+   "type": "tileset",
+   "zone": "forge",
+   "slot": "c2_forge_coal",
+   "verdict": "soso",
+   "review": "보통: 석탄이 검은 구멍처럼 보임",
+   "source": "orig",
+   "item": "공방 그을린 돌바닥 ↔ 석탄 가루",
+   "prompt": [
+    "soot-blackened stone workshop floor",
+    "heaps of black coal dust and iron filings on the floor"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_forge_coal_s122",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_pro_road",
+   "type": "tileset",
+   "zone": "road_s",
+   "slot": "c2_pro_road",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "가도 돌 포장길 ↔ 잿빛 흙 (pro)",
+   "prompt": [
+    "dark ash-covered dirt with soot and pebbles",
+    "worn grey cobblestone royal road dusted with ash"
+   ],
+   "file": "ch2/tiles/c2_pro_road",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_pro_sewer",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_pro_sewer",
+   "verdict": "soso",
+   "review": "보통: 둑은 좋은데 통로가 밝은 베이지",
+   "source": "orig",
+   "item": "하수도 통로 ↔ 오물 배수로 (pro, 낮은 둑)",
+   "prompt": [
+    "dark brown murky sewage water with filth",
+    "old sewer stone walkway crusted white with lime"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_pro_sewer",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_rampart_flag_s105",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c2_rampart_flag",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽 위 돌판 길 ↔ 무너진 돌무더기",
+   "prompt": [
+    "large worn grey stone flagstones of a castle rampart walkway",
+    "collapsed grey stone rubble and broken battlement blocks"
+   ],
+   "file": "ch2/tiles/c2_rampart_flag_s105",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_rampart_flag_s106",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c2_rampart_flag",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽 위 돌판 길 ↔ 무너진 돌무더기",
+   "prompt": [
+    "large worn grey stone flagstones of a castle rampart walkway",
+    "collapsed grey stone rubble and broken battlement blocks"
+   ],
+   "file": "ch2/tiles/c2_rampart_flag_s106",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_road_cobble_s101",
+   "type": "tileset",
+   "zone": "road_s",
+   "slot": "c2_road_cobble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "가도 잿빛 흙 ↔ 돌 포장길",
+   "prompt": [
+    "dark ash-covered dirt with soot and pebbles",
+    "worn grey cobblestone road paving dusted with grey ash"
+   ],
+   "file": "ch2/tiles/c2_road_cobble_s101",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_road_cobble_s102",
+   "type": "tileset",
+   "zone": "road_s",
+   "slot": "c2_road_cobble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "가도 잿빛 흙 ↔ 돌 포장길",
+   "prompt": [
+    "dark ash-covered dirt with soot and pebbles",
+    "worn grey cobblestone road paving dusted with grey ash"
+   ],
+   "file": "ch2/tiles/c2_road_cobble_s102",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_road_scrap_r2",
+   "type": "tileset",
+   "zone": "road_n",
+   "slot": "c2_road_scrap",
+   "verdict": "soso",
+   "review": "보통: 청록빛, 조각 작음",
+   "source": "orig",
+   "item": "가도 돌길 ↔ 녹슨 갑옷 조각 (다시)",
+   "prompt": [
+    "worn grey cobblestone road dusted with ash",
+    "grey cobblestones littered with rusty brown armor plates and broken spear shafts"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_road_scrap_r2",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_road_scrap_s104",
+   "type": "tileset",
+   "zone": "road_n",
+   "slot": "c2_road_scrap",
+   "verdict": "soso",
+   "review": "보통: 조각이 점처럼 작음",
+   "source": "orig",
+   "item": "가도 돌길 ↔ 녹슨 갑옷 조각 깔린 땅",
+   "prompt": [
+    "worn grey cobblestone road dusted with ash",
+    "ground littered with rusty broken armor plates, dented helmets and broken spear shafts"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/c2_road_scrap_s104",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_sewer_mercury_s113",
+   "type": "tileset",
+   "zone": "sw_mid",
+   "slot": "c2_sewer_mercury",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 돌바닥 ↔ 푸른 수은 웅덩이",
+   "prompt": [
+    "shiny heavy liquid mercury pool, silvery blue metallic surface",
+    "old sewer stone floor crusted white with lime deposits"
+   ],
+   "file": "ch2/tiles/c2_sewer_mercury_s113",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_sewer_sludge_s111",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_sewer_sludge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 석회 돌바닥 ↔ 오물 배수로",
+   "prompt": [
+    "thick brown murky sewage water with floating filth",
+    "old sewer stone floor crusted white with lime deposits"
+   ],
+   "file": "ch2/tiles/c2_sewer_sludge_s111",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_sewer_sludge_s112",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_sewer_sludge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "하수도 석회 돌바닥 ↔ 오물 배수로",
+   "prompt": [
+    "thick brown murky sewage water with floating filth",
+    "old sewer stone floor crusted white with lime deposits"
+   ],
+   "file": "ch2/tiles/c2_sewer_sludge_s112",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_sewer_toxic_r2_s301",
+   "type": "tileset",
+   "zone": "sw_deep",
+   "slot": "c2_sewer_toxic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "최심부 돌바닥 ↔ 맹독 폐수 (다시, 탁한 올리브)",
+   "prompt": [
+    "murky dull olive green poisonous waste water, dark and desaturated",
+    "dark wet sewer stone floor with slime stains"
+   ],
+   "file": "ch2/tiles/c2_sewer_toxic_r2_s301",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_sewer_toxic_r2_s302",
+   "type": "tileset",
+   "zone": "sw_deep",
+   "slot": "c2_sewer_toxic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "최심부 돌바닥 ↔ 맹독 폐수 (다시, 탁한 올리브)",
+   "prompt": [
+    "murky dull olive green poisonous waste water, dark and desaturated",
+    "dark wet sewer stone floor with slime stains"
+   ],
+   "file": "ch2/tiles/c2_sewer_toxic_r2_s302",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_slum_plank_s117",
+   "type": "tileset",
+   "zone": "sw_slum",
+   "slot": "c2_slum_plank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "판자촌 판자 바닥 ↔ 오물 물",
+   "prompt": [
+    "thick brown murky sewage water",
+    "rotten wooden plank boardwalk deck nailed together"
+   ],
+   "file": "ch2/tiles/c2_slum_plank_s117",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c2_slum_plank_s118",
+   "type": "tileset",
+   "zone": "sw_slum",
+   "slot": "c2_slum_plank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "판자촌 판자 바닥 ↔ 오물 물",
+   "prompt": [
+    "thick brown murky sewage water",
+    "rotten wooden plank boardwalk deck nailed together"
+   ],
+   "file": "ch2/tiles/c2_slum_plank_s118",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c2_edge_sewer_s7452",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_edge_sewer",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수도 배수로 가장자리 (절벽형) (보충)",
+   "prompt": [
+    "brown murky sewage channel water",
+    "old sewer stone walkway crusted with white lime"
+   ],
+   "file": "ch2/tiles/fl_c2_edge_sewer_s7452",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "fl_c2_rampart_flag_s6778",
+   "type": "tileset",
+   "zone": "gate",
+   "slot": "c2_rampart_flag",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성벽 위 돌판 길 ↔ 무너진 돌무더기 (보충)",
+   "prompt": [
+    "large worn grey stone flagstones of a castle rampart walkway",
+    "collapsed grey stone rubble and broken battlement blocks"
+   ],
+   "file": "ch2/tiles/fl_c2_rampart_flag_s6778",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c2_sewer_sludge_s3233",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "c2_sewer_sludge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "하수도 석회 돌바닥 ↔ 오물 배수로 (보충)",
+   "prompt": [
+    "thick brown murky sewage water with floating filth",
+    "old sewer stone floor crusted white with lime deposits"
+   ],
+   "file": "ch2/tiles/fl_c2_sewer_sludge_s3233",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c2_sewer_toxic_r2_s5842",
+   "type": "tileset",
+   "zone": "sw_deep",
+   "slot": "c2_sewer_toxic",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "최심부 돌바닥 ↔ 맹독 폐수 (다시, 탁한 올리브) (보충)",
+   "prompt": [
+    "murky dull olive green poisonous waste water, dark and desaturated",
+    "dark wet sewer stone floor with slime stains"
+   ],
+   "file": "ch2/tiles/fl_c2_sewer_toxic_r2_s5842",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c2_slum_plank_s6113",
+   "type": "tileset",
+   "zone": "sw_slum",
+   "slot": "c2_slum_plank",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "판자촌 판자 바닥 ↔ 오물 물 (보충)",
+   "prompt": [
+    "thick brown murky sewage water",
+    "rotten wooden plank boardwalk deck nailed together"
+   ],
+   "file": "ch2/tiles/fl_c2_slum_plank_s6113",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c2_forge_coal_s3045",
+   "type": "tileset",
+   "zone": "forge",
+   "slot": "c2_forge_coal",
+   "verdict": "soso",
+   "review": "보통 숯 안 보임",
+   "source": "redo",
+   "item": "공방 돌바닥 ↔ 숯 (다시) ← c2_forge_coal",
+   "prompt": [
+    "grey stone workshop floor, muted desaturated sepia and ash grey tones",
+    "scattered grey charcoal lumps with lighter grey ash between them, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/rd_c2_forge_coal_s3045",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c2_forge_coal_s3046",
+   "type": "tileset",
+   "zone": "forge",
+   "slot": "c2_forge_coal",
+   "verdict": "soso",
+   "review": "보통 숯 안 보임",
+   "source": "redo",
+   "item": "공방 돌바닥 ↔ 숯 (다시) ← c2_forge_coal",
+   "prompt": [
+    "grey stone workshop floor, muted desaturated sepia and ash grey tones",
+    "scattered grey charcoal lumps with lighter grey ash between them, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/rd_c2_forge_coal_s3046",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c2_road_scrap_s1600",
+   "type": "tileset",
+   "zone": "road_n",
+   "slot": "c2_road_scrap",
+   "verdict": "soso",
+   "review": "보통",
+   "source": "redo",
+   "item": "돌길 ↔ 갑옷 조각 (다시) ← c2_road_scrap",
+   "prompt": [
+    "worn grey cobblestone road dusted with ash, muted desaturated sepia and ash grey tones",
+    "grey cobblestones littered with large rusty brown armor plates and dented helmets, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/rd_c2_road_scrap_s1600",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c2_road_scrap_s1601",
+   "type": "tileset",
+   "zone": "road_n",
+   "slot": "c2_road_scrap",
+   "verdict": "soso",
+   "review": "보통",
+   "source": "redo",
+   "item": "돌길 ↔ 갑옷 조각 (다시) ← c2_road_scrap",
+   "prompt": [
+    "worn grey cobblestone road dusted with ash, muted desaturated sepia and ash grey tones",
+    "grey cobblestones littered with large rusty brown armor plates and dented helmets, muted desaturated sepia and ash grey tones"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/rd_c2_road_scrap_s1601",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "t05_tileset_std_ch2road",
+   "type": "tileset",
+   "zone": "road_s",
+   "slot": "t05_tileset_std_ch2road",
+   "verdict": "soso",
+   "review": "보통: 돌길보다 벽돌처럼 보임",
+   "source": "test",
+   "item": "ch2 highway road tileset (standard 32px)",
+   "prompt": [
+    "dark ash-covered dirt with soot and pebbles",
+    "worn grey cobblestone highway dusted with ash, a few rusty armor scraps"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/t05_tileset_std_ch2road",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "t06_tileset_pro_ch2sewer",
+   "type": "tileset",
+   "zone": "sw_entry",
+   "slot": "t06_tileset_pro_ch2sewer",
+   "verdict": "soso",
+   "review": "보통: 둑은 좋은데 폐수가 풀처럼 보임",
+   "source": "test",
+   "item": "ch2 sewer tileset (pro 32px, raised walkway)",
+   "prompt": [
+    "murky toxic green sewage water",
+    "old sewer stone walkway crusted with white lime, damp and stained"
+   ],
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch2/tiles/t06_tileset_pro_ch2sewer",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

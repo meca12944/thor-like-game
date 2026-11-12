@@ -1,0 +1,2436 @@
+{
+ "chapter": 7,
+ "zones": [
+  {
+   "id": "rampart",
+   "name": "왕도 상층 성벽길",
+   "kind": "field"
+  },
+  {
+   "id": "forecourt",
+   "name": "황금 문 전정",
+   "kind": "dungeon"
+  },
+  {
+   "id": "sandfall",
+   "name": "모래 폭포 대계단",
+   "kind": "dungeon"
+  },
+  {
+   "id": "gallery",
+   "name": "대회랑",
+   "kind": "dungeon"
+  },
+  {
+   "id": "throne",
+   "name": "옥좌의 방",
+   "kind": "boss"
+  },
+  {
+   "id": "altar",
+   "name": "옥좌 뒤 제단",
+   "kind": "hidden"
+  },
+  {
+   "id": "sidegarden",
+   "name": "석화된 왕실 정원",
+   "kind": "field"
+  }
+ ],
+ "note": "PixelLab 배경 (11-11~12). file = maps_v2/pixellab/ 기준 경로. verdict ok/soso (soso = 그 자리에 OK가 없어서 넣음, flag 참고).",
+ "items": [
+  {
+   "id": "c7_decal_garden",
+   "type": "decal",
+   "zone": "sidegarden",
+   "slot": "c7_decal_garden",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "왕실 정원 바닥 장식 16장",
+   "prompt": "1). dead leaves 2). sand drift 3). broken stone urn piece 4). withered rose 5). cracked flagstone 6). dry grass tuft 7). pebbles 8). broken statue hand",
+   "file": "ch7/decals/c7_decal_garden",
+   "tiles": 16
+  },
+  {
+   "id": "c7_decal_palace",
+   "type": "decal",
+   "zone": "gallery",
+   "slot": "c7_decal_palace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "궁전 바닥 장식 16장",
+   "prompt": "1). white limestone drip 2). gold leaf flakes 3). broken marble piece 4). ash dust 5). fallen crown jewel 6). torn crimson cloth 7). cracked marble 8). sand trickle",
+   "file": "ch7/decals/c7_decal_palace",
+   "tiles": 16
+  },
+  {
+   "id": "c7_decal_rampart",
+   "type": "decal",
+   "zone": "rampart",
+   "slot": "c7_decal_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽길 바닥 장식 16장",
+   "prompt": "1). pale ash sand drift 2). broken battlement stone 3). rusty arrowheads 4). torn royal banner scrap 5). cracked stone 6). pebbles 7). sand ripple 8). broken spear shaft",
+   "file": "ch7/decals/c7_decal_rampart",
+   "tiles": 16
+  },
+  {
+   "id": "fx_decal_ch7",
+   "type": "decal",
+   "zone": "rampart",
+   "slot": "fx_decal_ch7",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕성 바닥 장식 16장 (보충)",
+   "prompt": "1). gold leaf flakes 2). white limestone drip 3). pale sand ripple 4). broken crown piece 5). torn crimson cloth 6). marble chip 7). gold coin 8). cracked marble",
+   "file": "ch7/decals/fx_decal_ch7",
+   "tiles": 16
+  },
+  {
+   "id": "c7_kit_palace",
+   "type": "kit",
+   "zone": "gallery",
+   "slot": "c7_kit_palace",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "왕성 궁전 건물 키트",
+   "prompt": "royal palace interior: cream marble walls with gold trim and marble floor",
+   "file": "ch7/kits/c7_kit_palace",
+   "tiles": 80
+  },
+  {
+   "id": "c7_kit_rampart",
+   "type": "kit",
+   "zone": "rampart",
+   "slot": "c7_kit_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "왕성 성벽길 건물 키트",
+   "prompt": "royal castle rampart: grey stone battlement walls and stone walkway",
+   "file": "ch7/kits/c7_kit_rampart",
+   "tiles": 80
+  },
+  {
+   "id": "c7_broken_throne_r2_s41",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "orig",
+   "item": "부서진 옥좌 (다시)",
+   "prompt": "golden throne split down the middle by a big crack, the backrest snapped and the right armrest missing, gold pieces around it on a cracked marble dais, large and close up, filling the frame, seen from",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_broken_throne_r2_s41.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    18,
+    9,
+    158,
+    170
+   ]
+  },
+  {
+   "id": "c7_broken_throne_r2_s43",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "orig",
+   "item": "부서진 옥좌 (다시)",
+   "prompt": "golden throne split down the middle by a big crack, the backrest snapped and the right armrest missing, gold pieces around it on a cracked marble dais, large and close up, filling the frame, seen from",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_broken_throne_r2_s43.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    20,
+    8,
+    156,
+    170
+   ]
+  },
+  {
+   "id": "c7_broken_throne_s19",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "orig",
+   "item": "부서진 옥좌",
+   "prompt": "shattered golden throne broken in half on a cracked marble dais, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_broken_throne_s19.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    5,
+    6,
+    171,
+    169
+   ]
+  },
+  {
+   "id": "c7_broken_throne_s31",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "orig",
+   "item": "부서진 옥좌",
+   "prompt": "shattered golden throne broken in half on a cracked marble dais, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_broken_throne_s31.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    14,
+    11,
+    162,
+    158
+   ]
+  },
+  {
+   "id": "c7_broken_throne_s7",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "orig",
+   "item": "부서진 옥좌",
+   "prompt": "shattered golden throne broken in half on a cracked marble dais, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_broken_throne_s7.png",
+   "size": [
+    176,
+    176
+   ],
+   "bbox": [
+    4,
+    7,
+    172,
+    164
+   ]
+  },
+  {
+   "id": "c7_buried_fountain_r2_s43",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "orig",
+   "item": "모래에 묻힌 분수 (다시)",
+   "prompt": "top of a cream marble fountain sticking out of a big dune of pale grey sand, the basin half filled with sand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_buried_fountain_r2_s43.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    47,
+    18,
+    145,
+    130
+   ]
+  },
+  {
+   "id": "c7_buried_fountain_s19",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "orig",
+   "item": "모래에 묻힌 분수",
+   "prompt": "ornate marble fountain half buried in pale grey sand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mu",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_buried_fountain_s19.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    58,
+    20,
+    134,
+    138
+   ]
+  },
+  {
+   "id": "c7_buried_fountain_s31",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "orig",
+   "item": "모래에 묻힌 분수",
+   "prompt": "ornate marble fountain half buried in pale grey sand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mu",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_buried_fountain_s31.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    46,
+    28,
+    146,
+    145
+   ]
+  },
+  {
+   "id": "c7_buried_fountain_s7",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "orig",
+   "item": "모래에 묻힌 분수",
+   "prompt": "ornate marble fountain half buried in pale grey sand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, mu",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_buried_fountain_s7.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    28,
+    18,
+    165,
+    149
+   ]
+  },
+  {
+   "id": "c7_candelabra_s19",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 촛대 기둥",
+   "prompt": "tall golden floor candelabra with unlit white candles, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch7/props/c7_candelabra_s19.png",
+   "size": [
+    80,
+    192
+   ],
+   "bbox": [
+    15,
+    23,
+    66,
+    180
+   ]
+  },
+  {
+   "id": "c7_candelabra_s31",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 촛대 기둥",
+   "prompt": "tall golden floor candelabra with unlit white candles, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch7/props/c7_candelabra_s31.png",
+   "size": [
+    80,
+    192
+   ],
+   "bbox": [
+    13,
+    11,
+    63,
+    183
+   ]
+  },
+  {
+   "id": "c7_candelabra_s7",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 촛대 기둥",
+   "prompt": "tall golden floor candelabra with unlit white candles, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch7/props/c7_candelabra_s7.png",
+   "size": [
+    80,
+    192
+   ],
+   "bbox": [
+    17,
+    9,
+    62,
+    182
+   ]
+  },
+  {
+   "id": "c7_f_armor_stand_r2_s41",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_armor_stand",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "filler",
+   "item": "근위대 갑옷 거치대 (다시)",
+   "prompt": "tall empty gilded gold plate armor with a plumed helmet mounted on a wooden cross stand, bright gold, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_f_armor_stand_r2_s41.png",
+   "size": [
+    96,
+    160
+   ],
+   "bbox": [
+    20,
+    10,
+    76,
+    153
+   ]
+  },
+  {
+   "id": "c7_f_armor_stand_r2_s43",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_armor_stand",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "filler",
+   "item": "근위대 갑옷 거치대 (다시)",
+   "prompt": "tall empty gilded gold plate armor with a plumed helmet mounted on a wooden cross stand, bright gold, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/c7_f_armor_stand_r2_s43.png",
+   "size": [
+    96,
+    160
+   ],
+   "bbox": [
+    7,
+    8,
+    89,
+    154
+   ]
+  },
+  {
+   "id": "c7_f_bench_r2_s41",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_bench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 돌 벤치 (다시)",
+   "prompt": "big carved cream stone garden bench with curled armrests and pale sand on the seat, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ca",
+   "file": "ch7/props/c7_f_bench_r2_s41.png",
+   "size": [
+    176,
+    96
+   ],
+   "bbox": [
+    38,
+    21,
+    138,
+    80
+   ]
+  },
+  {
+   "id": "c7_f_bench_r2_s43",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_bench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 돌 벤치 (다시)",
+   "prompt": "big carved cream stone garden bench with curled armrests and pale sand on the seat, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ca",
+   "file": "ch7/props/c7_f_bench_r2_s43.png",
+   "size": [
+    176,
+    96
+   ],
+   "bbox": [
+    26,
+    23,
+    150,
+    81
+   ]
+  },
+  {
+   "id": "c7_f_chest_r2_s41",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕실 보물상자 (다시)",
+   "prompt": "ornate gold trimmed crimson red royal treasure chest, closed lid, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch7/props/c7_f_chest_r2_s41.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    31,
+    35,
+    82,
+    75
+   ]
+  },
+  {
+   "id": "c7_f_chest_s19",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕실 보물상자",
+   "prompt": "ornate gold and crimson royal treasure chest, closed, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch7/props/c7_f_chest_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    18,
+    23,
+    94,
+    78
+   ]
+  },
+  {
+   "id": "c7_f_crate_s19",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "군수품 상자",
+   "prompt": "stack of old wooden supply crates with royal crest, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch7/props/c7_f_crate_s19.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    11,
+    11,
+    100,
+    90
+   ]
+  },
+  {
+   "id": "c7_f_crate_s7",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "군수품 상자",
+   "prompt": "stack of old wooden supply crates with royal crest, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch7/props/c7_f_crate_s7.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    25,
+    23,
+    89,
+    85
+   ]
+  },
+  {
+   "id": "c7_f_hedge_r2_s43",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_hedge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "마른 정원수 (다시)",
+   "prompt": "one round trimmed garden bush with dry pale olive and tan leaves in a cream stone planter, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch7/props/c7_f_hedge_r2_s43.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    38,
+    27,
+    93,
+    116
+   ]
+  },
+  {
+   "id": "c7_f_lamp_s19",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성벽 등",
+   "prompt": "tall iron castle wall lamp post, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, de",
+   "file": "ch7/props/c7_f_lamp_s19.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    23,
+    12,
+    43,
+    139
+   ]
+  },
+  {
+   "id": "c7_f_lamp_s7",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성벽 등",
+   "prompt": "tall iron castle wall lamp post, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, de",
+   "file": "ch7/props/c7_f_lamp_s7.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    15,
+    4,
+    49,
+    136
+   ]
+  },
+  {
+   "id": "c7_f_painting_s19",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_painting",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕가 초상화",
+   "prompt": "large gilded frame portrait of a king in golden robes, faded, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch7/props/c7_f_painting_s19.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    19,
+    23,
+    93,
+    121
+   ]
+  },
+  {
+   "id": "c7_f_painting_s7",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_painting",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕가 초상화",
+   "prompt": "large gilded frame portrait of a king in golden robes, faded, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch7/props/c7_f_painting_s7.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    7,
+    8,
+    104,
+    129
+   ]
+  },
+  {
+   "id": "c7_f_rubble_s19",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_f_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "무너진 흉벽 돌",
+   "prompt": "pile of broken grey battlement stones with sand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch7/props/c7_f_rubble_s19.png",
+   "size": [
+    144,
+    96
+   ],
+   "bbox": [
+    19,
+    23,
+    125,
+    85
+   ]
+  },
+  {
+   "id": "c7_f_urn_s7",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_urn",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "돌 화병",
+   "prompt": "large cream stone garden urn with dead plants, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash gr",
+   "file": "ch7/props/c7_f_urn_s7.png",
+   "size": [
+    96,
+    128
+   ],
+   "bbox": [
+    21,
+    41,
+    72,
+    107
+   ]
+  },
+  {
+   "id": "c7_f_vase_s19",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_vase",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 꽃병",
+   "prompt": "tall gold vase with dried flowers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch7/props/c7_f_vase_s19.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    6,
+    2,
+    73,
+    107
+   ]
+  },
+  {
+   "id": "c7_f_vase_s7",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_vase",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 꽃병",
+   "prompt": "tall gold vase with dried flowers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch7/props/c7_f_vase_s7.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    7,
+    10,
+    74,
+    103
+   ]
+  },
+  {
+   "id": "c7_guard_statue_s19",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_guard_statue",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "근위대장 석상",
+   "prompt": "giant standing stone statue of a royal guard captain holding a greatsword point down, weathered grey stone, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "file": "ch7/props/c7_guard_statue_s19.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    27,
+    7,
+    106,
+    212
+   ]
+  },
+  {
+   "id": "c7_guard_statue_s31",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_guard_statue",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "근위대장 석상",
+   "prompt": "giant standing stone statue of a royal guard captain holding a greatsword point down, weathered grey stone, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "file": "ch7/props/c7_guard_statue_s31.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    11,
+    7,
+    118,
+    224
+   ]
+  },
+  {
+   "id": "c7_guard_statue_s7",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_guard_statue",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "근위대장 석상",
+   "prompt": "giant standing stone statue of a royal guard captain holding a greatsword point down, weathered grey stone, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "file": "ch7/props/c7_guard_statue_s7.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    19,
+    16,
+    126,
+    224
+   ]
+  },
+  {
+   "id": "c7_lime_pillar_s31",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_lime_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "석회 흘러내린 기둥",
+   "prompt": "tall cream marble column with white limestone drips running down, gold capital, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch7/props/c7_lime_pillar_s31.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    0,
+    4,
+    80,
+    224
+   ]
+  },
+  {
+   "id": "c7_lime_pillar_s7",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_lime_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "석회 흘러내린 기둥",
+   "prompt": "tall cream marble column with white limestone drips running down, gold capital, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch7/props/c7_lime_pillar_s7.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    15,
+    8,
+    66,
+    214
+   ]
+  },
+  {
+   "id": "c7_throne_s19",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 옥좌",
+   "prompt": "empty grand golden throne with crimson cushion on a marble dais, grey ash dust on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch7/props/c7_throne_s19.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    10,
+    11,
+    169,
+    196
+   ]
+  },
+  {
+   "id": "c7_throne_s31",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 옥좌",
+   "prompt": "empty grand golden throne with crimson cushion on a marble dais, grey ash dust on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch7/props/c7_throne_s31.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    8,
+    16,
+    168,
+    197
+   ]
+  },
+  {
+   "id": "c7_throne_s7",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 옥좌",
+   "prompt": "empty grand golden throne with crimson cushion on a marble dais, grey ash dust on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch7/props/c7_throne_s7.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    20,
+    21,
+    156,
+    195
+   ]
+  },
+  {
+   "id": "fl_c7_banner_s101",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕가 깃발 (보충)",
+   "prompt": "tall faded crimson royal banner with a gold crest on a gilded pole, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, so",
+   "file": "ch7/props/fl_c7_banner_s101.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    15,
+    17,
+    83,
+    134
+   ]
+  },
+  {
+   "id": "fl_c7_banner_s97",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕가 깃발 (보충)",
+   "prompt": "tall faded crimson royal banner with a gold crest on a gilded pole, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, so",
+   "file": "ch7/props/fl_c7_banner_s97.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    4,
+    17,
+    93,
+    156
+   ]
+  },
+  {
+   "id": "fl_c7_candelabra_s101",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 촛대 기둥 (보충)",
+   "prompt": "tall golden floor candelabra with unlit white candles, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch7/props/fl_c7_candelabra_s101.png",
+   "size": [
+    80,
+    192
+   ],
+   "bbox": [
+    17,
+    18,
+    66,
+    180
+   ]
+  },
+  {
+   "id": "fl_c7_candelabra_s97",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_candelabra",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 촛대 기둥 (보충)",
+   "prompt": "tall golden floor candelabra with unlit white candles, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, m",
+   "file": "ch7/props/fl_c7_candelabra_s97.png",
+   "size": [
+    80,
+    192
+   ],
+   "bbox": [
+    13,
+    17,
+    65,
+    177
+   ]
+  },
+  {
+   "id": "fl_c7_f_bench_r2_s101",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_bench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 돌 벤치 (다시) (보충)",
+   "prompt": "big carved cream stone garden bench with curled armrests and pale sand on the seat, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ca",
+   "file": "ch7/props/fl_c7_f_bench_r2_s101.png",
+   "size": [
+    176,
+    96
+   ],
+   "bbox": [
+    18,
+    37,
+    158,
+    79
+   ]
+  },
+  {
+   "id": "fl_c7_f_bench_r2_s97",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_bench",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "정원 돌 벤치 (다시) (보충)",
+   "prompt": "big carved cream stone garden bench with curled armrests and pale sand on the seat, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal ca",
+   "file": "ch7/props/fl_c7_f_bench_r2_s97.png",
+   "size": [
+    176,
+    96
+   ],
+   "bbox": [
+    28,
+    34,
+    147,
+    87
+   ]
+  },
+  {
+   "id": "fl_c7_f_chest_r2_s101",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕실 보물상자 (다시) (보충)",
+   "prompt": "ornate gold trimmed crimson red royal treasure chest, closed lid, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot",
+   "file": "ch7/props/fl_c7_f_chest_r2_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    11,
+    29,
+    98,
+    80
+   ]
+  },
+  {
+   "id": "fl_c7_f_chest_s101",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_chest",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕실 보물상자 (보충)",
+   "prompt": "ornate gold and crimson royal treasure chest, closed, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and",
+   "file": "ch7/props/fl_c7_f_chest_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    29,
+    39,
+    88,
+    85
+   ]
+  },
+  {
+   "id": "fl_c7_f_crate_s101",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_f_crate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "군수품 상자 (보충)",
+   "prompt": "stack of old wooden supply crates with royal crest, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and a",
+   "file": "ch7/props/fl_c7_f_crate_s101.png",
+   "size": [
+    112,
+    96
+   ],
+   "bbox": [
+    14,
+    27,
+    84,
+    86
+   ]
+  },
+  {
+   "id": "fl_c7_f_hedge_r2_s101",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_hedge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "마른 정원수 (다시) (보충)",
+   "prompt": "one round trimmed garden bush with dry pale olive and tan leaves in a cream stone planter, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch7/props/fl_c7_f_hedge_r2_s101.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    26,
+    10,
+    102,
+    118
+   ]
+  },
+  {
+   "id": "fl_c7_f_lamp_s101",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_f_lamp",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성벽 등 (보충)",
+   "prompt": "tall iron castle wall lamp post, unlit, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, de",
+   "file": "ch7/props/fl_c7_f_lamp_s101.png",
+   "size": [
+    64,
+    144
+   ],
+   "bbox": [
+    23,
+    3,
+    41,
+    138
+   ]
+  },
+  {
+   "id": "fl_c7_f_painting_s101",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_painting",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕가 초상화 (보충)",
+   "prompt": "large gilded frame portrait of a king in golden robes, faded, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia br",
+   "file": "ch7/props/fl_c7_f_painting_s101.png",
+   "size": [
+    112,
+    144
+   ],
+   "bbox": [
+    12,
+    12,
+    100,
+    124
+   ]
+  },
+  {
+   "id": "fl_c7_f_rubble_s97",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_f_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "무너진 흉벽 돌 (보충)",
+   "prompt": "pile of broken grey battlement stones with sand, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash ",
+   "file": "ch7/props/fl_c7_f_rubble_s97.png",
+   "size": [
+    144,
+    96
+   ],
+   "bbox": [
+    4,
+    7,
+    139,
+    82
+   ]
+  },
+  {
+   "id": "fl_c7_f_vase_s101",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_vase",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 꽃병 (보충)",
+   "prompt": "tall gold vase with dried flowers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch7/props/fl_c7_f_vase_s101.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    11,
+    4,
+    72,
+    107
+   ]
+  },
+  {
+   "id": "fl_c7_f_vase_s97",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_vase",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 꽃병 (보충)",
+   "prompt": "tall gold vase with dried flowers, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-stained, muted sepia browns and ash greys, desatur",
+   "file": "ch7/props/fl_c7_f_vase_s97.png",
+   "size": [
+    80,
+    112
+   ],
+   "bbox": [
+    7,
+    7,
+    71,
+    106
+   ]
+  },
+  {
+   "id": "fl_c7_golden_gate_s97",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_golden_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 문 (보충)",
+   "prompt": "giant golden double door with a royal crest keyhole in the middle, white limestone drips running down, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fant",
+   "file": "ch7/props/fl_c7_golden_gate_s97.png",
+   "size": [
+    240,
+    160
+   ],
+   "bbox": [
+    57,
+    12,
+    183,
+    142
+   ]
+  },
+  {
+   "id": "fl_c7_guard_statue_s101",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_guard_statue",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "근위대장 석상 (보충)",
+   "prompt": "giant standing stone statue of a royal guard captain holding a greatsword point down, weathered grey stone, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "file": "ch7/props/fl_c7_guard_statue_s101.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    6,
+    10,
+    128,
+    224
+   ]
+  },
+  {
+   "id": "fl_c7_guard_statue_s97",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_guard_statue",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "근위대장 석상 (보충)",
+   "prompt": "giant standing stone statue of a royal guard captain holding a greatsword point down, weathered grey stone, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal c",
+   "file": "ch7/props/fl_c7_guard_statue_s97.png",
+   "size": [
+    128,
+    224
+   ],
+   "bbox": [
+    20,
+    8,
+    110,
+    224
+   ]
+  },
+  {
+   "id": "fl_c7_hidden_altar_r2_s101",
+   "type": "prop",
+   "zone": "altar",
+   "slot": "c7_hidden_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "옥좌 뒤 제단 (다시) (보충)",
+   "prompt": "big cream marble altar block with gold trim and a long crimson red crack running across its top, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch7/props/fl_c7_hidden_altar_r2_s101.png",
+   "size": [
+    208,
+    160
+   ],
+   "bbox": [
+    18,
+    29,
+    190,
+    137
+   ]
+  },
+  {
+   "id": "fl_c7_hidden_altar_r2_s97",
+   "type": "prop",
+   "zone": "altar",
+   "slot": "c7_hidden_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "옥좌 뒤 제단 (다시) (보충)",
+   "prompt": "big cream marble altar block with gold trim and a long crimson red crack running across its top, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch7/props/fl_c7_hidden_altar_r2_s97.png",
+   "size": [
+    208,
+    160
+   ],
+   "bbox": [
+    17,
+    39,
+    191,
+    120
+   ]
+  },
+  {
+   "id": "fl_c7_lime_pillar_s101",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_lime_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "석회 흘러내린 기둥 (보충)",
+   "prompt": "tall cream marble column with white limestone drips running down, gold capital, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch7/props/fl_c7_lime_pillar_s101.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    16,
+    11,
+    65,
+    212
+   ]
+  },
+  {
+   "id": "fl_c7_lime_pillar_s97",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_lime_pillar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "석회 흘러내린 기둥 (보충)",
+   "prompt": "tall cream marble column with white limestone drips running down, gold capital, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal cas",
+   "file": "ch7/props/fl_c7_lime_pillar_s97.png",
+   "size": [
+    80,
+    224
+   ],
+   "bbox": [
+    13,
+    8,
+    68,
+    208
+   ]
+  },
+  {
+   "id": "fl_c7_throne_s101",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 옥좌 (보충)",
+   "prompt": "empty grand golden throne with crimson cushion on a marble dais, grey ash dust on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch7/props/fl_c7_throne_s101.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    10,
+    11,
+    167,
+    183
+   ]
+  },
+  {
+   "id": "fl_c7_throne_s97",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "황금 옥좌 (보충)",
+   "prompt": "empty grand golden throne with crimson cushion on a marble dais, grey ash dust on it, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a coloss",
+   "file": "ch7/props/fl_c7_throne_s97.png",
+   "size": [
+    176,
+    208
+   ],
+   "bbox": [
+    30,
+    10,
+    143,
+    197
+   ]
+  },
+  {
+   "id": "rd_c7_banner_s61_s61",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "왕가 깃발 (다시) ← c7_banner",
+   "prompt": "tall faded crimson royal banner with a gold crown crest on a gilded pole, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wa",
+   "file": "ch7/props/rd_c7_banner_s61_s61.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    15,
+    2,
+    76,
+    176
+   ]
+  },
+  {
+   "id": "rd_c7_banner_s67_s67",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_banner",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "왕가 깃발 (다시) ← c7_banner",
+   "prompt": "tall faded crimson royal banner with a gold crown crest on a gilded pole, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wa",
+   "file": "ch7/props/rd_c7_banner_s67_s67.png",
+   "size": [
+    96,
+    192
+   ],
+   "bbox": [
+    7,
+    7,
+    89,
+    177
+   ]
+  },
+  {
+   "id": "rd_c7_broken_throne_s61_s61",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "redo",
+   "item": "부서진 옥좌 (다시) ← c7_broken_throne",
+   "prompt": "golden throne split in half with the right armrest missing, the broken backrest top and gold pieces lying beside it on a cracked marble dais, large and close up, filling the frame, seen from slightly ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_broken_throne_s61_s61.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    40,
+    3,
+    156,
+    172
+   ]
+  },
+  {
+   "id": "rd_c7_broken_throne_s67_s67",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "redo",
+   "item": "부서진 옥좌 (다시) ← c7_broken_throne",
+   "prompt": "golden throne split in half with the right armrest missing, the broken backrest top and gold pieces lying beside it on a cracked marble dais, large and close up, filling the frame, seen from slightly ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_broken_throne_s67_s67.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    53,
+    12,
+    139,
+    143
+   ]
+  },
+  {
+   "id": "rd_c7_broken_throne_s71_s71",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "redo",
+   "item": "부서진 옥좌 (다시) ← c7_broken_throne",
+   "prompt": "golden throne split in half with the right armrest missing, the broken backrest top and gold pieces lying beside it on a cracked marble dais, large and close up, filling the frame, seen from slightly ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_broken_throne_s71_s71.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    2,
+    4,
+    191,
+    163
+   ]
+  },
+  {
+   "id": "rd_c7_broken_throne_s73_s73",
+   "type": "prop",
+   "zone": "throne",
+   "slot": "c7_broken_throne",
+   "verdict": "soso",
+   "review": "보통 안 부서짐",
+   "source": "redo",
+   "item": "부서진 옥좌 (다시) ← c7_broken_throne",
+   "prompt": "golden throne split in half with the right armrest missing, the broken backrest top and gold pieces lying beside it on a cracked marble dais, large and close up, filling the frame, seen from slightly ",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_broken_throne_s73_s73.png",
+   "size": [
+    192,
+    176
+   ],
+   "bbox": [
+    15,
+    7,
+    159,
+    176
+   ]
+  },
+  {
+   "id": "rd_c7_buried_fountain_s61_s61",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "redo",
+   "item": "모래에 묻힌 분수 (다시) ← c7_buried_fountain",
+   "prompt": "only the small top tier of a cream marble fountain sticking out of a wide mound of pale grey sand, the rest hidden under the sand, wide horizontal shape, large and close up, filling the frame, seen fr",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_buried_fountain_s61_s61.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    39,
+    36,
+    153,
+    129
+   ]
+  },
+  {
+   "id": "rd_c7_buried_fountain_s67_s67",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "redo",
+   "item": "모래에 묻힌 분수 (다시) ← c7_buried_fountain",
+   "prompt": "only the small top tier of a cream marble fountain sticking out of a wide mound of pale grey sand, the rest hidden under the sand, wide horizontal shape, large and close up, filling the frame, seen fr",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_buried_fountain_s67_s67.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    61,
+    69,
+    131,
+    121
+   ]
+  },
+  {
+   "id": "rd_c7_buried_fountain_s71_s71",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "redo",
+   "item": "모래에 묻힌 분수 (다시) ← c7_buried_fountain",
+   "prompt": "only the small top tier of a cream marble fountain sticking out of a wide mound of pale grey sand, the rest hidden under the sand, wide horizontal shape, large and close up, filling the frame, seen fr",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_buried_fountain_s71_s71.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    42,
+    34,
+    150,
+    132
+   ]
+  },
+  {
+   "id": "rd_c7_buried_fountain_s73_s73",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_buried_fountain",
+   "verdict": "soso",
+   "review": "보통 안 묻힘",
+   "source": "redo",
+   "item": "모래에 묻힌 분수 (다시) ← c7_buried_fountain",
+   "prompt": "only the small top tier of a cream marble fountain sticking out of a wide mound of pale grey sand, the rest hidden under the sand, wide horizontal shape, large and close up, filling the frame, seen fr",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_buried_fountain_s73_s73.png",
+   "size": [
+    192,
+    160
+   ],
+   "bbox": [
+    38,
+    35,
+    154,
+    125
+   ]
+  },
+  {
+   "id": "rd_c7_f_armor_stand_s61_s61",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_armor_stand",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "redo",
+   "item": "갑옷 거치대 (다시) ← c7_f_armor_stand",
+   "prompt": "full suit of polished gold plate armor with a plumed helmet standing on a short wooden pedestal, filling the frame, large and close up, filling the frame, seen from slightly above, dark fantasy ruined",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_f_armor_stand_s61_s61.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    34,
+    15,
+    79,
+    165
+   ]
+  },
+  {
+   "id": "rd_c7_f_armor_stand_s67_s67",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_armor_stand",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "redo",
+   "item": "갑옷 거치대 (다시) ← c7_f_armor_stand",
+   "prompt": "full suit of polished gold plate armor with a plumed helmet standing on a short wooden pedestal, filling the frame, large and close up, filling the frame, seen from slightly above, dark fantasy ruined",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_f_armor_stand_s67_s67.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    31,
+    3,
+    81,
+    169
+   ]
+  },
+  {
+   "id": "rd_c7_f_armor_stand_s71_s71",
+   "type": "prop",
+   "zone": "gallery",
+   "slot": "c7_f_armor_stand",
+   "verdict": "soso",
+   "review": "보통 작음",
+   "source": "redo",
+   "item": "갑옷 거치대 (다시) ← c7_f_armor_stand",
+   "prompt": "full suit of polished gold plate armor with a plumed helmet standing on a short wooden pedestal, filling the frame, large and close up, filling the frame, seen from slightly above, dark fantasy ruined",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/props/rd_c7_f_armor_stand_s71_s71.png",
+   "size": [
+    112,
+    176
+   ],
+   "bbox": [
+    30,
+    5,
+    82,
+    164
+   ]
+  },
+  {
+   "id": "rd_c7_f_hedge_s61_s61",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_hedge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "마른 정원수 (다시) ← c7_f_hedge",
+   "prompt": "one round trimmed garden bush with dry pale olive and tan leaves in a cream stone planter, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch7/props/rd_c7_f_hedge_s61_s61.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    33,
+    35,
+    91,
+    118
+   ]
+  },
+  {
+   "id": "rd_c7_f_hedge_s67_s67",
+   "type": "prop",
+   "zone": "sidegarden",
+   "slot": "c7_f_hedge",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "마른 정원수 (다시) ← c7_f_hedge",
+   "prompt": "one round trimmed garden bush with dry pale olive and tan leaves in a cream stone planter, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a c",
+   "file": "ch7/props/rd_c7_f_hedge_s67_s67.png",
+   "size": [
+    128,
+    128
+   ],
+   "bbox": [
+    18,
+    11,
+    87,
+    115
+   ]
+  },
+  {
+   "id": "rd_c7_f_rubble_s67_s67",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_f_rubble",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "무너진 흉벽 돌 (다시) ← c7_f_rubble",
+   "prompt": "pile of broken pale grey battlement stones with pale sand, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soot-staine",
+   "file": "ch7/props/rd_c7_f_rubble_s67_s67.png",
+   "size": [
+    160,
+    112
+   ],
+   "bbox": [
+    0,
+    8,
+    157,
+    104
+   ]
+  },
+  {
+   "id": "rd_c7_golden_gate_s61_s61",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_golden_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "황금 문 (다시) ← c7_golden_gate",
+   "prompt": "giant tall rectangular golden double door with a square top, royal crest keyhole in the middle, white limestone drips, large and close up, filling the frame, seen from slightly above, dark fantasy rui",
+   "file": "ch7/props/rd_c7_golden_gate_s61_s61.png",
+   "size": [
+    224,
+    176
+   ],
+   "bbox": [
+    65,
+    37,
+    159,
+    153
+   ]
+  },
+  {
+   "id": "rd_c7_golden_gate_s67_s67",
+   "type": "prop",
+   "zone": "forecourt",
+   "slot": "c7_golden_gate",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "황금 문 (다시) ← c7_golden_gate",
+   "prompt": "giant tall rectangular golden double door with a square top, royal crest keyhole in the middle, white limestone drips, large and close up, filling the frame, seen from slightly above, dark fantasy rui",
+   "file": "ch7/props/rd_c7_golden_gate_s67_s67.png",
+   "size": [
+    224,
+    176
+   ],
+   "bbox": [
+    62,
+    25,
+    162,
+    155
+   ]
+  },
+  {
+   "id": "rd_c7_guard_lift_s67_s67",
+   "type": "prop",
+   "zone": "rampart",
+   "slot": "c7_guard_lift",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "근위대 승강기 (다시) ← c7_guard_lift",
+   "prompt": "square cream stone lift platform with four gold corner posts and a brass lever on one side, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a ",
+   "file": "ch7/props/rd_c7_guard_lift_s67_s67.png",
+   "size": [
+    160,
+    160
+   ],
+   "bbox": [
+    25,
+    26,
+    135,
+    141
+   ]
+  },
+  {
+   "id": "rd_c7_hidden_altar_s61_s61",
+   "type": "prop",
+   "zone": "altar",
+   "slot": "c7_hidden_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "옥좌 뒤 제단 (다시) ← c7_hidden_altar",
+   "prompt": "big cream marble altar block with gold trim and a long crimson red crack running across its top, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch7/props/rd_c7_hidden_altar_s61_s61.png",
+   "size": [
+    208,
+    160
+   ],
+   "bbox": [
+    29,
+    37,
+    179,
+    126
+   ]
+  },
+  {
+   "id": "rd_c7_hidden_altar_s67_s67",
+   "type": "prop",
+   "zone": "altar",
+   "slot": "c7_hidden_altar",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "옥좌 뒤 제단 (다시) ← c7_hidden_altar",
+   "prompt": "big cream marble altar block with gold trim and a long crimson red crack running across its top, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ru",
+   "file": "ch7/props/rd_c7_hidden_altar_s67_s67.png",
+   "size": [
+    208,
+    160
+   ],
+   "bbox": [
+    31,
+    54,
+    177,
+    112
+   ]
+  },
+  {
+   "id": "rd_c7_sand_heap_s61_s61",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_sand_heap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "모래 더미 (다시) ← c7_sand_heap",
+   "prompt": "big smooth dune heap of pale grey ash sand, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch7/props/rd_c7_sand_heap_s61_s61.png",
+   "size": [
+    224,
+    128
+   ],
+   "bbox": [
+    41,
+    34,
+    186,
+    111
+   ]
+  },
+  {
+   "id": "rd_c7_sand_heap_s67_s67",
+   "type": "prop",
+   "zone": "sandfall",
+   "slot": "c7_sand_heap",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "모래 더미 (다시) ← c7_sand_heap",
+   "prompt": "big smooth dune heap of pale grey ash sand, wide horizontal shape, large and close up, filling the frame, seen from slightly above, dark fantasy ruined royal capital inside a colossal castle wall, soo",
+   "file": "ch7/props/rd_c7_sand_heap_s67_s67.png",
+   "size": [
+    224,
+    128
+   ],
+   "bbox": [
+    21,
+    24,
+    203,
+    103
+   ]
+  },
+  {
+   "id": "c7_room_altar",
+   "type": "room",
+   "zone": "altar",
+   "slot": "c7_room_altar",
+   "verdict": "soso",
+   "review": "보통 제단 안 보임",
+   "source": "orig",
+   "item": "옥좌 뒤 숨은 제단 (옥좌의 방과 같은 건물, style_room 연결)",
+   "prompt": "its small hidden altar room behind the throne: a stone altar with a crimson red crack in the middle, cream marble, faded gold, ash dust",
+   "flag": "soso_no_ok_for_slot",
+   "file": "ch7/rooms/c7_room_altar",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c7_room_forecourt",
+   "type": "room",
+   "zone": "forecourt",
+   "slot": "c7_room_forecourt",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "황금 문 전정 실내",
+   "prompt": "The inner forecourt hall of a royal palace: cream marble floor, columns with white limestone drips, faded gold trim, sand drifts, muted sepia and gold",
+   "file": "ch7/rooms/c7_room_forecourt",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c7_room_gallery",
+   "type": "room",
+   "zone": "gallery",
+   "slot": "c7_room_gallery",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대회랑 끝 (옥좌의 방과 같은 건물, style_room 연결)",
+   "prompt": "its long grand gallery end: tall columns, faded crimson carpet, a giant stone guard captain statue with a greatsword at the end, ash dust",
+   "file": "ch7/rooms/c7_room_gallery",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c7_room_throne",
+   "type": "room",
+   "zone": "throne",
+   "slot": "c7_room_throne",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "옥좌의 방",
+   "prompt": "A grand royal throne room frozen in time: pale cream marble walls with faded gold trim, white limestone drips, an empty golden throne on a dais at the north, a long faded crimson carpet, tall columns,",
+   "file": "ch7/rooms/c7_room_throne",
+   "size": [
+    256,
+    256
+   ]
+  },
+  {
+   "id": "c7_edge_rampart_s721",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_edge_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "무너진 성벽 가장자리 (절벽형)",
+   "prompt": [
+    "grey ash fog far below, pale grey, muted desaturated sepia and ash grey tones",
+    "worn grey stone rampart walkway, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_edge_rampart_s721",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c7_edge_rampart_s722",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_edge_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "무너진 성벽 가장자리 (절벽형)",
+   "prompt": [
+    "grey ash fog far below, pale grey, muted desaturated sepia and ash grey tones",
+    "worn grey stone rampart walkway, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_edge_rampart_s722",
+   "tile": 16,
+   "tiles": 25,
+   "wang": "corners",
+   "transition": true
+  },
+  {
+   "id": "c7_garden_s707",
+   "type": "tileset",
+   "zone": "sidegarden",
+   "slot": "c7_garden",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "왕실 정원 모래 ↔ 판석 길",
+   "prompt": [
+    "pale grey ash sand with dry dead grass, muted desaturated sepia and ash grey tones",
+    "old cream flagstone garden path with gold trim, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_garden_s707",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_garden_s708",
+   "type": "tileset",
+   "zone": "sidegarden",
+   "slot": "c7_garden",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "왕실 정원 모래 ↔ 판석 길",
+   "prompt": [
+    "pale grey ash sand with dry dead grass, muted desaturated sepia and ash grey tones",
+    "old cream flagstone garden path with gold trim, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_garden_s708",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_pro_gallery",
+   "type": "tileset",
+   "zone": "gallery",
+   "slot": "c7_pro_gallery",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "대회랑 대리석 ↔ 붉은 카펫 (pro)",
+   "prompt": [
+    "faded dusty crimson red carpet with gold border",
+    "pale cream marble gallery floor"
+   ],
+   "file": "ch7/tiles/c7_pro_gallery",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_pro_rampart",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_pro_rampart",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽길 돌길 ↔ 잿빛 모래 (pro)",
+   "prompt": [
+    "drifts of fine pale grey ash sand",
+    "worn grey stone rampart walkway blocks"
+   ],
+   "file": "ch7/tiles/c7_pro_rampart",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_rampart_sand_s701",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_rampart_sand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽길 돌길 ↔ 잿빛 모래",
+   "prompt": [
+    "worn grey stone rampart walkway blocks, muted desaturated sepia and ash grey tones",
+    "drifts of fine pale grey ash sand, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_rampart_sand_s701",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_rampart_sand_s702",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_rampart_sand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "성벽길 돌길 ↔ 잿빛 모래",
+   "prompt": [
+    "worn grey stone rampart walkway blocks, muted desaturated sepia and ash grey tones",
+    "drifts of fine pale grey ash sand, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_rampart_sand_s702",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_throne_floor_s711",
+   "type": "tileset",
+   "zone": "throne",
+   "slot": "c7_throne_floor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "옥좌의 방 금테 대리석 ↔ 잿가루",
+   "prompt": [
+    "pale cream marble floor with faded gold inlay, muted desaturated sepia and ash grey tones",
+    "pale grey ash dust layer, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_throne_floor_s711",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "c7_throne_floor_s712",
+   "type": "tileset",
+   "zone": "throne",
+   "slot": "c7_throne_floor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "orig",
+   "item": "옥좌의 방 금테 대리석 ↔ 잿가루",
+   "prompt": [
+    "pale cream marble floor with faded gold inlay, muted desaturated sepia and ash grey tones",
+    "pale grey ash dust layer, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/c7_throne_floor_s712",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c7_forecourt_s6853",
+   "type": "tileset",
+   "zone": "forecourt",
+   "slot": "c7_forecourt",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "전정 대리석 ↔ 흘러내린 석회 (보충)",
+   "prompt": [
+    "pale cream marble courtyard tiles with gold inlay lines, muted desaturated sepia and ash grey tones",
+    "thick white limestone drips and crust over marble, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/fl_c7_forecourt_s6853",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c7_garden_s7508",
+   "type": "tileset",
+   "zone": "sidegarden",
+   "slot": "c7_garden",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "왕실 정원 모래 ↔ 판석 길 (보충)",
+   "prompt": [
+    "pale grey ash sand with dry dead grass, muted desaturated sepia and ash grey tones",
+    "old cream flagstone garden path with gold trim, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/fl_c7_garden_s7508",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c7_rampart_sand_s6764",
+   "type": "tileset",
+   "zone": "rampart",
+   "slot": "c7_rampart_sand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "성벽길 돌길 ↔ 잿빛 모래 (보충)",
+   "prompt": [
+    "worn grey stone rampart walkway blocks, muted desaturated sepia and ash grey tones",
+    "drifts of fine pale grey ash sand, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/fl_c7_rampart_sand_s6764",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c7_stair_sand_s7071",
+   "type": "tileset",
+   "zone": "sandfall",
+   "slot": "c7_stair_sand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "대계단 돌계단 ↔ 쏟아진 모래 (보충)",
+   "prompt": [
+    "wide pale grey stone stair steps, muted desaturated sepia and ash grey tones",
+    "heavy piles of pale grey ash sand, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/fl_c7_stair_sand_s7071",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "fl_c7_throne_floor_s5353",
+   "type": "tileset",
+   "zone": "throne",
+   "slot": "c7_throne_floor",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "filler",
+   "item": "옥좌의 방 금테 대리석 ↔ 잿가루 (보충)",
+   "prompt": [
+    "pale cream marble floor with faded gold inlay, muted desaturated sepia and ash grey tones",
+    "pale grey ash dust layer, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/fl_c7_throne_floor_s5353",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c7_forecourt_s1753",
+   "type": "tileset",
+   "zone": "forecourt",
+   "slot": "c7_forecourt",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "전정 대리석 ↔ 석회 (다시) ← c7_forecourt",
+   "prompt": [
+    "pale cream marble courtyard tiles, muted desaturated sepia and ash grey tones",
+    "marble covered by white limestone crust with long drip streaks, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/rd_c7_forecourt_s1753",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c7_forecourt_s1754",
+   "type": "tileset",
+   "zone": "forecourt",
+   "slot": "c7_forecourt",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "전정 대리석 ↔ 석회 (다시) ← c7_forecourt",
+   "prompt": [
+    "pale cream marble courtyard tiles, muted desaturated sepia and ash grey tones",
+    "marble covered by white limestone crust with long drip streaks, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/rd_c7_forecourt_s1754",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c7_gallery_carpet_s1389",
+   "type": "tileset",
+   "zone": "gallery",
+   "slot": "c7_gallery_carpet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대리석 ↔ 바랜 카펫 (다시) ← c7_gallery_carpet",
+   "prompt": [
+    "pale cream marble gallery floor, muted desaturated sepia and ash grey tones",
+    "faded dusty dull rose red carpet with worn gold border, muted, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/rd_c7_gallery_carpet_s1389",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c7_gallery_carpet_s1390",
+   "type": "tileset",
+   "zone": "gallery",
+   "slot": "c7_gallery_carpet",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "대리석 ↔ 바랜 카펫 (다시) ← c7_gallery_carpet",
+   "prompt": [
+    "pale cream marble gallery floor, muted desaturated sepia and ash grey tones",
+    "faded dusty dull rose red carpet with worn gold border, muted, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/rd_c7_gallery_carpet_s1390",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  },
+  {
+   "id": "rd_c7_stair_sand_s2971",
+   "type": "tileset",
+   "zone": "sandfall",
+   "slot": "c7_stair_sand",
+   "verdict": "ok",
+   "review": "OK",
+   "source": "redo",
+   "item": "돌계단 ↔ 모래 (다시) ← c7_stair_sand",
+   "prompt": [
+    "wide pale grey stone stair steps, muted desaturated sepia and ash grey tones",
+    "smooth piles of pale grey ash sand, muted desaturated sepia and ash grey tones"
+   ],
+   "file": "ch7/tiles/rd_c7_stair_sand_s2971",
+   "tile": 32,
+   "tiles": 16,
+   "wang": "corners",
+   "transition": false
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "1": {
+  "decal": 1,
+  "prop": 56,
+  "room": 2,
+  "tileset": 18,
+  "soso": 8,
+  "total": 77
+ },
+ "2": {
+  "building": 9,
+  "decal": 4,
+  "kit": 4,
+  "prop": 72,
+  "room": 5,
+  "tileset": 31,
+  "soso": 19,
+  "total": 125
+ },
+ "3": {
+  "decal": 3,
+  "kit": 4,
+  "prop": 67,
+  "room": 3,
+  "tileset": 22,
+  "soso": 12,
+  "total": 99
+ },
+ "4": {
+  "building": 2,
+  "decal": 4,
+  "kit": 3,
+  "prop": 89,
+  "room": 4,
+  "tileset": 25,
+  "soso": 11,
+  "total": 127
+ },
+ "5": {
+  "decal": 4,
+  "kit": 3,
+  "prop": 69,
+  "room": 4,
+  "tileset": 27,
+  "soso": 6,
+  "total": 107
+ },
+ "6": {
+  "building": 3,
+  "decal": 5,
+  "kit": 4,
+  "prop": 57,
+  "room": 4,
+  "tileset": 31,
+  "soso": 14,
+  "total": 104
+ },
+ "7": {
+  "decal": 4,
+  "kit": 2,
+  "prop": 84,
+  "room": 4,
+  "tileset": 20,
+  "soso": 23,
+  "total": 114
+ },
+ "8": {
+  "decal": 3,
+  "kit": 1,
+  "prop": 48,
+  "tileset": 18,
+  "soso": 2,
+  "total": 70
+ }
+}
